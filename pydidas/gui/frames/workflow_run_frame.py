@@ -29,9 +29,8 @@ __all__ = ["WorkflowRunFrame"]
 
 
 import time
-from typing import Union
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...apps import ExecuteWorkflowApp
 from ...core import get_generic_param_collection
@@ -63,8 +62,8 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     params_not_to_restore = ["selected_results"]
     sig_processing_running = QtCore.Signal(bool)
 
-    def __init__(self, parent: Union[None, QtWidgets.QWidget] = None, **kwargs: dict):
-        BaseFrameWithApp.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrameWithApp.__init__(self, **kwargs)
         _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
@@ -166,7 +165,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self._runner.start()
 
     @staticmethod
-    def _check_tree_is_populated():
+    def _check_tree_is_populated() -> bool:
         """
         Check if the WorkflowTree is populated, i.e. not empty.
 

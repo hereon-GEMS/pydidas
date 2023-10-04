@@ -72,8 +72,8 @@ class DefineScanFrame(BaseFrame):
     menu_title = "Define\nScan"
     menu_entry = "Workflow processing/Define scan"
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -192,10 +192,9 @@ class DefineScanFrame(BaseFrame):
             self.param_widgets[param.refkey].set_value(param.value)
 
     @QtCore.Slot(int, int)
-    def move_dim(self, dim_index, direction):
+    def move_dim(self, dim_index: int, direction: int):
         """
-        Move the selected dimension up in the arrangement of scan dimensions in the
-        defined direction.
+        Move the selected dimension' position in the scan.
 
         Parameters
         ----------
@@ -226,7 +225,7 @@ class DefineScanFrame(BaseFrame):
             )
 
     @QtCore.Slot(str)
-    def set_new_base_directory(self, basedir):
+    def set_new_base_directory(self, basedir: str):
         """
         Set the new base directory for the scan.
 

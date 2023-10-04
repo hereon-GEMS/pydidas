@@ -32,7 +32,7 @@ import os
 import time
 from functools import partial
 from pathlib import Path
-from typing import Literal, Union
+from typing import Iterable, Literal, Union
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -67,8 +67,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
     menu_title = "Composite image creator"
     menu_entry = "Composite image creator"
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrameWithApp.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrameWithApp.__init__(self, **kwargs)
         SilxPlotWindowMixIn.__init__(self)
 
         self._app = CompositeCreatorApp()
@@ -190,7 +190,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__toggle_use_threshold(False)
         self.__toggle_use_det_mask(False)
 
-    def restore_state(self, state):
+    def restore_state(self, state: dict):
         """
         Restore the frame's state from stored information.
 
@@ -203,10 +203,10 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             A dictionary with 'params', 'app' and 'visibility' keys and the
             respective information for all.
         """
-        super().restore_state(state)
+        BaseFrameWithApp.restore_state(self, state)
         self._config["bg_configured"] = state["config"]["bg_configured"]
         self._config["input_configured"] = state["config"]["input_configured"]
-        super().frame_activated(self.frame_index)
+        BaseFrameWithApp.frame_activated(self, self.frame_index)
         if self.get_param_value("first_file") != Path():
             self._filelist.update()
             self._image_metadata.filename = self.get_param_value("first_file")
@@ -218,7 +218,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__toggle_roi_selection(self.get_param_value("use_roi"))
         self.__toggle_bg_file_selection(self.get_param_value("use_bg_file"))
 
-    def export_state(self):
+    def export_state(self) -> tuple[int, dict]:
         """
         Export the state of the Frame for saving.
 
@@ -232,14 +232,14 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             A dictionary with all the information required to export the
             frame's state.
         """
-        _index, _state = super().export_state()
+        _index, _state = BaseFrameWithApp.export_state(self)
         _state["config"] = {
             "bg_configured": self._config["bg_configured"],
             "input_configured": self._config["input_configured"],
         }
         return _index, _state
 
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Overload the generic frame_activated method.
 
@@ -248,7 +248,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         index : int
             The frame index.
         """
-        super().frame_activated(index)
+        BaseFrameWithApp.frame_activated(self, index)
         self._config["frame_active"] = index == self.frame_index
 
     def _run_app_serial(self):
@@ -353,7 +353,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self._app.export_image(fname, data_range=_data_range, overwrite=True)
 
     @QtCore.Slot(str)
-    def __selected_first_file(self, fname):
+    def __selected_first_file(self, fname: Union[Path, str]):
         """
         Perform required actions after selecting the first image file.
 
@@ -365,7 +365,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        fname : str
+        fname : Union[Path, str]
             The filename of the first image file.
         """
         self.__clear_entries(
@@ -406,7 +406,20 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__finalize_selection(_finalize_flag)
         self.__check_exec_enable()
 
-    def __check_file(self, fname):
+    def __check_file(self, fname: Union[Path, str]) -> bool:
+        """
+        Check whether the filename is valid for processing.
+
+        Parameters
+        ----------
+        fname : Union[Path, str]
+            The filename
+
+        Returns
+        -------
+        bool
+            The flag whether the file is valid.
+        """
         if self.get_param_value("live_processing") or os.path.isfile(fname):
             return True
         if fname not in ["", "."]:
@@ -434,7 +447,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.toggle_param_widget_visibility("last_file", True)
         self.toggle_param_widget_visibility("raw_image_shape", not hdf5_flag)
 
-    def __check_if_hdf5_file(self):
+    def __check_if_hdf5_file(self) -> bool:
         """
         Check if the first file is an hdf5 file.
 
@@ -446,13 +459,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         _ext = get_extension(self.get_param_value("first_file"))
         return _ext in HDF5_EXTENSIONS
 
-    def __popup_select_hdf5_key(self, fname):
+    def __popup_select_hdf5_key(self, fname: Union[Path, str]):
         """
         Create a popup window which asks the user to select a dataset.
 
         Parameters
         ----------
-        fname : str
+        fname : Union[Path, str]
             The filename to the hdf5 data file.
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
@@ -476,7 +489,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                 False,
             )
 
-    def __selected_bg_file(self, fname):
+    def __selected_bg_file(self, fname: Union[Path, str]):
         """
         Perform required actions after selecting background image file.
 
@@ -486,7 +499,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        fname : str
+        fname : Union[Path, str]
             The filename of the background image file.
         """
         self.__clear_entries(["bg_hdf5_key", "bg_hdf5_frame"])
@@ -545,13 +558,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._config["bg_configured"] = _flag
         self.__check_exec_enable()
 
-    def __reset_params(self, keys=None):
+    def __reset_params(self, keys: Union[Literal["all"], Iterable, None] = None):
         """
         Reset parameters to their default values.
 
         Parameters
         ----------
-        keys : Union['all', iterable], optional
+        keys : Union[Literal["all"], Iterable, None], optional
             An iterable of keys which reference the Parameters. If 'all',
             all Parameters in the ParameterCollection will be reset to their
             default values. The default is 'all'.
@@ -583,7 +596,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             _flag = _enable and self._config["input_configured"]
             self._widgets["but_exec"].setEnabled(_flag)
 
-    def __toggle_bg_file_selection(self, flag):
+    def __toggle_bg_file_selection(self, flag: bool):
         """
         Show or hide the detail for background image files.
 
@@ -611,7 +624,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._runner._wait_for_processes_to_finish(2)
         self._apprunner_finished()
 
-    def __toggle_roi_selection(self, flag):
+    def __toggle_roi_selection(self, flag: bool):
         """
         Show or hide the ROI selection.
 
@@ -626,7 +639,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         for _key in ["roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh"]:
             self.toggle_param_widget_visibility(_key, flag)
 
-    def __toggle_use_threshold(self, flag):
+    def __toggle_use_threshold(self, flag: bool):
         """
         Show or hide the threshold selection based on the flag selection.
 
@@ -641,7 +654,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         for _key in ["threshold_low", "threshold_high"]:
             self.toggle_param_widget_visibility(_key, flag)
 
-    def __toggle_use_det_mask(self, flag):
+    def __toggle_use_det_mask(self, flag: bool):
         """
         Show or hide the detector mask Parameters based on the flag selection.
 
@@ -656,13 +669,15 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         for _key in ["detector_mask_file", "detector_mask_val"]:
             self.toggle_param_widget_visibility(_key, flag)
 
-    def __clear_entries(self, keys="all", hide=True):
+    def __clear_entries(
+        self, keys: Union[Literal["all"], Iterable] = "all", hide: bool = True
+    ):
         """
         Clear the Parameter entries and reset to default for selected keys.
 
         Parameters
         ----------
-        keys : Union['all', list, tuple], optional
+        keys : Union[Literal["all"], Iterable], optional
             The keys for the Parameters to be reset. The default is 'all'.
         hide : bool, optional
             Flag for hiding the reset keys. The default is True.
@@ -684,8 +699,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     def __update_n_image(self):
         """
-        Update the number of images in the composite upon changing any
-        input parameter.
+        Update the number of images in the composite based on the input parameters.
         """
         if not self._config["input_configured"]:
             return
@@ -746,7 +760,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__update_composite_dim(self.get_param_value("composite_dir"))
         self.__check_exec_enable()
 
-    def __finalize_selection(self, flag):
+    def __finalize_selection(self, flag: bool):
         """
         Finalize input file selection.
 

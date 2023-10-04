@@ -78,8 +78,8 @@ class ImageMathFrame(BaseFrame):
     default_params = _DEFAULTS.copy()
     BUFFER_SIZE = 3
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent=parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self._image_buffer = {_key: None for _key in range(1, self.BUFFER_SIZE + 1)}
         self._input_image_buffer = {

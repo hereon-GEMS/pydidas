@@ -29,7 +29,6 @@ __all__ = ["UtilitiesFrame"]
 
 
 from functools import partial
-from typing import Union
 
 from qtpy import QtCore, QtWidgets
 
@@ -54,8 +53,8 @@ class UtilitiesFrame(BaseFrame):
     menu_title = "Utilities"
     menu_entry = "Utilities"
 
-    def __init__(self, parent: Union[None, QtWidgets.QWidget] = None, **kwargs: dict):
-        BaseFrame.__init__(self, parent=parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self._child_windows = {}
         self.__window_counter = 0
         self._add_config_windows()
@@ -108,7 +107,7 @@ class UtilitiesFrame(BaseFrame):
         )
 
     @QtCore.Slot(object)
-    def create_and_show_temp_window(self, window):
+    def create_and_show_temp_window(self, window: QtWidgets.QWidget):
         """
         Show the given temporary window.
 
@@ -127,7 +126,7 @@ class UtilitiesFrame(BaseFrame):
         self._child_windows[_name].show()
 
     @QtCore.Slot(object)
-    def create_and_show_frame(self, frame):
+    def create_and_show_frame(self, frame: BaseFrame):
         """
         Show the given frame.
 
@@ -146,7 +145,7 @@ class UtilitiesFrame(BaseFrame):
         _frame.show()
 
     @QtCore.Slot(str)
-    def show_window(self, name):
+    def show_window(self, name: str):
         """
         Show a separate window.
 
@@ -161,7 +160,7 @@ class UtilitiesFrame(BaseFrame):
         self._child_windows[name].raise_()
 
     @QtCore.Slot(str)
-    def remove_window_from_children(self, name):
+    def remove_window_from_children(self, name: str):
         """
         Remove the specified window from the list of child window.
 
@@ -171,4 +170,5 @@ class UtilitiesFrame(BaseFrame):
             The name key for the window.
         """
         if name in self._child_windows:
+            self._child_windows[name].deleteLater()
             del self._child_windows[name]

@@ -95,8 +95,8 @@ class HomeFrame(BaseFrame):
     menu_title = "Home"
     menu_entry = "Home"
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
 
     def build_frame(self):
         """Build the frame and add all widgets."""

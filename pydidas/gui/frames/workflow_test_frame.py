@@ -34,6 +34,7 @@ from qtpy import QtCore
 
 from ...contexts import ScanContext
 from ...core import (
+    Dataset,
     Parameter,
     ParameterCollection,
     UserConfigError,
@@ -46,7 +47,7 @@ from ...widgets.windows import (
     ShowDetailedPluginResultsWindow,
     TweakPluginParameterWindow,
 )
-from ...workflow import WorkflowTree
+from ...workflow import WorkflowNode, WorkflowTree
 from .builders import WorkflowTestFrameBuilder
 
 
@@ -72,7 +73,9 @@ IMAGE_SELECTION_PARAM = Parameter(
 )
 
 
-def _create_str_description_of_node_result(node, plugin_results):
+def _create_str_description_of_node_result(
+    node: WorkflowNode, plugin_results: Dataset
+) -> str:
     """
     Create a string description of the node results with all axes and data units
     and metadata for the node.
@@ -161,8 +164,8 @@ class WorkflowTestFrame(BaseFrame):
     )
     params_not_to_restore = ["selected_results"]
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self.__source_hash = -1
         self._tree = None
@@ -228,7 +231,7 @@ class WorkflowTestFrame(BaseFrame):
         self._config["details_active"] = False
 
     @QtCore.Slot(int)
-    def __updated_plugin_params(self, node_id):
+    def __updated_plugin_params(self, node_id: int):
         """
         Run the subtree with the new Parameters.
 
@@ -307,7 +310,7 @@ class WorkflowTestFrame(BaseFrame):
         self.__update_selection_choices()
 
     @staticmethod
-    def _check_tree_is_populated():
+    def _check_tree_is_populated() -> bool:
         """
         Check if the WorkflowTree is populated, i.e. not empty.
 
@@ -324,7 +327,7 @@ class WorkflowTestFrame(BaseFrame):
             return False
         return True
 
-    def __get_index(self):
+    def __get_index(self) -> int:
         """
         Get the frame index.
 
@@ -442,10 +445,9 @@ class WorkflowTestFrame(BaseFrame):
             self.param_widgets["selected_results"].setCurrentText(param.value)
 
     @QtCore.Slot(int)
-    def __selected_new_node(self, index):
+    def __selected_new_node(self, index: int):
         """
-        Received signal that the selection in the results Parameter has
-        changed.
+        Handle the selection of a new node.
 
         Parameters
         ----------
@@ -469,7 +471,7 @@ class WorkflowTestFrame(BaseFrame):
         self.__update_text_description_of_node_results()
         self.__plot_results()
 
-    def __set_derived_widget_visibility(self, visible):
+    def __set_derived_widget_visibility(self, visible: bool):
         """
         Change the visibility of all 'derived' widgets.
 
@@ -517,7 +519,7 @@ class WorkflowTestFrame(BaseFrame):
             self.show_plugin_details(set_focus=False)
 
     @QtCore.Slot()
-    def show_plugin_details(self, set_focus=True):
+    def show_plugin_details(self, set_focus: bool = True):
         """
         Show details for the selected plugin.
 
@@ -558,7 +560,7 @@ class WorkflowTestFrame(BaseFrame):
         self.__tweak_window.activateWindow()
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 

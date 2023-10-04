@@ -50,8 +50,8 @@ class DataBrowsingFrame(BaseFrame):
     menu_title = "Data browsing"
     menu_entry = "Data browsing"
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.__qtapp = QtWidgets.QApplication.instance()
         self.__supported_extensions = set(IoMaster.registry_import.keys())
 
@@ -81,7 +81,7 @@ class DataBrowsingFrame(BaseFrame):
         DataBrowsingFrameBuilder.build_frame(self)
 
     @QtCore.Slot(bool)
-    def change_splitter_pos(self, enlarge_dir=True):
+    def change_splitter_pos(self, enlarge_dir: bool = True):
         """
         Change the position of the window splitter to one of two predefined
         positions.

@@ -60,6 +60,8 @@ EXP = DiffractionExperimentContext()
 class _List(PydidasWidgetMixin, QtWidgets.QListWidget):
     """
     A list with automatic width scaling.
+
+    The scaling is handled automatically based on the font settings.
     """
 
     def __init__(self, **kwargs: dict):
@@ -67,7 +69,7 @@ class _List(PydidasWidgetMixin, QtWidgets.QListWidget):
         PydidasWidgetMixin.__init__(self, **kwargs)
 
 
-def _create_calib_tasks():
+def _create_calib_tasks() -> list[QtWidgets.QWidget]:
     """
     Create the tasks for the calibration.
 
@@ -130,8 +132,8 @@ class PyfaiCalibFrame(BaseFrame):
     A pyFAI Calibration frame similar to the "pyfai-calib2", adapted to be
     used within pydidas.
 
-    Note: Because this code is taking almost 100 % from pyFAI, the names,
-    nomenclature and code structure is different from the rest of pydidas.
+    Note: Because this code is adapted from pyFAI, the names, nomenclature and
+    code structure is different from the rest of pydidas.
 
     Acknowledgements go to the creators of pyFAI for making it freely
     available.
@@ -143,10 +145,8 @@ class PyfaiCalibFrame(BaseFrame):
     menu_title = "pyFAI calibration"
     menu_entry = "pyFAI calibration"
 
-    def __init__(
-        self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs: dict
-    ) -> Self:
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict) -> Self:
+        BaseFrame.__init__(self, **kwargs)
         self._setup_pyfai_context()
         self._tasks = _create_calib_tasks()
         self.__export_dialog = PydidasFileDialog(

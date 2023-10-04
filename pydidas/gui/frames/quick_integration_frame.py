@@ -29,6 +29,8 @@ __all__ = ["QuickIntegrationFrame"]
 
 
 from functools import partial
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore
@@ -83,8 +85,8 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_mask_file",
     ]
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self._EXP = DiffractionExperiment(detector_pxsizex=100, detector_pxsizey=100)
         self.add_params(self._EXP.params)
         self.set_default_params()
@@ -181,14 +183,15 @@ class QuickIntegrationFrame(BaseFrame):
             self.param_widgets[_param_key].io_edited.connect(self._update_beamcenter)
 
     @QtCore.Slot(str, object)
-    def open_image(self, filename, kwargs):
+    def open_image(self, filename: Union[str, Path], kwargs: dict):
         """
         Open an image with the given filename and display it in the plot.
 
         Parameters
         ----------
         filename : Union[str, Path]
-            The filename and path.
+            The filename and path. The QSignal only takes strings but if the method
+            is called directly, Paths are also an acceptable input.
         kwargs : dict
             Additional parameters to open a specific frame in a file.
         """
@@ -204,7 +207,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._bc_controller.manual_beamcenter_update(None)
 
     @QtCore.Slot(bool)
-    def _toggle_fname_valid(self, is_valid):
+    def _toggle_fname_valid(self, is_valid: bool):
         """
         Modify widgets visibility and activation based on the file selection.
 

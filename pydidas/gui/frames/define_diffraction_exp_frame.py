@@ -29,8 +29,11 @@ __all__ = ["DefineDiffractionExpFrame"]
 
 
 from functools import partial
+from pathlib import Path
+from typing import Union
 
 import numpy as np
+from pyFAI.detectors import Detector
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 from qtpy import QtCore, QtWidgets
@@ -68,8 +71,8 @@ class DefineDiffractionExpFrame(BaseFrame):
     menu_title = "Define Diffraction setup"
     menu_entry = "Workflow processing/Define diffraction setup"
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.params = EXP.params
         self._bc_params = get_generic_param_collection("beamcenter_x", "beamcenter_y")
         self.__import_dialog = PydidasFileDialog(
@@ -119,7 +122,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             _w.io_edited.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
-    def set_param_value_and_widget(self, key, value):
+    def set_param_value_and_widget(self, key: str, value: object):
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
@@ -183,7 +186,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         self.copy_energy_from_pyFAI(show_warning=False)
         self.copy_geometry_from_pyFAI()
 
-    def copy_detector_from_pyFAI(self, show_warning=True):
+    def copy_detector_from_pyFAI(self, show_warning: bool = True):
         """
         Copy the detector from the pyFAI CalibrationContext instance.
 
@@ -199,7 +202,12 @@ class DefineDiffractionExpFrame(BaseFrame):
         _maskfile = model.experimentSettingsModel().mask().filename()
         self.update_detector_params(_det, maskfile=_maskfile, show_warning=show_warning)
 
-    def update_detector_params(self, det, maskfile=None, show_warning=True):
+    def update_detector_params(
+        self,
+        det: Detector,
+        maskfile: Union[None, str, Path] = None,
+        show_warning: bool = True,
+    ):
         """
         Update the pydidas detector Parameters based on the selected pyFAI detector.
 
@@ -207,7 +215,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         ----------
         det : pyFAI.detectors.Detector
             The detector instance.
-        maskfile : Union [None, str], optional
+        maskfile : Union [None, str, Path], optional
             The path of the mask file, if it has been defined in the pyFAI calibration.
             The default is None.
         show_warning : bool, optional
@@ -230,7 +238,7 @@ class DefineDiffractionExpFrame(BaseFrame):
                 "No detector selected in pyFAI. Cannot copy information.",
             )
 
-    def copy_geometry_from_pyFAI(self, show_warning=True):
+    def copy_geometry_from_pyFAI(self, show_warning: bool = True):
         """
         Copy the geometry from the pyFAI CalibrationContext instance.
 
@@ -255,7 +263,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _GEO_INVALID)
 
-    def copy_energy_from_pyFAI(self, show_warning=True):
+    def copy_energy_from_pyFAI(self, show_warning: bool = True):
         """
         Copy the pyFAI energy and store it in the DiffractionExperimentContext.
 
@@ -291,7 +299,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         self.setEnabled(False)
 
     @QtCore.Slot(float, float)
-    def _beamcenter_selected(self, center_x, center_y):
+    def _beamcenter_selected(self, center_x: float, center_y: float):
         """
         Set the selected beamcenter in the DiffractionExperiment
 

@@ -29,10 +29,10 @@ __all__ = ["DirectorySpyFrame"]
 
 
 import time
-from typing import Self, Union
+from typing import Self
 
 from qtpy import QtCore
-from qtpy.QtWidgets import QApplication, QWidget
+from qtpy.QtWidgets import QApplication
 
 from ...apps import DirectorySpyApp
 from ...contexts import ScanContext
@@ -62,8 +62,8 @@ class DirectorySpyFrame(BaseFrameWithApp):
     menu_entry = "Directory spy"
     default_params = ParameterCollection()
 
-    def __init__(self, parent: Union[QWidget, None] = None, **kwargs: dict) -> Self:
-        BaseFrameWithApp.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict) -> Self:
+        BaseFrameWithApp.__init__(self, **kwargs)
         _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )

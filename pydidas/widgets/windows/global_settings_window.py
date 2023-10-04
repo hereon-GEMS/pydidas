@@ -54,8 +54,8 @@ class _GlobalSettingsWindow(PydidasWindow):
 
     default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas system settings")
 

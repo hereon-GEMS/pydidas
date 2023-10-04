@@ -65,8 +65,8 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         ),
     )
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Export Eiger pixelmask", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Export Eiger pixelmask", **kwargs)
 
     def build_frame(self):
         """

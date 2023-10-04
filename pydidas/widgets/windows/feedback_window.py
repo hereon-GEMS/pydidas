@@ -61,8 +61,8 @@ class FeedbackWindow(PydidasWindow):
         Parameter("email", str, "", name="E-mail address (optional)")
     )
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="pydidas feedback", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="pydidas feedback", **kwargs)
 
     def build_frame(self):
         """

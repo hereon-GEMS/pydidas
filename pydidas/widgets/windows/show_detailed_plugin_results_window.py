@@ -45,8 +45,8 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
     sig_new_selection = QtCore.Signal(str)
     sig_minimized = QtCore.Signal()
 
-    def __init__(self, parent=None, results=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
+    def __init__(self, results=None, **kwargs):
+        PydidasWindow.__init__(self, title="Detailed plugin results", **kwargs)
         self._config["n_plots"] = 0
         self._results = results
         if results is not None:

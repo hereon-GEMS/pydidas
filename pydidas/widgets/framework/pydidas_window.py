@@ -103,8 +103,8 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
     show_frame = False
     sig_closed = QtCore.Signal()
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         PydidasWindowMixIn.__init__(self)
         self.set_default_params()
         if kwargs.get("activate_frame", True):

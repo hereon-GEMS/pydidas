@@ -55,15 +55,15 @@ class TweakPluginParameterWindow(PydidasWindow):
     sig_new_params = QtCore.Signal(int)
     sig_this_frame_activated = QtCore.Signal()
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Tweak plugin parameters", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Tweak plugin parameters", **kwargs)
         self.__plugin = None
         self.__qtapp = QtWidgets.QApplication.instance()
         self._config = self._config | {
             "initial_results": None,
             "detailed_results": None,
             "current_results": None,
-            "parent": parent,
+            "parent": kwargs.get("parent", None),
             "accept_changes": False,
         }
 

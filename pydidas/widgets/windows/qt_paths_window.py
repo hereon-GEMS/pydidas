@@ -51,7 +51,7 @@ class QtPathsWindow(PydidasWindow):
 
     show_frame = False
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, **kwargs: dict):
         self._log_path = os.path.join(
             QtCore.QStandardPaths.standardLocations(
                 QtCore.QStandardPaths.DocumentsLocation
@@ -62,7 +62,7 @@ class QtPathsWindow(PydidasWindow):
         self._config_path = QtCore.QStandardPaths.standardLocations(
             QtCore.QStandardPaths.ConfigLocation
         )[0]
-        PydidasWindow.__init__(self, parent, title="pydidas paths", **kwargs)
+        PydidasWindow.__init__(self, title="pydidas paths", **kwargs)
 
     def build_frame(self):
         """Build the frame and create all widgets."""

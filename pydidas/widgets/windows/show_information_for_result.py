@@ -49,8 +49,8 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
     sig_closed = QtCore.Signal()
     sig_this_frame_activated = QtCore.Signal()
 
-    def __init__(self, parent=None):
-        PydidasWindow.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
 
         self.setWindowTitle("Information for data point")

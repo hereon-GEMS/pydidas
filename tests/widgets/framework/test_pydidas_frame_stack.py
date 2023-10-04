@@ -41,8 +41,8 @@ class TestWidget(BaseFrame):
     menu_entry = "Test/Entry"
     menu_title = "Test"
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        BaseFrame.__init__(self, **kwargs)
         self.hash = hash(self)
         self.menu_entry = "".join(
             random.choice(string.ascii_letters) for i in range(20)

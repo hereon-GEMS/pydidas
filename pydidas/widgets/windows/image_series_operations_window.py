@@ -70,8 +70,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
     )
     default_params.add_param(_operation)
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Average images", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Average images", **kwargs)
         self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
         self.setWindowTitle("Image series operations")
         self._config["num_frames_per_file"] = 1

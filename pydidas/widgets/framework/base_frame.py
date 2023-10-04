@@ -50,8 +50,6 @@ class BaseFrame(
 
     Parameters
     ----------
-    parent : Union[QWidget, None], optional
-        The parent widget. The default is None.
     **kwargs : dict
         Any additional keyword arguments which might be used by
         subclasses.
@@ -72,8 +70,8 @@ class BaseFrame(
     sig_this_frame_activated = QtCore.Signal()
     default_params = ParameterCollection()
 
-    def __init__(self, parent=None, **kwargs):
-        QtWidgets.QWidget.__init__(self)
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
         self.setWindowIcon(icons.pydidas_icon_with_bg())
         self.setVisible(False)
         self.setUpdatesEnabled(False)

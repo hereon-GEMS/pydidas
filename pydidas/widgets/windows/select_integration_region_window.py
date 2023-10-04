@@ -56,9 +56,9 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     sig_roi_changed = QtCore.Signal()
     sig_about_to_close = QtCore.Signal()
 
-    def __init__(self, plugin, parent=None, **kwargs):
+    def __init__(self, plugin, **kwargs):
         PydidasWindow.__init__(
-            self, parent, title="Select integration region", activate_frame=False
+            self, title="Select integration region", activate_frame=False
         )
         apply_qt_properties(self.layout(), contentsMargins=(10, 10, 10, 10))
 

@@ -93,8 +93,8 @@ class ScanDimensionInformationWindow(PydidasWindow):
     show_frame = False
     width_factor = 88
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Scan dimension help", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Scan dimension help", **kwargs)
         self.setMinimumHeight(600)
         self._qtapp = QtWidgets.QApplication.instance()
         self.process_new_font_metrics(*self._qtapp.font_metrics)

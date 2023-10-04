@@ -65,8 +65,8 @@ class AboutWindow(PydidasWindow):
 
     show_frame = False
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="About pydidas", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="About pydidas", **kwargs)
 
     def build_frame(self):
         """

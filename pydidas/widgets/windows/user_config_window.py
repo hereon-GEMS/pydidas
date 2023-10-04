@@ -73,9 +73,9 @@ class _UserConfigWindow(PydidasWindow):
 
     default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, **kwargs: dict):
         self.__qtapp = QtWidgets.QApplication.instance()
-        PydidasWindow.__init__(self, parent, **kwargs)
+        PydidasWindow.__init__(self, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas user configuration")
         self.setSizePolicy(*POLICY_MIN_MIN)

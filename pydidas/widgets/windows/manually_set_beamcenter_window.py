@@ -62,10 +62,9 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
     sig_selected_beamcenter = QtCore.Signal(float, float)
     sig_about_to_close = QtCore.Signal()
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, **kwargs: dict):
         PydidasWindow.__init__(
             self,
-            parent,
             activate_frame=False,
             title="Define beamcenter through selected points",
             **kwargs,

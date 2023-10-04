@@ -52,8 +52,8 @@ class MaskEditorWindow(PydidasWindow):
         "hdf5_frame",
     )
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Average images", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Average images", **kwargs)
         self.setWindowTitle("Mask editor")
 
     def build_frame(self):

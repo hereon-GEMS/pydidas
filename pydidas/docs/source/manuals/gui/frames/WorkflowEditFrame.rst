@@ -41,7 +41,7 @@ Plugin browser
 
 The Plugin collection presenter consists of two parts. On the left, it will show
 all Plugins which have been registered with the :py:class:`PluginCollection
-<pydidas.plugins.plugin_collection._PluginCollection>` (for more information 
+<pydidas.plugins.plugin_collection.PluginRegistry>` (for more information 
 about how paths are managed, please refer to :ref:`global_plugincollection`).
 On the right, it shows detailed information about the selected plugin:
 

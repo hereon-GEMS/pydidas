@@ -38,7 +38,7 @@ from pathlib import Path
 from pydidas.core import PydidasQsettings, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import BasePlugin, InputPlugin, OutputPlugin, ProcPlugin
-from pydidas.plugins.plugin_collection import _PluginCollection
+from pydidas.plugins.plugin_collection import PluginRegistry
 from pydidas.plugins.plugin_collection_util_funcs import get_generic_plugin_path
 from pydidas.unittest_objects import DummyPluginCollection, create_plugin_class
 
@@ -132,12 +132,12 @@ class TestPluginCollection(unittest.TestCase):
 
     def test_init__empty(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path="")
-        self.assertIsInstance(PC, _PluginCollection)
+        self.assertIsInstance(PC, PluginRegistry)
         self.assertEqual(len(PC.get_all_plugins()), 0)
 
     def test_init__empty_path(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self.assertIsInstance(PC, _PluginCollection)
+        self.assertIsInstance(PC, PluginRegistry)
         self.assertEqual(len(PC.get_all_plugins()), 0)
 
     def test_clear_collection__no_confirmation(self):
@@ -154,8 +154,8 @@ class TestPluginCollection(unittest.TestCase):
         )
         PC.clear_collection(True)
         self.assertEqual(PC.plugins, {})
-        self.assertEqual(PC._PluginCollection__plugin_types, {})
-        self.assertEqual(PC._PluginCollection__plugin_names, {})
+        self.assertEqual(PC._PluginRegistry__plugin_types, {})
+        self.assertEqual(PC._PluginRegistry__plugin_names, {})
 
     def test_registered_paths(self):
         PC = DummyPluginCollection(
@@ -233,7 +233,7 @@ class TestPluginCollection(unittest.TestCase):
         PC = DummyPluginCollection(
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
-        _name = list(PC._PluginCollection__plugin_names.keys())[0]
+        _name = list(PC._PluginRegistry__plugin_names.keys())[0]
         _plugin = PC.get_plugin_by_plugin_name(_name)
         self.assertTrue(issubclass(_plugin, BasePlugin))
 
@@ -250,7 +250,7 @@ class TestPluginCollection(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
-        PC._PluginCollection__remove_plugin_from_collection(_new_cls)
+        PC._PluginRegistry__remove_plugin_from_collection(_new_cls)
         self.assertEqual(len(PC.plugins), self.n_plugin)
 
     def test_remove_plugin_from_collection__existing_item(self):
@@ -258,7 +258,7 @@ class TestPluginCollection(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _name = PC.get_all_plugin_names()[0]
-        PC._PluginCollection__remove_plugin_from_collection(PC.plugins[_name])
+        PC._PluginRegistry__remove_plugin_from_collection(PC.plugins[_name])
         self.assertFalse(_name in PC.plugins)
 
     def test_add_new_class(self):
@@ -266,7 +266,7 @@ class TestPluginCollection(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
-        PC._PluginCollection__add_new_class(_new_cls)
+        PC._PluginRegistry__add_new_class(_new_cls)
         self.assertTrue(_new_cls.__name__ in PC.plugins)
         self.assertEqual(PC.plugins[_new_cls.__name__], _new_cls)
 
@@ -277,9 +277,9 @@ class TestPluginCollection(unittest.TestCase):
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
         _new_cls2 = create_plugin_class(0, number=self.n_plugin + 1)
         _new_cls2.plugin_name = _new_cls.plugin_name
-        PC._PluginCollection__add_new_class(_new_cls)
+        PC._PluginRegistry__add_new_class(_new_cls)
         with self.assertRaises(KeyError):
-            PC._PluginCollection__add_new_class(_new_cls2)
+            PC._PluginRegistry__add_new_class(_new_cls2)
 
     def test_check_and_register_class__new_class(self):
         self.n_plugin = 2
@@ -287,7 +287,7 @@ class TestPluginCollection(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
-        PC._PluginCollection__check_and_register_class(_new_cls)
+        PC._PluginRegistry__check_and_register_class(_new_cls)
         self.assertEqual(PC.plugins[_new_cls.__name__], _new_cls)
 
     def test_check_and_register_class__wrong_class(self):
@@ -296,7 +296,7 @@ class TestPluginCollection(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _name = get_random_string(12)
-        PC._PluginCollection__check_and_register_class(float)
+        PC._PluginRegistry__check_and_register_class(float)
         self.assertEqual(len(PC.get_all_plugins()), self.n_plugin)
         self.assertFalse(_name in PC.get_all_plugin_names())
 
@@ -308,8 +308,8 @@ class TestPluginCollection(unittest.TestCase):
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
         _new_cls2 = create_plugin_class(0, number=self.n_plugin + 2)
         _new_cls2.__name__ = _new_cls.__name__
-        PC._PluginCollection__check_and_register_class(_new_cls)
-        PC._PluginCollection__check_and_register_class(_new_cls2)
+        PC._PluginRegistry__check_and_register_class(_new_cls)
+        PC._PluginRegistry__check_and_register_class(_new_cls2)
         self.assertEqual(PC.plugins[_new_cls.__name__], _new_cls)
 
     def test_check_and_register_class__new_class_with_same_name_reload(self):
@@ -321,8 +321,8 @@ class TestPluginCollection(unittest.TestCase):
         _new_cls2 = create_plugin_class(0, number=self.n_plugin + 2)
         _new_cls2.__name__ = _new_cls.__name__
         _new_cls2.plugin_name = _new_cls.plugin_name
-        PC._PluginCollection__check_and_register_class(_new_cls)
-        PC._PluginCollection__check_and_register_class(_new_cls2, reload=True)
+        PC._PluginRegistry__check_and_register_class(_new_cls)
+        PC._PluginRegistry__check_and_register_class(_new_cls2, reload=True)
         self.assertEqual(PC.plugins[_new_cls2.__name__], _new_cls2)
 
     def test_import_module_and_get_classes_in_module(self):
@@ -331,9 +331,7 @@ class TestPluginCollection(unittest.TestCase):
         PC = DummyPluginCollection(
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
-        _members = PC._PluginCollection__get_classes_in_module(
-            "some other name", _fname
-        )
+        _members = PC._PluginRegistry__get_classes_in_module("some other name", _fname)
         _classes = [_cls for _name, _cls in _members]
         for _cls in [InputPlugin, ProcPlugin, OutputPlugin]:
             self.assertIn(_cls, _classes)
@@ -376,7 +374,7 @@ class TestPluginCollection(unittest.TestCase):
         _qplugin_path = self._qsettings.value("user/plugin_path")
         self.assertEqual(_qplugin_path, ";;".join(str(p) for p in _paths))
         for _path in self._otherpaths:
-            self.assertIn(_path, PC._PluginCollection__plugin_paths)
+            self.assertIn(_path, PC._PluginRegistry__plugin_paths)
 
     def test_find_and_register_plugins_in_path__path_does_not_exist(self):
         _path = self._pluginpath.joinpath(get_random_string(8))
@@ -466,33 +464,33 @@ class TestPluginCollection(unittest.TestCase):
     def test_get_generic_plugin_path__no_q_path(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         self._qsettings.set_value("user/plugin_path", None)
-        _path = PC._PluginCollection__get_generic_plugin_paths()
+        _path = PC._PluginRegistry__get_generic_plugin_paths()
         self.assertEqual(_path, get_generic_plugin_path())
 
     def test_get_generic_plugin_path__empty_q_path(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         self._qsettings.set_value("user/plugin_path", "")
-        _path = PC._PluginCollection__get_generic_plugin_paths()
+        _path = PC._PluginRegistry__get_generic_plugin_paths()
         self.assertEqual(_path, get_generic_plugin_path())
 
     def test_get_generic_plugin_path__q_path(self):
         _path = Path("some/path/to/nowhere")
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         self._qsettings.set_value("user/plugin_path", _path)
-        _newpath = PC._PluginCollection__get_generic_plugin_paths()
+        _newpath = PC._PluginRegistry__get_generic_plugin_paths()
         self.assertEqual([_path], _newpath)
 
     def test_get_plugin_path_from_kwargs__no_plugin_path(self):
         PC = DummyPluginCollection(n_plugins=0)
         kwargs = dict(some_entry=12, something=False)
-        _path = PC._PluginCollection__get_plugin_path_from_kwargs(**kwargs)
+        _path = PC._PluginRegistry__get_plugin_path_from_kwargs(**kwargs)
         self.assertIsNone(_path)
 
     def test_get_plugin_path_from_kwargs__single_str(self):
         _entry = Path("  some string ")
         PC = DummyPluginCollection(n_plugins=0)
         kwargs = dict(some_entry=12, something=False, plugin_path=_entry)
-        _path = PC._PluginCollection__get_plugin_path_from_kwargs(**kwargs)
+        _path = PC._PluginRegistry__get_plugin_path_from_kwargs(**kwargs)
         self.assertEqual(_path, [_entry])
 
     def test_get_plugin_path_from_kwargs__multi_str(self):
@@ -515,7 +513,7 @@ class TestPluginCollection(unittest.TestCase):
         )
         PC = DummyPluginCollection(n_plugins=0)
         kwargs = dict(some_entry=12, something=False, plugin_path=_entry)
-        _path = PC._PluginCollection__get_plugin_path_from_kwargs(**kwargs)
+        _path = PC._PluginRegistry__get_plugin_path_from_kwargs(**kwargs)
         self.assertEqual(_path, _entries)
 
     def test_get_plugin_path_from_kwargs__list(self):
@@ -527,7 +525,7 @@ class TestPluginCollection(unittest.TestCase):
         ]
         PC = DummyPluginCollection(n_plugins=0)
         kwargs = dict(some_entry=12, something=False, plugin_path=_entries)
-        _path = PC._PluginCollection__get_plugin_path_from_kwargs(**kwargs)
+        _path = PC._PluginRegistry__get_plugin_path_from_kwargs(**kwargs)
         self.assertEqual(_path, _entries)
 
     def test_unregister_plugin_path(self):

@@ -26,7 +26,7 @@ __status__ = "Production"
 
 import unittest
 
-from pydidas.plugins.plugin_collection import _PluginCollection
+from pydidas.plugins.plugin_collection import PluginRegistry
 from pydidas.unittest_objects import DummyPluginCollection
 
 
@@ -39,13 +39,13 @@ class TestDummyPluginCollection(unittest.TestCase):
 
     def test_dummy_plugin_collection(self):
         PC = DummyPluginCollection()
-        self.assertIsInstance(PC, _PluginCollection)
+        self.assertIsInstance(PC, PluginRegistry)
         self.assertEqual(len(PC.get_all_plugins()), 21)
 
     def test_dummy_plugin_collection_w_n_plugins(self):
         _n = 13
         PC = DummyPluginCollection(n_plugins=_n)
-        self.assertIsInstance(PC, _PluginCollection)
+        self.assertIsInstance(PC, PluginRegistry)
         self.assertEqual(len(PC.get_all_plugins()), _n)
 
 

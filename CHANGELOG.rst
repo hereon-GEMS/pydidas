@@ -43,7 +43,8 @@ Improvements
     - Updated the names of Dataset "update_axis" methods for 
       consistency.
     - Moved the generic parameter definitions to core.generic_params subpackage.
-    
+    - Renamed _PluginCollection to PluginRegistry to have a distinct name 
+      from its singleton instance 'PluginCollection'.
 
 Bugfixes
 --------

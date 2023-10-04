@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["_PluginCollectionTreeWidget", "SelectNewPluginWidget"]
+__all__ = ["PluginRegistryTreeWidget", "SelectNewPluginWidget"]
 
 from functools import partial
 
@@ -76,7 +76,7 @@ class SelectNewPluginWidget(CreateWidgetsMixIn, EmptyWidget):
         )
         self.add_any_widget(
             "treeview",
-            _PluginCollectionTreeWidget(collection=collection, **kwargs),
+            PluginRegistryTreeWidget(collection=collection, **kwargs),
             gridPos=(1, 0, 1, 2),
         )
         self._widgets["treeview"].sig_plugin_preselected.connect(
@@ -115,7 +115,7 @@ class SelectNewPluginWidget(CreateWidgetsMixIn, EmptyWidget):
             )
 
 
-class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
+class PluginRegistryTreeWidget(QtWidgets.QTreeView):
     """
     A QTreeView which displays all registered plugins sorted according to plugin type.
 

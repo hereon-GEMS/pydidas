@@ -30,11 +30,11 @@ __all__ = ["DummyPluginCollection"]
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.plugins.plugin_collection import _PluginCollection
+from pydidas.plugins.plugin_collection import PluginRegistry
 from pydidas.unittest_objects.create_dummy_plugins import create_plugin_class
 
 
-class DummyPluginCollection(_PluginCollection):
+class DummyPluginCollection(PluginRegistry):
     """
     Create a unique DummyPluginCollection with a defined path and a number
     of random plugins.
@@ -46,4 +46,4 @@ class DummyPluginCollection(_PluginCollection):
         _nplugins = kwargs.get("n_plugins", 21)
         for num in range(_nplugins):
             _class = create_plugin_class(num % 3, number=num // 3)
-            self._PluginCollection__add_new_class(_class)
+            self._PluginRegistry__add_new_class(_class)

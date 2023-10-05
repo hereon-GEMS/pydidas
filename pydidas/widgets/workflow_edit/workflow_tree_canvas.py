@@ -47,8 +47,8 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         The parent widget. The default is None.
     """
 
-    def __init__(self, parent=None):
-        QtWidgets.QFrame.__init__(self, parent=parent)
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QFrame.__init__(self, parent=kwargs.get("parent", None))
         CreateWidgetsMixIn.__init__(self)
         self.setAcceptDrops(True)
         self.painter = QtGui.QPainter()

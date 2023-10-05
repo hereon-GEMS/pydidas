@@ -30,7 +30,6 @@ __all__ = ["PluginInWorkflowBox"]
 
 
 from functools import partial
-from typing import Union
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QFrame
@@ -58,8 +57,15 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         The name of the Plugin class.
     widget_id : int
         The widget ID. This is the same as the corresponding node ID.
-    parent : Union[QtWidgets.QWidget, None], optional
-        The widget's parent. The default is None.
+    **kwargs : dict
+        Additional supported keyword arguments are:
+
+        parent : Union[QtWidgets.QWidget, None], optional
+            The widget's parent. The default is None.
+        label : str, optional
+            The node's label. The default is an empty string.
+        stardard_size : tuple[int, int]
+            The standard size in pixel.
     """
 
     sig_widget_activated = QtCore.Signal(int)
@@ -68,15 +74,8 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
     sig_new_node_parent_request = QtCore.Signal(int, int)
     sig_create_copy_request = QtCore.Signal(int, int)
 
-    def __init__(
-        self,
-        plugin_name,
-        widget_id,
-        parent: Union[None, QtWidgets.QWidget] = None,
-        label: str = "",
-        standardSize=(220, 50),
-    ):
-        QtWidgets.QFrame.__init__(self, parent)
+    def __init__(self, plugin_name: str, widget_id: int, **kwargs: dict):
+        QtWidgets.QFrame.__init__(self, kwargs.get("parent", None))
         CreateWidgetsMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(
@@ -86,7 +85,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         )
         self.setAcceptDrops(True)
         self.setObjectName("PluginInWorkflowBox")
-        self.setFixedSize(QtCore.QSize(*standardSize))
+        self.setFixedSize(QtCore.QSize(*kwargs.get("standard_size", (220, 50))))
         self.flags = {"active": False, "inconsistent": False}
         self.widget_id = widget_id
         self.setAutoFillBackground(True)
@@ -123,7 +122,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
 
         self.layout().setRowStretch(1, 1)
         self.layout().setColumnStretch(1, 1)
-        self.update_text(widget_id, label)
+        self.update_text(widget_id, kwargs.get("label", ""))
         self.__create_menus()
         self.__update_style()
 
@@ -237,7 +236,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self.sig_widget_delete_request.emit(self.widget_id)
 
     @QtCore.Slot(int)
-    def new_widget_selected(self, selection):
+    def new_widget_selected(self, selection: bool):
         """
         Select or deselect the widget.
 
@@ -251,34 +250,34 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self.__update_style()
 
     @QtCore.Slot(list)
-    def receive_inconsistent_signal(self, widget_ids):
+    def receive_inconsistent_signal(self, *widget_ids: tuple[int]):
         """
         Handle the node inconsistent signal set the stylesheets.
 
         Parameters
         ----------
-        *widget_ids : int
-            The widget node ID.
+        *widget_ids : tuple[int]
+            The widget node IDs which are inconsistent.
         """
         if self.widget_id in widget_ids and not self.flags["inconsistent"]:
             self.flags["inconsistent"] = True
             self.__update_style()
 
     @QtCore.Slot(list)
-    def receive_consistent_signal(self, widget_ids):
+    def receive_consistent_signal(self, *widget_ids: tuple[int]):
         """
         Handle the node consistent signal set the stylesheets.
 
         Parameters
         ----------
-        widget_id : int
+        widget_ids : tuple[int]
             The widget node ID.
         """
         if self.widget_id in widget_ids and self.flags["inconsistent"]:
             self.flags["inconsistent"] = False
             self.__update_style()
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QtCore.QEvent):
         """
         Implement a mouse move event to drag the plugins to a new position in the
         WorkflowTree.
@@ -293,7 +292,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             _drag.setPixmap(_pixmap)
             _drag.exec_(QtCore.Qt.MoveAction)
 
-    def dragEnterEvent(self, event):
+    def dragEnterEvent(self, event: QtCore.QEvent):
         """
         Enable dragging of this widget.
 
@@ -304,7 +303,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         """
         event.accept()
 
-    def dropEvent(self, event):
+    def dropEvent(self, event: QtCore.QEvent):
         """
         Allow dropping the widget on other WorkflowNode widgets.
 
@@ -318,7 +317,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self.sig_new_node_parent_request.emit(_source_widget.widget_id, self.widget_id)
 
     @QtCore.Slot(QtCore.QPoint)
-    def _open_context_menu(self, point):
+    def _open_context_menu(self, point: QtCore.QPoint):
         """
         Open the context menu after updating the menu entries based on the
         current WorkflowTree.
@@ -358,7 +357,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             )
 
     @QtCore.Slot(int)
-    def _emit_new_parent_signal(self, new_parent_id):
+    def _emit_new_parent_signal(self, new_parent_id: int):
         """
         Emit the signal to move the node to a new parent.
 
@@ -370,7 +369,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self.sig_new_node_parent_request.emit(self.widget_id, new_parent_id)
 
     @QtCore.Slot(int)
-    def _emit_create_copy_signal(self, new_parent_id):
+    def _emit_create_copy_signal(self, new_parent_id: int):
         """
         Emit the signal to move the node to a new parent.
 

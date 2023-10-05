@@ -26,7 +26,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PluginRegistryTreeWidget", "SelectNewPluginWidget"]
 
+
 from functools import partial
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
@@ -34,6 +36,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from ...core import constants
 from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
+from ...plugins.plugin_registry import PluginRegistry
 from ...workflow import WorkflowTree
 from ..factory import CreateWidgetsMixIn, EmptyWidget
 from ..misc import LineEditWithIcon
@@ -58,7 +61,7 @@ class SelectNewPluginWidget(CreateWidgetsMixIn, EmptyWidget):
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, collection=None, **kwargs):
+    def __init__(self, collection: Union[PluginRegistry, None] = None, **kwargs: dict):
         CreateWidgetsMixIn.__init__(self)
         EmptyWidget.__init__(self, **kwargs)
         self.add_any_widget(
@@ -135,8 +138,8 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, parent=None, collection=None, **kwargs):
-        super().__init__(parent)
+    def __init__(self, collection: Union[PluginRegistry, None] = None, **kwargs: dict):
+        QtWidgets.QTreeView.__init__(self, parent=kwargs.get("parent", None))
         apply_qt_properties(self, **kwargs)
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -262,7 +265,7 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
             )
 
     @QtCore.Slot(int)
-    def _emit_append_to_specific_node_signal(self, node_id):
+    def _emit_append_to_specific_node_signal(self, node_id: int):
         """
         Add a plugin to the WorkflowTree and to append it to a specific node.
 
@@ -278,13 +281,15 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
         self.sig_append_to_specific_node.emit(node_id, _name)
 
     @QtCore.Slot()
-    def __action_selected_item_in_menu(self, signal, checked=True):
+    def __action_selected_item_in_menu(
+        self, signal: QtCore.Signal, checked: bool = True
+    ):
         """
         Emit the signal to notify watchers that an action in the menu was selected.
 
         Parameters
         ----------
-        signal : QtCore.QSignal
+        signal : QtCore.Signal
             The signal to be emitted
         checked : bool
             Qt keyword whether the action was checked.
@@ -293,13 +298,13 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
         self.__send_signal_for_selected_item(signal, index)
 
     @QtCore.Slot()
-    def __send_signal_for_selected_item(self, signal, index):
+    def __send_signal_for_selected_item(self, signal: QtCore.Signal, index: int):
         """
         Confirm the selection and emit a signal with the name of the selection.
 
         Parameters
         ----------
-        signal : Qsignal
+        signal : Signal
             The signal emitted by the QTreeView.
         index : QtCore.QModelIndex
             The source index.
@@ -311,7 +316,7 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
             signal.emit(_name)
 
     @QtCore.Slot(str)
-    def update_filter(self, filter_text):
+    def update_filter(self, filter_text: str):
         """
         Update the Plugin search filter.
 
@@ -332,12 +337,12 @@ class _SearchFilterModel(QtCore.QSortFilterProxyModel):
     A custom QSortFilterProxyModel to filter out entries not matching the search filter.
     """
 
-    def __init__(self, parent=None):
-        QtCore.QSortFilterProxyModel.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        QtCore.QSortFilterProxyModel.__init__(self, kwargs.get("parent", None))
         self.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self.setDynamicSortFilter(True)
 
-    def _accept_index(self, index):
+    def _accept_index(self, index: int) -> bool:
         """
         Recursive implementation to display a row.
 
@@ -364,7 +369,9 @@ class _SearchFilterModel(QtCore.QSortFilterProxyModel):
                     return True
         return False
 
-    def filterAcceptsRow(self, sourceRow, sourceParent):
+    def filterAcceptsRow(
+        self, sourceRow: int, sourceParent: QtCore.QModelIndex
+    ) -> bool:
         """
         Reimplement the filterAcceptsRow method to use the filter.
 
@@ -415,7 +422,9 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         self.__height = int(char_height + 10)
         self.sizeHintChanged.emit(self.parent().currentIndex())
 
-    def sizeHint(self, options, index):
+    def sizeHint(
+        self, options: QtWidgets.QStyleOptionViewItem, index: QtCore.QModelIndex
+    ) -> QtCore.QSize:
         """
         Overload the size hint method to achieve a uniform row height.
 
@@ -435,10 +444,14 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         size.setHeight(self.__height)
         return size
 
-    def paint(self, painter, option, index):
+    def paint(
+        self,
+        painter: QtGui.QPainter,
+        option: QtWidgets.QStyleOptionViewItem,
+        index: QtCore.QModelIndex,
+    ):
         """
-        Overload the paint function with a custom font size for the top level
-        items.
+        Overload the paint function with a custom font size for the top level items.
 
         Parameters
         ----------

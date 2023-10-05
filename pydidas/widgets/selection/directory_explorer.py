@@ -31,7 +31,6 @@ __all__ = ["DirectoryExplorer"]
 
 import os
 import platform
-from typing import Self, Union
 
 import qtpy
 from qtpy import QtCore, QtWidgets
@@ -40,6 +39,10 @@ from ...core import PydidasQsettings, PydidasQsettingsMixin
 from ...core.constants import POLICY_EXP_EXP
 from ...core.utils import apply_qt_properties
 from ..factory import CreateWidgetsMixIn, EmptyWidget
+
+
+AscendingOrder = QtCore.Qt.AscendingOrder
+QSortFilterProxyModel = QtCore.QSortFilterProxyModel
 
 
 class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
@@ -59,8 +62,8 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
 
     sig_new_file_selected = QtCore.Signal(str)
 
-    def __init__(self, parent=None, **kwargs) -> Self:
-        EmptyWidget.__init__(self, parent=parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        EmptyWidget.__init__(self, parent=kwargs.get("parent", None), **kwargs)
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         self._create_widgets()
@@ -69,6 +72,9 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         self._widgets["explorer"].doubleClicked.connect(self.__file_selected)
         self._widgets["map_network_drives"].stateChanged.connect(
             self.__update_filesystem_network_drive_usage
+        )
+        self._widgets["case_sensitive"].stateChanged.connect(
+            self.__update_filter_case_sensitivity
         )
 
     def _create_widgets(self):
@@ -80,6 +86,13 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
             "Show network drives",
             checked=self.q_settings_get(
                 "directory_explorer/show_network_drives", dtype=bool, default=True
+            ),
+        )
+        self.create_check_box(
+            "case_sensitive",
+            "Sorting is case sensitive",
+            checked=self.q_settings_get(
+                "directory_explorer/is_case_sensitive", dtype=bool, default=True
             ),
         )
         self.create_any_widget("explorer", _DirectoryExplorer)
@@ -133,6 +146,26 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         self._filter_model.toggle_network_location_acceptance(_usage)
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
+    @QtCore.Slot(int)
+    def __update_filter_case_sensitivity(self, state: QtCore.Qt.CheckState):
+        """
+        Update the filter's case sensitivity.
+
+        Parameters
+        ----------
+        state : QtCore.Qt.CheckState
+            The checkbox's state.
+        """
+        if qtpy.QT_VERSION.startswith("6"):
+            _usage = state == QtCore.Qt.Checked.value
+        else:
+            _usage = state == QtCore.Qt.Checked
+        self.q_settings_set("directory_explorer/is_case_sensitive", _usage)
+        self._filter_model.setSortCaseSensitivity(
+            QtCore.Qt.CaseSensitive if _usage else QtCore.Qt.CaseInsensitive
+        )
+        self._filter_model.sort(0, self._filter_model.sortOrder())
+
     @QtCore.Slot()
     def __file_highlighted(self):
         """
@@ -164,18 +197,14 @@ class _DirectoryExplorer(QtWidgets.QTreeView):
 
     Parameters
     ----------
-    parent : Union[QWidget, None], optional
-        The parent widget, if appplicable. The default is None.
     **kwargs : dict
-        Any additional keyword arguments
+        Supported keywords are any keywords which are supported by QTreeView.
     """
 
-    def __init__(
-        self,
-        parent: Union[QtWidgets.QWidget, None] = None,
-        **kwargs,
-    ):
-        QtWidgets.QTreeView.__init__(self, parent)
+    init_kwargs = ["parent"]
+
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QTreeView.__init__(self, kwargs.get("parent", None))
         apply_qt_properties(self, **kwargs)
         self.raw_model = None
 
@@ -290,3 +319,31 @@ class _NetworkLocationFilterModel(QtCore.QSortFilterProxyModel):
         while _index.parent().isValid():
             _index = _index.parent()
         return self.sourceModel().filePath(_index) not in self.__network_drives
+
+    def lessThan(
+        self, entry_a: QtCore.QModelIndex, entry_b: QtCore.QModelIndex
+    ) -> bool:
+        """
+        Reimplement lessThan to sort directories and files separately.
+
+        Parameters
+        ----------
+        entry_a : QtCore.QModelIndex
+            The first entry to be compared.
+        entry_b : QtCore.QModelIndex
+            The second entry to be compared.
+
+        Returns
+        -------
+        bool
+            Flag whether entry_a should be displayed before entry_b.
+        """
+        _ascending = self.sortOrder() == AscendingOrder
+        _info_a = self.sourceModel().fileInfo(entry_a)
+        _info_b = self.sourceModel().fileInfo(entry_b)
+
+        if (not _info_a.isDir()) and _info_b.isDir():
+            return not _ascending
+        if _info_a.isDir() and not _info_b.isDir():
+            return _ascending
+        return QSortFilterProxyModel.lessThan(self, entry_a, entry_b)

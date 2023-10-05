@@ -32,14 +32,18 @@ import inspect
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
+from ...core import Dataset
+
 
 class PydidasPlot1D(Plot1D):
     """
     A customized silx.gui.plot.Plot1D with an additional configuration.
     """
 
-    def __init__(self, parent=None, backend=None):
-        Plot1D.__init__(self, parent, backend)
+    def __init__(self, **kwargs: dict):
+        Plot1D.__init__(
+            self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
+        )
         self._allowed_kwargs = [
             _key
             for _key, _value in inspect.signature(self.addCurve).parameters.items()
@@ -55,7 +59,7 @@ class PydidasPlot1D(Plot1D):
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-    def plot_pydidas_dataset(self, data, **kwargs):
+    def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
         """
         Plot a pydidas dataset.
 

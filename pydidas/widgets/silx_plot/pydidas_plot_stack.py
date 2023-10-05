@@ -28,8 +28,6 @@ __status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
 
-from typing import Union
-
 from qtpy import QtCore, QtWidgets
 
 from ...core import Dataset
@@ -43,20 +41,27 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
 
     Parameters
     ----------
-    parent : Union[QtWidgets.QWidget, None]
-    use_data_info_action : bool, optional
-        Flag to use the PydidasGetDataInfoAction to display information about a
-        result datapoint. The default is False.
-    diffraction_exp : DiffractionExperiment
-        The DiffractionExperiment instance to be used in the PydidasPlot2D for
-        the coordinate system.
+    **kwargs : dict
+        Supported keyword arguments are:
+
+        parent : Union[QtWidgets.QWidget, None]
+            The parent widget.
+        use_data_info_action : bool, optional
+            Flag to use the PydidasGetDataInfoAction to display information
+            about a result datapoint. The default is False.
+        diffraction_exp : DiffractionExperiment, optional
+            The DiffractionExperiment instance to be used in the PydidasPlot2D
+            for the coordinate system. The default is the generic
+            DiffractionExperimentContext.
+        cs_transform : bool, optional
+            Flag to enable coordinate system transformations.
     """
 
-    init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
+    init_kwargs = ["parent", "cs_transform", "use_data_info_action", "diffraction_exp"]
     sig_get_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs: dict):
-        QtWidgets.QStackedWidget.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QStackedWidget.__init__(self, kwargs.get("parent", None))
         self._frame1d = QtWidgets.QWidget()
         self._frame1d.setLayout(QtWidgets.QGridLayout())
         self._frame2d = QtWidgets.QWidget()

@@ -27,13 +27,18 @@ __status__ = "Production"
 __all__ = ["get_2d_silx_plot_ax_settings"]
 
 
-def get_2d_silx_plot_ax_settings(axis):
+from numpy import ndarray
+
+
+def get_2d_silx_plot_ax_settings(axis: ndarray) -> tuple[float, float]:
     """
     Get the axis settings to have pixels centered at their values.
+
     Parameters
     ----------
     axis : np.ndarray
         The numpy array with the axis positions.
+
     Returns
     -------
     _origin : float

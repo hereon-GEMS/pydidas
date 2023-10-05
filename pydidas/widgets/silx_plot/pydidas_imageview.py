@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = ["PydidasImageView"]
 
 
+from numpy import ndarray
 from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot import ImageView, Plot2D, tools
@@ -53,12 +54,28 @@ DIFFRACTION_EXP = DiffractionExperimentContext()
 class PydidasImageView(ImageView, PydidasQsettingsMixin):
     """
     A customized silx.gui.plot.ImageView with an additional configuration.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Supported keyword arguments are:
+
+        parent : Union[QWidget, None], optional
+            The parent widget or None for no parent. The default is None.
+        backend : Union[None, silx.gui.plot.backends.BackendBase], optional
+            The silx backend to use. If None, this defaults to the standard
+            silx settings. The default is None.
+        show_cs_transform : bool, optional
+            Flag whether to show the coordinate transform action. The default
+            is True.
     """
 
     _getImageValue = Plot2D._getImageValue
 
-    def __init__(self, parent=None, backend=None, show_cs_transform=True):
-        ImageView.__init__(self, parent, backend)
+    def __init__(self, **kwargs: dict):
+        ImageView.__init__(
+            self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
+        )
         PydidasQsettingsMixin.__init__(self)
 
         posInfo = [
@@ -85,7 +102,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
             self.keepDataAspectRatioAction, self.autoscaleToMeanAndThreeSigmaAction
         )
 
-        if show_cs_transform:
+        if kwargs.get("show_cs_transform", True):
             self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
             self._toolbar.addWidget(self.cs_transform)
         else:
@@ -95,7 +112,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
 
         _position_widget = PydidasPositionInfo(plot=self, converters=posInfo)
         _position_widget.setSnappingMode(SNAP_MODE)
-        if show_cs_transform:
+        if kwargs.get("show_cs_transform", True):
             self.cs_transform.sig_new_coordinate_system.connect(
                 _position_widget.new_coordinate_system
             )
@@ -135,7 +152,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(self._cs_transform_valid)
 
-    def setData(self, data, **kwargs):
+    def setData(self, data: ndarray, **kwargs: dict):
         """
         Set the image data, handle the coordinate system and forward the data to
         plotting.
@@ -152,7 +169,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         self._plot_kwargs = kwargs
         ImageView.setImage(self, data, **kwargs)
 
-    def _check_data_shape(self, data_shape):
+    def _check_data_shape(self, data_shape: tuple[int, ...]):
         """
         Check the data shape coordinate system.
 

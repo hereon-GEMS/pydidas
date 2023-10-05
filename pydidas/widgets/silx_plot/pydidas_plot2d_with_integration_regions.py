@@ -52,8 +52,8 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
     sig_new_point_selected = QtCore.Signal(float, float)
 
-    def __init__(self, parent=None, backend=None, **kwargs):
-        PydidasPlot2D.__init__(self, parent, backend, **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasPlot2D.__init__(self, **kwargs)
         self._config["overlay_color"] = kwargs.get(
             "overlay_color", PYDIDAS_COLORS["orange"]
         )

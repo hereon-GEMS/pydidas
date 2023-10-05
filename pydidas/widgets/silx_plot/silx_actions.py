@@ -34,7 +34,9 @@ __all__ = [
     "PydidasGetDataInfoAction",
 ]
 
+
 from numbers import Real
+from typing import NewType
 
 import numpy as np
 import silx.gui.plot
@@ -48,13 +50,16 @@ from ...resources import icons
 from ..file_dialog import PydidasFileDialog
 
 
+PydidasPlot2d = NewType("PydidasPlot2d", QtWidgets.QWidget)
+
+
 class ChangeCanvasToData(PlotAction):
     """
     A customized silx Action to change the size of the figure canvas to the data
     dimensions.
     """
 
-    def __init__(self, plot, parent=None):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
         PlotAction.__init__(
             self,
             plot,
@@ -63,10 +68,10 @@ class ChangeCanvasToData(PlotAction):
             tooltip="Change the canvas shape to match the data aspect ratio.",
             triggered=self._actionTriggered,
             checkable=False,
-            parent=parent,
+            parent=kwargs.get("parent", None),
         )
 
-    def _actionTriggered(self, checked=False):
+    def _actionTriggered(self, checked: bool = False):
         """
         Trigger the "change canvas to data" action.
 
@@ -98,7 +103,7 @@ class ExpandCanvas(PlotAction):
     size allowed by the widget.
     """
 
-    def __init__(self, plot, parent=None):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
         PlotAction.__init__(
             self,
             plot,
@@ -107,7 +112,7 @@ class ExpandCanvas(PlotAction):
             tooltip="Maximize the canvas size.",
             triggered=self._actionTriggered,
             checkable=False,
-            parent=parent,
+            parent=kwargs.get("parent", None),
         )
 
     def _actionTriggered(self, checked=False):
@@ -129,7 +134,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
     A new custom PlotAction to set the colormap to autoscale with mean +/- 3 sigma.
     """
 
-    def __init__(self, plot, parent=None):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
         PlotAction.__init__(
             self,
             plot,
@@ -138,7 +143,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
             tooltip="Autoscale colormap to mean +/- 3 std",
             triggered=self._actionTriggered,
             checkable=False,
-            parent=parent,
+            parent=kwargs.get("parent", None),
         )
         PydidasQsettingsMixin.__init__(self)
 
@@ -167,7 +172,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     The lower limit is implemented in two tiers of 12 bit
     """
 
-    def __init__(self, plot, parent=None):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
         PlotAction.__init__(
             self,
             plot,
@@ -176,7 +181,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             tooltip="Crop the colormap's histogram outliers",
             triggered=self._actionTriggered,
             checkable=False,
-            parent=parent,
+            parent=kwargs.get("parent", None),
         )
         PydidasQsettingsMixin.__init__(self)
 
@@ -270,7 +275,7 @@ class PydidasGetDataInfoAction(PlotAction):
 
     sig_show_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, plot, parent=None):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
         PlotAction.__init__(
             self,
             plot,
@@ -281,7 +286,7 @@ class PydidasGetDataInfoAction(PlotAction):
             ),
             triggered=self._actionTriggered,
             checkable=False,
-            parent=parent,
+            parent=kwargs.get("parent", None),
         )
 
     @QtCore.Slot()

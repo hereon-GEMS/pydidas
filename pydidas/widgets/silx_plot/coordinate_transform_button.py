@@ -28,6 +28,7 @@ __all__ = ["CoordinateTransformButton"]
 
 
 from functools import partial
+from typing import Literal
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot.PlotToolButtons import PlotToolButton
@@ -119,19 +120,21 @@ class CoordinateTransformButton(PlotToolButton):
         self.set_coordinates("cartesian")
         self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
 
-    def _create_action(self, coordinate_system):
+    def _create_action(self, coordinate_system: str) -> QtWidgets.QAction:
         _icon = self.STATE[coordinate_system, "icon"]
         _text = self.STATE[coordinate_system, "action"]
         return QtWidgets.QAction(_icon, _text, self)
 
     @QtCore.Slot()
-    def set_coordinates(self, cs_name):
+    def set_coordinates(
+        self, cs_name: Literal["cartesian", "r_chi", "2theta_chi", "q_chi"]
+    ):
         """
         Set the coordinate system associated with the given name.
 
         Parameters
         ----------
-        cs_name : str
+        cs_name : Literal["cartesian", "r_chi", "2theta_chi", "q_chi"]
             The descriptive name of the coordinate system.
         """
         self.setIcon(self.STATE[cs_name, "icon"])
@@ -139,7 +142,7 @@ class CoordinateTransformButton(PlotToolButton):
         self.sig_new_coordinate_system.emit(cs_name)
 
     @QtCore.Slot()
-    def check_detector_is_set(self, silent=False):
+    def check_detector_is_set(self, silent: bool = False):
         """
         Check that the detector is set to convert radii to q and 2 theta values.
 

@@ -36,7 +36,7 @@ from silx.gui.plot.ColorBar import _TickBar
 from ...core.utils import update_qobject_font
 
 
-def tickbar_paintEvent(instance, event: QtCore.QEvent):
+def tickbar_paintEvent(instance: QtWidgets.QWidget, event: QtCore.QEvent):
     """
     Handle the paintEvent with the global font.
 
@@ -68,9 +68,14 @@ def tickbar_paintEvent(instance, event: QtCore.QEvent):
         instance._paintTick(val, painter, majorTick=False)
 
 
-def tickbar_paintTick(instance, val, painter, majorTick=True):
+def tickbar_paintTick(
+    instance: QtWidgets.QWidget,
+    val: float,
+    painter: QtGui.QPainter,
+    majorTick: bool = True,
+):
     """
-    _paint a tick with the global font.
+    Paint a tick with the global font.
 
     This method is meant to replace the original method "_paintTick" in
     silx.gui.plot.ColorBar._TickBar

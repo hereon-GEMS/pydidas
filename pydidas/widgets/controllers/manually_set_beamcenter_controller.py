@@ -28,7 +28,8 @@ __status__ = "Production"
 __all__ = ["ManuallySetBeamcenterController"]
 
 
-from typing import Iterable, List, Literal, NewType, Tuple
+from collections.abc import Iterable
+from typing import List, Literal, NewType, Tuple
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -303,38 +304,58 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _x = np.round(event_dict["x"], decimals=3)
         _y = np.round(event_dict["y"], decimals=3)
         if self._config["2click_selection"] and not self._config["wait_for_2nd_click"]:
-            _cmap = self._plot.getImage().getColormap()
-            self._config["2click_xlimits"] = self._plot.getGraphXLimits()
-            self._config["2click_ylimits"] = self._plot.getGraphYLimits()
-            self._config["2click_cmap_limits"] = _cmap.getVRange()
-
-            _data = self._plot.getImage().getData(copy=False)
-            _x0 = int(np.round(max(0, _x - 25)))
-            _x1 = int(np.round(min(_data.shape[1], _x + 25)))
-            _y0 = int(np.round(max(0, _y - 25)))
-            _y1 = int(np.round(min(_data.shape[0], _y + 25)))
-            self._plot.setLimits(_x0, _x1, _y0, _y1)
-            _cmap.setVRange(
-                np.amin(_data[_y0:_y1, _x0:_x1]), np.amax(_data[_y0:_y1, _x0:_x1])
-            )
-            self._config["wait_for_2nd_click"] = True
+            self.__process_click_one_of_two(_x, _y)
             return
         elif self._config["2click_selection"] and self._config["wait_for_2nd_click"]:
-            self._plot.setLimits(
-                *self._config["2click_xlimits"], *self._config["2click_ylimits"]
-            )
-            self._config["wait_for_2nd_click"] = False
-            self._plot.getImage().getColormap().setVRange(
-                *self._config["2click_cmap_limits"]
-            )
-        _color = self._config["overlay_color"]
+            self.__process_click_two_of_two()
         if (_x, _y) in self._points:
             return
+        _color = self._config["overlay_color"]
         self._plot.addMarker(
             _x, _y, legend=f"marker_{_x}_{_y}", color=_color, symbol="x"
         )
         self._points.append((_x, _y))
         self._points_for_bc.add_point_to_table(_x, _y)
+
+    def __process_click_one_of_two(self, x: float, y: float):
+        """
+        Process the first click for the two-click selection.
+
+        Parameters
+        ----------
+        x : float
+            The x-coordinate of the click.
+        y : float
+            The y-coordinate of the click.
+        """
+        _cmap = self._plot.getImage().getColormap()
+        self._config["2click_xlimits"] = self._plot.getGraphXLimits()
+        self._config["2click_ylimits"] = self._plot.getGraphYLimits()
+        self._config["2click_cmap_limits"] = _cmap.getVRange()
+
+        _delta = 40
+        _data = self._plot.getImage().getData(copy=False)
+        _x0 = int(np.round(max(0, x - _delta)))
+        _x1 = int(np.round(min(_data.shape[1], x + _delta)))
+        _y0 = int(np.round(max(0, y - _delta)))
+        _y1 = int(np.round(min(_data.shape[0], y + _delta)))
+        self._plot.setLimits(_x0, _x1, _y0, _y1)
+        _cmap.setVRange(
+            np.amin(_data[_y0:_y1, _x0:_x1]), np.amax(_data[_y0:_y1, _x0:_x1])
+        )
+        self._config["wait_for_2nd_click"] = True
+
+    def __process_click_two_of_two(self):
+        """
+        Process the second click in the two-click selection.
+        """
+        self._plot.setLimits(
+            *self._config["2click_xlimits"], *self._config["2click_ylimits"]
+        )
+        self._config["wait_for_2nd_click"] = False
+        self._plot.getImage().getColormap().setVRange(
+            *self._config["2click_cmap_limits"]
+        )
 
     @QtCore.Slot()
     def set_beamcenter_from_point(self):

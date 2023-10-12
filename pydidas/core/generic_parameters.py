@@ -30,8 +30,8 @@ __status__ = "Production"
 __all__ = ["get_generic_parameter", "get_generic_param_collection"]
 
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 from .generic_params import GENERIC_PARAMS_METADATA
 from .hdf5_key import Hdf5key
@@ -76,10 +76,11 @@ def get_generic_parameter(refkey: str) -> Parameter:
     return Parameter(refkey, _type, _default, **_config)
 
 
-def get_generic_param_collection(*param_keys: Iterable) -> ParameterCollection:
+def get_generic_param_collection(
+    *param_keys: Iterable[str, ...]
+) -> ParameterCollection:
     """
-    Get a initialized ParameterCollection from a number of generic Parameter
-    keys.
+    Get a initialized ParameterCollection from a number of generic Parameter keys.
 
     Parameters
     ----------

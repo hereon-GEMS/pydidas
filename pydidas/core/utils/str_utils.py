@@ -46,8 +46,9 @@ import re
 import string as _string_
 import sys
 import time
+from collections.abc import Iterable
 from numbers import Integral, Real
-from typing import Iterable, Union
+from typing import Union
 
 import numpy as np
 
@@ -321,13 +322,13 @@ def convert_unicode_to_ascii(obj: Union[str, list]) -> Union[str, list]:
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
-def get_range_as_formatted_string(obj: Union[np.ndarray, Iterable]) -> str:
+def get_range_as_formatted_string(obj: Union[np.ndarray, Iterable[float, ...]]) -> str:
     """
     Get a formatted string representation of an iterable range.
 
     Parameters
     ----------
-    _range : Union[np.ndarray, Iterable]
+    _range : Union[np.ndarray, Iterable[float, ...]]
         The input range.
 
     Returns

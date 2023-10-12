@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetComboBox"]
 
 
+from collections.abc import Iterable
+
 from qtpy import QtCore
 
 from ...core import Parameter
@@ -129,7 +131,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         _txt_repr = convert_special_chars_to_unicode(str(value))
         self.setCurrentText(_txt_repr)
 
-    def update_choices(self, new_choices: list):
+    def update_choices(self, new_choices: Iterable[object, ...]):
         """
         Update the choices of the BaseParamIoWidget in place.
 

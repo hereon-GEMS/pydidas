@@ -30,10 +30,11 @@ __all__ = ["WorkerController"]
 
 import multiprocessing as mp
 import time
+from collections.abc import Iterable
 from contextlib import contextmanager
 from numbers import Integral
 from queue import Empty
-from typing import Iterable, Union
+from typing import Union
 
 from qtpy import QtCore
 

@@ -210,7 +210,7 @@ def get_axis_item_representation(
 
 
 def convert_data_to_dict(
-    data: Union[dict, Iterable],
+    data: Union[dict, Iterable[float, ...]],
     target_shape: Tuple[int],
     entry_type: Literal["str", "array"] = "str",
     calling_method_name: str = "undefined method",
@@ -224,7 +224,7 @@ def convert_data_to_dict(
 
     Parameters
     ----------
-    data : Union[dict, Iterable]
+    data : Union[dict, Iterable[float, ...]]
         The keys for the axis meta data.
     target_shape: Tuple[int]
         The shape of the target Dataset. This number is needed to sanity-check that

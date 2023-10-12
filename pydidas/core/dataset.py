@@ -29,10 +29,10 @@ __all__ = ["Dataset"]
 
 
 import warnings
-from collections import abc
+from collections.abc import Iterable
 from copy import deepcopy
 from numbers import Integral
-from typing import Iterable, Literal, Self, Union
+from typing import Literal, Self, Union
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -162,7 +162,7 @@ class Dataset(np.ndarray):
             if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
                     del self._meta[_item][_dim]
-            elif isinstance(_slicer, (slice, abc.Iterable, np.ndarray)):
+            elif isinstance(_slicer, (slice, Iterable, np.ndarray)):
                 if isinstance(_slicer, tuple):
                     _slicer = list(_slicer)
                 if self._meta["axis_ranges"][_dim] is not None:

@@ -28,8 +28,7 @@ __all__ = ["flatten", "flatten_all", "insert_item_in_tuple", "replace_item_in_it
 
 
 import itertools
-from collections import abc
-from typing import Iterable
+from collections.abc import Iterable
 
 
 def flatten(nested_iterable: Iterable, astype: type = list) -> object:
@@ -83,7 +82,7 @@ def flatten_all(nested_iterable: Iterable[Iterable], astype: type = list) -> obj
     """
     _new = []
     for _item in nested_iterable:
-        if isinstance(_item, abc.Iterable):
+        if isinstance(_item, Iterable):
             _items = flatten_all(_item, astype=list)
             _new.extend(_items)
         else:

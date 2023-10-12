@@ -37,8 +37,9 @@ __all__ = [
 
 
 import os
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List, Tuple, Union
+from typing import List, Literal, Tuple, Union
 
 import h5py
 import numpy as np
@@ -270,7 +271,7 @@ def _get_hdf5_file_and_dataset_names(
 
 def get_hdf5_metadata(
     fname: Union[str, Path],
-    meta: Union[str, Iterable],
+    meta: Union[Iterable[str], Literal["dtype", "shape", "size", "ndim", "nbytes"]],
     dset: Union[str, None] = None,
 ) -> Union[dict, object]:
     """
@@ -286,10 +287,9 @@ def get_hdf5_metadata(
     ----------
     fname : Union[str, Path]
         The filepath or path to filename and dataset.
-    meta : Union[str, Iterable]
+    meta : Union[Iterable[str], Literal["dtype", "shape", "size", "ndim", "nbytes"]]
         The metadata item(s). Accepted values are either an iterable (list or
-        tuple) of entries or a single string of the following: "dtype",
-        "shape", "size", "ndim" or "nbytes".
+        tuple) of entries or a single string of the given literal values.
     dset : Union[str, None], optional
         The optional dataset key, if not specified in the fname.
         The default is None.

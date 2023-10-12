@@ -30,8 +30,9 @@ __status__ = "Production"
 __all__ = ["ParameterCollection"]
 
 
+from collections.abc import Iterable
 from itertools import chain
-from typing import Iterable, List, Self, Tuple, Union
+from typing import List, Self, Tuple, Union
 
 from .parameter import Parameter
 
@@ -147,7 +148,7 @@ class ParameterCollection(dict):
         )
 
     def __check_key_available(
-        self, param: Parameter, keys: Union[Iterable, None] = None
+        self, param: Parameter, keys: Union[Iterable[str, ...], None] = None
     ):
         """
         Check if the Parameter refkey is already a registed key.
@@ -156,7 +157,7 @@ class ParameterCollection(dict):
         ----------
         param : Parameter
             The Parameter to be compared.
-        keys : Union[Iterable, None], optional
+        keys : Union[Iterable[str, ...], None], optional
             The keys to be compared against. If None, the comparison will be
             performed against all dictionary keys. The default is None.
 

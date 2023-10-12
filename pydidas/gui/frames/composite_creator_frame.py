@@ -30,9 +30,10 @@ __all__ = ["CompositeCreatorFrame"]
 
 import os
 import time
+from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
-from typing import Iterable, Literal, Union
+from typing import Literal, Union
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -558,13 +559,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._config["bg_configured"] = _flag
         self.__check_exec_enable()
 
-    def __reset_params(self, keys: Union[Literal["all"], Iterable, None] = None):
+    def __reset_params(self, keys: Union[Literal["all"], Iterable[str], None] = None):
         """
         Reset parameters to their default values.
 
         Parameters
         ----------
-        keys : Union[Literal["all"], Iterable, None], optional
+        keys : Union[Literal["all"], Iterable[str], None], optional
             An iterable of keys which reference the Parameters. If 'all',
             all Parameters in the ParameterCollection will be reset to their
             default values. The default is 'all'.
@@ -670,14 +671,14 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self.toggle_param_widget_visibility(_key, flag)
 
     def __clear_entries(
-        self, keys: Union[Literal["all"], Iterable] = "all", hide: bool = True
+        self, keys: Union[Literal["all"], Iterable[str]] = "all", hide: bool = True
     ):
         """
         Clear the Parameter entries and reset to default for selected keys.
 
         Parameters
         ----------
-        keys : Union[Literal["all"], Iterable], optional
+        keys : Union[Literal["all"], Iterable[str]], optional
             The keys for the Parameters to be reset. The default is 'all'.
         hide : bool, optional
             Flag for hiding the reset keys. The default is True.

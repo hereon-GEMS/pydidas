@@ -33,7 +33,7 @@ __all__ = [
 ]
 
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from qtpy import QtGui
 from qtpy.QtCore import QObject

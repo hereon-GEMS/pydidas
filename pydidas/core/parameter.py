@@ -30,6 +30,7 @@ __all__ = ["Parameter"]
 
 import numbers
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Dict, List, Self, Set, Tuple, Type, Union
 
@@ -512,15 +513,15 @@ class Parameter:
             return self.value
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
-    def update_value_and_choices(self, value, choices):
+    def update_value_and_choices(self, value: object, choices: Iterable[object, ...]):
         """
         Update the value and choices of the Parameter to prevent illegal selections.
 
         Parameters
         ----------
-        value : type
+        value : object
             The new Parameter values
-        choices : Iterable
+        choices : Iterable[object, ...]
             The new choices for the Parameter.
         """
         if not self.__typecheck(value):

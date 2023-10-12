@@ -28,7 +28,10 @@ __status__ = "Production"
 __all__ = ["DefineDiffractionExpFrameBuilder"]
 
 
+from qtpy import QtGui
+
 from ....core import constants
+from ....core.utils import update_palette
 from ....widgets import ScrollArea, get_pyqt_icon_from_str
 from ....widgets.framework import BaseFrame
 
@@ -137,7 +140,11 @@ class DefineDiffractionExpFrameBuilder:
             frame.create_param_widget(
                 frame._bc_params[_key], parent_widget="config_right"
             )
-            frame.param_widgets[_key].setEnabled(False)
+            update_palette(
+                frame.param_widgets[_key],
+                base=QtGui.QColor(235, 235, 235),
+            )
+            frame.param_widgets[_key].setReadOnly(True)
 
         frame.create_spacer(None, parent_widget="config")
         frame.create_button(

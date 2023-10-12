@@ -82,6 +82,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             "roi_plotted": False,
             "forced_edit_disable": kwargs.get("forced_edit_disable", False),
             "enabled": True,
+            "exp": None,
         }
         self._editor.param_widgets["overlay_color"].io_edited.connect(
             self.set_new_marker_color
@@ -113,13 +114,13 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         plugin : pydidas.plugins.BasePlugin
             The plugin to be edited
         """
-        if self._plugin is not None:
-            self._EXP.sig_params_changed.disconnect(self._process_exp_update)
+        if self._config["exp"] is not None:
+            self._config["exp"].sig_params_changed.disconnect(self._process_exp_update)
 
         self._plugin = plugin
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
-        self._EXP = plugin._EXP
-        self._EXP.sig_params_changed.connect(self._process_exp_update)
+        self._config["exp"] = plugin._EXP
+        self._config["exp"].sig_params_changed.connect(self._process_exp_update)
         self._process_exp_update()
 
         self._editor.clear_plugin_widgets()
@@ -131,8 +132,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             self._editor.create_widgets_for_axis(plugin, "azi")
             self._connect_axis_widgets("azi")
         if self._plot.getActiveImage() is None:
-            _nx = self._EXP.get_param_value("detector_npixx")
-            _ny = self._EXP.get_param_value("detector_npixy")
+            _nx = self._config["exp"].get_param_value("detector_npixx")
+            _ny = self._config["exp"].get_param_value("detector_npixy")
             self._plot.addImage(np.zeros((_ny, _nx)))
         self.reset_selection_mode()
 
@@ -245,7 +246,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         kind = ["azimuthal", "radial", "roi"] if "all" in kind else kind
         if "radial" in kind:
-            _pxsize = self._EXP.get_param_value("detector_pxsizex") * 1e-6
+            _pxsize = self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
             _range = self._plugin.get_radial_range_as_r()
             if _range is not None:
                 self._plot.draw_circle(_range[0] * 1e-3 / _pxsize, "radial_lower")
@@ -283,8 +284,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         Process updates of the DiffractionExperiment.
         """
-        self._config["beamcenter"] = self._EXP.beamcenter
-        self._config["det_dist"] = self._EXP.get_param_value("detector_dist")
+        self._config["beamcenter"] = self._config["exp"].beamcenter
+        self._config["det_dist"] = self._config["exp"].get_param_value("detector_dist")
         if self._config["roi_plotted"]:
             self.show_plot_items("roi")
 
@@ -331,7 +332,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         Show the integration region in the plot.
         """
-        _pxsize = self._EXP.get_param_value("detector_pxsizex") * 1e-6
+        _pxsize = self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
         _rad_range = self._plugin.get_radial_range_as_r()
         if _rad_range is not None:
             _rad_range = (
@@ -374,13 +375,13 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         _cx, _cy = self._config["beamcenter"]
         _r_px = ((xpos - _cx) ** 2 + (ypos - _cy) ** 2) ** 0.5
-        _r = _r_px * self._EXP.get_param_value("detector_pxsizex") * 1e-6
+        _r = _r_px * self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
         _2theta = np.arctan(_r / self._config["det_dist"])
 
         if self._plugin.get_param_value("rad_unit") == "r / mm":
             _val = _r * 1e3
         elif self._plugin.get_param_value("rad_unit") == "Q / nm^-1":
-            _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
+            _lambda = self._config["exp"].get_param_value("xray_wavelength") * 1e-10
             _val = (4 * np.pi / _lambda) * np.sin(_2theta / 2) * 1e-9
         elif self._plugin.get_param_value("rad_unit") == "2theta / deg":
             _val = 180 / np.pi * _2theta

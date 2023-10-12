@@ -343,7 +343,6 @@ class QuickIntegrationFrameBuilder:
         cls._frame.add_any_widget(
             "roi_selector",
             ShowIntegrationRoiParamsWidget(
-                cls._frame._widgets["input_plot"],
                 plugin=cls._frame._plugins["generic"],
                 show_reset_button=False,
                 add_bottom_spacer=False,

@@ -139,7 +139,7 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         if not os.path.exists(_out_dir):
             critical_warning(
                 "Output directory not found",
-                (f'The specified output directory "{_out_dir}" ' "could not be found."),
+                f"The specified output directory '{_out_dir}' could not be found.",
             )
             return
         store_eiger_pixel_mask_from_master_file(_master_fname, _export_fname)

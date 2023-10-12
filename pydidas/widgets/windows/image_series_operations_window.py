@@ -71,9 +71,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
     default_params.add_param(_operation)
 
     def __init__(self, **kwargs: dict):
-        PydidasWindow.__init__(self, title="Average images", **kwargs)
+        PydidasWindow.__init__(self, title="Image series operations", **kwargs)
         self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
-        self.setWindowTitle("Image series operations")
         self._config["num_frames_per_file"] = 1
 
     def build_frame(self):
@@ -105,7 +104,6 @@ class ImageSeriesOperationsWindow(PydidasWindow):
                 _config[
                     "persistent_qsettings_ref"
                 ] = "ImageSeriesOperationsWindow__export_file"
-
             return _config
 
         _sub_section_config = {
@@ -158,7 +156,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         Build the frame and create all widgets.
         """
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
-        self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
+        # self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
         QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )

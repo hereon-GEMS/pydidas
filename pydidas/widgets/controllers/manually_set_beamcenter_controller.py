@@ -28,10 +28,10 @@ __status__ = "Production"
 __all__ = ["ManuallySetBeamcenterController"]
 
 
-from typing import Iterable, List, Literal, Tuple
+from typing import Iterable, List, Literal, NewType, Tuple
 
 import numpy as np
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...core import UserConfigError
 from ...core.constants import PYDIDAS_COLORS
@@ -40,6 +40,11 @@ from ...core.utils import (
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,
 )
+
+
+BaseFrame = NewType("BaseFrame", QtWidgets.QWidget)
+PydidasPlot2d = NewType("PydidasPlot2d", QtWidgets.QWidget)
+PointsForBeamcenterWidget = NewType("PointsForBeamcenterWidget", QtWidgets.QWidget)
 
 
 class ManuallySetBeamcenterController(QtCore.QObject):
@@ -56,13 +61,19 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         The master widget which displays the information.
     plot : pydidas.widgets.silx_plot.PydidasPlot2D
         The plot to draw markers etc.
-    point_table : pydidas.widgets.misc.PointPositionTableWidget
+    point_table : pydidas.widgets.misc.PointsForBeamcenterWidget
         The table to store the selected points.
     """
 
     sig_selected_beamcenter = QtCore.Signal()
 
-    def __init__(self, master, plot, point_table, **kwargs):
+    def __init__(
+        self,
+        master: BaseFrame,
+        plot: PydidasPlot2d,
+        point_table: PointsForBeamcenterWidget,
+        **kwargs: dict,
+    ):
         QtCore.QObject.__init__(self)
         self._config = {
             "selection_active": kwargs.get("selection_active", True),
@@ -188,7 +199,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             _item.setColor(self._config["overlay_color"])
 
     def remove_plot_items(
-        self, *kind: Tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        self, *kind: tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
     ):
         """
         Remove the selected items from the plot.
@@ -208,14 +219,14 @@ class ManuallySetBeamcenterController(QtCore.QObject):
                 self._plot.removeMarker(f"marker_{_point[0]}_{_point[1]}")
 
     def show_plot_items(
-        self, *kind: Tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        self, *kind: tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
     ):
         """
         Show the selected items in the plot.
 
         Parameters
         ----------
-        *kind : Tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        *kind : tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
             The kind of items to be removed.
         """
         kind = ["marker", "beamcenter", "beamcenter_outline"] if "all" in kind else kind
@@ -230,7 +241,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             "beamcenter_outline" in kind
             and self._config["beamcenter_outline_points"] is not None
         ):
-            self._plot_beamcenter_outline(self._config["beamcenter_outline_points"])
+            self._plot_beamcenter_outline(*self._config["beamcenter_outline_points"])
         if "marker" in kind:
             for _point in self._points:
                 _label = f"marker_{_point[0]}_{_point[1]}"
@@ -344,13 +355,13 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._master.set_param_value_and_widget("beamcenter_y", _y[0])
         self.sig_selected_beamcenter.emit()
 
-    def _set_beamcenter_marker(self, position: Tuple[float, float]):
+    def _set_beamcenter_marker(self, position: tuple[float, float]):
         """
         Mark the beamcenter with a marker.
 
         Parameters
         ----------
-        position : Tuple[float, float]
+        position : tuple[float, float]
             The (x, y) position of the beamcenter.
         """
         _color = self._config["overlay_color"]
@@ -377,7 +388,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _theta = np.linspace(0, 2 * np.pi, num=73, endpoint=True)
         _x = np.cos(_theta) * _r + _cx
         _y = np.sin(_theta) * _r + _cy
-        self._plot_beamcenter_outline((_x, _y))
+        self._plot_beamcenter_outline(_x, _y)
         self.sig_selected_beamcenter.emit()
 
     @QtCore.Slot()
@@ -402,7 +413,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._master.set_param_value_and_widget("beamcenter_x", np.round(_cx, 4))
         self._master.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
         _x, _y = calc_points_on_ellipse(_coeffs)
-        self._plot_beamcenter_outline((_x, _y))
+        self._plot_beamcenter_outline(_x, _y)
         self.sig_selected_beamcenter.emit()
 
     def _toggle_beamcenter_is_set(self, is_set: bool):
@@ -464,7 +475,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             self._set_beamcenter_marker((_x, _y))
             self.remove_plot_items("beamcenter_outline")
 
-    def _plot_beamcenter_outline(self, points: Tuple[Tuple, Tuple]):
+    def _plot_beamcenter_outline(
+        self, xpoints: tuple[float, ...], ypoints: tuple[float, ...]
+    ):
         """
         Plot an outline from the beamcenter fit defined through the points.
 
@@ -473,14 +486,15 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
         Parameters
         ----------
-        points : Tuple[Tuple, Tuple]
-            The points for the outline in form of a tuple with x- and y- point
-            positions.
+        xpoints : tuple[float, ...]
+            The x positions of the points for the outline in form of a tuple.
+        ypoints : tuple[float, ...]
+            The y positions of the points for the outline in form of a tuple.
         """
-        self._config["beamcenter_outline_points"] = points
+        self._config["beamcenter_outline_points"] = (xpoints, ypoints)
         self._plot.addShape(
-            points[0],
-            points[1],
+            xpoints,
+            ypoints,
             legend="beamcenter_outline",
             color=self._config["overlay_color"],
             linestyle="--",

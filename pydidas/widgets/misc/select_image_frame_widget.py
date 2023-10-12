@@ -29,10 +29,11 @@ __all__ = ["SelectImageFrameWidget"]
 
 
 from pathlib import Path
+from typing import Union
 
 from qtpy import QtCore
 
-from ...core import UserConfigError
+from ...core import Parameter, UserConfigError
 from ...core.constants import POLICY_EXP_FIX
 from ...core.utils import get_hdf5_populated_dataset_keys, is_hdf5_filename
 from ...data_io import IoMaster
@@ -44,20 +45,33 @@ from ..widget_with_parameter_collection import WidgetWithParameterCollection
 class SelectImageFrameWidget(WidgetWithParameterCollection):
     """
     A widget which allows to select an image from a file.
+
+    Parameters
+    ----------
+    *input_params : tuple[Parameter, ...]
+        Parameters passed to the widget to handle the frame references.
+    **kwargs : dict
+        Supported keyword arguments are;
+
+        parent : Union[None, QWidget], optional
+            The parent widget. The default is None.
+        import_reference : Union[None, str], optional
+            The reference for the file dialogue to store persistent settings.
+            If None, only the
     """
 
     sig_new_file_selection = QtCore.Signal(str, object)
     sig_file_valid = QtCore.Signal(bool)
 
-    def __init__(self, *input_params, parent=None, import_reference=None, **kwargs):
-        WidgetWithParameterCollection.__init__(self, parent, **kwargs)
+    def __init__(self, *input_params: tuple[Parameter, ...], **kwargs: dict):
+        WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(*input_params)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
             caption="Import image",
             formats=IoMaster.get_string_of_formats(),
-            qsettings_ref=import_reference,
+            qsettings_ref=kwargs.get("import_reference", None),
         )
         self.create_button(
             "but_open",
@@ -68,7 +82,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         self.create_param_widget(
             self.get_param("filename"),
             linebreak=True,
-            persistent_qsettings_ref=import_reference,
+            persistent_qsettings_ref=kwargs.get("import_reference", None),
         )
         self.create_param_widget(
             self.get_param("hdf5_key"),
@@ -99,7 +113,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
             self.process_new_filename_input(_fname)
 
     @QtCore.Slot(str)
-    def process_new_filename_input(self, filename):
+    def process_new_filename_input(self, filename: Union[Path, str]):
         """
         Process the input of a new filename in the Parameter widget.
 
@@ -124,7 +138,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         if not is_hdf5_filename(filename):
             self._selected_new_file()
 
-    def _toggle_file_selected(self, is_selected):
+    def _toggle_file_selected(self, is_selected: bool):
         """
         Modify widgets visibility and activation based on the file selection.
 

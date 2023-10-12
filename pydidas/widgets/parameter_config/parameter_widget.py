@@ -222,7 +222,7 @@ class ParameterWidget(EmptyWidget):
             self.layout().setColumnStretch(1, int(100 * self._config["width_io"]))
 
     @QtCore.Slot(str)
-    def __emit_io_changed(self, value):
+    def __emit_io_changed(self, value: str):
         """
         Forward the io_changed signal from the IO widget.
 

@@ -27,16 +27,21 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SubtractBackgroundImageConfigWidget"]
 
+
 import os
 from pathlib import Path
+from typing import NewType
 
 from qtpy import QtCore
 
 from pydidas.core import Hdf5key
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, get_extension
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
+
+
+BasePlugin = NewType("BasePlugin", type)
 
 
 class SubtractBackgroundImageConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
@@ -44,8 +49,8 @@ class SubtractBackgroundImageConfigWidget(ParameterEditCanvas, CreateWidgetsMixI
     Subtract a background image from the data.
     """
 
-    def __init__(self, plugin, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, plugin: BasePlugin, *args: tuple, **kwargs: dict):
+        ParameterEditCanvas.__init__(self, *args, **kwargs)
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         self.plugin = plugin
         for param in self.plugin.params.values():
@@ -64,7 +69,7 @@ class SubtractBackgroundImageConfigWidget(ParameterEditCanvas, CreateWidgetsMixI
         self.toggle_param_widget_visibility("bg_hdf5_frame", _start_vis)
 
     @QtCore.Slot(str)
-    def _toggle_hdf5_plugin_visibility(self, new_file):
+    def _toggle_hdf5_plugin_visibility(self, new_file: str):
         """
         Toggle the visibility of the plugins for Hdf5 dataset and frame number.
 
@@ -73,7 +78,7 @@ class SubtractBackgroundImageConfigWidget(ParameterEditCanvas, CreateWidgetsMixI
         new_file : str
             The filename of the newly selected file.
         """
-        _visibility = os.path.splitext(new_file)[1][1:] in HDF5_EXTENSIONS
+        _visibility = get_extension(new_file) in HDF5_EXTENSIONS
         self.toggle_param_widget_visibility("bg_hdf5_key", _visibility)
         self.toggle_param_widget_visibility("bg_hdf5_frame", _visibility)
 

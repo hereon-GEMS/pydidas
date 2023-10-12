@@ -50,7 +50,7 @@ class PydidasWindowMixIn:
     def __init__(self):
         self._geometry = None
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtCore.QEvent):
         """
         Overload the closeEvent to store the window's geometry.
 
@@ -69,7 +69,7 @@ class PydidasWindowMixIn:
             self.setGeometry(self._geometry)
         super().show()
 
-    def export_window_state(self):
+    def export_window_state(self) -> dict:
         """
         Get the state of the window for exporting.
 
@@ -84,7 +84,7 @@ class PydidasWindowMixIn:
         """
         return {"geometry": self.geometry().getRect(), "visible": self.isVisible()}
 
-    def restore_window_state(self, state):
+    def restore_window_state(self, state: dict):
         """
         Restore the window state from saved information.
 

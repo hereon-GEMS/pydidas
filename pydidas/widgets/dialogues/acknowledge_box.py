@@ -54,7 +54,7 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         Keyword arguments passed to QtWidgets.QDialogue instanciation.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         _text = kwargs.pop("text", "")
         _qtapp = QtWidgets.QApplication.instance()
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
@@ -108,7 +108,7 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             _qtapp.font_height * 10,
         )
 
-    def set_text(self, text):
+    def set_text(self, text: str):
         """
         Set the text in the message box.
 

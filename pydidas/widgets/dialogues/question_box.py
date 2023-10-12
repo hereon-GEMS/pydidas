@@ -74,7 +74,7 @@ class QuestionBox(QtWidgets.QMessageBox):
         self.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         self.setDefaultButton(default)
 
-    def exec_(self):
+    def exec_(self) -> bool:
         """
         Show the box.
 

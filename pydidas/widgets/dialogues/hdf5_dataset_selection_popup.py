@@ -28,6 +28,7 @@ __status__ = "Production"
 __all__ = ["Hdf5DatasetSelectionPopup"]
 
 
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Union
 
@@ -63,7 +64,7 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         self.setWindowIcon(get_pyqt_icon_from_str("qt-std::SP_FileDialogListView"))
         self.setLabelText("Hdf5 datasets:")
 
-    def set_filename(self, fname):
+    def set_filename(self, fname: Union[Path, str]):
         """
         Set the filename for the Hdf5 file.
 
@@ -75,13 +76,13 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
         self.__update_combo_box_items(dsets)
 
-    def __update_combo_box_items(self, items):
+    def __update_combo_box_items(self, items: Iterable[str, ...]):
         """
         Update the ComboBox entries with new items.
 
         Parameters
         ----------
-        items : Union[list, set, tuple]
+        items : Iterable[str, ...]
             The items which are to be displayed. This must be an iterable
             of string items.
         """
@@ -96,7 +97,7 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 
-    def get_dset(self):
+    def get_dset(self) -> Union[Hdf5key, None]:
         """
         Show the QInputDialog.
 

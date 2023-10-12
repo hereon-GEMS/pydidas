@@ -16,7 +16,7 @@
 # along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PointPositionTableWidget class which is a table to select and display
+Module with the PointsForBeamcenterWidget class which is a table to select and display
 points (i.e. x/y tuples) in a plot.
 """
 
@@ -28,9 +28,7 @@ __status__ = "Production"
 __all__ = ["PointsForBeamcenterWidget"]
 
 
-from typing import List, Tuple
-
-from qtpy import QT_VERSION, QtCore, QtWidgets
+from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 
 from ...core import get_generic_parameter
 from ...core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
@@ -47,8 +45,8 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
     sig_new_selection = QtCore.Signal(object)
     sig_remove_points = QtCore.Signal(object)
 
-    def __init__(self, parent=None):
-        QtWidgets.QTableWidget.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QTableWidget.__init__(self, kwargs.get("parent", None))
         apply_qt_properties(
             self,
             columnCount=1,
@@ -60,7 +58,7 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.selectionModel().selectionChanged.connect(self.emit_new_selection)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
         """
         Extend the generic keyPressEvent to add a binding for the Del key.
 
@@ -107,13 +105,13 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         self.setRowCount(0)
         self.sig_remove_points.emit(_points_to_remove)
 
-    def _get_selected_points(self) -> List[Tuple[float, float]]:
+    def _get_selected_points(self) -> list[tuple[float, float], ...]:
         """
         Get the selected points.
 
         Returns
         -------
-        list
+        list[tuple[float, float], ...]
             List of the (x, y) position tuples.
         """
         _indices = self.selectedIndexes()
@@ -124,14 +122,14 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
             _selected_points.append(_pos)
         return _selected_points
 
-    def _get_all_points(self) -> List[Tuple[float, float]]:
+    def _get_all_points(self) -> list[tuple[float, float], ...]:
         """
         Get a list of all points.
 
         Returns
         -------
-        List
-            The list with all points
+        list[tuple[float, float], ...]
+            The list with all points (tuples of (x, y) positions).
         """
         _points = []
         for _index in range(self.rowCount()):
@@ -141,7 +139,7 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
             _points.append(_pos)
         return _points
 
-    def get_rows_of_selected_points(self) -> List:
+    def get_rows_of_selected_points(self) -> list[int, ...]:
         """
         Get the row numbers of the selected points, sorted in inverse order.
 

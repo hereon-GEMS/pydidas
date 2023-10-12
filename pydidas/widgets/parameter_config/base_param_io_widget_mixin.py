@@ -168,7 +168,7 @@ class BaseParamIoWidgetMixIn:
         """
         raise NotImplementedError
 
-    def set_value(self, value):
+    def set_value(self, value: object):
         """
         Set the input field's value.
 

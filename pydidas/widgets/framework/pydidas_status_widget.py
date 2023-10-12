@@ -40,8 +40,8 @@ class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
     to append text.
     """
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QPlainTextEdit.__init__(self, kwargs.get("parent", None))
         self.setReadOnly(True)
         self.setMinimumHeight(50)
         self.resize(500, 50)

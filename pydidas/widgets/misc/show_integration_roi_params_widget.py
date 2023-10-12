@@ -38,6 +38,7 @@ from ...core.constants import (
     POLICY_FIX_EXP,
     POLICY_MIN_MIN,
 )
+from ...plugins import BasePlugin
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
 
 
@@ -53,8 +54,8 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
     sig_roi_changed = QtCore.Signal()
     sig_toggle_edits = QtCore.Signal(bool)
 
-    def __init__(self, parent=None, **kwargs):
-        WidgetWithParameterCollection.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        WidgetWithParameterCollection.__init__(self, **kwargs)
         self.setSizePolicy(*POLICY_MIN_MIN)
         self.set_default_params()
         self._plugin = kwargs.get("plugin", None)
@@ -80,7 +81,7 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
                 stretch=(1, 1),
             )
 
-    def create_widgets_for_axis(self, plugin, axis: Literal["rad", "azi"]):
+    def create_widgets_for_axis(self, plugin: BasePlugin, axis: Literal["rad", "azi"]):
         """
         Create the widgets for the given axis.
 

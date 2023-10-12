@@ -64,7 +64,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         self.set_value(param.value)
         self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)
 
-    def __convert_bool(self, value: object):
+    def __convert_bool(self, value: object) -> object:
         """
         Convert boolean integers to string.
 

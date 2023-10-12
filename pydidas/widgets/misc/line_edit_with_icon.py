@@ -47,9 +47,12 @@ class LineEditWithIcon(QtWidgets.QLineEdit):
         Qt can be defined at creation.
     """
 
-    def __init__(self, parent=None, icon=None, **kwargs):
-        QtWidgets.QLineEdit.__init__(self, parent)
+    init_kwargs = ["parent", "icon"]
 
+    def __init__(self, icon=None, **kwargs):
+        QtWidgets.QLineEdit.__init__(self, kwargs.pop("parent", None))
+
+        icon = kwargs.pop("icon", None)
         if isinstance(icon, str):
             icon = get_pyqt_icon_from_str(icon)
         apply_qt_properties(self, **kwargs)

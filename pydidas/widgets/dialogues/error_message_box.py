@@ -57,7 +57,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         Keyword arguments passed to QtWidgets.QDialogue instanciation.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         self._text = kwargs.pop("text", "")
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
@@ -132,7 +132,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             self._widgets[_name].setFocusPolicy(QtCore.Qt.FocusPolicy.TabFocus)
         self.setTabOrder(self._widgets["button_copy"], self._widgets["button_okay"])
 
-    def set_text(self, text):
+    def set_text(self, text: str):
         """
         Set the text in the message box.
 

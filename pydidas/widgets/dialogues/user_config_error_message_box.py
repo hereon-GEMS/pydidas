@@ -53,7 +53,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         Keyword arguments passed to QtWidgets.QDialogue instanciation.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         _text = kwargs.pop("text", "")
         _font_height = QtWidgets.QApplication.instance().font_height
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
@@ -102,7 +102,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self._widgets["button_okay"].clicked.connect(self.close)
         self.set_text(_text)
 
-    def set_text(self, text):
+    def set_text(self, text: str):
         """
         Set the text in the message box.
 

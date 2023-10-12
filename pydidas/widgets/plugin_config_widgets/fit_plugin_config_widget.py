@@ -29,6 +29,7 @@ __all__ = ["FitPluginConfigWidget"]
 
 
 from functools import partial
+from typing import NewType
 
 from qtpy import QtCore
 from qtpy.QtWidgets import QStyle
@@ -40,6 +41,9 @@ from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
 
 
+BaseFitPlugin = NewType("BaseFitPlugin", type)
+
+
 class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     """
     A custom widget to modify the Parameters for peak fitting plugins.
@@ -47,7 +51,7 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     The widget adds a list of tickboxes to select the fit output.
     """
 
-    def __init__(self, plugin, *args, **kwargs):
+    def __init__(self, plugin: BaseFitPlugin, *args: tuple, **kwargs: dict):
         ParameterEditCanvas.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         apply_qt_properties(

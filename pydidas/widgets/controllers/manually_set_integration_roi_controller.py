@@ -29,10 +29,11 @@ __all__ = ["ManuallySetIntegrationRoiController"]
 
 
 from functools import partial
-from typing import Literal, Tuple
+from typing import Literal
 
 import numpy as np
 from qtpy import QtCore
+from qtpy.QtWidgets import QWidget
 
 from ...core import UserConfigError, get_generic_param_collection
 from ...core.constants import PYDIDAS_COLORS
@@ -44,14 +45,26 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
     """
     A controller to handle manually setting the integration region.
 
+    This controller connects a plot widget (PydidasPlot2d instance) with the editor
+    which holds the references to the Parameters for the integration ROI bounds.
+    It allows to draw the boundaries of the integration ROI in the plot (assuming
+    that the DiffractionExperimentContext has been set).
+    If enabled, it picks up clicks in the plot widget and updates the respective
+    Parameters and draws the new bounds in the plot.
+
     Parameters
     ----------
     editor : pydidas.widgets.misc.ShowIntegrationRoiParamsWidget
         The ShowIntegrationRoiParamsWidget instance to display parameter values.
     plot : pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions
         The plot to display the ROI.
-    plugin : pydidas.plugins.BasePlugin
-        The plugin to be edited.
+    **kwargs : dict
+        Supported keyword arguments are:
+
+        plugin : pydidas.plugins.BasePlugin
+            The plugin to be edited.
+        forced_edit_disable : bool
+            Flag to force
     """
 
     default_params = get_generic_param_collection("overlay_color")
@@ -60,10 +73,10 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
     sig_toggle_selection_mode = QtCore.Signal(bool)
     widget_width = 320
 
-    def __init__(self, editor, plot, plugin=None, **kwargs):
+    def __init__(self, editor: QWidget, plot: QWidget, **kwargs: dict):
         QtCore.QObject.__init__(self)
         self._plot = plot
-        self._plugin = None
+        self._plugin = kwargs.get("plugin", None)
         self._editor = editor
         self._config = {
             "roi_plotted": False,
@@ -76,8 +89,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self._editor._widgets["but_reset_to_start_values"].clicked.connect(
             self.reset_plugin
         )
-        if plugin is not None:
-            self.set_new_plugin(plugin)
+        if self._plugin is not None:
+            self.set_new_plugin(self._plugin)
 
     @property
     def enabled(self) -> bool:
@@ -220,14 +233,14 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
 
     @QtCore.Slot()
     def show_plot_items(
-        self, *kind: Tuple[Literal["azimuthal", "radial", "roi", "all"]]
+        self, *kind: tuple[Literal["azimuthal", "radial", "roi", "all"]]
     ):
         """
         Show the items for the given kind from the plot.
 
         Parameters
         ----------
-        *kind : Tuple[Literal["azimuthal", "radial", "roi", "all"]]
+        *kind : tuple[Literal["azimuthal", "radial", "roi", "all"]]
             The kind or markers to be removed.
         """
         kind = ["azimuthal", "radial", "roi"] if "all" in kind else kind
@@ -246,14 +259,14 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             self._show_integration_region()
 
     def remove_plot_items(
-        self, *kind: Tuple[Literal["azimuthal", "radial", "roi", "all"]]
+        self, *kind: tuple[Literal["azimuthal", "radial", "roi", "all"]]
     ):
         """
         Remove the items for the given kind from the plot.
 
         Parameters
         ----------
-        *kind : Tuple[Literal["azimuthal", "radial", "roi", "all"]]
+        *kind : tuple[Literal["azimuthal", "radial", "roi", "all"]]
             The kind or markers to be removed.
         """
         kind = ["azimuthal", "radial", "roi"] if "all" in kind else kind
@@ -276,14 +289,14 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             self.show_plot_items("roi")
 
     @QtCore.Slot()
-    def _start_selection(self, type_):
+    def _start_selection(self, type_: Literal["radial", "azimuthal"]):
         """
         Start the selection of the integration region.
 
         Parameters
         ----------
-        type_ : str
-            The type of region. Must be either radial or azimuthal.
+        type_ : Literal["radial", "azimuthal"]
+            The type of region to be selected.
         """
         if not self._plot.isEnabled():
             return
@@ -300,7 +313,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self.sig_toggle_selection_mode.emit(True)
         self._plot.sig_new_point_selected.connect(getattr(self, f"_new_{type_}_point"))
 
-    def set_param_value_and_widget(self, key, value):
+    def set_param_value_and_widget(self, key: str, value: object):
         """
         Set the Plugin's Parameter value and the widget display value.
 
@@ -348,7 +361,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             self._editor.toggle_param_widget_visibility("azi_range_upper", _flag)
 
     @QtCore.Slot(float, float)
-    def _new_radial_point(self, xpos, ypos):
+    def _new_radial_point(self, xpos: float, ypos: float):
         """
         Handle the selection of a new point in the radial selection.
 
@@ -384,7 +397,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             self.show_plot_items("roi")
 
     @QtCore.Slot(float, float)
-    def _new_azimuthal_point(self, xpos, ypos):
+    def _new_azimuthal_point(self, xpos: float, ypos: float):
         """
         Handle the selection of a new point in the azimuthal selection.
 
@@ -427,13 +440,13 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             self.set_param_value_and_widget("azi_range_upper", _high)
 
     @QtCore.Slot(str)
-    def _change_azi_unit(self, new_unit):
+    def _change_azi_unit(self, new_unit: Literal["chi / deg", "chi / rad"]):
         """
         Change the azimuthal unit for the integration region.
 
         Parameters
         ----------
-        new_unit : str
+        new_unit : Literal["chi / deg", "chi / rad"]
             The new unit for chi.
         """
         _low = self._plugin.get_param_value("azi_range_lower")
@@ -443,13 +456,15 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self.set_param_value_and_widget("azi_range_upper", np.round(_high * _factor, 6))
 
     @QtCore.Slot(str)
-    def _change_rad_unit(self, new_unit):
+    def _change_rad_unit(
+        self, new_unit: Literal["2theta / deg", "Q / nm^-1", "r / mm"]
+    ):
         """
         Change the unit for the radial integration region.
 
         Parameters
         ----------
-        new_unit : str
+        new_unit : Literal["2theta / deg", "Q / nm^-1", "r / mm"]
             The new unit for the radial selection.
         """
         self._plugin.convert_radial_range_values(self._config["rad_unit"], new_unit)
@@ -462,15 +477,25 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         )
 
     @QtCore.Slot(str)
-    def _updated_use_range_param(self, type_, value):
+    def _updated_use_range_param(
+        self,
+        type_: Literal["radial", "azimuthal"],
+        value: Literal[
+            "Full detector", "Specify radial range", "Specify azimuthal range"
+        ],
+    ):
         """
         Handle a new 'use radial/azimuthal range' Parameter setting.
 
         Parameters
         ----------
-        type_ : str
+        type_ : Literal["radial", "azimuthal"]
             The type of range. Must be either radial or azimuthal
-        value : str
+        value : Literal[
+            "Full detector",
+            "Specify radial range",
+            "Specify azimuthal range"
+        ]
             The new value of the Parameter.
         """
         _use_range = value == f"Specify {type_} range"

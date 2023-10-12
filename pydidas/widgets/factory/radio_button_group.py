@@ -48,12 +48,22 @@ class RadioButtonGroup(QtWidgets.QWidget):
         Parameters
         ----------
         **kwargs : dict
-            Keyword arguments. Supported kwargs are "entries" with a list of
-            labels for the butttons; "rows" and "columns" to control the layout of
-            the buttons and "title" to add a header label.
+            Keyword arguments. Supported kwargs are:
+
+            entries : list[str, ...], optional
+                The titles of the radio buttons.
+            rows : int, optional
+                The number of rows to arrange the radio buttons. Use -1 for automatic
+                detection. The default is 1.
+            columns : int, optional
+                The number of columns to arrange the radio buttons. Use -1 for
+                automatic detection. The default is -1.
+            title : str, optional
+                An optional title label, to be displayed above the radio buttons.
+                The default is an empty string.
         """
         QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
-        self._title = kwargs.get("title", None)
+        self._title = kwargs.get("title", "")
         for _key, _default in [["rows", 1], ["columns", -1]]:
             _val = kwargs.get(_key, _default)
             _val = _val if _val != -1 else len(entries)
@@ -72,22 +82,22 @@ class RadioButtonGroup(QtWidgets.QWidget):
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
         self.process_new_font_metrics(*self._qtapp.font_metrics)
 
-    def __create_widgets(self, entries):
+    def __create_widgets(self, entries: list[str, ...]):
         """
         Initialize the user interface with Widgets and Layout.
 
         Parameters
         ----------
-        entries : list
-            The list of entries as passed from __init__.
+        entries : list[str, ...]
+            The list of entries, as passed from __init__.
         """
-        _yoffset = self._title is not None
+        _yoffset = self._title != ""
 
         self.q_button_group = QtWidgets.QButtonGroup(self)
         _layout = QtWidgets.QGridLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.setSpacing(0)
-        if self._title is not None:
+        if self._title != "":
             _label = QtWidgets.QLabel(self._title)
             _layout.addWidget(_label, 0, 0, 1, self._columns, QtCore.Qt.AlignBottom)
 
@@ -107,7 +117,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         self.setLayout(_layout)
 
     @property
-    def emit_signal(self):
+    def emit_signal(self) -> bool:
         """
         Query whether a signal will be emitted on change.
 
@@ -119,7 +129,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         return self._emit_signal
 
     @emit_signal.setter
-    def emit_signal(self, value):
+    def emit_signal(self, value: bool):
         """
         Change the stored value for emit_signal.
 
@@ -152,7 +162,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
                 self.new_button_index.emit(_index)
                 self.new_button_label.emit(_entry)
 
-    def which_is_checked(self):
+    def which_is_checked(self) -> int:
         """
         Return the information about which index is checked.
 
@@ -164,7 +174,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         return self._active_index
 
     @property
-    def active_label(self):
+    def active_label(self) -> str:
         """
         Return the label name of the currently selected button.
 
@@ -175,7 +185,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         """
         return self._active_label
 
-    def select_by_index(self, index):
+    def select_by_index(self, index: int):
         """
         Select and activate a new RadioButton based on the index.
 
@@ -187,7 +197,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         _button = self._buttons[index]
         self.__select_new_button(_button)
 
-    def select_by_label(self, label):
+    def select_by_label(self, label: str):
         """
         Select and activate a new RadioButton based on the text label.
 
@@ -199,7 +209,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         _button = self._buttons[self._button_label[label]]
         self.__select_new_button(_button)
 
-    def __select_new_button(self, button):
+    def __select_new_button(self, button: QtWidgets.QRadioButton):
         """
         Toggle a new RadioButton without emitting a signal.
 

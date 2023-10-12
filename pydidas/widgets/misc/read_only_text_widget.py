@@ -64,7 +64,7 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         self.__text = ""
         self.__title = None
 
-    def setText(self, text, title=None):
+    def setText(self, text: str, title: str = ""):
         """
         Set the widget's text.
 
@@ -86,17 +86,17 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
             self.append(text)
         self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
-    def __add_title(self, title: Union[str, None]):
+    def __add_title(self, title: str):
         """
         Add the title to the box, if given.
 
         Parameters
         ----------
-        title : Union[str, None]
-            The title. If None, this method will be skipped.
+        title : str
+            The title to be added. Use an empty string to skip the title.
         """
         self.__title = title
-        if title is None:
+        if title == "":
             return
         self.setFontPointSize(self._qtapp.font_size + 3)
         self.setFontWeight(QtGui.QFont.Bold)
@@ -107,7 +107,7 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
     def set_text_from_dict(
         self,
         text_dict: dict,
-        title: Union[str, None] = None,
+        title: str = "",
         one_line_entries: bool = False,
         indent: int = 4,
     ):

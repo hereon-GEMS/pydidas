@@ -35,7 +35,7 @@ __all__ = [
 
 from collections.abc import Iterable
 
-from qtpy import QtGui
+from qtpy import QtGui, QT_VERSION
 from qtpy.QtCore import QObject
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import QWidget
@@ -130,10 +130,16 @@ def update_palette(obj: QObject, **kwargs: dict):
     """
     _palette = obj.palette()
     for _key, _value in kwargs.items():
-        _role = _key[0].upper() + _key[1:]
-        if _role in QtGui.QPalette.__dict__:
-            _rolekey = getattr(QtGui.QPalette, _role)
-            _palette.setColor(_rolekey, QtGui.QColor(_value))
+        if QT_VERSION.startswith("5"):
+            _role = _key[0].upper() + _key[1:]
+            if _role in QtGui.QPalette.__dict__:
+                _rolekey = getattr(QtGui.QPalette, _role)
+                _palette.setColor(_rolekey, QtGui.QColor(_value))
+        elif QT_VERSION.startswith("6"):
+            _role = _key[0].upper() + _key[1:]
+            if _role in QtGui.QPalette.ColorRole.__dict__:
+                _rolekey = getattr(QtGui.QPalette.ColorRole, _role)
+                _palette.setColor(_rolekey, QtGui.QColor(_value))
     obj.setPalette(_palette)
 
 

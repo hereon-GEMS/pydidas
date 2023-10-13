@@ -29,12 +29,18 @@ __status__ = "Production"
 __all__ = []
 
 # import __all__ items from modules:
+from .scan import *
 from .scan_context import *
 from .scan_context_io_base import *
 from .scan_context_io_meta import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import scan
+
+__all__.extend(scan.__all__)
+del scan
+
 from . import scan_context
 
 __all__.extend(scan_context.__all__)

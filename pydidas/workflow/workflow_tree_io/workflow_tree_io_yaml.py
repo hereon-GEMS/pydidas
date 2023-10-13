@@ -33,7 +33,9 @@ from typing import NewType, Union
 
 import yaml
 
+from ...core import UserConfigError
 from ...core.constants import YAML_EXTENSIONS
+from ...version import VERSION
 from .workflow_tree_io_base import WorkflowTreeIoBase
 
 
@@ -65,7 +67,10 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
             The workflow tree instance.
         """
         cls.check_for_existing_file(filename, **kwargs)
-        _dump = [node.dump() for node in tree.nodes.values()]
+        _dump = {
+            "version": VERSION,
+            "nodes": tree.export_to_list_of_nodes(),
+        }
         with open(filename, "w") as _file:
             yaml.safe_dump(_dump, _file)
 
@@ -88,9 +93,27 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
         """
         from ..workflow_tree import _WorkflowTree
 
+        _version = "23.7.5 or earlier"
+
         with open(filename, "r") as _file:
             _restoration = yaml.safe_load(_file)
 
-        _tree = _WorkflowTree()
-        _tree.restore_from_list_of_nodes(_restoration)
+        try:
+            if isinstance(_restoration, dict):
+                _version = _restoration["version"]
+                _restoration = _restoration["nodes"]
+            _tree = _WorkflowTree()
+            _tree.restore_from_list_of_nodes(_restoration)
+        except (KeyError, TypeError, UserConfigError):
+            if _version < VERSION:
+                raise UserConfigError(
+                    "Import of WorkflowTree was not successful. The WorkflowTree was "
+                    f"created with version {_version} and could not be imported in "
+                    f"the current version ({VERSION})."
+                )
+            raise UserConfigError(
+                "Could not import the Workflow from the given file:"
+                f"\n    {filename}\nPlease check that the content of the file "
+                "is a Pydidas WorkflowTree."
+            )
         return _tree

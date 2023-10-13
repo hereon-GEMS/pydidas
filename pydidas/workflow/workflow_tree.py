@@ -286,7 +286,18 @@ class _WorkflowTree(GenericTree):
         str
             The string representation.
         """
-        return str([node.dump() for node in self.nodes.values()])
+        return str(self.export_to_list_of_nodes())
+
+    def export_to_list_of_nodes(self) -> list[dict]:
+        """
+        Export the Tree to a representation of all nodes in form of dictionaries.
+
+        Returns
+        -------
+        list[dict]
+            The list with a dictionary entry for each node.
+        """
+        return [node.dump() for node in self.nodes.values()]
 
     def restore_from_string(self, string: str):
         """
@@ -302,8 +313,12 @@ class _WorkflowTree(GenericTree):
         """
         try:
             _nodes = ast.literal_eval(string)
-        except SyntaxError:
+        except SyntaxError as _syntax_error:
             _nodes = []
+            raise UserConfigError(
+                "Could not interpret the given string representation of the "
+                "Workflow to be restored. The WorkflowTree has been reset."
+            ) from _syntax_error
         self.restore_from_list_of_nodes(_nodes)
         self._config["tree_changed"] = True
 

@@ -361,8 +361,8 @@ class TestWorkflowTree(unittest.TestCase):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
-        self.tree.restore_from_string("")
-        self.assertEqual(self.tree.nodes, dict())
+        with self.assertRaises(UserConfigError):
+            self.tree.restore_from_string("")
 
     def test_restore_from_string__empty_list(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())

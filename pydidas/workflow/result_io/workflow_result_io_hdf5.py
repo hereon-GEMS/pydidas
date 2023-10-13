@@ -35,7 +35,7 @@ from typing import Union
 
 import h5py
 
-from ... import version
+from ... import VERSION
 from ...contexts import DiffractionExperimentContext, ScanContext
 from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...contexts.scan_context import Scan
@@ -117,7 +117,7 @@ def get_pydidas_context_config_entries(
         ["entry/pydidas_config", "workflow", {"data": tree.export_to_string()}]
     )
     _dsets.append(
-        ["entry/pydidas_config", "pydidas_version", {"data": version.version}]
+        ["entry/pydidas_config", "pydidas_version", {"data": VERSION}]
     )
     for _dim in range(scan.ndim):
         _label = scan.get_param_value(f"scan_dim{_dim}_label")

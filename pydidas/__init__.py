@@ -49,7 +49,7 @@ if __QtWidgets.QApplication.instance() is None:
 
 
 # import local modules
-from . import version
+from .version import version, VERSION
 
 # Change the multiprocessing Process spawn method to handle silx/pyFAI in linux
 import warnings as __warnings
@@ -85,6 +85,8 @@ __all__.extend(
         "widgets",
         "gui",
         "IS_QT6",
+        "version",
+        "VERSION",
     ]
 )
 
@@ -110,15 +112,14 @@ silx_opencl_logger.setLevel(__logging.ERROR)
 
 # if not existing, initialize all QSettings with the default values from the
 # default Parameters to avoid having "None" keys returned.
-__version = version.VERSION
 __settings = __QtCore.QSettings("Hereon", "pydidas")
 for _prefix, _keys in (
     ("global", core.constants.QSETTINGS_GLOBAL_KEYS),
     ("user", core.constants.QSETTINGS_USER_KEYS),
 ):
     for _key in _keys:
-        _val = __settings.value(f"{__version}/{_prefix}/{_key}")
+        _val = __settings.value(f"{VERSION}/{_prefix}/{_key}")
         if _val is None:
             _param = core.get_generic_parameter(_key)
-            __settings.setValue(f"{__version}/{_prefix}/{_key}", _param.default)
+            __settings.setValue(f"{VERSION}/{_prefix}/{_key}", _param.default)
 del __settings

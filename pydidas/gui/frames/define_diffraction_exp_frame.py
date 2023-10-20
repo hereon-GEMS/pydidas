@@ -295,6 +295,10 @@ class DefineDiffractionExpFrame(BaseFrame):
             self._select_beamcenter_window.sig_about_to_close.connect(
                 self._child_window_closed
             )
+        self._select_beamcenter_window.update_detector_description(
+            self.get_param_value("detector_name"),
+            self.get_param_value("detector_mask_file"),
+        )
         self._select_beamcenter_window.show()
         self.setEnabled(False)
 

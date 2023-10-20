@@ -35,7 +35,7 @@ from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext
 from ...core import Dataset, get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYFAI_DETECTOR_NAMES
 from ...data_io import import_data
 from ..controllers import ManuallySetBeamcenterController
 from ..dialogues import QuestionBox
@@ -69,13 +69,13 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             title="Define beamcenter through selected points",
             **kwargs,
         )
-        self._config = self._config | dict(
-            beamcenter_set=False,
-            diffraction_exp=kwargs.get(
+        self._config = self._config | {
+            "beamcenter_set": False,
+            "diffraction_exp": kwargs.get(
                 "diffraction_exp", DiffractionExperimentContext()
             ),
-            select_mode_active=False,
-        )
+            "select_mode_active": False,
+        }
         self._markers = {}
         self._image = Dataset(np.zeros((5, 5)))
         self.frame_activated(self.frame_index)
@@ -214,6 +214,26 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         _path = Path(filename)
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
         self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
+
+    def update_detector_description(self, detector_name: str, mask_filename: str):
+        """
+        Process the new detector settings.
+
+        Parameters
+        ----------
+        mask_filename : str
+            The name of the new mask file or None to disable mask usage.
+        """
+        _path = Path(mask_filename)
+        if detector_name in PYFAI_DETECTOR_NAMES and not _path.is_file():
+            print("setting mask from detector")
+            self._bc_controller.set_new_detector_with_mask(detector_name)
+        elif _path.is_file():
+            print("new mask file selection:", _path)
+            self._bc_controller.set_mask_file(_path)
+        else:
+            self._bc_controller.set_mask_file(None)
+            print("No mask")
 
     @QtCore.Slot()
     def _confirm_points(self):

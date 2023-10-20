@@ -29,9 +29,11 @@ __all__ = ["ManuallySetBeamcenterController"]
 
 
 from collections.abc import Iterable
-from typing import List, Literal, NewType, Tuple
+from pathlib import Path
+from typing import Literal, NewType, Union
 
 import numpy as np
+import pyFAI
 from qtpy import QtCore, QtWidgets
 
 from ...core import UserConfigError
@@ -41,6 +43,7 @@ from ...core.utils import (
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,
 )
+from ...data_io import import_data
 
 
 BaseFrame = NewType("BaseFrame", QtWidgets.QWidget)
@@ -90,6 +93,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._master = master
         self._plot = plot
         self._points_for_bc = point_table
+        self._mask = None
+        self._mask_hash = -1
         self._plot.sigPlotSignal.connect(self._process_plot_signal)
         self._points_for_bc.sig_new_selection.connect(self.__new_points_selected)
         self._points_for_bc.sig_remove_points.connect(self.__remove_points_from_plot)
@@ -106,7 +111,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         )
 
     @property
-    def points(self) -> Tuple[np.ndarray, np.ndarray]:
+    def points(self) -> tuple[np.ndarray, np.ndarray]:
         """
         The points marked in the image.
 
@@ -120,7 +125,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         return self._get_points_as_arrays(self._points)
 
     @property
-    def selected_points(self) -> Tuple[np.ndarray, np.ndarray]:
+    def selected_points(self) -> tuple[np.ndarray, np.ndarray]:
         """
         The currently selected points in the image.
 
@@ -133,13 +138,13 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         return self._get_points_as_arrays(self._config["selected_points"])
 
-    def _get_points_as_arrays(self, points: List[Tuple[float, float]]):
+    def _get_points_as_arrays(self, points: list[tuple[float, float]]):
         """
         Get the given list of points as arrays.
 
         Parameters
         ----------
-        points : List[Tuple[float, float]]
+        points : list[tuple[float, float]]
             The points to be processed.
 
         Returns
@@ -207,7 +212,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
         Parameters
         ----------
-        *kind : Tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        *kind : tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
             The kind of items to be removed.
         """
         kind = ["marker", "beamcenter", "beamcenter_outline"] if "all" in kind else kind
@@ -306,7 +311,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         if self._config["2click_selection"] and not self._config["wait_for_2nd_click"]:
             self.__process_click_one_of_two(_x, _y)
             return
-        elif self._config["2click_selection"] and self._config["wait_for_2nd_click"]:
+        if self._config["2click_selection"] and self._config["wait_for_2nd_click"]:
             self.__process_click_two_of_two()
         if (_x, _y) in self._points:
             return
@@ -333,16 +338,20 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._config["2click_ylimits"] = self._plot.getGraphYLimits()
         self._config["2click_cmap_limits"] = _cmap.getVRange()
 
-        _delta = 40
+        _delta = 50
+
         _data = self._plot.getImage().getData(copy=False)
         _x0 = int(np.round(max(0, x - _delta)))
         _x1 = int(np.round(min(_data.shape[1], x + _delta)))
         _y0 = int(np.round(max(0, y - _delta)))
         _y1 = int(np.round(min(_data.shape[0], y + _delta)))
+
+        _data = _data[_y0:_y1, _x0:_x1]
+        if self._mask is not None:
+            _data = np.ma.masked_array(_data, mask=self._mask[_y0:_y1, _x0:_x1])
+
         self._plot.setLimits(_x0, _x1, _y0, _y1)
-        _cmap.setVRange(
-            np.amin(_data[_y0:_y1, _x0:_x1]), np.amax(_data[_y0:_y1, _x0:_x1])
-        )
+        _cmap.setVRange(np.amin(_data), np.amax(_data))
         self._config["wait_for_2nd_click"] = True
 
     def __process_click_two_of_two(self):
@@ -436,6 +445,37 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _x, _y = calc_points_on_ellipse(_coeffs)
         self._plot_beamcenter_outline(_x, _y)
         self.sig_selected_beamcenter.emit()
+
+    def set_mask_file(self, mask: Union[None, Path]):
+        """
+        Set the mask file.
+
+        Parameters
+        ----------
+        mask : Union[None, Path]
+            The path to the mask file or None to skip masking.
+        """
+        if mask is None:
+            self._mask = None
+            self._mask_hash = -1
+            return
+        if mask.is_file():
+            if hash(mask) == self._mask_hash:
+                return
+            self._mask = import_data(mask)
+            self._mask_hash = hash(mask)
+
+    def set_new_detector_with_mask(self, detector_name: str):
+        """
+        Process the input of a new detector to select the generic mask.
+
+        Parameters
+        ----------
+        detector_name : str
+            The name of the detector.
+        """
+        self._mask = pyFAI.detector_factory(detector_name).mask
+        self._mask_hash = hash("detector-name::" + detector_name)
 
     def _toggle_beamcenter_is_set(self, is_set: bool):
         """

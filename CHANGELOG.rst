@@ -30,7 +30,8 @@ Improvements
       trees from different versions with changed requirements.
     - Improved the docstring for fitting plugins to allow better feature
       usage also by inexperienced users.
-    
+    - Added support for image masks in the manual beamcenter selection window
+      to filter out the masked values for the histogram.
     
 - Programmatic updates:
 

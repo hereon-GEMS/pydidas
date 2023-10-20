@@ -20,7 +20,7 @@ which holds information about the experimental/beamline setup.
 The frame only holds the configuration widgets:
 
 .. image:: images/define_experiment_frame_full.png
-    :width: 370px
+    :width: 540px
     :align: center
 
 Detailed description of frame items
@@ -99,14 +99,29 @@ and the detector position is described by the sample-detector distance, two
 positions for the point of normal incidence on the detector (PONI1 in vertical
 and PONI2 in hprizontal directions) which describe the orthogonal projection of 
 the origin (i.e. sample) on the detector and three rotations to modify the 
-detector position.  Please refer to the pyFAI documentation for a detailed 
-description.
+detector position. Please refer to the pyFAI documentation for a detailed 
+description. For the user's convenience, the derived beamcenter pixel position
+in detector pixel coordinates is also displayed.
 
-In addition to taking these settings from the the pyFAI calibration
-(see :ref:`copy_from calibration`) and manual update, pydidas also offers a 
-tool for manually setting the beamcenter. The button *Manual beamcenter 
+In addition to taking these settings from the pyFAI calibration (see 
+:ref:`copy_from calibration`) and manual Parameter updates , pydidas also offers 
+a tool for manually setting the beamcenter. The button *Manual beamcenter 
 definition* opens a new window. The window is described in detail in 
-:ref:`manually_set_beamcenter_window`.
+:ref:`manually_set_beamcenter_window`. 
+
+.. image:: images/define_experiment_frame_convert_from_fit2d.png
+    :width: 265px
+    :align: right
+
+The button *Convert Fit2D geometry* allows to convert an existing calibration 
+in Fit2D geometry to pyFAI's PONI geometry. Clicking the button temporarily 
+disables the frame's inputs and opens a new  window to input the existing 
+calibration:
+Input all parameters as required (sample-detector distance, beamcenter x/y, 
+detector tilt plane and tilt angle). The *Convet to pyFAI geometry* button will
+calculate the resulting pyFAI geometry parameters and display them in the bottom
+parameter fields. The *Accept and store pyFAI geometry* button will close the 
+window and copy the resulting geometry to the main frame.
 
 Export
 ^^^^^^

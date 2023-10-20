@@ -87,7 +87,6 @@ Detailed descriptions of the individual frames are given here.
 
     frames/DataBrowsingFrame
     frames/PyfaiCalibFrame
-    frames/CompositeCreatorFrame
     frames/DirectorySpyFrame
     frames/QuickIntegrationFrame
     frames/ImageMathFrame
@@ -119,6 +118,7 @@ Detailed information about the individual windows is given here.
     windows/ShowDetailedPluginResultsWindow
     windows/ManuallySetBeamcenterWindow
     windows/SelectIntegrationRegionWindow
+    frames/CompositeCreatorFrame
 
 .. _gui_recipes:
 

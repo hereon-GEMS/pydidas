@@ -91,7 +91,14 @@ processes and - depending on the type of calculations - may take a while to take
 effect because the current process might not accept the termination signal 
 until it starts a new job.
 
+Workflow result selection
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. include:: ./workflow_result_selection.rst
+
+
+Export of results
+^^^^^^^^^^^^^^^^^
 
 .. include:: ./workflow_result_export.rst
 

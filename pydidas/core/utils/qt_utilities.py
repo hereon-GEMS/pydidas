@@ -35,7 +35,7 @@ __all__ = [
 
 from collections.abc import Iterable
 
-from qtpy import QtGui, QT_VERSION
+from qtpy import QT_VERSION, QtGui
 from qtpy.QtCore import QObject
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import QWidget

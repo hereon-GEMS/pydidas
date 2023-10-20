@@ -116,9 +116,7 @@ def get_pydidas_context_config_entries(
     _dsets.append(
         ["entry/pydidas_config", "workflow", {"data": tree.export_to_string()}]
     )
-    _dsets.append(
-        ["entry/pydidas_config", "pydidas_version", {"data": VERSION}]
-    )
+    _dsets.append(["entry/pydidas_config", "pydidas_version", {"data": VERSION}])
     for _dim in range(scan.ndim):
         _label = scan.get_param_value(f"scan_dim{_dim}_label")
         _unit = scan.get_param_value(f"scan_dim{_dim}_unit")

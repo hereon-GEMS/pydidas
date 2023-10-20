@@ -69,6 +69,10 @@ class SubtractBackgroundImage(ProcPlugin):
         super().__init__(*args, **kwargs)
         self._bg_image = None
         self._thresh = None
+        self.params["multiplicator"]._Parameter__meta["tooltip"] = (
+            "The multiplication scaling factor to be applied to the background image "
+            "before subtracting it from the input data."
+        )
 
     def pre_execute(self):
         """

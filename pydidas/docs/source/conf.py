@@ -31,7 +31,8 @@ copyright = "2023, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 # The full version, including alpha/beta/rc tags
-release = "23.7.5"
+import pydidas
+release = pydidas.VERSION
 version = release
 
 # -- General configuration ---------------------------------------------------

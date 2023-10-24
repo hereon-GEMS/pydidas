@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ the UtilitiesFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["UtilitiesFrameBuilder"]
 
 
@@ -81,7 +81,7 @@ UTILITIES = {
 }
 
 
-class UtilitiesFrameBuilder(BaseFrame):
+class UtilitiesFrameBuilder:
     """
     Create all widgets and initialize their state.
 
@@ -94,75 +94,56 @@ class UtilitiesFrameBuilder(BaseFrame):
     GROUP_WIDTH = 320
     GRID_NUM = 3
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
-        self.setMinimumWidth(self.GRID_NUM * (self.GROUP_WIDTH + 10))
-
-    def build_frame(self):
+    @classmethod
+    def build_frame(cls, frame: BaseFrame):
         """
         Create all widgets for the frame and place them in the layout.
+
+        Parameters
+        ----------
+        frame : BaseFrame
+            The frame to be populated.
         """
-        self.create_label(
+        frame.layout().setSpacing(30)
+        frame.create_label(
             "label_title",
             "Utilities\n",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
-            gridPos=(0, 0, 1, 1),
-            fixedWidth=self.GROUP_WIDTH,
+            gridPos=(0, 0, 1, 3),
         )
 
         for _index, (_key, _entries) in enumerate(UTILITIES.items()):
-            _xpos = _index % self.GRID_NUM
-            _ypos = _index // self.GRID_NUM + 1
-            self.create_empty_widget(
+            _xpos = _index % cls.GRID_NUM
+            _ypos = _index // cls.GRID_NUM + 1
+            frame.create_empty_widget(
                 f"utility_{_key}",
                 gridPos=(_ypos, _xpos, 1, 1),
-                fixedWidth=self.GROUP_WIDTH,
-                fixedHeight=170,
+                font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+                layout_kwargs={"sizeConstraint": QtWidgets.QLayout.SetMinimumSize},
             )
-            self.create_label(
+            frame.create_label(
                 f"title_{_key}",
                 _entries["title"],
-                gridPos=(0, 0, 1, 1),
-                parent_widget=self._widgets[f"utility_{_key}"],
-                fontSize=constants.STANDARD_FONT_SIZE + 2,
-                fixedWidth=self.GROUP_WIDTH - 20,
                 bold=True,
+                fontsize_offset=2,
+                gridPos=(0, 0, 1, 1),
+                parent_widget=frame._widgets[f"utility_{_key}"],
             )
-            self.create_label(
+            frame.create_label(
                 f"text_{_key}",
                 _entries["text"],
+                alignment=constants.ALIGN_TOP_LEFT,
+                font_metric_height_factor=4,
+                font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
                 gridPos=(1, 0, 1, 1),
-                parent_widget=self._widgets[f"utility_{_key}"],
-                fixedWidth=self.GROUP_WIDTH - 20,
-                fontSize=constants.STANDARD_FONT_SIZE,
+                parent_widget=frame._widgets[f"utility_{_key}"],
+                sizePolicy=constants.POLICY_FIX_EXP,
+                wordWrap=True,
             )
-            self.create_spacer(
-                f"spacer_{_key}",
-                gridPos=(2, 0, 1, 1),
-                policy=QtWidgets.QSizePolicy.Minimum,
-                vertical_policy=QtWidgets.QSizePolicy.Expanding,
-                parent_widget=self._widgets[f"utility_{_key}"],
-                fixedWidth=self.GROUP_WIDTH - 20,
-            )
-            self.create_button(
+            frame.create_button(
                 f"button_{_key}",
                 _entries["button_text"],
-                gridPos=(3, 0, 1, 1),
-                fixedWidth=self.GROUP_WIDTH - 20,
-                parent_widget=self._widgets[f"utility_{_key}"],
-                alignment=constants.ALIGN_BOTTOM_LEFT,
+                gridPos=(2, 0, 1, 1),
+                parent_widget=frame._widgets[f"utility_{_key}"],
             )
-            self.create_spacer(
-                f"spacer_{_key}_2",
-                gridPos=(4, 0, 1, 1),
-                policy=QtWidgets.QSizePolicy.Minimum,
-                parent_widget=self._widgets[f"utility_{_key}"],
-                fixedHeight=50,
-            )
-
-        self.create_spacer(
-            "final_spacer",
-            gridPos=(_ypos + 1, 2, 1, 1),
-            policy=QtWidgets.QSizePolicy.Expanding,
-        )

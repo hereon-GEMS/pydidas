@@ -29,6 +29,8 @@ __all__ = ["QuickIntegrationFrame"]
 
 
 from functools import partial
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore
@@ -83,8 +85,8 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_mask_file",
     ]
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self._EXP = DiffractionExperiment(detector_pxsizex=100, detector_pxsizey=100)
         self.add_params(self._EXP.params)
         self.set_default_params()
@@ -111,6 +113,9 @@ class QuickIntegrationFrame(BaseFrame):
                 _generic.params, diffraction_exp=self._EXP
             ),
         }
+        self._image = None
+        self._bc_controller = None
+        self._roi_controller = None
 
     def build_frame(self):
         """
@@ -136,7 +141,6 @@ class QuickIntegrationFrame(BaseFrame):
         self._roi_controller.sig_toggle_selection_mode.connect(
             self._roi_selection_toggled
         )
-
         self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
 
@@ -149,9 +153,6 @@ class QuickIntegrationFrame(BaseFrame):
         )
         self._widgets["but_fit_center_circle"].clicked.connect(
             self._bc_controller.fit_beamcenter_with_circle
-        )
-        self.param_widgets["overlay_color"].io_edited.connect(
-            self._bc_controller.set_marker_color
         )
         self.param_widgets["detector_pxsize"].io_edited.connect(
             self._update_detector_pxsize
@@ -183,16 +184,20 @@ class QuickIntegrationFrame(BaseFrame):
             _w.io_edited.connect(partial(self._update_xray_param, _param_key, _w))
         for _param_key in ["beamcenter_x", "beamcenter_y"]:
             self.param_widgets[_param_key].io_edited.connect(self._update_beamcenter)
+        self.param_widgets["detector_mask_file"].io_edited.connect(
+            self._new_mask_file_selection
+        )
 
     @QtCore.Slot(str, object)
-    def open_image(self, filename, kwargs):
+    def open_image(self, filename: Union[str, Path], kwargs: dict):
         """
         Open an image with the given filename and display it in the plot.
 
         Parameters
         ----------
         filename : Union[str, Path]
-            The filename and path.
+            The filename and path. The QSignal only takes strings but if the method
+            is called directly, Paths are also an acceptable input.
         kwargs : dict
             Additional parameters to open a specific frame in a file.
         """
@@ -208,7 +213,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._bc_controller.manual_beamcenter_update(None)
 
     @QtCore.Slot(bool)
-    def _toggle_fname_valid(self, is_valid):
+    def _toggle_fname_valid(self, is_valid: bool):
         """
         Modify widgets visibility and activation based on the file selection.
 
@@ -329,12 +334,38 @@ class QuickIntegrationFrame(BaseFrame):
         _det_model = self.get_param_value("detector_model")
         if _det_model == "Custom detector":
             _pxsize = self._config["custom_det_pxsize"]
+            self._config["detector_name"] = None
             self.set_param_value("detector_name", "Custom detector")
+            _func = self._bc_controller.set_mask_file
         else:
             _det_name = _det_model.split("]")[1].strip()
             self._EXP.set_detector_params_from_name(_det_name)
             _pxsize = self.get_param_value("detector_pxsizex")
+            self._config["detector_name"] = _det_name
+            _func = self._bc_controller.set_new_detector_with_mask
+        if not self.get_param_value("detector_mask_file").is_file():
+            _func(self._config["detector_name"])
         self._update_detector_pxsize(_pxsize)
+
+    @QtCore.Slot(str)
+    def _new_mask_file_selection(self, mask_filename: str):
+        """
+        Propagate the new mask to the beamcente controller.
+
+        Parameters
+        ----------
+        mask_filename : str
+            The name of the new mask file or None to disable mask usage.
+        """
+        _path = Path(mask_filename)
+        if _path.is_file():
+            self._bc_controller.set_mask_file(_path)
+        elif self._config["detector_name"] is not None:
+            self._bc_controller.set_new_detector_with_mask(
+                self._config["detector_name"]
+            )
+        else:
+            self._bc_controller.set_mask_file(None)
 
     @QtCore.Slot(str)
     def _update_beamcenter(self, _):
@@ -354,7 +385,7 @@ class QuickIntegrationFrame(BaseFrame):
         """
         _active = not self._bc_controller.selection_active
         self._bc_controller.toggle_selection_active(_active)
-        self._widgets["input_plot_bc_selection"].setVisible(_active)
+        self._widgets["input_beamcenter_points"].setVisible(_active)
         for _txt in ["confirm_beamcenter", "set_beamcenter", "fit_center_circle"]:
             self._widgets[f"but_{_txt}"].setVisible(_active)
         self._widgets["but_select_beamcenter_manually"].setVisible(not _active)
@@ -362,7 +393,6 @@ class QuickIntegrationFrame(BaseFrame):
         self._roi_controller.toggle_marker_color_param_visibility(not _active)
         self._widgets["file_selector"].setEnabled(not _active)
         self._roi_controller.toggle_enable(not _active)
-        self._bc_controller.selected_points
         if _active:
             self._bc_controller.show_plot_items("all")
             self._roi_controller.remove_plot_items("roi")

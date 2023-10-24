@@ -48,6 +48,16 @@ FLOAT_VALIDATOR.setNotation(QtGui.QDoubleValidator.ScientificNotation)
 FLOAT_VALIDATOR.setLocale(LOCAL_SETTINGS)
 
 
+_kwargs_for_single_char_label = {
+    "bold": True,
+    "fontsize_offset": 1,
+    "font_metric_width_factor": 0.7,
+    "gridPos": (0, -1, 1, 1),
+    "margin": 2,
+    "minimum_width": 12,
+}
+
+
 class ImageMathFrameBuilder:
     """
     Create all widgets and initialize their state.
@@ -59,7 +69,6 @@ class ImageMathFrameBuilder:
     """
 
     _frame = None
-    width_of_controls = 450
 
     @classmethod
     def create_combo_button_row(
@@ -71,7 +80,7 @@ class ImageMathFrameBuilder:
         button_icon: Union[None, str] = None,
     ):
         """
-        Create a combined widget with label,
+        Create a combined widget with label, combobox and a button.
 
         Parameters
         ----------
@@ -88,35 +97,29 @@ class ImageMathFrameBuilder:
         """
         cls._frame.create_empty_widget(
             reference,
-            fixedWidth=cls.width_of_controls,
-            fixedHeight=25,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             parent_widget="left_container",
         )
         cls._frame.create_label(
             f"label_{reference}",
             label_text,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2,
             parent_widget=reference,
-            wordWrap=False,
             sizePolicy=constants.POLICY_MIN_MIN,
+            wordWrap=False,
         )
         cls._frame.create_combo_box(
             f"combo_{reference}",
-            parent_widget=reference,
-            items=combo_choices,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
             gridPos=(0, 1, 1, 1),
-        )
-        cls._frame.create_spacer(
-            None,
+            items=combo_choices,
             parent_widget=reference,
-            gridPos=(0, 2, 1, 1),
-            policy=QtWidgets.QSizePolicy.Expanding,
-            vertical_policy=QtWidgets.QSizePolicy.Fixed,
         )
         _kwargs = {
             "parent_widget": reference,
-            "gridPos": (0, 3, 1, 1),
-            "fixedWidth": 120,
-            "alignment": constants.ALIGN_CENTER_RIGHT,
+            "gridPos": (0, 2, 1, 1),
+            "alignment": None,
+            "sizePolicy": constants.POLICY_EXP_FIX,
         }
         if button_icon is not None:
             _kwargs["icon"] = button_icon
@@ -126,14 +129,19 @@ class ImageMathFrameBuilder:
     def populate_frame(cls, frame: BaseFrame):
         """
         Build the frame by creating all required widgets and placing them in the layout.
+
+        Parameters
+        ----------
+        frame : BaseFrame
+            The frame instance.
         """
         cls._frame = frame
 
         cls._frame.create_label(
             "title",
             "Image mathematics",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
+            fontsize_offset=4,
             gridPos=(0, 0, 1, 5),
         )
 
@@ -159,18 +167,17 @@ class ImageMathFrameBuilder:
         """Create the left config section."""
         cls._frame.create_empty_widget(
             "left_container",
-            fixedWidth=cls.width_of_controls,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             minimumHeight=600,
             parent_widget=None,
         )
         cls._frame.create_any_widget(
             "left_scroll_area",
             ScrollArea,
-            widget=cls._frame._widgets["left_container"],
-            fixedWidth=cls.width_of_controls + 50,
+            layout_kwargs={"alignment": None},
             sizePolicy=constants.POLICY_FIX_EXP,
             stretch=(1, 0),
-            layout_kwargs={"alignment": None},
+            widget=cls._frame._widgets["left_container"],
         )
 
     @classmethod
@@ -180,7 +187,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_open",
             "Open new image:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
             parent_widget="left_container",
         )
@@ -189,17 +196,16 @@ class ImageMathFrameBuilder:
             misc.SelectImageFrameWidget(
                 *cls._frame.params.values(),
                 import_reference="ImageMathFrame__image_import",
-                widget_width=cls.width_of_controls,
             ),
             parent_widget="left_container",
         )
-        cls._frame.create_spacer(None, parent_widget="left_container", fixedHeight=10)
+        cls._frame.create_spacer(None, parent_widget="left_container", fixedHeight=5)
         cls.create_combo_button_row(
             "store_input_image",
             "Store loaded image as ",
             cls._input_images,
             "Store",
-            button_icon="qt-std::57",
+            button_icon="qt-std::SP_CommandLink",
         )
         cls._frame.create_line("line_input", parent_widget="left_container")
 
@@ -214,32 +220,33 @@ class ImageMathFrameBuilder:
         cls._frame.create_spacer(None, parent_widget="left_container", fixedHeight=5)
         cls._frame.create_empty_widget(
             "display_from_buffer",
-            fixedWidth=cls.width_of_controls,
-            fixedHeight=25,
             parent_widget="left_container",
         )
         cls._frame.create_label(
             "label_display_from_buffer",
             "Display image:",
-            parent_widget="display_from_buffer",
-            wordWrap=False,
             bold=True,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
+            parent_widget="display_from_buffer",
             sizePolicy=constants.POLICY_MIN_MIN,
+            wordWrap=False,
         )
         cls._frame.create_spacer(
             None,
-            parent_widget="display_from_buffer",
             gridPos=(0, 1, 1, 1),
+            parent_widget="display_from_buffer",
             policy=QtWidgets.QSizePolicy.Expanding,
             vertical_policy=QtWidgets.QSizePolicy.Fixed,
         )
 
         cls._frame.create_combo_box(
             "combo_display_image",
-            parent_widget="display_from_buffer",
-            items=cls._all_images,
-            gridPos=(0, 2, 1, 1),
             alignment=constants.ALIGN_TOP_RIGHT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2,
+            font_metric_height_factor=1,
+            gridPos=(0, 2, 1, 1),
+            items=cls._all_images,
+            parent_widget="display_from_buffer",
         )
 
         cls._frame.create_line("line_buffer", parent_widget="left_container")
@@ -250,11 +257,11 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_ops",
             "Image operations:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
+            fontsize_offset=1,
             parent_widget="left_container",
         )
-        cls._frame.create_spacer(None, parent_widget="left_container", fixedHeight=10)
+        # cls._frame.create_spacer(None, parent_widget="left_container", fixedHeight=10)
 
     @classmethod
     def _create_ufunc_widgets(cls):
@@ -263,13 +270,12 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_ops",
             "Apply operator to image:",
-            fontsize=constants.STANDARD_FONT_SIZE,
             bold=True,
             parent_widget="left_container",
         )
         cls._frame.create_empty_widget(
             "ops_operator",
-            fixedWidth=cls.width_of_controls,
+            layout_kwargs={"horizontalSpacing": 2},
             parent_widget="left_container",
             toolTip=(
                 "Apply an operator in the input image and store it as a new image. "
@@ -279,81 +285,67 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_combo_box(
             "ops_operator_target",
-            parent_widget="ops_operator",
-            fixedWidth=85,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             gridPos=(0, 0, 1, 1),
             items=cls._images,
+            parent_widget="ops_operator",
         )
         cls._frame.create_label(
-            None,
-            "=",
-            parent_widget="ops_operator",
-            gridPos=(0, 1, 1, 1),
-            bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            None, "=", parent_widget="ops_operator", **_kwargs_for_single_char_label
         )
         cls._frame.create_combo_box(
             "ops_operator_func",
-            parent_widget="ops_operator",
-            fixedWidth=80,
+            currentIndex=4,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             gridPos=(0, -1, 1, 1),
             items=UFUNCS,
-            currentIndex=4,
+            parent_widget="ops_operator",
         )
         cls._frame.create_label(
-            None,
-            " ( ",
-            parent_widget="ops_operator",
-            gridPos=(0, -1, 1, 1),
-            bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            None, " ( ", parent_widget="ops_operator", **_kwargs_for_single_char_label
         )
         cls._frame.create_combo_box(
             "combo_ops_operator_input",
-            parent_widget="ops_operator",
-            items=cls._current_images,
             alignment=constants.ALIGN_CENTER_LEFT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
+            items=cls._current_images,
+            parent_widget="ops_operator",
         )
         cls._frame.create_label(
             "label_ops_operator_sep",
             ", ",
             parent_widget="ops_operator",
-            gridPos=(0, -1, 1, 1),
-            bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
-            alignment=constants.ALIGN_CENTER_LEFT,
             visible=False,
+            **_kwargs_for_single_char_label,
         )
         cls._frame.create_lineedit(
             "io_ops_operator_input",
-            parent_widget="ops_operator",
-            fixedWidth=50,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 9,
             gridPos=(0, -1, 1, 1),
-            visible=False,
+            parent_widget="ops_operator",
             validator=FLOAT_VALIDATOR,
+            visible=False,
         )
         cls._frame.create_label(
             "label_ops_operator_closing_bracket",
             ")",
             parent_widget="ops_operator",
-            gridPos=(0, -1, 1, 1),
-            bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            **_kwargs_for_single_char_label,
         )
         cls._frame.create_spacer(
             "spacer_operator_end",
-            parent_widget="ops_operator",
             gridPos=(0, -1, 1, 1),
+            parent_widget="ops_operator",
             policy=QtWidgets.QSizePolicy.Expanding,
             vertical_policy=QtWidgets.QSizePolicy.Fixed,
         )
         cls._frame.create_button(
             "but_ops_operator_execute",
             "Apply operator",
-            parent_widget="left_container",
-            fixedWidth=200,
             alignment=constants.ALIGN_TOP_RIGHT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2.25,
+            parent_widget="left_container",
         )
 
     @classmethod
@@ -365,64 +357,61 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_arithmetic",
             "Elementary arithmetic operations:",
-            fontsize=constants.STANDARD_FONT_SIZE,
             bold=True,
             parent_widget="left_container",
         )
         cls._frame.create_empty_widget(
             "ops_arithmetic",
-            fixedWidth=cls.width_of_controls,
+            layout_kwargs={"horizontalSpacing": 2},
             parent_widget="left_container",
         )
         cls._frame.create_combo_box(
             "ops_arithmetic_target",
-            parent_widget="ops_arithmetic",
-            fixedWidth=85,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             gridPos=(0, 0, 1, 1),
             items=cls._images,
+            parent_widget="ops_arithmetic",
         )
         cls._frame.create_label(
-            None,
-            "=",
-            parent_widget="ops_arithmetic",
-            gridPos=(0, 1, 1, 1),
-            bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            None, "=", parent_widget="ops_arithmetic", **_kwargs_for_single_char_label
         )
         cls._frame.create_combo_box(
             "combo_ops_arithmetic_input",
-            parent_widget="ops_arithmetic",
-            items=cls._current_images,
             alignment=constants.ALIGN_CENTER_LEFT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
+            items=cls._current_images,
+            parent_widget="ops_arithmetic",
         )
         cls._frame.create_combo_box(
             "combo_ops_arithmetic_operation",
-            parent_widget="ops_arithmetic",
-            fixedWidth=50,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 10,
             gridPos=(0, -1, 1, 1),
             items=["+", "-", "/", "x"],
+            minimum_width=35,
+            parent_widget="ops_arithmetic",
         )
         cls._frame.create_lineedit(
             "io_ops_arithmetic_input",
-            parent_widget="ops_arithmetic",
-            fixedWidth=80,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
+            font_metric_height_factor=1,
             gridPos=(0, -1, 1, 1),
+            parent_widget="ops_arithmetic",
             validator=FLOAT_VALIDATOR,
         )
         cls._frame.create_spacer(
             "spacer_arithmetic_end",
-            parent_widget="ops_arithmetic",
             gridPos=(0, -1, 1, 1),
+            parent_widget="ops_arithmetic",
             policy=QtWidgets.QSizePolicy.Expanding,
             vertical_policy=QtWidgets.QSizePolicy.Fixed,
         )
         cls._frame.create_button(
             "but_ops_arithmetic_execute",
             "Apply arithmetic operation",
-            parent_widget="left_container",
-            fixedWidth=200,
             alignment=constants.ALIGN_TOP_RIGHT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2.25,
+            parent_widget="left_container",
         )
 
     @classmethod
@@ -434,72 +423,70 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_image_arithmetic",
             "Arithmetic image operations:",
-            fontsize=constants.STANDARD_FONT_SIZE,
             bold=True,
             parent_widget="left_container",
         )
         cls._frame.create_empty_widget(
             "ops_image_arithmetic",
-            fixedWidth=cls.width_of_controls,
             parent_widget="left_container",
         )
         cls._frame.create_combo_box(
             "ops_image_arithmetic_target",
-            parent_widget="ops_image_arithmetic",
-            fixedWidth=85,
-            gridPos=(0, 0, 1, 1),
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             items=cls._images,
+            parent_widget="ops_image_arithmetic",
         )
         cls._frame.create_label(
             None,
             "=",
             parent_widget="ops_image_arithmetic",
-            gridPos=(0, 1, 1, 1),
-            bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            **_kwargs_for_single_char_label,
         )
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_input_1",
-            parent_widget="ops_image_arithmetic",
-            items=cls._current_images,
             alignment=constants.ALIGN_CENTER_LEFT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
+            items=cls._current_images,
+            parent_widget="ops_image_arithmetic",
         )
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_operation",
-            parent_widget="ops_image_arithmetic",
-            fixedWidth=50,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 10,
+            minimum_width=35,
             gridPos=(0, -1, 1, 1),
             items=["+", "-", "/", "x"],
+            parent_widget="ops_image_arithmetic",
         )
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_input_2",
-            parent_widget="ops_image_arithmetic",
-            items=cls._current_images,
             alignment=constants.ALIGN_CENTER_LEFT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
+            items=cls._current_images,
+            parent_widget="ops_image_arithmetic",
         )
 
         cls._frame.create_spacer(
             "spacer_image_arithmetic_end",
-            parent_widget="ops_image_arithmetic",
             gridPos=(0, -1, 1, 1),
+            parent_widget="ops_image_arithmetic",
             policy=QtWidgets.QSizePolicy.Expanding,
             vertical_policy=QtWidgets.QSizePolicy.Fixed,
         )
         cls._frame.create_button(
             "but_ops_image_arithmetic_execute",
             "Apply image arithmetic",
-            parent_widget="left_container",
-            fixedWidth=200,
             alignment=constants.ALIGN_TOP_RIGHT,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2.25,
+            parent_widget="left_container",
         )
 
     @classmethod
     def _create_export_widgets(cls):
         """Create widgets for exporting the image."""
-        cls._frame.create_line("line_export", parent_widget="left_container")
         cls._frame.create_spacer(None, parent_widget="left_container", fixedHeight=10)
+        cls._frame.create_line("line_export", parent_widget="left_container")
         cls._frame.create_button(
             "but_export", "Export current image", parent_widget="left_container"
         )

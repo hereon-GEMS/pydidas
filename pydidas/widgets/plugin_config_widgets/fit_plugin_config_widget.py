@@ -29,29 +29,34 @@ __all__ = ["FitPluginConfigWidget"]
 
 
 from functools import partial
+from typing import NewType
 
 from qtpy import QtCore
+from qtpy.QtWidgets import QStyle
 
-from pydidas.core.constants import (
-    DEFAULT_PLUGIN_PARAM_CONFIG,
-    PLUGIN_PARAM_WIDGET_WIDTH,
-    FIT_OUTPUT_OPTIONS,
-)
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_EXP_FIX
+from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
 
 
+BaseFitPlugin = NewType("BaseFitPlugin", type)
+
+
 class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     """
-    The FitPluginConfigWidget is the custom widget to modify the Parameters for
-    peak fitting plugins.
+    A custom widget to modify the Parameters for peak fitting plugins.
+
+    The widget adds a list of tickboxes to select the fit output.
     """
 
-    def __init__(self, plugin, *args, **kwargs):
+    def __init__(self, plugin: BaseFitPlugin, *args: tuple, **kwargs: dict):
         ParameterEditCanvas.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
-        apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
+        apply_qt_properties(
+            self.layout(), contentsMargins=(0, 0, 0, 0), horizontalSpacing=0
+        )
         self.plugin = plugin
         self._params_already_added = ["fit_output"]
         _plugin_output = plugin.get_param_value("fit_output").split("; ")
@@ -60,24 +65,29 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         }
         for _key in ["keep_results", "label", "process_data_dim", "fit_func"]:
             _param = self.plugin.get_param(_key)
-            self.create_param_widget(_param, **DEFAULT_PLUGIN_PARAM_CONFIG)
+            self.create_param_widget(_param, linebreak=_key == "label")
             self._params_already_added.append(_key)
-        self.create_empty_widget(
-            "checkbox_widget", fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH
-        )
+        self.create_empty_widget("checkbox_widget", sizePolicy=POLICY_EXP_FIX)
         self.create_label(
-            "fit_output",
+            "label_fit_output",
             "Fit output values:",
-            fixedWidth=DEFAULT_PLUGIN_PARAM_CONFIG["width_text"],
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            gridPos=(0, 0, 1, 2),
             parent_widget="checkbox_widget",
+        )
+        self.create_empty_widget(
+            "spacer_fit_output",
+            parent_widget="checkbox_widget",
+            font_metric_width_factor=0.1 * FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         for _index, _key in enumerate(FIT_OUTPUT_OPTIONS):
             self.create_check_box(
                 f"checkbox_{_key}",
                 _key,
-                parent_widget="checkbox_widget",
                 checked=_key in _plugin_output,
-                gridPos=(_index, 1, 1, 1),
+                font_metric_width_factor=0.9 * FONT_METRIC_PARAM_EDIT_WIDTH,
+                gridPos=(_index + 1, 1, 1, 1),
+                parent_widget="checkbox_widget",
             )
             self._widgets[f"checkbox_{_key}"].stateChanged.connect(
                 partial(self._box_checked, _key)
@@ -87,21 +97,19 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 _key not in self._params_already_added
                 and _key not in self.plugin.advanced_parameters
             ):
-                self.create_param_widget(_param, **DEFAULT_PLUGIN_PARAM_CONFIG)
+                self.create_param_widget(_param)
                 self._params_already_added.append(_key)
 
         self.__advanced_hidden = True
         self.create_button(
             "but_toggle_advanced_params",
             "Display advanced Parameters",
-            icon=self.style().standardIcon(6),
-            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=self.__toggle_advanced_params,
+            icon="qt-std::SP_TitleBarUnshadeButton",
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)
-            _kwargs = DEFAULT_PLUGIN_PARAM_CONFIG | {"visible": False}
-            self.create_param_widget(_param, **_kwargs)
+            self.create_param_widget(_param, visible=False)
 
     @QtCore.Slot(int)
     def _box_checked(self, name: str, state: int):
@@ -142,7 +150,11 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             else "Hide advanced Parameters"
         )
         self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(6 if self.__advanced_hidden else 5)
+            self.style().standardIcon(
+                QStyle.SP_TitleBarUnshadeButton
+                if self.__advanced_hidden
+                else QStyle.SP_TitleBarShadeButton
+            )
         )
 
     def update_edits(self):
@@ -153,7 +165,6 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             if param.refkey != "fit_output":
                 self.update_widget_value(param.refkey, param.value)
             if param.refkey == "fit_output":
-                print(param)
                 _keys = param.value.split("; ")
                 for _key in self._fit_output:
                     self._fit_output[_key] = _key in _keys

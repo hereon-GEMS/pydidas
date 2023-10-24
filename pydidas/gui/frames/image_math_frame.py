@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-
 """
 Module with the ImageMathFrame which allows to perform mathematical
 operations on images.
@@ -41,7 +40,6 @@ from ...core import (
     constants,
     get_generic_param_collection,
 )
-from ...core.utils import SignalBlocker
 from ...data_io import IoMaster, export_data, import_data
 from ...gui.frames.builders import ImageMathFrameBuilder
 from ...widgets import PydidasFileDialog
@@ -80,8 +78,8 @@ class ImageMathFrame(BaseFrame):
     default_params = _DEFAULTS.copy()
     BUFFER_SIZE = 3
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent=parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self._image_buffer = {_key: None for _key in range(1, self.BUFFER_SIZE + 1)}
         self._input_image_buffer = {
@@ -194,7 +192,7 @@ class ImageMathFrame(BaseFrame):
         """
         _text = self._widgets["combo_display_image"].currentText()
         if _text != new_value:
-            with SignalBlocker(self._widgets["combo_display_image"]):
+            with QtCore.QSignalBlocker(self._widgets["combo_display_image"]):
                 self._widgets["combo_display_image"].setCurrentText(new_value)
         if new_value == "Opened file":
             self._plot_image(input_data=True)

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,15 +21,19 @@ DiffractionExperimentContext metadata from a pyFAI poni file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DiffractionExperimentIoPoni"]
+
+
+from typing import Union
 
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_M_TO_E
+from .diffraction_experiment import DiffractionExperiment
 from .diffraction_experiment_context import DiffractionExperimentContext
 from .diffraction_experiment_io_base import DiffractionExperimentIoBase
 
@@ -46,7 +50,7 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
     format_name = "PONI"
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs):
+    def export_to_file(cls, filename: str, **kwargs: dict):
         """
         Write the ExperimentalTree to a pyFAI style poni file.
 
@@ -86,7 +90,9 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
             pfile.write(stream)
 
     @classmethod
-    def import_from_file(cls, filename, diffraction_exp=None):
+    def import_from_file(
+        cls, filename: str, diffraction_exp: Union[DiffractionExperiment, None] = None
+    ):
         """
         Restore the DiffractionExperimentContext from a YAML file.
 
@@ -105,7 +111,7 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         cls._write_to_exp_settings(diffraction_exp=diffraction_exp)
 
     @classmethod
-    def _update_detector_from_pyFAI(cls, det):
+    def _update_detector_from_pyFAI(cls, det: pyFAI.detectors.Detector):
         """
         Update the detector information from a pyFAI Detector instance.
 
@@ -129,7 +135,7 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
             cls.imported_params[key] = value
 
     @classmethod
-    def _update_geometry_from_pyFAI(cls, geo):
+    def _update_geometry_from_pyFAI(cls, geo: pyFAI.geometry.Geometry):
         """
         Update the geometry information from a pyFAI Geometry instance.
 

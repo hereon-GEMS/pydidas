@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,33 +21,41 @@ access to global QSettings values.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
-__all__ = ["PydidasQsettingsMixin", "CopyableQSettings"]
+__status__ = "Production"
+__all__ = ["PydidasQsettingsMixin"]
+
 
 from numbers import Integral, Real
+from typing import Self, Union
 
 from qtpy import QtCore
 
 from ..version import VERSION
 
 
-class CopyableQSettings(QtCore.QSettings):
+class _CopyablePydidasQSettings(QtCore.QSettings):
     """
-    QtCore.QSettings subclass with added copy, setstate and getstate methods
-    to allow pickling.
+    A pydidas-specific QSettings instance which allows pickling.
+
+    CopyableQSettings is a QtCore.QSettings subclass with added copy, setstate and
+    getstate methods to allow pickling. Note that the organization and application
+    are hard-coded to "Hereon" and "pydidas", respectively.
     """
 
-    def __copy__(self):
-        return CopyableQSettings(self.organizationName(), self.applicationName())
+    def __init__(self):
+        QtCore.QSettings.__init__(self, "Hereon", "pydidas")
 
-    def __getstate__(self):
-        return {"org_name": self.organizationName(), "app_name": self.applicationName()}
+    def __copy__(self) -> Self:
+        return _CopyablePydidasQSettings()
 
-    def __setstate__(self, state):
-        super().__init__(state["org_name"], state["app_name"])
+    def __getstate__(self) -> dict:
+        return {"org_name": "Hereon", "app_name": "pydidas"}
+
+    def __setstate__(self, state: dict):
+        return
 
 
 class PydidasQsettingsMixin:
@@ -57,9 +67,14 @@ class PydidasQsettingsMixin:
     """
 
     def __init__(self):
-        self.q_settings = CopyableQSettings("Hereon", "pydidas")
+        self.q_settings = _CopyablePydidasQSettings()
 
-    def q_settings_get_value(self, key, dtype=None, default=None):
+    def q_settings_get(
+        self,
+        key: str,
+        dtype: Union[type, None] = None,
+        default: Union[object, None] = None,
+    ) -> object:
         """
         Get the value from a QSetting key.
 
@@ -89,10 +104,12 @@ class PydidasQsettingsMixin:
                 return int(_value)
             if dtype == Real:
                 return float(_value)
+            if dtype == bool:
+                return _value == "true"
             return dtype(_value)
         return _value
 
-    def q_settings_set_key(self, key, value):
+    def q_settings_set(self, key: str, value: object):
         """
         Set the value of a QSettings key.
 

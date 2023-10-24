@@ -29,7 +29,7 @@ __all__ = ["get_bounds_indices", "DoublePeakMixin", "TriplePeakMixin"]
 
 from typing import List, Tuple, Union
 
-from numpy import amax, amin, ndarray, where, r_, delete
+from numpy import amax, amin, delete, ndarray, r_, where
 
 from ..exceptions import UserConfigError
 

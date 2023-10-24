@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -56,15 +56,10 @@ class AsciiSaver(OutputPlugin):
     input_data_dim = 1
     output_data_dim = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict):
         """
-        Save data to file.
+        Save data to file in raw ascii text format.
 
-        Parameters
-        ----------
         Parameters
         ----------
         data : Union[np.ndarray, pydidas.core.Dataset]
@@ -75,7 +70,7 @@ class AsciiSaver(OutputPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        data : pydidas.core.Dataset
             The input data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
@@ -89,7 +84,7 @@ class AsciiSaver(OutputPlugin):
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
-            data.update_axis_ranges(0, np.arange(data.size))
+            data.update_axis_range(0, np.arange(data.size))
         with open(_fname, "w") as _file:
             _file.write("# Metadata:\n")
             for _key, _val in data.metadata:

@@ -1,4 +1,4 @@
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
 [build-system]
@@ -14,7 +14,7 @@ requires-python = ">=3.9"
 license = {text = "GNU General Public License v3"}
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Scientific/Engineering",
@@ -26,15 +26,13 @@ dependencies = [
     "meson-python",
     "cython",
     "build>=0.10.0",
-    "PyQt5>=5.15.7",
-    "pyFAI==2023.1.0",
+    "pyFAI>=2023.1.0",
     "scikit-image>=0.20.0",
     "qtawesome>=1.0.3",
     "sphinx>=4.4.0",
     "sphinx_rtd_theme>=1.0.0",
     "pyopencl>=2023.1",
     "qtpy>=2.3.0",
-    "natsort>=8.2.0",
     "hdf5plugin>=4.0.1",
     "pyyaml>=6.0",
     "requests>=2.31.0",
@@ -50,7 +48,7 @@ changelog = "https://github.com/hereon-GEMS/pydidas/blob/master/CHANGELOG.md"
 version = {attr = "pydidas.version.VERSION"}
 
 [tool.setuptools]
-packages = ["pydidas", "pydidas_scripts", "pydidas_plugins"]
+packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]
 
 [project.scripts]
 pydidas-clear-qsettings = "pydidas_scripts.clear_pydidas_qsettings:clear_pydidas_QSettings"

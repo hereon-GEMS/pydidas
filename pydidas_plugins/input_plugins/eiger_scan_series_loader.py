@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,15 +21,16 @@ images from single Hdf5 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["EigerScanSeriesLoader"]
+
 
 import os
 
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
 from pydidas.data_io import import_data
@@ -84,7 +85,7 @@ class EigerScanSeriesLoader(InputPlugin):
     output_data_dim = 2
     advanced_parameters = InputPlugin.advanced_parameters.copy() + ["images_per_file"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)
         self.filename_string = ""
 
@@ -120,7 +121,7 @@ class EigerScanSeriesLoader(InputPlugin):
             "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
         )
 
-    def get_frame(self, frame_index, **kwargs):
+    def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Load a frame and pass it on.
 
@@ -136,6 +137,8 @@ class EigerScanSeriesLoader(InputPlugin):
         -------
         data : pydidas.core.Dataset
             The image data.
+        kwargs : dict
+            The updated keyword arguments used for loading the frame.
         """
         _fname = self.get_filename(frame_index)
         _hdf_index = frame_index % self.get_param_value("_counted_images_per_file")
@@ -148,7 +151,7 @@ class EigerScanSeriesLoader(InputPlugin):
         return _data, kwargs
 
     @copy_docstring(InputPlugin)
-    def get_filename(self, frame_index):
+    def get_filename(self, frame_index: int) -> str:
         """
         For the full docstring, please refer to the
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin

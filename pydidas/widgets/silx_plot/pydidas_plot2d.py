@@ -29,13 +29,14 @@ __all__ = ["PydidasPlot2D"]
 
 
 import inspect
+from functools import partial
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
 
 from ...contexts import DiffractionExperimentContext
-from ...core import PydidasQsettingsMixin
+from ...core import Dataset, PydidasQsettingsMixin
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .silx_actions import (
@@ -45,21 +46,32 @@ from .silx_actions import (
     ExpandCanvas,
     PydidasGetDataInfoAction,
 )
+from .silx_tickbar import tickbar_paintEvent, tickbar_paintTick
 from .utilities import get_2d_silx_plot_ax_settings
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     """
-    A customized silx.gui.plot.Plot2D with an additional features to limit the figure
-    canvas to the data limits.
+    A customized silx.gui.plot.Plot2D with an additional features.
+
+    Additional features are implemented through additional SilxActions which
+    are added to the toolbar.
     """
 
     setData = Plot2D.addImage
     sig_get_more_info_for_data = QtCore.Signal(float, float)
+    init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
 
-    def __init__(self, parent=None, backend=None, **kwargs):
-        Plot2D.__init__(self, parent, backend)
+    def __init__(self, **kwargs: dict):
         PydidasQsettingsMixin.__init__(self)
+        Plot2D.__init__(
+            self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
+        )
+        self._qtapp = QtWidgets.QApplication.instance()
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        if hasattr(self._qtapp, "sig_mpl_font_change"):
+            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
+
         self._config = {
             "cs_transform": kwargs.get("cs_transform", True),
             "cs_transform_valid": True,
@@ -69,14 +81,30 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 if kwargs.get("diffraction_exp", None) is None
                 else kwargs.get("diffraction_exp")
             ),
+            "allowed_add_image_kwargs": [
+                _key
+                for _key, _value in inspect.signature(self.addImage).parameters.items()
+                if _value.default is not inspect.Parameter.empty
+            ],
         }
-        self._allowed_kwargs = [
-            _key
-            for _key, _value in inspect.signature(self.addImage).parameters.items()
-            if _value.default is not inspect.Parameter.empty
-        ]
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self._plot_config = {"kwargs": {}}
 
+        self._add_canvas_resize_actions()
+        self._add_histogram_actions()
+        if self._config["cs_transform"]:
+            self._add_cs_transform_actions()
+        self._set_colormap_and_bar()
+
+        if self._config["use_data_info_action"]:
+            self._add_data_info_action()
+
+    def _add_canvas_resize_actions(self):
+        """
+        Add actions to resize the canvas.
+
+        Two actions for changing the canvas to the data shape (with square pixels)
+        and to maximize its shape are added.
+        """
         self.changeCanvasToDataAction = self.group.addAction(
             ChangeCanvasToData(self, parent=self)
         )
@@ -89,6 +117,13 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.addAction(self.expandCanvasAction)
         self._toolbar.insertAction(self.colormapAction, self.expandCanvasAction)
 
+    def _add_histogram_actions(self):
+        """
+        Add actions to change the histogram scale based on the data range.
+
+        Two actions for cropping histogram outliers and for changing the histogram
+        to the data mean and 3 sigma ranges.
+        """
         self.cropHistOutliersAction = self.group.addAction(
             CropHistogramOutliers(self, parent=self)
         )
@@ -105,45 +140,64 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.keepDataAspectRatioAction, self.autoscaleToMeanAndThreeSigmaAction
         )
 
-        if self._config["cs_transform"]:
-            self._config["diffraction_exp"].sig_params_changed.connect(
-                self.update_exp_setup_params
-            )
-            self.update_exp_setup_params()
-            self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
-            self._toolbar.addWidget(self.cs_transform)
+    def _add_cs_transform_actions(self):
+        """
+        Add the action to transform the coordinate system.
 
-            _pos_widget_converters = [
-                (_field[1], _field[2]) for _field in self._positionWidget._fields
-            ]
-            _new_position_widget = PydidasPositionInfo(
-                plot=self,
-                converters=_pos_widget_converters,
-                diffraction_exp=self._config["diffraction_exp"],
-            )
-            _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
-            _layout = self.findChild(self._positionWidget.__class__).parent().layout()
-            _layout.replaceWidget(self._positionWidget, _new_position_widget)
-            self.cs_transform.sig_new_coordinate_system.connect(
-                _new_position_widget.new_coordinate_system
-            )
-            self._positionWidget = _new_position_widget
+        This action allows to display image coordinates in polar coordinates
+        (with r / mm, 2theta / deg or q / nm^-1) scaling.
+        """
+        self._config["diffraction_exp"].sig_params_changed.connect(
+            self.update_exp_setup_params
+        )
+        self.update_exp_setup_params()
+        self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
+        self._toolbar.addWidget(self.cs_transform)
 
-        _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
+        _pos_widget_converters = [
+            (_field[1], _field[2]) for _field in self._positionWidget._fields
+        ]
+        _new_position_widget = PydidasPositionInfo(
+            plot=self,
+            converters=_pos_widget_converters,
+            diffraction_exp=self._config["diffraction_exp"],
+        )
+        _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
+        _layout = self.findChild(self._positionWidget.__class__).parent().layout()
+        _layout.replaceWidget(self._positionWidget, _new_position_widget)
+        self.cs_transform.sig_new_coordinate_system.connect(
+            _new_position_widget.new_coordinate_system
+        )
+        self._positionWidget = _new_position_widget
+
+    def _set_colormap_and_bar(self):
+        """
+        Set the default colormap from the PydidasQSettings.
+
+        This method also updates the colorbar widget's labels paint events
+        to handle changed font sizes and families.
+        """
+        _cmap_name = self.q_settings_get("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
             )
+        _tb = self.getColorBarWidget().getColorScaleBar().getTickBar()
+        _tb.paintEvent = partial(tickbar_paintEvent, _tb)
+        _tb._paintTick = partial(tickbar_paintTick, _tb)
 
-        if self._config["use_data_info_action"]:
-            self.get_data_info_action = self.group.addAction(
-                PydidasGetDataInfoAction(self, parent=self)
-            )
-            self.addAction(self.get_data_info_action)
-            self._toolbar.addAction(self.get_data_info_action)
-            self.get_data_info_action.sig_show_more_info_for_data.connect(
-                self.sig_get_more_info_for_data
-            )
+    def _add_data_info_action(self):
+        """
+        Add the data info action to demand more information for data points.
+        """
+        self.get_data_info_action = self.group.addAction(
+            PydidasGetDataInfoAction(self, parent=self)
+        )
+        self.addAction(self.get_data_info_action)
+        self._toolbar.addAction(self.get_data_info_action)
+        self.get_data_info_action.sig_show_more_info_for_data.connect(
+            self.sig_get_more_info_for_data
+        )
 
     @QtCore.Slot()
     def update_exp_setup_params(self):
@@ -157,7 +211,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             and self._config["diffraction_exp"].get_param_value("detector_npixy") > 0
         )
 
-    def enable_cs_transform(self, enable):
+    def enable_cs_transform(self, enable: bool):
         """
         Enable or disable the coordinate system transformations.
 
@@ -172,7 +226,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(enable and self._config["cs_transform_valid"])
 
-    def update_cs_units(self, x_unit, y_unit):
+    def update_cs_units(self, x_unit: str, y_unit: str):
         """
         Update the coordinate system units.
 
@@ -189,7 +243,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             return
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
-    def plot_pydidas_dataset(self, data, **kwargs):
+    def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
         """
         Plot a pydidas dataset.
 
@@ -198,7 +252,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         data : pydidas.core.Dataset
             The data to be plotted.
         **kwargs : dict
-            Additional keyword arguments to be passed to the silx plot method."""
+            Additional keyword arguments to be passed to the silx plot method.
+        """
         self.enable_cs_transform(
             data.shape
             == (
@@ -208,35 +263,36 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         )
         if data.axis_units[0] != "" and data.axis_units[1] != "":
             self.update_cs_units(data.axis_units[1], data.axis_units[0])
-        _ax_label = [
-            data.axis_labels[i]
-            + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
-            for i in [0, 1]
-        ]
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
         _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
-        self.setGraphYLabel(_ax_label[0])
-        self.setGraphXLabel(_ax_label[1])
-        self.addImage(
-            data,
-            replace=kwargs.pop("replace", True),
-            copy=kwargs.pop("copy", False),
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
-            **{
+        self._plot_config = {
+            "ax_labels": [
+                data.axis_labels[i]
+                + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
+                for i in [0, 1]
+            ],
+            "kwargs": {
+                "replace": kwargs.pop("replace", True),
+                "copy": kwargs.pop("copy", False),
+                "origin": (_originx, _originy),
+                "scale": (_scalex, _scaley),
+            }
+            | {
                 _key: _val
                 for _key, _val in kwargs.items()
-                if _key in self._allowed_kwargs
+                if _key in self._config["allowed_add_image_kwargs"]
             },
-        )
-        _cbar = self.getColorBarWidget()
-        _legend = ""
+        }
+        self.setGraphYLabel(self._plot_config["ax_labels"][0])
+        self.setGraphXLabel(self._plot_config["ax_labels"][1])
+        self.addImage(data, **self._plot_config["kwargs"])
+        self._plot_config["cbar_legend"] = ""
         if len(data.data_label) > 0:
-            _legend += data.data_label
+            self._plot_config["cbar_legend"] += data.data_label
         if len(data.data_unit) > 0:
-            _legend += f"/ {data.data_unit}"
-        if len(_legend) > 0:
-            _cbar.setLegend(_legend)
+            self._plot_config["cbar_legend"] += f" / {data.data_unit}"
+        if len(self._plot_config["cbar_legend"]) > 0:
+            self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
 
         if data.shape == (
             self._config["diffraction_exp"].get_param_value("detector_npixy"),
@@ -253,3 +309,20 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.setGraphYLabel("")
         self.setGraphXLabel("")
         self.getColorBarWidget().setLegend("")
+
+    @QtCore.Slot()
+    def update_mpl_fonts(self):
+        """
+        Update the plot's fonts.
+        """
+        _image = self.getImage()
+        if _image is None:
+            return
+        _title = self.getGraphTitle()
+        self.getBackend().fig.gca().cla()
+        _cb = self.getColorBarWidget()
+        _cb.setLegend(self._plot_config.get("cbar_legend", ""))
+        _cb.getColorScaleBar().setFixedWidth(int(1.6 * self._qtapp.font_height))
+        _cb.update()
+        self.addImage(_image.getData(), **self._plot_config["kwargs"])
+        self.setGraphTitle(_title)

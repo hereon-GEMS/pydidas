@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,10 +20,10 @@ Module with file utility functions pertaining to filenames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "trim_filename",
     "get_extension",
@@ -31,13 +31,16 @@ __all__ = [
     "get_file_naming_scheme",
 ]
 
+
 import os
 import re
 from pathlib import Path
+from typing import List, Tuple, Union
 
 from ..constants import FILENAME_DELIMITERS
 from ..exceptions import UserConfigError
 from .iterable_utils import flatten
+
 
 _FILE_NAME_SCHEME_ERROR_STR = (
     "Could not interprete the filenames. The filenames do not differ in exactly one "
@@ -46,7 +49,7 @@ _FILE_NAME_SCHEME_ERROR_STR = (
 ).replace("\\\\.", ".")
 
 
-def trim_filename(path):
+def trim_filename(path: Path) -> Path:
     """
     Trim a filename from a path if present.
 
@@ -63,7 +66,7 @@ def trim_filename(path):
     return path.parent if path.is_file() else path
 
 
-def get_extension(path):
+def get_extension(path: Union[Path, str]) -> str:
     """
     Get the extension to a file in the given path.
 
@@ -77,13 +80,15 @@ def get_extension(path):
     str
         The extracted file extension.
     """
-    _ext = os.path.splitext(path)[1]
-    if _ext != "":
+    if isinstance(path, str):
+        path = Path(path)
+    _ext = path.suffix
+    if _ext.startswith("."):
         _ext = _ext[1:]
     return _ext
 
 
-def find_valid_python_files(path):
+def find_valid_python_files(path: Path) -> List[Path]:
     """
     Search for all python files in path and subdirectories.
 
@@ -129,7 +134,11 @@ def find_valid_python_files(path):
     return _results
 
 
-def get_file_naming_scheme(filename1, filename2, ignore_leading_zeros=False):
+def get_file_naming_scheme(
+    filename1: Union[Path, str],
+    filename2: Union[Path, str],
+    ignore_leading_zeros: bool = False,
+) -> Tuple[str, range]:
     """
     Get the naming scheme (formattable string with 'index' variable) from two filenames.
 
@@ -154,7 +163,6 @@ def get_file_naming_scheme(filename1, filename2, ignore_leading_zeros=False):
     range : range
         The range iterable which points to all file names.
     """
-
     _path1, _fname1 = os.path.split(filename1)
     _fname2 = os.path.split(filename2)[1]
     _name_parts_1 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname1)[0])

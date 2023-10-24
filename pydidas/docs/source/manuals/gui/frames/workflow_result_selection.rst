@@ -9,21 +9,18 @@ image below).
 .. image:: images/workflow_results_dropdown.png
     :align: right
 
-|
-|
-|
-|
-|
-
 
 .. image:: images/workflow_results_selector_overview.png
-    :align: right
+    :align: left
  
 Once a node has been selected, additional information for these node's results 
-will be displayed, see the image to the right.
+will be displayed, see the image to the left.
 
 Result Arrangement
 """"""""""""""""""
+
+.. image:: images/workflow_results_timeline.png
+    :align: left
 
 For some applications, it can be interesting to arrange the results not by
 scan shape but as a timeline, effictively collapsing all scan dimensions to a 
@@ -32,21 +29,6 @@ corrsponding radio button item. This will also trigger an update of the results
 metadata, as seen on the image to the left. Note that the first dimension is 
 now labelled *Chronological scan points*.
 
-.. image:: images/workflow_results_timeline.png
-    :align: left
-
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
-|
 
 Result metadata
 """""""""""""""
@@ -74,9 +56,9 @@ Result subset selection
     :figwidth: 302 px
     :align: right
     
-    Data selection. In this example, the axes 1 and 2 will be used for the 
+    Data selection. In this example, the axes 1 will be used for the line
     plot. The axis zero is sliced at the index corresponding to the data value
-    30.
+    0 and the axis two is sliced at the value 0.
     
 The *Data selection* radio buttons allow to toggle the selection of data 
 between data values and axis indices. If axis indices are toggled, integer

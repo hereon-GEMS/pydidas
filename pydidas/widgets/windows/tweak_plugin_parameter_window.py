@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -14,16 +14,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
 Module with the TweakPluginParameterWindow class which is a stand-alone frame
 to store the Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["TweakPluginParameterWindow"]
 
 
@@ -32,7 +33,7 @@ import copy
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import POLICY_FIX_EXP
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from ...core.utils import ShowBusyMouse
 from ..framework import PydidasWindow
 from ..parameter_config import EditPluginParametersWidget, ParameterEditCanvas
@@ -43,8 +44,10 @@ from .show_detailed_plugin_results_window import ShowDetailedPluginResultsWindow
 
 class TweakPluginParameterWindow(PydidasWindow):
     """
-    Window to display detailed plugin results in combination with all Plugin
-    Parameters to allow running the Plugin with different values.
+    Window to to modify Plugin Parameters on the fly and inspect results.
+
+    The TweakPluginParameterWindow displays detailed plugin results in combination
+    with all Plugin Parameters to allow running the Plugin with different values.
     """
 
     show_frame = False
@@ -52,14 +55,15 @@ class TweakPluginParameterWindow(PydidasWindow):
     sig_new_params = QtCore.Signal(int)
     sig_this_frame_activated = QtCore.Signal()
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Tweak plugin parameters", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Tweak plugin parameters", **kwargs)
         self.__plugin = None
+        self.__qtapp = QtWidgets.QApplication.instance()
         self._config = self._config | {
             "initial_results": None,
             "detailed_results": None,
             "current_results": None,
-            "parent": parent,
+            "parent": kwargs.get("parent", None),
             "accept_changes": False,
         }
 
@@ -67,37 +71,27 @@ class TweakPluginParameterWindow(PydidasWindow):
         """
         Build the frame and create all widgets.
         """
-        # self.setVisible(True)
-
         self.create_label(
             "label_title",
             "Tweak plugin parameters",
-            fontsize=14,
             bold=True,
-            gridPos=(0, 0, 1, 1),
+            fontsize_offset=4,
+            gridPos=(0, 0, 1, 2),
         )
         self._widgets["config_area"] = ParameterEditCanvas(
-            parent=None,
-            init_layout=True,
-            lineWidth=5,
-            sizePolicy=POLICY_FIX_EXP,
-            fixedWidth=385,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH
         )
         self.create_any_widget(
             "config_scroll_area",
             ScrollArea,
             minimumHeight=500,
+            resize_to_widget_width=True,
             widget=self._widgets["config_area"],
-            fixedWidth=410,
-            sizePolicy=(
-                QtWidgets.QSizePolicy.Expanding,
-                QtWidgets.QSizePolicy.Expanding,
-            ),
-            gridPos=(1, 0, 1, 1),
         )
         self.create_any_widget(
             "plugin_param_edit",
             EditPluginParametersWidget,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["config_area"],
         )
         self.create_line(
@@ -147,11 +141,12 @@ class TweakPluginParameterWindow(PydidasWindow):
         plugin : pydidas.plugins.BasePlugin
             The plugin instance to be tweaked.
         """
+        self._widgets["config_scroll_area"].adjustSize()
         self._config["accept_changes"] = False
         self.__plugin = plugin
         self.__original_plugin_params = copy.deepcopy(plugin.params)
         self._config["initial_results"] = results
-        self._widgets["plugin_param_edit"].configure_plugin(0, plugin)
+        self._widgets["plugin_param_edit"].configure_plugin(plugin.node_id, plugin)
         self._widgets["plugin_param_edit"]._widgets["restore_defaults"].setVisible(
             False
         )
@@ -181,6 +176,12 @@ class TweakPluginParameterWindow(PydidasWindow):
             self._config["detailed_results"] = None
             self._widgets["detailed_results"].update_results({}, "")
             self._widgets["detailed_results"].setVisible(False)
+
+    @QtCore.Slot()
+    def __update_scroll_area_width(self):
+        """
+        Update the width of the scroll area based on the ParameterEditWidget.
+        """
 
     @QtCore.Slot()
     def run_plugin(self):

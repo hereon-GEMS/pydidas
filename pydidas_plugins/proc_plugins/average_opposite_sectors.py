@@ -27,24 +27,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["AverageOppositeSectors"]
 
-from typing import Tuple
 
 import numpy as np
 
+from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
-from pydidas.core import (
-    Dataset,
-    # Parameter,
-    # ParameterCollection,
-    UserConfigError,
-)
 from pydidas.plugins import ProcPlugin
-
-
-_symmetry = "180\u00B0 rotational symmetry around center"
-_full_symmetry = (
-    "180\u00B0 rotational symmetry and mirror symmetry around \u03C7=90\u00B0"
-)
 
 
 class AverageOppositeSectors(ProcPlugin):
@@ -65,22 +53,6 @@ class AverageOppositeSectors(ProcPlugin):
     output_data_label = "Integrated data"
     output_data_unit = "a.u."
     new_dataset = True
-    # default_params = ParameterCollection(
-    #     Parameter(
-    #         "symmetry",
-    #         str,
-    #         _symmetry,
-    #         choices=[_symmetry, _full_symmetry],
-    #         toolTip=(
-    #             u"The assumed symmetry. For '180\u00B0 rotational symmetry around "
-    #             "center', it is simply assumed that sectors which are rotated by "
-    #             u"180\u00B0 around the beamcenter have the same signal and can be "
-    #             f"averaged. For '{_full_symmetry}', an additional symmetry around the"
-    #             " detector y-axis is asumed, i.e. a total of four sectors will be "
-    #             "combined for each new sector."
-    #         )
-    #     )
-    # )
 
     def pre_execute(self):
         """
@@ -88,7 +60,7 @@ class AverageOppositeSectors(ProcPlugin):
         """
         self._config["symmetry_check"] = False
 
-    def execute(self, data: Dataset, **kwargs: dict) -> Tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Crop 1D data.
 
@@ -110,7 +82,7 @@ class AverageOppositeSectors(ProcPlugin):
             self._check_input_symmetry(data)
         _i = data.shape[0] // 2
         _new_data = (data[:_i] + data[_i:]) / 2.0
-        _new_data.update_axis_ranges(
+        _new_data.update_axis_range(
             0,
             np.mod(
                 _new_data.axis_ranges[0], 180 if "deg" in data.axis_units[0] else np.pi
@@ -132,7 +104,7 @@ class AverageOppositeSectors(ProcPlugin):
         UserConfigError
             If the number of datapoints or data range does not match the symmetry.
         """
-        _sym_number = 2  # if self.get_param_value("symmetry") == _symmetry else 4
+        _sym_number = 2
         _chi = data.axis_ranges[0]
         _half_rot = 180 if "deg" in data.axis_units[0] else np.pi
         _chi_mod = np.round(np.mod(_chi, _half_rot), 5).reshape(
@@ -148,35 +120,6 @@ class AverageOppositeSectors(ProcPlugin):
             )
         self._config["symmetry_check"] = True
 
-    # def _check_input_full_symmetry(self, data: Dataset):
-    #     """
-    #     Check the input symmetry for full rotational and mirror symmetry.
-
-    #     Parameters
-    #     ----------
-    #     data : Dataset
-    #         The input dataset.
-
-    #     Raises
-    #     ------
-    #     UserConfigError
-    #         If the number of datapoints or data range does not match the symmetry.
-    #     """
-    #     _sym_number = 2 if self.get_param_value("symmetry") == _symmetry else 4
-    #     _chi = data.axis_ranges[0]
-    #     _half_rot = np.round(180 if "deg" in data.axis_units[0] else np.pi, 5)
-    #     _quarter_rot = np.round(_half_rot / 2, 5)
-    #     _chi = np.round(np.mod(_chi, _half_rot), 5)
-    #     _chi = np.where(_chi > _quarter_rot, _half_rot - _chi, _chi)
-    #     if 0 in _chi:
-    #         _i_zero = np.where(_chi ==0)[0]
-    #         _chi = np.roll(np.insert(_chi, _i_zero, 0), -1)
-    #     if _quarter_rot in _chi:
-    #         _i_q = np.where(_chi ==_quarter_rot)[0]
-    #         _chi = np.insert(_chi, _i_q, _quarter_rot)
-
-    #     self._config["symmetry_check"] = True
-
     def calculate_result_shape(self):
         """Calculate the result's shape based on the input data shape."""
         _shape = self._config.get("input_shape", None)
@@ -191,14 +134,3 @@ class AverageOppositeSectors(ProcPlugin):
                 f"plugin. The number of input points {_shape[0]} is not divisible by 2."
             )
         self._config["result_shape"] = (_shape[0] // 2, _shape[1])
-        # _sym = self.get_param_value("symmetry")
-        # _sym_number = 2 if _sym == _symmetry else 4
-        # if np.mod(_shape[0], _sym_number) != 0:
-        #     raise UserConfigError(
-        #         "The input shape is invalid for the 'Average opposite sectors' "
-        #         f"plugin. The number of input points {_shape[0]} is not divisible by "
-        #         f"{_sym_number} in the specified geometry ({_sym})."
-        #     )
-        # self._config["result_shape"] = (
-        #     _shape[0] // _sym_number + (1 if _sym_number == 4 else 0), _shape[1]
-        # )

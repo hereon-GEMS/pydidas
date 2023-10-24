@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -58,12 +58,10 @@ class ChiSaver(OutputPlugin):
     input_data_dim = 1
     output_data_dim = None
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Save data to file
+        Save data to file in ASCII format with a chi header.
 
-        Parameters
-        ----------
         Parameters
         ----------
         data : Union[np.ndarray, pydidas.core.Dataset]
@@ -74,7 +72,7 @@ class ChiSaver(OutputPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        data : pydidas.core.Dataset
             The input data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
@@ -88,8 +86,8 @@ class ChiSaver(OutputPlugin):
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
-            data.update_axis_ranges(0, np.arange(data.size))
-            data.update_axis_labels(0, "index")
+            data.update_axis_range(0, np.arange(data.size))
+            data.update_axis_label(0, "index")
         _title = os.path.basename(_fname) + "\n"
         _unit = data.axis_units[0]
         _axislabel = str(data.axis_labels[0]) + (

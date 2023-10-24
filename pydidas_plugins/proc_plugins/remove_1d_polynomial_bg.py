@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,17 +22,17 @@ diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Remove1dPolynomialBackground"]
 
 import numpy as np
 from numpy.polynomial import Polynomial
 
+from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
-from pydidas.core import ParameterCollection, Parameter, Dataset, get_generic_parameter
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
 
@@ -56,7 +58,7 @@ DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG = ParameterCollection(
         name="Polynomial fit order",
         tooltip=(
             "The polynomial order for the fit. This value "
-            "should typically not exceed3 or 4."
+            "should typically not exceed 3 or 4."
         ),
     ),
     Parameter(
@@ -124,7 +126,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         self.__kwargs = {}
 
     @property
-    def detailed_results(self):
+    def detailed_results(self) -> dict:
         """
         Get the detailed results for the Remove1dPolynomialBackground plugin.
 
@@ -154,10 +156,9 @@ class Remove1dPolynomialBackground(ProcPlugin):
             self._kernel = None
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Fit a polynomial background to the data and remove its contribution
-        from the data.
+        Fit and remove a polynomial background to the data.
 
         Parameters
         ----------
@@ -173,7 +174,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self.__input_data = data.copy()
+        self.__input_data = data
         self.__kwargs = kwargs
 
         if self._kernel is not None:
@@ -181,9 +182,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
             data[self._klim_low : -self._klim_high] = np.convolve(
                 data, self._kernel, mode="valid"
             )
-
         _x = np.arange(data.size)
-
         # find and fit the local minima
         local_min = (
             np.where(
@@ -212,7 +211,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         _tmpindices = np.where(_res[_local_res_min] <= 0.002)[0]
         _local_res_min = _local_res_min[_tmpindices]
 
-        _p_final = Polynomial.fit(_local_res_min, data[_local_res_min], 3)
+        _p_final = Polynomial.fit(_local_res_min, data[_local_res_min], self._fit_order)
 
         if self._kernel is not None:
             data = _raw
@@ -234,10 +233,14 @@ class Remove1dPolynomialBackground(ProcPlugin):
         return data, kwargs
 
     @staticmethod
-    def __filter_local_minima_by_offset(xpos, data, offset):
+    def __filter_local_minima_by_offset(
+        xpos: np.ndarray, data: np.ndarray, offset: float
+    ) -> np.ndarray:
         """
-        Filter local minima from a list of positions by evaluating their offset
-        from the linear connection between neighbouring local minima.
+        Filter local minima from a list of positions.
+
+        Minima are filtered by evaluating their offset from the linear
+        connection between neighbouring local minima.
 
         Parameters
         ----------
@@ -266,7 +269,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
                 _index += 1
         return xpos
 
-    def _create_detailed_results(self):
+    def _create_detailed_results(self) -> dict:
         """
         Get the detailed results for the background removal.
 
@@ -297,7 +300,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
                 1: "intensity / a.u.",
             },
             "items": [
-                {"plot": 0, "label": "input data", "data": self.__input_data.copy()},
+                {"plot": 0, "label": "input data", "data": self.__input_data},
                 {"plot": 0, "label": "background", "data": self.__background},
                 {"plot": 1, "label": "", "data": self.__results},
             ],

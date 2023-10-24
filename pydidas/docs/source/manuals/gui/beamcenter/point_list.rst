@@ -6,8 +6,28 @@
 Point list and controls
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-At the very top of the list is a configuration widget to change the color of all
-the plot overlay items like the points to increase the contrast. 
+Located at the top are controls for how to select points and for the overlay 
+color.
+
+The *Use 2 click point selection* toggles how points are selected in the image:
+
+  - Disabled 2-click point selection:
+
+    If disabled, points will be selected directly with a single click in the 
+    image. This requires the user to manually zoom in to select points with 
+    high accuracy.
+    
+  - Enabled 2-click point selection:
+
+    When enabled, clicking on a point in the image will zoom in on the selected
+    point to allow a higher degree of precision for the point selection. 
+    The second click will select the point and reset the zoom to the previous
+    settings.
+    
+The second item is a configuration widget to change the color of all the plot 
+overlay items like the points to increase the contrast, depending on the chosen
+colormap for the image. Changing the color in the drop-down selection will 
+automatically update the color in all overlay items. 
 
 The point list displays the positions of all clicked points. Left-clicking on
 a point in the list will select this point and also highlight it in the image

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,17 +20,19 @@ Module with PydidasPlot1D class which adds configurations to the base silx Plot1
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasPlot1D"]
 
 
 import inspect
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
+
+from ...core import Dataset
 
 
 class PydidasPlot1D(Plot1D):
@@ -36,8 +40,10 @@ class PydidasPlot1D(Plot1D):
     A customized silx.gui.plot.Plot1D with an additional configuration.
     """
 
-    def __init__(self, parent=None, backend=None):
-        Plot1D.__init__(self, parent, backend)
+    def __init__(self, **kwargs: dict):
+        Plot1D.__init__(
+            self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
+        )
         self._allowed_kwargs = [
             _key
             for _key, _value in inspect.signature(self.addCurve).parameters.items()
@@ -47,9 +53,13 @@ class PydidasPlot1D(Plot1D):
         self.getRoiAction().setVisible(False)
         self.getFitAction().setVisible(False)
 
+        self._qtapp = QtWidgets.QApplication.instance()
+        if hasattr(self._qtapp, "sig_mpl_font_change"):
+            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
+
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-    def plot_pydidas_dataset(self, data, **kwargs):
+    def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
         """
         Plot a pydidas dataset.
 
@@ -63,23 +73,30 @@ class PydidasPlot1D(Plot1D):
         if kwargs.get("replace", True):
             self.clear_plot()
 
-        self.setGraphXLabel(
-            data.axis_labels[0]
-            + (" / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else "")
-        )
-        self.setGraphYLabel(
-            data.data_label
-            + (" / " + data.data_unit if len(data.data_unit) > 0 else "")
-        )
-        self.addCurve(
-            data.axis_ranges[0],
-            data.array,
-            linewidth=1.5,
-            **{
+        self._plot_config = {
+            "ax_label_x": (
+                data.axis_labels[0]
+                + (" / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else "")
+            ),
+            "ax_label_y": (
+                data.data_label
+                + (" / " + data.data_unit if len(data.data_unit) > 0 else "")
+            ),
+            "kwargs": {
+                "linewidth": 1.5,
+            }
+            | {
                 _key: _val
                 for _key, _val in kwargs.items()
                 if _key in self._allowed_kwargs
             },
+        }
+        self.setGraphXLabel(self._plot_config["ax_label_x"])
+        self.setGraphYLabel(self._plot_config["ax_label_y"])
+        self.addCurve(
+            data.axis_ranges[0],
+            data.array,
+            **self._plot_config["kwargs"],
         )
 
     def clear_plot(self):
@@ -90,3 +107,19 @@ class PydidasPlot1D(Plot1D):
         self.setGraphTitle("")
         self.setGraphYLabel("")
         self.setGraphXLabel("")
+
+    @QtCore.Slot()
+    def update_mpl_fonts(self):
+        """
+        Update the plot's fonts.
+        """
+        _curve = self.getCurve()
+        if _curve is None:
+            return
+        _xarr, _yarr, _, _ = _curve.getData()
+        _title = self.getGraphTitle()
+        self.getBackend().fig.gca().cla()
+        self.addCurve(_xarr, _yarr, **self._plot_config["kwargs"])
+        self.setGraphTitle(_title)
+        self.setGraphXLabel(self._plot_config["ax_label_x"])
+        self.setGraphYLabel(self._plot_config["ax_label_y"])

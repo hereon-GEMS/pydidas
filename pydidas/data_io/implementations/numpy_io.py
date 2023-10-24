@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,16 +20,20 @@ Module with the NumpyIo class for importing and exporting numpy data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
+
+
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 
-from ...core.constants import NUMPY_EXTENSIONS
 from ...core import Dataset
+from ...core.constants import NUMPY_EXTENSIONS
 from .io_base import IoBase
 
 
@@ -40,7 +46,7 @@ class NumpyIo(IoBase):
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
-    def import_from_file(cls, filename, **kwargs):
+    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict):
         """
         Read data from a numpy file.
 
@@ -71,7 +77,9 @@ class NumpyIo(IoBase):
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(cls, filename, data, **kwargs):
+    def export_to_file(
+        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
+    ):
         """
         Export data to a numpy file.
 

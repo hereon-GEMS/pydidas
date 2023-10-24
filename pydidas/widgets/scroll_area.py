@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -14,26 +14,28 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
 Module with the ScrollAreaclass, a QScrollArea implementation with convenience
 calling arguments for simplified formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ScrollArea"]
 
 
-from qtpy import QtWidgets
+from qtpy.QtCore import QSize, Slot
+from qtpy.QtWidgets import QApplication, QFrame, QScrollArea
 
 from ..core.constants import POLICY_EXP_EXP
 from ..core.utils import apply_qt_properties
 
 
-class ScrollArea(QtWidgets.QScrollArea):
+class ScrollArea(QScrollArea):
     """
     Convenience class to simplify the setup of a QScrollArea.
 
@@ -42,20 +44,24 @@ class ScrollArea(QtWidgets.QScrollArea):
     parent : QWidget, optional
         The parent widget. The default is None.
     **kwargs : dict
-        Any additional keyword arguments. See below for supported arguments.
-    **QtAttribute : depends on the attribute
-        Any Qt attributes which are supported by the RadioButtonGroup. Use the
-        Qt attribute name with a lowercase first character. Examples are
-        ``widget``, ``fixedWidth``, ``fixedHeight``.
+        Any additional keyword arguments. All Qt attributes with a setAttribute
+        method are valid keywords.
     """
 
+    init_kwargs = ["resize_to_widget_width"]
+
     def __init__(self, parent=None, **kwargs):
-        super().__init__(parent)
+        QScrollArea.__init__(self, parent)
         kwargs["widgetResizable"] = True
         kwargs["autoFillBackground"] = True
         kwargs["sizePolicy"] = POLICY_EXP_EXP
-        kwargs["frameShape"] = QtWidgets.QFrame.NoFrame
+        kwargs["frameShape"] = QFrame.NoFrame
         apply_qt_properties(self, **kwargs)
+        self.__scrollbar_width = QApplication.instance().scrollbar_width
+        if kwargs.get("resize_to_widget_width", False):
+            QApplication.instance().sig_font_metrics_changed.connect(
+                self.force_width_from_size_hint
+            )
 
     def sizeHint(self):
         """
@@ -71,5 +77,13 @@ class ScrollArea(QtWidgets.QScrollArea):
             The size hint for the ScrollArea.
         """
         if self.widget() is not None:
-            return self.widget().sizeHint()
+            _hint = self.widget().sizeHint()
+            return QSize(_hint.width() + self.__scrollbar_width + 5, _hint.height())
         return super().sizeHint()
+
+    @Slot()
+    def force_width_from_size_hint(self):
+        """
+        Enforce a fixed width based on the own sizeHint.
+        """
+        self.setFixedWidth(self.sizeHint().width())

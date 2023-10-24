@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,49 +21,43 @@ class is used for all Parameters with predefined choices.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParamIoWidgetComboBox"]
 
-from qtpy import QtWidgets, QtCore
 
-from .base_param_io_widget import BaseParamIoWidget
-from ...core.utils import (
-    convert_unicode_to_ascii,
-    SignalBlocker,
-    convert_special_chars_to_unicode,
-)
+from collections.abc import Iterable
+
+from qtpy import QtCore
+
+from ...core import Parameter
+from ...core.utils import convert_special_chars_to_unicode, convert_unicode_to_ascii
+from ..factory import PydidasComboBox
 from ..utilities import get_max_pixel_width_of_entries
+from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
-class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
-    """
-    Widgets for I/O during plugin parameter editing with predefined
-    choices.
-    """
+class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
+    """Widgets for I/O during plugin parameter editing with predefined choices."""
 
-    # because of the double inheritance, inhering the signal does not work
-    io_edited = QtCore.Signal(str)
-
-    def __init__(self, parent, param, width=255):
+    def __init__(self, param: Parameter, **kwargs: dict):
         """
-        Setup the widget.
+        Initialize the widget.
 
         Init method to setup the widget and set the links to the parameter
         and Qt parent widget.
 
         Parameters
         ----------
-        parent : QWidget
-            A QWidget instance.
         param : Parameter
             A Parameter instance.
         width : int, optional
             The width of the IOwidget.
         """
-        super().__init__(parent, param, width)
+        PydidasComboBox.__init__(self)
+        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
         for choice in param.choices:
             self.addItem(f"{convert_special_chars_to_unicode(str(choice))}")
 
@@ -70,7 +66,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
         self.set_value(param.value)
         self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)
 
-    def __convert_bool(self, value):
+    def __convert_bool(self, value: object) -> object:
         """
         Convert boolean integers to string.
 
@@ -79,7 +75,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
 
         Parameters
         ----------
-        value : any
+        value : object
             The input value from the field. This could be any object.
 
         Returns
@@ -106,31 +102,36 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
             self._old_value = _cur_value
             self.io_edited.emit(_cur_value)
 
-    def get_value(self):
+    def get_value(self) -> object:
         """
         Get the current value from the combobox to update the Parameter value.
 
         Returns
         -------
-        type
+        object
             The text converted to the required datatype (int, float, path)
             to update the Parameter value.
         """
         text = convert_unicode_to_ascii(self.currentText())
         return self.get_value_from_text(text)
 
-    def set_value(self, value):
+    def set_value(self, value: object):
         """
         Set the input field's value.
 
         This method changes the combobox selection to the specified value.
+
+        Parameters
+        ----------
+        value : object
+            The value to be set.
         """
         value = self.__convert_bool(value)
         self._old_value = value
         _txt_repr = convert_special_chars_to_unicode(str(value))
         self.setCurrentText(_txt_repr)
 
-    def update_choices(self, new_choices):
+    def update_choices(self, new_choices: Iterable[object, ...]):
         """
         Update the choices of the BaseParamIoWidget in place.
 
@@ -143,7 +144,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
         new_choices : collections.abc.Iterable
             Any iterable with new choices.
         """
-        with SignalBlocker(self):
+        with QtCore.QSignalBlocker(self):
             self.clear()
             for choice in new_choices:
                 _itemstr = convert_special_chars_to_unicode(str(choice))

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,38 +16,38 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PluginPositionNode class which is a subclassed GenericNode
+The PluginPositionNode class can calculate node positions in a WorkflowTree.
+
+This module includes the PluginPositionNode class which is a subclassed GenericNode
 with additional functionality to get the size of an encompassing square around
 the node and all its children.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PluginPositionNode"]
+
 
 import numpy as np
 
 from .generic_node import GenericNode
-from ..core.constants import (
-    GENERIC_PLUGIN_WIDGET_WIDTH,
-    GENERIC_PLUGIN_WIDGET_HEIGHT,
-    GENERIC_PLUGIN_WIDGET_Y_OFFSET,
-    GENERIC_PLUGIN_WIDGET_X_OFFSET,
-)
 
 
 class PluginPositionNode(GenericNode):
     """
-    The PluginPositionNode class manages the sizes and positions of
-    items in a tree. This class only manages the position data without any
-    reference to actual widgets.
+    The PluginPositionNode class manages the sizes and positions of items in a tree.
+
+    This class only manages the position data without any reference to actual widgets.
     """
 
+    PLUGIN_HEIGHT_OFFSET = 0.6
+    PLUGIN_WIDTH_OFFSET = 0.1
+
     @property
-    def width(self):
+    def width(self) -> float:
         """
         Get the width of the current branch.
 
@@ -54,18 +56,18 @@ class PluginPositionNode(GenericNode):
 
         Returns
         -------
-        int
+        float
             The width of the tree branch.
         """
         if self.is_leaf:
-            return GENERIC_PLUGIN_WIDGET_WIDTH
-        _w = (len(self._children) - 1) * GENERIC_PLUGIN_WIDGET_X_OFFSET
+            return 1
+        _w = (len(self._children) - 1) * self.PLUGIN_WIDTH_OFFSET
         for child in self._children:
             _w += child.width
         return _w
 
     @property
-    def height(self):
+    def height(self) -> float:
         """
         Get the height of the current branch.
 
@@ -74,17 +76,17 @@ class PluginPositionNode(GenericNode):
 
         Returns
         -------
-        int
+        float
             The height of the tree branch.
         """
         if self.is_leaf:
-            return GENERIC_PLUGIN_WIDGET_HEIGHT
+            return 1
         _h = []
         for child in self._children:
             _h.append(child.height)
-        return max(_h) + GENERIC_PLUGIN_WIDGET_Y_OFFSET + GENERIC_PLUGIN_WIDGET_HEIGHT
+        return max(_h) + self.PLUGIN_HEIGHT_OFFSET + 1
 
-    def get_relative_positions(self):
+    def get_relative_positions(self, accuracy: int = 3) -> dict:
         """
         Get the relative positions of the node and all children.
 
@@ -92,47 +94,27 @@ class PluginPositionNode(GenericNode):
         node_ids and the relative positions of children with respect to the
         parent node.
 
+        Parameters
+        ----------
+        accuracy : int, optional
+            The accuracy of the position results.
+
         Returns
         -------
         pos : dict
             A dictionary with entries of the type "node_id: [xpos, ypos]".
         """
-        pos = {self.node_id: [(self.width - GENERIC_PLUGIN_WIDGET_WIDTH) // 2, 0]}
+        pos = {self.node_id: [np.round((self.width - 1) / 2, accuracy), 0]}
         if self.is_leaf:
             return pos
         xoffset = 0
-        yoffset = GENERIC_PLUGIN_WIDGET_HEIGHT + GENERIC_PLUGIN_WIDGET_Y_OFFSET
+        yoffset = 1 + self.PLUGIN_HEIGHT_OFFSET
         for child in self._children:
             _p = child.get_relative_positions()
-            for key in _p:
-                pos.update({key: [_p[key][0] + xoffset, _p[key][1] + yoffset]})
-            xoffset += child.width + GENERIC_PLUGIN_WIDGET_X_OFFSET
-        self.make_grid_positions_positive(pos)
+            for _key, (_x, _y) in _p.items():
+                pos[_key] = [
+                    np.round(_x + xoffset, accuracy),
+                    np.round(_y + yoffset, accuracy),
+                ]
+            xoffset += child.width + self.PLUGIN_WIDTH_OFFSET
         return pos
-
-    @staticmethod
-    def make_grid_positions_positive(pos_dict):
-        """
-        Make all grid positions positive.
-
-        Because child positions will be setup symmetrically around the parent
-        node, negative numbers will be included. To correctly print the tree,
-        positive numbers are required. This method will change the dictionary
-        values in place and make them positive.
-
-        Parameters
-        ----------
-        pos_dict : dict
-            A dictionary with entries of the type "node_id: [xpos, ypos]".
-
-        Returns
-        -------
-        pos_dict : dict
-            A dictionary with entries of the type "node_id: [xpos, ypos]"
-            where all positions are positive.
-        """
-        vals = np.asarray(list(pos_dict.values()))
-        xoffset = np.amin(vals[:, 0])
-        yoffset = np.amin(vals[:, 1])
-        for key in pos_dict:
-            pos_dict[key] = [pos_dict[key][0] - xoffset, pos_dict[key][1] - yoffset]

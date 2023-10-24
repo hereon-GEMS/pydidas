@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import copy
@@ -294,7 +294,7 @@ class TestWorkflowTree(unittest.TestCase):
             self.assertIsInstance(_node, WorkflowNode)
         for _node in tree2.root._children:
             self.assertTrue(_node in tree2.nodes.values())
-        for key in set(self.tree.__dict__.keys()) - {"root", "nodes"}:
+        for key in set(self.tree.__dict__.keys()) - {"root", "nodes", "_starthash"}:
             self.assertEqual(getattr(self.tree, key), getattr(tree2, key))
 
     def test_tree_pickling(self):
@@ -361,8 +361,8 @@ class TestWorkflowTree(unittest.TestCase):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
-        self.tree.restore_from_string("")
-        self.assertEqual(self.tree.nodes, dict())
+        with self.assertRaises(UserConfigError):
+            self.tree.restore_from_string("")
 
     def test_restore_from_string__empty_list(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,32 +20,34 @@ The decorator module has useful decorators to facilitate coding.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "copy_docstring",
     "process_1d_with_multi_input_dims",
     "calculate_result_shape_for_multi_input_dims",
 ]
 
+
 import functools
 import itertools
+from typing import Callable, Tuple
 
 import numpy as np
 
 from ..dataset import Dataset
 from .iterable_utils import (
     insert_item_in_tuple,
-    replace_item_in_iterable,
     remove_item_at_index_from_iterable,
+    replace_item_in_iterable,
 )
 
 
-def copy_docstring(origin):
+def copy_docstring(origin: type) -> type:
     """
-    Decorator to initialize the docstring from another source.
+    Initialize the docstring from another source.
 
     This is useful to duplicate a docstring for inheritance and composition.
 
@@ -67,9 +71,7 @@ def copy_docstring(origin):
         if not isinstance(dest, type) and isinstance(origin, type):
             origin = getattr(origin, dest.__name__, None)
             if origin is None:
-                raise ValueError(
-                    "Origin class has no method called " f"{dest.__name__}"
-                )
+                raise ValueError("Origin class has no method called {dest.__name__}")
 
         dest.__doc__ = origin.__doc__
         return dest
@@ -77,7 +79,7 @@ def copy_docstring(origin):
     return functools.partial(_docstring, origin=origin)
 
 
-def process_1d_with_multi_input_dims(method):
+def process_1d_with_multi_input_dims(method: Callable) -> Callable:
     """
     Decorator to run processing of 1-dim input with multi-dimensional inputs which are
     (except for the dimension to be processed) additional dimensions which are to be
@@ -85,10 +87,11 @@ def process_1d_with_multi_input_dims(method):
     """
 
     @functools.wraps(method)
-    def _implementation(self, data, **kwargs):
+    def _implementation(self, data: Dataset, **kwargs: dict) -> Tuple[Dataset, dict]:
         """
-        Implementation of the multi-dimensional input decorator which updates the
-        original execute method in the pydidas Plugin.
+        Implement the multi-dimensional input decorator.
+
+        This decorator updates the original execute method in the pydidas Plugin.
 
         Parameters
         ----------
@@ -152,7 +155,7 @@ def process_1d_with_multi_input_dims(method):
     return _implementation
 
 
-def calculate_result_shape_for_multi_input_dims(method):
+def calculate_result_shape_for_multi_input_dims(method: Callable) -> Callable:
     """
     Decorator to update the result shape for multiple input dimensions.
     """
@@ -160,14 +163,10 @@ def calculate_result_shape_for_multi_input_dims(method):
     @functools.wraps(method)
     def _implementation(self):
         """
-        Implementation of the calculate_result_shape for multi-dimensional input
-        decorator which updates the original calculate_result_shape method in the
-        pydidas Plugin.
+        Calculate_result_shape for multi-dimensional input.
 
-        Returns
-        -------
-        tuple
-            The resulting result shape.
+        This decorator updates the original calculate_result_shape method
+        in the pydidas Plugin.
         """
         method(self)
         if self._config["input_shape"] is None:

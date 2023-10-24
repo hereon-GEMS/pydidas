@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,21 +18,21 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
-import string
 import random
+import string
+import unittest
 
 from qtpy import QtWidgets
 
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.factory.create_widgets_mixin import CreateWidgetsMixIn
-from pydidas.widgets.utilities import get_widget_layout_args, get_grid_pos
+from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
 
 
 class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
@@ -40,14 +42,12 @@ class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.name = "".join(random.choice(string.ascii_letters) for i in range(20))
 
 
-def get_test_widget(*args, **kwargs):
-    return TestWidget()
-
-
 class TestCreateWidgetsMixIn(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.q_app = QtWidgets.QApplication([])
+        cls.q_app = QtWidgets.QApplication.instance()
+        if cls.q_app is None:
+            cls.q_app = QtWidgets.QApplication([])
         cls.widgets = []
 
     @classmethod
@@ -56,6 +56,9 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
             w = cls.widgets.pop()
             w.deleteLater()
         cls.q_app.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def setUp(self):
         ...
@@ -63,9 +66,11 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def get_widget(self):
+    def get_widget(self, layout=QtWidgets.QGridLayout):
         _w = TestWidget()
-        _w.setLayout(QtWidgets.QGridLayout())
+        if layout is not None:
+            _w.setLayout(layout())
+        self.widgets.append(_w)
         return _w
 
     def testget_grid_pos_default(self):
@@ -207,7 +212,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def test_create_widget__with_layout_args(self):
         obj = self.get_widget()
-        obj._CreateWidgetsMixIn__create_widget(get_test_widget, "ref", layout_kwargs={})
+        obj.create_any_widget("ref", TestWidget, layout_kwargs={})
         self.assertTrue("ref" in obj._widgets)
 
     def test_create_any_widget__plain(self):

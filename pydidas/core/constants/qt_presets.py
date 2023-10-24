@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,11 @@ graphical user interface of the application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
-    "STANDARD_FONT_SIZE",
     "ALIGN_TOP_LEFT",
     "ALIGN_TOP_CENTER",
     "ALIGN_TOP_RIGHT",
@@ -47,15 +46,7 @@ __all__ = [
     "POLICY_MIN_MIN",
 ]
 
-import platform
-
 from qtpy import QtCore, QtGui, QtWidgets
-
-
-if platform.system() == "Windows":
-    STANDARD_FONT_SIZE = 10
-else:
-    STANDARD_FONT_SIZE = 8
 
 
 ALIGN_TOP_LEFT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop

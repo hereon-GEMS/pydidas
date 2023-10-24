@@ -31,9 +31,9 @@ __all__ = ["QuickIntegrationFrameBuilder"]
 from qtpy import QtWidgets
 
 from ....core import constants
-from ....widgets import ScrollArea, get_pyqt_icon_from_str
+from ....widgets import ScrollArea
 from ....widgets.misc import (
-    PointPositionTableWidget,
+    PointsForBeamcenterWidget,
     SelectImageFrameWidget,
     ShowIntegrationRoiParamsWidget,
 )
@@ -49,64 +49,8 @@ class QuickIntegrationFrameBuilder:
     _frame = None
 
     @classmethod
-    def _1line_options(cls, parent_key: str = "config", **kwargs) -> dict:
-        """
-        Get the options for 1-line Parameter widgets.
-
-        Parameters
-        ----------
-        parent_key : str
-            The parent widget reference key.
-        **kwargs : dict
-            Any keywords to be added to the generic options.
-
-        Returns
-        -------
-        dict
-            The options dictionary.
-        """
-        _1line_options = (
-            dict(
-                width_text=cls._frame._config["scroll_width"] - 180,
-                width_io=150,
-                width_total=cls._frame._config["scroll_width"],
-                parent_widget=cls._frame._widgets[parent_key],
-            )
-            | kwargs
-        )
-        return _1line_options
-
-    @classmethod
-    def _2line_options(cls, parent_key: str = "config", **kwargs) -> dict:
-        """
-        Get the options for 1-line Parameter widgets.
-
-        Parameters
-        ----------
-        parent_key : str, optional
-            The parent widget reference key. The default is "config".
-        **kwargs : dict
-            Any keywords to be added to the generic options.
-
-        Returns
-        -------
-        dict
-            The options dictionary.
-        """
-        _2line_options = (
-            constants.DEFAULT_TWO_LINE_PARAM_CONFIG
-            | {
-                "width_total": cls._frame._config["scroll_width"],
-                "width_io": cls._frame._config["scroll_width"] - 20,
-                "parent_widget": cls._frame._widgets[parent_key],
-            }
-            | kwargs
-        )
-        return _2line_options
-
-    @classmethod
     def _label_header(
-        cls, parent_key: str = "config", size_offset: int = 1, **kwargs
+        cls, parent_key: str = "config", size_offset: int = 1, **kwargs: dict
     ) -> dict:
         """
         Get the options for header labels.
@@ -125,16 +69,12 @@ class QuickIntegrationFrameBuilder:
         dict
             The options dictionary.
         """
-        _label_header = (
-            dict(
-                fontsize=constants.STANDARD_FONT_SIZE + size_offset,
-                bold=True,
-                fixedWidth=cls._frame._config["scroll_width"],
-                parent_widget=cls._frame._widgets[parent_key],
-            )
-            | kwargs
-        )
-        return _label_header
+        return {
+            "bold": True,
+            "fontsize_offset": size_offset,
+            "parent_widget": parent_key,
+            **kwargs,
+        }
 
     @classmethod
     def populate_frame(cls, frame):
@@ -169,52 +109,36 @@ class QuickIntegrationFrameBuilder:
         # Create tab widgets first because the config references the plot widget.
         cls._frame.create_empty_widget(
             "tab_plot",
-            parent_widget=None,
             layout_kwargs=dict(
                 contentsMargins=(10, 10, 10, 10),
                 columnStretch=(1, 1),
                 rowStretch=(0, 1),
             ),
+            parent_widget=None,
         )
         cls._frame.add_any_widget(
             "input_plot",
             PydidasPlot2DwithIntegrationRegions(diffraction_exp=cls._frame._EXP),
-            parent_widget=cls._frame._widgets["tab_plot"],
-            gridPos=(0, 1, 1, 1),
             enabled=False,
+            gridPos=(0, 1, 1, 1),
             minimumHeight=500,
             minimumWidth=500,
+            parent_widget="tab_plot",
             sizePolicy=constants.POLICY_EXP_EXP,
-        )
-        cls._frame.create_empty_widget(
-            "input_plot_bc_selection",
-            parent_widget=cls._frame._widgets["tab_plot"],
-            gridPos=(0, 0, 1, 1),
-            visible=False,
-        )
-        cls._frame.create_param_widget(
-            cls._frame.get_param("overlay_color"),
-            width_text=PointPositionTableWidget.widget_width - 90,
-            width_io=90,
-            width_unit=0,
-            width_total=PointPositionTableWidget.widget_width,
-            parent_widget=cls._frame._widgets["input_plot_bc_selection"],
-            gridPos=(0, 0, 1, 1),
         )
         cls._frame.add_any_widget(
             "input_beamcenter_points",
-            PointPositionTableWidget(cls._frame._widgets["input_plot"]),
-            parent_widget=cls._frame._widgets["input_plot_bc_selection"],
-            gridPos=(1, 0, 1, 1),
-            fixedWidth=PointPositionTableWidget.widget_width,
+            PointsForBeamcenterWidget(cls._frame._widgets["input_plot"]),
+            gridPos=(0, 0, 1, 1),
+            parent_widget="tab_plot",
+            visible=False,
         )
         cls._frame.create_any_widget(
             "result_plot",
             PydidasPlotStack,
-            parent_widget=None,
             diffraction_exp=cls._frame._EXP,
+            parent_widget=None,
         )
-
         cls._frame._widgets["tabs"].addTab(
             cls._frame._widgets["tab_plot"], "Input image"
         )
@@ -227,30 +151,29 @@ class QuickIntegrationFrameBuilder:
         """
         Create the config widgets and headers.
         """
+        cls._frame.create_empty_widget(
+            "config",
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            init_layout=True,
+            parent_widget=None,
+            sizePolicy=constants.POLICY_FIX_EXP,
+        )
         cls._frame.create_label(
             "label_title",
             "Quick integration\n",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
-            gridPos=(0, 0, 1, 1),
-            fixedWidth=cls._frame._config["scroll_width"],
-        )
-        cls._frame.create_empty_widget(
-            "config",
-            parent_widget=None,
-            init_layout=True,
-            sizePolicy=constants.POLICY_FIX_EXP,
-            fixedWidth=cls._frame._config["scroll_width"],
+            fontsize_offset=4,
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            parent_widget="config",
         )
         cls._frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=cls._frame._widgets["config"],
-            fixedWidth=cls._frame._config["scroll_width"] + 50,
-            sizePolicy=constants.POLICY_FIX_EXP,
             gridPos=(1, 0, 1, 1),
-            stretch=(1, 0),
             layout_kwargs={"alignment": None},
+            sizePolicy=constants.POLICY_FIX_EXP,
+            stretch=(1, 0),
+            widget=cls._frame._widgets["config"],
         )
         cls._frame.create_label(None, "Input file:", **cls._label_header())
         cls._frame.add_any_widget(
@@ -258,12 +181,10 @@ class QuickIntegrationFrameBuilder:
             SelectImageFrameWidget(
                 *cls._frame.params.values(),
                 import_reference="QuickIntegrationFrame__image_import",
-                widget_width=cls._frame._config["scroll_width"],
             ),
-            parent_widget=cls._frame._widgets["config"],
-            fixedWidth=cls._frame._config["scroll_width"],
+            parent_widget="config",
         )
-        cls._frame.create_line(None, parent_widget=cls._frame._widgets["config"])
+        cls._frame.create_line(None, parent_widget="config")
 
     @classmethod
     def _create_exp_section_widgets(cls):
@@ -274,73 +195,65 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "copy_exp_context",
             "Copy expriment description from workflow setup",
-            icon=get_pyqt_icon_from_str("qta::fa.copy"),
-            fixedWidth=cls._frame._config["scroll_width"],
-            parent_widget=cls._frame._widgets["config"],
+            icon="qta::fa.copy",
+            parent_widget="config",
         )
         cls._frame.create_button(
             "but_show_exp_section",
             "Show detailed experiment section",
-            icon=cls._frame.style().standardIcon(6),
-            fixedWidth=cls._frame._config["scroll_width"],
-            parent_widget=cls._frame._widgets["config"],
+            icon="qt-std::SP_TitleBarUnshadeButton",
+            parent_widget="config",
             visible=True,
         )
         cls._frame.create_empty_widget(
-            "exp_section", parent_widget=cls._frame._widgets["config"], visible=False
+            "exp_section", parent_widget="config", visible=False
         )
         cls._frame.create_button(
             "but_import_exp",
             "Import diffraction experimental parameters",
-            icon=cls._frame.style().standardIcon(42),
-            fixedWidth=cls._frame._config["scroll_width"],
-            parent_widget=cls._frame._widgets["exp_section"],
+            icon="qt-std::SP_DialogOpenButton",
+            parent_widget="exp_section",
         )
         cls._frame.create_label(
             None, "X-ray energy:", **cls._label_header("exp_section", 0)
         )
         cls._frame.create_param_widget(
-            cls._frame.get_param("xray_energy"),
-            **cls._1line_options("exp_section"),
+            cls._frame.get_param("xray_energy"), parent_widget="exp_section"
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("xray_wavelength"),
-            **cls._1line_options("exp_section"),
+            parent_widget="exp_section",
         )
         cls._frame.create_label(
             None, "Detector:", **cls._label_header("exp_section", 0)
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("detector_pxsize"),
-            **cls._1line_options("exp_section"),
+            parent_widget="exp_section",
         )
         cls._frame.create_param_widget(
-            cls._frame.get_param("detector_dist"),
-            **cls._1line_options("exp_section"),
+            cls._frame.get_param("detector_dist"), parent_widget="exp_section"
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("detector_mask_file"),
-            **cls._2line_options("exp_section"),
+            parent_widget="exp_section",
+            linebreak=True,
         )
-        cls._frame.create_spacer(
-            None, fixedHeight=15, parent_widget=cls._frame._widgets["exp_section"]
-        )
+        cls._frame.create_spacer(None, fixedHeight=15, parent_widget="exp_section")
         cls._frame.create_button(
             "but_hide_exp_section",
             "Hide detailed experiment section",
-            icon=cls._frame.style().standardIcon(5),
-            fixedWidth=cls._frame._config["scroll_width"],
-            parent_widget=cls._frame._widgets["exp_section"],
+            icon="qt-std::SP_TitleBarShadeButton",
+            parent_widget="exp_section",
             visible=True,
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("detector_model"),
-            **(cls._2line_options() | dict(visible=False)),
+            linebreak=True,
+            parent_widget="config",
+            visible=False,
         )
-
-        cls._frame.create_spacer(
-            None, fixedHeight=15, parent_widget=cls._frame._widgets["exp_section"]
-        )
+        cls._frame.create_spacer(None, fixedHeight=15, parent_widget="exp_section")
 
     @classmethod
     def _create_beamcenter_section_widgets(cls):
@@ -350,7 +263,7 @@ class QuickIntegrationFrameBuilder:
 
         cls._frame.create_empty_widget(
             "beamcenter_section",
-            parent_widget=cls._frame._widgets["config"],
+            parent_widget="config",
             visible=False,
         )
         cls._frame.create_line(
@@ -362,39 +275,34 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "but_select_beamcenter_manually",
             "Start graphical beamcenter selection",
-            fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["beamcenter_section"],
         )
         cls._frame.create_button(
             "but_set_beamcenter",
             "Set selected point as beamcenter",
-            fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["beamcenter_section"],
             visible=False,
         )
         cls._frame.create_button(
             "but_fit_center_circle",
             "Fit beamcenter from points on circle",
-            fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["beamcenter_section"],
             visible=False,
         )
         cls._frame.create_button(
             "but_confirm_beamcenter",
             "Confirm beamcenter",
-            icon=cls._frame.style().standardIcon(45),
-            fixedWidth=cls._frame._config["scroll_width"],
+            icon="qt-std::SP_DialogApplyButton",
             parent_widget=cls._frame._widgets["beamcenter_section"],
             visible=False,
         )
 
         cls._frame.create_param_widget(
             cls._frame.get_param("beamcenter_x"),
-            **cls._1line_options("beamcenter_section"),
+            parent_widget="beamcenter_section",
         )
         cls._frame.create_param_widget(
-            cls._frame.get_param("beamcenter_y"),
-            **cls._1line_options("beamcenter_section"),
+            cls._frame.get_param("beamcenter_y"), parent_widget="beamcenter_section"
         )
 
     @classmethod
@@ -404,7 +312,7 @@ class QuickIntegrationFrameBuilder:
         """
         cls._frame.create_empty_widget(
             "integration_header",
-            parent_widget=cls._frame._widgets["config"],
+            parent_widget="config",
             visible=False,
         )
         cls._frame.create_line(
@@ -417,15 +325,14 @@ class QuickIntegrationFrameBuilder:
         )
         cls._frame.create_empty_widget(
             "integration_section",
-            parent_widget=cls._frame._widgets["config"],
+            parent_widget="config",
             visible=False,
         )
         cls._frame.create_button(
             "but_show_integration_section",
             "Show integration ROI section",
-            icon=cls._frame.style().standardIcon(6),
-            fixedWidth=cls._frame._config["scroll_width"],
-            parent_widget=cls._frame._widgets["config"],
+            icon="qt-std::SP_TitleBarUnshadeButton",
+            parent_widget="config",
             visible=False,
         )
         cls._frame.create_label(
@@ -433,13 +340,10 @@ class QuickIntegrationFrameBuilder:
             "Integration ROI display color",
             **cls._label_header("integration_section", 0),
         )
-
         cls._frame.add_any_widget(
             "roi_selector",
             ShowIntegrationRoiParamsWidget(
-                cls._frame._widgets["input_plot"],
                 plugin=cls._frame._plugins["generic"],
-                widget_width=cls._frame._config["scroll_width"],
                 show_reset_button=False,
                 add_bottom_spacer=False,
             ),
@@ -454,8 +358,7 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "but_hide_integration_section",
             "Hide integration ROI section",
-            icon=cls._frame.style().standardIcon(5),
-            fixedWidth=cls._frame._config["scroll_width"],
+            icon="qt-std::SP_TitleBarShadeButton",
             parent_widget=cls._frame._widgets["integration_section"],
             visible=True,
         )
@@ -472,15 +375,8 @@ class QuickIntegrationFrameBuilder:
         """
         cls._frame.create_empty_widget(
             "run_integration",
-            parent_widget=cls._frame._widgets["config"],
+            parent_widget="config",
             visible=False,
-        )
-        _options = dict(
-            width_text=cls._frame._config["scroll_width"] - 100,
-            width_io=100,
-            width_unit=0,
-            width_total=cls._frame._config["scroll_width"],
-            parent_widget=cls._frame._widgets["run_integration"],
         )
 
         cls._frame.create_line(
@@ -491,20 +387,20 @@ class QuickIntegrationFrameBuilder:
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("integration_direction"),
-            width_text=cls._frame._config["scroll_width"] - 185,
-            width_io=180,
-            width_unit=0,
-            width_total=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["run_integration"],
         )
-        cls._frame.create_param_widget(cls._frame.get_param("azi_npoint"), **_options)
         cls._frame.create_param_widget(
-            cls._frame.get_param("rad_npoint"), **(_options | dict(visible=False))
+            cls._frame.get_param("azi_npoint"),
+            parent_widget=cls._frame._widgets["run_integration"],
+        )
+        cls._frame.create_param_widget(
+            cls._frame.get_param("rad_npoint"),
+            parent_widget=cls._frame._widgets["run_integration"],
+            visible=False,
         )
         cls._frame.create_button(
             "but_run_integration",
             "Run pyFAI integration",
-            fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["run_integration"],
         )
         cls._frame.create_spacer(None, fixedHeight=10)

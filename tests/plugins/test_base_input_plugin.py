@@ -69,7 +69,7 @@ class TestInputPlugin(InputPlugin):
 
 
 def dummy_update_filename_string(plugin):
-    plugin.filename_string = plugin._image_metadata.filename
+    plugin.filename_string = str(plugin._image_metadata.filename)
 
 
 class TestBaseInputPlugin(unittest.TestCase):
@@ -217,6 +217,14 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 6))
+
+    def test_execute__w_multiplicity_and_max(self):
+        SCAN.set_param_value("scan_multiplicity", 4)
+        SCAN.set_param_value("scan_multi_image_handling", "Maximum")
+        plugin = TestInputPlugin(filename=self._fname)
+        plugin.pre_execute()
+        _data, _ = plugin.execute(0)
+        self.assertTrue(np.allclose(_data, 3))
 
     def test_execute__w_start_index(self):
         SCAN.set_param_value("scan_start_index", 4)

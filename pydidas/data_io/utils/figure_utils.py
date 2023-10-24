@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,14 +20,16 @@ Module with utility functions for matplotlib figure creation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["calculate_fig_size_arguments"]
 
 
-def calculate_fig_size_arguments(image_shape, target_size_inches=10):
+def calculate_fig_size_arguments(
+    image_shape: tuple[float], target_size_inches: int = 10
+) -> tuple[tuple[float, float], float]:
     """
     Get the arguments to create a new figure with image data in the correct
     size.
@@ -40,7 +44,7 @@ def calculate_fig_size_arguments(image_shape, target_size_inches=10):
 
     Returns
     -------
-    fig_shape : tuple
+    fig_shape : tuple[float]
         The shape of the figure to match the image shape.
     fig_dpi : float
         The figure dpi settings to achieve the correct size.

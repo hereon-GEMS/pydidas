@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
 import copy
+import unittest
 
 from pydidas.core import Parameter, ParameterCollection
 
@@ -60,6 +60,8 @@ class TestParameterCollection(unittest.TestCase):
         obj = ParameterCollection(*self._params)
         _ps = obj.get_params("Test0", "Test1")
         self.assertEqual(_ps, self._params[0:2])
+        self.assertEqual(id(_ps[0]), id(self._params[0]))
+        self.assertEqual(id(_ps[1]), id(self._params[1]))
 
     def test_get_params__wrong_key(self):
         obj = ParameterCollection(*self._params)

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,16 +21,17 @@ which is used as a global logging and status widget.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasStatusWidget"]
 
-from qtpy import QtWidgets, QtCore, QtGui
 
-from ...core.utils import get_time_string
+from qtpy import QtCore, QtGui, QtWidgets
+
 from ...core import SingletonFactory
+from ...core.utils import get_time_string
 
 
 class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
@@ -37,13 +40,13 @@ class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
     to append text.
     """
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QPlainTextEdit.__init__(self, kwargs.get("parent", None))
         self.setReadOnly(True)
         self.setMinimumHeight(50)
         self.resize(500, 50)
 
-    def sizeHint(self):
+    def sizeHint(self) -> QtCore.QSize:
         """
         Give a sizeHint which corresponds to a wide and short field.
 
@@ -54,9 +57,9 @@ class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
         """
         return QtCore.QSize(500, 50)
 
-    def add_status(self, text):
+    def add_status(self, text: str):
         """
-        Add a status message to the PydidasStatusWidget
+        Add a status message to the PydidasStatusWidget.
 
         This method will add a status message to the Info/Log widget together
         with a timestamp.

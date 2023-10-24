@@ -35,6 +35,7 @@ from .base_output_plugin import *
 from .base_plugin import *
 from .base_proc_plugin import *
 from .plugin_collection import *
+from .plugin_collection_util_funcs import *
 from .plugin_getter_ import *
 
 # The base plugins with references to widgets must be imported last:
@@ -83,6 +84,11 @@ from . import plugin_collection
 
 __all__.extend(plugin_collection.__all__)
 del plugin_collection
+
+from . import plugin_collection_util_funcs
+
+__all__.extend(plugin_collection_util_funcs.__all__)
+del plugin_collection_util_funcs
 
 from . import plugin_getter_
 

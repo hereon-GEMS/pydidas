@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,13 +21,15 @@ keys.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Hdf5key"]
 
+
 from pathlib import Path
+from typing import Union
 
 
 class Hdf5key(str):
@@ -35,13 +39,13 @@ class Hdf5key(str):
     A class used for referencing hdf5 keys.
     """
 
-    def __new__(cls, text):
+    def __new__(cls, text: str):
         _instance = super().__new__(cls, text)
         _instance.__hdf_fname = None
         return _instance
 
     @property
-    def hdf5_filename(self):
+    def hdf5_filename(self) -> Path:
         """
         Get the filename of the associated hdf5 file.
 
@@ -53,7 +57,7 @@ class Hdf5key(str):
         return self.__hdf_fname
 
     @hdf5_filename.setter
-    def hdf5_filename(self, txt):
+    def hdf5_filename(self, txt: Union[str, Path]):
         """
         Set the hdf_filename property.
 

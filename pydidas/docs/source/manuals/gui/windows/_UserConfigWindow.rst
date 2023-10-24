@@ -12,6 +12,20 @@ pydidas copy. The individual Parameters are described below.
 Using the :py:data:`Restore defaults` button will change all settings back to 
 their default values.
 
+Font settings
+-------------
+
+The font size and font family can be selected with the respective controls.
+These settings are global for the full pydidas user interface. Font sizes 
+between 5 and 20 points are supported.
+
+The selection of fonts relies on the available system fonts. All TrueType 
+scalable systems fonts are also available in pydidas.
+
+The pydidas user interface will rescale itself based on the font metrics of 
+the selection font size & family configuration. Selecting larger fonts will
+grow all widgets and allows to rescale for high-DPI displays.
+
 Settings
 --------
 
@@ -22,13 +36,6 @@ Settings
     
     * - Parameter 
       - Description
-    * - Detector mask file
-      - The path to the *global* detector mask file used in pydidas. Whenever a
-        *global detector mask* is referred to in pydidas, it refers to this 
-        file.
-    * - Detector mask display value
-      - The value to display for masked pixels. **This value is used for 
-        visualization only, not for processing.**
     * - Mosaic tiling border width
       - The width (in pixels) of the border between adjacent images in 
         composites.
@@ -46,12 +53,18 @@ Settings
       - The default colormap to be used for displaying 2D datasets. The 
         colormap can still be changed in each individual data window but those
         changes are not persistent.
-    * - Plugin paths
-      - The paths where pydidas is searching for its plugins. The default
-        directory will have all generic pydidas plugins. To add individual 
-        paths with custom plugins, just add them to the list. 
+
+Plugins
+-------
+
+The *Plugin paths* allows to modify the path where pydidas plugins are located
+or to add additional paths, for example for custom plugins. **Entries must be 
+separated by a double semicolor ";;".**
         
-        **Entries must be separated by a double semicolor ";;".**
-        
-        Changes to the plugin path will only take effect after using the 
-        :py:data:`Update plugin collection` button.
+Changes to the plugin path will only take effect after using the 
+:py:data:`Update plugin collection` button.
+
+.. note:
+    
+    Updating the plugin collection will also clear any WorkflowTree currently
+    defined / in use.

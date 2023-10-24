@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import os
@@ -33,6 +33,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+from qtpy import QtWidgets
 
 import pydidas
 from pydidas.contexts.diffraction_exp_context import DiffractionExperimentContext
@@ -43,6 +44,8 @@ from pydidas.plugins import PluginCollection
 from pydidas.unittest_objects import DummyLoader, DummyProc, create_hdf5_io_file
 from pydidas.workflow import WorkflowResults, WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
+from pydidas_qtcore import PydidasQApplication
+
 
 SCAN = ScanContext()
 EXP = DiffractionExperimentContext()
@@ -65,6 +68,9 @@ class TestWorkflowResults(unittest.TestCase):
         RES._TREE = TREE
         RES.SCAN = SCAN
         RES._EXP = EXP
+        _app = QtWidgets.QApplication.instance()
+        if _app is None:
+            _ = PydidasQApplication([])
 
     @classmethod
     def tearDownClass(cls):
@@ -117,7 +123,7 @@ class TestWorkflowResults(unittest.TestCase):
         _shape2 = self._result2_shape
         _res2 = Dataset(
             np.random.random(_shape2),
-            axis_units=["m", "Test", None],
+            axis_units=["m", "Test", ""],
             axis_labels=["dim1", "2nd dim", "dim #3"],
             axis_ranges=[12 + np.arange(_shape2[0]), None, None],
         )
@@ -179,7 +185,7 @@ class TestWorkflowResults(unittest.TestCase):
         _shape2 = self._result2_shape
         _res2 = Dataset(
             np.random.random(_shape2),
-            axis_units=["m", "Test", None],
+            axis_units=["m", "Test", ""],
             axis_labels=["dim1", "2nd dim", "dim #3"],
             axis_ranges=[
                 12 + np.arange(_shape2[0]),

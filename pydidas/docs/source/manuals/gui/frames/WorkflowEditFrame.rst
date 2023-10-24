@@ -1,5 +1,5 @@
 .. 
-    Copyright 2021-, Helmholtz-Zentrum Hereon
+    Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _workflow_edit_frame:
@@ -41,7 +41,7 @@ Plugin browser
 
 The Plugin collection presenter consists of two parts. On the left, it will show
 all Plugins which have been registered with the :py:class:`PluginCollection
-<pydidas.plugins.plugin_collection._PluginCollection>` (for more information 
+<pydidas.plugins.plugin_collection.PluginRegistry>` (for more information 
 about how paths are managed, please refer to :ref:`global_plugincollection`).
 On the right, it shows detailed information about the selected plugin:
 

@@ -51,9 +51,9 @@ class Lorentzian(FitFuncBase):
 
         The Lorentzian function has the general form
 
-        L(x) = A / pi * (Gamma / 2) / ((x - x0)**2 + (Gamma / 2)**2 ) + bg_0 + x * bg_1,
+        L(x) = A / pi * gamma / ((x - x0)**2 + gamma**2 ) + bg_0 + x * bg_1,
 
-        where A is the amplitude, Gamma is the FWHM, x0 is the center. bg_0 is an
+        where A is the amplitude, gamma is the HWHM, x0 is the center. bg_0 is an
         optional background offset and bg_1 is the (optional) first order term for the
         background.
 
@@ -62,7 +62,7 @@ class Lorentzian(FitFuncBase):
         c : Tuple[float]
             The tuple with the function parameters.
             c[0] : amplitude
-            c[1] : Gamma
+            c[1] : gamma
             c[2] : center
         x : ndarray
             The input x data points.
@@ -72,7 +72,7 @@ class Lorentzian(FitFuncBase):
         ndarray
             The Lorentzian function values for the input parameters.
         """
-        return c[0] / pi * (0.5 * c[1]) / ((x - c[2]) ** 2 + (0.5 * c[1]) ** 2)
+        return c[0] * (c[1] / pi) / ((x - c[2]) ** 2 + c[1] ** 2)
 
     @classmethod
     def guess_peak_start_params(
@@ -126,7 +126,7 @@ class Lorentzian(FitFuncBase):
         """
         Get the FWHM of the fit from the values of the parameters.
 
-        This method needs to be implemented by each fitting function.
+        For the Lorentzian profile, this is twice the gamma value.
 
         Parameters
         ----------
@@ -138,7 +138,7 @@ class Lorentzian(FitFuncBase):
         float
             The function FWHM.
         """
-        return c[1]
+        return 2 * c[1]
 
     @staticmethod
     def amplitude(c: Tuple[float]) -> float:
@@ -159,4 +159,4 @@ class Lorentzian(FitFuncBase):
         float
             The function amplitude.
         """
-        return 2 * c[0] / pi / c[1]
+        return c[0] / pi / c[1]

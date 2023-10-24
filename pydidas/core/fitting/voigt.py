@@ -53,6 +53,7 @@ class Voigt(FitFuncBase):
         Get function values for a Voigt function.
 
         The Voigt function is a convolution of a Gaussian and Lorentzian profile.
+        Note that the "gamma" used is the HWHM, i.e. Gamma / 2.
 
         Parameters
         ----------
@@ -133,6 +134,9 @@ class Voigt(FitFuncBase):
         to spectral-line profile analysis. 8. Auflage. Vol. 63. Journal of the Optical
         Society of America, 1973.
 
+        The factor for using gamma instead of Gamma has been implemented in the
+        two numerical factors for c[2].
+
         Parameters
         ----------
         c : tuple
@@ -143,7 +147,7 @@ class Voigt(FitFuncBase):
         float
             The function FWHM.
         """
-        return 0.5343 * c[2] + (0.2169 * c[2] ** 2 + 5.545177 * c[1] ** 2) ** 0.5
+        return 1.0686 * c[2] + (0.8676 * c[2] ** 2 + 5.545177 * c[1] ** 2) ** 0.5
 
     @staticmethod
     def amplitude(c: Tuple[float]) -> float:

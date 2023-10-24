@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,22 +20,48 @@ The pyfai_names module holds names (constants) extracted from pyFAI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "PYFAI_DETECTOR_MANUFACTURERS",
     "PYFAI_DETECTOR_NAMES",
     "PYFAI_MANUFACTURERS_OF_DETECTORS",
     "PYFAI_SHAPES_OF_DETECTOR_MODELS",
     "PYFAI_DETECTOR_MODELS_OF_SHAPES",
+    "pyFAI_UNITS",
+    "pyFAI_METHOD",
 ]
 
 
 import pyFAI.detectors as __det
 
+
 __class_names = __det._detector_class_names
+
+
+pyFAI_UNITS = {
+    "Q / nm^-1": "q_nm^-1",
+    "Q / A^-1": "q_A^-1",
+    "2theta / deg": "2th_deg",
+    "2theta / rad": "2th_rad",
+    "r / mm": "r_mm",
+    "chi / deg": "chi_deg",
+    "chi / rad": "chi_rad",
+}
+
+pyFAI_METHOD = {
+    "CSR": ("bbox", "csr", "cython"),
+    "CSR OpenCL": ("bbox", "csr", "opencl"),
+    "CSR full": ("full", "csr", "cython"),
+    "CSR full OpenCL": ("full", "csr", "opencl"),
+    "CSC": ("bbox", "csc", "cython"),
+    "CSC OpenCL": ("bbox", "csc", "opencl"),
+    "CSC full": ("full", "csc", "cython"),
+    "CSC full OpenCL": ("full", "csc", "opencl"),
+}
+
 
 PYFAI_DETECTOR_MANUFACTURERS = set()
 PYFAI_DETECTOR_NAMES = set()

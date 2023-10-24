@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ mask editor in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["MaskEditorWindow"]
 
 
@@ -33,23 +33,11 @@ import os
 from qtpy import QtCore, QtWidgets
 
 from ...core import UserConfigError, get_generic_param_collection
-from ...core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
-    HDF5_EXTENSIONS,
-)
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
 from ...core.utils import get_extension, update_size_policy
 from ...data_io import import_data
 from .. import dialogues, parameter_config, silx_plot
 from ..framework import PydidasWindow
-
-
-PARAM_CONFIG = dict(
-    width_io=100,
-    width_unit=0,
-    width_text=CONFIG_WIDGET_WIDTH - 100,
-    width_total=CONFIG_WIDGET_WIDTH,
-)
 
 
 class MaskEditorWindow(PydidasWindow):
@@ -64,8 +52,8 @@ class MaskEditorWindow(PydidasWindow):
         "hdf5_frame",
     )
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Average images", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Average images", **kwargs)
         self.setWindowTitle("Mask editor")
 
     def build_frame(self):
@@ -75,31 +63,32 @@ class MaskEditorWindow(PydidasWindow):
         self.create_any_widget(
             "param_frame",
             parameter_config.ParameterEditCanvas,
+            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(0, 0, 1, 1),
         )
         self.create_label(
             "title",
             "Input reference data file (not the mask)",
-            fontSize=11,
+            fontsize_offset=1,
+            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             bold=True,
             parent_widget=self._widgets["param_frame"],
         )
         self.create_param_widget(
             self.params["filename"],
             parent_widget=self._widgets["param_frame"],
-            **DEFAULT_TWO_LINE_PARAM_CONFIG.copy(),
+            linebreak=True,
         )
         self.create_param_widget(
             self.params["hdf5_key"],
             parent_widget=self._widgets["param_frame"],
             visible=False,
-            **DEFAULT_TWO_LINE_PARAM_CONFIG.copy(),
+            linebreak=True,
         )
         self.create_param_widget(
             self.params["hdf5_frame"],
             parent_widget=self._widgets["param_frame"],
             visible=False,
-            **PARAM_CONFIG,
         )
         self.create_button(
             "button_open_file",
@@ -111,8 +100,9 @@ class MaskEditorWindow(PydidasWindow):
         self.create_label(
             "title",
             "Mask parameters",
-            fontSize=11,
+            fontsize_offset=1,
             bold=True,
+            font_metric_width_factor=0.5 * FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["param_frame"],
         )
 
@@ -124,7 +114,6 @@ class MaskEditorWindow(PydidasWindow):
         )
         self._widgets["mask_tools"].setDirection(QtWidgets.QBoxLayout.TopToBottom)
         self._widgets["mask_tools"].setMultipleMasks("single")
-        self._widgets["mask_tools"].setFixedWidth(CONFIG_WIDGET_WIDTH + 10)
         self.add_any_widget(
             "mask_tools", self._widgets["mask_tools"], gridPos=(1, 0, 1, 1)
         )

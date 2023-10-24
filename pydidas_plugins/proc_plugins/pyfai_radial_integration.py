@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PyFAIradialIntegration Plugin which allows radial integration
-to acquire azimuthal profiles.
+The PyFAIradialIntegration Plugin performs radial integrations to acquire azimuthal
+profiles.
 """
 
 __author__ = "Malte Storm"
@@ -73,21 +73,21 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             "data_unit": "counts",
         }
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Apply a mask to an image (2d data-array).
+        Perform a radial integration on the input dataset.
 
         Parameters
         ----------
         data : Union[pydidas.core.Dataset, np.ndarray]
-            The image / frame data .
+            The image / frame data.
         **kwargs : dict
             Any calling keyword arguments.
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The image data.
+        data : pydidas.core.Dataset
+            The azimuthal integration profile.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """

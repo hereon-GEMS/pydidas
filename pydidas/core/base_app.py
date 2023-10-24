@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,17 +20,21 @@ Module with the BaseApp class from which all Pydidas apps should inherit.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["BaseApp"]
+
 
 from copy import copy
 from pathlib import Path
+from typing import Self
 
-from .parameter_collection import ParameterCollection
+from qtpy import QtCore
+
 from .object_with_parameter_collection import ObjectWithParameterCollection
+from .parameter_collection import ParameterCollection
 
 
 class BaseApp(ObjectWithParameterCollection):
@@ -43,9 +47,8 @@ class BaseApp(ObjectWithParameterCollection):
 
     Parameters
     ----------
-    *args : list
-        Any arguments. Defined by the concrete
-        implementation of the app.
+    *args : tuple
+        Any arguments. Defined by the concrete implementation of the app.
     **kwargs : dict
         A dictionary of keyword arguments. Defined by the concrete
         implementation of the app.
@@ -55,15 +58,10 @@ class BaseApp(ObjectWithParameterCollection):
     parse_func = lambda self: {}
     attributes_not_to_copy_to_slave_app = []
 
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-        self.slave_mode = kwargs.get("slave_mode", False)
-        if "slave_mode" in kwargs:
-            del kwargs["slave_mode"]
-        self.add_params(*args)
-        self._config = {}
-        self.set_default_params()
-        self.update_param_values_from_kwargs(**kwargs)
+    def __init__(self, *args: tuple, **kwargs: dict):
+        self.slave_mode = kwargs.pop("slave_mode", False)
+        ObjectWithParameterCollection.__init__(self)
+        self.update_params_from_init(*args, **kwargs)
         self.parse_args_and_set_params()
 
     def parse_args_and_set_params(self):
@@ -73,9 +71,9 @@ class BaseApp(ObjectWithParameterCollection):
         if self.parse_func is None:
             return
         _cmdline_args = self.parse_func()
-        for _key in self.params:
-            if _key in _cmdline_args and _cmdline_args[_key] is not None:
-                self.params.set_value(_key, _cmdline_args[_key])
+        for _key, _value in _cmdline_args.items():
+            if _key in self.params and _value is not None:
+                self.params.set_value(_key, _value)
 
     def run(self):
         """
@@ -96,34 +94,57 @@ class BaseApp(ObjectWithParameterCollection):
     def multiprocessing_pre_run(self):
         """
         Perform operations prior to running main parallel processing function.
+
+        The generic method simple performs no operation and subclasses only
+        need to re-implement it when they explicitly need it.
         """
         return
 
     def multiprocessing_post_run(self):
         """
         Perform operations after running main parallel processing function.
+
+        The generic method simple performs no operation and subclasses only
+        need to re-implement it when they explicitly need it.
         """
         return
 
     def multiprocessing_get_tasks(self):
         """
         Return all tasks required in multiprocessing.
+
+        This method must be implemented by the BaseApp subclasses.
         """
         raise NotImplementedError
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Perform operations in the pre-cycle of every task.
+
+        The generic method simple performs no operation and subclasses only
+        need to re-implement it when they explicitly need it.
+
+        Parameters
+        ----------
+        index : int
+            The index to be processed.
         """
         return
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int):
         """
         Perform key operation with parallel processing.
+
+        This method must be implemented by the BaseApp subclasses.
+
+        Parameters
+        ----------
+        index : int
+            The index to be processed.
         """
         raise NotImplementedError
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Wait for specific tasks to give the clear signal.
 
@@ -139,20 +160,23 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return True
 
-    def multiprocessing_store_results(self, index, *args):
+    def multiprocessing_store_results(self, index: int, *args: tuple):
         """
         Store the multiprocessing results for other pydidas apps and processes.
+
+        This method must be implemented by the BaseApp subclasses.
+
 
         Parameters
         ----------
         index : int
             The frame index
-        args : object
+        args : tuple
             The results. The specific type depends on the app.
         """
         raise NotImplementedError
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the App configuration.
 
@@ -163,7 +187,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return copy(self._config)
 
-    def export_state(self):
+    def export_state(self) -> dict:
         """
         Get the sanitized app Parameters and configuration for export.
 
@@ -191,7 +215,7 @@ class BaseApp(ObjectWithParameterCollection):
             "config": _cfg,
         }
 
-    def import_state(self, state):
+    def import_state(self, state: dict):
         """
         Import a stored state including Parameters and configuration.
 
@@ -230,7 +254,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return
 
-    def copy(self, slave_mode=False):
+    def copy(self, slave_mode: bool = False) -> Self:
         """
         Get a copy of the App.
 
@@ -247,7 +271,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return self.__copy__(slave_mode)
 
-    def __copy__(self, slave_mode=False):
+    def __copy__(self, slave_mode: bool = False) -> Self:
         """
         Reimplement the generic copy method.
 
@@ -261,11 +285,27 @@ class BaseApp(ObjectWithParameterCollection):
         BaseApp
             The copy of the app.
         """
-        _do_not_copy = self.attributes_not_to_copy_to_slave_app
         _obj_copy = type(self)()
-        for _key in self.__dict__:
-            if not (slave_mode and _key in _do_not_copy):
-                _obj_copy.__dict__[_key] = copy(self.__dict__[_key])
+        _obj_copy.__dict__.update(
+            {
+                _key: copy(_value)
+                for _key, _value in self.__dict__.items()
+                if not (
+                    isinstance(
+                        _value,
+                        (
+                            QtCore.SignalInstance,
+                            QtCore.QMetaObject,
+                            ParameterCollection,
+                        ),
+                    )
+                    or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
+                    or _key in ["__METAOBJECT__"]
+                )
+            }
+        )
+        for _key, _param in self.params.items():
+            _obj_copy.set_param_value(_key, _param.value)
         if slave_mode:
             _obj_copy.slave_mode = True
         return _obj_copy

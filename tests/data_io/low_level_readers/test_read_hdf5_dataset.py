@@ -22,20 +22,20 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
-import tempfile
-import shutil
 import os
+import shutil
+import tempfile
+import unittest
 
 import h5py
 import numpy as np
 
 from pydidas.data_io.low_level_readers.read_hdf5_dataset_ import (
-    read_hdf5_dataset,
     get_selection,
+    read_hdf5_dataset,
 )
 
 

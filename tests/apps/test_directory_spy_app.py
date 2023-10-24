@@ -219,7 +219,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertFalse(_ret)
@@ -230,7 +230,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertEqual(app._config["latest_file"], _names[0])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertTrue(_ret)
@@ -241,7 +241,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertEqual(app._config["latest_file"], _names[-1])
         self.assertEqual(app._config["2nd_latest_file"], _names[-2])
         self.assertTrue(_ret)
@@ -255,7 +255,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertEqual(app._config["latest_file"], _names[-1])
         self.assertEqual(app._config["2nd_latest_file"], _names[-2])
         self.assertTrue(_ret)
@@ -266,9 +266,9 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertFalse(_ret)
 
     def test_find_latest_file_of_pattern__same_files_with_changed_size(self):
@@ -277,13 +277,13 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertFalse(_ret)
         with open(_names[-1], "w") as f:
             f.write("other content")
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertTrue(_ret)
 
     def test_find_latest_file_of_pattern__missing_files(self):
@@ -294,14 +294,14 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        app._DirectorySpyApp__find_latest_file_of_pattern()
+        app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertEqual(app._config["latest_file"], _names[_index - 1])
         self.assertEqual(app._config["2nd_latest_file"], _names[_index - 2])
 
     def test_find_latest_file__empty(self):
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertFalse(_ret)
@@ -311,7 +311,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         os.makedirs(os.path.join(self._path, "dir2"))
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertFalse(_ret)
@@ -320,7 +320,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=1)
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertEqual(app._config["latest_file"], _names[0])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertTrue(_ret)
@@ -329,7 +329,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertEqual(app._config["latest_file"], _names[-1])
         self.assertEqual(app._config["2nd_latest_file"], _names[-2])
         self.assertTrue(_ret)
@@ -338,9 +338,9 @@ class TestDirectorySpyApp(unittest.TestCase):
         _ = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertFalse(_ret)
 
     def test_initialize_shared_memory(self):

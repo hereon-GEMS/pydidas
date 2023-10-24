@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,18 +21,18 @@ plugins to add them to the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PluginCollectionBrowser"]
 
-from qtpy import QtCore, QtWidgets
+
+from qtpy import QtCore
 
 from ...core.constants import PROC_PLUGIN_TYPE_NAMES
-from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
-from ..factory import CreateWidgetsMixIn
+from ..factory import CreateWidgetsMixIn, EmptyWidget
 from ..misc import ReadOnlyTextWidget
 from .select_new_plugin_widget import SelectNewPluginWidget
 
@@ -40,8 +40,10 @@ from .select_new_plugin_widget import SelectNewPluginWidget
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
+class PluginCollectionBrowser(CreateWidgetsMixIn, EmptyWidget):
     """
+    A widget allows to browse through the list of available plugins.
+
     The PluginCollectionBrowser includes both a QTreeView to browse through
     the list of available plugins as well as a QTextEdit to show a description
     of the plugin.
@@ -51,24 +53,20 @@ class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
     parent : QWidget, optional
         The parent widget. The default is None.
     **kwargs : dict
-        Any keyword arguments. Supported keywords are listed below.
-    **collection : Union[pydidas.PluginCollection, None]
-        The plugin collection. Normally, this entry should not be changed by
-        the user. If None, this defaults to the generic plugin collection.
-        The default is None.
+        Any keyword arguments. Supported keywords are generic keywords and
+        "collection" to set the linked plugin collection. By default, this should
+        not be changed and will default to the PluginCollection singleton.
     """
+
+    init_kwargs = ["collection"]
 
     sig_add_plugin_to_tree = QtCore.Signal(str)
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, parent=None, **kwargs):
-        QtWidgets.QWidget.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        EmptyWidget.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
-        _layout = QtWidgets.QGridLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_layout)
-        apply_qt_properties(self, **kwargs)
         _local_plugin_coll = kwargs.get("collection", None)
         self.collection = (
             _local_plugin_coll if _local_plugin_coll is not None else PLUGIN_COLLECTION
@@ -96,9 +94,11 @@ class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
         self._widgets["plugin_treeview"].sig_append_to_specific_node.connect(
             self.sig_append_to_specific_node
         )
+        self.layout().setColumnStretch(0, 2)
+        self.layout().setColumnStretch(1, 4)
 
     @QtCore.Slot(str)
-    def __confirm_selection(self, name):
+    def __confirm_selection(self, name: str):
         """
         Confirm the selection of the plugin to add it to the workflow tree.
 
@@ -117,7 +117,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.sig_add_plugin_to_tree.emit(name)
 
     @QtCore.Slot(str)
-    def display_plugin_description(self, name):
+    def display_plugin_description(self, name: str):
         """
         Display the plugin description of the selected plugin.
 
@@ -134,6 +134,6 @@ class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
         ]:
             return
         _p = self.collection.get_plugin_by_plugin_name(name)
-        self._widgets["plugin_description"].setTextFromDict(
+        self._widgets["plugin_description"].set_text_from_dict(
             _p.get_class_description_as_dict(), _p.plugin_name
         )

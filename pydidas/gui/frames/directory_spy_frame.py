@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,16 +21,18 @@ directory spy app and visualize the results.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DirectorySpyFrame"]
 
 
 import time
+from typing import Self
 
 from qtpy import QtCore
+from qtpy.QtWidgets import QApplication
 
 from ...apps import DirectorySpyApp
 from ...contexts import ScanContext
@@ -38,6 +40,7 @@ from ...core import ParameterCollection
 from ...core.constants import HDF5_EXTENSIONS
 from ...core.utils import get_extension, pydidas_logger
 from ...multiprocessing import AppRunner, app_processor_without_tasks
+from ...widgets.framework import BaseFrameWithApp
 from ...workflow import WorkflowResultsContext, WorkflowTree
 from .builders.directory_spy_frame_builder import DirectorySpyFrameBuilder
 
@@ -48,7 +51,7 @@ TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
-class DirectorySpyFrame(DirectorySpyFrameBuilder):
+class DirectorySpyFrame(BaseFrameWithApp):
     """
     The DirectorySpyFrame is used to get automatic updates from a directory
     and display the latest data.
@@ -59,9 +62,9 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
     menu_entry = "Directory spy"
     default_params = ParameterCollection()
 
-    def __init__(self, parent=None, **kwargs):
-        DirectorySpyFrameBuilder.__init__(self, parent, **kwargs)
-        _global_plot_update_time = self.q_settings_get_value(
+    def __init__(self, **kwargs: dict) -> Self:
+        BaseFrameWithApp.__init__(self, **kwargs)
+        _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
         self._config.update(
@@ -103,20 +106,11 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         self.__update_det_mask_visibility()
         self.__update_bg_widget_visibility()
 
-    def restore_state(self, state):
+    def build_frame(self):
         """
-        Restore the frame's state from stored information.
-
-        Parameters
-        ----------
-        state : dict
-            A dictionary with 'params', 'app' and 'visibility' keys and the
-            respective information for all.
+        Populate the frame with widgets.
         """
-        super().restore_state(state)
-        super().frame_activated(self.frame_index)
-        self.__update_det_mask_visibility()
-        self.__update_bg_widget_visibility()
+        DirectorySpyFrameBuilder.build_frame(self)
 
     @QtCore.Slot()
     def __update_file_widget_visibility(self):
@@ -219,7 +213,8 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         """
         logger.debug("Telling AppRunner to exit.")
         self._runner.exit()
-        self._runner = None
+        self._runner.deleteLater()
+        QApplication.instance().sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
         logger.debug("AppRunner successfully shut down.")
         self.set_status("Stopped scanning for new images.")
         self.__set_proc_widget_enabled_for_running(False)
@@ -252,7 +247,7 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         self._widgets["plot"].setGraphXLabel("pixel")
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 
@@ -266,10 +261,12 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         """
         super().frame_activated(index)
         if index == self.frame_index:
+            self.__update_det_mask_visibility()
+            self.__update_bg_widget_visibility()
             self.__check_for_plot_update()
         self._config["frame_active"] = index == self.frame_index
 
-    def __set_proc_widget_enabled_for_running(self, running):
+    def __set_proc_widget_enabled_for_running(self, running: bool):
         """
         Set the visibility of all widgets which need to be updated for/after
         procesing

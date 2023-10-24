@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -44,13 +44,13 @@ from ..exceptions import UserConfigError
 from .hdf5_dataset_utils import get_hdf5_populated_dataset_keys
 
 
-def check_hdf5_key_exists_in_file(fname, key):
+def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
     """
     Veriy that the selected file has a dataset with key.
 
     Parameters
     ----------
-    fname : str
+    fname : Union[Path, str]
         The filename and path.
     key : str
         The dataset key.
@@ -137,7 +137,7 @@ def verify_files_of_range_are_same_size(files: List[Path]):
         raise UserConfigError("The selected files are not all of the same size.")
 
 
-def file_is_writable(filename: Union[Path, str], overwrite=False):
+def file_is_writable(filename: Union[Path, str], overwrite=False) -> bool:
     """
     Check whether a file exists and the file is writable.
 

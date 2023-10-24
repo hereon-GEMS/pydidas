@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,24 +21,26 @@ multiprocessing function calls.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["processor"]
 
-import time
+
 import queue
+import time
+from multiprocessing import Queue
 
 
 def processor(
-    input_queue,
-    output_queue,
-    stop_queue,
-    finished_queue,
-    function,
-    *func_args,
-    **func_kwargs,
+    input_queue: Queue,
+    output_queue: Queue,
+    stop_queue: Queue,
+    aborted_queue: Queue,
+    function: type,
+    *func_args: tuple,
+    **func_kwargs: dict,
 ):
     """
     Start a loop to process function calls on individual frames.
@@ -54,10 +58,10 @@ def processor(
         The queue for transmissing the results to the controlling thread.
     stop_queue : multiprocessing.Queue
         The queue for sending a termination signal to the worker.
-    finished_queue : multiprocessing.Queue
+    aborted_queue : multiprocessing.Queue
         The queue which is used by the processor to signal the calling
-        thread that it has finished its cycle.
-    function : object
+        thread that it has aborted its cycle.
+    function : type
         The function to be called in the process. The function must accept
         the first argument from the queue and all additional arguments and
         keyword arguments from the calling arguments of processor.
@@ -70,6 +74,7 @@ def processor(
         # check for stop signal
         try:
             stop_queue.get_nowait()
+            aborted_queue.put(1)
             break
         except queue.Empty:
             pass
@@ -77,15 +82,17 @@ def processor(
         try:
             _arg1 = input_queue.get(timeout=0.005)
             if _arg1 is None:
+                output_queue.put([None, None])
                 break
             try:
                 _results = function(_arg1, *func_args, **func_kwargs)
             except Exception as ex:
                 print(f"Exception occured during function call to: {function}: {ex}")
-                # Sleep time required to stop queues from becoming corrupted.
+                # For some arcane reason, sleep time required to stop queues from
+                # becoming corrupted.
                 time.sleep(0.02)
+                aborted_queue.put(1)
                 break
             output_queue.put([_arg1, _results])
         except queue.Empty:
             time.sleep(0.01)
-    finished_queue.put(1)

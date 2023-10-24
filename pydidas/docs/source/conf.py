@@ -19,6 +19,9 @@
 import os
 import sys
 
+import pydidas
+
+
 sys.path.insert(0, os.path.abspath("./../.."))
 sys.path.insert(1, os.path.abspath("./../../.."))
 
@@ -30,7 +33,8 @@ copyright = "2023, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 # The full version, including alpha/beta/rc tags
-release = "23.7.5"
+
+release = pydidas.VERSION
 version = release
 
 # -- General configuration ---------------------------------------------------

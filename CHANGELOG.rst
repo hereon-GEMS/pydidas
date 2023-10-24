@@ -2,6 +2,77 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+v23.mm.dd
+=========
+
+Improvements
+------------
+
+- General improvements:
+
+    - Moved the functions to get resource icons and images to the resources
+      subpackage.
+    - Created a pydidas_qtcore package to bundle all the core Qt functionalities
+      which need to be loaded prior to starting the UI.
+    - Added support for changing the default font and fontsize.
+    - Removed STANDARD_FONT_SIZE constant and added dynamic standard_font_size 
+      to PydidasQApplication.
+    - Improved the detailed output from fitting plugins.
+    - During active processing, editing diffraction setup, scan and workflow 
+      are disabled.
+    - All widgets now scale dynamically with font height and width to allow
+      using pydidas with any system font.
+    - Added an option to select points for the beamcenter with a 2-click
+      method to select the peak centers more easily.
+    - Added option to import Fit2d geometry for the DiffractionExperiment
+    - Added a version tag to exported WorkflowTrees to improve handling of 
+      trees from different versions with changed requirements.
+    - Improved the docstring for fitting plugins to allow better feature
+      usage also by inexperienced users.
+    - Added support for image masks in the manual beamcenter selection window
+      to filter out the masked values for the histogram.
+    
+- Programmatic updates:
+
+    - Changed handling of Qt icons in preparation for Qt6 support.
+    - Changed the factory creation of ParameterWidgets to remove patched 
+      circular dependencies.
+    - Changed the widgets.factory to remove unnecessary intermediate functions
+      for widget creation and added more custom pydidas widgets.
+    - ParameterWidgets use the new Pydidas widgets and scale automatically with
+      the font size.
+    - Added type hints to contexts, gui, widget subpackages.
+    - Updated the nomenclature of PydidasQSettings method names for 
+      consistency.
+    - Updated the names of Dataset "update_axis" methods for 
+      consistency.
+    - Moved the generic parameter definitions to core.generic_params subpackage.
+    - Renamed _PluginCollection to PluginRegistry to have a distinct name 
+      from its singleton instance 'PluginCollection'.
+
+Bugfixes
+--------
+
+- Fixed an issue with wrong signal signaturs in WorkflowTreeEditManager.
+- Fixed a bug in the Remove1dPolynomialBackground plugin which forced a 
+  polynomial order setting of 3.
+- Fixed an issue with pyFAI's calib2 app and additional argparse arguments.
+- Fixed an issue when deleting the root node in a GenericTree.
+- Fixed an issue where plugin labels were not updated in the WorkflowEditFrame
+  when the plugins had a custom widget.
+- Fixed an issue when displaying Hdf5 files in the DirectoryExplorer which did
+  not have any valid datasets.
+- Fixed a bug when copying objects (Apps, Plugins) with objects with linked
+  Parameters where the linking got lost.
+- Fixed an issue with the RoiSliceManager and numpy integer datatypes.
+- Fixed a bug in the GenericNode where copying the node would keep references
+  to the original parent.
+- Fixed an issue in the DirectorySpyApp with changes in the exceptions raised
+  from tifffile if a tiff file could not be read.
+- Fixed a bug in the FWHM calculation of the scipy Voigt profile.
+
+
 v23.07.05
 =========
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,17 +21,17 @@ additional data for the selected plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ShowDetailedPluginResultsWindow"]
 
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import STANDARD_FONT_SIZE
-from ...core.utils import SignalBlocker, update_size_policy
+from ...core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
+from ...core.utils import update_size_policy
 from ..framework import PydidasWindow
 from ..silx_plot import PydidasPlotStack
 
@@ -45,8 +45,8 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
     sig_new_selection = QtCore.Signal(str)
     sig_minimized = QtCore.Signal()
 
-    def __init__(self, parent=None, results=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
+    def __init__(self, results=None, **kwargs):
+        PydidasWindow.__init__(self, title="Detailed plugin results", **kwargs)
         self._config["n_plots"] = 0
         self._results = results
         if results is not None:
@@ -59,31 +59,38 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Detailed plugin results",
-            fontsize=STANDARD_FONT_SIZE + 4,
             bold=True,
+            fontsize_offset=4,
             gridPos=(0, 0, 1, 2),
         )
-        self.create_empty_widget("metadata", gridPos=(1, 0, 2, 1))
+        self.create_empty_widget(
+            "metadata",
+            gridPos=(1, 0, 2, 1),
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+        )
         self.create_combo_box(
             "selector",
-            parent_widget=self._widgets["metadata"],
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
             gridPos=(-1, 0, 1, 1),
-            fixedWidth=250,
+            parent_widget="metadata",
         )
         self.create_label(
             "metadata_title",
             "Metadata:",
-            parent_widget=self._widgets["metadata"],
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            fontsize_offset=2,
             gridPos=(-1, 0, 1, 1),
-            fixedWidth=250,
-            fontsize=STANDARD_FONT_SIZE + 2,
+            parent_widget="metadata",
         )
         self.create_label(
             "metadata_label",
             "",
-            parent_widget=self._widgets["metadata"],
+            alignment=ALIGN_TOP_LEFT,
+            font_metric_height_factor=20,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
             gridPos=(-1, 0, 1, 1),
-            fixedWidth=250,
+            parent_widget="metadata",
+            wordWrap=True,
         )
 
     def connect_signals(self):
@@ -101,7 +108,8 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         QtCore.QSize
             The desired size.
         """
-        return QtCore.QSize(1200, 600)
+        _font_height = QtWidgets.QApplication.instance().font_height
+        return QtCore.QSize(70 * _font_height, 40 * _font_height)
 
     def update_results(self, results, title=None):
         """
@@ -158,7 +166,10 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             _y = 1 + _index // 2
             _x = 1 + _index % 2
             self.create_any_widget(
-                f"plot_{_index}", PydidasPlotStack, gridPos=(_y, _x, 1, 1)
+                f"plot_{_index}",
+                PydidasPlotStack,
+                gridPos=(_y, _x, 1, 1),
+                minimumWidth=500,
             )
             update_size_policy(self._widgets[f"plot_{_index}"], horizontalStretch=1)
 
@@ -170,7 +181,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             self._widgets["selector"].setVisible(False)
             self.__select_point(None)
         else:
-            with SignalBlocker(self._widgets["selector"]):
+            with QtCore.QSignalBlocker(self._widgets["selector"]):
                 self._widgets["selector"].clear()
                 self._widgets["selector"].addItems(list(self._results.keys()))
             self._widgets["selector"].setCurrentIndex(0)

@@ -34,6 +34,7 @@ from qtpy import QtCore
 
 from ...contexts import ScanContext
 from ...core import (
+    Dataset,
     Parameter,
     ParameterCollection,
     UserConfigError,
@@ -41,11 +42,12 @@ from ...core import (
     utils,
 )
 from ...widgets.dialogues import WarningBox
+from ...widgets.framework import BaseFrame
 from ...widgets.windows import (
     ShowDetailedPluginResultsWindow,
     TweakPluginParameterWindow,
 )
-from ...workflow import WorkflowTree
+from ...workflow import WorkflowNode, WorkflowTree
 from .builders import WorkflowTestFrameBuilder
 
 
@@ -53,7 +55,27 @@ SCAN = ScanContext()
 TREE = WorkflowTree()
 
 
-def _create_str_description_of_node_result(node, plugin_results):
+IMAGE_SELECTION_PARAM = Parameter(
+    "image_selection",
+    str,
+    "Use global index",
+    name="Scan point selection",
+    choices=[
+        "Use global index",
+        "Use scan dimensional indices",
+        "Use detector image number",
+    ],
+    tooltip=(
+        "Choose between selecing frames using either the global index for the "
+        "flattened image / frame index (the 'timeline'), the multi-dimensional "
+        "position in the scan or the detector image number."
+    ),
+)
+
+
+def _create_str_description_of_node_result(
+    node: WorkflowNode, plugin_results: Dataset
+) -> str:
     """
     Create a string description of the node results with all axes and data units
     and metadata for the node.
@@ -113,7 +135,7 @@ def _create_str_description_of_node_result(node, plugin_results):
     return _str
 
 
-class WorkflowTestFrame(WorkflowTestFrameBuilder):
+class WorkflowTestFrame(BaseFrame):
     """
     The ProcessingSinglePluginFrame allows to run / test single plugins on a
     single datapoint.
@@ -129,22 +151,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     menu_entry = "Workflow processing/Test workflow"
 
     default_params = ParameterCollection(
-        Parameter(
-            "image_selection",
-            str,
-            "Use global index",
-            name="Scan point selection",
-            choices=[
-                "Use global index",
-                "Use scan dimensional indices",
-                "Use detector image number",
-            ],
-            tooltip=(
-                "Choose between selecing frames using either the global index for the "
-                "flattened image / frame index (the 'timeline'), the multi-dimensional "
-                "position in the scan or the detector image number."
-            ),
-        ),
+        IMAGE_SELECTION_PARAM.copy(),
         get_generic_param_collection(
             "frame_index",
             "scan_index1",
@@ -157,8 +164,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     )
     params_not_to_restore = ["selected_results"]
 
-    def __init__(self, parent=None, **kwargs):
-        WorkflowTestFrameBuilder.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self.__source_hash = -1
         self._tree = None
@@ -174,6 +181,12 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 "details_active": False,
             }
         )
+
+    def build_frame(self):
+        """
+        Build the frame and create all necessary widgets.
+        """
+        WorkflowTestFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """
@@ -218,7 +231,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._config["details_active"] = False
 
     @QtCore.Slot(int)
-    def __updated_plugin_params(self, node_id):
+    def __updated_plugin_params(self, node_id: int):
         """
         Run the subtree with the new Parameters.
 
@@ -297,7 +310,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self.__update_selection_choices()
 
     @staticmethod
-    def _check_tree_is_populated():
+    def _check_tree_is_populated() -> bool:
         """
         Check if the WorkflowTree is populated, i.e. not empty.
 
@@ -314,10 +327,12 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             return False
         return True
 
-    def __get_index(self):
+    def __get_index(self) -> int:
         """
-        Get the frame index based on the user selection for indexing using
-        the absolute number or scan position numbers.
+        Get the frame index.
+
+        The frame in dex is based on the user selection for indexing using
+        the absolute number, scan position numbers or the detector image number.
 
         Returns
         -------
@@ -326,10 +341,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if self.get_param_value("image_selection") == "Use global index":
             return self.__get_global_index()
-        elif self.get_param_value("image_selection") == "Use scan dimensional indices":
+        if self.get_param_value("image_selection") == "Use scan dimensional indices":
             return self.__get_index_from_scan_dim_indices()
-        elif self.get_param_value("image_selection") == "Use detector image number":
-            return self.__get_index_of_image()
+        # last choice is using the detector image number
+        return self.__get_index_of_image()
 
     def __get_global_index(self) -> int:
         """
@@ -425,15 +440,14 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             param.choices = _new_choices[:-1]
             self._active_node = -1
             self._config["plot_active"] = False
-        with utils.SignalBlocker(self.param_widgets["selected_results"]):
+        with QtCore.QSignalBlocker(self.param_widgets["selected_results"]):
             self.param_widgets["selected_results"].update_choices(param.choices)
             self.param_widgets["selected_results"].setCurrentText(param.value)
 
     @QtCore.Slot(int)
-    def __selected_new_node(self, index):
+    def __selected_new_node(self, index: int):
         """
-        Received signal that the selection in the results Parameter has
-        changed.
+        Handle the selection of a new node.
 
         Parameters
         ----------
@@ -457,7 +471,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self.__update_text_description_of_node_results()
         self.__plot_results()
 
-    def __set_derived_widget_visibility(self, visible):
+    def __set_derived_widget_visibility(self, visible: bool):
         """
         Change the visibility of all 'derived' widgets.
 
@@ -505,7 +519,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self.show_plugin_details(set_focus=False)
 
     @QtCore.Slot()
-    def show_plugin_details(self, set_focus=True):
+    def show_plugin_details(self, set_focus: bool = True):
         """
         Show details for the selected plugin.
 
@@ -546,7 +560,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self.__tweak_window.activateWindow()
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 

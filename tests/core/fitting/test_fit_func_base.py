@@ -52,7 +52,7 @@ class TestFitFuncBase(unittest.TestCase):
 
     def test_func(self):
         _res = FIT_CLASS.func([], self._y)
-        self.assertTrue(np.alltrue(_res == self._y))
+        self.assertTrue(np.all(_res == self._y))
 
     def test_profile(self):
         _result = FIT_CLASS.profile([], self._x)
@@ -78,7 +78,7 @@ class TestFitFuncBase(unittest.TestCase):
         _x = np.arange(20)
         _y = np.sin(_x / 3)
         _y_new, _bg_params = FIT_CLASS.calculate_background_params(_x, _y, 0)
-        self.assertTrue(np.alltrue(_y_new >= 0))
+        self.assertTrue(np.all(_y_new >= 0))
         self.assertEqual(_bg_params, [np.amin(_y)])
 
     def test_calculate_background_params__bg_order1(self):
@@ -87,7 +87,7 @@ class TestFitFuncBase(unittest.TestCase):
         _offset = 80
         _y = 10 * np.exp(-0.25 * (_x - 8) ** 2) + _slope * _x + _offset
         _y_new, _bg_params = FIT_CLASS.calculate_background_params(_x, _y, 1)
-        self.assertTrue(np.alltrue(_y_new >= -1e-6))
+        self.assertTrue(np.all(_y_new >= -1e-6))
         self.assertTrue(abs(_slope - _bg_params[1]) < 0.1)
         self.assertTrue(abs(_offset - _bg_params[0]) < 0.1)
 
@@ -103,13 +103,13 @@ class TestFitFuncBase(unittest.TestCase):
         _x0 = (_x[19] + _x[20]) / 2
         _y0 = np.sin(_x0)
         _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
-        self.assertTrue(np.alltrue(np.where(_y >= 0.5 * _y0)[0] == _range))
+        self.assertTrue(np.all(np.where(_y >= 0.5 * _y0)[0] == _range))
 
     def test_get_fwhm_indices__empty_range(self):
         _x = 0.4 * np.arange(30) + 2
         _y = np.ones(_x.size)
         _range = FIT_CLASS.get_fwhm_indices(_x[15], 3, _x, _y)
-        self.assertTrue(np.alltrue(np.array([]) == _range))
+        self.assertTrue(np.all(np.array([]) == _range))
 
     def test_get_fwhm_indices__adjacent_jumps(self):
         _x = 0.4 * np.arange(30) + 2
@@ -118,7 +118,7 @@ class TestFitFuncBase(unittest.TestCase):
         _y[9] = 1
         _y[15:18] = 1
         _range = FIT_CLASS.get_fwhm_indices(_x[3], 1, _x, _y)
-        self.assertTrue(np.alltrue(np.arange(2, 5) == _range))
+        self.assertTrue(np.all(np.arange(2, 5) == _range))
 
     def test_get_fwhm_indices__double_range_x_in(self):
         _x = np.linspace(-0.5 * np.pi, 3.5 * np.pi, num=61)
@@ -126,7 +126,7 @@ class TestFitFuncBase(unittest.TestCase):
         _x0 = (_x[15] + _x[14]) / 2
         _y0 = np.sin(_x0)
         _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
-        self.assertTrue(np.alltrue(np.where(_y[:31] >= 0.5 * _y0)[0] == _range))
+        self.assertTrue(np.all(np.where(_y[:31] >= 0.5 * _y0)[0] == _range))
 
     def test_get_fwhm_indices__double_range_x_out(self):
         _x = np.linspace(-0.5 * np.pi, 3.5 * np.pi, num=61)
@@ -134,7 +134,7 @@ class TestFitFuncBase(unittest.TestCase):
         _x0 = np.pi
         _y0 = 1
         _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
-        self.assertTrue(np.alltrue(np.array([]) == _range))
+        self.assertTrue(np.all(np.array([]) == _range))
 
     def test_backgroup_at_peak__single_peak_no_bg(self):
         class FitTestClass(FitFuncBase):
@@ -190,7 +190,7 @@ class TestFitFuncBase(unittest.TestCase):
         c = (1, 1, _x0, 1, 1, _x1)
         _bg = FitTestClass.background_at_peak(c)
         del FitFuncMeta.registry["Test class"]
-        self.assertTrue(np.alltrue(_bg == 0 * np.asarray((_x0, _x1))))
+        self.assertTrue(np.all(_bg == 0 * np.asarray((_x0, _x1))))
 
     def test_backgroup_at_peak__double_peak_0th_order_bg(self):
         _bg0 = 12
@@ -206,7 +206,7 @@ class TestFitFuncBase(unittest.TestCase):
         c = (1, 1, _x0, 1, 1, _x1, _bg0)
         _bg = FitTestClass.background_at_peak(c)
         del FitFuncMeta.registry["Test class"]
-        self.assertTrue(np.alltrue(_bg == _bg0 + 0 * np.asarray((_x0, _x1))))
+        self.assertTrue(np.all(_bg == _bg0 + 0 * np.asarray((_x0, _x1))))
 
     def test_backgroup_at_peak__double_peak_1st_order_bg(self):
         _bg0 = 12
@@ -223,7 +223,7 @@ class TestFitFuncBase(unittest.TestCase):
         c = (1, 1, _x0, 1, 1, _x1, _bg0, _bg1)
         _bg = FitTestClass.background_at_peak(c)
         del FitFuncMeta.registry["Test class"]
-        self.assertTrue(np.alltrue(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
+        self.assertTrue(np.all(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
 
     def test_backgroup_at_peak__double_peak_1st_order_bg_more_params(self):
         _bg0 = 12
@@ -240,7 +240,7 @@ class TestFitFuncBase(unittest.TestCase):
         c = (1, 1, _x0, 1, 1, 1, _x1, 1, _bg0, _bg1)
         _bg = FitTestClass.background_at_peak(c)
         del FitFuncMeta.registry["Test class"]
-        self.assertTrue(np.alltrue(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
+        self.assertTrue(np.all(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
 
 
 if __name__ == "__main__":

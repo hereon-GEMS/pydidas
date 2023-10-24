@@ -1,9 +1,11 @@
-# This file is part of pydidas.
+# This file is part of pydidas
+#
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -11,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+# along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the Hdf5DatasetSelector widget which allows to select a dataset
@@ -19,22 +21,22 @@ from an Hdf5 file and to browse through its data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Hdf5DatasetSelector"]
+
 
 from functools import partial
 
 import h5py
-import hdf5plugin
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
 from ...core import PydidasGuiError
-from ...core.utils import get_hdf5_populated_dataset_keys, apply_qt_properties
-from ...core.constants import QT_COMBO_BOX_SIZE_POLICY
+from ...core.constants import ALIGN_TOP_RIGHT, QT_COMBO_BOX_SIZE_POLICY
+from ...core.utils import apply_qt_properties, get_hdf5_populated_dataset_keys
 from ..factory import CreateWidgetsMixIn
 from ..utilities import get_max_pixel_width_of_entries
 
@@ -46,6 +48,8 @@ DEFAULT_FILTERS = {
 
 class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     """
+    A compound widget to select datasets in Hdf5 files.
+
     The Hdf5DatasetSelector is a compound widget which allows to select
     an hdf5 dataset key and the frame number. By convention, the first
     dimension of a n-dimensional (n >= 3) dataset is the frame number. Any
@@ -53,8 +57,6 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
     Parameters
     ----------
-    parent : Union[QWidget, None], optional
-        The parent widget. The default is None.
     viewWidget : Union[QWidget, None], optional
         A widget for a full view. It can also be registered later using
         the  *register_view_widget* method. The default is None.
@@ -73,21 +75,21 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
     new_frame_signal = QtCore.Signal(object)
 
-    def __init__(self, parent=None, viewWidget=None, datasetKeyFilters=None, **kwargs):
-        QtWidgets.QWidget.__init__(self, parent)
+    def __init__(self, viewWidget=None, datasetKeyFilters=None, **kwargs):
+        QtWidgets.QWidget.__init__(self, kwargs.pop("parent", None))
         CreateWidgetsMixIn.__init__(self)
         apply_qt_properties(self, **kwargs)
 
-        self._config = dict(
-            activeDsetFilters=[],
-            urrentDset=None,
-            currentFname=None,
-            currentIndex=None,
-            dsetFilters=(
+        self._config = {
+            "activeDsetFilters": [],
+            "currentDset": None,
+            "currentFname": None,
+            "currentIndex": None,
+            "dsetFilters": (
                 datasetKeyFilters if datasetKeyFilters is not None else DEFAULT_FILTERS
             ),
-        )
-        self.flags = dict(slotActive=False, autoUpdate=True)
+        }
+        self.flags = {"slotActive": False, "autoUpdate": True}
         self._widgets["viewer"] = viewWidget
         self._frame = None
         self.__create_widgets_and_layout()
@@ -127,18 +129,21 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         )
         self.create_spin_box(
             "min_datasize",
-            value=50,
-            valueRange=(0, int(1e9)),
             gridPos=(_row_offset, 1, 1, 1),
+            range=(0, int(1e9)),
+            value=50,
         )
         self.create_spin_box(
-            "min_datadim", value=2, valueRange=(0, 3), gridPos=(_row_offset, 4, 1, 1)
+            "min_datadim",
+            gridPos=(_row_offset, 4, 1, 1),
+            range=(0, 3),
+            value=2,
         )
         self.create_combo_box(
             "select_dataset",
+            gridPos=(1 + _row_offset, 1, 1, 4),
             minimumContentsLength=25,
             sizeAdjustPolicy=QT_COMBO_BOX_SIZE_POLICY,
-            gridPos=(1 + _row_offset, 1, 1, 4),
         )
         self.add_any_widget(
             "frame_browser",
@@ -148,21 +153,22 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.create_button(
             "but_view",
             "Show full frame",
+            alignment=ALIGN_TOP_RIGHT,
             gridPos=(3 + _row_offset, 3, 1, 2),
-            alignment=QtCore.Qt.AlignRight | QtCore.Qt.AlignTop,
         )
         self.create_check_box(
             "auto_update",
             "Auto update",
-            gridPos=(3 + _row_offset, 0, 1, 2),
             checked=True,
+            gridPos=(3 + _row_offset, 0, 1, 2),
         )
         self.setVisible(False)
 
     def __connect_slots(self):
         """
-        Connect all required widget slots (except for the filter keys
-        which are set up dynamically along their widgets)
+        Connect all required widget slots.
+
+        Filter keys are set up dynamically along with their checkbox widgets.
         """
         self._widgets["min_datasize"].valueChanged.connect(self.__populate_dataset_list)
         self._widgets["min_datadim"].valueChanged.connect(self.__populate_dataset_list)
@@ -190,10 +196,9 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             ignore_keys=self._config["activeDsetFilters"],
         )
         _combo = self._widgets["select_dataset"]
-        _combo.currentTextChanged.disconnect()
-        _combo.clear()
-        _combo.addItems(_datasets)
-        _combo.currentTextChanged.connect(self.__select_dataset)
+        with QtCore.QSignalBlocker(self._widgets["select_dataset"]):
+            self._widgets["select_dataset"].clear()
+            self._widgets["select_dataset"].addItems(_datasets)
         if len(_datasets) > 0:
             _items = [_combo.itemText(i) for i in range(_combo.count())]
             _combo.view().setMinimumWidth(get_max_pixel_width_of_entries(_items) + 50)
@@ -219,7 +224,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self._widgets["but_view"].setEnabled(True)
         self.__update()
 
-    def __update(self, new_frame=False):
+    def __update(self, new_frame: bool = False):
         """
         Propagate an update to any consumers.
 
@@ -236,6 +241,8 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         if self.flags["autoUpdate"] or self.flags["slotActive"] or new_frame:
             self.__get_frame()
+            if self._frame is None:
+                return
         if self.flags["slotActive"]:
             self.new_frame_signal.emit(self._frame)
         if self.flags["autoUpdate"] and self._widgets["viewer"] is not None:
@@ -250,6 +257,8 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         / signals)
         """
         _dset = self._widgets["select_dataset"].currentText()
+        if _dset == "":
+            self._frame = None
         with h5py.File(self._config["currentFname"], "r") as _file:
             _dset = _file[_dset]
             _ndim = len(_dset.shape)
@@ -258,7 +267,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             elif _ndim == 2:
                 self._frame = _dset[...]
 
-    def register_view_widget(self, widget):
+    def register_view_widget(self, widget: QtWidgets.QWidget):
         """
         Register a view widget to be used for full visualization of data.
 
@@ -280,7 +289,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             return
         raise TypeError("Error: Object must be a widget with a setData method.")
 
-    def _toggle_filter_key(self, widget, key):
+    def _toggle_filter_key(self, widget: QtWidgets.QWidget, key: str):
         """
         Add or remove the filter key from the active dataset key filters.
 
@@ -310,7 +319,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         self.flags["autoUpdate"] = self._widgets["auto_update"].isChecked()
 
-    def enable_signal_slot(self, enable):
+    def enable_signal_slot(self, enable: bool):
         """
         Toggle the signal slot to emit the selected frame as signal for other
         widgets.
@@ -324,7 +333,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         self.flags["slotActive"] = enable
 
-    def set_filename(self, name):
+    def set_filename(self, name: str):
         """
         Set the filename of the hdf5 file to be used.
 
@@ -340,7 +349,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.__populate_dataset_list()
         self.__update(True)
 
-    def _index_changed(self, index):
+    def _index_changed(self, index: int):
         """
         Store the new index from the frame selector.
 

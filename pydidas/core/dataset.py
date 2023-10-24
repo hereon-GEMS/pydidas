@@ -32,8 +32,10 @@ import warnings
 from collections.abc import Iterable
 from copy import deepcopy
 from numbers import Integral
+from typing import Literal, Self, Union
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from .utils.dataset_utils import (
     convert_data_to_dict,
@@ -74,7 +76,7 @@ class Dataset(np.ndarray):
         The description of the data. The default is an empty string.
     """
 
-    def __new__(cls, array, **kwargs):
+    def __new__(cls, array: np.ndarray, **kwargs: dict) -> Self:
         """
         Create a new Dataset.
 
@@ -96,14 +98,14 @@ class Dataset(np.ndarray):
         update_dataset_properties_from_kwargs(obj, kwargs)
         return obj
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union[tuple, int]):
         """
         Overwrite the generic __getitem__ method to catch the slicing keys.
 
         Parameters
         ----------
         key : Union[int, tuple]
-            The slicing objects
+            The slicing objects.
 
         Returns
         -------
@@ -116,7 +118,7 @@ class Dataset(np.ndarray):
             self._meta["getitem_key"] = ()
         return _item
 
-    def __array_finalize__(self, obj):
+    def __array_finalize__(self, obj: Self):
         """
         Finalizazion of numpy.ndarray object creation.
 
@@ -131,7 +133,7 @@ class Dataset(np.ndarray):
             obj._meta["getitem_key"] = ()
         self._meta["getitem_key"] = ()
 
-    def __update_keys_from_object(self, obj):
+    def __update_keys_from_object(self, obj: object):
         """
         Update the axis keys from the original object.
 
@@ -176,7 +178,7 @@ class Dataset(np.ndarray):
                 for _dim, (_key, _item) in enumerate(sorted(self._meta[_item].items()))
             }
 
-    def __insert_axis_keys(self, dim):
+    def __insert_axis_keys(self, dim: int):
         """
         Insert a new axis key at the specified dimension.
 
@@ -202,7 +204,11 @@ class Dataset(np.ndarray):
             self._meta[_item] = _copy
 
     def flatten_dims(
-        self, *args, new_dim_label="Flattened", new_dim_unit="", new_dim_range=None
+        self,
+        *args: tuple,
+        new_dim_label: str = "Flattened",
+        new_dim_unit: str = "",
+        new_dim_range: Union[None, np.ndarray, Iterable] = None,
     ):
         """
         Flatten the specified dimensions in place in the Dataset.
@@ -223,8 +229,9 @@ class Dataset(np.ndarray):
             'Flattened'.
         new_dim_unit : str, optional
             The unit for the new, flattened dimension. The default is ''.
-        new_dim_range : object, optional
-            The new range for the flattened dimension. The default is None.
+        new_dim_range : Union[None, np.ndarray, Iterable], optional
+            The new range for the flattened dimension. If None, a simple The
+            default is None.
         """
         if len(args) < 2:
             return
@@ -252,7 +259,7 @@ class Dataset(np.ndarray):
         self.axis_units = _axis_units
         self.axis_ranges = _axis_ranges
 
-    def get_rebinned_copy(self, binning):
+    def get_rebinned_copy(self, binning: int) -> Self:
         """
         Get a binned copy of the Dataset.
 
@@ -301,7 +308,7 @@ class Dataset(np.ndarray):
     # ##########
 
     @property
-    def property_dict(self):
+    def property_dict(self) -> dict:
         """
         Get a copy of the properties dictionary.
 
@@ -313,7 +320,7 @@ class Dataset(np.ndarray):
         return {_key: deepcopy(_val) for _key, _val in self._meta.items()}
 
     @property
-    def data_unit(self):
+    def data_unit(self) -> str:
         """
         Get the data unit.
 
@@ -325,9 +332,9 @@ class Dataset(np.ndarray):
         return self._meta["data_unit"]
 
     @data_unit.setter
-    def data_unit(self, data_unit):
+    def data_unit(self, data_unit: str):
         """
-        Set the data unit
+        Set the data unit.
 
         Parameters
         ----------
@@ -344,7 +351,7 @@ class Dataset(np.ndarray):
         self._meta["data_unit"] = data_unit
 
     @property
-    def data_label(self):
+    def data_label(self) -> str:
         """
         Get the data label.
 
@@ -356,9 +363,9 @@ class Dataset(np.ndarray):
         return self._meta["data_label"]
 
     @data_label.setter
-    def data_label(self, data_label):
+    def data_label(self, data_label: str):
         """
-        Set the data unit
+        Set the data label.
 
         Parameters
         ----------
@@ -375,26 +382,27 @@ class Dataset(np.ndarray):
         self._meta["data_label"] = data_label
 
     @property
-    def metadata(self):
+    def metadata(self) -> dict:
         """
-        Get the image ID.
+        Get the dataset metadata.
 
         Returns
         -------
-        integer
-            The image ID.
+        dict
+            The metadata dictionary. There is no enforced structure of the
+            dictionary.
         """
         return self._meta["metadata"].copy()
 
     @metadata.setter
-    def metadata(self, metadata):
+    def metadata(self, metadata: Union[dict, None]):
         """
-        Set the image metadata.
+        Set the Dataset metadata.
 
         Parameters
         ----------
         metadata : Union[dict, None]
-            The image metadata.
+            The Dataset metadata.
 
         Raises
         ------
@@ -406,7 +414,7 @@ class Dataset(np.ndarray):
         self._meta["metadata"] = metadata
 
     @property
-    def array(self):
+    def array(self) -> np.ndarray:
         """
         Get the raw array data of the dataset.
 
@@ -418,7 +426,7 @@ class Dataset(np.ndarray):
         return self.__array__()
 
     @property
-    def axis_units(self):
+    def axis_units(self) -> dict:
         """
         Get the axis units.
 
@@ -431,23 +439,22 @@ class Dataset(np.ndarray):
         return self._meta["axis_units"].copy()
 
     @axis_units.setter
-    def axis_units(self, units):
+    def axis_units(self, units: Union[Iterable, dict]):
         """
         Set the axis_units metadata.
 
         Parameters
         ----------
-        labels : Union[dict, list, tuple]
-            The new axis units. Both tuples and lists (of length ndim) as
-            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
-            accepted.
+        labels : Union[Iterable, dict]
+            The new axis units. Both Iterables (of length ndim) as well as
+            dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
         self._meta["axis_units"] = convert_data_to_dict(units, self.shape, "axis_units")
 
     @property
-    def axis_labels(self):
+    def axis_labels(self) -> dict:
         """
-        Get the axis_labels
+        Get the axis_labels.
 
         Returns
         -------
@@ -458,26 +465,27 @@ class Dataset(np.ndarray):
         return self._meta["axis_labels"].copy()
 
     @axis_labels.setter
-    def axis_labels(self, labels):
+    def axis_labels(self, labels: Union[Iterable, dict]):
         """
         Set the axis_labels metadata.
 
         Parameters
         ----------
-        labels : Union[dict, list, tuple]
-            The new axis labels. Both tuples and lists (of length ndim) as
-            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
-            accepted.
+        labels : Union[Iterable, dict]
+            The new axis labels. Both Iterables (of length ndim) as well as
+            dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
         self._meta["axis_labels"] = convert_data_to_dict(
             labels, self.shape, "axis_labels"
         )
 
     @property
-    def axis_ranges(self):
+    def axis_ranges(self) -> dict:
         """
-        Get the axis ranges. These arrays for every dimension give the range
-        of the data (in conjunction with the units).
+        Get the axis ranges.
+
+        These arrays for every dimension give the range of the data
+        (in conjunction with the units).
 
         Returns
         -------
@@ -488,23 +496,24 @@ class Dataset(np.ndarray):
         return self._meta["axis_ranges"].copy()
 
     @axis_ranges.setter
-    def axis_ranges(self, ranges):
+    def axis_ranges(self, ranges: Union[Iterable, dict]):
         """
         Set the axis_ranges metadata.
 
         Parameters
         ----------
-        labels : Union[dict, list, tuple]
-            The new axis ranges. Both tuples and lists (of length ndim) as
-            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
-            accepted.
+        labels : Union[Iterable, dict]
+            The new axis ranges. Both Iterables (of length ndim) as well as
+            dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
         _ranges = convert_data_to_dict(ranges, self.shape, "axis_ranges")
         self._convert_ranges_and_verify_length_okay(_ranges)
         self._meta["axis_ranges"] = _ranges
 
-    def _convert_ranges_and_verify_length_okay(self, ranges):
+    def _convert_ranges_and_verify_length_okay(self, ranges: dict):
         """
+        Convert ranges to ndarray.
+
         Verify that all given true ranges (i.e. with more than one item) are of type
         np.ndarray and that the length of all given ranges matches the data shape.
 
@@ -535,19 +544,19 @@ class Dataset(np.ndarray):
                 )
             raise ValueError(_error)
 
-    # ################################################
-    # Implement update methods for the axis properties
-    # ################################################
+    # ######################################
+    # Update methods for the axis properties
+    # ######################################
 
-    def update_axis_ranges(self, index, item):
+    def update_axis_range(self, index: int, item: Union[np.ndarray, Iterable]):
         """
-        Update a single axis ranges value.
+        Update a single axis range value.
 
         Parameters
         ----------
         index : int
             The dimension to be updated.
-        item : Union[None, str, np.ndarray]
+        item : Union[np.ndarray, Iterable]
             The new item for the range of the selected dimension.
 
         Raises
@@ -560,7 +569,7 @@ class Dataset(np.ndarray):
         self._convert_ranges_and_verify_length_okay({index: item})
         self._meta["axis_ranges"][index] = item
 
-    def update_axis_labels(self, index, item):
+    def update_axis_label(self, index: int, item: str):
         """
         Update a single axis label value.
 
@@ -568,19 +577,24 @@ class Dataset(np.ndarray):
         ----------
         index : int
             The dimension to be updated.
-        item : Union[None, str, np.ndarray]
+        item : str
             The new item for the range of the selected dimension.
 
         Raises
         ------
         ValueError
-            If the index is not in range of the Dataset dimensions.
+            If the index is not in range of the Dataset dimensions or if the item is
+            not a string.
         """
         if not 0 <= index < self.ndim:
-            raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
+            raise ValueError(f"The index *{index}* is out of bounds (0..{self.ndim}).")
+        if not isinstance(item, str):
+            raise ValueError(
+                f"The item *{item}* is not a string. Cannot update the axis label."
+            )
         self._meta["axis_labels"][index] = item
 
-    def update_axis_units(self, index, item):
+    def update_axis_unit(self, index: int, item: str):
         """
         Update a single axis unit value.
 
@@ -588,19 +602,24 @@ class Dataset(np.ndarray):
         ----------
         index : int
             The dimension to be updated.
-        item : Union[None, str, np.ndarray]
+        item : str
             The new item for the range of the selected dimension.
 
         Raises
         ------
         ValueError
-            If the index is not in range of the Dataset dimensions.
+            If the index is not in range of the Dataset dimensions or if the item is
+            not a string.
         """
         if not 0 <= index < self.ndim:
             raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
+        if not isinstance(item, str):
+            raise ValueError(
+                f"The item *{item}* is not a string. Cannot update the axis label."
+            )
         self._meta["axis_units"][index] = item
 
-    def get_description_of_point(self, indices):
+    def get_description_of_point(self, indices: Iterable) -> str:
         """
         Get the metadata description of a single point in the array.
 
@@ -608,7 +627,7 @@ class Dataset(np.ndarray):
 
         Parameters
         ----------
-        indices : Union[tuple, list]
+        indices : Iterable
             The indices for each dimension.
 
         Returns
@@ -633,12 +652,12 @@ class Dataset(np.ndarray):
     # Reimplementations of generic ndarray methods
     # ############################################
 
-    def transpose(self, *axes):
+    def transpose(self, *axes: tuple) -> Self:
         """
         Overload the generic transpose method to transpose the metadata as well.
 
         Note that contrary to the generic method, transpose creates a deepcopy of the
-        data and not only a view to prevent up inconsistent metadata.
+        data and not only a view to prevent inconsistent metadata.
 
         Parameters
         ----------
@@ -658,7 +677,7 @@ class Dataset(np.ndarray):
         _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
         return _new
 
-    def flatten(self, order="C"):
+    def flatten(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
         Clear the metadata when flattening the array.
 
@@ -676,12 +695,14 @@ class Dataset(np.ndarray):
         self._meta["axis_ranges"] = {0: np.arange(self.size)}
         self._meta["axis_units"] = {0: ""}
         _new = np.ndarray.flatten(self, order)
-        _new.update_keys_in_flattened_array()
+        _new._update_keys_in_flattened_array()
         return _new
 
-    def update_keys_in_flattened_array(self):
+    def _update_keys_in_flattened_array(self):
         """
         Update the keys in flattened arrays i.e. if the new dimension is one.
+
+        Note that the metadara keys are updated in place.
         """
         if self.ndim == 1 and (
             len(self._meta["axis_ranges"]) > 1
@@ -692,7 +713,7 @@ class Dataset(np.ndarray):
             self._meta["axis_ranges"] = {0: np.arange(self.size)}
             self._meta["axis_units"] = {0: ""}
 
-    def squeeze(self, axis=None):
+    def squeeze(self, axis: Union[None, int] = None) -> Self:
         """
         Squeeze the array and remove dimensions of length one.
 
@@ -725,7 +746,13 @@ class Dataset(np.ndarray):
                 setattr(_new, _key, _entry)
         return _new
 
-    def take(self, indices, axis=None, out=None, mode="raise"):
+    def take(
+        self,
+        indices: Union[int, ArrayLike],
+        axis: Union[int, None] = None,
+        out: Union[None, np.ndarray] = None,
+        mode: Literal["raise", "wrap", "clip"] = "raise",
+    ) -> Self:
         """
         Take elements from an array along an axis.
 
@@ -734,7 +761,7 @@ class Dataset(np.ndarray):
 
         Parameters
         ----------
-        indices : Union[int, array_like]
+        indices : Union[int, ArrayLike]
             The indicies of the values to extract.
         axis : Union[None, int], optional
             The axis to take the data from. If None, data will be taken from the
@@ -766,7 +793,7 @@ class Dataset(np.ndarray):
                 )
         return _new
 
-    def copy(self, order="C"):
+    def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
         Overload the generic nd.ndarray copy method to copy metadata as well.
 
@@ -796,9 +823,9 @@ class Dataset(np.ndarray):
                 _new._meta["metadata"][_key] = _val
         return _new
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
-        Reimplementation of the numpy.ndarray.__repr__ method
+        Reimplementation of the numpy.ndarray.__repr__ method.
 
         Returns
         -------
@@ -829,14 +856,17 @@ class Dataset(np.ndarray):
         np.set_printoptions(threshold=_thresh, edgeitems=3)
         return _repr
 
-    def __get_axis_item_repr(self, obj_name):
+    def __get_axis_item_repr(
+        self, obj_name: Literal["axis_labels", "axis_ranges", "axis_units"]
+    ) -> str:
         """
-        Get a string representation for a dictionary item of 'axis_labels',
-        'axis_ranges' or 'axis_units'
+        Get a string representation for a metadata entry.
+
+        Supported entries are 'axis_labels', 'axis_ranges', and 'axis_units'.
 
         Parameters
         ----------
-        obj_name : str
+        obj_name : Literal["axis_labels", "axis_ranges", "axis_units"]
             The name of the dictionary to be represented as a string.
 
         Returns
@@ -852,7 +882,7 @@ class Dataset(np.ndarray):
         _str = f"{obj_name}:" + " {\n" + "\n".join(_str_entries) + "}"
         return _str
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Reimplementation of the numpy.ndarray.__str__ method.
 
@@ -863,7 +893,7 @@ class Dataset(np.ndarray):
         """
         return self.__repr__()
 
-    def __reduce__(self):
+    def __reduce__(self) -> tuple:
         """
         Reimplementation of the numpy.ndarray.__reduce__ method to add
         the Dataset metadata to the pickled version.
@@ -884,7 +914,7 @@ class Dataset(np.ndarray):
         _dataset_state = _ndarray_reduced[2] + (self.__dict__,)
         return (_ndarray_reduced[0], _ndarray_reduced[1], _dataset_state)
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: tuple):
         """
         Reimplementation of the numpy.ndarray.__setstate__.
 
@@ -900,16 +930,20 @@ class Dataset(np.ndarray):
         self.__dict__ = state[-1]
         np.ndarray.__setstate__(self, state[0:-1])
 
-    def __array_wrap__(self, obj, context=None):
+    def __array_wrap__(
+        self, obj: np.ndarray, context: Union[None, object] = None
+    ) -> Self:
         """
-        Overload the generic __array_wrap__ to return 0-d results from ufuncs
-        as single values and not empty Dataset arrays.
+        Return 0-d results from ufuncs as single values.
+
+        This method overloads the generic __array_wrap__ to return values and not
+        0-d results for Dataset arrays.
 
         Parameters
         ----------
         obj : Union[np.ndarray, pydidas.core.Dataset]
             The output array from the ufunc call.
-        context : Union[None, type], optional
+        context : Union[None, object], optional
             The calling context. The default is None.
 
         Returns
@@ -922,7 +956,7 @@ class Dataset(np.ndarray):
             return np.atleast_1d(obj)[0]
         return np.ndarray.__array_wrap__(self, obj, context)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Generate a hash value for the dataset.
 

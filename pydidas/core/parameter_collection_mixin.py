@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -84,6 +84,21 @@ class ParameterCollectionMixIn:
             An instance of a Parameter object.
         """
         self.params.add_param(param)
+
+    def update_params_from_init(self, *args: Tuple, **kwargs: Dict):
+        """
+        Update the Parameters from the given init args and kwargs.
+
+        Parameters
+        ----------
+        *args : Tuple
+            The input arguments.
+        **kwargs : Dict
+            The input keyword arguments.
+        """
+        self.add_params(*args)
+        self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
 
     def add_params(self, *params: Tuple[Union[Parameter, dict, ParameterCollection]]):
         """
@@ -200,13 +215,13 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         return self.params[param_key]
 
-    def get_params(self, *param_keys: Tuple[str]) -> List[Parameter]:
+    def get_params(self, *param_keys: Tuple[str, ...]) -> List[Parameter]:
         """
         Get multiple parameters based on their reference keys.
 
         Parameters
         ----------
-        *param_keys : Tuple[str]
+        *param_keys : Tuple[str, ...]
             Any number of reference keys.
 
         Returns
@@ -280,7 +295,6 @@ class ParameterCollectionMixIn:
     def print_param_values(self):
         """
         Print the name and value of all Parameters.
-        None.
         """
         _config = self.get_param_values_as_dict()
         for _key in _config:
@@ -323,7 +337,7 @@ class ParameterCollectionMixIn:
         _param = self.get_param(param_refkey)
         if _param.dtype is not Integral:
             raise ValueError(
-                f'The datatype of Parameter "{_param.refkey}"' " is not integer."
+                f"The datatype of Parameter *{_param.refkey}* is not integer."
             )
         if _param.value == modulo:
             return _param.value
@@ -364,5 +378,5 @@ class ParameterCollectionMixIn:
         """
         if key not in self.params:
             raise KeyError(
-                f"The key {key} is not registered with " f"{self.__class__.__name__}!"
+                f"The key {key} is not registered with {self.__class__.__name__}!"
             )

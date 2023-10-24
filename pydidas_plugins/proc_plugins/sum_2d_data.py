@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,17 +20,17 @@ Module with the Sum2dData Plugin which can be used to sum over 2D data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Sum2dData"]
 
 
 import numpy as np
 
-from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import Dataset, get_generic_param_collection
+from pydidas.core.constants import PROC_PLUGIN
 from pydidas.plugins import ProcPlugin
 
 
@@ -55,9 +57,15 @@ class Sum2dData(ProcPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._data = None
+        self._config["slices"] = None
 
-    def execute(self, data, **kwargs):
+    def pre_execute(self):
+        """
+        Reset the index range slices before starting a new processing run.
+        """
+        self._config["slices"] = None
+
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Sum data.
 
@@ -76,32 +84,29 @@ class Sum2dData(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
-        _selection = self._data[self._get_index_ranges()]
-        _sum = np.sum(_selection)
-        _new_data = Dataset(
-            [_sum],
-            axis_labels=["Data sum"],
-            axis_units=[""],
-            metadata=data.metadata,
-            data_label=self.output_data_label,
-            data_unit=self.output_data_unit,
+        return (
+            Dataset(
+                [np.sum(data[self._get_index_ranges()])],
+                axis_labels=["Data sum"],
+                axis_units=[""],
+                metadata=data.metadata,
+                data_label=self.output_data_label,
+                data_unit=self.output_data_unit,
+            ),
+            kwargs,
         )
-        return _new_data, kwargs
 
-    def _get_index_ranges(self):
+    def _get_index_ranges(self) -> tuple[slice, slice]:
         """
         Get the indices for the selected data range.
 
-        Parameters
-        ----------
-        axis : str
-            The axis to be processed. Must be either "x" or "y".
-
         Returns
         -------
-        slice
+        tuple[slice, slice]
             The slice object to select the range from the input data.
         """
+        if self._config["slices"] is not None:
+            return self._config["slices"]
         _slices = []
         for _ax in [0, 1]:
             if self.get_param_value("type_selection") == "Indices":
@@ -119,16 +124,19 @@ class Sum2dData(ProcPlugin):
                     _slices.append(slice(0, 0))
                 else:
                     _slices.append(slice(_bounds[0], _bounds[-1] + 1))
-        return tuple(_slices)
+        self._config["slices"] = tuple(_slices)
+        return self._config["slices"]
 
-    def _get_axis_range(self, axis, default_low, default_high):
+    def _get_axis_range(
+        self, axis: int, default_low: float, default_high: float
+    ) -> tuple[float, float]:
         """
         Get the range for the selected axis.
 
         Parameters
         ----------
         axis : int
-            The axis numbe.
+            The axis number.
         default_low : float
             The default value in case the lower limit is None.
         default_high : float
@@ -136,7 +144,7 @@ class Sum2dData(ProcPlugin):
 
         Returns
         -------
-        tuple
+        tuple[float, float]
             The axis bounds
         """
         _low = (

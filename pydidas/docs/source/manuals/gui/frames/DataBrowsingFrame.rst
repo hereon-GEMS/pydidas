@@ -1,5 +1,5 @@
 .. 
-    Copyright 2021-, Helmholtz-Zentrum Hereon
+    Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 
@@ -33,6 +33,23 @@ frames can be dragged by the mouse to change the relative sizes.
     splitter further, the respective widget will be hidden. It can be enlarged
     again by capturing and dragging the slider from the edge towards the center.
     
+Controls
+^^^^^^^^
+
+The controls are located on the left, above the directory explorer.
+Selecting or deselecting an option will directly update the directory explorer.
+
+The options are:
+
+  - Show network drives
+  
+    This option allows to show or hide linked network drives in the explorer
+    view.
+    
+  - Sorting is case sensitive
+  
+    This option toggles case sensitive sorting. If enabled, lowercase and 
+    uppercase names will be sorted and displayed separately.
 
 Directory explorer
 ^^^^^^^^^^^^^^^^^^

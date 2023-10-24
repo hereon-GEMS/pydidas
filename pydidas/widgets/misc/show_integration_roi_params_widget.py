@@ -33,7 +33,12 @@ from typing import Literal
 from qtpy import QtCore
 
 from ...core import get_generic_param_collection
-from ...core.constants import POLICY_FIX_EXP, POLICY_MIN_MIN, STANDARD_FONT_SIZE
+from ...core.constants import (
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    POLICY_FIX_EXP,
+    POLICY_MIN_MIN,
+)
+from ...plugins import BasePlugin
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
 
 
@@ -48,44 +53,35 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
     default_params = get_generic_param_collection("overlay_color")
     sig_roi_changed = QtCore.Signal()
     sig_toggle_edits = QtCore.Signal(bool)
-    widget_width = 320
 
-    def __init__(self, parent=None, **kwargs):
-        self.widget_width = kwargs.get("widget_width", self.widget_width)
-        WidgetWithParameterCollection.__init__(self, parent)
+    def __init__(self, **kwargs: dict):
+        WidgetWithParameterCollection.__init__(self, **kwargs)
         self.setSizePolicy(*POLICY_MIN_MIN)
         self.set_default_params()
-        self.setFixedWidth(self.widget_width)
         self._plugin = kwargs.get("plugin", None)
         self._config = self._config | {
             "forced_edit_disable": kwargs.get("forced_edit_disable", False),
             "roi_active": False,
         }
-        self.create_param_widget(
-            self.get_param("overlay_color"), **self._plugin_kwargs()
-        )
+        self.create_param_widget(self.get_param("overlay_color"))
         self.create_empty_widget(
             "plugin_container",
-            fixedWidth=self.widget_width,
-            stretch=(0, 0),
             sizePolicy=POLICY_MIN_MIN,
+            stretch=(0, 0),
         )
         self.create_button(
             "but_reset_to_start_values",
             "Reset all changes",
-            fixedWidth=self.widget_width,
-            fixedHeight=25,
             visible=kwargs.get("show_reset_button", True),
         )
         if kwargs.get("add_bottom_spacer", True):
             self.create_empty_widget(
                 "bottom_spacer",
-                stretch=(1, 1),
                 sizePolicy=POLICY_FIX_EXP,
-                fixedWidth=self.widget_width,
+                stretch=(1, 1),
             )
 
-    def create_widgets_for_axis(self, plugin, axis: Literal["rad", "azi"]):
+    def create_widgets_for_axis(self, plugin: BasePlugin, axis: Literal["rad", "azi"]):
         """
         Create the widgets for the given axis.
 
@@ -98,14 +94,11 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
         """
         _axis_long = "radial" if axis == "rad" else "azimuthal"
         _Axis_long = "Radial" if axis == "rad" else "Azimuthal"
-        _label_kwargs = dict(
-            fontsize=STANDARD_FONT_SIZE,
-            fixedWidth=self.widget_width,
+        self.create_label(
+            f"label_{axis}",
+            f"{_Axis_long} integration region",
             bold=True,
             parent_widget=self._widgets["plugin_container"],
-        )
-        self.create_label(
-            f"label_{axis}", f"{_Axis_long} integration region", **_label_kwargs
         )
         if axis == "azi":
             self.create_label(
@@ -115,19 +108,21 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
                 "oriented-axis (i.e. the origin at the top of the image), the positive "
                 "angular direction is clockwise. \nThe zero position is at the positive"
                 " x-axis, i.e. right of the beamcenter.",
+                font_metric_height_factor=7,
+                font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
                 parent_widget=self._widgets["plugin_container"],
-                wordWrap=True,
                 sizePolicy=POLICY_FIX_EXP,
+                wordWrap=True,
             )
         self.create_param_widget(
             plugin.get_param(f"{axis}_use_range"),
-            **self._plugin_kwargs("plugin_container"),
+            parent_widget=self._widgets["plugin_container"],
+            width_io=0.7,
+            width_text=0.3,
         )
         self.create_button(
             f"but_select_{_axis_long}",
             f"Select {_axis_long} integration range in image",
-            fixedWidth=self.widget_width,
-            fixedHeight=25,
             parent_widget=self._widgets["plugin_container"],
         )
 
@@ -135,13 +130,9 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
             _pname = f"{axis}_{_suffix}"
             self.create_param_widget(
                 plugin.get_param(_pname),
-                **self._plugin_kwargs("plugin_container"),
+                parent_widget=self._widgets["plugin_container"],
             )
-        self.create_line(
-            None,
-            parent_widget=self._widgets["plugin_container"],
-            fixedWidth=self.widget_width,
-        )
+        self.create_line(None, parent_widget=self._widgets["plugin_container"])
 
     def toggle_enable(self, enabled: bool):
         """
@@ -183,27 +174,3 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
                 _name = f"{_prefix}_{_suffix}"
                 if _name in self.param_widgets:
                     self.param_widgets.pop(_name)
-
-    def _plugin_kwargs(self, container_name=None):
-        """
-        Get the kwargs for the plugin widget creation.
-
-        Parameters
-        ----------
-        container_name : str
-            The name of the container to use as parent.
-
-        Returns
-        -------
-        dict
-            The kwargs for the param_widget creation.
-        """
-        return dict(
-            width_total=self.widget_width,
-            width_io=120,
-            width_text=180,
-            width_unit=0,
-            parent_widget=(
-                self._widgets[container_name] if container_name is not None else self
-            ),
-        )

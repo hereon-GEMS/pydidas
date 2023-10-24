@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["MainWindow"]
 
+
 import os
 import warnings
 from functools import partial
@@ -34,8 +35,9 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 
 from ..core import PydidasGuiError
-from ..widgets.framework import PydidasStatusWidget
+from ..widgets.framework import FontScalingToolbar, PydidasStatusWidget
 from . import utils
+from .frames import DefineDiffractionExpFrame, DefineScanFrame, WorkflowEditFrame
 from .main_menu import MainMenu
 
 
@@ -122,61 +124,50 @@ class MainWindow(MainMenu):
         self._create_toolbars()
         self._create_toolbar_actions()
 
-        for _toolbar_name, _toolbar in self._toolbars.items():
-            if _toolbar_name != "":
-                self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
-            self.addToolBar(QtCore.Qt.LeftToolBarArea, _toolbar)
-
         self._update_toolbar_visibility()
         self.select_item(self.centralWidget().currentWidget().menu_entry)
         self.__configuration["toolbars_created"] = True
+        self.__connect_workflow_processing_signals()
 
     def _create_toolbar_menu_entries(self):
         """
         Create the required toolbar menu entries to populate the menu.
         """
-        _menu_entries = []
+        self.__configuration["menu_entries"] = []
         for _key in self.centralWidget().frame_toolbar_entries:
             _items = _key.split("/")
-            _entries = ["/".join(_items[: _i + 1]) for _i in range(len(_items))]
-            for _entry in _entries:
-                if _entry not in _menu_entries:
-                    _menu_entries.append(_entry)
+            for _entry in ["/".join(_items[: _i + 1]) for _i in range(len(_items))]:
+                if _entry not in self.__configuration["menu_entries"]:
+                    self.__configuration["menu_entries"].append(_entry)
                 if _entry not in self._toolbar_metadata:
                     self._toolbar_metadata[_entry] = utils.create_generic_toolbar_entry(
                         _entry
                     )
                     self.__configuration["toolbar_visibility"][_entry] = False
-        self.__configuration["menu_entries"] = _menu_entries
 
     def _create_toolbars(self):
         """
         Create the toolbar widgets for the toolbar menu.
         """
-        self._toolbars = {}
         for _tb in utils.find_toolbar_bases(self.__configuration["menu_entries"]):
             tb_title = _tb if _tb else "Main toolbar"
-            self._toolbars[_tb] = QtWidgets.QToolBar(tb_title, self)
-            self._toolbars[_tb].generic_label = tb_title
-            self._toolbars[_tb].setStyleSheet("QToolBar{spacing:20px;}")
-            self._toolbars[_tb].setIconSize(QtCore.QSize(45, 45))
-            self._toolbars[_tb].setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-            self._toolbars[_tb].setFixedWidth(90)
-            self._toolbars[_tb].setMovable(False)
-            self._toolbars[_tb].toggleViewAction().setEnabled(False)
+            self._toolbars[_tb] = FontScalingToolbar(tb_title, self)
+        for _toolbar_name, _toolbar in self._toolbars.items():
+            if _toolbar_name != "":
+                self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
+            self.addToolBar(QtCore.Qt.LeftToolBarArea, _toolbar)
 
     def _create_toolbar_actions(self):
         """
         Create the toolbar actions to swtich between frames.
         """
-        for item in self.__configuration["menu_entries"]:
-            _icon = self._toolbar_metadata[item]["icon"]
-            _label = self._toolbar_metadata[item]["label"]
-            _action = QtWidgets.QAction(_icon, _label, self)
+        for _entry in self.__configuration["menu_entries"]:
+            _metadata = self._toolbar_metadata[_entry]
+            _action = QtWidgets.QAction(_metadata["icon"], _metadata["label"], self)
             _action.setCheckable(True)
-            _action.triggered.connect(partial(self.select_item, item))
-            self._toolbar_actions[item] = _action
-            itembase = os.path.dirname(item)
+            _action.triggered.connect(partial(self.select_item, _entry))
+            self._toolbar_actions[_entry] = _action
+            itembase = os.path.dirname(_entry)
             self._toolbars[itembase].addAction(_action)
 
     def _update_toolbar_visibility(self):
@@ -188,6 +179,24 @@ class MainWindow(MainMenu):
             _toolbar.setVisible(_visible)
             if _name != "":
                 self._auto_update_toolbar_entry(_name)
+
+    def __connect_workflow_processing_signals(self):
+        """
+        Connect the signals from the WorkflowProcessing which block changes.
+        """
+        try:
+            _proc_frame = self.centralWidget().get_widget_by_name(
+                "Workflow processing/Run full workflow"
+            )
+        except KeyError:
+            return
+        for _key, _action in self._toolbar_actions.items():
+            if _key in [
+                WorkflowEditFrame.menu_entry,
+                DefineScanFrame.menu_entry,
+                DefineDiffractionExpFrame.menu_entry,
+            ]:
+                _proc_frame.sig_processing_running.connect(_action.setDisabled)
 
     def _auto_update_toolbar_entry(self, label):
         """
@@ -336,6 +345,4 @@ class MainWindow(MainMenu):
             The status message.
         """
         self.statusBar().showMessage(text)
-        if text[-1] != "\n":
-            text += "\n"
-        self.__info_widget.add_status(text)
+        self.__info_widget.add_status(text if text[-1] == "\n" else text + "\n")

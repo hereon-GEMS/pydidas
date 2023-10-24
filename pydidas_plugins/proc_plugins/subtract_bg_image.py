@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -27,11 +27,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SubtractBackgroundImage"]
 
+
 import os
 
 import numpy as np
 
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
@@ -42,6 +43,13 @@ from pydidas.widgets.plugin_config_widgets import SubtractBackgroundImageConfigW
 class SubtractBackgroundImage(ProcPlugin):
     """
     Subtract a background image from the data.
+
+    A new threshold for the resulting image can be defined, for example to prevent
+    negative values.
+
+    Another option is to apply a multiplicator to the background image, for example
+    to correct for different exposure times or high sample absorption which reduces
+    the background.
     """
 
     plugin_name = "Subtract background image"
@@ -61,6 +69,10 @@ class SubtractBackgroundImage(ProcPlugin):
         super().__init__(*args, **kwargs)
         self._bg_image = None
         self._thresh = None
+        self.params["multiplicator"]._Parameter__meta["tooltip"] = (
+            "The multiplication scaling factor to be applied to the background image "
+            "before subtracting it from the input data."
+        )
 
     def pre_execute(self):
         """
@@ -83,9 +95,9 @@ class SubtractBackgroundImage(ProcPlugin):
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Apply a mask to an image (2d data-array).
+        Subtract a background image from the input data.
 
         Parameters
         ----------
@@ -96,7 +108,7 @@ class SubtractBackgroundImage(ProcPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        corrected_data : pydidas.core.Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

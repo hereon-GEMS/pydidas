@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,12 @@ settings like dimensionality, number of points and labels.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DefineScanFrame"]
+
 
 from functools import partial
 
@@ -34,6 +35,7 @@ from qtpy import QtCore, QtWidgets
 from ...contexts import ScanContext, ScanContextIoMeta
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
+from ...widgets.framework import BaseFrame
 from ...widgets.windows import ScanDimensionInformationWindow
 from ...workflow import WorkflowTree
 from .builders import DefineScanFrameBuilder
@@ -61,7 +63,7 @@ DIM_LABELS = {
 }
 
 
-class DefineScanFrame(DefineScanFrameBuilder):
+class DefineScanFrame(BaseFrame):
     """
     Frame for managing the global scan setup.
     """
@@ -70,8 +72,8 @@ class DefineScanFrame(DefineScanFrameBuilder):
     menu_title = "Define\nScan"
     menu_entry = "Workflow processing/Define scan"
 
-    def __init__(self, parent=None, **kwargs):
-        DefineScanFrameBuilder.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -87,8 +89,14 @@ class DefineScanFrame(DefineScanFrameBuilder):
             default_extension="yaml",
             qsettings_ref="DefineScanFrame__export",
         )
-        self.__app = QtWidgets.QApplication.instance()
+        self._qtapp = QtWidgets.QApplication.instance()
         self.__info_window = ScanDimensionInformationWindow()
+
+    def build_frame(self):
+        """
+        Populate the frame with widgets.
+        """
+        DefineScanFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """
@@ -111,7 +119,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
         self.param_widgets["scan_base_directory"].io_edited.connect(
             self.set_new_base_directory
         )
-        self.__app.sig_close_gui.connect(self.__info_window.close)
+        self._qtapp.sig_close_gui.connect(self.__info_window.close)
 
     def finalize_ui(self):
         """
@@ -144,6 +152,10 @@ class DefineScanFrame(DefineScanFrameBuilder):
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
             if i in DIM_LABELS[_dim].keys():
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
+        _total_width = DefineScanFrameBuilder.width_factor(_dim in [3, 4])
+        self._widgets["master"].font_metric_width_factor = _total_width
+        self._widgets["config_B"].setVisible(_dim in [3, 4])
+        self._widgets["config_area"].force_width_from_size_hint()
 
     @QtCore.Slot()
     def load_from_file(self):
@@ -180,10 +192,9 @@ class DefineScanFrame(DefineScanFrameBuilder):
             self.param_widgets[param.refkey].set_value(param.value)
 
     @QtCore.Slot(int, int)
-    def move_dim(self, dim_index, direction):
+    def move_dim(self, dim_index: int, direction: int):
         """
-        Move the selected dimension up in the arrangement of scan dimensions in the
-        defined direction.
+        Move the selected dimension' position in the scan.
 
         Parameters
         ----------
@@ -214,7 +225,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
             )
 
     @QtCore.Slot(str)
-    def set_new_base_directory(self, basedir):
+    def set_new_base_directory(self, basedir: str):
         """
         Set the new base directory for the scan.
 

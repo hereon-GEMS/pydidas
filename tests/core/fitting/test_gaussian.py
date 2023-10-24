@@ -34,18 +34,21 @@ from pydidas.core.fitting.gaussian import Gaussian
 
 class TestGaussian(unittest.TestCase):
     def setUp(self):
-        self._peakpos = 42
+        self._x = np.linspace(0, 10, num=2000)
+        self._sigma = 1.42
+        self._x0 = self._x[987]
+        self._amplitude = 7.3
         self._data = Dataset(
-            np.ones((150)), data_unit="data unit", axis_units=["ax_unit"]
+            (
+                self._amplitude
+                / (self._sigma * np.sqrt(2 * np.pi))
+                * np.exp(-((self._x - self._x0) ** 2) / (2 * self._sigma**2))
+            ),
+            data_unit="data unit",
+            axis_units=["ax_unit"],
+            axis_ranges=[self._x],
         )
-        self._x = np.arange(self._data.size) * 0.5
-        self._peak_x = self._x[self._peakpos]
-        self._data.axis_ranges = [self._x]
-
-        self._sigma = 1.25
-        self._amp = 25
-        _peak = self._amp * Gaussian.func((1, self._sigma, 0), np.linspace(-4, 4, 15))
-        self._data[self._peakpos - 7 : self._peakpos + 8] += _peak
+        self._params = [self._amplitude, self._sigma, self._x0]
 
     def tearDown(self):
         pass
@@ -63,6 +66,22 @@ class TestGaussian(unittest.TestCase):
         _data[40] = 5
         _params = Gaussian.guess_fit_start_params(self._x, self._data)
         self.assertTrue(_params[1] > 0)
+
+    def test_func__values(self):
+        _func_values = Gaussian.func(self._params, self._x)
+        self.assertTrue(np.allclose(self._data, _func_values))
+
+    def test_amplitude(self):
+        _amp = Gaussian.amplitude(self._params)
+        self.assertAlmostEqual(np.amax(self._data), _amp)
+
+    def test_fwhm(self):
+        _y_max = np.amax(self._data)
+        _indices = np.where(self._data >= 0.5 * _y_max)[0]
+        _fwhm = self._x[_indices[-1]] - self._x[_indices[0]]
+        self.assertTrue(
+            abs(_fwhm - Gaussian.fwhm(self._params)) <= 2 * (self._x[1] - self._x[0])
+        )
 
 
 if __name__ == "__main__":

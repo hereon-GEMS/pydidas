@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,20 +20,20 @@ Module with the CenterOfMass1dData Plugin which can be used to sum over 1D data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["CenterOfMass1dData"]
 
 
 import numpy as np
 
-from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import Dataset, get_generic_param_collection
+from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core.utils import (
-    process_1d_with_multi_input_dims,
     calculate_result_shape_for_multi_input_dims,
+    process_1d_with_multi_input_dims,
 )
 from pydidas.plugins import ProcPlugin
 
@@ -51,14 +53,10 @@ class CenterOfMass1dData(ProcPlugin):
     output_data_unit = "a.u."
     new_dataset = True
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._data = None
-
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Sum data.
+        Calculate the center of mass for 1d input data.
 
         Parameters
         ----------
@@ -69,12 +67,11 @@ class CenterOfMass1dData(ProcPlugin):
 
         Returns
         -------
-        sum : np.ndarray
+        sum : Dataset
             The data sum in form of an array of shape (1,).
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self._data = data
         _x = data.axis_ranges[0]
         self.output_data_unit = data.axis_units[0]
         _com = np.sum(_x * data) / np.sum(data)

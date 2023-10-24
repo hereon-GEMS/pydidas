@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,24 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 Module with parsers to parse command line arguments for the
 CompositeCreatorApp.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["composite_creator_app_parser"]
 
+
 import argparse
+from typing import Union
 
-from ...core.constants import GENERIC_PARAMS_METADATA as PARAMS
+from ...core.generic_params import GENERIC_PARAMS_METADATA as PARAMS
 
 
-def composite_creator_app_parser(caller=None):
+def composite_creator_app_parser(caller: Union[object, None] = None) -> dict:
     """
     Parse the command line arguments for the CompositeCreatorApp.
 
@@ -132,7 +137,8 @@ def composite_creator_app_parser(caller=None):
             "default is Path()."
         ),
     )
-    _args = dict(vars(parser.parse_args()))
+    _options, _unknown = parser.parse_known_args()
+    _args = dict(vars(_options))
     # store None for keyword arguments which were not selected:
     for _key in ["use_roi", "use_thresholds", "use_bg_file", "use_detector_mask"]:
         _val = _args[_key]

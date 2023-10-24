@@ -1,5 +1,5 @@
-.. 
-    Copyright 2021-, Helmholtz-Zentrum Hereon
+..
+    Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 
@@ -8,8 +8,8 @@
 Developers guide to pydidas applications
 ========================================
 
-All pydidas applications should inherit from the :py:class:`BaseApp 
-<pydidas.core.BaseApp>` class. 
+All pydidas applications should inherit from the :py:class:`BaseApp
+<pydidas.core.BaseApp>` class.
 
 Generic attributes and methods
 ------------------------------
@@ -21,30 +21,30 @@ Class attributes
     :widths: 30 70
     :header-rows: 1
     :class: tight-table
-    
+
     * - class attribute
       - description
     * - :py:data:`default_params`
-      - A pydidas :py:class:`ParameterCollection 
-        <pydidas.core.ParameterCollection>` which define the 
+      - A pydidas :py:class:`ParameterCollection
+        <pydidas.core.ParameterCollection>` which define the
         :py:class:`Parameters <pydidas.core.Parameter>` required to use the app.
     * - :py:data:`parse_func`
       - The function used to parse command line arguments to starting Parameter
         values.
     * - :py:data:`attributes_not_to_copy_to_slave_app`
-      - A list with the names of instance attributes which must not be copied 
+      - A list with the names of instance attributes which must not be copied
         to a slave app. This is relevant for using the AppRunner for parallel
         processing, where it should be avoided to copy large objects because
         of the serialization of all objects during pickling.
 
 Instance attributes
-^^^^^^^^^^^^^^^^^^^ 
+^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
     :widths: 20 80
     :header-rows: 1
     :class: tight-table
-    
+
     * - instance attribute
       - description
     * - :py:data:`slave_app`
@@ -52,14 +52,14 @@ Instance attributes
         or slave.
     * - :py:data:`_config`
       - The :py:data:`_config` dictionary should be used to store all app
-        configuration which is not directly controlled by a Parameter. The 
+        configuration which is not directly controlled by a Parameter. The
         :py:data:`_config` is saved in the app state for export / import.
     * - :py:data:`params`
       - The :py:class:`ParameterCollection <pydidas.core.ParameterCollection>`
-        instance for the app. It should be accessed indirectly through the 
+        instance for the app. It should be accessed indirectly through the
         control methods for Parameters :py:class:`ObjectWithParameterCollection
         <pydidas.core.ObjectWithParameterCollection>`.
-        
+
 Generic methods
 ^^^^^^^^^^^^^^^
 
@@ -71,21 +71,21 @@ return values and calling parameters, please refer to the class documentation:
     :widths: 20 80
     :header-rows: 1
     :class: tight-table
-    
+
     * - method names
       - description
     * - :py:data:`run`
       - Run the app's task list serially in the present process. Note that this
-        will freeze the process and may take a lot of time, depending on the 
+        will freeze the process and may take a lot of time, depending on the
         number of tasks and the processing steps.
     * - :py:data:`multiprocessing_get_tasks`
       - This method must return all the tasks (as an iterable object) defined
         in the app. The app configuration should be done using Parameters and
-        this method process the input from all Parameters to create the task 
+        this method process the input from all Parameters to create the task
         list. **This method must be defined in a custom app.**
     * - :py:data:`multiprocessing_pre_run`
-      - This method runs all the required initialization which needs to be 
-        performed once before processing tasks. By default, this method 
+      - This method runs all the required initialization which needs to be
+        performed once before processing tasks. By default, this method
         passes.
     * - :py:data:`multiprocessing_post_run`
       - Final processing which needs to be performed after all tasks have been
@@ -95,29 +95,29 @@ return values and calling parameters, please refer to the class documentation:
         this method passes.
     * - :py:data:`multiprocessing_carryon`
       - This method allows to check whether processing can carry on or needs to
-        wait (for example for new data). It is called after the pre_cycle and 
+        wait (for example for new data). It is called after the pre_cycle and
         is called repeatedly until it returns a True. By default, this method
         returns True.
     * - :py:data:`multiprocessing_func`
       - This is the core processing function in which the computation for each
         task should be defined. **This method must be defined in a custom app.**
     * - :py:data:`multiprocessing_store_results`
-      - This method takes the task index and the function results and stores 
-        them in whichever way the app defined. It is separated from the 
-        processing to separate it in parallel processing and only store the 
-        results in the master process. **This method must be defined in a 
+      - This method takes the task index and the function results and stores
+        them in whichever way the app defined. It is separated from the
+        processing to separate it in parallel processing and only store the
+        results in the master process. **This method must be defined in a
         custom app.**
     * - :py:data:`initialize_shared_memory`
       - This method is used to create shared memory objects to be shared between
         master and slave apps or it initialize it again. Details must be defined
-        by the app which wishes to use it. 
+        by the app which wishes to use it.
     * - :py:data:`export_state`
       - This method returns a dictionary with the app state in a serializable
         format, i.e. all entries are safe to process in YAML or pickle.
     * - :py:data:`import_state`
       - This method takes a state dictionary and restores the app to its
         previous state.
-      
+
 Creating an app instance
 ------------------------
 
@@ -127,27 +127,28 @@ class:
 .. code-block::
 
     import pydidas
-    
+
     class RandomImageGeneratorApp(pydidas.core.BaseApp):
     default_params = ParameterCollection(
         Parameter("num_images", int, 50),
         Parameter("image_shape", tuple, (100, 100)),
     )
-    
+
     app = RandomImageGeneratorApp()
 
 All pydidas apps can be configured at creation in one of three ways:
-      
-    1. By specifrying the :py:data:`parse_func` and using the python argparse 
+
+    1. By specifrying the :py:data:`parse_func` and using the python argparse
     package and sys.argv:
-        
+
     .. code-block::
-    
+
         def app_param_parser(caller=None):
             parser = argparse.ArgumentParser()
             parser.add_argument("-num_images", "-n", help="The number of images")
             parser.add_argument("-image_shape", "-i", help="The image size")
-            _args = dict(vars(parser.parse_args()))
+            _input, _unknown = parser.parse_known_args()
+            _args = dict(vars(_input))
             if _args["num_images"] is not None:
                 _args["num_images"] = int(_args["num_images"])
             if _args["image_shape"] is not None:
@@ -155,7 +156,7 @@ All pydidas apps can be configured at creation in one of three ways:
                     [int(entry) for entry in _args["image_shape"].strip("()").split(",")]
                 )
             return _args
-    
+
         class RandomImageGeneratorApp(pydidas.core.BaseApp):
             default_params = ParameterCollection(
                 Parameter("num_images", int, 50),
@@ -164,11 +165,11 @@ All pydidas apps can be configured at creation in one of three ways:
             parse_func = app_param_parser
 
     With the default sys.argv, the app will initialize with the default values.
-    When the sys.argv arguments have been set, the app will initialize with 
+    When the sys.argv arguments have been set, the app will initialize with
     those:
-    
+
     .. code-block::
-    
+
         >>> import sys
         >>> app = RandomImageGeneratorApp()
         >>> app.get_param_values_as_dict()
@@ -178,11 +179,11 @@ All pydidas apps can be configured at creation in one of three ways:
         >>> app2.get_param_values_as_dict()
         {'num_images': 30, 'image_shape': (25, 50)}
 
-    2. By passing the values for the Parameters as keyword arguments. Without 
-    any keywords, Parameters are created with their default values (see code 
-    block above). Giving the Parameter refkeys as keywords, it is possible to 
+    2. By passing the values for the Parameters as keyword arguments. Without
+    any keywords, Parameters are created with their default values (see code
+    block above). Giving the Parameter refkeys as keywords, it is possible to
     update the Parameter values directly at creation:
-    
+
     .. code-block::
 
         >>> app = RandomImageGeneratorApp()
@@ -192,13 +193,13 @@ All pydidas apps can be configured at creation in one of three ways:
         >>> app.get_param_values_as_dict()
         {'num_images': 20, 'image_shape': (20, 20)}
 
-    3. By sharing Parameters with other objects. One of the key advantages of 
-    using pydidas Parameter for handling app data  is that they are objects 
-    which can be shared between different python objects. Any changes to the 
+    3. By sharing Parameters with other objects. One of the key advantages of
+    using pydidas Parameter for handling app data  is that they are objects
+    which can be shared between different python objects. Any changes to the
     object will be directly available to all linked apps:
-    
+
     .. code-block::
-    
+
         >>> app_1 = RandomImageGeneratorApp()
         >>> num_param = app_1.get_param("num_images")
         >>> app_2 = RandomImageGeneratorApp(num_param)
@@ -207,7 +208,7 @@ All pydidas apps can be configured at creation in one of three ways:
         >>> id(app_2.get_param("num_images"))
         2638563877360
         >>> print(
-        >>>     "Num images: ",    
+        >>>     "Num images: ",
         >>>     app_1.get_param_value("num_images"),
         >>>     app_2.get_param_value("num_images"),
         >>> )
@@ -223,13 +224,13 @@ All pydidas apps can be configured at creation in one of three ways:
 .. note::
 
     The order of precedence (from lowest to highest) is:
-    
+
         - shared Parameters
         - keyword arguments at creation
         - parsed sys.argv arguments
-        
-    This allows the user to set presets in scripts but still change the 
-    behaviour dynamically by changing calling arguments on the command line. 
+
+    This allows the user to set presets in scripts but still change the
+    behaviour dynamically by changing calling arguments on the command line.
 
 
 Running an app
@@ -253,7 +254,7 @@ The run method's definition is given below to demonstrate the exact sequence:
                 _results = self.multiprocessing_func(task)
                 self.multiprocessing_store_results(task, _results)
         self.multiprocessing_post_run()
-        
+
 
 To run an app with parallelization or simple in the background, please refer to
 :ref:`developer_guide_to_multiprocessing`\ .
@@ -265,14 +266,14 @@ Example
 As example, let us extend the RandomImageGeneratorApp to a fully functional app.
 The app will create a random noisy image of the given shape as its core
 function.
-It will utilize a shared memory array to store results to demonstrate how 
+It will utilize a shared memory array to store results to demonstrate how
 master and slave apps interact in multiprocessing.
 Just for demonstration purposes, it will wait for 50 ms for every 5th index
 and fail every 2nd carryon check. These methods will also print some info for
 demonstration:
 
 .. code-block::
-    
+
     import time
     import argparse
     import multiprocessing as mp
@@ -287,7 +288,8 @@ demonstration:
         parser = argparse.ArgumentParser()
         parser.add_argument("-num_images", "-n", help="The number of images")
         parser.add_argument("-image_shape", "-i", help="The image size")
-        _args = dict(vars(parser.parse_args()))
+        _input, _unknown = parser.parse_known_args()
+        _args = dict(vars(_input))
         if _args["num_images"] is not None:
             _args["num_images"] = int(_args["num_images"])
         if _args["image_shape"] is not None:
@@ -416,7 +418,7 @@ the app's :py:data:`results` attribute with random images:
 
     >>> np.where(app.results == 0)
      (array([], dtype=int64), array([], dtype=int64), array([], dtype=int64))
-     
+
 Using the app's shared memory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -424,7 +426,7 @@ To use the app's shared memory, we only need to create a copy of the app (in the
 slave mode). This will allow the two apps to use the joint shared memory:
 
 .. code-block::
-    
+
     >>> app = RandomImageGeneratorApp()
     >>> app.multiprocessing_pre_run()
     >>> app_slave = app.copy(slave_mode=True)
@@ -434,7 +436,7 @@ slave mode). This will allow the two apps to use the joint shared memory:
     >>> # The first buffer has now been used:
     >>> app.shared_index_in_use
     array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    >>> # now, the data from the slave is stored in the shared array and 
+    >>> # now, the data from the slave is stored in the shared array and
     >>> # also accessible by the master app:
     >>> app.shared_array[buffer_index, 0, 0:5]
     array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],

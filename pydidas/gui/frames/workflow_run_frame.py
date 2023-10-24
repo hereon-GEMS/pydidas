@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ processing workflow and visualize the results.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowRunFrame"]
 
 
@@ -37,6 +37,7 @@ from ...core import get_generic_param_collection
 from ...core.utils import pydidas_logger
 from ...multiprocessing import AppRunner
 from ...widgets.dialogues import WarningBox
+from ...widgets.framework import BaseFrameWithApp
 from ...workflow import WorkflowTree
 from ..mixins import ViewResultsMixin
 from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
@@ -46,10 +47,9 @@ TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
-class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
+class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     """
-    The WorkflowRunFrame is used to start processing of the WorkflowTree
-    and visualize the results.
+    A widget for running the ExecuteWorkflowApp  and visualizing the results.
     """
 
     menu_icon = "qta::msc.run-all"
@@ -60,10 +60,11 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         "selected_results", "saving_format", "enable_overwrite"
     )
     params_not_to_restore = ["selected_results"]
+    sig_processing_running = QtCore.Signal(bool)
 
-    def __init__(self, parent=None, **kwargs):
-        WorkflowRunFrameBuilder.__init__(self, parent, **kwargs)
-        _global_plot_update_time = self.q_settings_get_value(
+    def __init__(self, **kwargs: dict):
+        BaseFrameWithApp.__init__(self, **kwargs)
+        _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
         self._config.update(
@@ -77,6 +78,12 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         self._app = ExecuteWorkflowApp()
         self.set_default_params()
         self.add_params(self._app.params)
+
+    def build_frame(self):
+        """
+        Populate the frame with widgets.
+        """
+        WorkflowRunFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """
@@ -98,7 +105,7 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         ViewResultsMixin.__init__(self)
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 
@@ -112,8 +119,8 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         """
         super().frame_activated(index)
         if index == self.frame_index:
-            self._update_choices_of_selected_results()
-            self._update_export_button_activation()
+            self.update_choices_of_selected_results()
+            self.update_export_button_activation()
         self._config["frame_active"] = index == self.frame_index
 
     def __abort_execution(self):
@@ -131,6 +138,7 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         Execute the Application in the chosen type (GUI or command line).
         """
         self._verify_result_shapes_uptodate()
+        self.sig_processing_running.emit(True)
         self._run_app()
 
     def _run_app(self):
@@ -157,7 +165,7 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         self._runner.start()
 
     @staticmethod
-    def _check_tree_is_populated():
+    def _check_tree_is_populated() -> bool:
         """
         Check if the WorkflowTree is populated, i.e. not empty.
 
@@ -222,9 +230,10 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         Perform finishing touches after the processing has terminated.
         """
         self.__set_proc_widget_visibility_for_running(False)
-        self._update_choices_of_selected_results()
+        self.sig_processing_running.emit(False)
+        self.update_choices_of_selected_results()
 
-    def __set_proc_widget_visibility_for_running(self, running):
+    def __set_proc_widget_visibility_for_running(self, running: bool):
         """
         Set the visibility of all widgets which need to be updated for/after
         procesing

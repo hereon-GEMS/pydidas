@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,14 @@ running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ViewResultsFrame"]
 
+
+from typing import Self
 
 from qtpy import QtCore
 
@@ -34,6 +36,7 @@ from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...contexts.scan_context import Scan
 from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
+from ...widgets.framework import BaseFrame
 from ...workflow import WorkflowResults, result_io
 from ...workflow.workflow_tree import _WorkflowTree
 from ..mixins import ViewResultsMixin
@@ -43,7 +46,7 @@ from .builders.view_results_frame_builder import ViewResultsFrameBuilder
 SAVER = result_io.WorkflowResultIoMeta
 
 
-class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
+class ViewResultsFrame(BaseFrame, ViewResultsMixin):
     """
     The ViewResultsFrame is used to import and visualize the pydidas WorkflowResults.
     """
@@ -57,23 +60,29 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
     )
     params_not_to_restore = ["selected_results"]
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, **kwargs: dict) -> Self:
         self._SCAN = Scan()
         self._TREE = _WorkflowTree()
         self._EXP = DiffractionExperiment()
         self._RESULTS = WorkflowResults(
-            scan_context=self._SCAN,
             diffraction_exp_context=self._EXP,
+            scan_context=self._SCAN,
             workflow_tree=self._TREE,
         )
-        ViewResultsFrameBuilder.__init__(self, parent, **kwargs)
+        BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_directory",
             caption="Workflow results directory",
+            dialog_type="open_directory",
+            parent=self,
             qsettings_ref="WorkflowResults__import",
         )
+
+    def build_frame(self):
+        """
+        Build the frame and polulate it with widgets.
+        """
+        ViewResultsFrameBuilder.build_frame(self)
 
     def finalize_ui(self):
         """
@@ -88,7 +97,7 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         )
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 
@@ -100,7 +109,7 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         index : int
             The index of the newly activated frame.
         """
-        super().frame_activated(index)
+        BaseFrame.frame_activated(self, index)
         self._config["frame_active"] = index == self.frame_index
 
     def import_data_to_workflow_results(self):
@@ -112,5 +121,5 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
             self._RESULTS.import_data_from_directory(_dir)
             self._RESULTS._TREE.root.plugin._SCAN = self._RESULTS._SCAN
             self._RESULTS._TREE.root.plugin.update_filename_string()
-            self._update_choices_of_selected_results()
-            self._update_export_button_activation()
+            self.update_choices_of_selected_results()
+            self.update_export_button_activation()

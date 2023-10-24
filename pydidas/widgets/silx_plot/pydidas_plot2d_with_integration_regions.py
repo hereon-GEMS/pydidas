@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,14 @@ PydidasPlot2D with functionality to draw integration regions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasPlot2DwithIntegrationRegions"]
 
+
+from typing import Tuple, Union
 
 import numpy as np
 from qtpy import QtCore
@@ -50,8 +52,8 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
     sig_new_point_selected = QtCore.Signal(float, float)
 
-    def __init__(self, parent=None, backend=None, **kwargs):
-        PydidasPlot2D.__init__(self, parent, backend, **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasPlot2D.__init__(self, **kwargs)
         self._config["overlay_color"] = kwargs.get(
             "overlay_color", PYDIDAS_COLORS["orange"]
         )
@@ -80,7 +82,12 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         """
         self._config["overlay_color"] = PYDIDAS_COLORS[color]
 
-    def draw_circle(self, radius, legend, center=None):
+    def draw_circle(
+        self,
+        radius: float,
+        legend: str,
+        center: Union[None, Tuple[float, float]] = None,
+    ):
         """
         Draw a circle with the given radius and store it as the given legend.
 
@@ -105,7 +112,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             linewidth=2.0,
         )
 
-    def draw_line_from_beamcenter(self, chi, legend):
+    def draw_line_from_beamcenter(self, chi: float, legend: str):
         """
         Draw a line from the beamcenter in the direction given by the angle chi.
 
@@ -141,7 +148,11 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             linewidth=2.0,
         )
 
-    def draw_integration_region(self, radial, azimuthal):
+    def draw_integration_region(
+        self,
+        radial: Union[None, Tuple[float, float]],
+        azimuthal: Union[None, Tuple[float, float]],
+    ):
         """
         Draw the given integration region.
 
@@ -236,7 +247,9 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         )
         self._config["roi_active"] = True
 
-    def _get_included_corners(self, startpoint, endpoint):
+    def _get_included_corners(
+        self, startpoint: Tuple[float, float], endpoint: Tuple[float, float]
+    ):
         """
         Get the corners on the detector outline between startpoint and endpoint.
 
@@ -301,7 +314,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         return _c_x, _c_y
 
     @QtCore.Slot(dict)
-    def _process_plot_signal(self, event_dict):
+    def _process_plot_signal(self, event_dict: dict):
         """
         Process events from the plot and filter and process mouse clicks.
 

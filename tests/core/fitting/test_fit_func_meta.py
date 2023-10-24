@@ -27,10 +27,7 @@ __status__ = "Production"
 import copy
 import unittest
 
-from pydidas.core.fitting import (
-    FitFuncMeta,
-    FitFuncBase,
-)
+from pydidas.core.fitting import FitFuncBase, FitFuncMeta
 
 
 def create_test_class():

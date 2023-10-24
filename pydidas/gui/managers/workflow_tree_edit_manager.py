@@ -29,13 +29,11 @@ __all__ = ["WorkflowTreeEditManager"]
 
 
 import time
-from functools import partial
 
 import numpy as np
-from qtpy import QtCore
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import SingletonFactory
-from ...core.constants import gui_constants
 from ...plugins import PluginCollection
 from ...widgets.workflow_edit import PluginInWorkflowBox
 from ...workflow import PluginPositionNode, WorkflowTree
@@ -58,17 +56,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     """
 
     sig_plugin_selected = QtCore.Signal(int)
-    sig_plugin_to_delete = QtCore.Signal(int)
     sig_plugin_class_selected = QtCore.Signal(str)
     sig_inconsistent_plugins = QtCore.Signal(list)
     sig_consistent_plugins = QtCore.Signal(list)
 
-    pos_x_min = 5
-    pos_y_min = 5
+    PLUGIN_WIDGET_WIDTH = -1
+    PLUGIN_WIDGET_HEIGHT = -1
 
     def __init__(self, qt_canvas=None):
         """
-        Setup the instance.
+        Set up the instance.
 
         Parameters
         ----------
@@ -82,6 +79,13 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_positions = {}
         self._node_widgets = {}
         self._nodes = {}
+        self.__qtapp = QtWidgets.QApplication.instance()
+        self.__qtapp.sig_font_size_changed.connect(self.__app_font_changed)
+        self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
+        self.__app_font_changed()
+        PLUGIN_COLLECTION.sig_updated_plugins.connect(
+            self.__delete_all_nodes_and_widgets
+        )
 
     def update_qt_canvas(self, qt_canvas):
         """
@@ -168,7 +172,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             if TREE.nodes[node_id].parent is None
             else TREE.nodes[node_id].parent.node_id
         )
-        _parent = None if _parent_id is None else self._nodes.get(_parent_id, None)
+        _parent = self._nodes.get(_parent_id, None)
         _node = PluginPositionNode(parent=_parent, node_id=node_id)
         self._nodes[node_id] = _node
         if self.root is None:
@@ -189,13 +193,15 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The plugin label.
         """
         _widget = PluginInWorkflowBox(
-            title, node_id, parent=self.qt_canvas, label=label
+            title,
+            node_id,
+            parent=self.qt_canvas,
+            label=label,
+            standardSize=(self.PLUGIN_WIDGET_WIDTH, self.PLUGIN_WIDGET_HEIGHT),
         )
         _widget.sig_widget_activated.connect(self.set_active_node)
-        _widget.sig_widget_delete_branch_request.connect(
-            partial(self.delete_branch, node_id)
-        )
-        _widget.sig_widget_delete_request.connect(partial(self.delete_node, node_id))
+        _widget.sig_widget_delete_branch_request.connect(self.delete_branch)
+        _widget.sig_widget_delete_request.connect(self.delete_node)
         _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)
         _widget.sig_create_copy_request.connect(self.create_node_copy_request)
         self.sig_consistent_plugins.connect(_widget.receive_consistent_signal)
@@ -245,7 +251,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(plugin_name)()
         TREE.replace_node_plugin(TREE.active_node_id, _plugin)
-        self._node_widgets[TREE.active_node_id].setText(plugin_name)
+        self._node_widgets[TREE.active_node_id].update_plugin(plugin_name)
         self.sig_plugin_selected.emit(TREE.active_node_id)
         self._check_consistency()
 
@@ -260,8 +266,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The node ID to be updated
         label : str
             The new node label.
-        plugin_name : str
-            The plugin class name.
         """
         self._node_widgets[node_id].update_text(node_id, label)
 
@@ -315,16 +319,17 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             return
         _positions = self.root.get_relative_positions()
         _pos_vals = np.asarray(list(_positions.values()))
-        _tree_width = self.root.width
-        _pos_vals[:, 0] += -np.amin(_pos_vals[:, 0]) + self.pos_x_min
-        _pos_vals[:, 1] += -np.amin(_pos_vals[:, 1]) + self.pos_y_min
+        _pos_vals[:, 0] *= self.PLUGIN_WIDGET_WIDTH
+        _pos_vals[:, 1] *= self.PLUGIN_WIDGET_HEIGHT
+        _pos_vals = np.round(_pos_vals).astype(int)
         self._node_positions = {key: _pos_vals[i] for i, key in enumerate(_positions)}
         for node_id in TREE.node_ids:
             self._node_widgets[node_id].move(
                 self._node_positions[node_id][0], self._node_positions[node_id][1]
             )
         self.qt_canvas.setFixedSize(
-            _tree_width + 2 * self.pos_x_min, self.root.height + 2 * self.pos_y_min
+            int(np.round(self.root.width * self.PLUGIN_WIDGET_WIDTH + 10)),
+            int(np.round(self.root.height * self.PLUGIN_WIDGET_HEIGHT + 10)),
         )
         self.__update_node_connections()
 
@@ -338,18 +343,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         node_conns = self.root.get_recursive_connections()
         widget_conns = []
         for node0, node1 in node_conns:
-            x0 = (
-                self._node_positions[node0][0]
-                + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2
-            )
-            y0 = (
-                self._node_positions[node0][1]
-                + gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
-            )
-            x1 = (
-                self._node_positions[node1][0]
-                + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2
-            )
+            x0 = self._node_positions[node0][0] + self.PLUGIN_WIDGET_WIDTH // 2
+            y0 = self._node_positions[node0][1] + self.PLUGIN_WIDGET_HEIGHT
+            x1 = self._node_positions[node1][0] + self.PLUGIN_WIDGET_WIDTH // 2
             y1 = self._node_positions[node1][1]
             widget_conns.append([x0, y0, x1, y1])
         self.qt_canvas.update_widget_connections(widget_conns)
@@ -413,7 +409,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         TREE.delete_node_by_id(node_id)
         self._nodes[node_id].delete_node_references()
         self.__delete_nodes_and_widgets(*_ids)
-        self.sig_plugin_to_delete.emit(node_id)
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
@@ -434,10 +429,15 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         node_id : int
             The node_id if the node to be deleted.
         """
-        TREE.delete_node_by_id(node_id, keep_children=True, recursive=False)
+        if self._nodes[node_id] == self.root and self.root is not None:
+            if self.root.n_children == 0:
+                self.root = None
+            elif self.root.n_children == 1:
+                self.root = self.root.get_children()[0]
         self._nodes[node_id].connect_parent_to_children()
         self.__delete_nodes_and_widgets(node_id)
-        self.sig_plugin_to_delete.emit(node_id)
+        TREE.delete_node_by_id(node_id, keep_children=True, recursive=False)
+
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
@@ -464,7 +464,23 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             del self._node_positions[_id]
         if len(self._nodes) == 0:
             self.root = None
-            self.qt_canvas.update_widget_connections([])
+            if self.qt_canvas is not None:
+                self.qt_canvas.update_widget_connections([])
+
+    @QtCore.Slot()
+    def __app_font_changed(self):
+        """
+        Handle the QApplication's font changed signal and update the widgets.
+        """
+        _font = self.__qtapp.font()
+        _font.setPointSizeF(self.__qtapp.font_size + 1)
+        _metrics = QtGui.QFontMetrics(_font)
+        _rect = _metrics.boundingRect("pyFAI azimuthal integration Test")
+        self.PLUGIN_WIDGET_WIDTH = _width = _rect.width() + 10
+        self.PLUGIN_WIDGET_HEIGHT = _height = int(self.PLUGIN_WIDGET_WIDTH / 4.2)
+        for _widget in self._node_widgets.values():
+            _widget.setFixedSize(QtCore.QSize(_width, _height))
+        self.update_node_positions()
 
 
 WorkflowTreeEditManager = SingletonFactory(_WorkflowTreeEditManager)

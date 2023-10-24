@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ URLs for the documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "DOC_MAKE_DIRECTORY",
     "DOC_HOME_FILENAME",
@@ -40,7 +42,7 @@ import os
 from qtpy import QtCore
 
 
-def doc_qurl_for_window_manual(name):
+def doc_qurl_for_window_manual(name: str) -> QtCore.QUrl:
     """
     Get the QUrl for the window manual html file.
 
@@ -59,7 +61,7 @@ def doc_qurl_for_window_manual(name):
     return _url
 
 
-def doc_filename_for_window_manual(name):
+def doc_filename_for_window_manual(name: str) -> str:
     """
     Get the file system path for the filename of the manual for the given window class.
 
@@ -79,7 +81,7 @@ def doc_filename_for_window_manual(name):
     return os.path.join(_docdir, f"{name}.html")
 
 
-def doc_qurl_for_frame_manual(name):
+def doc_qurl_for_frame_manual(name: str) -> QtCore.QUrl:
     """
     Get the QUrl for the frame manual html.
 
@@ -98,7 +100,7 @@ def doc_qurl_for_frame_manual(name):
     return _url
 
 
-def doc_filename_for_frame_manual(name):
+def doc_filename_for_frame_manual(name: str) -> str:
     """
     Get the file system path for the filename of the frame manual for the given class.
 
@@ -117,7 +119,7 @@ def doc_filename_for_frame_manual(name):
     )
 
 
-def _doc_home_address():
+def _doc_home_address() -> str:
     """
     Get the pydidas documentation home address in a browser-readable format.
 
@@ -131,7 +133,7 @@ def _doc_home_address():
     return _address
 
 
-def _doc_home_filename():
+def _doc_home_filename() -> str:
     """
     Get the filename of the pydidas documentation homepage.
 
@@ -144,7 +146,7 @@ def _doc_home_filename():
     return _docfile
 
 
-def _doc_make_directory():
+def _doc_make_directory() -> str:
     """
     Get the directory with the documentation make files.
 
@@ -159,10 +161,10 @@ def _doc_make_directory():
     return os.path.join(_name, "docs")
 
 
-def _get_doc_home_qurl():
+def _get_doc_home_qurl() -> QtCore.QUrl:
     """
-    Get the full filepath & -name of the index.html for the pydidas
-    documentation.
+    Get the full filepath & -name of the index.html for the pydidas documentation.
+
     Returns
     -------
     url : QtCore.QUrl

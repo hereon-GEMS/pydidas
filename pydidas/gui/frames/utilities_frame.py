@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ Module with the UtilitiesFrame which allows to present and open various utilitie
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["UtilitiesFrame"]
 
 
@@ -32,6 +32,7 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
+from ...widgets.framework import BaseFrame
 from ...widgets.windows import (
     ExportEigerPixelmaskWindow,
     GlobalSettingsWindow,
@@ -43,7 +44,7 @@ from .builders import UtilitiesFrameBuilder
 from .composite_creator_frame import CompositeCreatorFrame
 
 
-class UtilitiesFrame(UtilitiesFrameBuilder):
+class UtilitiesFrame(BaseFrame):
     """
     The UtilitiesFrame allows to open various independent utilities.
     """
@@ -52,8 +53,8 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
     menu_title = "Utilities"
     menu_entry = "Utilities"
 
-    def __init__(self, parent=None, **kwargs):
-        UtilitiesFrameBuilder.__init__(self, parent=parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self._child_windows = {}
         self.__window_counter = 0
         self._add_config_windows()
@@ -68,6 +69,12 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         _frame = UserConfigWindow()
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["user_config"] = _frame
+
+    def build_frame(self):
+        """
+        Build the frame and populate it with widgets.
+        """
+        UtilitiesFrameBuilder.build_frame(self)
 
     def finalize_ui(self):
         """
@@ -100,7 +107,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         )
 
     @QtCore.Slot(object)
-    def create_and_show_temp_window(self, window):
+    def create_and_show_temp_window(self, window: QtWidgets.QWidget):
         """
         Show the given temporary window.
 
@@ -119,7 +126,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         self._child_windows[_name].show()
 
     @QtCore.Slot(object)
-    def create_and_show_frame(self, frame):
+    def create_and_show_frame(self, frame: BaseFrame):
         """
         Show the given frame.
 
@@ -138,7 +145,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         _frame.show()
 
     @QtCore.Slot(str)
-    def show_window(self, name):
+    def show_window(self, name: str):
         """
         Show a separate window.
 
@@ -153,7 +160,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         self._child_windows[name].raise_()
 
     @QtCore.Slot(str)
-    def remove_window_from_children(self, name):
+    def remove_window_from_children(self, name: str):
         """
         Remove the specified window from the list of child window.
 
@@ -163,4 +170,5 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
             The name key for the window.
         """
         if name in self._child_windows:
+            self._child_windows[name].deleteLater()
             del self._child_windows[name]

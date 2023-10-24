@@ -34,14 +34,17 @@ __all__ = [
 ]
 
 
+from typing import Union
+
 import qtawesome
 from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
+from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
-from ..core import PydidasGuiError, utils
+from ..core import PydidasGuiError
+from ..resources import icons
 
 
-def delete_all_items_in_layout(layout):
+def delete_all_items_in_layout(layout: QtWidgets.QLayout):
     """
     Recursively delete items in a QLayout.
 
@@ -53,15 +56,17 @@ def delete_all_items_in_layout(layout):
     if layout is not None:
         while layout.count():
             item = layout.takeAt(0)
+            if item.spacerItem() is not None:
+                layout.removeItem(item)
+            if item.layout() is not None:
+                delete_all_items_in_layout(item.layout())
+                layout.remove(item)
             widget = item.widget()
             if widget is not None:
-                widget.setParent(None)
                 widget.deleteLater()
-            else:
-                delete_all_items_in_layout(item.layout())
 
 
-def create_default_grid_layout():
+def create_default_grid_layout() -> QGridLayout:
     """
     Create a QGridLayout with default parameters.
 
@@ -83,7 +88,7 @@ def create_default_grid_layout():
     return _layout
 
 
-def get_pyqt_icon_from_str(ref_string):
+def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
     """
     Get a QIcon from the reference string.
 
@@ -116,11 +121,11 @@ def get_pyqt_icon_from_str(ref_string):
     if _type == "qta":
         _menu_icon = qtawesome.icon(_ref)
     elif _type == "qt-std":
-        _num = int(_ref)
+        _ref = getattr(QStyle, _ref)
         app = QtWidgets.QApplication.instance()
-        _menu_icon = app.style().standardIcon(_num)
+        _menu_icon = app.style().standardIcon(_ref)
     elif _type == "pydidas":
-        _menu_icon = utils.get_pydidas_qt_icon(_ref)
+        _menu_icon = icons.get_pydidas_qt_icon(_ref)
     elif _type == "path":
         _menu_icon = QtGui.QIcon(_ref)
     else:
@@ -128,7 +133,7 @@ def get_pyqt_icon_from_str(ref_string):
     return _menu_icon
 
 
-def get_max_pixel_width_of_entries(entries):
+def get_max_pixel_width_of_entries(entries: Union[str, tuple, list]) -> int:
     """
     Get the maximum width from a number of entries.
 
@@ -153,7 +158,7 @@ def get_max_pixel_width_of_entries(entries):
     return _width
 
 
-def get_widget_layout_args(parent, **kwargs):
+def get_widget_layout_args(parent: QtWidgets.QWidget, **kwargs: dict):
     """
     Get the arguments for adding a widget to the layout of the parent.
 
@@ -195,7 +200,7 @@ def get_widget_layout_args(parent, **kwargs):
     return [*_grid_pos]
 
 
-def get_grid_pos(parent, **kwargs):
+def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: dict):
     """
     Get the gridPos format from the kwargs or create it.
 
@@ -259,11 +264,9 @@ def update_param_and_widget_choices(param_widget, new_choices):
         _param.choices = None
         _param.value = ""
     else:
-        _param.choices = None
-        _param.value = new_choices[0]
-        _param.choices = new_choices
+        _param.update_value_and_choices(new_choices[0], new_choices)
     param_widget.io_widget.setEnabled(len(new_choices) != 0)
-    with utils.SignalBlocker(param_widget.io_widget):
+    with QtCore.QSignalBlocker(param_widget.io_widget):
         if len(new_choices) == 0:
             param_widget.io_widget.update_choices([""])
             param_widget.io_widget.setCurrentText("")

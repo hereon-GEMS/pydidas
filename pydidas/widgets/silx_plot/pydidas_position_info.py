@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["PydidasPositionInfo"]
 
 
+from typing import Literal
+
 import numpy as np
 from qtpy import QtCore
 from silx.gui.plot.tools import PositionInfo
@@ -49,15 +51,30 @@ class PydidasPositionInfo(PositionInfo):
     """
     A customized silx.gui.plot.PositionInfo which allows to use coordinate
     transformations to display polar coordinates.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Supported keyword arguments are:
+
+            converters : Union[list[tuple[str, Callable]], None], optional
+                The converters for changing the image coordinates. Takes a
+                list of 2-tuples with name to display and conversion function from
+                (x, y) coordinates. The default is None.
+            parent : Union[QWidget, None], optional
+                The parent widget. The default is None.
+            plot : Union[QWidget, None], optional
+                The associated plot instance. The default is None
     """
 
-    def __init__(self, parent=None, plot=None, converters=None, diffraction_exp=None):
-        PositionInfo.__init__(self, parent, plot, converters)
-        self._EXP = (
-            DiffractionExperimentContext()
-            if diffraction_exp is None
-            else diffraction_exp
+    def __init__(self, **kwargs: dict):
+        PositionInfo.__init__(
+            self,
+            plot=kwargs.get("plot", None),
+            converters=kwargs.get("converters", None),
+            parent=kwargs.get("parent", None),
         )
+        self._EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
         self._EXP.sig_params_changed.connect(self.update_exp_setup_params)
         self._x_widget = self.layout().itemAt(0).widget()
         self._y_widget = self.layout().itemAt(2).widget()
@@ -70,14 +87,16 @@ class PydidasPositionInfo(PositionInfo):
         self.update_exp_setup_params()
 
     @QtCore.Slot(str)
-    def new_coordinate_system(self, cs_name):
+    def new_coordinate_system(
+        self, cs_name: Literal["cartesian", "r_chi", "q_chi", "2theta_chi"]
+    ):
         """
         Receive the signal that a new coordinate system has been selected and
         update the interal reference.
 
         Parameters
         ----------
-        cs_name : str
+        cs_name : Literal["cartesian", "r_chi", "q_chi", "2theta_chi"]
             The name of the new coordinate system.
         """
         self._cs_name = cs_name
@@ -102,7 +121,7 @@ class PydidasPositionInfo(PositionInfo):
         self._x_widget.setText(f"<b>{_x_text}:</b>")
         self._y_widget.setText(f"<b>{_y_text}:</b>")
 
-    def update_coordinate_units(self, x_unit, y_unit):
+    def update_coordinate_units(self, x_unit: str, y_unit: str):
         """
         Update the coordinate units in the PositionInfo widget.
 
@@ -137,11 +156,14 @@ class PydidasPositionInfo(PositionInfo):
             _f2dgeo["det_dist"] * 1e-3,
         )
 
-    def _plotEvent(self, event):
+    def _plotEvent(self, event: dict):
         """
         Handle events from the Plot.
 
-        :param dict event: Plot event
+        Parameters
+        ----------
+        event : dict
+            The silx plot event dictionary.
         """
         if event["event"] == "mouseMoved":
             _x, _y = event["x"], event["y"]
@@ -150,15 +172,15 @@ class PydidasPositionInfo(PositionInfo):
             _x_pix, _y_pix = event["xpixel"], event["ypixel"]
             self._updateStatusBar(_coord1, _coord2, _x_pix, _y_pix)
 
-    def pixel_to_cs_cartesian(self, x_pix, y_pix):
+    def pixel_to_cs_cartesian(self, x_pix: float, y_pix: float) -> tuple[float, float]:
         """
         Convert a position in pixels to a position in cartesian data coordinates.
 
         Parameters
         ----------
-        x_pix : int
+        x_pix : float
             The pixel x coordinate.
-        y_pix : int
+        y_pix : float
             The pixel y coordinate.
 
         Returns
@@ -168,15 +190,15 @@ class PydidasPositionInfo(PositionInfo):
         """
         return (x_pix, y_pix)
 
-    def pixel_to_cs_r_chi(self, x_pix, y_pix):
+    def pixel_to_cs_r_chi(self, x_pix: float, y_pix: float) -> tuple[float, float]:
         """
         Convert a position in pixels to a position in radial r, chi coordinates.
 
         Parameters
         ----------
-        x_pix : int
+        x_pix : float
             The pixel x coordinate.
-        y_pix : int
+        y_pix : float
             The pixel y coordinate.
 
         Returns
@@ -190,15 +212,15 @@ class PydidasPositionInfo(PositionInfo):
         _chi = get_chi_from_x_and_y(_x_rel, _y_rel) * 180 / np.pi
         return (_r, _chi)
 
-    def pixel_to_cs_2theta_chi(self, x_pix, y_pix):
+    def pixel_to_cs_2theta_chi(self, x_pix: float, y_pix: float) -> tuple[float, float]:
         """
         Convert a position in pixels to a position in 2-theta, chi data coordinates.
 
         Parameters
         ----------
-        x_pix : int
+        x_pix : float
             The pixel x coordinate.
-        y_pix : int
+        y_pix : float
             The pixel y coordinate.
 
         Returns
@@ -213,15 +235,15 @@ class PydidasPositionInfo(PositionInfo):
         _chi = get_chi_from_x_and_y(_x_rel, _y_rel) * 180 / np.pi
         return (_2theta, _chi)
 
-    def pixel_to_cs_q_chi(self, x_pix, y_pix):
+    def pixel_to_cs_q_chi(self, x_pix: float, y_pix: float) -> tuple[float, float]:
         """
         Convert a position in pixels to a position in data coordinates.
 
         Parameters
         ----------
-        x_pix : int
+        x_pix : float
             The pixel x coordinate.
-        y_pix : int
+        y_pix : float
             The pixel y coordinate.
 
         Returns

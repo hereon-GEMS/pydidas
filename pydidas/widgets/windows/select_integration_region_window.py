@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from ...core import Dataset, UserConfigError, get_generic_param_collection
-from ...core.constants import STANDARD_FONT_SIZE
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from ...core.utils import apply_qt_properties
 from ...data_io import import_data
 from ..controllers import ManuallySetIntegrationRoiController
@@ -50,16 +50,15 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     A pydidas window which allows to open a file
     """
 
-    container_width = ShowIntegrationRoiParamsWidget.widget_width
     default_params = get_generic_param_collection(
         "filename", "hdf5_key", "hdf5_frame", "overlay_color"
     )
     sig_roi_changed = QtCore.Signal()
     sig_about_to_close = QtCore.Signal()
 
-    def __init__(self, plugin, parent=None, **kwargs):
+    def __init__(self, plugin, **kwargs):
         PydidasWindow.__init__(
-            self, parent, title="Select integration region", activate_frame=False
+            self, title="Select integration region", activate_frame=False
         )
         apply_qt_properties(self.layout(), contentsMargins=(10, 10, 10, 10))
 
@@ -67,15 +66,15 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._EXP = plugin._EXP
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
         self.add_params(plugin.params)
-        self._config = self._config | dict(
-            radial_active=False,
-            azimuthal_active=False,
-            beamcenter=self._EXP.beamcenter,
-            det_dist=self._EXP.get_param_value("detector_dist"),
-            rad_unit=self._plugin.get_param_value("rad_unit"),
-            closing_confirmed=False,
-            only_show_roi=kwargs.get("only_show_roi", False),
-        )
+        self._config = self._config | {
+            "azimuthal_active": False,
+            "beamcenter": self._EXP.beamcenter,
+            "closing_confirmed": False,
+            "det_dist": self._EXP.get_param_value("detector_dist"),
+            "only_show_roi": kwargs.get("only_show_roi", False),
+            "radial_active": False,
+            "rad_unit": self._plugin.get_param_value("rad_unit"),
+        }
         self._image = None
         self.frame_activated(self.frame_index)
 
@@ -90,30 +89,30 @@ class SelectIntegrationRegionWindow(PydidasWindow):
                 if self._config["only_show_roi"]
                 else "Select integration region"
             ),
-            fontsize=STANDARD_FONT_SIZE + 1,
-            fixedWidth=self.container_width,
             bold=True,
+            fontsize_offset=1,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         self.create_empty_widget(
             "left_container",
-            fixedWidth=self.container_width,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             minimumHeight=400,
             parent_widget=None,
         )
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
-            widget=self._widgets["left_container"],
-            fixedWidth=self.container_width + 20,
             gridPos=(1, 0, 1, 1),
+            resize_to_widget_width=True,
+            widget=self._widgets["left_container"],
         )
         self.create_spacer(None, fixedWidth=25, gridPos=(1, 1, 1, 1))
         self.add_any_widget(
             "plot",
             PydidasPlot2DwithIntegrationRegions(cs_transform=True),
+            gridPos=(1, 2, 1, 1),
             minimumWidth=700,
             minimumHeight=700,
-            gridPos=(1, 2, 1, 1),
         )
         self.create_spacer(None, parent_widget=self._widgets["left_container"])
         self.create_label(
@@ -122,16 +121,19 @@ class SelectIntegrationRegionWindow(PydidasWindow):
                 "Note: The math for calculating the angles is only defined for "
                 "detectors with square pixels."
             ),
-            parent_widget=self._widgets["left_container"],
-            fontsize=STANDARD_FONT_SIZE,
             bold=True,
+            font_metric_height_factor=2,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            parent_widget=self._widgets["left_container"],
+            wordWrap=True,
         )
         self.create_line(None, parent_widget=self._widgets["left_container"])
         self.create_label(
             "label_file",
             "Select input file:",
+            fontsize_offset=1,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["left_container"],
-            fontsize=STANDARD_FONT_SIZE + 1,
             underline=True,
         )
         self.add_any_widget(
@@ -139,10 +141,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             SelectImageFrameWidget(
                 *self.params.values(),
                 import_reference="SelectIntegrationRegion__import",
-                widget_width=self.container_width,
             ),
             parent_widget=self._widgets["left_container"],
-            fixedWidth=self.container_width,
         )
 
         self.create_line(None, parent_widget=self._widgets["left_container"])
@@ -150,16 +150,14 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.add_any_widget(
             "roi_selector",
             ShowIntegrationRoiParamsWidget(
-                plugin=self._plugin,
                 forced_edit_disable=self._config["only_show_roi"],
+                plugin=self._plugin,
             ),
             parent_widget=self._widgets["left_container"],
         )
         self.create_button(
             "but_confirm",
             "Confirm integration region",
-            fixedWidth=self.container_width,
-            fixedHeight=25,
             parent_widget=self._widgets["left_container"],
         )
         self.create_spacer(None, parent_widget=self._widgets["left_container"])

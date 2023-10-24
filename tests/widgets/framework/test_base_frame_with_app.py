@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
@@ -31,6 +31,11 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core import BaseApp, get_generic_parameter
 from pydidas.widgets.framework import BaseFrameWithApp
+
+
+class DummyRunner:
+    def exit(self):
+        pass
 
 
 class TestClass(QtCore.QObject):
@@ -51,7 +56,9 @@ class TestClass(QtCore.QObject):
 class TestBaseFrameWithApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.q_app = QtWidgets.QApplication([])
+        cls._qtapp = QtWidgets.QApplication.instance()
+        if cls._qtapp is None:
+            cls._qtapp = QtWidgets.QApplication([])
         # cls.widgets = []
 
     @classmethod
@@ -59,7 +66,10 @@ class TestBaseFrameWithApp(unittest.TestCase):
         # while cls.widgets:
         #     w = cls.widgets.pop()
         #     w.deleteLater()
-        cls.q_app.quit()
+        cls._qtapp.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def setUp(self):
         self.tester = TestClass()
@@ -121,7 +131,7 @@ class TestBaseFrameWithApp(unittest.TestCase):
 
     def test_apprunner_finished(self):
         obj = self.get_base_frame_with_app()
-        obj._runner = True
+        obj._runner = DummyRunner()
         self.tester.simple_signal.connect(obj._apprunner_finished)
         self.tester.simple_signal.emit()
         self.assertIsNone(obj._runner)

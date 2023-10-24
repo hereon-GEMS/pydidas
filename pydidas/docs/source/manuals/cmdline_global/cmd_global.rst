@@ -182,12 +182,12 @@ PluginCollection
 ^^^^^^^^^^^^^^^^
 
 pydidas uses a global 
-:py:class:`PluginCollection <pydidas.plugins.plugin_collection._PluginCollection>` 
+:py:class:`PluginCollection <pydidas.plugins.plugin_collection.PluginRegistry>` 
 to manage all known plugins. Plugins will be discovered based on known plugin 
 paths which are managed persistently in the PluginCollection using Qt's 
 QSettings which use the systems registry and are platform-independent. A 
 reference to the persistent :py:class:`PluginCollection 
-<pydidas.plugins.plugin_collection._PluginCollection>` object can be obtained 
+<pydidas.plugins.plugin_collection.PluginRegistry>` object can be obtained 
 using:
 
 .. code-block::
@@ -198,7 +198,7 @@ using:
 .. note::
     For the full documentation of all available methods, please refer to the 
     class documentation:
-    :py:class:`PluginCollection <pydidas.plugins.plugin_collection._PluginCollection>` 
+    :py:class:`PluginCollection <pydidas.plugins.plugin_collection.PluginRegistry>` 
     This section handles only the most common use cases.
 
 Management of stored paths
@@ -206,29 +206,29 @@ Management of stored paths
 
 Paths can be managed by three methods. New paths can be added using the 
 :py:meth:`find_and_register_plugins 
-<pydidas.plugins.plugin_collection._PluginCollection.find_and_register_plugins>` 
+<pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins>` 
 method and a list of all currently registered paths can be obtained by the 
 :py:meth:`get_all_registered_paths 
-<pydidas.plugins.plugin_collection._PluginCollection.get_all_registered_paths>` 
+<pydidas.plugins.plugin_collection.PluginRegistry.get_all_registered_paths>` 
 method. To permanently remove all stored paths, a user can use the 
 :py:meth:`clear_qsettings 
-<pydidas.plugins.plugin_collection._PluginCollection.clear_qsettings>` 
+<pydidas.plugins.plugin_collection.PluginRegistry.clear_qsettings>` 
 method. To remove all stored paths and plugins from the current instance, use
 the 
 :py:meth:`clear_collection 
-<pydidas.plugins.plugin_collection._PluginCollection.clear_collection>` method. 
+<pydidas.plugins.plugin_collection.PluginRegistry.clear_collection>` method. 
 This method must be called with a :py:data:`True` flag to take effect and is 
 ignored otherwise.
 
 .. Warning::
     Using the :py:meth:`clear_qsettings 
-    <pydidas.plugins.plugin_collection._PluginCollection.clear_qsettings>` 
+    <pydidas.plugins.plugin_collection.PluginRegistry.clear_qsettings>` 
     method will remove all paths which have ever been registered and the user is 
     responsible to add all new paths again.
     
     Also, calling this method will **not** remove known plugins from the current
     instance. If desired, this must be done using the :py:meth:`clear_collection 
-    <pydidas.plugins.plugin_collection._PluginCollection.clear_collection>` 
+    <pydidas.plugins.plugin_collection.PluginRegistry.clear_collection>` 
     method.
 
 An example of the use of stored paths is given below.
@@ -325,13 +325,13 @@ Finding and getting a plugin
 
 Plugins can either be found by their class name using the 
 :py:meth:`get_plugin_by_name 
-<pydidas.plugins.plugin_collection._PluginCollection.get_plugin_by_name>` 
+<pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name>` 
 method or by their plugin name using the 
 :py:meth:`get_plugin_by_plugin_name 
-<pydidas.plugins.plugin_collection._PluginCollection.get_plugin_by_plugin_name>` 
+<pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_plugin_name>` 
 method. A list of all available plugin class names can be obtained with the 
 :py:meth:`get_all_plugin_names 
-<pydidas.plugins.plugin_collection._PluginCollection.get_all_plugin_names>` 
+<pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names>` 
 method.
 
 .. code-block::

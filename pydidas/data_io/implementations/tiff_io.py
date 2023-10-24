@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,19 +20,23 @@ Module with the TiffIo class for importing and exporting tiff data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
+
 import warnings
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 from skimage.io import imread, imsave
+from tifffile import TiffFileError
 
+from ...core import Dataset, UserConfigError
 from ...core.constants import TIFF_EXTENSIONS
-from ...core import Dataset
 from .io_base import IoBase
 
 
@@ -43,7 +49,7 @@ class TiffIo(IoBase):
     dimensions = [2]
 
     @classmethod
-    def import_from_file(cls, filename, **kwargs):
+    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
         """
         Read data from a tiff file.
 
@@ -69,12 +75,20 @@ class TiffIo(IoBase):
         data : pydidas.core.Dataset
             The data in form of a pydidas Dataset (with embedded metadata)
         """
-        _data = imread(filename)
+        try:
+            _data = imread(filename)
+        except TiffFileError as _error:
+            raise UserConfigError(
+                f"Failed to load tiff image {filename}!\n\nOriginal exception: {_error}"
+            )
+
         cls._data = Dataset(_data)
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(cls, filename, data, **kwargs):
+    def export_to_file(
+        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
+    ):
         """
         Export data to a tiff file.
 

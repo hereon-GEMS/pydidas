@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,10 +20,10 @@ Module with the InputPlugin base class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["InputPlugin"]
 
 import os
@@ -31,7 +31,7 @@ import os
 import numpy as np
 
 from ..contexts import ScanContext
-from ..core import UserConfigError, get_generic_parameter
+from ..core import Dataset, UserConfigError, get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
 from ..managers import ImageMetadataManager
 from .base_plugin import BasePlugin
@@ -70,7 +70,7 @@ class InputPlugin(BasePlugin):
         "binning",
     ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         """
         Create BasicPlugin instance.
         """
@@ -78,6 +78,7 @@ class InputPlugin(BasePlugin):
         self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
         self.__setup_image_magedata_manager()
+        self._original_input_shape = None
 
     def __setup_image_magedata_manager(self):
         """
@@ -87,17 +88,9 @@ class InputPlugin(BasePlugin):
         The shape of the final image is required to determine the shape of
         the processed data in the WorkflowTree.
         """
-        _metadata_params = [
-            self.get_param(key)
-            for key in [
-                "use_roi",
-                "roi_xlow",
-                "roi_xhigh",
-                "roi_ylow",
-                "roi_yhigh",
-                "binning",
-            ]
-        ]
+        _metadata_params = self.get_params(
+            "use_roi", "roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh", "binning"
+        )
         if "hdf5_key" in self.params:
             _metadata_params.append(self.get_param("hdf5_key"))
         self._image_metadata = ImageMetadataManager(*_metadata_params)
@@ -123,7 +116,7 @@ class InputPlugin(BasePlugin):
         """
         self._config["file_size"] = self.get_first_file_size()
 
-    def get_first_file_size(self):
+    def get_first_file_size(self) -> int:
         """
         Get the size of the first file to be processed.
 
@@ -136,7 +129,7 @@ class InputPlugin(BasePlugin):
         self._config["file_size"] = os.stat(_fname).st_size
         return self._config["file_size"]
 
-    def input_available(self, index):
+    def input_available(self, index: int) -> bool:
         """
         Check whether a new input file is available.
 
@@ -164,11 +157,13 @@ class InputPlugin(BasePlugin):
         """
         self.update_filename_string()
         self._image_metadata.update(filename=self.get_filename(0))
+        if self._original_input_shape is None:
+            self.calculate_result_shape()
         self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
         self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
         self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
 
-    def get_filename(self, frame_index):
+    def get_filename(self, frame_index: int) -> str:
         """
         Get the filename of the file associated with the frame index.
 
@@ -205,7 +200,7 @@ class InputPlugin(BasePlugin):
             "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
         )
 
-    def execute(self, index, **kwargs):
+    def execute(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Import the data and pass it on after (optionally) handling image multiplicity.
 
@@ -220,27 +215,56 @@ class InputPlugin(BasePlugin):
         -------
         pydidas.core.Dataset
             The image data frame.
+        kwargs : dict
+            The updated kwargs.
         """
         if "n_multi" not in self._config:
             raise UserConfigError(
                 "Calling plugin execution without prior pre-execution is not allowed."
             )
-        _data = None
-        if "roi" not in kwargs and self.get_param_value("use_roi"):
-            kwargs["roi"] = self._image_metadata.roi
+        self.update_required_kwargs(kwargs)
+        if self._config["n_multi"] == 1:
+            _data, kwargs = self.get_frame(index, **kwargs)
+            _data.data_label = self.output_data_label
+            _data.data_unit = self.output_data_unit
+            return _data, kwargs
+        return self.handle_multi_image(index, **kwargs)
+
+    def handle_multi_image(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+        """
+        Handle frames with an image multiplicity.
+
+        Parameters
+        ----------
+        index : int
+            The scan index.
+        **kwargs : dict
+            Keyword arguments for the get_frame method.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The image data frame.
+        kwargs : dict
+            The updated kwargs.
+        """
         _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
+        _handling = self._SCAN.get_param_value("scan_multi_image_handling")
+        _factor = self._config["n_multi"] if _handling == "Average" else 1
+        _data = Dataset(np.zeros(self._original_input_shape, dtype=np.float32))
         for _frame_index in _frames:
-            if _data is None:
-                _data, kwargs = self.get_frame(_frame_index, **kwargs)
+            _tmp_data, kwargs = self.get_frame(_frame_index, **kwargs)
+            if _handling == "Maximum":
+                np.maximum(_data, _tmp_data, out=_data)
             else:
-                _data += self.get_frame(_frame_index, **kwargs)[0]
-        if self._SCAN.get_param_value("scan_multi_image_handling") == "Average":
-            _data = _data / self._config["n_multi"]
+                _data += _tmp_data / _factor
         if _frames.size > 1:
             kwargs["frames"] = _frames
+        _data.data_label = self.output_data_label
+        _data.data_unit = self.output_data_unit
         return _data, kwargs
 
-    def get_frame(self, frame_index, **kwargs):
+    def get_frame(self, frame_index: int, **kwargs: dict) -> Dataset:
         """
         Get the specified image frame (which does not necessarily correspond to the
         scan point index).
@@ -258,3 +282,10 @@ class InputPlugin(BasePlugin):
             The image data frame.
         """
         raise NotImplementedError
+
+    def update_required_kwargs(self, kwargs: dict):
+        """
+        Update the kwargs dict in place.
+        """
+        if "roi" not in kwargs and self.get_param_value("use_roi"):
+            kwargs["roi"] = self._image_metadata.roi

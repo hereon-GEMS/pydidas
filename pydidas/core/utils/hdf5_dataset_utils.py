@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ a list of all dataset keys which fulfill certain filter criteria.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "hdf5_dataset_check",
     "get_hdf5_populated_dataset_keys",
@@ -35,12 +35,14 @@ __all__ = [
     "is_hdf5_filename",
 ]
 
-import os
-import pathlib
 
-import numpy as np
+import os
+from collections.abc import Iterable
+from pathlib import Path
+from typing import List, Literal, Tuple, Union
+
 import h5py
-import hdf5plugin
+import numpy as np
 
 from ..constants import HDF5_EXTENSIONS
 from ..dataset import Dataset
@@ -48,8 +50,13 @@ from .file_utils import get_extension
 
 
 def get_hdf5_populated_dataset_keys(
-    item, min_size=50, min_dim=3, file_ref=None, ignore_keys=None
-):
+    item: Union[str, Path, h5py.File, h5py.Group, h5py.Dataset],
+    min_size: int = 50,
+    min_dim: int = 3,
+    max_dim: Union[int, None] = None,
+    file_ref: Union[h5py.File, None] = None,
+    ignore_keys: Union[list, None] = None,
+) -> List[str]:
     """
     Get the dataset keys of all datasets that match the conditions.
 
@@ -62,7 +69,7 @@ def get_hdf5_populated_dataset_keys(
 
     Parameters
     ----------
-    item : Union[str, h5py.File, h5py.Group, h5py.Dataset]
+    item : Union[str, Path, h5py.File, h5py.Group, h5py.Dataset]
         The item to be checked recursively. A str will be interpreted as
         filepath to the Hdf5 file.
     min_size : int, optional
@@ -71,7 +78,9 @@ def get_hdf5_populated_dataset_keys(
     min_dim : int, optional
         The minimum dimensionality of the dataset. Allowed entries are
         between 0 and 3. The default is 3.
-    file_ref : h5py.File reference, optional
+    max_dim : Union[int, None], optional
+        The maximum dimension of the dataset.
+    file_ref : Union[h5py.File, None], optional
         A reference to the base hdf5 file. This information is used to
         detect external datasets. If not specified, this information will
         be queried from the base calling parameter <item>. The default is None.
@@ -90,21 +99,20 @@ def get_hdf5_populated_dataset_keys(
 
     Returns
     -------
-    list
+    List[str]
         A list with all dataset keys which correspond to the filter criteria.
     """
-    _close_on_exit = False
+    _close_on_exit = isinstance(item, (str, Path))
     _ignore = ignore_keys if ignore_keys is not None else []
-    # return in case of a dataset
+
     if isinstance(item, h5py.Dataset):
-        if hdf5_dataset_check(item, min_size, min_dim, _ignore):
+        if hdf5_dataset_check(item, min_size, min_dim, max_dim, _ignore):
             return [item.name]
         return []
 
-    if isinstance(item, (str, pathlib.Path)):
+    if isinstance(item, (str, Path)):
         _hdf5_filename_check(item)
         item = h5py.File(item, "r")
-        _close_on_exit = True
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
     _datasets = []
@@ -116,28 +124,28 @@ def get_hdf5_populated_dataset_keys(
         # if file_ref == _item.file, this is a local dataset.
         if file_ref == _item.file:
             _datasets += get_hdf5_populated_dataset_keys(
-                item[key], min_size, min_dim, file_ref, _ignore
+                item[key], min_size, min_dim, max_dim, file_ref, _ignore
             )
         else:
-            if hdf5_dataset_check(_item, min_size, min_dim, _ignore):
+            if hdf5_dataset_check(_item, min_size, min_dim, max_dim, _ignore):
                 _datasets += [f"{item.name}/{key}"]
             if isinstance(_item, (h5py.File, h5py.Group)):
                 raise KeyError(
-                    'External link to hdf5.Group detected: "{item.name}/{key}'
-                    '". Cannot follow the link. Aborting ...'
+                    "Detected an external link to an hdf5.Group which cannot "
+                    f"be followed: {item.name}/{key}."
                 )
     if _close_on_exit:
         item.close()
     return _datasets
 
 
-def is_hdf5_filename(filename):
+def is_hdf5_filename(filename: Union[Path, str]) -> bool:
     """
     Check whether the given filename has an hdf5 extension.
 
     Parameters
     ----------
-    filename : Union[pathlib.Path, str]
+    filename : Union[Path, str]
         The filename to check.
 
     Returns
@@ -148,13 +156,13 @@ def is_hdf5_filename(filename):
     return get_extension(filename) in HDF5_EXTENSIONS
 
 
-def _hdf5_filename_check(item):
+def _hdf5_filename_check(item: Union[Path, str]):
     """
     Check that a specified filename is okay and points to an existing file.
 
     Parameters
     ----------
-    item : Union[str, pathlib.Path]
+    item : Union[str, Path]
         The filename.
 
     Raises
@@ -172,10 +180,15 @@ def _hdf5_filename_check(item):
         raise FileNotFoundError(f'The specified file "{item}" does not exist.')
 
 
-def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):
+def hdf5_dataset_check(
+    item: object,
+    min_size: int = 50,
+    min_dim: int = 3,
+    max_dim: Union[int, None] = None,
+    to_ignore: tuple = (),
+) -> bool:
     """
-    Check if an h5py item is a dataset which corresponds to the filter
-    criteria.
+    Check if an h5py item is a dataset which corresponds to the filter criteria.
 
     This function checks if an item is an instance of :py:class:`h5py.Dataset`
     and if it fulfills the defined filtering criteria for minimum data size,
@@ -191,6 +204,8 @@ def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):
         dataset, not the size along any one dimension. The default is 50.
     min_dim : int, optional
         The minimum dimensionality of the item. The default is 3.
+    max_dim : Union[list, None], optional
+        The maximum acceptable dimension of the Dataset.
     to_ignore : Union[list, tuple], optional
         A list or tuple of strings. If the dataset key starts with any
         of the entries, the dataset is ignored. The default is ().
@@ -208,11 +223,13 @@ def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):
         and item.size >= min_size
         and not item.name.startswith(tuple(to_ignore))
     ):
-        return True
+        return max_dim is None or len(item.shape) <= max_dim
     return False
 
 
-def _get_hdf5_file_and_dataset_names(fname, dset=None):
+def _get_hdf5_file_and_dataset_names(
+    fname: Union[Path, str], dset: Union[str, None] = None
+) -> Tuple[str]:
     """
     Get the name of the file and an hdf5 dataset.
 
@@ -222,9 +239,9 @@ def _get_hdf5_file_and_dataset_names(fname, dset=None):
 
     Parameters
     ----------
-    fname : Union[str, pathlib.Path]
+    fname : Union[str, Path]
         The filepath or path to filename and dataset.
-    dset : str, optional
+    dset : Union[str, None], optional
         The optional dataset key, if not specified in the fname.
         The default is None.
 
@@ -233,7 +250,7 @@ def _get_hdf5_file_and_dataset_names(fname, dset=None):
     KeyError
         If the dataset has not been specified.
     TypeError
-        If fname is not of type str or pathlib.Path.
+        If fname is not of type str or Path.
 
     Returns
     -------
@@ -242,9 +259,9 @@ def _get_hdf5_file_and_dataset_names(fname, dset=None):
     dset : str
         The internal path to the dataset.
     """
-    fname = str(fname) if isinstance(fname, pathlib.Path) else fname
+    fname = str(fname) if isinstance(fname, Path) else fname
     if not isinstance(fname, str):
-        raise TypeError("The path must be specified as string or pathlib.Path")
+        raise TypeError("The path must be specified as string or Path")
     if fname.find("://") > 0:
         fname, dset = fname.split("://")
     if dset is None:
@@ -252,7 +269,11 @@ def _get_hdf5_file_and_dataset_names(fname, dset=None):
     return fname, dset
 
 
-def get_hdf5_metadata(fname, meta, dset=None):
+def get_hdf5_metadata(
+    fname: Union[str, Path],
+    meta: Union[Iterable[str], Literal["dtype", "shape", "size", "ndim", "nbytes"]],
+    dset: Union[str, None] = None,
+) -> Union[dict, object]:
     """
     Get metadata about an hdf5 dataset.
 
@@ -264,19 +285,18 @@ def get_hdf5_metadata(fname, meta, dset=None):
 
     Parameters
     ----------
-    fname : Union[str, pathlib.Path]
+    fname : Union[str, Path]
         The filepath or path to filename and dataset.
-    meta : Union[str, iterable]
+    meta : Union[Iterable[str], Literal["dtype", "shape", "size", "ndim", "nbytes"]]
         The metadata item(s). Accepted values are either an iterable (list or
-        tuple) of entries or a single string of the following: "dtype",
-        "shape", "size", "ndim" or "nbytes".
-    dset : str, optional
+        tuple) of entries or a single string of the given literal values.
+    dset : Union[str, None], optional
         The optional dataset key, if not specified in the fname.
         The default is None.
 
     Returns
     -------
-    meta : dict or type
+    meta : Union[dict, object]
         The return value. If exactly one metadata information has been
         requested, this information is returned directly. If more
         than one piece of information has been requested, a dictionary with
@@ -303,7 +323,12 @@ def get_hdf5_metadata(fname, meta, dset=None):
     return _results
 
 
-def create_hdf5_dataset(origin, group, dset_name, **dset_kws):
+def create_hdf5_dataset(
+    origin: Union[h5py.File, h5py.Group],
+    group: Union[str, None],
+    dset_name: str,
+    **dset_kws: dict,
+):
     """
     Create an hdf5 dataset at the specified location.
 
@@ -337,7 +362,7 @@ def create_hdf5_dataset(origin, group, dset_name, **dset_kws):
     _group.create_dataset(dset_name, **dset_kws)
 
 
-def convert_data_for_writing_to_hdf5_dataset(data):
+def convert_data_for_writing_to_hdf5_dataset(data: object) -> object:
     """
     Convert specific datatypes which cannot be written directly with hdf5.
 
@@ -357,8 +382,11 @@ def convert_data_for_writing_to_hdf5_dataset(data):
 
 
 def read_and_decode_hdf5_dataset(
-    h5object, group=None, dataset=None, return_dataset=True
-):
+    h5object: Union[h5py.Dataset, h5py.File],
+    group: Union[None, str] = None,
+    dataset: Union[h5py.Dataset, None] = None,
+    return_dataset: bool = True,
+) -> object:
     """
     Read and decode hdf5 dataset.
 

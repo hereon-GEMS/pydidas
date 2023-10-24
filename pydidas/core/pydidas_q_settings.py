@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,14 +21,17 @@ modify the globally stored QSettings for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasQsettings"]
 
-from .pydidas_q_settings_mixin import PydidasQsettingsMixin
+
+from typing import Union
+
 from ..version import VERSION
+from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class PydidasQsettings(PydidasQsettingsMixin):
@@ -45,7 +50,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         for _key, _val in _sets.items():
             print(f"{_key}: {_val}")
 
-    def get_all_stored_q_settings(self):
+    def get_all_stored_q_settings(self) -> dict:
         """
         Get all stored QSettings values as a dictionary.
 
@@ -57,7 +62,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         _keys = self.q_settings.allKeys()
         return {_key: self.q_settings.value(_key) for _key in _keys}
 
-    def set_value(self, key, val):
+    def set_value(self, key: str, val: object):
         """
         Set the value of a QSettings key.
 
@@ -70,7 +75,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         """
         self.q_settings.setValue(f"{VERSION}/{key}", val)
 
-    def value(self, key, dtype=None):
+    def value(self, key: dict, dtype: Union[None, type] = None) -> object:
         """
         Get the value from a QSetting key.
 
@@ -91,4 +96,4 @@ class PydidasQsettings(PydidasQsettingsMixin):
             The value, converted to the type associated with the Parameter
             referenced by param_key or dtype, if given.
         """
-        return self.q_settings_get_value(key, dtype)
+        return self.q_settings_get(key, dtype)

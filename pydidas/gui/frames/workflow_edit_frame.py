@@ -34,6 +34,7 @@ from qtpy import QtCore, QtWidgets
 
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
+from ...widgets.framework import BaseFrame
 from ...workflow import WorkflowTree
 from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
 from ..managers import WorkflowTreeEditManager
@@ -46,10 +47,13 @@ WORKFLOW_EDIT_MANAGER = WorkflowTreeEditManager()
 
 
 @QtCore.Slot(int, str)
-def workflow_add_plugin_at_parent(parent_id, name):
+def workflow_add_plugin_at_parent(parent_id: int, name: str):
     """
-    Get the signal that a new Plugin has been selected and must be added
-    to the WorkflowTree and forward it to the WorkflowTreeEditManager.
+    Add a plugin to the given parent node.
+
+    This function handles the signal that a new Plugin has been selected and
+    must be added to the WorkflowTree and forwards the signal to the
+    WorkflowTreeEditManager.
 
     Parameters
     ----------
@@ -65,7 +69,7 @@ def workflow_add_plugin_at_parent(parent_id, name):
     WORKFLOW_EDIT_MANAGER.add_new_plugin_node(name, parent_node_id=parent_id)
 
 
-class WorkflowEditFrame(WorkflowEditFrameBuilder):
+class WorkflowEditFrame(BaseFrame):
     """
     The WorkflowEditFrame includes three major objects:
         a. The editing canvas which shows the WorkflowTree structure.
@@ -80,8 +84,8 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
     menu_icon = "pydidas::frame_icon_workflow_edit.png"
     sig_workflow_edit_frame_activated = QtCore.Signal()
 
-    def __init__(self, parent=None, **kwargs):
-        WorkflowEditFrameBuilder.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -97,6 +101,13 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             default_extension="yaml",
             qsettings_ref="WorkflowEditFrame__export",
         )
+        self.__qtapp = QtWidgets.QApplication.instance()
+
+    def build_frame(self):
+        """
+        Build the frame and create all widgets.
+        """
+        WorkflowEditFrameBuilder.populate_frame(self)
 
     def connect_signals(self):
         """
@@ -122,7 +133,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
 
     @QtCore.Slot(int)
-    def configure_plugin(self, node_id):
+    def configure_plugin(self, node_id: int):
         """
         Get the signal that a new Plugin has been selected to be edited and
         pass the information to the PluginEditCanvas.
@@ -164,7 +175,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         TREE.import_from_file(_fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
-    def export_state(self):
+    def export_state(self) -> tuple[int, dict]:
         """
         Export the state of the Frame for saving.
 
@@ -182,7 +193,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         }
         return (self.frame_index, {"params": _params, "widgets": _widgets})
 
-    def restore_state(self, state):
+    def restore_state(self, state: dict):
         """
         Restore the frame's state from stored information.
 
@@ -197,16 +208,12 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
-        if not self._config["built"]:
-            self._config["state"] = state
-            return
-        super().restore_state(state)
-        for _key, _coords in state["widgets"].items():
-            self._widgets[_key].setGeometry(*_coords)
-        WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
+        BaseFrame.restore_state(self, state)
+        if self._config["built"]:
+            WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 
@@ -218,7 +225,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         index : int
             The index of the newly activated frame.
         """
-        super().frame_activated(index)
+        BaseFrame.frame_activated(self, index)
         if self.frame_index == index:
             WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 

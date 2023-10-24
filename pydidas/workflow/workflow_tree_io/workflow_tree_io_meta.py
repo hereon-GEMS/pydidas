@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,20 +14,28 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
 Module with the WorkflowTreeIoMeta class which is used for creating
 exporter/importer classes and registering them.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowTreeIoMeta"]
+
+
+from pathlib import Path
+from typing import NewType, Union
 
 from ...core.io_registry import GenericIoMeta
 from ...core.utils import get_extension
+
+
+WorkflowTree = NewType("WWorkflowTree", type)
 
 
 class WorkflowTreeIoMeta(GenericIoMeta):
@@ -39,14 +49,15 @@ class WorkflowTreeIoMeta(GenericIoMeta):
     registry = {}
 
     @classmethod
-    def export_to_file(cls, filename, tree, **kwargs):
+    def export_to_file(
+        cls, filename: Union[Path, str], tree: WorkflowTree, **kwargs: dict
+    ):
         """
-        Call the concrete export_to_file method in the subclass registered
-        to the extension of the filename.
+        Call the export_to_file method associated with extension of the filename.
 
         Parameters
         ----------
-        filename : str
+        filename : Union[Path, str]
             The full filename and path.
         tree : pydidas.workflow.WorkflowTree
             The instance of the WorkflowTree
@@ -59,14 +70,14 @@ class WorkflowTreeIoMeta(GenericIoMeta):
         _io_class.export_to_file(filename, tree, **kwargs)
 
     @classmethod
-    def import_from_file(cls, filename):
+    def import_from_file(cls, filename: Union[Path, str]) -> WorkflowTree:
         """
         Call the concrete import_from_file method in the subclass registered
         to the extension of the filename.
 
         Parameters
         ----------
-        filename : str
+        filename : Union[Path, str]
             The full filename and path.
 
         Returns

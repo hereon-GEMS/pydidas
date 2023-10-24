@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,25 +14,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-
 """
 The core package defines base classes used throughout the full pydidas
 suite.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 # import sub-packages:
 from . import constants
+from . import generic_params
 from . import io_registry
 from . import utils
 
-__all__.extend(["constants", "io_registry", "utils"])
+__all__.extend(["constants", "generic_params", "io_registry", "utils"])
 
 # import __all__ items from modules:
 from .base_app import *
@@ -42,7 +44,6 @@ from .object_with_parameter_collection import *
 from .parameter import *
 from .parameter_collection import *
 from .parameter_collection_mixin import *
-from .pydidas_qapp import *
 from .pydidas_q_settings import *
 from .pydidas_q_settings_mixin import *
 from .singleton_factory import *
@@ -98,11 +99,6 @@ from . import singleton_factory
 
 __all__.extend(singleton_factory.__all__)
 del singleton_factory
-
-from . import pydidas_qapp
-
-__all__.extend(pydidas_qapp.__all__)
-del pydidas_qapp
 
 from . import pydidas_q_settings
 

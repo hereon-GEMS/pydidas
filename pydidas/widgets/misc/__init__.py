@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,18 +20,17 @@ Package with miscellaneous individual QWidgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 # import __all__ items from modules:
 from .line_edit_with_icon import *
-from .point_position_table_widget import *
+from .points_for_beamcenter_widget import *
 from .select_image_frame_widget import *
-from .show_information_for_result import *
 from .show_integration_roi_params_widget import *
 from .read_only_text_widget import *
 
@@ -42,20 +41,15 @@ from . import line_edit_with_icon
 __all__.extend(line_edit_with_icon.__all__)
 del line_edit_with_icon
 
-from . import point_position_table_widget
+from . import points_for_beamcenter_widget
 
-__all__.extend(point_position_table_widget.__all__)
-del point_position_table_widget
+__all__.extend(points_for_beamcenter_widget.__all__)
+del points_for_beamcenter_widget
 
 from . import select_image_frame_widget
 
 __all__.extend(select_image_frame_widget.__all__)
 del select_image_frame_widget
-
-from . import show_information_for_result
-
-__all__.extend(show_information_for_result.__all__)
-del show_information_for_result
 
 from . import show_integration_roi_params_widget
 

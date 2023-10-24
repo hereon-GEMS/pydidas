@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,28 +21,29 @@ for testing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DummyPluginCollection"]
+
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.plugins.plugin_collection import _PluginCollection
+from pydidas.plugins.plugin_collection import PluginRegistry
 from pydidas.unittest_objects.create_dummy_plugins import create_plugin_class
 
 
-class DummyPluginCollection(_PluginCollection):
+class DummyPluginCollection(PluginRegistry):
     """
     Create a unique DummyPluginCollection with a defined path and a number
     of random plugins.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         kwargs["plugin_path"] = kwargs.get("plugin_path", [])
         super().__init__(**kwargs)
         _nplugins = kwargs.get("n_plugins", 21)
         for num in range(_nplugins):
             _class = create_plugin_class(num % 3, number=num // 3)
-            self._PluginCollection__add_new_class(_class)
+            self._PluginRegistry__add_new_class(_class)

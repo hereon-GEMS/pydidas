@@ -27,7 +27,8 @@ __status__ = "Production"
 __all__ = ["PydidasImageView"]
 
 
-from qtpy import QtCore
+from numpy import ndarray
+from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot import ImageView, Plot2D, tools
 from silx.utils.weakref import WeakMethodProxy
@@ -53,12 +54,28 @@ DIFFRACTION_EXP = DiffractionExperimentContext()
 class PydidasImageView(ImageView, PydidasQsettingsMixin):
     """
     A customized silx.gui.plot.ImageView with an additional configuration.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Supported keyword arguments are:
+
+        parent : Union[QWidget, None], optional
+            The parent widget or None for no parent. The default is None.
+        backend : Union[None, silx.gui.plot.backends.BackendBase], optional
+            The silx backend to use. If None, this defaults to the standard
+            silx settings. The default is None.
+        show_cs_transform : bool, optional
+            Flag whether to show the coordinate transform action. The default
+            is True.
     """
 
     _getImageValue = Plot2D._getImageValue
 
-    def __init__(self, parent=None, backend=None, show_cs_transform=True):
-        ImageView.__init__(self, parent, backend)
+    def __init__(self, **kwargs: dict):
+        ImageView.__init__(
+            self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
+        )
         PydidasQsettingsMixin.__init__(self)
 
         posInfo = [
@@ -85,7 +102,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
             self.keepDataAspectRatioAction, self.autoscaleToMeanAndThreeSigmaAction
         )
 
-        if show_cs_transform:
+        if kwargs.get("show_cs_transform", True):
             self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
             self._toolbar.addWidget(self.cs_transform)
         else:
@@ -95,7 +112,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
 
         _position_widget = PydidasPositionInfo(plot=self, converters=posInfo)
         _position_widget.setSnappingMode(SNAP_MODE)
-        if show_cs_transform:
+        if kwargs.get("show_cs_transform", True):
             self.cs_transform.sig_new_coordinate_system.connect(
                 _position_widget.new_coordinate_system
             )
@@ -106,11 +123,14 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         DIFFRACTION_EXP.sig_params_changed.connect(self.update_from_diffraction_exp)
         self.update_from_diffraction_exp()
 
-        _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
+        _cmap_name = self.q_settings_get("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
             )
+        self._qtapp = QtWidgets.QApplication.instance()
+        if hasattr(self._qtapp, "sig_mpl_font_change"):
+            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
 
     @QtCore.Slot()
     def update_from_diffraction_exp(self):
@@ -132,7 +152,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(self._cs_transform_valid)
 
-    def setData(self, data, **kwargs):
+    def setData(self, data: ndarray, **kwargs: dict):
         """
         Set the image data, handle the coordinate system and forward the data to
         plotting.
@@ -146,11 +166,14 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         """
         if self.cs_transform is not None:
             self._check_data_shape(data.shape)
+        self._plot_kwargs = kwargs
         ImageView.setImage(self, data, **kwargs)
 
-    def _check_data_shape(self, data_shape):
+    def _check_data_shape(self, data_shape: tuple[int, ...]):
         """
-        Check the data shape and reset the coordinate system to cartesian if it differs
+        Check the data shape coordinate system.
+
+        This method will reset the coordinate system to cartesian if it differs
         from the defined detector geometry.
 
         Parameters
@@ -162,3 +185,18 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         if not _valid:
             self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(_valid)
+
+    @QtCore.Slot()
+    def update_mpl_fonts(self):
+        """
+        Update the plot's fonts.
+        """
+        _image = self.getImage()
+        if _image is None:
+            return
+        self.getBackend().fig.gca().cla()
+        ImageView.setImage(self, _image.getData(), **self._plot_kwargs)
+        for _histo in [self._histoHPlot, self._histoVPlot]:
+            _profile = _histo.getProfile()
+            _histo.getBackend().fig.gca().cla()
+            _histo.setProfile(_profile)

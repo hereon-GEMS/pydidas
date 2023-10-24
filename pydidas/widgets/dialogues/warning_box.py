@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,11 +20,12 @@ Module with WarningBox class for displaying pop-up notifications.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WarningBox"]
+
 
 from qtpy import QtWidgets
 
@@ -31,8 +34,7 @@ from ..utilities import get_pyqt_icon_from_str
 
 class WarningBox(QtWidgets.QMessageBox):
     """
-    QMessageBox subclass which simplifies the calling syntax to generate
-    user warning.
+    A QMessageBox with simplified calling syntax to generate a user warning.
 
     The WarningBox class will set title and message of the QMessageBox
     and call the execute function to display it with a single line of
@@ -45,20 +47,20 @@ class WarningBox(QtWidgets.QMessageBox):
     msg : str
         The message box text.
     info : str, optional
-        Additional informative text. The default is None.
+        Additional informative text. The default is an empty string.
     details : str, optional
-        Addition details for the warning. The default is None.
+        Addition details for the warning. The default is an empty string.
     """
 
-    def __init__(self, title, msg, info=None, details=None):
+    def __init__(self, title: str, msg: str, info: str = "", details: str = ""):
         super().__init__()
         self.setIcon(self.Warning)
         self.setWindowTitle(title)
-        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::10"))
+        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::SP_MessageBoxWarning"))
         self.setText(msg)
-        if info:
+        if info != "":
             self.setInformativeText(info)
-        if details:
+        if details != "":
             self.setDetailedText(details)
         self.setStandardButtons(self.Ok)
         self.__exec__()

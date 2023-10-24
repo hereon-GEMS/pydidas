@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -14,21 +14,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
-Module with the ScanDimensionInformationWindow class which explains the scan dimensions.
+The ScanDimensionInformationWindow class is a window which explains the scan dimensions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ScanDimensionInformationWindow"]
 
 
 from pathlib import Path
 
-from qtpy import QtCore, QtGui
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import constants
 from ..framework import PydidasWindow
@@ -59,7 +60,7 @@ INTRO_TEXT = (
 
 EXAMPLE_0 = (
     "Consider the following example of a two-dimensional mesh scan in <i>x</i> and "
-    "<i>z</i>: Three linescans with 6 points each in <i>x</i> inside a loop over 3"
+    "<i>z</i>: Three linescans with 6 points each in <i>x</i> inside a loop over 3 "
     "<i>z</i> positions:"
 )
 EXAMPLE_1 = (
@@ -90,9 +91,14 @@ class ScanDimensionInformationWindow(PydidasWindow):
     """
 
     show_frame = False
+    width_factor = 88
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Scan dimension help", **kwargs)
+    def __init__(self, **kwargs: dict):
+        PydidasWindow.__init__(self, title="Scan dimension help", **kwargs)
+        self.setMinimumHeight(600)
+        self._qtapp = QtWidgets.QApplication.instance()
+        self.process_new_font_metrics(*self._qtapp.font_metrics)
+        self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
     def build_frame(self):
         """
@@ -101,18 +107,15 @@ class ScanDimensionInformationWindow(PydidasWindow):
 
         self.create_empty_widget(
             "canvas",
-            layout_kwargs=dict(
-                contentsMargins=(0, 0, 0, 0),
-            ),
             sizePolicy=constants.POLICY_EXP_FIX,
             alignment=constants.ALIGN_TOP_LEFT,
             parent_widget=None,
+            font_metric_width_factor=self.width_factor,
         )
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
             widget=self._widgets["canvas"],
-            fixedWidth=650,
             sizePolicy=constants.POLICY_FIX_EXP,
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
@@ -120,12 +123,12 @@ class ScanDimensionInformationWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Scan dimension information",
-            fontsize=14,
+            fontsize_offset=4,
             bold=True,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            font_metric_width_factor=self.width_factor,
+            parent_widget="canvas",
         )
-        self.create_spacer(None, parent_widget=self._widgets["canvas"])
+        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "label_intro",
             INTRO_TEXT,
@@ -133,23 +136,27 @@ class ScanDimensionInformationWindow(PydidasWindow):
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
             textFormat=QtCore.Qt.RichText,
             gridPos=(-1, 0, 1, 1),
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            font_metric_width_factor=self.width_factor,
+            font_metric_height_factor=19,
+            parent_widget="canvas",
+            wordWrap=True,
         )
-        self.create_spacer(None, parent_widget=self._widgets["canvas"])
+        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "example_title",
             "Example:",
             underline=True,
             bold=True,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            font_metric_width_factor=self.width_factor,
+            parent_widget="canvas",
         )
         self.create_label(
             "example_0",
             EXAMPLE_0,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            font_metric_width_factor=self.width_factor,
+            font_metric_height_factor=2,
+            parent_widget="canvas",
+            wordWrap=True,
         )
 
         _image0 = QtGui.QPixmap(
@@ -161,13 +168,15 @@ class ScanDimensionInformationWindow(PydidasWindow):
             pixmap=_image0,
             fixedWidth=_image0.width(),
             fixedHeight=_image0.height(),
-            parent_widget=self._widgets["canvas"],
+            parent_widget="canvas",
         )
         self.create_label(
             "example_1",
             EXAMPLE_1,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            font_metric_width_factor=self.width_factor,
+            font_metric_height_factor=11,
+            parent_widget="canvas",
+            wordWrap=True,
         )
         _image1 = QtGui.QPixmap(
             IMAGE_PATH.joinpath("scan_scheme_with_points.png").as_posix()
@@ -178,17 +187,23 @@ class ScanDimensionInformationWindow(PydidasWindow):
             pixmap=_image1,
             fixedWidth=_image1.width(),
             fixedHeight=_image1.height(),
-            parent_widget=self._widgets["canvas"],
+            parent_widget="canvas",
         )
         self.create_label(
             "example_2",
             EXAMPLE_2,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            font_metric_width_factor=self.width_factor,
+            font_metric_height_factor=2,
+            parent_widget="canvas",
+            wordWrap=True,
         )
 
         self.create_button(
-            "but_close", "Close", gridPos=(-1, 1, 1, 1), autoDefault=True
+            "but_close",
+            "Close",
+            gridPos=(-1, 1, 1, 1),
+            autoDefault=True,
+            font_metric_width_factor=12,
         )
 
     def connect_signals(self):
@@ -197,9 +212,16 @@ class ScanDimensionInformationWindow(PydidasWindow):
         """
         self._widgets["but_close"].clicked.connect(self.close)
 
-    def finalize_ui(self):
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
         """
-        Build the window.
+        Set the fixed width of the widget dynamically from the font height metric.
+
+        Parameters
+        ----------
+        char_width: float
+            The font width in pixels.
+        char_height : float
+            The font height in pixels.
         """
-        super().finalize_ui()
-        self.setGeometry(200, 200, 640, 640)
+        self.setFixedWidth(int(100 * char_width) + self._qtapp.scrollbar_width + 30)

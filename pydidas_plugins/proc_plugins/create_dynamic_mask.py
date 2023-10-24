@@ -72,7 +72,7 @@ class CreateDynamicMask(ProcPlugin):
     output_data_label = "image"
     output_data_unit = "counts"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         self._EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
         super().__init__(*args, **kwargs)
         self._mask = None
@@ -80,7 +80,7 @@ class CreateDynamicMask(ProcPlugin):
         self.set_param_value("use_detector_mask", True)
 
     @property
-    def detailed_results(self):
+    def detailed_results(self) -> dict:
         """
         Get the detailed results for the Remove1dPolynomialBackground plugin.
 
@@ -129,7 +129,7 @@ class CreateDynamicMask(ProcPlugin):
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Create a dynamic mask based on the input data.
 
@@ -173,11 +173,16 @@ class CreateDynamicMask(ProcPlugin):
         kwargs["custom_mask"] = _mask
         return data, kwargs
 
-    def _create_detailed_results(self, final_mask):
+    def _create_detailed_results(self, final_mask: np.ndarray):
         """
         Get the detailed results for the dynamic mask plugin.
 
         This method will return information with the input image and the mask.
+
+        Parameters
+        ----------
+        final_mask : np.ndarray
+            The final masking array.
 
         Returns
         -------

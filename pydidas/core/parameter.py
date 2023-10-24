@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -30,16 +30,16 @@ __all__ = ["Parameter"]
 
 import numbers
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Dict, List, Self, Set, Tuple, Type, Union
 
 from .hdf5_key import Hdf5key
 
 
-def _get_base_class(cls):
+def _get_base_class(cls) -> type:
     """
-    Filter numerical classes and return the corresponding
-    abstract base class.
+    Filter numerical classes and return the corresponding abstract base class.
 
     This function checks whether cls is a numerical class and returns the
     numerical abstract base class from the numbers module for type-checking.
@@ -513,15 +513,15 @@ class Parameter:
             return self.value
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
-    def update_value_and_choices(self, value, choices):
+    def update_value_and_choices(self, value: object, choices: Iterable[object, ...]):
         """
         Update the value and choices of the Parameter to prevent illegal selections.
 
         Parameters
         ----------
-        value : type
+        value : object
             The new Parameter values
-        choices : Iterable
+        choices : Iterable[object, ...]
             The new choices for the Parameter.
         """
         if not self.__typecheck(value):
@@ -660,7 +660,7 @@ class Parameter:
 
     def __call__(self) -> object:
         """
-        Calling method to get the value.
+        Get the stored Parameter value.
 
         Returns
         -------

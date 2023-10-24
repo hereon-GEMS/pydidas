@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,21 +16,25 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PydidasFrameStack which is a QStackedWidget and is used as
-the central widget in the pydidas GUI. All frames can be accessed through
-the PydidasFrameStack once they have been registered.
+Module with the PydidasFrameStack.
+
+The PydidasFrameStack is a QStackedWidget and is used as the central widget
+in the pydidas GUI. All frames can be accessed through the PydidasFrameStack
+once they have been registered.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasFrameStack"]
 
-from pathlib import Path
 
-from qtpy import QtWidgets, QtCore
+from pathlib import Path
+from typing import List, Union
+
+from qtpy import QtCore, QtWidgets
 
 from ...core import SingletonFactory, utils
 from ..utilities import get_pyqt_icon_from_str
@@ -39,8 +43,8 @@ from .base_frame import BaseFrame
 
 class _PydidasFrameStack(QtWidgets.QStackedWidget):
     """
-    The _PydidasFrameStack is a QStackedWidget with references to all
-    the possible top level widgets.
+    A QStackedWidget with references to all the possible top level widgets.
+
     Widgets are responsible for registering themself with this class to
     allow a later reference. For the pydidas main application, the main
     window takes care of registration.
@@ -66,7 +70,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         self.frame_indices = {}
         self.frames = []
 
-    def register_frame(self, frame):
+    def register_frame(self, frame: BaseFrame):
         """
         Register a Frame with the stacked widget.
 
@@ -100,10 +104,9 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         self.frames.append(frame)
         self.frame_indices[frame.menu_entry] = index
 
-    def get_name_from_index(self, index):
+    def get_name_from_index(self, index: int) -> str:
         """
-        Get the widget reference name associated with the widget indexed at
-        index.
+        Get the widget reference name associated with the indexed widget.
 
         This method searches the dictionary of (name: index) entries and
         returns the name key for the index value.
@@ -122,7 +125,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         val_list = list(self.frame_indices.values())
         return key_list[val_list.index(index)]
 
-    def get_widget_by_name(self, ref_name):
+    def get_widget_by_name(self, ref_name: str) -> BaseFrame:
         """
         Get a widget from its reference name.
 
@@ -141,7 +144,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
 
         Returns
         -------
-        widget : QtWidgets.QWidget
+        widget : pydidas.widgets.framework.BaseFrame
             The widget referenced by the name.
         """
         if ref_name not in self.frame_indices:
@@ -151,7 +154,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         return self.widget(self.frame_indices[ref_name])
 
     @property
-    def frame_toolbar_entries(self):
+    def frame_toolbar_entries(self) -> List[str]:
         """
         Get all menu entries based on the stored information in the Frames.
 
@@ -166,7 +169,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         return _entries
 
     @property
-    def frame_toolbar_metadata(self):
+    def frame_toolbar_metadata(self) -> dict:
         """
         Get all the metadata to create the frame toolbar menu from the frames.
 
@@ -195,7 +198,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         return _meta
 
     @property
-    def active_widget_name(self):
+    def active_widget_name(self) -> str:
         """
         Return the name of the active widget.
 
@@ -206,7 +209,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         return self.get_name_from_index(self.currentIndex())
 
-    def get_all_widget_names(self):
+    def get_all_widget_names(self) -> List[str]:
         """
         Get the names of all registered widgets.
 
@@ -217,7 +220,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         return [w.menu_entry for w in self.frames]
 
-    def activate_widget_by_name(self, ref_name):
+    def activate_widget_by_name(self, ref_name: str):
         """
         Set the widget referenced by name to the active widget.
 
@@ -239,7 +242,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         index = self.frame_indices[ref_name]
         self.setCurrentIndex(index)
 
-    def remove_widget_by_name(self, ref_name):
+    def remove_widget_by_name(self, ref_name: str):
         """
         Remove a widget by its reference name.
 
@@ -265,7 +268,9 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         _widget = self.frames[self.frame_indices[ref_name]]
         self.removeWidget(_widget)
 
-    def addWidget(self, widget=None, name=None):
+    def addWidget(
+        self, widget: Union[None, QtWidgets.QWidget] = None, name: str = None
+    ):
         """
         Overload the QStackedWidget.addWidget method to deactivate it.
 
@@ -281,7 +286,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
             'Please use the "register_widget(name, widget)" method.'
         )
 
-    def removeWidget(self, widget):
+    def removeWidget(self, widget: BaseFrame):
         """
         Remove a widget from the QStackdWidget.
 
@@ -290,7 +295,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
 
         Parameters
         ----------
-        widget : QWidget
+        widget : BaseFrame
             The widget to be remvoed from the QStackedWidget.
 
         Raises
@@ -319,7 +324,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         while len(self.frames) > 0:
             self.removeWidget(self.frames[0])
 
-    def is_registered(self, widget):
+    def is_registered(self, widget: BaseFrame) -> bool:
         """
         Check if a widget is already registered.
 
@@ -339,7 +344,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         return widget in self.frames
 
-    def change_reference_name(self, new_name, widget):
+    def change_reference_name(self, new_name: str, widget: BaseFrame):
         """
         Change the reference name for a widget.
 
@@ -350,7 +355,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         ----------
         new_name : str
             The new reference name.
-        widget : QWidget
+        widget : BaseFrame
             The widget of which the refernce name shall be changed.
 
         Raises

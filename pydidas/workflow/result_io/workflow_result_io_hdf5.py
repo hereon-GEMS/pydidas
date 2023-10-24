@@ -24,15 +24,18 @@ __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowResultIoHdf5"]
+
 
 import os
 from functools import partial
+from pathlib import Path
+from typing import Union
 
 import h5py
 
-from ... import version
+from ... import VERSION
 from ...contexts import DiffractionExperimentContext, ScanContext
 from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...contexts.scan_context import Scan
@@ -43,7 +46,9 @@ from ..workflow_tree import WorkflowTree, _WorkflowTree
 from .workflow_result_io_base import WorkflowResultIoBase
 
 
-def get_detector_metadata_entries(scan, exp):
+def get_detector_metadata_entries(
+    scan: Scan, exp: DiffractionExperiment
+) -> list[list[str, str, dict]]:
     """
     Get the metadata for the detector.
 
@@ -56,7 +61,7 @@ def get_detector_metadata_entries(scan, exp):
 
     Returns
     -------
-    list
+    list[list[str, str, dict]]
         List with entries of all metadata to be written.
     """
     return [
@@ -83,22 +88,24 @@ def get_detector_metadata_entries(scan, exp):
     ]
 
 
-def get_pydidas_context_config_entries(scan, exp, tree):
+def get_pydidas_context_config_entries(
+    scan: Scan, exp: DiffractionExperiment, tree: _WorkflowTree
+) -> list[list[str, str, dict]]:
     """
     Get the context configuration from the pydidas Context singletons.
 
     Parameters
     ----------
     scan : Scan
-        The scan context.
-    exp : DiffractionExp
-        The diffraction experiment context.
+        The scan (context).
+    exp : DiffractionExperiment
+        The diffraction experiment (context).
     tree : WorkflowTree
         The workflow tree.
 
     Returns
     -------
-    list
+    list[list[str, str, dict]]
         List with writable entries for the contexts.
     """
     _dsets = []
@@ -109,9 +116,7 @@ def get_pydidas_context_config_entries(scan, exp, tree):
     _dsets.append(
         ["entry/pydidas_config", "workflow", {"data": tree.export_to_string()}]
     )
-    _dsets.append(
-        ["entry/pydidas_config", "pydidas_version", {"data": version.version}]
-    )
+    _dsets.append(["entry/pydidas_config", "pydidas_version", {"data": VERSION}])
     for _dim in range(scan.ndim):
         _label = scan.get_param_value(f"scan_dim{_dim}_label")
         _unit = scan.get_param_value(f"scan_dim{_dim}_unit")
@@ -136,13 +141,15 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
     _metadata_written = False
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, node_information, **kwargs):
+    def prepare_files_and_directories(
+        cls, save_dir: Union[Path, str], node_information: dict, **kwargs: dict
+    ):
         """
         Prepare the hdf5 files with the metadata.
 
         Parameters
         ----------
-        save_dir : Union[pathlib.Path, str]
+        save_dir : Union[Path, str]
             The full path for the data to be saved.
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
@@ -151,17 +158,21 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
-        scan_context : Union[Scan, None], optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        diffraction_exp_context : Union[DiffractionExp, None], optional
-            The diffraction experiment context. If None, the generic context will be
-            used. Only specify this, if you explicitly require a different context. The
-            default is None.
-        workflow_tree : Union[WorkflowTree, None], optional
-            The WorkflowTree. If None, the generic WorkflowTree will be used. Only
-            specify this, if you explicitly require a different context. The default is
-            None.
+        **kwargs:
+            Supported kwargs are:
+
+            scan_context : Union[Scan, None], optional
+                The scan context. If None, the generic context will be used.
+                Only specify this, if you explicitly require a different context.
+                The default is None.
+            diffraction_exp_context : Union[DiffractionExp, None], optional
+                The diffraction experiment context. If None, the generic context
+                will be used. Only specify this, if you explicitly require a
+                different context. The default is None.
+            workflow_tree : Union[WorkflowTree, None], optional
+                The WorkflowTree. If None, the generic WorkflowTree will be used.
+                Only specify this, if you explicitly require a different context.
+                The default is None.
         """
         _scan = kwargs.get("scan_context", ScanContext())
         _exp = kwargs.get("diffraction_exp_context", DiffractionExperimentContext())
@@ -177,7 +188,13 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             cls._create_file_and_populate_metadata(_index, _scan, _exp, _tree)
 
     @classmethod
-    def _create_file_and_populate_metadata(cls, node_id, scan, exp, workflow):
+    def _create_file_and_populate_metadata(
+        cls,
+        node_id: int,
+        scan: Scan,
+        exp: DiffractionExperiment,
+        workflow: _WorkflowTree,
+    ):
         """
         Create a hdf5 file and populate it with the Scan metadata.
 
@@ -186,11 +203,11 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         node_id : int
             The nodeID.
         scan : Scan
-            The scan context.
+            The scan (context).
         exp : DiffractionExperiment
-            The diffraction experiment context.
+            The diffraction experiment (context).
         workflow : WorkflowTree
-            The workflow.
+            The workflow tree.
         """
         _node_attribute = partial(cls.get_node_attribute, node_id)
         _dsets = [
@@ -212,7 +229,11 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
 
     @classmethod
     def export_frame_to_file(
-        cls, index, frame_result_dict, scan_context=None, **kwargs
+        cls,
+        index: int,
+        frame_result_dict: dict,
+        scan_context: Union[None, Scan] = None,
+        **kwargs: dict,
     ):
         """
         Export the results of one frame and store them on disk.
@@ -240,8 +261,8 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
     @classmethod
     def export_full_data_to_file(
         cls,
-        full_data,
-        scan_context=None,
+        full_data: dict,
+        scan_context: Union[Scan, None] = None,
     ):
         """
         Export the full dataset to disk.
@@ -267,7 +288,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
-    def write_metadata_to_files(cls, frame_result_dict, scan):
+    def write_metadata_to_files(cls, frame_result_dict: dict, scan: Scan):
         """
         Write the metadata from the WorkflowTree to the individual files
         for each node.
@@ -276,16 +297,15 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         ----------
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Union[Scan, None], optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
+        scan : Scan
+            The scan (context).
         """
         for _node_id, _data in frame_result_dict.items():
             cls.update_node_metadata(_node_id, _data, scan)
         cls._metadata_written = True
 
     @classmethod
-    def update_node_metadata(cls, index, data, scan):
+    def update_node_metadata(cls, index: int, data: Dataset, scan: Scan):
         """
         Update the metadata for a single node.
 
@@ -295,9 +315,8 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             The nodeID.
         data : pydidas.core.Dataset
             The processed Dataset.
-        scan : Union[Scan, None], optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
+        scan : Scan
+            The scan (context).
         """
         _ndim = scan.get_param_value("scan_dim")
         with h5py.File(
@@ -311,7 +330,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                     create_hdf5_dataset(_axisgroup, None, _key, data=_dict[_dim])
 
     @classmethod
-    def update_frame_metadata(cls, metadata, scan=None):
+    def update_frame_metadata(cls, metadata: dict, scan: Union[Scan, None] = None):
         """
         Update the frame metadata with a separately supplied metadata
         dictionary.
@@ -321,9 +340,9 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         metadata : dict
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
-        scan : Union[pydidas.contexts.scan_context.Scan, None], optional
-            The Scan instance. If None, this will default to the generic ScanContext.
-            The default is None.
+        scan : Union[Scan, None], optional
+            The Scan (context) instance. If None, this will default to the
+            generic ScanContext. The default is None.
         """
         _scan = ScanContext() if scan is None else scan
         _ndim = _scan.get_param_value("scan_dim")
@@ -342,13 +361,15 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         cls._metadata_written = True
 
     @classmethod
-    def import_results_from_file(cls, filename):
+    def import_results_from_file(
+        cls, filename: Union[Path, str]
+    ) -> tuple[Dataset, dict, Scan, DiffractionExperiment, _WorkflowTree]:
         """
         Import results from a file and store them as a Dataset.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Union[Path, str]
             The full filename of the file to be imported.
 
         Returns
@@ -359,9 +380,9 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             A dictionary with node_label, data_label, plugin_name keys and the
             respective values.
         scan : pydidas.contexts.scan_context.Scan
-            The imported scan context.
-        diffraction_exp : pydidas.contexts.diffraction_exp.DiffractionExp
-            The inported diffraction experiment context.
+            The imported scan configuration.
+        diffraction_exp : pydidas.contexts.diffraction_exp.DiffractionExperiment
+            The inported diffraction experiment configuration.
         tree : pydidas.workflow.WorkflowTree
             The imported workflow tree.
         """

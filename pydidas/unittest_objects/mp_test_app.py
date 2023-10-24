@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,24 +21,23 @@ real multiprocessing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["MpTestApp"]
+
 
 import time
 
 import numpy as np
 from qtpy import QtCore
 
-# because these Plugins will be loaded directly by importlib, absolute imports
-# are required:
-from pydidas.core import get_generic_param_collection, BaseApp
+from pydidas.core import BaseApp, get_generic_param_collection
 from pydidas.managers import CompositeImageManager
 
 
-def get_test_image(index, **kwargs):
+def get_test_image(index: int, **kwargs: dict) -> np.ndarray:
     """
     Get a random test image.
 
@@ -45,7 +46,7 @@ def get_test_image(index, **kwargs):
 
     Parameters
     ----------
-    index : object
+    index : int
         The index. Not used within the function but the pydidas architecture
         expects it.
     **kwargs : dict
@@ -100,7 +101,7 @@ class MpTestApp(BaseApp):
             datatype=np.float64,
         )
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> list[int, ...]:
         """
         Get the tasks of the Application.
 
@@ -114,7 +115,7 @@ class MpTestApp(BaseApp):
         """
         return self._config["mp_tasks"]
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Check for carryon calls.
 
@@ -132,7 +133,7 @@ class MpTestApp(BaseApp):
             return False
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int) -> np.ndarray:
         """
         Perform the multiprocessing computation.
 
@@ -152,8 +153,8 @@ class MpTestApp(BaseApp):
         _image = get_test_image(_fname, **_kwargs)
         return _image
 
-    @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, image, *args):
+    @QtCore.Slot(object, object)
+    def multiprocessing_store_results(self, index: int, image: np.ndarray):
         """
         Store the result of the multiprocessing function call.
 

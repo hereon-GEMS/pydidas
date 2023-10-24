@@ -10,6 +10,7 @@ global-exclude .git
 recursive-include pydidas *.py
 recursive-include pydidas_plugins *.py
 recursive-include pydidas_scripts *.py
+recursive-include pydidas_qtcore *.py
 recursive-include pydidas/docs *.png
 recursive-include pydidas/docs *.rst
 recursive-include pydidas/resources *.png

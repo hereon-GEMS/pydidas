@@ -29,17 +29,18 @@ __all__ = ["PyfaiIntegrationConfigWidget"]
 
 
 from functools import partial
+from typing import Literal, NewType
 
 from qtpy import QtCore
+from qtpy.QtWidgets import QStyle
 
-from pydidas.core.constants import (
-    DEFAULT_PLUGIN_PARAM_CONFIG,
-    PLUGIN_PARAM_WIDGET_WIDTH,
-)
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
 from pydidas.widgets.windows import SelectIntegrationRegionWindow
+
+
+BasePlugin = NewType("BasePlugin", type)
 
 
 class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
@@ -48,7 +49,7 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     pyFAI integration plugins.
     """
 
-    def __init__(self, plugin, *args, **kwargs):
+    def __init__(self, plugin: BasePlugin, *args: tuple, **kwargs: dict):
         ParameterEditCanvas.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
@@ -57,7 +58,7 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self._window_show = None
         for _key, _param in self.plugin.params.items():
             if _key not in self.plugin.advanced_parameters:
-                self.create_param_widget(_param, **DEFAULT_PLUGIN_PARAM_CONFIG)
+                self.create_param_widget(_param, linebreak=_key == "label")
         if "azi_use_range" in self.param_composite_widgets:
             self.param_composite_widgets["azi_use_range"].io_edited.connect(
                 self._toggle_azimuthal_ranges_visibility
@@ -75,36 +76,34 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_button(
             "but_show_integration_region",
             "Show selected integration region",
-            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=partial(self._select_integration_region, allow_edit=False),
         )
         self.create_button(
             "but_select_integration_region",
             "Select integration region in image",
-            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=partial(self._select_integration_region, allow_edit=True),
         )
         self.__advanced_hidden = True
         self.create_button(
             "but_toggle_advanced_params",
             "Display advanced Parameters",
-            icon=self.style().standardIcon(6),
-            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=self.__toggle_advanced_params,
+            icon="qt-std::SP_TitleBarUnshadeButton",
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)
-            _kwargs = DEFAULT_PLUGIN_PARAM_CONFIG | {"visible": False}
-            self.create_param_widget(_param, **_kwargs)
+            self.create_param_widget(_param, visible=False)
 
     @QtCore.Slot(str)
-    def _toggle_azimuthal_ranges_visibility(self, new_selection):
+    def _toggle_azimuthal_ranges_visibility(
+        self, new_selection: Literal["Specify azimuthal range", "Full detector"]
+    ):
         """
         Toggle the visibility of the plugin parameters for the azimuthal ranges.
 
         Parameters
         ----------
-        new_selection : str
+        new_selection : Literal["Specify azimuthal range", "Full detector"]
             The new selection of the azimuthal ranges Parameter.
         """
         _visibility = new_selection == "Specify azimuthal range"
@@ -112,13 +111,15 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.toggle_param_widget_visibility("azi_range_upper", _visibility)
 
     @QtCore.Slot(str)
-    def _toggle_radial_ranges_visibility(self, new_selection):
+    def _toggle_radial_ranges_visibility(
+        self, new_selection: Literal["Specify radial range", "Full detector"]
+    ):
         """
         Toggle the visibility of the plugin parameters for the radial ranges.
 
         Parameters
         ----------
-        new_selection : str
+        new_selection : Literal["Specify radial range", "Full detector"]
             The new selection of the azimuthal ranges Parameter.
         """
         _visibility = new_selection == "Specify radial range"
@@ -139,11 +140,15 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             else "Hide advanced Parameters"
         )
         self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(6 if self.__advanced_hidden else 5)
+            self.style().standardIcon(
+                QStyle.SP_TitleBarUnshadeButton
+                if self.__advanced_hidden
+                else QStyle.SP_TitleBarShadeButton
+            )
         )
 
     @QtCore.Slot()
-    def _select_integration_region(self, allow_edit=True):
+    def _select_integration_region(self, allow_edit: bool = True):
         """
         Select the plugin's integration region interactively.
 
@@ -182,7 +187,7 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             self._window_edit.close()
         self._toggle_io_mode(True)
 
-    def _toggle_io_mode(self, enabled):
+    def _toggle_io_mode(self, enabled: bool):
         """
         Block the input/output and disable all Parameter widgets.
 

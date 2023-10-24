@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import random
@@ -41,8 +41,8 @@ class TestWidget(BaseFrame):
     menu_entry = "Test/Entry"
     menu_title = "Test"
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        BaseFrame.__init__(self, **kwargs)
         self.hash = hash(self)
         self.menu_entry = "".join(
             random.choice(string.ascii_letters) for i in range(20)
@@ -55,7 +55,9 @@ class TestWidget(BaseFrame):
 class TestPydidasFrameStack(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.q_app = QtWidgets.QApplication([])
+        cls._qtapp = QtWidgets.QApplication.instance()
+        if cls._qtapp is None:
+            cls._qtapp = QtWidgets.QApplication([])
         cls.frames = []
 
     @classmethod
@@ -63,7 +65,10 @@ class TestPydidasFrameStack(unittest.TestCase):
         while cls.frames:
             w = cls.frames.pop()
             w.deleteLater()
-        cls.q_app.quit()
+        cls._qtapp.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def setUp(self):
         self.frames = []

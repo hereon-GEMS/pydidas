@@ -28,162 +28,171 @@ __status__ = "Production"
 __all__ = ["DefineDiffractionExpFrameBuilder"]
 
 
+from qtpy import QtGui
+
 from ....core import constants
+from ....core.utils import update_palette
 from ....widgets import ScrollArea, get_pyqt_icon_from_str
 from ....widgets.framework import BaseFrame
-from ....widgets.parameter_config import ParameterEditCanvas
 
 
-class DefineDiffractionExpFrameBuilder(BaseFrame):
+class DefineDiffractionExpFrameBuilder:
     """
-    Mix-in class which includes the build_self method to populate the
-    base class's UI and initialize all widgets.
+    Class to populate the DefineDiffractionExpFrame with widgets.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+    frame = None
 
-    def build_frame(self):
+    @classmethod
+    def build_frame(cls, frame: BaseFrame):
         """
-        Build the frame and create all widgets.
+        Populate the input frame with the required widgets.
+
+        Parameters
+        ----------
+        frame : BaseFrame
+            The DefineDiffractionExpFrame instance.
         """
-        self._scroll_width = 360
-        self._widgets["config"] = ParameterEditCanvas(
-            parent=None,
-            init_layout=True,
-            lineWidth=5,
+        cls.frame = frame
+        frame.create_empty_widget(
+            "config",
+            parent_widget=None,
             sizePolicy=constants.POLICY_FIX_EXP,
+            font_metric_width_factor=2.1 * constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            layout_kwargs={"horizontalSpacing": 0},
         )
-        _2line_options = constants.DEFAULT_TWO_LINE_PARAM_CONFIG | {
-            "width_total": self._scroll_width,
-            "width_io": self._scroll_width - 20,
-            "parent_widget": self._widgets["config"],
-        }
-        _1line_options = dict(
-            width_text=self._scroll_width - 180,
-            width_io=150,
-            width_total=self._scroll_width,
-            parent_widget=self._widgets["config"],
-        )
-        self.create_label(
+        frame.create_label(
             None,
             "Diffraction experimental setup\n",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
+            fontsize_offset=4,
             gridPos=(0, 0, 1, 1),
-            fixedWidth=self._scroll_width,
         )
-        self.create_any_widget(
+        frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=self._widgets["config"],
-            fixedWidth=self._scroll_width + 50,
-            sizePolicy=constants.POLICY_FIX_EXP,
-            gridPos=(-1, 0, 1, 1),
-            stretch=(1, 0),
             layout_kwargs={"alignment": None},
+            sizePolicy=constants.POLICY_FIX_EXP,
+            stretch=(1, 0),
+            widget=frame._widgets["config"],
         )
-        self.create_button(
+        frame.create_button(
             "but_load_from_file",
             "Import diffraction experimental parameters",
-            icon=self.style().standardIcon(42),
-            gridPos=(-1, 0, 1, 1),
-            alignment=None,
-            fixedWidth=self._scroll_width,
-            parent_widget=self._widgets["config"],
+            icon="qt-std::SP_DialogOpenButton",
+            parent_widget="config",
         )
-        self.create_button(
+        frame.create_button(
             "but_copy_from_pyfai",
             "Copy experimental parameters from calibration",
-            alignment=None,
             icon=get_pyqt_icon_from_str("qta::fa.copy"),
-            fixedWidth=self._scroll_width,
-            parent_widget=self._widgets["config"],
+            parent_widget=frame._widgets["config"],
         )
-        for _param in self.params.values():
+
+        _row = frame.layout().rowCount()
+        _parent = "config_left"
+        frame.create_empty_widget(
+            "config_left",
+            parent_widget="config",
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            gridPos=(_row, 0, 1, 1),
+        )
+        frame.create_empty_widget(
+            "config_spacer",
+            parent_widget="config",
+            font_metric_width_factor=0.1 * constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            gridPos=(_row, 1, 1, 1),
+        )
+        frame.create_empty_widget(
+            "config_right",
+            parent_widget="config",
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            gridPos=(_row, 2, 1, 1),
+        )
+
+        for _param in frame.params.values():
             if _param.refkey == "xray_wavelength":
-                self.create_label(
+                frame.create_label(
                     None,
                     "\nBeamline X-ray energy:",
-                    fontsize=constants.STANDARD_FONT_SIZE + 1,
                     bold=True,
-                    fixedWidth=self._scroll_width,
-                    parent_widget=self._widgets["config"],
+                    fontsize_offset=1,
+                    parent_widget=_parent,
                 )
             if _param.refkey == "detector_name":
-                self.__create_detector_header()
+                cls.create_detector_header()
             if _param.refkey == "detector_dist":
-                self.__create_geometry_header()
-            _options = (
-                _2line_options
-                if _param.refkey == "detector_mask_file"
-                else _1line_options
+                cls.create_geometry_header()
+                _parent = "config_right"
+            frame.create_param_widget(
+                _param,
+                linebreak=_param.refkey == "detector_mask_file",
+                parent_widget=_parent,
             )
-            self.create_param_widget(_param, **_options)
 
-        self.create_label(
+        frame.create_label(
             "bc_label",
             "Derived beamcenter pixel position:",
-            fixedWidth=self._scroll_width,
             bold=True,
-            parent_widget=self._widgets["config"],
+            parent_widget="config_right",
         )
         for _key in ["beamcenter_x", "beamcenter_y"]:
-            self.create_param_widget(self._bc_params[_key], **_1line_options)
-            self.param_widgets[_key].setEnabled(False)
+            frame.create_param_widget(
+                frame._bc_params[_key], parent_widget="config_right"
+            )
+            update_palette(
+                frame.param_widgets[_key],
+                base=QtGui.QColor(235, 235, 235),
+            )
+            frame.param_widgets[_key].setReadOnly(True)
 
-        self.create_spacer(
-            None, gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
-        )
-        self.create_button(
+        frame.create_spacer(None, parent_widget="config")
+        frame.create_button(
             "but_save_to_file",
             "Export experimental parameters to file",
-            gridPos=(-1, 0, 1, 1),
             alignment=None,
-            fixedWidth=self._scroll_width,
-            parent_widget=self._widgets["config"],
-            icon=self.style().standardIcon(43),
+            parent_widget="config",
+            icon="qt-std::SP_DialogSaveButton",
         )
 
-    def __create_detector_header(self):
+    @classmethod
+    def create_detector_header(cls):
         """
         Create header items (label / buttons) for the detector.
         """
-        self.create_label(
+        cls.frame.create_label(
             None,
             "\nX-ray detector:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=self._scroll_width,
-            parent_widget=self._widgets["config"],
+            parent_widget="config_left",
         )
-        self.create_button(
+        cls.frame.create_button(
             "but_select_detector",
             "Select X-ray detector from list",
-            gridPos=(-1, 0, 1, 1),
             alignment=None,
-            fixedWidth=self._scroll_width,
-            parent_widget=self._widgets["config"],
+            parent_widget="config_left",
         )
 
-    def __create_geometry_header(self):
+    @classmethod
+    def create_geometry_header(cls):
         """
         Create header items (label / buttons) for the detector.
         """
-        self.create_label(
+        cls.frame.create_label(
             None,
             "\nDetector geometry:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=self._scroll_width,
-            parent_widget=self._widgets["config"],
+            parent_widget="config_right",
         )
-        self.create_button(
+        cls.frame.create_button(
             "but_select_beamcenter_manually",
             "Manual beamcenter definition",
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=self._scroll_width,
-            parent_widget=self._widgets["config"],
+            parent_widget="config_right",
+        )
+        cls.frame.create_button(
+            "but_convert_fit2d",
+            "Convert Fit2D geometry",
+            parent_widget="config_right",
         )

@@ -29,8 +29,11 @@ __all__ = ["DefineDiffractionExpFrame"]
 
 
 from functools import partial
+from pathlib import Path
+from typing import Union
 
 import numpy as np
+from pyFAI.detectors import Detector
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 from qtpy import QtCore, QtWidgets
@@ -39,7 +42,8 @@ from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
-from ...widgets.windows import ManuallySetBeamcenterWindow
+from ...widgets.framework import BaseFrame
+from ...widgets.windows import ConvertFit2dGeometryWindow, ManuallySetBeamcenterWindow
 from .builders import DefineDiffractionExpFrameBuilder
 
 
@@ -57,7 +61,7 @@ _ENERGY_INVALID = (
 )
 
 
-class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
+class DefineDiffractionExpFrame(BaseFrame):
     """
     The DefineDiffractionExpFrame is the main frame for reading, editing and
     saving the DiffractionExperimentContext in the GUI.
@@ -67,8 +71,8 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
     menu_title = "Define Diffraction setup"
     menu_entry = "Workflow processing/Define diffraction setup"
 
-    def __init__(self, parent=None, **kwargs):
-        DefineDiffractionExpFrameBuilder.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.params = EXP.params
         self._bc_params = get_generic_param_collection("beamcenter_x", "beamcenter_y")
         self.__import_dialog = PydidasFileDialog(
@@ -88,6 +92,13 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             qsettings_ref="DefineDiffractionExpFrame__export",
         )
         self._select_beamcenter_window = None
+        self._fit2d_window = None
+
+    def build_frame(self):
+        """
+        Build the frame and create all widgets.
+        """
+        DefineDiffractionExpFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """
@@ -99,6 +110,8 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         self._widgets["but_select_beamcenter_manually"].clicked.connect(
             self.select_beamcenter_manually
         )
+        self._widgets["but_convert_fit2d"].clicked.connect(self.convert_from_fit2d)
+
         self._widgets["but_save_to_file"].clicked.connect(self.export_to_file)
         for _param_key in self.params.keys():
             param = self.get_param(_param_key)
@@ -109,7 +122,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             _w.io_edited.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
-    def set_param_value_and_widget(self, key, value):
+    def set_param_value_and_widget(self, key: str, value: object):
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
@@ -133,7 +146,8 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         else:
             self.param_widgets[key].set_value(value)
 
-    def update_param(self, param_key, widget):
+    @QtCore.Slot(str)
+    def update_param(self, param_key: str, widget: QtWidgets.QWidget, value_str: str):
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -143,6 +157,8 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             The reference key.
         widget : pydidas.widgets.parameter_config.BaseParamIoWidget
             The Parameter editing widget.
+        value_str : str
+            The string representation of the value.
         """
         EXP.set_param_value(param_key, widget.get_value())
         # explicitly call update fo wavelength and energy
@@ -170,7 +186,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         self.copy_energy_from_pyFAI(show_warning=False)
         self.copy_geometry_from_pyFAI()
 
-    def copy_detector_from_pyFAI(self, show_warning=True):
+    def copy_detector_from_pyFAI(self, show_warning: bool = True):
         """
         Copy the detector from the pyFAI CalibrationContext instance.
 
@@ -186,7 +202,12 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         _maskfile = model.experimentSettingsModel().mask().filename()
         self.update_detector_params(_det, maskfile=_maskfile, show_warning=show_warning)
 
-    def update_detector_params(self, det, maskfile=None, show_warning=True):
+    def update_detector_params(
+        self,
+        det: Detector,
+        maskfile: Union[None, str, Path] = None,
+        show_warning: bool = True,
+    ):
         """
         Update the pydidas detector Parameters based on the selected pyFAI detector.
 
@@ -194,7 +215,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         ----------
         det : pyFAI.detectors.Detector
             The detector instance.
-        maskfile : Union [None, str], optional
+        maskfile : Union [None, str, Path], optional
             The path of the mask file, if it has been defined in the pyFAI calibration.
             The default is None.
         show_warning : bool, optional
@@ -217,7 +238,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
                 "No detector selected in pyFAI. Cannot copy information.",
             )
 
-    def copy_geometry_from_pyFAI(self, show_warning=True):
+    def copy_geometry_from_pyFAI(self, show_warning: bool = True):
         """
         Copy the geometry from the pyFAI CalibrationContext instance.
 
@@ -242,7 +263,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _GEO_INVALID)
 
-    def copy_energy_from_pyFAI(self, show_warning=True):
+    def copy_energy_from_pyFAI(self, show_warning: bool = True):
         """
         Copy the pyFAI energy and store it in the DiffractionExperimentContext.
 
@@ -272,13 +293,17 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
                 self._beamcenter_selected
             )
             self._select_beamcenter_window.sig_about_to_close.connect(
-                self._beamcenter_window_closed
+                self._child_window_closed
             )
+        self._select_beamcenter_window.update_detector_description(
+            self.get_param_value("detector_name"),
+            self.get_param_value("detector_mask_file"),
+        )
         self._select_beamcenter_window.show()
         self.setEnabled(False)
 
     @QtCore.Slot(float, float)
-    def _beamcenter_selected(self, center_x, center_y):
+    def _beamcenter_selected(self, center_x: float, center_y: float):
         """
         Set the selected beamcenter in the DiffractionExperiment
 
@@ -298,7 +323,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             self.set_param_value_and_widget(f"detector_rot{_index}", 0)
 
     @QtCore.Slot()
-    def _beamcenter_window_closed(self):
+    def _child_window_closed(self):
         """
         Handle the signal that the beamcenter window is to be closed.
         """
@@ -337,7 +362,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         if _fname is not None:
             EXP.export_to_file(_fname, overwrite=True)
 
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Add a check whether the DiffractionExperimentContext has changed from some
         other source (e.g. pyFAI calibration) and update widgets accordingly.
@@ -355,3 +380,52 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
                 self._config["exp_hash"] = hash(self.params)
         else:
             self._config["exp_hash"] = hash(self.params)
+
+    @QtCore.Slot()
+    def convert_from_fit2d(self):
+        """
+        Convert a Fit2d geometry to pyFAI's PONI geometry.
+        """
+        if self._fit2d_window is None:
+            self._fit2d_window = ConvertFit2dGeometryWindow()
+            self._fit2d_window.sig_about_to_close.connect(self._child_window_closed)
+            self._fit2d_window.sig_new_geometry.connect(
+                self._process_new_geometry_from_fit2
+            )
+        self._fit2d_window.show()
+        self.setEnabled(False)
+
+    @QtCore.Slot(float, float, float, float, float, float)
+    def _process_new_geometry_from_fit2(
+        self,
+        det_dist: float,
+        poni1: float,
+        poni2: float,
+        rot1: float,
+        rot2: float,
+        rot3: float,
+    ):
+        """
+        Process the new parameters in the pyFAI geometry from the Fit2d geometry.
+
+        Parameters
+        ----------
+        det_dist : float
+            The new detector distance.
+        poni1 : float
+            The new PONI1 value.
+        poni2 : float
+            The new PONI2 value.
+        rot1 : float
+            The new detector rotation #1.
+        rot2 : float
+            The new detector rotation #2.
+        rot3 : float
+            The new detector rotation #3.
+        """
+        self.set_param_value_and_widget("detector_dist", det_dist)
+        self.set_param_value_and_widget("detector_poni1", poni1)
+        self.set_param_value_and_widget("detector_poni2", poni2)
+        self.set_param_value_and_widget("detector_rot1", rot1)
+        self.set_param_value_and_widget("detector_rot2", rot2)
+        self.set_param_value_and_widget("detector_rot3", rot3)

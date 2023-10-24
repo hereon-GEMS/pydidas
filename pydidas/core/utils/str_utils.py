@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,10 +20,10 @@ The str_utils module includes convenience functions for string formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "get_fixed_length_str",
     "get_time_string",
@@ -39,13 +39,16 @@ __all__ = [
     "get_simplified_array_representation",
 ]
 
-import re
-import sys
+
 import os
-import time
 import random
+import re
 import string as _string_
-from numbers import Real, Integral
+import sys
+import time
+from collections.abc import Iterable
+from numbers import Integral, Real
+from typing import Union
 
 import numpy as np
 
@@ -53,8 +56,13 @@ from ..constants import GREEK_ASCII_TO_UNI, GREEK_UNI_TO_ASCII
 
 
 def get_fixed_length_str(
-    obj, length, fill_back=True, fill_char=".", formatter="{:.3f}", final_space=True
-):
+    obj: str,
+    length: int,
+    fill_back: bool = True,
+    fill_char: str = ".",
+    formatter: str = "{:.3f}",
+    final_space: bool = True,
+) -> str:
     """
     Format an input object to a string of defined length.
 
@@ -107,7 +115,7 @@ def get_fixed_length_str(
     )
 
 
-def get_time_string(epoch=None, human_output=True):
+def get_time_string(epoch: Union[float, None] = None, human_output: bool = True) -> str:
     """
     Return a formatted time string.
 
@@ -147,9 +155,9 @@ def get_time_string(epoch=None, human_output=True):
     return _str
 
 
-def get_short_time_string(epoch=None):
+def get_short_time_string(epoch: Union[float, None] = None) -> str:
     """
-    Return a short time string in the format (DD/MM HH:MM:ss)
+    Return a short time string in the format (DD/MM HH:MM:ss).
 
     Parameters
     ----------
@@ -165,7 +173,7 @@ def get_short_time_string(epoch=None):
     return get_time_string(epoch)[5:-4]
 
 
-def timed_print(string, new_lines=0, verbose=True):
+def timed_print(string: str, new_lines: int = 0, verbose: bool = True):
     """
     Print a string with a time prefix.
 
@@ -191,8 +199,12 @@ def timed_print(string, new_lines=0, verbose=True):
 
 
 def get_warning(
-    string, severe=False, new_lines=0, print_warning=True, return_warning=False
-):
+    string: str,
+    severe: bool = False,
+    new_lines: int = 0,
+    print_warning: bool = True,
+    return_warning: bool = False,
+) -> Union[str, None]:
     """
     Generate a warning message (formatted string in a "box" of dashes).
 
@@ -246,7 +258,7 @@ def get_warning(
     return None
 
 
-def convert_special_chars_to_unicode(obj):
+def convert_special_chars_to_unicode(obj: Union[str, list]) -> Union[str, list]:
     """
     Convert a selection of special characters to unicode.
 
@@ -278,7 +290,7 @@ def convert_special_chars_to_unicode(obj):
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
-def convert_unicode_to_ascii(obj):
+def convert_unicode_to_ascii(obj: Union[str, list]) -> Union[str, list]:
     """
     Convert a selection of special unicode characters to ASCII.
 
@@ -310,13 +322,13 @@ def convert_unicode_to_ascii(obj):
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
-def get_range_as_formatted_string(obj):
+def get_range_as_formatted_string(obj: Union[np.ndarray, Iterable[float, ...]]) -> str:
     """
     Get a formatted string representation of an iterable range.
 
     Parameters
     ----------
-    _range : Union[np.ndarray, list, tuple]
+    _range : Union[np.ndarray, Iterable[float, ...]]
         The input range.
 
     Returns
@@ -342,7 +354,9 @@ def get_range_as_formatted_string(obj):
         return "unknown range"
 
 
-def get_simplified_array_representation(obj, max_items=6, leading_indent=4):
+def get_simplified_array_representation(
+    obj: np.ndarray, max_items: int = 6, leading_indent: int = 4
+) -> str:
     """
     Get a simplified representation of an array.
 
@@ -381,7 +395,7 @@ def get_simplified_array_representation(obj, max_items=6, leading_indent=4):
     return _repr
 
 
-def update_separators(path):
+def update_separators(path: str) -> str:
     """
     Check the separators and update to os.sep if required.
 
@@ -401,14 +415,13 @@ def update_separators(path):
 
 
 def format_input_to_multiline_str(
-    input_str,
-    max_line_length=60,
-    pad_to_max_length=False,
-    keep_linebreaks=True,
-):
+    input_str: str,
+    max_line_length: int = 60,
+    pad_to_max_length: bool = False,
+    keep_linebreaks: bool = True,
+) -> str:
     """
-    Format an input string by inserting linebreaks to achieve a maximum line
-    length equal to the defined max_line_length.
+    Format an input string by changing linebreaks to limit the maximum line length.
 
     This function will split the input string and join fragments as long as
     the length of the joint fragment is less or equal to the defined maximum
@@ -449,10 +462,9 @@ def format_input_to_multiline_str(
     return "\n".join(_result_lines)
 
 
-def _get_unformatted_lines(input_str, max_line_length=60):
+def _get_unformatted_lines(input_str: str, max_line_length: int = 60) -> list:
     """
-    Get the input string in lines of a defined maximum length without taking into
-    account linebreaks.
+    Get the input string in lines of a defined maximum length, ignoring linebreaks.
 
     Parameters
     ----------
@@ -471,19 +483,16 @@ def _get_unformatted_lines(input_str, max_line_length=60):
     _current_str = _words.pop(0) if len(_words) > 0 else ""
     while len(_words) > 0:
         _newword = _words.pop(0)
-        # need to check with the length + 1 against max_line_length to account for the
-        # additional space between both entries
         if len(_current_str + _newword) + 1 > max_line_length:
             _result_lines.append(_current_str)
             _current_str = _newword
         else:
             _current_str = f"{_current_str} {_newword}"
-    # append final line
     _result_lines.append(_current_str)
     return _result_lines
 
 
-def get_random_string(length):
+def get_random_string(length: int) -> str:
     """
     Get a random string of a specific length.
 

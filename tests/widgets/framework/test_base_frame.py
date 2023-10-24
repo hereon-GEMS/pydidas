@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
@@ -50,7 +50,10 @@ class SignalTestClass(QtCore.QObject):
 class TestBaseFrame(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.q_app = QtWidgets.QApplication([])
+        cls._qtapp = QtWidgets.QApplication.instance()
+        if cls._qtapp is None:
+            cls._qtapp = QtWidgets.QApplication([])
+
         cls.tester = SignalTestClass()
         # cls.widgets = []
 
@@ -59,7 +62,10 @@ class TestBaseFrame(unittest.TestCase):
         # while cls.widgets:
         #     w = cls.widgets.pop()
         #     w.deleteLater()
-        cls.q_app.quit()
+        cls._qtapp.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def get_base_frame(self, **kwargs):
         _frame = BaseFrame(**kwargs)
@@ -91,26 +97,11 @@ class TestBaseFrame(unittest.TestCase):
         obj.set_status(_test)
         self.assertEqual(self.tester.reveived_signals.pop(), _test)
 
-    def test_next_row_empty(self):
-        obj = BaseFrame()
-        # self.widgets.append(obj)
-        _row = obj.next_row()
-        self.assertEqual(_row, 0)
-
-    def test_next_row(self):
-        obj = self.get_base_frame()
-        w = QtWidgets.QLabel("test")
-        w2 = QtWidgets.QLabel("test2")
-        obj.layout().addWidget(w, 0, 0, 1, 1)
-        obj.layout().addWidget(w2, 1, 0, 1, 1)
-        _row = obj.next_row()
-        self.assertEqual(_row, 2)
-
     def test_export_state(self):
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)
-        QtCore.QTimer.singleShot(100, self.q_app.quit)
+        QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         _, _state = obj.export_state()
         self.assertEqual(obj.get_param_values_as_dict(), _state["params"])
@@ -122,7 +113,7 @@ class TestBaseFrame(unittest.TestCase):
         self.create_widgets_in_frame(obj, _n)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
         _state = {"params": _params}
-        QtCore.QTimer.singleShot(100, self.q_app.quit)
+        QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         obj.restore_state(_state)
         self.assertEqual(obj._config["state"], _state)
@@ -134,7 +125,7 @@ class TestBaseFrame(unittest.TestCase):
         obj.frame_activated(obj.frame_index)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
         _state = {"params": _params}
-        QtCore.QTimer.singleShot(100, self.q_app.quit)
+        QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         obj.restore_state(_state)
         _, _state = obj.export_state()

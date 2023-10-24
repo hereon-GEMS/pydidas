@@ -59,10 +59,37 @@ _ADVANCED = FitMultiPeak.advanced_parameters + [
 
 class FitDoublePeak(FitMultiPeak):
     """
-    Fit a single peak to the input data.
+    Fit two (potentially overlapping) peaks to the input data.
 
     This plugin allows to fit the input data with any function defined in the
     pydidas.core.fitting package.
+
+    The fitting range is defined through the *Peak fit lower limit* and
+    *Peak fit upper limit*.
+
+    The Fit double peak plugin always sorts peaks in ascending order of their
+    x-positions. That is, the peak at the smallest x position will always be peak #1.
+
+    By default, the plugin tries to estimate starting values for the peak
+    positions and peak widths from the input data by finding the data maximum.
+    These defaults can be manually overwritten with the *Peak #i fit x0 start guess*
+    and *Peak #i fit sigma or Gamma start guess* values in the advanced parameter,
+    where #i corresponds to the peak number (#1 or #2).
+
+    Fitting limits for the center position can be set with the *Peak #i low x boundary*
+    and *Peak #i high x boundary* values.
+
+    To discard small peaks, i.e. data points where there is no signal, the
+    *Minimum peak height to fit* parameter can be set to define a minimum height
+    (of the data maximum) above the background to attempt a fit.
+
+    The quality of the fit is measured in the normalized standard deviation of the
+    fit from the data
+        Std(data - fit) / Mean(data)
+    Fits which differ by more than the threshold defined in the
+    *Fit sigma rejection threshold* will be handled as failed and will return NaN
+    values. Adjusting the rejection threshold will allow to modify the goodness of the
+    fits to accept.
     """
 
     plugin_name = "Fit double peak"

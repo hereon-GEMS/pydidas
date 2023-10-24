@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -24,20 +24,28 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
-import tempfile
-import shutil
 import copy
 import pickle
+import shutil
+import tempfile
+import unittest
 
 import numpy as np
 
-from pydidas.core import Parameter, get_generic_parameter, utils, UserConfigError
+from pydidas.core import Parameter, UserConfigError, get_generic_parameter, utils
 from pydidas.core.constants import BASE_PLUGIN
 from pydidas.core.utils import rebin2d
-from pydidas.unittest_objects import create_plugin_class
-from pydidas.plugins import BasePlugin
 from pydidas.data_io.utils import RoiSliceManager
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import create_plugin_class
+
+
+class TestLinkedObject:
+    def __init__(self, params):
+        self.params = params
+
+    def get_param_value(self, key):
+        return self.params.get_value(key)
 
 
 class TestBasePlugin(unittest.TestCase):
@@ -445,6 +453,20 @@ class TestBasePlugin(unittest.TestCase):
         cp = copy.copy(obj)
         self.assertEqual(obj.__class__, cp.__class__)
         self.assertEqual(obj.get_param_value("label"), cp.get_param_value("label"))
+        self.assertNotEqual(id(obj.params), id(cp.params))
+
+    def test_copy__with_linked_object(self):
+        plugin = create_plugin_class(BASE_PLUGIN)
+        obj = plugin()
+        obj.dummy = TestLinkedObject(obj.params)
+        obj.set_param_value("label", "Test 12423536")
+        self.assertEqual(
+            obj.dummy.get_param_value("label"), obj.get_param_value("label")
+        )
+        cp = copy.copy(obj)
+        self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
+        cp.set_param_value("label", "Test 12423536")
+        self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
 
     def test_init__plain(self):
         plugin = create_plugin_class(BASE_PLUGIN)()

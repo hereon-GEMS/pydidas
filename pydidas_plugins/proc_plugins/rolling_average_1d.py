@@ -29,13 +29,13 @@ __all__ = ["RollingAverage1d"]
 
 import numpy as np
 
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core import (
     Dataset,
-    get_generic_param_collection,
     Parameter,
     UserConfigError,
+    get_generic_param_collection,
 )
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
 
@@ -74,7 +74,7 @@ class RollingAverage1d(ProcPlugin):
         self._details = None
 
     @property
-    def detailed_results(self):
+    def detailed_results(self) -> dict:
         """
         Get the detailed results for the RemoveOutliers plugin.
 
@@ -96,7 +96,7 @@ class RollingAverage1d(ProcPlugin):
         self._kernel = np.ones(self._config["width"]) / self._config["width"]
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Crop 1D data.
 
@@ -109,20 +109,18 @@ class RollingAverage1d(ProcPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The image data.
+        data : pydidas.core.Dataset
+            The averaged profile.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self._input_data = data.copy()
+        self._input_data = data
         _new_data = Dataset(
             np.convolve(data, self._kernel, mode="same"), **data.property_dict
         )
-        _new_data[: self._config["index_offset"]] = data[: self._config["index_offset"]]
-        _new_data[-self._config["index_offset"] :] = data[
-            -self._config["index_offset"] :
-        ]
-
+        _offset = self._config["index_offset"]
+        _new_data[:_offset] = data[:_offset]
+        _new_data[-_offset:] = data[-_offset:]
         self._results = _new_data
         self._details = {None: self._create_detailed_results()}
         return _new_data, kwargs

@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,14 +21,15 @@ be opened by the main GUI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 # import __all__ items from modules:
 from .about_window import *
+from .convert_fit2d_geometry import *
 from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .image_series_operations_window import *
@@ -39,6 +40,7 @@ from .qt_paths_window import *
 from .scan_dimension_information_window import *
 from .select_integration_region_window import *
 from .show_detailed_plugin_results_window import *
+from .show_information_for_result import *
 from .tweak_plugin_parameter_window import *
 from .user_config_window import *
 
@@ -48,6 +50,11 @@ from . import about_window
 
 __all__.extend(about_window.__all__)
 del about_window
+
+from . import convert_fit2d_geometry
+
+__all__.extend(convert_fit2d_geometry.__all__)
+del convert_fit2d_geometry
 
 from . import export_eiger_pixelmask
 
@@ -98,6 +105,11 @@ from . import show_detailed_plugin_results_window
 
 __all__.extend(show_detailed_plugin_results_window.__all__)
 del show_detailed_plugin_results_window
+
+from . import show_information_for_result
+
+__all__.extend(show_information_for_result.__all__)
+del show_information_for_result
 
 from . import tweak_plugin_parameter_window
 

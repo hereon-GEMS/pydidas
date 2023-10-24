@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,23 +16,23 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Timer class which allows to time code running and print
-the code runtime to the console.
+The Timer context manager allows to time and print code runtimes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Timer", "TimerSaveRuntime"]
+
 
 import time
 
 
 class Timer:
     """
-    The Timer class can be used to time running code.
+    The Timer class can be used to time running code and print results.
 
     Is it designed to be used in a "with Timer():" statement.
 
@@ -46,9 +48,11 @@ class Timer:
         self._msg = msg
 
     def __enter__(self):
+        """Start the context manager."""
         self._tstart = time.perf_counter()
 
     def __exit__(self, type_, value, traceback):
+        """Exit the context manager."""
         _delta = time.perf_counter() - self._tstart
         _str = f"Code runtime is {_delta:0.9f} seconds."
         if self._msg is not None:
@@ -58,8 +62,10 @@ class Timer:
 
 class TimerSaveRuntime:
     """
-    The TimerSaveRuntime class can be used to time running code and save the result
-    to a variable.
+    The TimerSaveRuntime context manager can be used to time code runtime.
+
+    When running code with this context manager, the runtime can be accessed
+    through a call to the context manager after running it.
 
     Is it designed to be used in a "with TimerSaveRuntime() as var:" statement.
 
@@ -76,8 +82,10 @@ class TimerSaveRuntime:
         self._tend = 0
 
     def __enter__(self):
+        """Start the context manager."""
         self._tstart = time.perf_counter()
         return lambda: self._tend - self._tstart
 
     def __exit__(self, type_, value, traceback):
+        """Exit the context manager."""
         self._tend = time.perf_counter()

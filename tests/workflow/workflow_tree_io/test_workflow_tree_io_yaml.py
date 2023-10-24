@@ -33,9 +33,10 @@ import yaml
 
 import pydidas
 from pydidas.core import UserConfigError
-from pydidas.workflow.workflow_tree import _WorkflowTree, WorkflowTree
-from pydidas.workflow.workflow_tree_io.workflow_tree_io_yaml import WorkflowTreeIoYaml
+from pydidas.workflow.workflow_tree import WorkflowTree, _WorkflowTree
 from pydidas.workflow.workflow_tree_io import WorkflowTreeIoMeta
+from pydidas.workflow.workflow_tree_io.workflow_tree_io_yaml import WorkflowTreeIoYaml
+
 
 PLUGIN_COLL = pydidas.plugins.PluginCollection()
 

@@ -51,8 +51,6 @@ if __QtWidgets.QApplication.instance() is None:
 # import local modules
 from .version import version, VERSION
 
-# Change the multiprocessing Process spawn method to handle silx/pyFAI in linux
-import warnings as __warnings
 
 # import sub-packages:
 from . import core

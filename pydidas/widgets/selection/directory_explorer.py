@@ -275,7 +275,7 @@ class _NetworkLocationFilterModel(QtCore.QSortFilterProxyModel):
         __storage = QtCore.QStorageInfo()
         if platform.system() == "Windows":
             __prefix = "\\\\?\\Volume"
-        elif platform.system() == "Unix":
+        elif platform.system() in ["Unix", "Linux"]:
             __prefix = "/dev/"
         else:
             raise SystemError("Only windows and unix operating systems are supported!")

@@ -253,9 +253,6 @@ class PydidasFileDialog(
             )
         if self._config["curr_dir"] is not None:
             self.setDirectory(self._config["curr_dir"])
-
-        _splitter = self.layout().itemAt(2).widget()
-        _splitter.moveSplitter(self._widgets["sidebar_frame"].width(), 1)
         return QtWidgets.QFileDialog.exec_(self)
 
     def get_existing_directory(self):

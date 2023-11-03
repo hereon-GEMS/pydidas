@@ -29,6 +29,7 @@ __all__ = ["WorkflowTreeEditManager"]
 
 
 import time
+from typing import Iterable, Optional
 
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
@@ -87,11 +88,11 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.__delete_all_nodes_and_widgets
         )
 
-    def update_qt_canvas(self, qt_canvas):
+    def update_qt_canvas(self, qt_canvas: Optional[QtWidgets.QWidget] = None):
         """
-        Store references to the QT items.
+        Store references to the QtCanvas for drawing.
 
-        This method stores internal references to the canvas and main window.
+        This method stores an internal reference to the canvas.
         Because the class is designed as singleton, this information will
         typically not be available at instantiation and needs to be supplied
         at runtime.
@@ -197,7 +198,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             node_id,
             parent=self.qt_canvas,
             label=label,
-            standardSize=(self.PLUGIN_WIDGET_WIDTH, self.PLUGIN_WIDGET_HEIGHT),
+            standard_size=(self.PLUGIN_WIDGET_WIDTH, self.PLUGIN_WIDGET_HEIGHT),
         )
         _widget.sig_widget_activated.connect(self.set_active_node)
         _widget.sig_widget_delete_branch_request.connect(self.delete_branch)
@@ -389,7 +390,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         new workflow.
         """
         _all_ids = list(self._node_widgets.keys())
-        self.__delete_nodes_and_widgets(*_all_ids)
+        self.__delete_nodes_and_widgets(*_all_ids, delete_widgets=_all_ids)
 
     @QtCore.Slot(int)
     def delete_branch(self, node_id):
@@ -406,9 +407,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The node_id if the node to be deleted.
         """
         _ids = TREE.nodes[node_id].get_recursive_ids()
+        _branch_ids = [_id for _id in _ids if _id != node_id]
         TREE.delete_node_by_id(node_id)
         self._nodes[node_id].delete_node_references()
-        self.__delete_nodes_and_widgets(*_ids)
+        self.__delete_nodes_and_widgets(*_ids, delete_widgets=_branch_ids)
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
@@ -445,19 +447,32 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.sig_plugin_selected.emit(-1)
         self._check_consistency()
 
-    def __delete_nodes_and_widgets(self, *ids):
+    def __delete_nodes_and_widgets(
+        self, *ids: Iterable[int], delete_widgets: Iterable[int]=()
+        ):
         """
         Delete all nodes and widgets with corresponding IDs from the manager.
 
         Parameters
         ----------
-        *ids : tuple
-            The list of integer widget/node IDs.
+        *ids : Iterable[int]
+            All integer widget/node IDs in any Iterable datatype.
+        delete_widgets : Iterable[int], optional
+            The integer widget IDs of the widgets to be deleted.        
         """
-        for _id in ids:
+        for _id in delete_widgets:
+            self.sig_consistent_plugins.disconnect(
+                self._node_widgets[_id].receive_consistent_signal
+            )
+            self.sig_inconsistent_plugins.disconnect(
+                self._node_widgets[_id].receive_inconsistent_signal
+            )
             self._node_widgets[_id].deleteLater()
-        # wait to verify that widgets have had time to be removed
-        time.sleep(0.0005)
+#        # wait to verify that widgets have had time to be removed
+#        time.sleep(0.0005)
+        QtWidgets.QApplication.instance().sendPostedEvents(        
+            None, QtCore.QEvent.DeferredDelete
+        )
         for _id in ids:
             del self._nodes[_id]
             del self._node_widgets[_id]

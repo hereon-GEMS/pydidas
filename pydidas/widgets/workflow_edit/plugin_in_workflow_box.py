@@ -179,9 +179,11 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self._del_actions["delete"].triggered.connect(
             partial(self.sig_widget_delete_request.emit, self.widget_id)
         )
+        self._del_actions["delete"].triggered.connect(self.deleteLater)
         self._del_actions["delete_branch"].triggered.connect(
             partial(self.sig_widget_delete_branch_request.emit, self.widget_id)
         )
+        self._del_actions["delete_branch"].triggered.connect(self.deleteLater)
         self._delete_node_context.addAction(self._del_actions["delete"])
         self._delete_node_context.addAction(self._del_actions["delete_branch"])
 

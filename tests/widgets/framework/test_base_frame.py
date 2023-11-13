@@ -31,6 +31,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.widgets.framework import BaseFrame
+from pydidas_qtcore import PydidasQApplication
 
 
 class SignalTestClass(QtCore.QObject):
@@ -52,7 +53,7 @@ class TestBaseFrame(unittest.TestCase):
     def setUpClass(cls):
         cls._qtapp = QtWidgets.QApplication.instance()
         if cls._qtapp is None:
-            cls._qtapp = QtWidgets.QApplication([])
+            cls._qtapp = PydidasQApplication([])
 
         cls.tester = SignalTestClass()
         # cls.widgets = []

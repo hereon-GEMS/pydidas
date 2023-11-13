@@ -31,6 +31,7 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core import BaseApp, get_generic_parameter
 from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas_qtcore import PydidasQApplication
 
 
 class DummyRunner:
@@ -58,7 +59,7 @@ class TestBaseFrameWithApp(unittest.TestCase):
     def setUpClass(cls):
         cls._qtapp = QtWidgets.QApplication.instance()
         if cls._qtapp is None:
-            cls._qtapp = QtWidgets.QApplication([])
+            cls._qtapp = PydidasQApplication([])
         # cls.widgets = []
 
     @classmethod

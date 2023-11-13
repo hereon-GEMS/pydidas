@@ -30,6 +30,7 @@ import unittest
 from qtpy import QtCore, QtWidgets
 
 from pydidas.widgets.framework import PydidasStatusWidget
+from pydidas_qtcore import PydidasQApplication
 
 
 class TestPydidasStatusWidget(unittest.TestCase):
@@ -37,7 +38,7 @@ class TestPydidasStatusWidget(unittest.TestCase):
     def setUpClass(cls):
         cls.q_app = QtWidgets.QApplication.instance()
         if cls.q_app is None:
-            cls.q_app = QtWidgets.QApplication(sys.argv)
+            cls.q_app = PydidasQApplication(sys.argv)
         cls.widgets = []
 
     @classmethod

@@ -33,6 +33,7 @@ from qtpy import QtWidgets
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.factory.create_widgets_mixin import CreateWidgetsMixIn
 from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
+from pydidas_qtcore import PydidasQApplication
 
 
 class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
@@ -47,7 +48,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
     def setUpClass(cls):
         cls.q_app = QtWidgets.QApplication.instance()
         if cls.q_app is None:
-            cls.q_app = QtWidgets.QApplication([])
+            cls.q_app = PydidasQApplication([])
         cls.widgets = []
 
     @classmethod

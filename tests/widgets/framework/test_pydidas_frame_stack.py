@@ -32,6 +32,7 @@ import numpy as np
 from qtpy import QtWidgets
 
 from pydidas.widgets.framework import BaseFrame, PydidasFrameStack
+from pydidas_qtcore import PydidasQApplication
 
 
 class TestWidget(BaseFrame):
@@ -57,7 +58,7 @@ class TestPydidasFrameStack(unittest.TestCase):
     def setUpClass(cls):
         cls._qtapp = QtWidgets.QApplication.instance()
         if cls._qtapp is None:
-            cls._qtapp = QtWidgets.QApplication([])
+            cls._qtapp = PydidasQApplication([])
         cls.frames = []
 
     @classmethod

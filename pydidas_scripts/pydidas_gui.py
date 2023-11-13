@@ -98,11 +98,11 @@ def start_pydidas_gui(splash_screen: QSplashScreen, restore_state: str = "None")
 
 def run_gui():
     """Run the pydidas graphical user interface process."""
+    # need to import here to prevent crash on Debian
+    import pyFAI.azimuthalIntegrator
     from qtpy.QtWidgets import QApplication
 
     from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
-    # need to import here to prevent crash on Debian
-    import pyFAI.azimuthalIntegrator
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = QApplication.instance()

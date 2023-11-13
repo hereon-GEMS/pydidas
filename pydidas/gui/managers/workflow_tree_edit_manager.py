@@ -64,7 +64,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     PLUGIN_WIDGET_WIDTH = -1
     PLUGIN_WIDGET_HEIGHT = -1
 
-    def __init__(self, qt_canvas=None):
+    def __init__(self, qt_canvas: Optional[QtWidgets.QWidget] = None):
         """
         Set up the instance.
 
@@ -116,7 +116,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_widgets = {}
         self._nodes = {}
 
-    def add_new_plugin_node(self, name, title=None, parent_node_id=None):
+    def add_new_plugin_node(
+        self, name: str, title: str = "", parent_node_id: Optional[int] = None
+    ):
         """
         Add a new plugin node to the workflow.
 
@@ -133,8 +135,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         name : str
             The name of the plugin.
         title : str, optional
-            The title of the plugin widget. If None, this will default to the
-            widget name. The default is None.
+            The title of the plugin widget. If no title is given, this will default
+            to the widget name. The default is an empty string.
         parent_node : Union[int, None], optional
             The id of the parent node, if given. If None, this will default to the
             WorkflowTree's active node.
@@ -152,14 +154,14 @@ class _WorkflowTreeEditManager(QtCore.QObject):
 
         _node_id = TREE.active_node_id
         self.__create_position_node(_node_id)
-        self.__create_widget(title if title is not None else name, _node_id)
+        self.__create_widget(title if len(title) > 0 else name, _node_id)
         self.set_active_node(_node_id, force_update=True)
         if not self.qt_canvas:
             raise Warning("No QtCanvas defined. Nodes cannot be displayed")
         self.update_node_positions()
         self._check_consistency()
 
-    def __create_position_node(self, node_id):
+    def __create_position_node(self, node_id: int):
         """
         Create a new PluginPositionNode with the current node ID.
 
@@ -179,7 +181,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         if self.root is None:
             self.root = _node
 
-    def __create_widget(self, title, node_id, label=""):
+    def __create_widget(self, title: str, node_id: int, label: str = ""):
         """
         Create the widget associated with the Plugin to display the plugin
         position on the canvas.
@@ -191,7 +193,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         node_id : int
             The node ID. Required for referencing the widgets later.
         label : str, optional
-            The plugin label.
+            The plugin label. The default is an empty string.
         """
         _widget = PluginInWorkflowBox(
             title,
@@ -212,7 +214,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_widgets[node_id] = _widget
 
     @QtCore.Slot(int)
-    def set_active_node(self, node_id, force_update=False):
+    def set_active_node(self, node_id: int, force_update: bool = False):
         """
         Set the node with node_id to be the active node.
 
@@ -241,7 +243,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.sig_plugin_class_selected.emit(TREE.active_node.plugin.plugin_name)
 
     @QtCore.Slot(str)
-    def replace_plugin(self, plugin_name):
+    def replace_plugin(self, plugin_name: str):
         """
         Replace the active node's Plugin by a new Plugin class.
 
@@ -257,7 +259,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._check_consistency()
 
     @QtCore.Slot(int, str)
-    def new_node_label_selected(self, node_id, label):
+    def new_node_label_selected(self, node_id: int, label: str):
         """
         Process the newly selected plugin label.
 
@@ -271,7 +273,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_widgets[node_id].update_text(node_id, label)
 
     @QtCore.Slot(int, int)
-    def new_node_parent_request(self, calling_node, new_parent_node):
+    def new_node_parent_request(self, calling_node: int, new_parent_node: int):
         """
         Handle the signal that a node requested to have a new parent.
 
@@ -288,7 +290,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._check_consistency()
 
     @QtCore.Slot(int, int)
-    def create_node_copy_request(self, calling_node, new_parent_node):
+    def create_node_copy_request(self, calling_node: int, new_parent_node: int):
         """
         Handle the signal that a node requested to append a copy of itself to parent.
 
@@ -351,7 +353,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             widget_conns.append([x0, y0, x1, y1])
         self.qt_canvas.update_widget_connections(widget_conns)
 
-    def update_from_tree(self, reset_active_node=False):
+    def update_from_tree(self, reset_active_node: bool = False):
         """
         Update the canvas and nodes from the WorkflowTree.
 
@@ -393,7 +395,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.__delete_nodes_and_widgets(*_all_ids, delete_widgets=_all_ids)
 
     @QtCore.Slot(int)
-    def delete_branch(self, node_id):
+    def delete_branch(self, node_id: int):
         """
         Remove a node and branch from the tree.
 
@@ -418,7 +420,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.sig_plugin_selected.emit(-1)
 
     @QtCore.Slot(int)
-    def delete_node(self, node_id):
+    def delete_node(self, node_id: int):
         """
         Remove a single node from the tree and connect its children to its parent.
 
@@ -448,8 +450,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._check_consistency()
 
     def __delete_nodes_and_widgets(
-        self, *ids: Iterable[int], delete_widgets: Iterable[int]=()
-        ):
+        self, *ids: Iterable[int], delete_widgets: Iterable[int] = ()
+    ):
         """
         Delete all nodes and widgets with corresponding IDs from the manager.
 
@@ -458,7 +460,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         *ids : Iterable[int]
             All integer widget/node IDs in any Iterable datatype.
         delete_widgets : Iterable[int], optional
-            The integer widget IDs of the widgets to be deleted.        
+            The integer widget IDs of the widgets to be deleted.
         """
         for _id in delete_widgets:
             self.sig_consistent_plugins.disconnect(
@@ -468,11 +470,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
                 self._node_widgets[_id].receive_inconsistent_signal
             )
             self._node_widgets[_id].deleteLater()
-#        # wait to verify that widgets have had time to be removed
-#        time.sleep(0.0005)
-        QtWidgets.QApplication.instance().sendPostedEvents(        
-            None, QtCore.QEvent.DeferredDelete
-        )
         for _id in ids:
             del self._nodes[_id]
             del self._node_widgets[_id]

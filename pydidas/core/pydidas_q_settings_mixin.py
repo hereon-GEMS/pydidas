@@ -101,11 +101,15 @@ class PydidasQsettingsMixin:
             return default
         if dtype is not None:
             if dtype == Integral:
+                if _value in ["true", "True"]:
+                    return 1
+                if _value in ["false", "False"]:
+                    return 0
                 return int(_value)
             if dtype == Real:
                 return float(_value)
             if dtype == bool:
-                return _value == "true"
+                return _value in ["true", "True"]
             return dtype(_value)
         return _value
 

@@ -170,6 +170,16 @@ class _UserConfigWindow(PydidasWindow):
         )
         self.create_spacer(None, parent_widget="config_canvas")
 
+        self.create_label("section_updates", "Update settings", **_section_options)
+        self.create_param_widget(
+            self.get_param("auto_check_for_updates"),
+            parent_widget="config_canvas",
+            width_io=0.25,
+            width_text=0.7,
+        )
+
+        self.create_spacer(None, parent_widget="config_canvas")
+
         self.create_label(
             "section_mosaic", "Composite creator settings", **_section_options
         )

@@ -11,6 +11,12 @@ Improvements
 - Added an exporter for SpecFile .dat format and merged all exporters for 
   ASCII-type files in a single plugin.
 
+Bugfixes
+--------
+
+- Fixed an issue where boolean QSettings could not be read automatically
+  without explicit dtype.
+
 
 v23.10.20
 =========

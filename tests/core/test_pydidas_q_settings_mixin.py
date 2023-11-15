@@ -42,6 +42,7 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
             Parameter("param_float", float, default=123.45),
             Parameter("param_int", int, default=23),
             Parameter("param_str", str, default="test123"),
+            Parameter("param_bool", int, default=True, choices=[True, False]),
         )
         self.q_settings = QtCore.QSettings("Hereon", "pydidas")
         self.q_settings.setValue("old_version/param_int", 42)
@@ -73,11 +74,23 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
         self.assertTrue(isinstance(_val, float))
         self.assertEqual(_val, self._params.get_value("param_float"))
 
+    def test_q_settings_get_value__with_bool(self):
+        obj = PydidasQsettingsMixin()
+        _val = obj.q_settings_get("param_bool", dtype=bool)
+        self.assertTrue(isinstance(_val, bool))
+        self.assertEqual(_val, self._params.get_value("param_bool"))
+
     def test_q_settings_get_value__with_Integral(self):
         obj = PydidasQsettingsMixin()
         _val = obj.q_settings_get("param_int", dtype=Integral)
         self.assertTrue(isinstance(_val, int))
         self.assertEqual(_val, self._params.get_value("param_int"))
+
+    def test_q_settings_get_value__int_with_bool(self):
+        obj = PydidasQsettingsMixin()
+        _val = obj.q_settings_get("param_bool", dtype=Integral)
+        self.assertTrue(isinstance(_val, int))
+        self.assertEqual(_val, self._params.get_value("param_bool"))
 
     def test_q_settings_get_value__with_Real(self):
         obj = PydidasQsettingsMixin()

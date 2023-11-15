@@ -2,6 +2,15 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v20.11.20
+=========
+
+Improvements
+------------
+
+- Added an exporter for SpecFile .dat format and merged all exporters for 
+  ASCII-type files in a single plugin.
+
 
 v23.10.20
 =========

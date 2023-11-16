@@ -92,6 +92,7 @@ def start_pydidas_gui(splash_screen: QSplashScreen, restore_state: str = "None")
         except UserConfigError:
             pass
     splash_screen.finish(gui)
+    gui.check_for_updates(auto_check=True)
     gui.raise_()
     return _app.exec_()
 

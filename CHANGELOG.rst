@@ -10,12 +10,14 @@ Improvements
 
 - Added an exporter for SpecFile .dat format and merged all exporters for 
   ASCII-type files in a single plugin.
+- Added additional keyword options to the AcknowledgeBox.
 
 Bugfixes
 --------
 
 - Fixed an issue where boolean QSettings could not be read automatically
   without explicit dtype.
+- Fixed a Qt5 issue with font scaling in the AcknowledgeBox widget.
 
 
 v23.10.20

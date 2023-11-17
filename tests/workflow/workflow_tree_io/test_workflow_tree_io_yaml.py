@@ -33,15 +33,17 @@ import yaml
 
 import pydidas
 from pydidas.core import UserConfigError
-from pydidas.workflow.workflow_tree import WorkflowTree, _WorkflowTree
-from pydidas.workflow.workflow_tree_io import WorkflowTreeIoMeta
-from pydidas.workflow.workflow_tree_io.workflow_tree_io_yaml import WorkflowTreeIoYaml
+from pydidas.workflow import ProcessingTree, WorkflowTree
+from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
+from pydidas.workflow.processing_tree_io.processing_tree_io_yaml import (
+    ProcessingTreeIoYaml,
+)
 
 
 PLUGIN_COLL = pydidas.plugins.PluginCollection()
 
 
-class TestWorkflowTreeIoYaml(unittest.TestCase):
+class TestProcessingTreeIoYaml(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._path = tempfile.mkdtemp()
@@ -71,23 +73,23 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
             yaml.safe_dump(_dump, _f)
 
     def test_init(self):
-        obj = WorkflowTreeIoYaml()
-        self.assertIsInstance(obj, WorkflowTreeIoYaml)
+        obj = ProcessingTreeIoYaml()
+        self.assertIsInstance(obj, ProcessingTreeIoYaml)
 
     def test_export_to_file(self):
-        WorkflowTreeIoYaml.export_to_file(self._filename, self.TREE, overwrite=True)
+        ProcessingTreeIoYaml.export_to_file(self._filename, self.TREE, overwrite=True)
         with open(self._filename, "r") as f:
             _save = yaml.safe_load(f)
         self.assertIn("version", _save)
         self.assertIn("nodes", _save)
         self.assertEqual(_save["version"], pydidas.VERSION)
         # assert does not raise an error
-        _new = _WorkflowTree()
+        _new = ProcessingTree()
         _new.restore_from_list_of_nodes(_save["nodes"])
 
     def test_import_from_file__w_version(self):
         self.create_correct_export()
-        _new = WorkflowTreeIoYaml.import_from_file(self._filename)
+        _new = ProcessingTreeIoYaml.import_from_file(self._filename)
         self.assertEqual(set(_new.nodes), set(self.TREE.nodes))
         for _id, _node in _new.nodes.items():
             self.assertEqual(
@@ -99,7 +101,7 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
             _dump = {"nodes": "np.ndarrray((12))", "version": pydidas.VERSION}
             yaml.safe_dump(_dump, _f)
         with self.assertRaises(UserConfigError):
-            WorkflowTreeIoYaml.import_from_file(self._filename)
+            ProcessingTreeIoYaml.import_from_file(self._filename)
 
     def test_import_from_file__old_version_no_error(self):
         with open(self._filename, "w") as _f:
@@ -108,7 +110,7 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
                 "version": "0.0.0",
             }
             yaml.safe_dump(_dump, _f)
-        _new = WorkflowTreeIoYaml.import_from_file(self._filename)
+        _new = ProcessingTreeIoYaml.import_from_file(self._filename)
         self.assertEqual(set(_new.nodes), set(self.TREE.nodes))
         for _id, _node in _new.nodes.items():
             self.assertEqual(
@@ -120,24 +122,24 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
             _dump = {"nodes": "dummy incorrect string", "version": "0.0.0"}
             yaml.safe_dump(_dump, _f)
         with self.assertRaises(UserConfigError):
-            WorkflowTreeIoYaml.import_from_file(self._filename)
+            ProcessingTreeIoYaml.import_from_file(self._filename)
 
     def test_export_to_file__existing_file_no_overwrite(self):
         with open(self._filename, "w") as f:
             f.write("test")
         with self.assertRaises(FileExistsError):
-            WorkflowTreeIoYaml.export_to_file(self._filename, self.TREE)
+            ProcessingTreeIoYaml.export_to_file(self._filename, self.TREE)
 
     def test_export_to_file__existing_file__overwrite(self):
         with open(self._filename, "w") as f:
             f.write("test")
-        WorkflowTreeIoYaml.export_to_file(self._filename, self.TREE, overwrite=True)
+        ProcessingTreeIoYaml.export_to_file(self._filename, self.TREE, overwrite=True)
         # assert does not raise an error
 
     def test__meta_import_from_file(self):
-        WorkflowTreeIoMeta.register_class(WorkflowTreeIoYaml, update_registry=True)
+        ProcessingTreeIoMeta.register_class(ProcessingTreeIoYaml, update_registry=True)
         self.create_correct_export()
-        _new = WorkflowTreeIoMeta.import_from_file(self._filename)
+        _new = ProcessingTreeIoMeta.import_from_file(self._filename)
         self.assertEqual(set(_new.nodes), set(self.TREE.nodes))
         for _id, _node in _new.nodes.items():
             self.assertEqual(

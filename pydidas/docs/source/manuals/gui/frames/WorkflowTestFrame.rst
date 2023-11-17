@@ -13,7 +13,7 @@ Workflow test frame
     :backlinks: none
     
 The Workflow test frame can be used to run the 
-:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` locally
+:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` locally
 for a single scan point and visualize all results, including intermediate 
 results.
 
@@ -27,11 +27,11 @@ canvas for data visualization on the right.
 Keeping the Workflow up to date
 -------------------------------
 
-The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
+The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`
 is automatically kept up to date. If any Plugin, Plugin Parameter or ScanContext
 Parameter changes, the WorkflowTree is automatically updated.
 In these instances, it is not required to manually update the 
-:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
+:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`.
 
 .. image: images/workflow_test_reset.png
     :align: right
@@ -48,7 +48,7 @@ Data source selection
 
 
 A single frame must be selected to test the 
-:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`. Three 
+:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`. Three 
 options exist for selecting the frame which can be toggled by the "Image 
 selection" Parameter (see image on the right). 
 

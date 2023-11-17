@@ -40,7 +40,7 @@ from ...contexts.scan_context import Scan
 from ...core import Dataset
 from ...core.io_registry import GenericIoMeta
 from ...core.utils import get_extension
-from ..workflow_tree import _WorkflowTree
+from ..processing_tree import ProcessingTree
 
 
 class WorkflowResultIoMeta(GenericIoMeta):
@@ -117,7 +117,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
         node_information: dict,
         scan_context: Union[Scan, None] = None,
         diffraction_exp: Union[DiffractionExperiment, None] = None,
-        workflow_tree: Union[_WorkflowTree, None] = None,
+        workflow_tree: Union[ProcessingTree, None] = None,
     ):
         """
         Prepare the active savers for storing data.
@@ -275,7 +275,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
     @classmethod
     def import_data_from_directory(
         cls, dirname: Union[Path, str]
-    ) -> tuple[dict[int, Dataset], dict, Scan, DiffractionExperiment, _WorkflowTree]:
+    ) -> tuple[dict[int, Dataset], dict, Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import data from files in a directory.
 
@@ -305,7 +305,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
         _node_info_dict = {}
         _scan = Scan()
         _exp = DiffractionExperiment()
-        _tree = _WorkflowTree()
+        _tree = ProcessingTree()
         _files = [
             _file
             for _file in os.listdir(dirname)

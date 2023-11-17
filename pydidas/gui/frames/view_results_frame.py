@@ -37,8 +37,7 @@ from ...contexts.scan_context import Scan
 from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame
-from ...workflow import WorkflowResults, result_io
-from ...workflow.workflow_tree import _WorkflowTree
+from ...workflow import ProcessingTree, WorkflowResults, result_io
 from ..mixins import ViewResultsMixin
 from .builders.view_results_frame_builder import ViewResultsFrameBuilder
 
@@ -62,7 +61,7 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
 
     def __init__(self, **kwargs: dict) -> Self:
         self._SCAN = Scan()
-        self._TREE = _WorkflowTree()
+        self._TREE = ProcessingTree()
         self._EXP = DiffractionExperiment()
         self._RESULTS = WorkflowResults(
             diffraction_exp_context=self._EXP,

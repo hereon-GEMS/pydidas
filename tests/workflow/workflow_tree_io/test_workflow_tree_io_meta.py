@@ -27,18 +27,18 @@ __status__ = "Production"
 import unittest
 
 from pydidas.unittest_objects.mp_test_app import MpTestApp
-from pydidas.workflow.workflow_tree_io import WorkflowTreeIoMeta
+from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
 
 
-class TestWorkflowTreeIoMeta(unittest.TestCase):
+class TestProcessingTreeIoMeta(unittest.TestCase):
     def setUp(self):
-        WorkflowTreeIoMeta.clear_registry()
+        ProcessingTreeIoMeta.clear_registry()
 
     def tearDown(self):
         ...
 
     def create_test_class(self):
-        class TestClass(metaclass=WorkflowTreeIoMeta):
+        class TestClass(metaclass=ProcessingTreeIoMeta):
             extensions = ["test", "another_test"]
             format_name = "Test"
             trees = {}
@@ -56,39 +56,39 @@ class TestWorkflowTreeIoMeta(unittest.TestCase):
         self.test_class = TestClass
 
     def test_empty(self):
-        self.assertEqual(WorkflowTreeIoMeta.registry, dict())
+        self.assertEqual(ProcessingTreeIoMeta.registry, dict())
 
     def test_new__method(self):
-        self.assertEqual(WorkflowTreeIoMeta.registry, dict())
+        self.assertEqual(ProcessingTreeIoMeta.registry, dict())
         self.create_test_class()
         for _key in self.test_class.extensions:
-            self.assertTrue(_key in WorkflowTreeIoMeta.registry)
+            self.assertTrue(_key in ProcessingTreeIoMeta.registry)
 
     def test_import_from_file(self):
-        self.assertEqual(WorkflowTreeIoMeta.registry, dict())
+        self.assertEqual(ProcessingTreeIoMeta.registry, dict())
         self.create_test_class()
         # just use any object for testing:
         _test_object = MpTestApp()
         self.test_class.trees["dummy.test"] = _test_object
-        _new_obj = WorkflowTreeIoMeta.import_from_file("dummy.test")
+        _new_obj = ProcessingTreeIoMeta.import_from_file("dummy.test")
         self.assertEqual(_test_object, _new_obj)
 
     def test_export_to_file(self):
-        self.assertEqual(WorkflowTreeIoMeta.registry, dict())
+        self.assertEqual(ProcessingTreeIoMeta.registry, dict())
         self.create_test_class()
         # just use any object for testing:
         _test_object = MpTestApp()
-        WorkflowTreeIoMeta.export_to_file("dummy.test", _test_object)
+        ProcessingTreeIoMeta.export_to_file("dummy.test", _test_object)
         self.assertEqual(_test_object, self.test_class.trees["dummy.test"])
 
     def test_get_string_of_formats__empty(self):
         self.assertEqual(
-            WorkflowTreeIoMeta.get_string_of_formats(), "All supported files ()"
+            ProcessingTreeIoMeta.get_string_of_formats(), "All supported files ()"
         )
 
     def test_get_string_of_formats__with_entry(self):
         self.create_test_class()
-        _res = WorkflowTreeIoMeta.get_string_of_formats()
+        _res = ProcessingTreeIoMeta.get_string_of_formats()
         _target = (
             "All supported files (*.test *.another_test);;"
             "Test (*.test *.another_test)"
@@ -96,11 +96,11 @@ class TestWorkflowTreeIoMeta(unittest.TestCase):
         self.assertEqual(_res, _target)
 
     def test_get_registered_formats_and_extensions__empty(self):
-        self.assertEqual(WorkflowTreeIoMeta.get_registered_formats(), dict())
+        self.assertEqual(ProcessingTreeIoMeta.get_registered_formats(), dict())
 
     def test_get_registered_formats_and_extensions__with_entry(self):
         self.create_test_class()
-        _res = WorkflowTreeIoMeta.get_registered_formats()
+        _res = ProcessingTreeIoMeta.get_registered_formats()
         self.assertEqual(
             _res, {self.test_class.format_name: self.test_class.extensions}
         )

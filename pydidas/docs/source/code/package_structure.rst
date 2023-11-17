@@ -116,7 +116,7 @@ Sub-package descriptions
         Classes to handle writing the results of the workflow execution to 
         files.
 
-  - *pydidas.workflow.workflow_tree_io* 
+  - *pydidas.workflow.processing_tree_io* 
         
         Registry with importers/exporters and the importer/exporter 
         implementations.

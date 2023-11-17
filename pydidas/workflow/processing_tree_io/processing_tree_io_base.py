@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowTreeIoBase class which exporters/importerss should
+Module with the ProcessingTreeIoBase class which exporters/importerss should
 inherit from.
 """
 
@@ -25,19 +25,19 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowTreeIoBase"]
+__all__ = ["ProcessingTreeIoBase"]
 
 
 from ...core.io_registry import GenericIoBase
-from .workflow_tree_io_meta import WorkflowTreeIoMeta
+from .processing_tree_io_meta import ProcessingTreeIoMeta
 
 
-class WorkflowTreeIoBase(GenericIoBase, metaclass=WorkflowTreeIoMeta):
+class ProcessingTreeIoBase(GenericIoBase, metaclass=ProcessingTreeIoMeta):
     """
     Base class for WorkflowTree exporters.
 
     This class defines the format_name and extensions attributes for all
-    WorkflowTreeIo classes.
+    ProcessingTreeIo classes.
     """
 
     extensions = []

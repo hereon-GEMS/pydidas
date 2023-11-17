@@ -29,10 +29,10 @@ import shutil
 import tempfile
 import unittest
 
-from pydidas.workflow.workflow_tree_io import WorkflowTreeIoBase
+from pydidas.workflow.processing_tree_io import ProcessingTreeIoBase
 
 
-class TestWorkflowTreeIoBase(unittest.TestCase):
+class TestProcessingTreeIoBase(unittest.TestCase):
     def setUp(self):
         self._path = tempfile.mkdtemp()
 
@@ -40,26 +40,26 @@ class TestWorkflowTreeIoBase(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def test_init(self):
-        obj = WorkflowTreeIoBase()
-        self.assertIsInstance(obj, WorkflowTreeIoBase)
+        obj = ProcessingTreeIoBase()
+        self.assertIsInstance(obj, ProcessingTreeIoBase)
 
     def test_import_from_file(self):
-        obj = WorkflowTreeIoBase
+        obj = ProcessingTreeIoBase
         with self.assertRaises(NotImplementedError):
             obj.export_to_file("something")
 
     def test_export_to_file(self):
-        obj = WorkflowTreeIoBase
+        obj = ProcessingTreeIoBase
         with self.assertRaises(NotImplementedError):
             obj.import_from_file("something")
 
     def test_check_for_existing_file__file_does_not_exist(self):
-        obj = WorkflowTreeIoBase
+        obj = ProcessingTreeIoBase
         obj.check_for_existing_file(os.path.join(self._path, "test.txt"))
         # assert does not raise an Error
 
     def test_check_for_existing_file__file_does_exist(self):
-        obj = WorkflowTreeIoBase
+        obj = ProcessingTreeIoBase
         _fname = os.path.join(self._path, "test.txt")
         with open(_fname, "w") as f:
             f.write("test")
@@ -67,7 +67,7 @@ class TestWorkflowTreeIoBase(unittest.TestCase):
             obj.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_does_exist_and_overwrite(self):
-        obj = WorkflowTreeIoBase
+        obj = ProcessingTreeIoBase
         _fname = os.path.join(self._path, "test.txt")
         with open(_fname, "w") as f:
             f.write("test")

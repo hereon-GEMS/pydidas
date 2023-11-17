@@ -11,6 +11,10 @@ Improvements
 - Added an exporter for SpecFile .dat format and merged all exporters for 
   ASCII-type files in a single plugin.
 - Added additional keyword options to the AcknowledgeBox.
+- Added update checks to the menu and to the pydidas_gui startup script.
+- Renamed the _WorkflowTree to ProcessingTree to allow easier direct access
+  to the class and updated references.
+
 
 Bugfixes
 --------

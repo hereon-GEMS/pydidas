@@ -37,8 +37,7 @@ import numpy as np
 from pydidas import unittest_objects
 from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import PluginCollection
-from pydidas.workflow import GenericNode, WorkflowNode, WorkflowTree
-from pydidas.workflow.workflow_tree import _WorkflowTree
+from pydidas.workflow import GenericNode, ProcessingTree, WorkflowNode, WorkflowTree
 
 
 COLL = PluginCollection()
@@ -289,7 +288,7 @@ class TestWorkflowTree(unittest.TestCase):
             unittest_objects.DummyProc(), parent=self.tree.root
         )
         tree2 = copy.copy(self.tree)
-        self.assertIsInstance(tree2, _WorkflowTree)
+        self.assertIsInstance(tree2, ProcessingTree)
         for _node in tree2.nodes.values():
             self.assertIsInstance(_node, WorkflowNode)
         for _node in tree2.root._children:
@@ -302,7 +301,7 @@ class TestWorkflowTree(unittest.TestCase):
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         tree2 = pickle.loads(pickle.dumps(self.tree))
-        self.assertIsInstance(tree2, _WorkflowTree)
+        self.assertIsInstance(tree2, ProcessingTree)
         for _node in tree2.nodes.values():
             self.assertIsInstance(_node, WorkflowNode)
 
@@ -428,22 +427,22 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(hash(tree), hash(tree2))
 
     def test_hash___full_tree(self):
-        tree = _WorkflowTree()
+        tree = ProcessingTree()
         tree.create_and_add_node(unittest_objects.DummyLoader())
         tree.create_and_add_node(unittest_objects.DummyProc())
         tree.create_and_add_node(unittest_objects.DummyProc())
-        tree2 = _WorkflowTree()
+        tree2 = ProcessingTree()
         tree2.create_and_add_node(unittest_objects.DummyLoader())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         self.assertNotEqual(hash(tree), hash(tree2))
 
     def test_hash___full_tree_w_different_plugin_param(self):
-        tree = _WorkflowTree()
+        tree = ProcessingTree()
         tree.create_and_add_node(unittest_objects.DummyLoader())
         tree.create_and_add_node(unittest_objects.DummyProc())
         tree.create_and_add_node(unittest_objects.DummyProc())
-        tree2 = _WorkflowTree()
+        tree2 = ProcessingTree()
         tree2.create_and_add_node(unittest_objects.DummyLoader())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         tree2.create_and_add_node(unittest_objects.DummyProc())

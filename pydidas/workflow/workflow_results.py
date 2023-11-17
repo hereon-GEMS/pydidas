@@ -40,8 +40,9 @@ from ..contexts import DiffractionExperimentContext, ScanContext
 from ..contexts.diffraction_exp_context import DiffractionExperiment
 from ..contexts.scan_context import Scan
 from ..core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
+from .processing_tree import ProcessingTree
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER
-from .workflow_tree import WorkflowTree, _WorkflowTree
+from .workflow_tree import WorkflowTree
 
 
 class WorkflowResults(QtCore.QObject):
@@ -74,7 +75,7 @@ class WorkflowResults(QtCore.QObject):
         self,
         diffraction_exp_context: Union[None, DiffractionExperiment] = None,
         scan_context: Union[None, Scan] = None,
-        workflow_tree: Union[None, _WorkflowTree] = None,
+        workflow_tree: Union[None, ProcessingTree] = None,
     ) -> Self:
         super().__init__()
         self._SCAN = ScanContext() if scan_context is None else scan_context

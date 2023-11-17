@@ -4,8 +4,8 @@
     Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
-workflow.result_io
-----------------------
+workflow.processing_tree_io
+---------------------------
 
-.. automodule:: pydidas.workflow.result_io
+.. automodule:: pydidas.workflow.processing_tree_io
     :members:

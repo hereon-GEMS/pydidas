@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _workflow_results:
 
 The WorkflowResults class
@@ -11,19 +17,19 @@ The WorkflowResults class
 Introduction
 ------------
 
-The :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` is the 
-Singleton instance of the 
+The :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` is the
+Singleton instance of the
 :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`.
 It is used for managing the processing results.
 
-This class does not need any configuration as the layout of the results are 
-determined based on 
+This class does not need any configuration as the layout of the results are
+determined based on
 
-  1. The information about the scan from the 
-     :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
+  1. The information about the scan from the
+     :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`
      class.
-  2. The information about the processing steps from the 
-     :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
+  2. The information about the processing steps from the
+     :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`.
 
 The :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
 is only responsible for storing and presenting the results.
@@ -35,14 +41,14 @@ To access the instance, execute the following code:
     >>> import pydidas
     >>> RESULTS = pydidas.workflow.WorkflowResults()
 
-The public interface is detailed in the class documentation 
+The public interface is detailed in the class documentation
 (:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`)
 and this document will focus on the use case to access results.
 
 Getting information about the results
 -------------------------------------
 
-To get more information about the results, the 
+To get more information about the results, the
 :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
 class has several properties to get general information about the stored results
 
@@ -51,7 +57,7 @@ class has several properties to get general information about the stored results
     :widths: 25 75
     :header-rows: 1
     :class: tight-table
-    
+
     * - property name
       - description
     * - labels
@@ -62,14 +68,14 @@ class has several properties to get general information about the stored results
     * - ndims
       - The number of dimensions of the stored results.
 
-These properties each return a dictionary with the node IDs as keys and the 
+These properties each return a dictionary with the node IDs as keys and the
 respective properties as values.
 
 .. note::
 
-    All information needs to be accessed through the node ID of the 
-    corresponding node in the 
-    :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
+    All information needs to be accessed through the node ID of the
+    corresponding node in the
+    :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`.
 
 An example of what the property values look like is given below:
 
@@ -77,16 +83,16 @@ An example of what the property values look like is given below:
 
     >>> import pydidas
     >>> RESULTS = pydidas.workflow.WorkflowResults()
-    
+
     >>> RESULTS.labels
     {1: 'Azimuth full', 2: 'azimuthal range'}
-    
+
     >>> RESULTS.shapes
     {1: (21, 4, 1000), 2: (21, 4, 1000)}
-    
+
     >>> RESULTS.ndims
     {1: 3, 2: 3}
-    
+
 Accessing results
 -----------------
 
@@ -96,9 +102,9 @@ Accessing a full Plugin Dataset
 Metadata
 """"""""
 
-The metadata of a node ID's Dataset can be accessed using the 
-:py:meth:`get_result_metadata(node_id) 
-<pydidas.workflow.WorkflowResults.get_result_metadata>` 
+The metadata of a node ID's Dataset can be accessed using the
+:py:meth:`get_result_metadata(node_id)
+<pydidas.workflow.WorkflowResults.get_result_metadata>`
 method. It will return a dictionary with the metadata keys and their respective
 data:
 
@@ -118,13 +124,13 @@ data:
 
 Note that the metadata is also included in the full :py:class:`Dataset <pydidas.core.Dataset>`
 and this method is primarily intended if the user needs the metadata without
-creating a copy of the full data. 
+creating a copy of the full data.
 
 Generic Data
 """"""""""""
 
-The :py:meth:`get_results(node_id) <pydidas.workflow.WorkflowResults.get_results>` 
-method is available to access the full Dataset with the results of a Plugin. 
+The :py:meth:`get_results(node_id) <pydidas.workflow.WorkflowResults.get_results>`
+method is available to access the full Dataset with the results of a Plugin.
 The calling parameter is the node ID of the particular Plugin corresponding to
 the results:
 
@@ -183,10 +189,10 @@ Flattened scan dimensions
 """""""""""""""""""""""""
 
 For some applications, it might be interesting to ignore the detailed shape of
-the scan and flatten the scan to a *timeline*. The 
-:py:meth:`get_results_for_flattened_scan(node_id) 
-<pydidas.workflow.WorkflowResults.get_results_for_flattened_scan>` 
-method allows to get a Dataset with all the scan dimensions flattened to a 
+the scan and flatten the scan to a *timeline*. The
+:py:meth:`get_results_for_flattened_scan(node_id)
+<pydidas.workflow.WorkflowResults.get_results_for_flattened_scan>`
+method allows to get a Dataset with all the scan dimensions flattened to a
 single dimension renamed to *timeline*:
 
 .. automethod:: pydidas.workflow.WorkflowResults.get_results_for_flattened_scan
@@ -198,7 +204,7 @@ An example is given below:
 
     >>> import pydidas
     >>> RESULTS = pydidas.workflow.WorkflowResults()
-    
+
     # Get the result in the generic shape:
     >>> res1 = RESULTS.get_results(1)
     >>> res1.shape
@@ -240,15 +246,15 @@ An example is given below:
 Accessing a data subset
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-For convenience, a method to access only a subset of the data is implemented as 
-well: 
+For convenience, a method to access only a subset of the data is implemented as
+well:
 
 .. automethod:: pydidas.workflow.WorkflowResults.get_result_subset
     :noindex:
 
-This method is interesing if the user wants to access a specific subset in the 
-flattened data, for example the results for the frames 40 to 55 of the 
-experiment. This can easily be done using the :py:meth:`get_result_subset 
+This method is interesing if the user wants to access a specific subset in the
+flattened data, for example the results for the frames 40 to 55 of the
+experiment. This can easily be done using the :py:meth:`get_result_subset
 <pydidas.workflow.WorkflowResults.get_result_subset>`
 method, as demonstrated in the example below:
 
@@ -257,10 +263,10 @@ method, as demonstrated in the example below:
 
     >>> import pydidas
     >>> RESULTS = pydidas.workflow.WorkflowResults()
-    
+
     # Define the slice to get the frames 40 to 55 (note that the final index is not included):
     >>> s = slice(40, 56, 1)
-    
+
     # Note that the slices must be a tuple, so we need to create a tuple with
     # the slice object:
     >>> res1 = RESULTS.get_result_subset(1, (s, ), flattened_scan_dim=True)
@@ -294,15 +300,15 @@ method, as demonstrated in the example below:
            [0.        , 0.15469511, 0.00470399, ..., 0.5591186 , 0.9095903 ,
             0.7084448 ]], dtype=float32)
     )
-    
+
 Saving results
 --------------
 
 Saving the results is achieved via the :py:meth:`save_results_to_disk
-<pydidas.workflow.WorkflowResults.save_results_to_disk>` 
+<pydidas.workflow.WorkflowResults.save_results_to_disk>`
 method:
 
-.. automethod:: 
+.. automethod::
     pydidas.workflow.WorkflowResults.save_results_to_disk
     :noindex:
 
@@ -315,16 +321,14 @@ An example is given below:
 .. code-block::
 
     >>> import pydidas
-    >>> RESULTS = pydidas.workflow.WorkflowResults()   
+    >>> RESULTS = pydidas.workflow.WorkflowResults()
     >>> RESULTS.save_results_to_disk('/scratch/scan42_results', 'HDF5')
-    
+
     # Now that the files have been written, trying to write to the same directory
     # will raise an Exception
     >>> RESULTS.save_results_to_disk('/scratch/scan42_results', 'HDF5')
-    FileExistsError: The specified directory "d:/tmp/new3" exists and is not empty. Please 
+    FileExistsError: The specified directory "d:/tmp/new3" exists and is not empty. Please
     select a different directory.
-    
+
     # If we set the overwrite flag, we can write to the same directory again:
     >>> RESULTS.save_results_to_disk('/scratch/scan42_results', 'HDF5', overwrite=True)
-    
-

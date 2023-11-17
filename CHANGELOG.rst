@@ -14,6 +14,9 @@ Improvements
 - Added update checks to the menu and to the pydidas_gui startup script.
 - Renamed the _WorkflowTree to ProcessingTree to allow easier direct access
   to the class and updated references.
+- Added a feature to the AppRunner which automatically calls the 
+  multiprocessing_pre_run method of the input app if it has not yet been
+  called manually by the user.
 
 
 Bugfixes
@@ -22,6 +25,7 @@ Bugfixes
 - Fixed an issue where boolean QSettings could not be read automatically
   without explicit dtype.
 - Fixed a Qt5 issue with font scaling in the AcknowledgeBox widget.
+
 
 
 v23.10.20

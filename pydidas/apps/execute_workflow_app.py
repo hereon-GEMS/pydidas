@@ -118,6 +118,7 @@ class ExecuteWorkflowApp(BaseApp):
                 "shared_memory": {},
                 "tree_str_rep": "[]",
                 "buffer_n": 4,
+                "run_prepared": False,
             }
         )
         self._index = -1
@@ -128,6 +129,7 @@ class ExecuteWorkflowApp(BaseApp):
         Reset the runtime variables for a new run.
         """
         self._config["result_metadata_set"] = False
+        self._config["run_prepared"] = False
         self._shared_arrays = {}
         self._result_metadata = {}
         self._mp_tasks = np.array(())
@@ -174,6 +176,7 @@ class ExecuteWorkflowApp(BaseApp):
         self.__initialize_arrays_from_shared_memory()
         self._redefine_multiprocessing_carryon()
         TREE.prepare_execution()
+        self._config["run_prepared"] = True
         if self.get_param_value("live_processing"):
             TREE.root.plugin.prepare_carryon_check()
 

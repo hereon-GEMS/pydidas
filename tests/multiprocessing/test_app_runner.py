@@ -80,6 +80,10 @@ class TestAppRunner(unittest.TestCase):
         # this will only test the setup method
         ...
 
+    def test_init(self):
+        self._runner = AppRunner(self.app)
+        self.assertTrue(self.app._config["run_prepared"])
+
     def test_call_app_method(self):
         self._runner = AppRunner(self.app)
         self._runner.call_app_method("multiprocessing_post_run")

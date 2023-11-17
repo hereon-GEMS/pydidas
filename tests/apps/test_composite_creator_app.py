@@ -538,7 +538,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_pre_run(self):
         app = self.get_default_app()
         app.multiprocessing_pre_run()
-        self.assertTrue(app._config["mp_pre_run_called"])
+        self.assertTrue(app._config["run_prepared"])
         self.assertIsNotNone(app._config["mp_tasks"])
 
 

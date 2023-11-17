@@ -162,7 +162,6 @@ class CompositeCreatorApp(BaseApp):
         Perform operations prior to running main parallel processing function.
         """
         self.prepare_run()
-        self._config["mp_pre_run_called"] = True
         _ntotal = self._image_metadata.images_per_file * self._filelist.n_files
         self._config["mp_tasks"] = range(_ntotal)
         self._store_detector_mask()
@@ -200,6 +199,7 @@ class CompositeCreatorApp(BaseApp):
             return
         self.__update_composite_image_params()
         self.__check_and_store_thresholds()
+        self._config["run_prepared"] = True
 
     def _store_detector_mask(self):
         """

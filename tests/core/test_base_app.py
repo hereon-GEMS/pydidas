@@ -135,7 +135,7 @@ class TestBaseApp(unittest.TestCase):
 
     def test_get_config(self):
         app = BaseApp()
-        self.assertEqual(app.get_config(), {})
+        self.assertEqual(app.get_config(), {"run_prepared": False})
 
     def test_copy(self):
         app = BaseApp()

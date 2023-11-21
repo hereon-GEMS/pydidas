@@ -87,6 +87,7 @@ class AppRunner(WorkerController):
         WorkerController.__init__(self, n_workers=n_workers)
         if not app._config["run_prepared"]:
             app.multiprocessing_pre_run()
+        self.sig_results.connect(app.multiprocessing_store_results)
         self.__app = app.copy(slave_mode=True)
         self.__check_app_is_set()
         self._processor["func"] = processor

@@ -314,7 +314,6 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._runner = AppRunner(self._app)
         self._runner.sig_final_app_state.connect(self._set_app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_results.connect(self._app.multiprocessing_store_results)
         self._runner.finished.connect(self._apprunner_finished)
         logger.debug("Starting AppRunner")
         self._runner.start()

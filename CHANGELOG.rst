@@ -19,6 +19,8 @@ Improvements
   called manually by the user.
 - Added an option to change the logging level with a command line calling 
   option '-logging-level LEVEL'.
+- Included a check that apps have run their multiprocessing_pre_process
+  method in the AppRunner.
 
 Bugfixes
 --------

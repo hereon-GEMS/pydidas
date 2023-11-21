@@ -155,7 +155,6 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         logger.debug("Starting AppRunner")
         self._runner = AppRunner(self._app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_results.connect(self._app.multiprocessing_store_results)
         self._runner.sig_results.connect(self.__update_result_node_information)
         self._runner.sig_results.connect(self.__check_for_plot_update)
         self._runner.finished.connect(self._apprunner_finished)

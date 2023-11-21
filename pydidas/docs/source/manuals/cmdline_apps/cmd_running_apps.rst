@@ -73,18 +73,18 @@ blocking call until the application is finished with its processing.
 Running an application using parallelization
 --------------------------------------------
 
+.. note::
+
+    For a detailed description of how the pydidas multiprocessing works,
+    please refer to the :ref:`multiprocessing_package` or to the 
+    :ref:`developer_guide_to_multiprocessing`.
+
 To run an application using parallel processing, an additional object is needed
 to control the parallelization. This is the 
 :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>`. Usage is 
 straightforward and happens through only a few commands. The AppRunner starts
 in a separate thread and is non-blocking. It launches multiple independent
 processes and can run in the background.
-
-.. note::
-
-    For a detailed description of how the pydidas multiprocessing works,
-    please refer to the :ref:`multiprocessing_package` or to the 
-    :ref:`developer_guide_to_multiprocessing`.
 
 To run an application, first configure the application as usually. Then,
 create an :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` instance
@@ -103,65 +103,136 @@ method to modify one of the application's parameters.
     instance will not be mirrored in the 
     :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>`'s app instance.
 
+Running an application with the 
+:py:class`AppRunner <pydidas.multiprocessing.AppRunner>` requires to call the 
+:py:data:`start` method. This will start the thread and create the worker
+processes.
+
+.. warning::
+
+    Running apps which rely on Qt's Signals and Slots (like the 
+    :py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>`) will 
+    require a running QApplication event loop.
+    Also do not forget to stop the event loop when finished.
+
+An example with a custom application is given below:
+
 .. code-block::
+
+    import random
+    import string
+
+    import numpy as np
+    from qtpy import QtWidgets
+
+    import pydidas
+
+
+    #define CHARS to create random strings
+    CHARS = string.ascii_letters + string.digits
+
+
+    class DummyApp(pydidas.core.BaseApp):
+        default_params = pydidas.core.ParameterCollection(
+            pydidas.core.Parameter('number_of_strings', int, 10),
+            pydidas.core.Parameter('length_of_strings', int, 10),
+        )
+
+        def multiprocessing_pre_run(self):
+            self.results = {}
+            pydidas.core.BaseApp.multiprocessing_pre_run(self)
+
+        def multiprocessing_get_tasks(self):
+            """Get the dummy tasks."""
+            return np.arange(self.get_param_value('number_of_strings'))
+
+        def multiprocessing_func(self, index):
+            """Create a random string."""
+            length = self.get_param_value('length_of_strings', 10)
+            return ''.join(random.choice(CHARS) for _ in range(length))
+
+        def multiprocessing_store_results(self, index, result):
+            self.results[index] = result
+
+
+    def main():
+        qtapp = QtWidgets.QApplication.instance()
+        app = DummyApp()
+        runner = pydidas.multiprocessing.AppRunner(app)
+
+        # Now connect the AppRunner's emitted results to our local app:
+        runner.sig_results.connect(app.multiprocessing_store_results)
+
+        # Also make sure to terminate the QApplication event loop after
+        # finishing the calculations:
+        runner.finished.connect(qtapp.quit)
+
+        # Start the runner and the QApplication event loop:
+        runner.start()
+        qtapp.exec_()
+
+        print('Resulting random strings:')
+        for _key, _val in app.results.items():
+            print(f'  {_key:02d}: {_val}')
+
+
+    if __name__ == '__main__':
+        main()
+
+Running this script will create an output like:
+
+.. code-block::
+
+    Resulting random strings:
+      00: EgLDoQCBto
+      01: tbE07t910T
+      02: JpmZZJ6QjL
+      03: YTgKKtLWqP
+      04: vvFAuJ8W9d
+      05: HFLVkWt1Gm
+      06: kPjP2pWA6Z
+      07: AHiPGRADWa
+      08: 1vFmmMM2mZ
+      09: BSrpoTxzOg
+
+For status updates, one could use the :py:data:`AppRunner.sig_process` 
+Signal. An example with a new printing slot and an updated :py:data:`main`
+function is given below:
+
+.. code-block:: 
+
+    def print_progress(progress):
+        """Print the current progress repeatedly in the same line."""
+        _n_chars = int(60 * progress)
+        _txt = (
+            "\u2588" * _n_chars
+            + "-" * (60 - _n_chars)
+            + "|"
+            + f" {100*progress:05.2f}%: "
+        )
+        print(_txt, end='\r', flush=True)
+
+    def main():
+        qtapp = QtWidgets.QApplication.instance()
+        app = DummyApp()
+        runner = pydidas.multiprocessing.AppRunner(app)
+
+        # Now connect the AppRunner's emitted results to our local app:
+        runner.sig_results.connect(app.multiprocessing_store_results)
+
+        # Also make sure to terminate the QApplication event loop after
+        # finishing the calculations:
+        runner.finished.connect(qtapp.quit)
     
-    # Set up the app:
-    >>> import pydidas
-    >>> app = pydidas.apps.DummyApp()
-    >>> app
-    <pydidas.apps.dummy_app.DummyApp at 0x1c23aed0ee0>
-    >>> app.set_param_value('number_of_strings', 10)
-    >>> app.set_param_value('length_of_string', 10)
-    
-    # Define the AppRunner
-    >>> runner = pydidas.multiprocessing.AppRunner(app)
-    
-    # Checking the progress now will yield a -1 because the AppRunner has not 
-    # yet queried the app for the tasks
-    >>> runner.progress
-    -1
-    
-    # If we change an app parameter in the runner, the local instance will not
-    # be modified:
-    >>> runner.set_app_param('length_of_string', 20)
-    >>> app.get_param('length_of_string')
-    Parameter <length_of_string (type: Integral): 10 (default: 5)>
-    
-    # If we start the runner and query the progress immediately, it will yield
-    # zero:
-    >>> runner.start()
-    >>> runner.progress
-    0
-    
-    # To check, whether the runner is finished, check that progress is equal
-    # to one:
-    >>> runner.progress
-    1
-    
-    # Now, we need to get the runner's update app back into the local namespace
-    # to access it directly. 
-    >>> app = runner.get_app()
-    >>> app
-    <pydidas.apps.dummy_app.DummyApp at 0x1c246465e50>
-    app.get_param_values_as_dict()
-    {'number_of_strings': 10,
-     'length_of_string': 20}
-    >>> app.get_results()
-    ['HynGtTMzELIGpxKUjsmv',
-     'vHpcpwnqbVbpbnDKIOnf',
-     'RFQvZvqotYCMpityIHGk',
-     'MIXWNdsbLbFDxNDRQnjA',
-     'sKbWVcxyRbTrEAvSNyfp',
-     'PUaRVxJiCEjfeiCozoHN',
-     'zByPTNALcybfXkDTyXPL',
-     'LaBUIxLkWBTBdcSkDrct',
-     'nWUnyMWHxHEXJxalOjcX',
-     'tpAYNIMIUhymdzyDOmLJ']
-    
-.. note::
-    
-    This is a very basic example and communication while running apps in 
-    multiprocessing can be performed more elegantly by using Qt's signal and 
-    slot system which is used by pydidas. For a full description of the signals, 
-    please refer to the :ref:`developer_guide_to_signals`.
+        # Connect also the AppRunner.sig_progress to the print_progress
+        # function:
+        runner.sig_progress.connect(print_progress)
+
+        # Start the runner and the QApplication event loop:
+        runner.start()
+        qtapp.exec_()
+
+        print('\nResulting random strings:')
+        for _key, _val in app.results.items():
+            print(f'  {_key:02d}: {_val}')
 

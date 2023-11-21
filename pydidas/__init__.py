@@ -50,7 +50,7 @@ if __QtWidgets.QApplication.instance() is None:
 
 # import local modules
 from .version import version, VERSION
-
+from .logging_level import LOGGING_LEVEL
 
 # import sub-packages:
 from . import core
@@ -85,6 +85,7 @@ __all__.extend(
         "IS_QT6",
         "version",
         "VERSION",
+        "LOGGING_LEVEL",
     ]
 )
 

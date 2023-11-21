@@ -17,7 +17,8 @@ Improvements
 - Added a feature to the AppRunner which automatically calls the 
   multiprocessing_pre_run method of the input app if it has not yet been
   called manually by the user.
-
+- Added an option to change the logging level with a command line calling 
+  option '-logging-level LEVEL'.
 
 Bugfixes
 --------

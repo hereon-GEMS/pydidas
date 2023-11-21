@@ -492,7 +492,7 @@ def _get_unformatted_lines(input_str: str, max_line_length: int = 60) -> list:
     return _result_lines
 
 
-def get_random_string(length: int) -> str:
+def get_random_string(length: int, use_digits: bool = False) -> str:
     """
     Get a random string of a specific length.
 
@@ -500,10 +500,13 @@ def get_random_string(length: int) -> str:
     ----------
     length : int
         The length of the output string.
+    use_digits : bool, optional
+        Flag to include digits in the random string. The default is False.
 
     Returns
     -------
     str
         The random string.
     """
-    return "".join(random.choice(_string_.ascii_letters) for i in range(length))
+    _chars = _string_.ascii_letters + (_string_.digits if use_digits else "")
+    return "".join(random.choice(_chars) for _ in range(length))

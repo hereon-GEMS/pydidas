@@ -465,7 +465,7 @@ class WorkflowResults(QtCore.QObject):
     def save_results_to_disk(
         self,
         save_dir: Union[str, Path],
-        *save_formats: tuple,
+        *save_formats: tuple[str],
         overwrite: bool = False,
         node_id: Union[None, int] = None,
     ):
@@ -484,7 +484,7 @@ class WorkflowResults(QtCore.QObject):
         ----------
         save_dir : Union[str, pathlib.Path]
             The basepath for all saved data.
-        save_formats : str
+        save_formats : tuple[str]
             Strings of all formats to be written. Individual formats can be
             also be given in a single string if they are separated by comma
             (","), ampersand ("&") or slash ("/") characters.

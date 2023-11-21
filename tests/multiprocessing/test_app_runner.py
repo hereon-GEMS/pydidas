@@ -128,7 +128,7 @@ class TestAppRunner(unittest.TestCase):
             self.assertTrue(self._runner.isSignalConnected(_sig_results))
             self.assertTrue(self._runner.isSignalConnected(_sig_progress))
         else:
-            self.assertEqual(self._runner.receivers(self._runner.sig_results), 1)
+            self.assertEqual(self._runner.receivers(self._runner.sig_results), 2)
             self.assertEqual(self._runner.receivers(self._runner.sig_progress), 1)
 
     def testcycle_post_run(self):

@@ -58,10 +58,7 @@ PLUGINS = PluginCollection()
 class TestWorkflowResults(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        _paths = [
-            Path(pydidas.__file__).parent.joinpath(f"unittest_objects/{_name}.py")
-            for _name in ["dummy_loader", "dummy_proc"]
-        ]
+        _paths = [Path(pydidas.__file__).parent.joinpath(f"unittest_objects/")]
         cls._plugin_paths = PLUGINS.registered_paths
         PLUGINS.find_and_register_plugins(*_paths)
         global SCAN, TREE, EXP, RES

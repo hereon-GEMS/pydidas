@@ -32,6 +32,7 @@ __all__ = []
 
 import importlib
 import inspect
+import warnings
 from pathlib import Path
 from typing import Literal, Union
 
@@ -75,6 +76,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         self.plugins = {}
         self.__plugin_types = {}
         self.__plugin_names = {}
+        self.__plugin_basic_types = {}
         self.__plugin_paths = []
         PydidasQsettingsMixin.__init__(self)
         _plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
@@ -83,6 +85,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             "initialized": False,
             "must_emit_signal": False,
         }
+        self.__test_mode = kwargs.pop("test_mode", False)
         if kwargs.get("force_initialization", False):
             self.verify_is_initialized()
 
@@ -118,7 +121,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             A list of plugin paths.
         """
         plugin_paths = self.get_q_settings_plugin_paths()
-        if plugin_paths == [Path()] or plugin_paths is None:
+        if plugin_paths in [[Path()], [""], [None]]:
             plugin_paths = get_generic_plugin_path()
         return plugin_paths
 
@@ -132,12 +135,40 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             None if not QSettings has been defined, else a list of path
             entries.
         """
-        _path = self.q_settings_get("user/plugin_path")
-        if isinstance(_path, str):
-            return [Path(_key) for _key in _path.split(";;")]
-        if isinstance(_path, Path):
-            return [_path]
-        return _path
+        _paths = self.q_settings_get("user/plugin_path")
+        _paths = (
+            [Path(_key) for _key in _paths.split(";;")]
+            if isinstance(_paths, str)
+            else _paths
+        )
+        if _paths is None:
+            return [_paths]
+        _paths = self.__remove_nonexistent_paths(_paths)
+        return _paths
+
+    def __remove_nonexistent_paths(self, paths: list[Path]) -> list[Path]:
+        """
+        Remove nonexistent paths from the list of paths and from the QSettings.
+
+        Parameters
+        ----------
+        paths : list[str]
+            The list of paths stored in the QSettings.
+
+        Returns
+        -------
+        list[str]
+            The sanitized list of paths.
+        """
+        _new_paths = [_path for _path in paths if _path.is_dir()]
+        if len(_new_paths) < len(paths):
+            warnings.warn(
+                "Non-existent paths were found in the stored Plugin paths and have "
+                "been removed. Please check the pydidas plugin paths."
+            )
+        _paths_to_store = ";;".join(str(_path) for _path in _new_paths)
+        self.q_settings_set("user/plugin_path", _paths_to_store)
+        return _new_paths
 
     def find_and_register_plugins(
         self, *plugin_paths: tuple[Union[Path, str], ...], reload: bool = True
@@ -156,7 +187,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         for _path in plugin_paths:
             if isinstance(_path, str):
                 _path = Path(_path)
-            if _path != Path():
+            if _path != Path() and _path.is_dir():
                 self._find_and_register_plugins_in_path(_path, reload)
         if self._config["initialized"]:
             self.sig_updated_plugins.emit()
@@ -270,6 +301,9 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         ]
         if "pydidas.plugins.base_plugin.BasePlugin" not in _class_bases:
             return
+        if class_.basic_plugin is True:
+            self.__plugin_basic_types[class_.__name__] = class_
+            return
         if class_.__name__ not in self.plugins:
             self.__add_new_class(class_)
         elif reload:
@@ -332,6 +366,8 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             else self.__get_generic_plugin_paths()
         )
         self.find_and_register_plugins(*_plugin_path)
+        if len(self.__plugin_names) == 0 and not self.__test_mode:
+            self.find_and_register_plugins(*get_generic_plugin_path())
         self._config["initialized"] = True
         if self._config["must_emit_signal"]:
             self.sig_updated_plugins.emit()
@@ -386,6 +422,8 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         self.verify_is_initialized()
         if name in self.plugins:
             return self.plugins[name]
+        if name in self.__plugin_basic_types:
+            return self.__plugin_basic_types[name]
         raise KeyError(f'No plugin with name "{name}" has been registered!')
 
     def get_all_plugins(self) -> list[type]:
@@ -417,6 +455,8 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             A list with all Plugins which have the specified type.
         """
         self.verify_is_initialized()
+        if plugin_type == "base":
+            return list(self.__plugin_basic_types.values())
         _key = {"base": -1, "input": 0, "proc": 1, "output": 2}[plugin_type]
         _res = []
         for _name, _plugin in self.plugins.items():

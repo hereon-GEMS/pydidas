@@ -28,7 +28,8 @@ Bugfixes
 - Fixed an issue where boolean QSettings could not be read automatically
   without explicit dtype.
 - Fixed a Qt5 issue with font scaling in the AcknowledgeBox widget.
-
+- Fixed an issue with persistent plugin paths which were not updated in case
+  that pydidas has been moved to a new location.
 
 
 v23.10.20

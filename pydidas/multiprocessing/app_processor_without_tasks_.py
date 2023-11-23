@@ -38,7 +38,6 @@ from ..core.utils import LOGGING_LEVEL, pydidas_logger
 
 
 logger = pydidas_logger()
-logger.setLevel(LOGGING_LEVEL)
 
 
 def app_processor_without_tasks(
@@ -80,9 +79,17 @@ def app_processor_without_tasks(
         The dictionary which is used for overwriting the app._config
         dictionary.
     **kwargs : dict
-        Any keyword arguments passed to the app processor.
+        Supported keyword arguments are:
+
+        wait_for_output_queue : bool, optional
+            Flag to wait for the output queue to be empty before shutting down the
+            worker. The default is True.
+        logging_level : int, optional
+            The logger's logging level. The default is the pydidas default logging
+            level.
     """
     _wait_for_output = kwargs.get("wait_for_output_queue", True)
+    logger.setLevel(kwargs.get("logging_level", LOGGING_LEVEL))
     _app_carryon = True
     logger.debug("Started process")
     _app = app(app_params, slave_mode=True)

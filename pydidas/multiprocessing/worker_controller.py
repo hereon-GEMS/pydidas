@@ -40,6 +40,7 @@ from qtpy import QtCore
 
 from ..core import PydidasQsettings
 from ..core.utils import pydidas_logger
+from ..logging_level import LOGGING_LEVEL
 from .processor_ import processor
 
 
@@ -107,7 +108,11 @@ class WorkerController(QtCore.QThread):
             self._queues["aborted"],
             None,
         )
-        self._processor = {"func": processor, "args": _worker_args, "kwargs": {}}
+        self._processor = {
+            "func": processor,
+            "args": _worker_args,
+            "kwargs": {"logging_level": LOGGING_LEVEL},
+        }
         self._progress_done = 0
         self._progress_target = 0
         if function is not None:
@@ -206,7 +211,7 @@ class WorkerController(QtCore.QThread):
         while self.flags["active"]:
             time.sleep(0.05)
             if time.time() - _t0 >= timeout:
-                logger.debug("Process finish timeout")
+                logger.debug("WorkerController: Process finish timeout")
                 break
 
     def change_function(self, func: type, *args: tuple, **kwargs: dict):
@@ -307,6 +312,7 @@ class WorkerController(QtCore.QThread):
                 self._to_process.append(task)
         self.flags["stop_after_run"] = True
 
+    @QtCore.Slot()
     def send_stop_signal(self):
         """
         Send stop signal to workers.
@@ -316,7 +322,7 @@ class WorkerController(QtCore.QThread):
         of the called function. The currrent call will be finished before the stop
         signal will be processed.
         """
-        logger.debug("Sending stop queue signals")
+        logger.debug("WorkerController: Sending stop queue signals")
         for _ in self._workers:
             self._queues["stop"].put(1)
 
@@ -338,10 +344,10 @@ class WorkerController(QtCore.QThread):
                 self._get_and_emit_all_queue_items()
                 self._check_if_workers_finished()
             if self.flags["active"]:
-                logger.debug("Starting post run")
+                logger.debug("WorkerController: Starting post run")
                 self.cycle_post_run()
             time.sleep(0.001)
-        logger.debug("finished worker_controller loop")
+        logger.debug("WorkerController: Finished worker_controller loop")
 
     def cycle_pre_run(self):
         """
@@ -370,8 +376,9 @@ class WorkerController(QtCore.QThread):
             )
             for i in range(self._n_workers)
         ]
-        for _worker in self._workers:
+        for _i, _worker in enumerate(self._workers):
             _worker.start()
+            logger.debug("WorkerController: Started worker %i" % _i)
 
     def _put_next_task_in_queue(self):
         """
@@ -390,7 +397,7 @@ class WorkerController(QtCore.QThread):
                 _task, _results = self._queues["recv"].get_nowait()
                 if _task is None and _results is None:
                     self._workers_done += 1
-                    logger.debug("Received None result - Worker done")
+                    logger.debug("WorkerController: Received None result - Worker done")
                 else:
                     self.sig_results.emit(_task, _results)
                     self._progress_done += 1
@@ -408,12 +415,12 @@ class WorkerController(QtCore.QThread):
             for _worker in self._workers:
                 self._queues["aborted"].get_nowait()
                 self._workers_done += 1
-                logger.debug("Worker done")
+                logger.debug("WorkerController: Worker aborted processing.")
         except Empty:
             pass
         if self._workers_done >= len(self._workers):
             self.flags["running"] = False
-            logger.debug("Stopped running")
+            logger.debug("WorkerController: Workers stopped running")
 
     def cycle_post_run(self, timeout: float = 10):
         """
@@ -425,12 +432,12 @@ class WorkerController(QtCore.QThread):
             The waiting time to wait on the workers to send the finished
             signal before raising a TimeoutError.
         """
-        logger.debug("Calling join on workers")
+        logger.debug("WorkerController: Calling join on workers")
         self.join_workers()
         if self.flags["stop_after_run"]:
             self.flags["thread_alive"] = False
         self._wait_for_worker_finished_signals(timeout)
-        logger.debug("finished cycle post run")
+        logger.debug("WorkerController: Finished cycle post run")
 
     def join_workers(self):
         """
@@ -442,7 +449,7 @@ class WorkerController(QtCore.QThread):
             _worker.join()
         self._workers = []
         self.flags["active"] = False
-        logger.debug("Joined all workers")
+        logger.debug("WorkerController: Joined all workers")
 
     def _wait_for_worker_finished_signals(self, timeout: float = 10):
         """

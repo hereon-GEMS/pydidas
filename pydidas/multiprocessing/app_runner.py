@@ -83,7 +83,7 @@ class AppRunner(WorkerController):
         n_workers: Union[None, int] = None,
         processor: type = app_processor,
     ):
-        logger.debug("Starting AppRunner")
+        logger.debug("AppRunner: Starting AppRunner")
         WorkerController.__init__(self, n_workers=n_workers)
         if not app._config["run_prepared"]:
             app.multiprocessing_pre_run()

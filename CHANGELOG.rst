@@ -35,6 +35,8 @@ Bugfixes
 - Fixed an issue where the result selection would reset after processing 
   when results were already selected during processing in the 
   WorkflowRunFrame.
+- Fixed an issue in the RunWorkflowFrame where aborting the processing would
+  lead to a frozen GUI.
 
 
 v23.10.20

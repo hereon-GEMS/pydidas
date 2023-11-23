@@ -44,7 +44,8 @@ if any(
 ):
     for _index, _arg in enumerate(sys.argv):
         if _arg.strip("-") in __log_keys and _index < len(sys.argv) - 1:
-            _level = sys.argv[_index + 1].upper()
+            _ = sys.argv.pop(_index)
+            _level = sys.argv.pop(_index).upper()
             if _level in __log_levels:
                 __log_level = getattr(logging, _level)
                 break

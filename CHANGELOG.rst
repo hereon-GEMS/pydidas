@@ -30,6 +30,8 @@ Bugfixes
 - Fixed a Qt5 issue with font scaling in the AcknowledgeBox widget.
 - Fixed an issue with persistent plugin paths which were not updated in case
   that pydidas has been moved to a new location.
+- Fixed an issue where tweaking a Plugin in the WorkflowTree would clear the 
+  plugin's node_id.
 
 
 v23.10.20

@@ -141,6 +141,7 @@ class ProcessingTree(GenericTree):
         new_plugin : pydidas.plugins.BasePlugin
             The instance of the new Plugin.
         """
+        new_plugin.node_id = node_id
         self.nodes[node_id].plugin = new_plugin
         self._config["tree_changed"] = True
 
@@ -351,6 +352,7 @@ class ProcessingTree(GenericTree):
         _new_nodes = {}
         for _item in list_of_nodes:
             _plugin = PLUGINS.get_plugin_by_name(_item["plugin_class"])()
+            _plugin.node_id = _item["node_id"]
             _node = WorkflowNode(node_id=_item["node_id"], plugin=_plugin)
             for key, val in _item["plugin_params"]:
                 _node.plugin.set_param_value(key, val)

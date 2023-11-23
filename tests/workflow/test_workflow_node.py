@@ -54,6 +54,19 @@ class TestWorkflowNode(unittest.TestCase):
             _nodes.append(_tiernodes)
         return _nodes, _index
 
+    def test_init__plugin_node_id(self):
+        _node_id = 42
+        obj = WorkflowNode(plugin=DummyLoader(), node_id=_node_id)
+        self.assertEqual(obj.plugin.node_id, _node_id)
+
+    def test_copy(self):
+        _node_id = 42
+        obj = WorkflowNode(plugin=DummyLoader(), node_id=_node_id)
+        obj.plugin.set_param_value("binning", 3)
+        new = obj.copy()
+        self.assertEqual(new.plugin.node_id, _node_id)
+        self.assertEqual(obj.plugin.node_id, _node_id)
+
     def test_node_id_property__get(self):
         obj = WorkflowNode(plugin=DummyLoader())
         self.assertIsNone(obj.node_id)

@@ -30,7 +30,7 @@ __all__ = ["WorkflowNode"]
 
 from copy import deepcopy
 from numbers import Integral
-from typing import Union
+from typing import Self, Union
 
 from ..core import Dataset
 from ..core.utils import LOGGING_LEVEL, TimerSaveRuntime, pydidas_logger
@@ -50,7 +50,7 @@ class WorkflowNode(GenericNode):
     chain through the WorkflowTree.
     """
 
-    kwargs_for_copy_creation = ["plugin", "_result_shape"]
+    kwargs_for_copy_creation = ["plugin", "node_id", "_result_shape"]
 
     def __init__(self, **kwargs: dict):
         self.__preprocess_kwargs(kwargs)
@@ -95,6 +95,7 @@ class WorkflowNode(GenericNode):
             )
         if not isinstance(self.plugin, BasePlugin):
             raise TypeError("Plugin must be an instance of BasePlugin (or subclass).")
+        self.plugin.node_id = self.__tmp_node_id
 
     @property
     def node_id(self) -> Union[int, None]:
@@ -325,3 +326,16 @@ class WorkflowNode(GenericNode):
         _hashables = [len(self._children), self._parent, self._node_id, self.plugin]
         _hashes = tuple(hash(_item) for _item in _hashables)
         return hash(_hashes)
+
+    def __copy__(self) -> Self:
+        """
+        Return a copy of the WorkflowNode.
+
+        Returns
+        -------
+        Self
+            The WorkflowNode instance copy.
+        """
+        _copy = GenericNode.__copy__(self)
+        _copy.plugin.node_id = _copy.node_id
+        return _copy

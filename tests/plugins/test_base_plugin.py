@@ -449,11 +449,13 @@ class TestBasePlugin(unittest.TestCase):
     def test_copy(self):
         plugin = create_plugin_class(BASE_PLUGIN)
         obj = plugin()
+        obj.node_id = 42
         obj.set_param_value("label", "Test 12423536")
         cp = copy.copy(obj)
         self.assertEqual(obj.__class__, cp.__class__)
         self.assertEqual(obj.get_param_value("label"), cp.get_param_value("label"))
         self.assertNotEqual(id(obj.params), id(cp.params))
+        self.assertEqual(obj.node_id, cp.node_id)
 
     def test_copy__with_linked_object(self):
         plugin = create_plugin_class(BASE_PLUGIN)

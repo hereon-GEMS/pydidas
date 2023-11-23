@@ -269,6 +269,22 @@ class BasePlugin(ObjectWithParameterCollection):
             _obj_copy.set_param_value(_key, _param.value)
         return _obj_copy
 
+    def __deepcopy__(self, memo: dict) -> Self:
+        """
+        Create a deep copy of the Plugin.
+
+        Parameters
+        ----------
+        memo : dict
+            The dictionary of already copied objects.
+
+        Returns
+        -------
+        BasePlugin
+            The deep copy of the plugin.
+        """
+        return self.__copy__()
+
     def __getstate__(self) -> dict:
         """
         Get the state of the Plugin for pickling.

@@ -230,7 +230,6 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         self.__set_proc_widget_visibility_for_running(False)
         self.sig_processing_running.emit(False)
-        self.update_choices_of_selected_results()
 
     def __set_proc_widget_visibility_for_running(self, running: bool):
         """

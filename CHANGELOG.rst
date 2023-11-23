@@ -32,6 +32,9 @@ Bugfixes
   that pydidas has been moved to a new location.
 - Fixed an issue where tweaking a Plugin in the WorkflowTree would clear the 
   plugin's node_id.
+- Fixed an issue where the result selection would reset after processing 
+  when results were already selected during processing in the 
+  WorkflowRunFrame.
 
 
 v23.10.20

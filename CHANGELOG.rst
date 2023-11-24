@@ -21,6 +21,9 @@ Improvements
   option '-logging-level LEVEL'.
 - Included a check that apps have run their multiprocessing_pre_process
   method in the AppRunner.
+- Added a status property to the PydidasQApplication and connected it to 
+  the PydidasStatusWidget for easier submission of status messages.
+
 
 Bugfixes
 --------

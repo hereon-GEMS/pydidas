@@ -96,6 +96,7 @@ class PydidasQApplication(QtWidgets.QApplication):
     sig_font_metrics_changed = QtCore.Signal()
     sig_mpl_font_change = QtCore.Signal()
     sig_mpl_font_setting_error = QtCore.Signal(str)
+    sig_status_message = QtCore.Signal(str)
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
@@ -103,6 +104,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.setOrganizationDomain("Hereon/WPI")
         self.setApplicationName("pydidas")
         self.__settings = QtCore.QSettings()
+        self.__status = ""
         self.__standard_font = self.font()
         self.__available_mpl_fonts = mpl_font_manager.get_font_names()
         self.__font_config = {
@@ -303,3 +305,26 @@ class PydidasQApplication(QtWidgets.QApplication):
             self.__font_config["font_metric_width"],
             self.__font_config["font_metric_height"],
         )
+
+    def set_status_message(self, status: str):
+        """
+        Set a status message.
+
+        Parameters
+        ----------
+        status : str
+            The new status message.
+        """
+        self.__status = status
+        self.sig_status_message.emit(status)
+
+    @property
+    def status(self) -> str:
+        """
+        Get the status string.
+
+        Returns
+        -------
+        str
+            The current status string.
+        """

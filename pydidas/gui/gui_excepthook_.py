@@ -33,9 +33,9 @@ import time
 import traceback
 from io import StringIO
 
-from ..core import UserConfigError
+from ..core import FileReadError, UserConfigError
 from ..core.utils import get_logging_dir
-from ..widgets.dialogues import ErrorMessageBox, UserConfigErrorMessageBox
+from ..widgets.dialogues import ErrorMessageBox, PydidasExceptionMessageBox
 
 
 def gui_excepthook(exc_type, exception, trace):
@@ -55,12 +55,15 @@ def gui_excepthook(exc_type, exception, trace):
     trace : traceback object
         The trace of where the exception occured.
     """
-    if exc_type is UserConfigError:
+    if exc_type in (UserConfigError, FileReadError):
         # need to select the splitting char explicitly because used ' and " chars
         # will alter the representation.
-        _split_char = repr(exception)[16]
+        _split_char = repr(exception)[16 if exc_type is UserConfigError else 14]
+        _title = (
+            "Configuration Error" if exc_type is UserConfigError else "File read error"
+        )
         _exc_repr = repr(exception).split(_split_char)[1]
-        _ = UserConfigErrorMessageBox(text=_exc_repr).exec_()
+        _ = PydidasExceptionMessageBox(text=_exc_repr, title=_title).exec_()
         return
     with StringIO() as _tmpfile:
         traceback.print_tb(trace, None, _tmpfile)

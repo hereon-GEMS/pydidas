@@ -46,7 +46,7 @@ from ...core.constants import (
     QSETTINGS_USER_KEYS,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
-from ..dialogues import AcknowledgeBox, QuestionBox, UserConfigErrorMessageBox
+from ..dialogues import AcknowledgeBox, PydidasExceptionMessageBox, QuestionBox
 from ..factory import SquareButton
 from ..framework import PydidasWindow
 
@@ -470,7 +470,7 @@ class _UserConfigWindow(PydidasWindow):
         error : str
             The error description.
         """
-        _ = UserConfigErrorMessageBox(text=error).exec_()
+        _ = PydidasExceptionMessageBox(text=error).exec_()
 
 
 UserConfigWindow = SingletonFactory(_UserConfigWindow)

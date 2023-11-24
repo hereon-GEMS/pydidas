@@ -34,10 +34,16 @@ import warnings
 from typing import Tuple, Union
 
 import numpy as np
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ..contexts import DiffractionExperimentContext, ScanContext
-from ..core import BaseApp, Dataset, UserConfigError, get_generic_param_collection
+from ..core import (
+    BaseApp,
+    Dataset,
+    FileReadError,
+    UserConfigError,
+    get_generic_param_collection,
+)
 from ..workflow import WorkflowResultsContext, WorkflowTree
 from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
@@ -338,9 +344,12 @@ class ExecuteWorkflowApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            TREE.execute_process(index)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                TREE.execute_process(index)
+        except FileReadError:
+            return -1
         self.__write_results_to_shared_arrays()
         if self._config["result_metadata_set"]:
             return self._config["buffer_pos"]
@@ -411,6 +420,13 @@ class ExecuteWorkflowApp(BaseApp):
                 self._store_frame_metadata(data[1])
         else:
             buffer_pos = data
+        if buffer_pos == -1:
+            _filename = TREE.root.plugin.get_filename(index)
+            QtWidgets.QApplication.instance().set_status_message(
+                f"File reading error during processing of scan index #{index}."
+                f" (filename: {_filename})"
+            )
+            return
         _new_results = {_key: None for _key in self._config["result_shapes"]}
         with self._config["shared_memory"]["lock"]:
             for _key in _new_results:

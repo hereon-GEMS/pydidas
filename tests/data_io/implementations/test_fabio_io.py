@@ -24,21 +24,22 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import fabio
 import numpy as np
 
+from pydidas.core import FileReadError
 from pydidas.data_io.implementations.fabio_io import FabioIo
 
 
 class TestFabioIo(unittest.TestCase):
     def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = os.path.join(self._path, "test.edf")
+        self._path = Path(tempfile.mkdtemp())
+        self._fname = self._path.joinpath("test.edf")
         self._img_shape = (10, 10)
         self._data = np.random.random(self._img_shape)
         _file = fabio.edfimage.EdfImage(self._data)
@@ -47,9 +48,19 @@ class TestFabioIo(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self._path)
 
-    def test_read_image(self):
+    def test_import_from_file(self):
         data = FabioIo.import_from_file(self._fname)
         self.assertTrue(np.allclose(data, self._data))
+
+    def test_read_image__wrong_name(self):
+        with self.assertRaises(FileReadError):
+            FabioIo.import_from_file(self._fname.joinpath("dummy"))
+
+    def test_read_imag__wrong_type(self):
+        with open(self._fname, "w") as f:
+            f.write("now it's just an ASCII text file.")
+        with self.assertRaises(FileReadError):
+            FabioIo.import_from_file(self._fname)
 
 
 if __name__ == "__main__":

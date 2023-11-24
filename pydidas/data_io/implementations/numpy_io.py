@@ -72,7 +72,10 @@ class NumpyIo(IoBase):
         data : pydidas.core.Dataset
             The data in form of a pydidas Dataset (with embedded metadata)
         """
-        _data = np.squeeze(np.load(filename))
+        try:
+            _data = np.squeeze(np.load(filename))
+        except (ValueError, FileNotFoundError) as _ex:
+            cls.raise_filereaderror_from_exception(_ex, str(filename))
         cls._data = Dataset(_data)
         return cls.return_data(**kwargs)
 

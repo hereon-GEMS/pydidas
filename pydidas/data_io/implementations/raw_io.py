@@ -88,10 +88,15 @@ class RawIo(IoBase):
         """
         if datatype is None:
             raise KeyError("The datatype has not been specified.")
-
-        _data = np.fromfile(filename, dtype=datatype)
+        try:
+            _data = np.fromfile(filename, dtype=datatype)
+        except (FileNotFoundError, ValueError, OSError) as _ex:
+            cls.raise_filereaderror_from_exception(_ex, str(filename))
         if _data.size != np.prod(shape):
-            raise ValueError("The given shape does not match the data size.")
+            cls.raise_filereaderror_from_exception(
+                ValueError("The given shape does not match the data size."),
+                str(filename),
+            )
         cls._data = Dataset(_data.reshape(shape))
         return cls.return_data(**kwargs)
 

@@ -33,8 +33,8 @@ from .acknowledge_box import *
 from .critical_warning_ import *
 from .error_message_box import *
 from .hdf5_dataset_selection_popup import *
+from .pydidas_exception_message_box import *
 from .question_box import *
-from .user_config_error_message_box import *
 from .warning_box import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -59,15 +59,15 @@ from . import hdf5_dataset_selection_popup
 __all__.extend(hdf5_dataset_selection_popup.__all__)
 del hdf5_dataset_selection_popup
 
+from . import pydidas_exception_message_box
+
+__all__.extend(pydidas_exception_message_box.__all__)
+del pydidas_exception_message_box
+
 from . import question_box
 
 __all__.extend(question_box.__all__)
 del question_box
-
-from . import user_config_error_message_box
-
-__all__.extend(user_config_error_message_box.__all__)
-del user_config_error_message_box
 
 from . import warning_box
 

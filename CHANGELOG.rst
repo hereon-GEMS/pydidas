@@ -23,6 +23,9 @@ Improvements
   method in the AppRunner.
 - Added a status property to the PydidasQApplication and connected it to 
   the PydidasStatusWidget for easier submission of status messages.
+- Added a FileReadError exception class and exception catching in the file
+  reading.
+
 
 
 Bugfixes

@@ -37,7 +37,7 @@ import numpy as np
 
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.apps.parsers import directory_spy_app_parser
-from pydidas.core import UserConfigError, get_generic_parameter
+from pydidas.core import FileReadError, UserConfigError, get_generic_parameter
 from pydidas.core.utils import get_random_string
 
 
@@ -539,7 +539,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         for _name in _names:
             with open(_name, "w") as f:
                 f.write("no image file")
-        with self.assertRaises(UserConfigError):
+        with self.assertRaises(FileReadError):
             app.multiprocessing_func(None)
 
     def test_multiprocessing_func__both_files_readable(self):

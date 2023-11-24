@@ -72,8 +72,12 @@ class FabioIo(IoBase):
         image : pydidas.core.Dataset
             The image in form of a Dataset (with embedded metadata)
         """
-        with fabio.open(filename) as _file:
-            _data = _file.data
-            _header = _file.header
+        try:
+            with fabio.open(filename) as _file:
+                _data = _file.data
+                _header = _file.header
+        except Exception as _ex:
+            cls.raise_filereaderror_from_exception(_ex, str(filename))
+
         cls._data = Dataset(_data, metadata=_header)
         return cls.return_data(**kwargs)

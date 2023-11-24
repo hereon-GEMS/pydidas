@@ -36,7 +36,7 @@ from typing import Union
 import h5py
 from numpy import amax, ndarray, squeeze
 
-from ...core import Dataset
+from ...core import Dataset, FileReadError
 from ...core.constants import HDF5_EXTENSIONS
 from ..low_level_readers import read_hdf5_dataset
 from .io_base import IoBase
@@ -107,8 +107,10 @@ class Hdf5Io(IoBase):
                 (_tmpframe.pop(0) if _i in slicing_axes else None)
                 for _i in range(amax(slicing_axes) + 1)
             ]
-
-        _data = squeeze(read_hdf5_dataset(filename, dataset, _slicer))
+        try:
+            _data = squeeze(read_hdf5_dataset(filename, dataset, _slicer))
+        except (FileNotFoundError, KeyError, OSError) as _ex:
+            cls.raise_filereaderror_from_exception(_ex, str(filename))
         cls._data = Dataset(
             _data,
             metadata={"slicing_axes": slicing_axes, "frame": frame, "dataset": dataset},

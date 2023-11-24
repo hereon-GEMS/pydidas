@@ -35,7 +35,7 @@ import numpy as np
 from skimage.io import imread, imsave
 from tifffile import TiffFileError
 
-from ...core import Dataset, UserConfigError
+from ...core import Dataset
 from ...core.constants import TIFF_EXTENSIONS
 from .io_base import IoBase
 
@@ -77,10 +77,8 @@ class TiffIo(IoBase):
         """
         try:
             _data = imread(filename)
-        except TiffFileError as _error:
-            raise UserConfigError(
-                f"Failed to load tiff image {filename}!\n\nOriginal exception: {_error}"
-            )
+        except (TiffFileError, OSError, FileNotFoundError) as _ex:
+            cls.raise_filereaderror_from_exception(_ex, str(filename))
 
         cls._data = Dataset(_data)
         return cls.return_data(**kwargs)

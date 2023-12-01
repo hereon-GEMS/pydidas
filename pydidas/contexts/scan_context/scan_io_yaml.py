@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanContextIoYaml class which is used to import and export
+Module with the ScanIoYaml class which is used to import and export
 ScanContext metadata from a YAML file.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["ScanContextIoYaml"]
+__all__ = ["ScanIoYaml"]
 
 
 from typing import Union
@@ -34,15 +34,15 @@ import yaml
 
 from ...core.constants import YAML_EXTENSIONS
 from .scan_context import Scan, ScanContext
-from .scan_context_io_base import ScanContextIoBase
+from .scan_io_base import ScanIoBase
 
 
 SCAN = ScanContext()
 
 
-class ScanContextIoYaml(ScanContextIoBase):
+class ScanIoYaml(ScanIoBase):
     """
-    YAML importer/exporter for ScanSetting files.
+    YAML importer/exporter for Scan objects.
     """
 
     extensions = YAML_EXTENSIONS

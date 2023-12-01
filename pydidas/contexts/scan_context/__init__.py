@@ -31,8 +31,8 @@ __all__ = []
 # import __all__ items from modules:
 from .scan import *
 from .scan_context import *
-from .scan_context_io_base import *
-from .scan_context_io_meta import *
+from .scan_io_base import *
+from .scan_io import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -46,15 +46,15 @@ from . import scan_context
 __all__.extend(scan_context.__all__)
 del scan_context
 
-from . import scan_context_io_base
+from . import scan_io_base
 
-__all__.extend(scan_context_io_base.__all__)
-del scan_context_io_base
+__all__.extend(scan_io_base.__all__)
+del scan_io_base
 
-from . import scan_context_io_meta
+from . import scan_io
 
-__all__.extend(scan_context_io_meta.__all__)
-del scan_context_io_meta
+__all__.extend(scan_io.__all__)
+del scan_io
 
 # Automatically find and import IO classes to have them registered
 # with the Metaclass:
@@ -65,7 +65,7 @@ _dir = os.path.dirname(__file__)
 _io_classes = set(
     item.strip(".py")
     for item in os.listdir(_dir)
-    if (item.startswith("scan_context_io") and not item[-7:] in ["base.py", "meta.py"])
+    if (item.startswith("scan_io") and not item[-7:] in ["base.py", "meta.py"])
 )
 
 for _module in _io_classes:

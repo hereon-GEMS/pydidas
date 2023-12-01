@@ -40,14 +40,14 @@ from .diffraction_exp_context import (
     DiffractionExperimentContext,
     DiffractionExperimentIo,
 )
-from .scan_context import ScanContext, ScanContextIoMeta
+from .scan_context import ScanContext, ScanIo
 
 __all__.extend(
     [
         "DiffractionExperimentContext",
         "DiffractionExperimentIo",
         "ScanContext",
-        "ScanContextIoMeta",
+        "ScanIo",
     ]
 )
 

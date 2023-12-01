@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanContextIoMeta class which is used for creating
+Module with the ScanIo class which is used for creating
 exporter/importer classes for the ScanContext singleton and registering them.
 """
 
@@ -25,28 +25,34 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["ScanContextIoMeta"]
+__all__ = ["ScanIo"]
 
 
-from typing import Union
+from typing import Optional, TypeVar
 
 from ...core.io_registry import GenericIoMeta
 from ...core.utils.file_utils import get_extension
 
 
-class ScanContextIoMeta(GenericIoMeta):
+Scan = TypeVar("Scan")
+
+
+class ScanIo(GenericIoMeta):
     """
-    Metaclass for ScanContext exporters and importers which holds the registry with all
-    associated file extensions for importing / exporting the ScanContext.
+    Metaclass for ScanContext exporters and importers.
+
+    The ScanIo holds the registry with all associated file extensions
+    for importing / exporting Scan (and ScanContexts).
     """
 
-    # need to redefine the registry to have a unique registry for
-    # ScanContextIoMeta
+    # need to redefine the registry to have a unique registry for ScanIo
     registry = {}
 
     @classmethod
-    def import_from_file(cls, filename: str, scan: Union[object, None] = None):
+    def import_from_file(cls, filename: str, scan: Optional[Scan] = None):
         """
+        Import a Scan from file and update the given Scan object.
+
         Call the concrete import_from_file method in the subclass registered
         to the extension of the filename.
 
@@ -54,7 +60,7 @@ class ScanContextIoMeta(GenericIoMeta):
         ----------
         filename : str
             The full filename and path.
-        scan : Union[None, pydidas.contexts.scan_context.Scan], optional
+        scan : Optional[Scan]
             The Scan object to be updated. If None, the generic ScanContext is used.
             The default is None.
         """

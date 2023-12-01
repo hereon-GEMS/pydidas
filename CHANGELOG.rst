@@ -12,21 +12,23 @@ Improvements
   ASCII-type files in a single plugin.
 - Added additional keyword options to the AcknowledgeBox.
 - Added update checks to the menu and to the pydidas_gui startup script.
-- Renamed the _WorkflowTree to ProcessingTree to allow easier direct access
-  to the class and updated references.
-- Added a feature to the AppRunner which automatically calls the 
-  multiprocessing_pre_run method of the input app if it has not yet been
-  called manually by the user.
 - Added an option to change the logging level with a command line calling 
   option '-logging-level LEVEL'.
-- Included a check that apps have run their multiprocessing_pre_process
-  method in the AppRunner.
-- Added a status property to the PydidasQApplication and connected it to 
-  the PydidasStatusWidget for easier submission of status messages.
-- Added a FileReadError exception class and exception catching in the file
-  reading.
 
+- Programmatic improvements:
 
+    - Renamed the _WorkflowTree to ProcessingTree to allow easier direct 
+      access  the class and updated references.
+    - Added a feature to the AppRunner which automatically calls the 
+      multiprocessing_pre_run method of the input app if it has not yet 
+      been called manually by the user.
+    - Added a status property to the PydidasQApplication and connected 
+      it to the PydidasStatusWidget for easier submission of status 
+      messages.
+    - Added a FileReadError exception class and exception catching in 
+      the file reading.
+    - Changed the names of the Scan import/export registry classes to more 
+      consistent names.
 
 Bugfixes
 --------

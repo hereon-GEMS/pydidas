@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["FioMcaLineScanSeriesLoader"]
 
 import os
-from numbers import Integral
 from pathlib import Path
 
 import numpy as np
@@ -43,7 +42,7 @@ from pydidas.core import (
     get_generic_parameter,
 )
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core.utils import copy_docstring
+from pydidas.core.utils import CatchFileErrors, copy_docstring
 from pydidas.plugins import InputPlugin, InputPlugin1d
 
 
@@ -155,7 +154,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
 
     def pre_execute(self):
         """
-        Prepare loading images from a file series.
+        Prepare loading spectra from a file series.
         """
         InputPlugin1d.pre_execute(self)
         self._check_files_per_directory()
@@ -184,8 +183,14 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         correctly.
         """
         if self.get_param_value("files_per_directory") == -1:
-            _nstart = SCAN.get_param_value("scan_start_index")
+            _nstart = self._SCAN.get_param_value("scan_start_index")
             _path = Path(self.filename_string.format(index0=_nstart, index1=1)).parent
+            if not _path.is_dir():
+                raise FileReadError(
+                    "The given directory for the first batch of fio files does not "
+                    "exist. Please check the scan base directory and naming "
+                    f"pattern. \n\nDirectory name not found:\n{str(_path)}"
+                )
             _nfiles = sum(1 for _name in _path.iterdir() if _name.is_file())
             self.set_param_value("_counted_files_per_directory", _nfiles)
             if self.get_param_value("_counted_files_per_directory") == 0:
@@ -204,8 +209,9 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         Determine the size of the header in lines.
         """
         _fname = self.get_filename(0)
-        with open(_fname, "r") as _f:
-            _lines = _f.readlines()
+        with CatchFileErrors(_fname):
+            with open(_fname, "r") as _f:
+                _lines = _f.readlines()
         _lines_total = len(_lines)
         _n_header = _lines.index("! Data \n") + 2
         _lines = _lines[_n_header:]
@@ -245,20 +251,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             The updated kwargs.
         """
         _fname = self.get_filename(index)
-        try:
+        with CatchFileErrors(_fname):
             _data = np.loadtxt(_fname, skiprows=self._config["header_lines"])
-        except (ValueError, FileNotFoundError, OSError) as _ex:
-            _index = 1 if isinstance(_ex.args[0], Integral) else 0
-            if len(_fname) > 60:
-                _fname = "[...]" + _fname[-55:]
-            _msg = (
-                _ex.__class__.__name__
-                + ": "
-                + _ex.args[_index]
-                + f"\n\nFilename: {_fname}"
-            )
-            raise FileReadError(_msg)
-
         if self._config["energy_scale"] is None:
             self._create_energy_scale()
         _dataset = Dataset(
@@ -314,8 +308,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         int
             The number of bins in the input data.
         """
-        if len(self.filename_string) == 0:
-            self.update_filename_string()
+        self.update_filename_string()
         if self.get_param_value("_counted_files_per_directory") < 1:
             self._check_files_per_directory()
         if self._config.get("data_lines", None) is None:

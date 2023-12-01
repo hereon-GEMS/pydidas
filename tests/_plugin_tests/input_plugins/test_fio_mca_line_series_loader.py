@@ -31,6 +31,7 @@ from pathlib import Path
 import numpy as np
 
 from pydidas.contexts import ScanContext
+from pydidas.core import FileReadError
 from pydidas.plugins import BasePlugin, PluginCollection
 
 
@@ -107,6 +108,13 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
             plugin.get_param_value("_counted_files_per_directory"), self._n_files
         )
 
+    def test_check_files_per_directory__no_preset_wrong_dir(self):
+        plugin = self.create_standard_plugin()
+        plugin.update_filename_string()
+        SCAN.set_param_value("scan_start_index", 12345)
+        with self.assertRaises(FileReadError):
+            plugin._check_files_per_directory()
+
     def test_check_files_per_directory__w_preset(self):
         _new_n_files = 7
         plugin = self.create_standard_plugin()
@@ -125,6 +133,14 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         with open(plugin.get_filename(0), "r") as f:
             _n_header_lines = len(f.readlines()) - self._n_channels
         self.assertEqual(_n_header_lines, plugin._config["header_lines"])
+
+    def test_determine_header_size__file_does_not_exist(self):
+        plugin = self.create_standard_plugin()
+        plugin.set_param_value("fio_suffix", "_something_s#.fio")
+        plugin.update_filename_string()
+        plugin._check_files_per_directory()
+        with self.assertRaises(FileReadError):
+            plugin._determine_header_size()
 
     def test_get_filename__start(self):
         plugin = self.create_standard_plugin()
@@ -151,6 +167,15 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         plugin.set_param_value("roi_xhigh", 256)
         plugin.pre_execute()
         self.assertEqual(plugin._config["roi"], slice(128, 256))
+
+    def test_get_frame__no_file(self):
+        _i_image = 37
+        plugin = self.create_standard_plugin()
+        plugin.pre_execute()
+        plugin.set_param_value("fio_suffix", "_something_s#.fio")
+        plugin.update_filename_string()
+        with self.assertRaises(FileReadError):
+            _data, _ = plugin.get_frame(_i_image)
 
     def test_get_frame__no_energy_scale(self):
         _i_image = 37

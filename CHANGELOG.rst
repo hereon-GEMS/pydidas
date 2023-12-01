@@ -29,6 +29,8 @@ Improvements
       the file reading.
     - Changed the names of the Scan import/export registry classes to more 
       consistent names.
+    - Added a context manager to handle file reading errors more
+      generically.
 
 Bugfixes
 --------

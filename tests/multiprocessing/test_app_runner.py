@@ -24,6 +24,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import sys
 import time
 import unittest
 

@@ -153,7 +153,11 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         logger.debug("WorkflowRunFrame: Clicked execute")
         self._verify_result_shapes_uptodate()
         self.sig_processing_running.emit(True)
-        self._run_app()
+        try:
+            self._run_app()
+        except:
+            self.sig_processing_running.emit(False)
+            raise
 
     def _run_app(self):
         """

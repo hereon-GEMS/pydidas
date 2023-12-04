@@ -42,6 +42,7 @@ from ..core import PydidasQsettings
 from ..core.utils import pydidas_logger
 from ..logging_level import LOGGING_LEVEL
 from .processor_ import processor
+from .pydidas_process import PydidasProcess
 
 
 logger = pydidas_logger()
@@ -367,7 +368,7 @@ class WorkerController(QtCore.QThread):
         """
         _pid = mp.current_process().pid
         self._workers = [
-            mp.Process(
+            PydidasProcess(
                 target=self._processor["func"],
                 args=self._processor["args"],
                 kwargs=self._processor["kwargs"],

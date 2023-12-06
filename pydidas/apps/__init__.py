@@ -36,6 +36,7 @@ from . import parsers
 from .composite_creator_app import *
 from .directory_spy_app import *
 from .execute_workflow_app import *
+from .execute_workflow_runner import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -53,3 +54,8 @@ from . import execute_workflow_app
 
 __all__.extend(execute_workflow_app.__all__)
 del execute_workflow_app
+
+from . import execute_workflow_runner
+
+__all__.extend(execute_workflow_runner.__all__)
+del execute_workflow_runner

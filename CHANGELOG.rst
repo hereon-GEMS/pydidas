@@ -14,6 +14,8 @@ Improvements
 - Added update checks to the menu and to the pydidas_gui startup script.
 - Added an option to change the logging level with a command line calling 
   option '-logging-level LEVEL'.
+- Added the ExecuteWorkflowRunner class to handle running workflows from the 
+  command line.
 
 - Programmatic improvements:
 

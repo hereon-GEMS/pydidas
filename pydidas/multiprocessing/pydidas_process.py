@@ -43,9 +43,6 @@ class PydidasProcess(Process):
         Process.__init__(self, *args, **kwargs)
 
     def run(self):
-        """
-        Reimplement the Process.run witih signal interruption.
-
-        """
+        """Reimplement the Process.run witih signal interruption."""
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         Process.run(self)

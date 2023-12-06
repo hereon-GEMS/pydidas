@@ -36,7 +36,7 @@ from numbers import Integral
 from queue import Empty
 from typing import Optional, Union
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ..core import PydidasQsettings
 from ..core.utils import pydidas_logger
@@ -335,6 +335,8 @@ class WorkerController(QtCore.QThread):
 
         This method is automatically called upon starting the thread.
         """
+        _app = QtWidgets.QApplication.instance()
+        _app.register_thread(self)
         self._workers_done = 0
         self.flags["running"] = True
         while self.flags["thread_alive"]:
@@ -350,6 +352,7 @@ class WorkerController(QtCore.QThread):
                 logger.debug("WorkerController: Starting post run")
                 self.cycle_post_run()
             time.sleep(0.001)
+        _app.unregister_thread(self)
         logger.debug("WorkerController: Finished worker_controller loop")
 
     def cycle_pre_run(self):
@@ -500,6 +503,7 @@ class WorkerController(QtCore.QThread):
         This is a reimplementation of the generic "requestInterruption" method of the
         QThread.
         """
+        logger.debug("WorkerController: Interruption request received.")
         self.send_stop_signal()
         self.flags["running"] = False
         self.flags["thread_alive"] = False

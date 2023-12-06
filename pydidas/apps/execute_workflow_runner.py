@@ -288,7 +288,10 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             if self.parsed_args["verbose"]:
                 print("Processing progress:")
             self._qtapp.exec_()
-        except (KeyboardInterrupt, UserConfigError):
-            runner.stop()
+        except UserConfigError:
+            runner.requestInterruption()
+            if self.parsed_args["verbose"]:
+                print("\nAborted workflow processing because of illegal configuration.")
+            return
         if self.parsed_args["verbose"]:
             print("\nProcessing finished successfully.")

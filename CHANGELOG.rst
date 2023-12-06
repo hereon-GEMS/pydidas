@@ -53,6 +53,7 @@ Bugfixes
   development versions are installed on the same machine.
 - Fixed an issue with consistency signals in PluginInWorkflowBox widget.
 - Fixed an issue with unsorted files in the filelist manager in Unix.
+- Fixed an issue with QSettings storage of bool values in Unix.
 
 
 

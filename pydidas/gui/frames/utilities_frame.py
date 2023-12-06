@@ -81,7 +81,9 @@ class UtilitiesFrame(BaseFrame):
         finalize the UI initialization.
         """
         self.__app = QtWidgets.QApplication.instance()
-        self.__app.sig_exit_pydidas.connect(self._child_windows["global_settings"].close)
+        self.__app.sig_exit_pydidas.connect(
+            self._child_windows["global_settings"].close
+        )
 
     def connect_signals(self):
         """

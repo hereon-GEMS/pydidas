@@ -101,6 +101,7 @@ def app_processor_without_tasks(
             stop_queue.get_nowait()
             logger.debug("Received stop queue signal")
             aborted_queue.put(1)
+            _wait_for_output = False
             break
         except queue.Empty:
             pass
@@ -112,7 +113,11 @@ def app_processor_without_tasks(
             output_queue.put([_index, _results])
         else:
             time.sleep(0.005)
-    logger.debug("Worker finished with all tasks. Waiting for output queue to empty.")
+    logger.debug("Worker finished with all tasks.")
+    _carry_on = False
     while _wait_for_output and not output_queue.empty():
+        if not _carry_on:
+            logger.debug("Waiting for output queue to empty.")
+            _carry_on = True
         time.sleep(0.05)
-    logger.debug("Output queue empty. Worker shutting down.")
+    logger.debug("Worker shutting down.")

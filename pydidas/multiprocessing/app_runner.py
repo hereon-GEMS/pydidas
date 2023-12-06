@@ -184,12 +184,10 @@ class AppRunner(WorkerController):
         timeout: float
             The timeout while waiting for the worker processes.
         """
-        self.join_workers()
-        if self.flags["stop_after_run"]:
-            self.flags["thread_alive"] = False
-        self._wait_for_worker_finished_signals(timeout)
+        WorkerController.cycle_post_run(self, timeout)
         self.__app.multiprocessing_post_run()
         self.sig_final_app_state.emit(self.__app.copy())
+        logger.debug("AppRunner: Finished cycle post run")
 
     @QtCore.Slot(float)
     def __check_progress(self, progress: float):

@@ -29,9 +29,7 @@ __all__ = ["PydidasQApplication"]
 
 import argparse
 import sys
-import signal
 from typing import Tuple
-import os
 
 import matplotlib as mpl
 import matplotlib.font_manager as mpl_font_manager

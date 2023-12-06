@@ -140,7 +140,7 @@ class TestWorkerController(unittest.TestCase):
         if IS_QT6:
             return
         _tasks = [1, 2, 3, 4]
-        wc = WorkerController(n_workers=4)
+        wc = WorkerController(n_workers=2)
         wc.change_function(local_test_func, *(0, 0))
         wc.add_tasks(_tasks)
         wc.finalize_tasks()
@@ -153,7 +153,7 @@ class TestWorkerController(unittest.TestCase):
         if not IS_QT6:
             return
         _tasks = [1, 2, 3, 4]
-        wc = WorkerController(n_workers=4)
+        wc = WorkerController(n_workers=2)
         wc.change_function(local_test_func, *(0, 0))
         wc.add_tasks(_tasks)
         wc.finalize_tasks()
@@ -257,7 +257,7 @@ class TestWorkerController(unittest.TestCase):
             self.assertEqual(_spy[1][1], _res2)
 
     def test_check_if_workers_done__no_signal(self):
-        wc = WorkerController(n_workers=4)
+        wc = WorkerController(n_workers=2)
         wc.flags["running"] = True
         wc._workers = [1, 2, 3, 4]
         wc._check_if_workers_finished()
@@ -265,7 +265,7 @@ class TestWorkerController(unittest.TestCase):
         self.assertTrue(wc.flags["running"])
 
     def test_check_if_workers_done__get_numbers(self):
-        wc = WorkerController(n_workers=4)
+        wc = WorkerController(n_workers=2)
         wc._workers = [1, 2, 3, 4]
         _nfinished = 3
         for i in range(_nfinished):
@@ -275,19 +275,19 @@ class TestWorkerController(unittest.TestCase):
         self.assertEqual(wc._workers_done, _nfinished)
 
     def test_wait_for_worker_finished_signals__not_running(self):
-        wc = WorkerController(n_workers=4)
+        wc = WorkerController(n_workers=2)
         wc._wait_for_worker_finished_signals(0.1)
         # assert: does not raise TimeoutError
 
     def test_wait_for_worker_finished_signals__running_not_done(self):
-        wc = WorkerController(n_workers=4)
+        wc = WorkerController(n_workers=2)
         wc.flags["running"] = True
         wc._workers = [1, 2, 3, 4]
         with self.assertRaises(TimeoutError):
             wc._wait_for_worker_finished_signals(0.2)
 
     def test_wait_for_worker_finished_signals__running_done(self):
-        wc = WorkerController(n_workers=4)
+        wc = WorkerController(n_workers=2)
         wc.flags["running"] = True
         wc._workers = [1, 2, 3, 4]
         for i in range(len(wc._workers)):

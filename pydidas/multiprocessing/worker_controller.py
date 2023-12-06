@@ -34,7 +34,7 @@ from collections.abc import Iterable
 from contextlib import contextmanager
 from numbers import Integral
 from queue import Empty
-from typing import Union
+from typing import Optional, Union
 
 from qtpy import QtCore
 
@@ -60,10 +60,10 @@ class WorkerController(QtCore.QThread):
 
     Parameters
     ----------
-    n_workers : Union[None, int], optional
+    n_workers : int, optional
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
-    function : Union[type, None], optional
+    function : type, optional
         The function to be called by the workers. If not specified at init, it must
         be set later for the workers to actually perform tasks.
     func_args : tuple, optional
@@ -77,10 +77,10 @@ class WorkerController(QtCore.QThread):
 
     def __init__(
         self,
-        n_workers: Union[None, int] = None,
-        function: Union[None, type] = None,
+        n_workers: Optional[int] = None,
+        function: Optional[type] = None,
         func_args: tuple = (),
-        func_kwargs: Union[dict, None] = None,
+        func_kwargs: Optional[dict] = None,
     ):
         QtCore.QThread.__init__(self)
         self.flags = {
@@ -182,7 +182,9 @@ class WorkerController(QtCore.QThread):
         return self._progress_done / self._progress_target
 
     def stop(self):
-        """Stop the thread from running and clean up."""
+        """
+        Stop the thread from running.
+        """
         self.add_tasks([None] * self.n_workers, are_stop_tasks=True)
         self.suspend()
         self.send_stop_signal()
@@ -435,6 +437,7 @@ class WorkerController(QtCore.QThread):
         """
         logger.debug("WorkerController: Calling join on workers")
         self.join_workers()
+        self.join_queues()
         if self.flags["stop_after_run"]:
             self.flags["thread_alive"] = False
         self._wait_for_worker_finished_signals(timeout)
@@ -451,6 +454,21 @@ class WorkerController(QtCore.QThread):
         self._workers = []
         self.flags["active"] = False
         logger.debug("WorkerController: Joined all workers")
+
+    def join_queues(self):
+        """
+        Joining all active queues.
+        """
+        logger.debug("WorkerController: Telling queues to join.")
+        for _queue in self._queues.values():
+            while True:
+                try:
+                    _queue.get_nowait()
+                except Empty:
+                    break
+            _queue.close()
+            _queue.join_thread()
+        logger.debug("WorkerController: Joined all queues.")
 
     def _wait_for_worker_finished_signals(self, timeout: float = 10):
         """
@@ -483,6 +501,8 @@ class WorkerController(QtCore.QThread):
         QThread.
         """
         self.send_stop_signal()
+        self.flags["running"] = False
+        self.flags["thread_alive"] = False
 
     def exit(self, code: Union[None, int] = None):
         """
@@ -495,6 +515,7 @@ class WorkerController(QtCore.QThread):
         code : Union[None, int]
             The exit code.
         """
+        logger.debug("WorkerController: Exiting thread")
         for _queue in self._queues.values():
             _queue.close()
             _queue.join_thread()

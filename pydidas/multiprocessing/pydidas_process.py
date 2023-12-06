@@ -38,6 +38,7 @@ class PydidasProcess(Process):
     The PydidasProcess can be used to ignore KeyboardInterrupts in the main process.
     However, the script takes responbisiblity to handle worker shutdown.
     """
+
     def __init__(self, *args, **kwargs):
         Process.__init__(self, *args, **kwargs)
 

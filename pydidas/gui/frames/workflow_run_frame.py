@@ -131,7 +131,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         if self._runner is not None:
             with ShowBusyMouse():
                 logger.debug("WorkflowRunFrame: Sending stop signal")
-                self._runner.send_stop_signal()
+                self._runner.requestInterruption()
                 _t0 = time.time()
                 while self._runner is not None:
                     if time.time() - _t0 > 5:
@@ -219,7 +219,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Clean up after AppRunner is done.
         """
-        logger.debug("WorkflowRunFrame: Telling AppRunner to delete.")
+        logger.debug("WorkflowRunFrame: Handle AppRunner loop finished signal.")
         self._runner.sig_final_app_state.disconnect()
         self._runner.sig_progress.disconnect()
         self._runner.sig_results.disconnect()

@@ -34,6 +34,7 @@ import fabio
 
 from ...core import Dataset
 from ...core.constants import FABIO_EXTENSIONS
+from ...core.utils import CatchFileErrors
 from .io_base import IoBase
 
 
@@ -72,12 +73,10 @@ class FabioIo(IoBase):
         image : pydidas.core.Dataset
             The image in form of a Dataset (with embedded metadata)
         """
-        try:
+        with CatchFileErrors(filename, Exception):
             with fabio.open(filename) as _file:
                 _data = _file.data
                 _header = _file.header
-        except Exception as _ex:
-            cls.raise_filereaderror_from_exception(_ex, str(filename))
 
         cls._data = Dataset(_data, metadata=_header)
         return cls.return_data(**kwargs)

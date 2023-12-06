@@ -35,6 +35,7 @@ import numpy as np
 
 from ...core import Dataset
 from ...core.constants import BINARY_EXTENSIONS
+from ...core.utils import CatchFileErrors
 from .io_base import IoBase
 
 
@@ -88,10 +89,8 @@ class RawIo(IoBase):
         """
         if datatype is None:
             raise KeyError("The datatype has not been specified.")
-        try:
+        with CatchFileErrors(filename):
             _data = np.fromfile(filename, dtype=datatype)
-        except (FileNotFoundError, ValueError, OSError) as _ex:
-            cls.raise_filereaderror_from_exception(_ex, str(filename))
         if _data.size != np.prod(shape):
             cls.raise_filereaderror_from_exception(
                 ValueError("The given shape does not match the data size."),

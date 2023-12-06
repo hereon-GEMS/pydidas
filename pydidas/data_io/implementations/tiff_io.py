@@ -37,6 +37,7 @@ from tifffile import TiffFileError
 
 from ...core import Dataset
 from ...core.constants import TIFF_EXTENSIONS
+from ...core.utils import CatchFileErrors
 from .io_base import IoBase
 
 
@@ -75,10 +76,8 @@ class TiffIo(IoBase):
         data : pydidas.core.Dataset
             The data in form of a pydidas Dataset (with embedded metadata)
         """
-        try:
+        with CatchFileErrors(filename, TiffFileError):
             _data = imread(filename)
-        except (TiffFileError, OSError, FileNotFoundError) as _ex:
-            cls.raise_filereaderror_from_exception(_ex, str(filename))
 
         cls._data = Dataset(_data)
         return cls.return_data(**kwargs)

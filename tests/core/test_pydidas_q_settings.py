@@ -90,13 +90,13 @@ class TestPydidasQSettings(unittest.TestCase):
 
     def test_value__no_type(self):
         obj = PydidasQsettings()
-        _val = obj.value("global/param_float")
+        _val = obj.value("global/param_str")
         self.assertIsInstance(_val, str)
         self.assertEqual(_val, self._params.get_value("param_str"))
 
     def test_value__w_type(self):
         obj = PydidasQsettings()
-        _val = obj.value("global/param_str", float)
+        _val = obj.value("global/param_float", float)
         self.assertIsInstance(_val, float)
         self.assertEqual(_val, self._params.get_value("param_float"))
 

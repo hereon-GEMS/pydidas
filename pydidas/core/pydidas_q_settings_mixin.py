@@ -68,6 +68,7 @@ class PydidasQsettingsMixin:
 
     def __init__(self):
         self.q_settings = _CopyablePydidasQSettings()
+        self.q_settings_version = VERSION
 
     def q_settings_get(
         self,
@@ -96,7 +97,7 @@ class PydidasQsettingsMixin:
             The value, converted to the type associated with the Parameter
             referenced by param_key or dtype, if given.
         """
-        _value = self.q_settings.value(f"{VERSION}/{key}")
+        _value = self.q_settings.value(f"{self.q_settings_version}/{key}")
         if _value is None:
             return default
         if dtype is not None:
@@ -124,4 +125,4 @@ class PydidasQsettingsMixin:
         value : object
             The value to be stored.
         """
-        self.q_settings.setValue(f"{VERSION}/{key}", value)
+        self.q_settings.setValue(f"{self.q_settings_version}/{key}", value)

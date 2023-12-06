@@ -30,7 +30,6 @@ __all__ = ["PydidasQsettings"]
 
 from typing import Union
 
-from ..version import VERSION
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
@@ -73,7 +72,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         val : object
             The new value stored for the key.
         """
-        self.q_settings.setValue(f"{VERSION}/{key}", val)
+        self.q_settings.setValue(f"{self.q_settings_version}/{key}", val)
 
     def value(self, key: dict, dtype: Union[None, type] = None) -> object:
         """

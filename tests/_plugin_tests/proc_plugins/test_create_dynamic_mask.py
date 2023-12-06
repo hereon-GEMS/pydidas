@@ -31,13 +31,15 @@ import unittest
 
 import numpy as np
 import scipy.ndimage
+from qtpy import QtCore
 
 from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
 from pydidas.core import UserConfigError
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestCreateDynamicMask(unittest.TestCase):
@@ -59,6 +61,8 @@ class TestCreateDynamicMask(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._temppath)
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def create_plugin(self, low=None, high=12, grow=0, iterations=1):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("CreateDynamicMask")(

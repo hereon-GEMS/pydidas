@@ -27,12 +27,14 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset, UserConfigError
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestExtractAzimuthalSectors(unittest.TestCase):
@@ -40,6 +42,11 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
     def setUpClass(cls):
         cls._input_data = np.ones((72, 1000))
         cls._x = np.arange(cls._input_data.shape[1])
+
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def setUp(self):
         ...

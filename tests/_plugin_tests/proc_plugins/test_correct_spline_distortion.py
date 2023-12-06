@@ -32,12 +32,14 @@ import warnings
 import numpy as np
 import pyFAI
 from pyFAI.distortion import Distortion
+from qtpy import QtCore
 
 from pydidas.core import Dataset, UserConfigError
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestCorrectSplineDistortion(unittest.TestCase):
@@ -90,6 +92,8 @@ class TestCorrectSplineDistortion(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._temppath)
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def create_input_dataset(self):
         return Dataset(np.ones(self.data_shape), **self._data_metadata)

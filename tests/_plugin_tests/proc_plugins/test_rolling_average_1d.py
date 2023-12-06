@@ -27,12 +27,14 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset, UserConfigError
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestRollingAverage1d(unittest.TestCase):
@@ -41,6 +43,11 @@ class TestRollingAverage1d(unittest.TestCase):
         cls._n = 120
         cls._x = np.linspace(0, 2 * np.pi, num=cls._n)
         cls._y = np.sin(cls._x) + 0.2 * (0.5 - np.random.random(cls._n))
+
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def setUp(self):
         ...

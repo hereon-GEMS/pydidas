@@ -49,6 +49,8 @@ Bugfixes
   WorkflowRunFrame.
 - Fixed an issue in the RunWorkflowFrame where aborting the processing would
   lead to a frozen GUI.
+- Fixed an issue with plugin paths during unittests when production and 
+  development versions are installed on the same machine.
 
 
 v23.10.20

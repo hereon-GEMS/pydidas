@@ -28,12 +28,14 @@ import unittest
 import warnings
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestRemove1dPolynomialBackground(unittest.TestCase):
@@ -42,6 +44,11 @@ class TestRemove1dPolynomialBackground(unittest.TestCase):
         cls._n = 120
         cls._x = 4 + 0.42 * np.arange(cls._n)
         cls._y = 12 + 1.67 * np.sin(cls._x / 3) + (0.5 - np.random.random(cls._n))
+
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def setUp(self):
         ...

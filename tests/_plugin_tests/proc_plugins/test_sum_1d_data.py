@@ -27,15 +27,22 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestSum1dData(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
+
     def setUp(self):
         self._n = 120
         self._data = np.arange(self._n)

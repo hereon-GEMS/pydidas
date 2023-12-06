@@ -252,13 +252,13 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self.__update_style()
 
     @QtCore.Slot(list)
-    def receive_inconsistent_signal(self, *widget_ids: tuple[int]):
+    def receive_inconsistent_signal(self, widget_ids: list[int]):
         """
         Handle the node inconsistent signal set the stylesheets.
 
         Parameters
         ----------
-        *widget_ids : tuple[int]
+        *widget_ids : list[int]
             The widget node IDs which are inconsistent.
         """
         if self.widget_id in widget_ids and not self.flags["inconsistent"]:
@@ -266,13 +266,13 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             self.__update_style()
 
     @QtCore.Slot(list)
-    def receive_consistent_signal(self, *widget_ids: tuple[int]):
+    def receive_consistent_signal(self, widget_ids: list[int]):
         """
         Handle the node consistent signal set the stylesheets.
 
         Parameters
         ----------
-        widget_ids : tuple[int]
+        widget_ids : list[int]
             The widget node ID.
         """
         if self.widget_id in widget_ids and self.flags["inconsistent"]:

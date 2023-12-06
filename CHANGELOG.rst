@@ -52,6 +52,8 @@ Bugfixes
 - Fixed an issue with plugin paths during unittests when production and 
   development versions are installed on the same machine.
 - Fixed an issue with consistency signals in PluginInWorkflowBox widget.
+- Fixed an issue with unsorted files in the filelist manager in Unix.
+
 
 
 v23.10.20

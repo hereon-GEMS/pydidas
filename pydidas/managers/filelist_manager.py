@@ -248,8 +248,7 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         _file1 = self.get_param_value("first_file")
         _file2 = self.get_param_value("last_file")
-        _suffix = _file1.suffix
-        _list = [_item for _item in _file1.parent.rglob("*") if _item.suffix == _suffix]
+        _list = sorted(_file1.parent.rglob(f"*{_file1.suffix}"))
         if _file2 not in _list:
             raise UserConfigError(
                 f"No file with the selected name {_file2.name} exists in the directory "

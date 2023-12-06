@@ -117,8 +117,8 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         self._help_shortcut.activated.connect(self.open_help)
 
         _app = QtWidgets.QApplication.instance()
-        if hasattr(_app, "sig_close_gui"):
-            _app.sig_close_gui.connect(self.deleteLater)
+        if hasattr(_app, "sig_exit_pydidas"):
+            _app.sig_exit_pydidas.connect(self.deleteLater)
 
     @QtCore.Slot()
     def open_help(self):

@@ -119,7 +119,7 @@ class DefineScanFrame(BaseFrame):
         self.param_widgets["scan_base_directory"].io_edited.connect(
             self.set_new_base_directory
         )
-        self._qtapp.sig_close_gui.connect(self.__info_window.close)
+        self._qtapp.sig_exit_pydidas.connect(self.__info_window.close)
 
     def finalize_ui(self):
         """

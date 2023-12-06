@@ -81,7 +81,7 @@ class UtilitiesFrame(BaseFrame):
         finalize the UI initialization.
         """
         self.__app = QtWidgets.QApplication.instance()
-        self.__app.sig_close_gui.connect(self._child_windows["global_settings"].close)
+        self.__app.sig_exit_pydidas.connect(self._child_windows["global_settings"].close)
 
     def connect_signals(self):
         """
@@ -122,7 +122,7 @@ class UtilitiesFrame(BaseFrame):
         self._child_windows[_name].sig_closed.connect(
             partial(self.remove_window_from_children, _name)
         )
-        self.__app.sig_close_gui.connect(self._child_windows[_name].close)
+        self.__app.sig_exit_pydidas.connect(self._child_windows[_name].close)
         self._child_windows[_name].show()
 
     @QtCore.Slot(object)

@@ -130,7 +130,7 @@ class WorkflowEditFrame(BaseFrame):
         self._widgets["but_save"].clicked.connect(self.save_tree_to_file)
         self._widgets["but_load"].clicked.connect(self.load_tree_from_file)
         _app = QtWidgets.QApplication.instance()
-        _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
+        _app.sig_exit_pydidas.connect(WORKFLOW_EDIT_MANAGER.reset)
 
     @QtCore.Slot(int)
     def configure_plugin(self, node_id: int):

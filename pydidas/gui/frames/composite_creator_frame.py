@@ -159,8 +159,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         )
         self._app.updated_composite.connect(self.__received_composite_update)
         _app = QtWidgets.QApplication.instance()
-        if hasattr(_app, "sig_close_gui"):
-            _app.sig_close_gui.connect(self.deleteLater)
+        if hasattr(_app, "sig_exit_pydidas"):
+            _app.sig_exit_pydidas.connect(self.deleteLater)
 
         self.setup_initial_state()
 

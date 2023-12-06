@@ -31,6 +31,7 @@ import argparse
 import sys
 import signal
 from typing import Tuple
+import psutil
 import os
 
 import matplotlib as mpl
@@ -81,6 +82,22 @@ def parse_cmd_args():
     return _kwargs
 
 
+def sigint_signal_handler(signal, handler):
+    _app = QtWidgets.QApplication.instance()
+    # if _app.is_daemon:
+    #     print("forcibily exiting daemon", os.getpid())
+    #     sys.exit()
+    #     # os._exit(os.EX_OK)
+    print("exiting QT app @", os.getpid())
+    _app.sig_exit_pydidas.emit()
+
+    _app.kill_daemon_processes()
+    _app.quit()
+    print("told app to quit @", os.getpid())
+    sys.exit()
+    # os._exit(os.EX_OK)
+
+
 class PydidasQApplication(QtWidgets.QApplication):
     """
     A subclassed QApplication used in pydidas for controlling the UI and event loops.
@@ -102,9 +119,12 @@ class PydidasQApplication(QtWidgets.QApplication):
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
+        signal.signal(signal.SIGINT, sigint_signal_handler)
         self.setOrganizationName("Hereon")
         self.setOrganizationDomain("Hereon/WPI")
         self.setApplicationName("pydidas")
+        self.__daemon_processes = []
+        self.__worker_threads = []
         self.__settings = QtCore.QSettings()
         self.__status = ""
         self.__standard_font = self.font()
@@ -122,6 +142,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.font_size = _kwargs.get("fontsize", self.__font_config["size"])
         self.font_family = self.__font_config["family"]
         self._update_font_metrics()
+        print("creating PydidasQApp@", os.getpid())
 
     def _update_font_metrics(self):
         """
@@ -330,4 +351,91 @@ class PydidasQApplication(QtWidgets.QApplication):
         str
             The current status string.
         """
-        return self.__status
+
+    def register_daemon_process(self, process_id: int):
+        """
+        Register a daemon process with the main QtApp.
+
+        Parameters
+        ----------
+        process_id : int
+            The process id.
+        """
+        print(f"registering daemon ID {process_id} in process {os.getpid()}")
+        self.__daemon_processes.append(process_id)
+
+    def kill_daemon_processes(self):
+        """
+        Kill all running daemon processes.
+        """
+        _current_pids = psutil.pids()
+        print("Killing daemons from", os.getpid())
+        print("registered daemons:", self.__daemon_processes)
+        for _pid in self.__daemon_processes:
+            if _pid not in _current_pids:
+                continue
+            os.kill(_pid, signal.SIGTERM)
+            print("kill signal sent to", _pid)
+
+    def register_thread(self, controller: QtCore.QThread):
+        """
+        Register a started thread
+
+        Parameters
+        ----------
+        controller : QtCore.QThread
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
+        _ref = weakref.ref(controller)
+        print("registering thread")
+        self.__worker_threads.append(_ref)
+
+    @QtCore.Slot(object)
+    def unregister_thread(self, controller: QtCore.QThread):
+        """
+        Unregister
+
+        Parameters
+        ----------
+        controller : QtCore.QThread
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
+
+    # @property
+    # def is_daemon(self) -> bool:
+    #     """
+    #     Get the is_daemon flag.
+
+    #     For spawned processes, the daemon flag can be set to forcibly exit
+    #     the process upon termination.
+
+    #     Returns
+    #     -------
+    #     bool
+    #         The flag whether the process is a daemon.
+    #     """
+    #     return self.__is_daemon
+
+    # @is_daemon.setter
+    # def is_daemon(self, flag: bool):
+    #     """
+    #     Set the is_daemon property flag.
+
+    #     Parameters
+    #     ----------
+    #     flag : bool
+    #         The new is_daemon flag to be set.
+    #     """
+    #     if not isinstance(flag, bool):
+    #         raise ValueError("The is_daemon flag must be boolean.")
+    #     self.__is_daemon = flag

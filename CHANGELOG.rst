@@ -58,7 +58,8 @@ Bugfixes
   DiffractionExperiment and not keep the global context
 - Fixed an issue with updating the PluginCollection from the GUI's 
   UserConfigWindow.
-
+- Fixed an issue where running the sphinx-build externally would trigger 
+  building the documentation twice.
 
 
 v23.10.20

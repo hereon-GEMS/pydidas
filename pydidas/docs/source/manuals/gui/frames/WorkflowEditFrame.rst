@@ -4,7 +4,6 @@
     Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
-
 .. _workflow_edit_frame:
 
 Workflow edit frame

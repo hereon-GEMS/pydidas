@@ -7,9 +7,6 @@
 workflow
 --------
 
-.. autoclass:: <pydidas.workflow.ProcessingTree>
-    :members:
-
 .. autoclass:: pydidas.workflow.workflow_results.WorkflowResults
     :members:
 

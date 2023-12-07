@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _scan_context:
 
 The ScanContext class
@@ -38,7 +44,7 @@ and to add metadata about the scan to plots and stored datasets.
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in :ref:`scan_context_parameters`\ .
+given in :ref:`List of all ScanContext Parameters <scan_context_parameters>`\ .
 
 Its instance can be obtained by calling the following code:
 

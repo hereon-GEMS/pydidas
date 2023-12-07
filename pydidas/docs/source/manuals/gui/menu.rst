@@ -65,7 +65,7 @@ pydidas menu structure
         
     - Exit
         This action will close the pydidas GUI **without confirmation**.
-- Utilities
+- Tools
     - Export Eiger Pixelmask
         This menu item will open a small window which allows the user to 
         specify an Eiger-written *master* file which includes detector metadata, 
@@ -80,6 +80,9 @@ pydidas menu structure
         This menu entry will open a window to define and edit a detector mask. 
         For more information, please refer to the corresponding :ref:`Mask 
         editor window manual <mask_editor_window>`.
+    - Clear local log filesystem
+        Using this menu entry will try to clear all written pydidas log files 
+        from the local file system. 
 - Options
     - User config
         The User config entry opens a window to modify user preferences like 
@@ -99,6 +102,15 @@ pydidas menu structure
         The *open feedback form* will open the pydidas feedback form in a new 
         web browser tab. The feedback form allows to submit bug reports,
         improvement suggestions or questions.
+    - Pydidas paths
+        This entry will open a small window with information about the local
+        paths in which log files and configuration files are placed by the 
+        pydidas application.
+    - Check for update
+        Using this option will require an active internet connection. Pydidas
+        will check the latest release version on Github and compare the 
+        remote version number with the locally installed version. The result
+        will be supplied to the user in a pop-up window.
     - About
         The about window has copyright information and links to the pydidas 
         homepage and github home.

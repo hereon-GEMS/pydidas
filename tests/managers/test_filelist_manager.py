@@ -40,18 +40,21 @@ from pydidas.managers import FilelistManager
 class TestFilelistManager(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
-        _fname = lambda i: Path(os.path.join(cls._path, f"test_{i:02d}.npy"))
+        cls._path = Path(tempfile.mkdtemp())
         cls._img_shape = (10, 10)
         cls._data = np.random.random((50,) + cls._img_shape)
         for i in range(50):
-            np.save(_fname(i), cls._data[i])
+            np.save(cls._fname(i), cls._data[i])
         for i in range(50, 60):
-            np.save(_fname(i), np.random.random((20, 20)))
+            np.save(cls._fname(i), np.random.random((20, 20)))
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._path)
+
+    @classmethod
+    def _fname(cls, i: int):
+        return cls._path.joinpath(f"test_{i:02d}.npy")
 
     def setUp(self):
         self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:02d}.npy"))

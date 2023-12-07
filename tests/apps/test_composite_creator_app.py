@@ -50,17 +50,15 @@ from pydidas.managers import CompositeImageManager
 class TestCompositeCreatorApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
-        _fname = lambda i: Path(os.path.join(cls._path, f"test{i:02d}.npy"))
+        cls._path = Path(tempfile.mkdtemp())
         cls._img_shape = (10, 10)
         cls._n_total = 50
         cls._n_files = 10
         cls._data = np.random.random((cls._n_total,) + cls._img_shape)
         for i in range(cls._n_total):
-            np.save(_fname(i), cls._data[i])
+            np.save(cls._fname(i), cls._data[i])
         cls._hdf5_fnames = [
-            Path(os.path.join(cls._path, f"test_{i:03d}.h5"))
-            for i in range(cls._n_files)
+            cls._path.joinpath(f"test_{i:03d}.h5") for i in range(cls._n_files)
         ]
         _n_per_file = int(cls._n_total / cls._n_files)
         for i in range(cls._n_files):
@@ -73,7 +71,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         cls._border = cls._q_settings.value("user/mosaic_border_width", int)
         cls._bgvalue = cls._q_settings.value("user/mosaic_border_value", float)
         _mask = np.zeros((cls._img_shape), dtype=np.bool_)
-        _maskfile = Path(os.path.join(cls._path, "mask.npy"))
+        _maskfile = cls._path.joinpath("mask.npy")
         np.save(_maskfile, _mask)
         cls._maskfile = _maskfile
 
@@ -82,8 +80,9 @@ class TestCompositeCreatorApp(unittest.TestCase):
         shutil.rmtree(cls._path)
         cls._q_settings = PydidasQsettings()
 
-    def _fname(self, i: int):
-        return Path(os.path.join(self._path, f"test{i:02d}.npy"))
+    @classmethod
+    def _fname(cls, i: int):
+        return cls._path.joinpath(f"test{i:02d}.npy")
 
     def get_default_app(self):
         self._ny = 5

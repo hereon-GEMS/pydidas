@@ -9,7 +9,7 @@ Pydidas QSettings are grouped into two main categories: 'global' settings and
 whereas the user settings handle convenience user configurations.
 
 **Global** settings
-^^^^^^^^^^^^^^^^^^^ 
+""""""""""""""""""" 
 
 - Multiprocessing settings
     - Number of MP workers (key: global/mp_n_workers, type: int, default: 4)
@@ -28,7 +28,7 @@ whereas the user settings handle convenience user configurations.
         The maximum number of datasets in the buffer. A dataset consists of all 
         results for one frame. For performance reasons, the buffer should not 
         be too large as this is only a temporary buffer.
-     - Maximum image size (key: global/max_image_size, type: float, default: 100, unit: MPixel)
+    - Maximum image size (key: global/max_image_size, type: float, default: 100, unit: MPixel)
         The maximum image size determines the maximum size of images pydidas 
         will handle. The default is 100 Megapixels.
 - GUI plot update settings
@@ -38,7 +38,7 @@ whereas the user settings handle convenience user configurations.
 
 
 **User** settings
-^^^^^^^^^^^^^^^^^ 
+""""""""""""""""" 
 
 - Update settings
     - Plot update time (key: user/auto_check_for_updates, type: bool, default: True)
@@ -72,3 +72,4 @@ whereas the user settings handle convenience user configurations.
         The default is normally per-determined by pydidas and should not be 
         changed except for expert users. Additional paths can be added by 
         appending them with a double semicolon ";;" as separator.
+

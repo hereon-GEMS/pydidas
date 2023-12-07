@@ -72,15 +72,16 @@ The object :py:data:`exp` will be used in all examples below.
              'detector_name',
              'detector_npixx',
              'detector_npixy',
-             'detector_sizex',
-             'detector_sizey',
+             'detector_pxsizex',
+             'detector_pxsizey',
+             'detector_mask_file',
              'detector_dist',
              'detector_poni1',
              'detector_poni2',
              'detector_rot1',
              'detector_rot2',
              'detector_rot3']
-
+             
     2. Get the value of the :py:class:`Parameter <pydidas.core.Parameter>`
     *xray_energy*
 
@@ -103,6 +104,7 @@ The object :py:data:`exp` will be used in all examples below.
              'detector_npixy': 3269,
              'detector_sizex': 7.5e-05,
              'detector_sizey': 7.5e-05,
+             'detector_mask_file': Path('.'),
              'detector_dist': 0.23561364873702045,
              'detector_poni1': 0.11575233539615679,
              'detector_poni2': 0.12393982882406686,
@@ -165,7 +167,7 @@ These objects can be accesses by calling their respective factories:
     >>> import pydidas
     >>> SCAN = pydidas.contexts.ScanContext()
     >>> EXPERIMENT = pydidas.contexts.DiffractionExperimentContext()
-    >>> TREE= pydidas.workflow.WorkflowTree()
+    >>> TREE = pydidas.workflow.WorkflowTree()
 
 Note that the factories return a link to the unique instance and multiple calls
 yield the same object:
@@ -216,26 +218,23 @@ Paths can be managed by three methods. New paths can be added using the
 method and a list of all currently registered paths can be obtained by the
 :py:meth:`get_all_registered_paths
 <pydidas.plugins.plugin_collection.PluginRegistry.get_all_registered_paths>`
-method. To permanently remove all stored paths, a user can use the
-:py:meth:`clear_qsettings
-<pydidas.plugins.plugin_collection.PluginRegistry.clear_qsettings>`
+method. To permanently remove a stored paths, a user can use the
+:py:meth:`unregister_plugin_path
+<pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path>`
 method. To remove all stored paths and plugins from the current instance, use
-the
-:py:meth:`clear_collection
+the :py:meth:`clear_collection
 <pydidas.plugins.plugin_collection.PluginRegistry.clear_collection>` method.
 This method must be called with a :py:data:`True` flag to take effect and is
 ignored otherwise.
 
 .. Warning::
-    Using the :py:meth:`clear_qsettings
-    <pydidas.plugins.plugin_collection.PluginRegistry.clear_qsettings>`
+    Using the :py:meth:`clear_collection
+    <pydidas.plugins.plugin_collection.PluginRegistry.clear_collection>`
     method will remove all paths which have ever been registered and the user is
     responsible to add all new paths again.
 
-    Also, calling this method will **not** remove known plugins from the current
-    instance. If desired, this must be done using the :py:meth:`clear_collection
-    <pydidas.plugins.plugin_collection.PluginRegistry.clear_collection>`
-    method.
+    Also, if a user tries to access the  empty PluginCollection, the default
+    plugin path will be added automatically.
 
 An example of the use of stored paths is given below.
 
@@ -244,12 +243,14 @@ An example of the use of stored paths is given below.
     >>> import pydidas
     >>> COLLECTION = pydidas.plugins.PluginCollection()
     >>> COLLECTION.registered_paths
-    ['/home/someuser/path/to/plugins']
-    >>> COLLECTION.find_and_register_plugins('/home/someuser/another/path',
-    ...                                      'home/someuser/yet/another/path')
+    [Path(''/home/someuser/path/to/plugins')]
+    >>> COLLECTION.find_and_register_plugins(
+        '/home/someuser/another/path',
+        'home/someuser/yet/another/path')
     >>> COLLECTION.registered_paths
-    ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
-     '/home/someuser/yet/another/path']
+    [Path('/home/someuser/path/to/plugins'), 
+     Path('/home/someuser/another/path'),
+     Path('/home/someuser/yet/another/path')]
 
     # Now, if we exit and restart python, all paths will be included in the
     # new instance:
@@ -258,48 +259,23 @@ An example of the use of stored paths is given below.
     >>> import pydidas
     >>> COLLECTION = pydidas.plugins.PluginCollection()
     >>> COLLECTION.registered_paths
-    ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
-     '/home/someuser/yet/another/path']
-
-    # If we use the ``clear_qsettings`` method, the paths will still exist
-    # in the current instance, but will be gone once we restart the kernel:
-    >>> COLLECTION.clear_qsettings()
-    >>> COLLECTION.registered_paths
-    ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
-     '/home/someuser/yet/another/path']
-    >>> exit()
-    $ python
-    >>> import pydidas
-    >>> COLLECTION = pydidas.plugins.PluginCollection()
-    >>> COLLECTION.registered_paths
-    []
-    >>> COLLECTION.find_and_register_plugins('/home/someuser/path/to/plugins',
-    ...                                      '/home/someuser/another/path',
-    ...                                      '/home/someuser/yet/another/path')
-    >>> COLLECTION.registered_paths
-    ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
-     '/home/someuser/yet/another/path']
+    [Path('/home/someuser/path/to/plugins'), 
+     Path('/home/someuser/another/path'),
+     Path(''/home/someuser/yet/another/path')]
 
     # Using the ``clear_collection`` method without the confirmation flag
     # will be ignored:
     >>> COLLECTION.clear_collection()
     'The confirmation flag was not given. The PluginCollection has not been reset.'
     >>> COLLECTION.registered_paths
-    ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
-     '/home/someuser/yet/another/path']
+    [Path('/home/someuser/path/to/plugins'), 
+     Path('/home/someuser/another/path'),
+     Path('/home/someuser/yet/another/path')]
     >>> COLLECTION.clear_collection(True)
+    # When accessing the COLLECTION with no paths registered, the default
+    # Path will be added:
     >>> COLLECTION.registered_paths
-    []
-
-    # Starting a new instance will restore the paths because the qsettings have
-    # not been reset:
-    >>> exit()
-    $ python
-    >>> import pydidas
-    >>> COLLECTION = pydidas.plugins.PluginCollection()
-    >>> COLLECTION.registered_paths
-    ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
-     '/home/someuser/yet/another/path']
+    [Path('/generic/plugin/path')]
 
 
 Plugin references

@@ -21,6 +21,7 @@ The following general manuals are available:
     cmdline_global/cmd_scan_context
     cmdline_global/cmd_workflow_tree
     cmdline_global/cmd_workflow_results
+    cmdline_global/cmd_running_workflows
 
 Documentation for the following applications is available:
 

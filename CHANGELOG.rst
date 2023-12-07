@@ -56,6 +56,8 @@ Bugfixes
 - Fixed an issue with QSettings storage of bool values in Unix.
 - Fixed an issue when copying a plugin would create a new 
   DiffractionExperiment and not keep the global context
+- Fixed an issue with updating the PluginCollection from the GUI's 
+  UserConfigWindow.
 
 
 

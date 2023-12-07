@@ -74,7 +74,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         """
         self.q_settings.setValue(f"{self.q_settings_version}/{key}", val)
 
-    def value(self, key: dict, dtype: Union[None, type] = None) -> object:
+    def value(self, key: str, dtype: Union[None, type] = None) -> object:
         """
         Get the value from a QSetting key.
 

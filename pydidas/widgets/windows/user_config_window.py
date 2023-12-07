@@ -330,9 +330,9 @@ class _UserConfigWindow(PydidasWindow):
             "Do you want to reset the PluginCollection paths and lose all changes?",
         ).exec_()
         if _reply:
-            self.set_param_value_and_widget(
-                "plugin_path", str(get_generic_plugin_path()[0])
-            )
+            _path = str(get_generic_plugin_path()[0])
+            self.set_param_value_and_widget("plugin_path", _path)
+            self.update_qsetting("plugin_path",_path)
             PLUGINS.clear_collection(True)
             PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 

@@ -33,7 +33,9 @@ from qtpy import QtCore
 
 from pydidas.core import Parameter, ParameterCollection, PydidasQsettingsMixin
 from pydidas.core.pydidas_q_settings_mixin import _CopyablePydidasQSettings
-from pydidas.version import VERSION
+
+
+VERSION = "unittesting"
 
 
 class TestPydidasQSettingsMixin(unittest.TestCase):
@@ -50,63 +52,61 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
             self.q_settings.setValue(f"{VERSION}/{key}", self._params.get_value(key))
 
     def tearDown(self):
-        self.q_settings.remove("old_version/param_int")
         self.q_settings.remove("old_version")
-        for key in self._params:
-            self.q_settings.remove(f"{VERSION}/{key}")
+        self.q_settings.remove(VERSION)
 
     def test_creation(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         self.assertIsInstance(obj, PydidasQsettingsMixin)
         self.assertTrue(hasattr(obj, "q_settings"))
         self.assertIsInstance(obj.q_settings, _CopyablePydidasQSettings)
 
     def test_q_settings_get_value__plain(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         obj.params = self._params
         obj.get_param = obj.params.get
         _val = obj.q_settings_get("param_float")
         self.assertEqual(float(_val), self._params.get_value("param_float"))
 
     def test_q_settings_get_value__with_dtype(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         _val = obj.q_settings_get("param_float", dtype=float)
         self.assertTrue(isinstance(_val, float))
         self.assertEqual(_val, self._params.get_value("param_float"))
 
     def test_q_settings_get_value__with_bool(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         _val = obj.q_settings_get("param_bool", dtype=bool)
         self.assertTrue(isinstance(_val, bool))
         self.assertEqual(_val, self._params.get_value("param_bool"))
 
     def test_q_settings_get_value__with_Integral(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         _val = obj.q_settings_get("param_int", dtype=Integral)
         self.assertTrue(isinstance(_val, int))
         self.assertEqual(_val, self._params.get_value("param_int"))
 
     def test_q_settings_get_value__int_with_bool(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         _val = obj.q_settings_get("param_bool", dtype=Integral)
         self.assertTrue(isinstance(_val, int))
         self.assertEqual(_val, self._params.get_value("param_bool"))
 
     def test_q_settings_get_value__with_Real(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         _val = obj.q_settings_get("param_float", dtype=Real)
         self.assertTrue(isinstance(_val, float))
         self.assertEqual(_val, self._params.get_value("param_float"))
 
     def test_q_settings_set(self):
         _val = 42.1235
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         obj.q_settings_set("param_float", _val)
         _new_val = float(obj.q_settings.value(f"{VERSION}/param_float"))
         self.assertEqual(_val, _new_val)
 
     def test_q_settings_pickle(self):
-        obj = PydidasQsettingsMixin()
+        obj = PydidasQsettingsMixin(version="unittesting")
         obj.params = self._params
         new_obj = pickle.loads(pickle.dumps(obj))
         self.assertIsInstance(new_obj, PydidasQsettingsMixin)

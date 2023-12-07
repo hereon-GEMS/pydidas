@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["PydidasQsettings"]
 
 
-from typing import Union
+from typing import Optional, Union
 
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
@@ -36,10 +36,16 @@ from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 class PydidasQsettings(PydidasQsettingsMixin):
     """
     A modified version of the QSettings with some additional convenience methods.
+
+    Parameters
+    ----------
+    version : Optional[str]
+        An optional version string. If None, the pydidas version will be used.
+        The default is None.
     """
 
-    def __init__(self):
-        PydidasQsettingsMixin.__init__(self)
+    def __init__(self, version: Optional[str] = None):
+        PydidasQsettingsMixin.__init__(self, version=version)
 
     def show_all_stored_q_settings(self):
         """
@@ -59,7 +65,15 @@ class PydidasQsettings(PydidasQsettingsMixin):
             The dict with (key: stored_value) pairs.
         """
         _keys = self.q_settings.allKeys()
-        return {_key: self.q_settings.value(_key) for _key in _keys}
+        _prefix = f"{self.q_settings_version}/"
+        return {
+            _key.removeprefix(_prefix): self.q_settings.value(_key)
+            for _key in _keys
+            if (
+                (_key.startswith(_prefix) or _key.startswith("font/"))
+                and not (_key.startswith(f"{_prefix}dialogues"))
+            )
+        }
 
     def set_value(self, key: str, val: object):
         """

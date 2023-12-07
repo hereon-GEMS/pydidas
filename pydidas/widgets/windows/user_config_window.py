@@ -332,7 +332,7 @@ class _UserConfigWindow(PydidasWindow):
         if _reply:
             _path = str(get_generic_plugin_path()[0])
             self.set_param_value_and_widget("plugin_path", _path)
-            self.update_qsetting("plugin_path",_path)
+            self.update_qsetting("plugin_path", _path)
             PLUGINS.clear_collection(True)
             PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 

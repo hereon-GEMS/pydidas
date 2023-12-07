@@ -29,7 +29,7 @@ __all__ = ["PydidasQsettingsMixin"]
 
 
 from numbers import Integral, Real
-from typing import Self, Union
+from typing import Optional, Self, Union
 
 from qtpy import QtCore
 
@@ -64,11 +64,16 @@ class PydidasQsettingsMixin:
 
     This class can be inherited by any class which requires access to the
     global QSettings defined in pydidas.
+
+    Parameters
+    ----------
+    version : Optional[str]
+        An optional version string. The default is the pydidas version number.
     """
 
-    def __init__(self):
+    def __init__(self, version: Optional[str] = None):
         self.q_settings = _CopyablePydidasQSettings()
-        self.q_settings_version = VERSION
+        self.q_settings_version = version if version is not None else VERSION
 
     def q_settings_get(
         self,

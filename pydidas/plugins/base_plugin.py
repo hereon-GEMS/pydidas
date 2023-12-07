@@ -36,6 +36,7 @@ from typing import Self, Union
 import numpy as np
 from qtpy import QtCore
 
+from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import (
     Dataset,
     ObjectWithParameterCollection,
@@ -62,6 +63,8 @@ _TYPES_NOT_TO_COPY = (
     ParameterCollection,
     ImageMetadataManager,
 )
+
+EXP = DiffractionExperimentContext()
 
 
 def _data_dim(entry):
@@ -267,6 +270,8 @@ class BasePlugin(ObjectWithParameterCollection):
         )
         for _key, _param in self.params.items():
             _obj_copy.set_param_value(_key, _param.value)
+        if hasattr(self, "_EXP") and self._EXP == EXP:
+            _obj_copy._EXP = EXP
         return _obj_copy
 
     def __deepcopy__(self, memo: dict) -> Self:

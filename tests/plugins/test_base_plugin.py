@@ -32,12 +32,17 @@ import unittest
 
 import numpy as np
 
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
 from pydidas.core import Parameter, UserConfigError, get_generic_parameter, utils
 from pydidas.core.constants import BASE_PLUGIN
 from pydidas.core.utils import rebin2d
 from pydidas.data_io.utils import RoiSliceManager
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import create_plugin_class
+
+
+EXP = DiffractionExperimentContext()
 
 
 class TestLinkedObject:
@@ -469,6 +474,23 @@ class TestBasePlugin(unittest.TestCase):
         self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
         cp.set_param_value("label", "Test 12423536")
         self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
+
+    def test_copy__with_exp_attribute(self):
+        plugin = create_plugin_class(BASE_PLUGIN)
+        obj = plugin()
+        obj._EXP = EXP
+        _copy = copy.copy(obj)
+        self.assertEqual(obj._EXP, EXP)
+        self.assertEqual(_copy._EXP, EXP)
+
+    def test_copy__with_local_exp_attribute(self):
+        plugin = create_plugin_class(BASE_PLUGIN)
+        obj = plugin()
+        obj._EXP = DiffractionExperiment()
+        _copy = copy.copy(obj)
+        self.assertNotEqual(obj._EXP, EXP)
+        self.assertNotEqual(obj._EXP, _copy._EXP)
+        self.assertNotEqual(_copy._EXP, EXP)
 
     def test_init__plain(self):
         plugin = create_plugin_class(BASE_PLUGIN)()

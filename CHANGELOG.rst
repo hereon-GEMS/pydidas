@@ -54,6 +54,8 @@ Bugfixes
 - Fixed an issue with consistency signals in PluginInWorkflowBox widget.
 - Fixed an issue with unsorted files in the filelist manager in Unix.
 - Fixed an issue with QSettings storage of bool values in Unix.
+- Fixed an issue when copying a plugin would create a new 
+  DiffractionExperiment and not keep the global context
 
 
 

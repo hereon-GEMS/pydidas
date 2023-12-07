@@ -28,8 +28,12 @@ import unittest
 
 import numpy as np
 
+from pydidas.contexts import DiffractionExperimentContext
 from pydidas.unittest_objects import DummyLoader, DummyProc
 from pydidas.workflow import WorkflowNode
+
+
+EXP = DiffractionExperimentContext()
 
 
 class TestWorkflowNode(unittest.TestCase):
@@ -66,6 +70,16 @@ class TestWorkflowNode(unittest.TestCase):
         new = obj.copy()
         self.assertEqual(new.plugin.node_id, _node_id)
         self.assertEqual(obj.plugin.node_id, _node_id)
+
+    def test_copy__with_EXP_property(self):
+        _node_id = 42
+        obj = WorkflowNode(plugin=DummyLoader(), node_id=_node_id)
+        obj.plugin._EXP = EXP
+        new = obj.copy()
+        self.assertEqual(new.plugin.node_id, _node_id)
+        self.assertEqual(obj.plugin.node_id, _node_id)
+        self.assertEqual(obj.plugin._EXP, EXP)
+        self.assertEqual(new.plugin._EXP, EXP)
 
     def test_node_id_property__get(self):
         obj = WorkflowNode(plugin=DummyLoader())

@@ -60,13 +60,9 @@ class TestBaseFrameWithApp(unittest.TestCase):
         cls._qtapp = QtWidgets.QApplication.instance()
         if cls._qtapp is None:
             cls._qtapp = PydidasQApplication([])
-        # cls.widgets = []
 
     @classmethod
     def tearDownClass(cls):
-        # while cls.widgets:
-        #     w = cls.widgets.pop()
-        #     w.deleteLater()
         cls._qtapp.quit()
         app = QtWidgets.QApplication.instance()
         if app is None:

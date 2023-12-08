@@ -60,7 +60,7 @@ class WorkerController(QtCore.QThread):
 
     Parameters
     ----------
-    n_workers : int, optional
+    n_workers : Union[None, int], optional
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
     function : type, optional

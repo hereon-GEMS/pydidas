@@ -29,20 +29,13 @@ import shutil
 import tempfile
 import unittest
 
-from pydidas.contexts.scan_context import (
-    Scan,
-    ScanContext,
-    ScanContextIoBase,
-    ScanContextIoMeta,
-)
+from pydidas.contexts.scan_context import Scan, ScanContext, ScanIo, ScanIoBase
 
 
 SCAN = ScanContext()
-SCAN_IO_META = ScanContextIoMeta
-SCAN_IO_META.clear_registry()
 
 
-class TestIo(ScanContextIoBase):
+class TestIo(ScanIoBase):
     extensions = ["test"]
     format_name = "Test"
 
@@ -65,7 +58,17 @@ class TestIo(ScanContextIoBase):
         cls.import_filename = filename
 
 
-class TestScanContextIoMeta(unittest.TestCase):
+class TestScanIo(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._original_registry = ScanIo.registry.copy()
+        ScanIo.clear_registry()
+        ScanIo.register_class(TestIo)
+
+    @classmethod
+    def tearDownClass(cls):
+        ScanIo.registry = cls._original_registry
+
     def setUp(self):
         self._tmppath = tempfile.mkdtemp()
         TestIo.reset()
@@ -76,13 +79,13 @@ class TestScanContextIoMeta(unittest.TestCase):
 
     def test_export_to_file(self):
         _fname = os.path.join(self._tmppath, "test.test")
-        SCAN_IO_META.export_to_file(_fname)
+        ScanIo.export_to_file(_fname)
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
 
     def test_import_from_file__generic_ScanContext(self):
         _fname = os.path.join(self._tmppath, "test.test")
-        SCAN_IO_META.import_from_file(_fname)
+        ScanIo.import_from_file(_fname)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
         self.assertEqual(TestIo.scan, SCAN)
@@ -90,7 +93,7 @@ class TestScanContextIoMeta(unittest.TestCase):
     def test_import_from_file__given_Scan(self):
         _fname = os.path.join(self._tmppath, "test.test")
         _scan = Scan()
-        SCAN_IO_META.import_from_file(_fname, scan=_scan)
+        ScanIo.import_from_file(_fname, scan=_scan)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
         self.assertEqual(TestIo.scan, _scan)
@@ -98,4 +101,4 @@ class TestScanContextIoMeta(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    SCAN_IO_META.clear_registry()
+    ScanIo.clear_registry()

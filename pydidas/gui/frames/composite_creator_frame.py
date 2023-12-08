@@ -159,8 +159,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         )
         self._app.updated_composite.connect(self.__received_composite_update)
         _app = QtWidgets.QApplication.instance()
-        if hasattr(_app, "sig_close_gui"):
-            _app.sig_close_gui.connect(self.deleteLater)
+        if hasattr(_app, "sig_exit_pydidas"):
+            _app.sig_exit_pydidas.connect(self.deleteLater)
 
         self.setup_initial_state()
 
@@ -314,7 +314,6 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._runner = AppRunner(self._app)
         self._runner.sig_final_app_state.connect(self._set_app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_results.connect(self._app.multiprocessing_store_results)
         self._runner.finished.connect(self._apprunner_finished)
         logger.debug("Starting AppRunner")
         self._runner.start()

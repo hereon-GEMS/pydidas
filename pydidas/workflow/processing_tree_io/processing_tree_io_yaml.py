@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowTreeIoYaml class to import/export the WorkflowTree to yaml
+Module with the ProcessingTreeIoYaml class to import/export the WorkflowTree to yaml
 files.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowTreeIoYaml"]
+__all__ = ["ProcessingTreeIoYaml"]
 
 
 from pathlib import Path
@@ -36,13 +36,13 @@ import yaml
 from ...core import UserConfigError
 from ...core.constants import YAML_EXTENSIONS
 from ...version import VERSION
-from .workflow_tree_io_base import WorkflowTreeIoBase
+from .processing_tree_io_base import ProcessingTreeIoBase
 
 
 WorkflowTree = NewType("WWorkflowTree", type)
 
 
-class WorkflowTreeIoYaml(WorkflowTreeIoBase):
+class ProcessingTreeIoYaml(ProcessingTreeIoBase):
     """
     Base class for WorkflowTree exporters.
     """
@@ -91,7 +91,7 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
         pydidas.workflow.WorkflowTree
             The restored WorkflowTree.
         """
-        from ..workflow_tree import _WorkflowTree
+        from ..processing_tree import ProcessingTree
 
         _version = "23.7.5 or earlier"
 
@@ -102,7 +102,7 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
             if isinstance(_restoration, dict):
                 _version = _restoration["version"]
                 _restoration = _restoration["nodes"]
-            _tree = _WorkflowTree()
+            _tree = ProcessingTree()
             _tree.restore_from_list_of_nodes(_restoration)
         except (KeyError, TypeError, UserConfigError):
             if _version < VERSION:

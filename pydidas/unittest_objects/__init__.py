@@ -35,6 +35,7 @@ from .create_hdf5_io_file_ import *
 from .dummy_loader import *
 from .dummy_plugin_collection import *
 from .dummy_proc import *
+from .local_plugin_collection import *
 from .mp_test_app import *
 from .parametrized_sub_tests_ import *
 
@@ -64,6 +65,11 @@ from . import dummy_proc
 
 __all__.extend(dummy_proc.__all__)
 del dummy_proc
+
+from . import local_plugin_collection
+
+__all__.extend(local_plugin_collection.__all__)
+del local_plugin_collection
 
 from . import mp_test_app
 

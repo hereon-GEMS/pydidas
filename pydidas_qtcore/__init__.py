@@ -38,7 +38,7 @@ if "--qt6" in __sys.argv:
 
 import qtpy
 
-if "--verbose" in __sys.argv:
+if "--verbose-qt" in __sys.argv:
     print("pydidas Using QT: ", qtpy.API_NAME)
 
 

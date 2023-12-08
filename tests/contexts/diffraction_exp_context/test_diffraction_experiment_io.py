@@ -35,8 +35,6 @@ from pydidas.contexts.diffraction_exp_context import (
 
 
 EXP = DiffractionExperimentContext()
-EXP_IO_META = DiffractionExperimentIo
-EXP_IO_META.clear_registry()
 
 
 class TestIo(DiffractionExperimentIoBase):
@@ -64,6 +62,16 @@ class TestIo(DiffractionExperimentIoBase):
 
 
 class TestDiffractionExperimentIo(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._original_registry = DiffractionExperimentIo.registry.copy()
+        DiffractionExperimentIo.clear_registry()
+        DiffractionExperimentIo.register_class(TestIo)
+
+    @classmethod
+    def tearDownClass(cls):
+        DiffractionExperimentIo.registry = cls._original_registry
+
     def setUp(self):
         TestIo.reset()
 
@@ -72,13 +80,13 @@ class TestDiffractionExperimentIo(unittest.TestCase):
 
     def test_export_to_file(self):
         _fname = "test.test"
-        EXP_IO_META.export_to_file(_fname)
+        DiffractionExperimentIo.export_to_file(_fname)
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
 
     def test_import_from_file__generic(self):
         _fname = "test.test"
-        EXP_IO_META.import_from_file(_fname)
+        DiffractionExperimentIo.import_from_file(_fname)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
         self.assertEqual(TestIo.diffraction_exp, EXP)
@@ -86,7 +94,7 @@ class TestDiffractionExperimentIo(unittest.TestCase):
     def test_import_from_file__given_Exp(self):
         _exp = DiffractionExperiment()
         _fname = "test.test"
-        EXP_IO_META.import_from_file(_fname, diffraction_exp=_exp)
+        DiffractionExperimentIo.import_from_file(_fname, diffraction_exp=_exp)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
         self.assertEqual(TestIo.diffraction_exp, _exp)
@@ -94,4 +102,4 @@ class TestDiffractionExperimentIo(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    EXP_IO_META.clear_registry()
+    DiffractionExperimentIo.clear_registry()

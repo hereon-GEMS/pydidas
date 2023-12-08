@@ -63,6 +63,7 @@ class BaseApp(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.update_params_from_init(*args, **kwargs)
         self.parse_args_and_set_params()
+        self._config["run_prepared"] = False
 
     def parse_args_and_set_params(self):
         """
@@ -98,7 +99,7 @@ class BaseApp(ObjectWithParameterCollection):
         The generic method simple performs no operation and subclasses only
         need to re-implement it when they explicitly need it.
         """
-        return
+        self._config["run_prepared"] = True
 
     def multiprocessing_post_run(self):
         """

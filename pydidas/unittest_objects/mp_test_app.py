@@ -75,21 +75,21 @@ class MpTestApp(BaseApp):
         super().__init__(*args, **kwargs)
         self.set_default_params()
         self._composite = None
-        self._config = {
-            "n_image": None,
-            "datatype": None,
-            "mp_pre_run_called": False,
-            "mp_post_run_called": False,
-            "calls": 0,
-            "min_index": 0,
-            "max_index": 40,
-        }
+        self._config.update(
+            {
+                "n_image": None,
+                "datatype": None,
+                "mp_post_run_called": False,
+                "calls": 0,
+                "min_index": 0,
+                "max_index": 40,
+            }
+        )
 
     def multiprocessing_pre_run(self):
         """
         The pre-run method sets up the tasks and creates a compositite image.
         """
-        self._config["mp_pre_run_called"] = True
         self._config["mp_tasks"] = range(
             self._config["min_index"], self._config["max_index"]
         )
@@ -100,6 +100,7 @@ class MpTestApp(BaseApp):
             composite_dir="x",
             datatype=np.float64,
         )
+        self._config["run_prepared"] = True
 
     def multiprocessing_get_tasks(self) -> list[int, ...]:
         """

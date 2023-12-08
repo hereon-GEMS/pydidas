@@ -36,10 +36,8 @@ from typing import List
 
 from qtpy import QtCore
 
+from ...logging_level import LOGGING_LEVEL
 from ...version import VERSION
-
-
-LOGGING_LEVEL = logging.ERROR
 
 
 _LOG_FORMATTER = logging.Formatter(

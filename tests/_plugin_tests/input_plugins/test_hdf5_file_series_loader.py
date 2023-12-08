@@ -32,14 +32,17 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Parameter, UserConfigError
 from pydidas.core.utils import get_random_string
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
+
 SCAN = ScanContext()
 
 
@@ -68,6 +71,8 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._path)
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def setUp(self):
         SCAN.restore_all_defaults(True)

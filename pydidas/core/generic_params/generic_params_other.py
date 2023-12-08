@@ -581,4 +581,19 @@ GENERIC_PARAMS_OTHER = {
             "dimension."
         ),
     },
+    ####################
+    # User Configuration
+    ####################
+    "auto_check_for_updates": {
+        "type": int,
+        "default": True,
+        "name": "Check for updates",
+        "choices": [False, True],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "This parameter allows the user to activate/deactivate the automatic "
+            "checking for updates at startup."
+        ),
+    },
 }

@@ -36,7 +36,7 @@ from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame
 from ...workflow import WorkflowTree
-from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
+from ...workflow.processing_tree_io import ProcessingTreeIoMeta
 from ..managers import WorkflowTreeEditManager
 from .builders import WorkflowEditFrameBuilder
 
@@ -90,14 +90,14 @@ class WorkflowEditFrame(BaseFrame):
             parent=self,
             dialog_type="open_file",
             caption="Import workflow tree file",
-            formats=WorkflowTreeIoMeta.get_string_of_formats(),
+            formats=ProcessingTreeIoMeta.get_string_of_formats(),
             qsettings_ref="WorkflowEditFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="save_file",
             caption="Export workflow tree file",
-            formats=WorkflowTreeIoMeta.get_string_of_formats(),
+            formats=ProcessingTreeIoMeta.get_string_of_formats(),
             default_extension="yaml",
             qsettings_ref="WorkflowEditFrame__export",
         )
@@ -130,7 +130,7 @@ class WorkflowEditFrame(BaseFrame):
         self._widgets["but_save"].clicked.connect(self.save_tree_to_file)
         self._widgets["but_load"].clicked.connect(self.load_tree_from_file)
         _app = QtWidgets.QApplication.instance()
-        _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
+        _app.sig_exit_pydidas.connect(WORKFLOW_EDIT_MANAGER.reset)
 
     @QtCore.Slot(int)
     def configure_plugin(self, node_id: int):

@@ -30,11 +30,11 @@ __all__ = ["WorkflowRunFrame"]
 
 import time
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...apps import ExecuteWorkflowApp
-from ...core import get_generic_param_collection
-from ...core.utils import pydidas_logger
+from ...core import UserConfigError, get_generic_param_collection
+from ...core.utils import ShowBusyMouse, pydidas_logger
 from ...multiprocessing import AppRunner
 from ...widgets.dialogues import WarningBox
 from ...widgets.framework import BaseFrameWithApp
@@ -127,19 +127,37 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Abort the execution of the AppRunner.
         """
+        self._widgets["but_abort"].setEnabled(False)
         if self._runner is not None:
-            self._runner.send_stop_signal()
+            with ShowBusyMouse():
+                logger.debug("WorkflowRunFrame: Sending stop signal")
+                self._runner.requestInterruption()
+                _t0 = time.time()
+                while self._runner is not None:
+                    if time.time() - _t0 > 5:
+                        raise UserConfigError(
+                            "Timeout while waiting for AppRunner to abort workflow "
+                            "execution. Please consider restarting pydidas before "
+                            "processing a workflow again."
+                        )
+                        break
+                    time.sleep(0.02)
+                    QtWidgets.QApplication.instance().processEvents()
         self.set_status("Aborted processing of full workflow.")
-        self._finish_processing()
 
     @QtCore.Slot()
     def __execute(self):
         """
         Execute the Application in the chosen type (GUI or command line).
         """
+        logger.debug("WorkflowRunFrame: Clicked execute")
         self._verify_result_shapes_uptodate()
         self.sig_processing_running.emit(True)
-        self._run_app()
+        try:
+            self._run_app()
+        except:
+            self.sig_processing_running.emit(False)
+            raise
 
     def _run_app(self):
         """
@@ -147,21 +165,23 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         if not self._check_tree_is_populated():
             return
-        logger.debug("Starting workflow")
+        logger.debug("WorkflowRunFrame: Starting workflow")
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
         self._config["last_update"] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
-        logger.debug("Starting AppRunner")
+        logger.debug("WorkflowRunFrame: Starting AppRunner")
         self._runner = AppRunner(self._app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_results.connect(self._app.multiprocessing_store_results)
         self._runner.sig_results.connect(self.__update_result_node_information)
         self._runner.sig_results.connect(self.__check_for_plot_update)
         self._runner.finished.connect(self._apprunner_finished)
         self._runner.sig_final_app_state.connect(self._set_app)
+        QtWidgets.QApplication.instance().aboutToQuit.connect(
+            self._runner.send_stop_signal
+        )
         self._config["update_node_information_connected"] = True
-        logger.debug("Running AppRunner")
+        logger.debug("WorkflowRunFrame: Running AppRunner")
         self._runner.start()
 
     @staticmethod
@@ -199,11 +219,14 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Clean up after AppRunner is done.
         """
-        logger.debug("Telling AppRunner to exit.")
-        self._runner.exit()
+        logger.debug("WorkflowRunFrame: Handle AppRunner loop finished signal.")
+        self._runner.sig_final_app_state.disconnect()
+        self._runner.sig_progress.disconnect()
+        self._runner.sig_results.disconnect()
+        self._runner.deleteLater()
         self._runner = None
-        logger.debug("AppRunner successfully shut down.")
-        self.set_status("Finished processing of full workflow.")
+        logger.debug("WorkflowRunFrame: AppRunner successfully shut down.")
+        self.set_status("WorkflowRunFrame: Finished processing of full workflow.")
         self._finish_processing()
         self.update_plot()
 
@@ -231,7 +254,8 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         self.__set_proc_widget_visibility_for_running(False)
         self.sig_processing_running.emit(False)
-        self.update_choices_of_selected_results()
+        QtWidgets.QApplication.instance().processEvents()
+        logger.debug("WorkflowRunFrame: Finished processing")
 
     def __set_proc_widget_visibility_for_running(self, running: bool):
         """
@@ -246,6 +270,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         self._widgets["but_exec"].setEnabled(not running)
         self._widgets["but_abort"].setVisible(running)
+        self._widgets["but_abort"].setEnabled(running)
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)

@@ -32,7 +32,7 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import ScanContext, ScanContextIoMeta
+from ...contexts import ScanContext, ScanIo
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame
@@ -78,14 +78,14 @@ class DefineScanFrame(BaseFrame):
             parent=self,
             dialog_type="open_file",
             caption="Import scan context file",
-            formats=ScanContextIoMeta.get_string_of_formats(),
+            formats=ScanIo.get_string_of_formats(),
             qsettings_ref="DefineScanFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="save_file",
             caption="Export scan context file",
-            formats=ScanContextIoMeta.get_string_of_formats(),
+            formats=ScanIo.get_string_of_formats(),
             default_extension="yaml",
             qsettings_ref="DefineScanFrame__export",
         )
@@ -119,7 +119,7 @@ class DefineScanFrame(BaseFrame):
         self.param_widgets["scan_base_directory"].io_edited.connect(
             self.set_new_base_directory
         )
-        self._qtapp.sig_close_gui.connect(self.__info_window.close)
+        self._qtapp.sig_exit_pydidas.connect(self.__info_window.close)
 
     def finalize_ui(self):
         """

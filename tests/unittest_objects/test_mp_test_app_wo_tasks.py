@@ -46,7 +46,7 @@ class TestMpTestAppWoTasks(unittest.TestCase):
     def test_mp_pre_run(self):
         app = MpTestAppWoTasks()
         app.multiprocessing_pre_run()
-        self.assertTrue(app._config["mp_pre_run_called"])
+        self.assertTrue(app._config["run_prepared"])
 
     def test_mp_get_tasks(self):
         app = MpTestAppWoTasks()

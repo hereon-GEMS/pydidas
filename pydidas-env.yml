@@ -3,10 +3,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python>=3.9
+  - python>=3.11
   - pyqt>=5.15.7
   - pip=22.3.1
-  - pyFAI==2023.1.0
+  - pyFAI>=2023.1.0
   - scikit-image>=0.20.0
   - qtawesome>=1.0.3
   - sphinx>=4.4.0
@@ -19,4 +19,3 @@ dependencies:
   - pip:
     - h5py>=3.7.0
     - hdf5plugin>=4.0.1
-  

@@ -28,6 +28,7 @@ __all__ = [
     "PydidasGuiError",
     "PydidasConfigError",
     "UserConfigError",
+    "FileReadError",
 ]
 
 
@@ -71,3 +72,28 @@ class UserConfigError(Exception):
             The representation string.
         """
         return f"UserConfigError('{str(self)}')"
+
+
+class FileReadError(Exception):
+    """
+    An Exception for signalling an error in reading a file.
+
+    FileReadError can be raised if the input cannot be processed. The exception
+    handling for FileReadError is different from the generic exception handling
+    to allow pydidas to raise less severe Exceptions in case of missing files
+    etc.
+    """
+
+    def __repr__(self):
+        """
+        Explicitly handle the representation.
+
+        This call is used to assert that the exception message is included with
+        single quote marks.
+
+        Returns
+        -------
+        str
+            The representation string.
+        """
+        return f"FileReadError('{str(self)}')"

@@ -430,8 +430,6 @@ class GenericTree:
             }
         )
         if self.root is not None:
-            # print("root:", self.root)
-            # print("root copy", _root_copy.__dict__)
             _copy.set_root(copy.deepcopy(self.root))
         return _copy
 

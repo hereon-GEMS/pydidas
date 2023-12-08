@@ -33,12 +33,12 @@ import yaml
 
 from pydidas.contexts import ScanContext
 from pydidas.contexts.scan_context import Scan
-from pydidas.contexts.scan_context.scan_context_io_yaml import ScanContextIoYaml
+from pydidas.contexts.scan_context.scan_io_yaml import ScanIoYaml
 from pydidas.core import UserConfigError
 
 
 SCAN = ScanContext()
-SCAN_IO_YAML = ScanContextIoYaml
+SCAN_IO_YAML = ScanIoYaml
 
 
 class TestScanSetupIoYaml(unittest.TestCase):

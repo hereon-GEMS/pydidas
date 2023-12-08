@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="105.49206mm"
-   height="106.59601mm"
-   viewBox="0 0 105.49206 106.59601"
+   width="106.596mm"
+   height="106.596mm"
+   viewBox="0 0 106.596 106.596"
    version="1.1"
    id="svg8"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
    sodipodi:docname="pydidas_snakes_w_bg.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -1240,15 +1240,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="182.33253"
-     inkscape:cy="264.65996"
+     inkscape:cx="184.35284"
+     inkscape:cy="184.1003"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
-     inkscape:window-width="3440"
-     inkscape:window-height="1377"
-     inkscape:window-x="1912"
+     inkscape:window-width="1920"
+     inkscape:window-height="1177"
+     inkscape:window-x="5352"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      fit-margin-top="0"
@@ -1273,7 +1273,7 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(1.9346132,3.3478749)">
+     transform="translate(2.4637799,3.3478749)">
     <path
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:6.81574;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:14.9;stroke-dasharray:none;stroke-dashoffset:98.9998;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
        id="rect1519"
@@ -1281,9 +1281,10 @@
        height="106.59601"
        x="-1.9346132"
        y="-3.3478749"
-       inkscape:path-effect="#path-effect1525"
+       sodipodi:type="rect"
        d="M 11.294554,-3.3478749 H 90.328278 A 13.229167,13.229167 45 0 1 103.55744,9.8812921 V 90.018966 A 13.229167,13.229167 135 0 1 90.328278,103.24813 H 11.294554 A 13.229167,13.229167 45 0 1 -1.9346132,90.018966 V 9.8812921 A 13.229167,13.229167 135 0 1 11.294554,-3.3478749 Z"
-       sodipodi:type="rect" />
+       inkscape:path-effect="#path-effect1525"
+       transform="matrix(1.0104647,0,0,0.99999992,-0.50892153,-2.6070373e-7)" />
     <path
        style="opacity:0;fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 22.473777,61.713067 c -1.572798,-3.478631 -1.486214,-5.682916 -1.486214,-5.682916 l -0.291194,2.257012 -1.632537,-2.52499 c 0,0 0.899764,6.094732 1.985692,6.032506 z"

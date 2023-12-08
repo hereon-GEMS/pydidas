@@ -33,16 +33,16 @@ from numbers import Integral, Real
 import numpy as np
 
 from pydidas.contexts.scan_context import Scan, ScanContext
-from pydidas.contexts.scan_context.scan_context_io_base import ScanContextIoBase
+from pydidas.contexts.scan_context.scan_io_base import ScanIoBase
 from pydidas.core import UserConfigError
 from pydidas.core.utils import get_random_string
 
 
 SCAN = ScanContext()
-SCAN_IO = ScanContextIoBase
+SCAN_IO = ScanIoBase
 
 
-class TestScanContextIoBase(unittest.TestCase):
+class TestScanIoBase(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self._path = os.path.join(_test_dir, "_data", "load_test_scan_context_")

@@ -27,12 +27,14 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset, UserConfigError
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestAverageOppositeSectors(unittest.TestCase):
@@ -50,6 +52,11 @@ class TestAverageOppositeSectors(unittest.TestCase):
             axis_ranges=[np.linspace(0, 360, 36, endpoint=False), np.arange(400)],
             axis_units=["chi / deg", "2theta / deg"],
         )
+
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def tearDown(self):
         ...

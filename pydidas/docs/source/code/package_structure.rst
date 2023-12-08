@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _package_structure:
 
 Package structure
@@ -116,7 +122,7 @@ Sub-package descriptions
         Classes to handle writing the results of the workflow execution to 
         files.
 
-  - *pydidas.workflow.workflow_tree_io* 
+  - *pydidas.workflow.processing_tree_io* 
         
         Registry with importers/exporters and the importer/exporter 
         implementations.

@@ -29,11 +29,13 @@ __all__ = [
     "get_standard_state_full_filename",
     "clear_local_log_files",
     "open_doc_in_browser",
+    "get_remote_version",
 ]
 
 import os
 from pathlib import Path
 
+import requests
 from qtpy import QtCore, QtGui
 
 from ...core import UserConfigError, utils
@@ -92,3 +94,25 @@ def open_doc_in_browser():
     Open the link to the documentation in the system web browser.
     """
     _ = QtGui.QDesktopServices.openUrl(utils.DOC_HOME_QURL)
+
+
+def get_remote_version() -> str:
+    """
+    Get the remove pydidas version number available on github.
+
+    Returns
+    -------
+    str :
+        The string for the remote version.
+    """
+    _url = (
+        "https://raw.githubusercontent.com/"
+        "hereon-GEMS/pydidas/master/pydidas/version.py"
+    )
+    try:
+        _lines = requests.get(_url, timeout=0.5).text.split("\n")
+        for _line in _lines:
+            if _line.startswith("__version__ ="):
+                return _line.split('"')[1]
+    except requests.ReadTimeout:
+        return -1

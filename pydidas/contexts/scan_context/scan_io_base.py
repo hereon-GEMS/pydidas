@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanContextIoBase class which exporters/importers for the
+Module with the ScanIoBase class which exporters/importers for the
 ScanContext should inherit from.
 """
 
@@ -25,22 +25,22 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["ScanContextIoBase"]
+__all__ = ["ScanIoBase"]
 
 
-from typing import Union
+from typing import Optional
 
 from ...core import UserConfigError
 from ...core.generic_params import SCAN_GENERIC_PARAM_NAMES
 from ...core.io_registry import GenericIoBase
 from .scan_context import Scan, ScanContext
-from .scan_context_io_meta import ScanContextIoMeta
+from .scan_io import ScanIo
 
 
 SCAN = ScanContext()
 
 
-class ScanContextIoBase(GenericIoBase, metaclass=ScanContextIoMeta):
+class ScanIoBase(GenericIoBase, metaclass=ScanIo):
     """
     Base class for ScanContext importer/exporters.
     """
@@ -74,13 +74,13 @@ class ScanContextIoBase(GenericIoBase, metaclass=ScanContextIoMeta):
             raise UserConfigError(_text)
 
     @classmethod
-    def _write_to_scan_settings(cls, scan: Union[Scan, None] = None):
+    def _write_to_scan_settings(cls, scan: Optional[Scan] = None):
         """
         Write the loaded (temporary) Parameters to the scanSettings.
 
         Parameters
         ----------
-        scan : Union[None, pydidas.contexts.scan_context.Scan], optional
+        scan : Optional[Scan], optional
             The Scan instance to be updated. If None, the ScanContext instance is used.
             The default is None.
         """

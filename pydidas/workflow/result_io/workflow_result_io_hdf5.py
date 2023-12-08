@@ -42,7 +42,8 @@ from ...contexts.scan_context import Scan
 from ...core import Dataset
 from ...core.constants import HDF5_EXTENSIONS
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
-from ..workflow_tree import WorkflowTree, _WorkflowTree
+from ..processing_tree import ProcessingTree
+from ..workflow_tree import WorkflowTree
 from .workflow_result_io_base import WorkflowResultIoBase
 
 
@@ -89,7 +90,7 @@ def get_detector_metadata_entries(
 
 
 def get_pydidas_context_config_entries(
-    scan: Scan, exp: DiffractionExperiment, tree: _WorkflowTree
+    scan: Scan, exp: DiffractionExperiment, tree: ProcessingTree
 ) -> list[list[str, str, dict]]:
     """
     Get the context configuration from the pydidas Context singletons.
@@ -193,7 +194,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         node_id: int,
         scan: Scan,
         exp: DiffractionExperiment,
-        workflow: _WorkflowTree,
+        workflow: ProcessingTree,
     ):
         """
         Create a hdf5 file and populate it with the Scan metadata.
@@ -363,7 +364,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
     @classmethod
     def import_results_from_file(
         cls, filename: Union[Path, str]
-    ) -> tuple[Dataset, dict, Scan, DiffractionExperiment, _WorkflowTree]:
+    ) -> tuple[Dataset, dict, Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import results from a file and store them as a Dataset.
 
@@ -386,7 +387,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         tree : pydidas.workflow.WorkflowTree
             The imported workflow tree.
         """
-        _tree = _WorkflowTree()
+        _tree = ProcessingTree()
         _scan = Scan()
         _exp = DiffractionExperiment()
         with h5py.File(filename, "r") as _file:

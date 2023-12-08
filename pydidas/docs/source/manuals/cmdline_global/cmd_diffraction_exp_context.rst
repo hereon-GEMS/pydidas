@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _diffraction_exp_context:
 
 The DiffractionExperimentContext class
@@ -25,7 +31,8 @@ experimental setup. Stored information include
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in :ref:`diffraction_exp_context_parameters`\ .
+given in :ref:`Full list of Parameters for DiffractionExperimentContext 
+<diffraction_exp_context_parameters>`\ .
 
 Its instance can be obtained by running the following code:
 

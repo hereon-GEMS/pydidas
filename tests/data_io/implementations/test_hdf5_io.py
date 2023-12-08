@@ -24,14 +24,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import h5py
 import numpy as np
 
+from pydidas.core import FileReadError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.data_io.implementations.hdf5_io import Hdf5Io
 
@@ -39,8 +40,8 @@ from pydidas.data_io.implementations.hdf5_io import Hdf5Io
 class TestHdf5Io(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
-        cls._fname = os.path.join(cls._path, "test.h5")
+        cls._path = Path(tempfile.mkdtemp())
+        cls._fname = cls._path.joinpath("test.h5")
         cls._data_shape = (12, 13, 14, 15)
         cls._data = np.random.random(cls._data_shape)
         with h5py.File(cls._fname, "w") as _file:
@@ -66,6 +67,17 @@ class TestHdf5Io(unittest.TestCase):
     def test_import_from_file__default(self):
         _data = Hdf5Io.import_from_file(self._fname)
         self.assertTrue(np.allclose(_data, self._data[0, :10, :10, 0]))
+
+    def test_import_from_file__wrong_name(self):
+        with self.assertRaises(FileReadError):
+            Hdf5Io.import_from_file(self._fname.joinpath("dummy"), datatype=np.float64)
+
+    def test_import_from_file__wrong_type(self):
+        _fname_new = self._path.joinpath("test2.dat")
+        with open(_fname_new, "w") as f:
+            f.write("now it's just an ASCII text file.")
+        with self.assertRaises(FileReadError):
+            Hdf5Io.import_from_file(_fname_new, datatype=np.float64)
 
     def test_import_from_file__w_int_slice(self):
         _slice = 7
@@ -121,14 +133,14 @@ class TestHdf5Io(unittest.TestCase):
             Hdf5Io.export_to_file(self._fname, self._data)
 
     def test_export_to_file__file_exists_and_overwrite(self):
-        _fname = os.path.join(self._path, "test_new.h5")
+        _fname = self._path.joinpath("test_new.h5")
         Hdf5Io.export_to_file(_fname, self._data)
         Hdf5Io.export_to_file(_fname, self._data[:11], overwrite=True)
         _data = Hdf5Io.import_from_file(_fname, slicing_axes=[])
         self.assertEqual(_data.shape, (11,) + self._data_shape[1:])
 
     def test_export_to_file__w_groupname(self):
-        _fname = os.path.join(self._path, "test_gname.h5")
+        _fname = self._path.joinpath("test_gname.h5")
         Hdf5Io.export_to_file(_fname, self._data, dataset="test/new_data")
         _data = Hdf5Io.import_from_file(
             _fname, dataset="test/new_data", slicing_axes=[]

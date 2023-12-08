@@ -83,8 +83,11 @@ class AppRunner(WorkerController):
         n_workers: Union[None, int] = None,
         processor: type = app_processor,
     ):
-        logger.debug("Starting AppRunner")
+        logger.debug("AppRunner: Starting AppRunner")
         WorkerController.__init__(self, n_workers=n_workers)
+        if not app._config["run_prepared"]:
+            app.multiprocessing_pre_run()
+        self.sig_results.connect(app.multiprocessing_store_results)
         self.__app = app.copy(slave_mode=True)
         self.__check_app_is_set()
         self._processor["func"] = processor
@@ -181,12 +184,10 @@ class AppRunner(WorkerController):
         timeout: float
             The timeout while waiting for the worker processes.
         """
-        self.join_workers()
-        if self.flags["stop_after_run"]:
-            self.flags["thread_alive"] = False
-        self._wait_for_worker_finished_signals(timeout)
+        WorkerController.cycle_post_run(self, timeout)
         self.__app.multiprocessing_post_run()
         self.sig_final_app_state.emit(self.__app.copy())
+        logger.debug("AppRunner: Finished cycle post run")
 
     @QtCore.Slot(float)
     def __check_progress(self, progress: float):

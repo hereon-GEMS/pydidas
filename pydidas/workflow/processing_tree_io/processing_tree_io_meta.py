@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowTreeIoMeta class which is used for creating
+Module with the ProcessingTreeIoMeta class which is used for creating
 exporter/importer classes and registering them.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowTreeIoMeta"]
+__all__ = ["ProcessingTreeIoMeta"]
 
 
 from pathlib import Path
@@ -38,14 +38,14 @@ from ...core.utils import get_extension
 WorkflowTree = NewType("WWorkflowTree", type)
 
 
-class WorkflowTreeIoMeta(GenericIoMeta):
+class ProcessingTreeIoMeta(GenericIoMeta):
     """
     Metaclass for WorkflowTree exporters and importers which holds the
     registry with all associated file extensions for exporting WorkflowTrees.
     """
 
     # need to redefine the registry to have a unique registry for
-    # WorkflowTreeIoMeta
+    # ProcessingTreeIoMeta
     registry = {}
 
     @classmethod

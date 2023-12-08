@@ -29,12 +29,13 @@ __all__ = ["IoBase"]
 
 
 import os
+from numbers import Integral
 from pathlib import Path
 from typing import Union
 
 from numpy import amax, amin, ndarray
 
-from ...core import Dataset
+from ...core import Dataset, FileReadError
 from ...core.utils import rebin
 from ..io_master import IoMaster
 from ..utils import RoiSliceManager
@@ -175,3 +176,28 @@ class IoBase(metaclass=IoMaster):
         if _return_type not in ("auto", _data.dtype):
             _data = _data.astype(_return_type)
         return _data
+
+    @staticmethod
+    def raise_filereaderror_from_exception(ex: Exception, filename: str):
+        """
+        Raise a FileReadError from the given Exception.
+
+        Parameters
+        ----------
+        ex : Exception
+            The original exception.
+        filename : str
+            The filename of the file causing the Exception.
+
+        Raises
+        ------
+        FileReadError
+            The new FileReadError.
+        """
+        _index = 1 if isinstance(ex.args[0], Integral) else 0
+        if len(filename) > 60:
+            filename = "[...]" + filename[-55:]
+        _msg = (
+            ex.__class__.__name__ + ": " + ex.args[_index] + f"\n\nFilename: {filename}"
+        )
+        raise FileReadError(_msg)

@@ -45,6 +45,7 @@ class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
         self.setReadOnly(True)
         self.setMinimumHeight(50)
         self.resize(500, 50)
+        QtWidgets.QApplication.instance().sig_status_message.connect(self.add_status)
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -57,6 +58,7 @@ class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
         """
         return QtCore.QSize(500, 50)
 
+    @QtCore.Slot(str)
     def add_status(self, text: str):
         """
         Add a status message to the PydidasStatusWidget.
@@ -69,6 +71,8 @@ class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
         text : str
             The text to add.
         """
+        if text[-1] != "\n":
+            text = text + "\n"
         _cursor = self.textCursor()
         _cursor.movePosition(QtGui.QTextCursor.Start, QtGui.QTextCursor.MoveAnchor, 1)
         self.setTextCursor(_cursor)

@@ -27,11 +27,13 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestRemoveOutliers(unittest.TestCase):
@@ -60,6 +62,11 @@ class TestRemoveOutliers(unittest.TestCase):
         cls._create_base_data()
         cls._add_peaks_to_data()
         cls._add_noise_to_data()
+
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     @classmethod
     def _create_base_data(cls):

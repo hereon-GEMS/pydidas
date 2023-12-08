@@ -80,6 +80,10 @@ class TestAppRunner(unittest.TestCase):
         # this will only test the setup method
         ...
 
+    def test_init(self):
+        self._runner = AppRunner(self.app)
+        self.assertTrue(self.app._config["run_prepared"])
+
     def test_call_app_method(self):
         self._runner = AppRunner(self.app)
         self._runner.call_app_method("multiprocessing_post_run")
@@ -124,7 +128,7 @@ class TestAppRunner(unittest.TestCase):
             self.assertTrue(self._runner.isSignalConnected(_sig_results))
             self.assertTrue(self._runner.isSignalConnected(_sig_progress))
         else:
-            self.assertEqual(self._runner.receivers(self._runner.sig_results), 1)
+            self.assertEqual(self._runner.receivers(self._runner.sig_results), 2)
             self.assertEqual(self._runner.receivers(self._runner.sig_progress), 1)
 
     def testcycle_post_run(self):

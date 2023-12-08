@@ -38,18 +38,26 @@ from pydidas.managers import FilelistManager
 
 
 class TestFilelistManager(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:02d}.npy"))
-        self._img_shape = (10, 10)
-        self._data = np.random.random((50,) + self._img_shape)
+    @classmethod
+    def setUpClass(cls):
+        cls._path = Path(tempfile.mkdtemp())
+        cls._img_shape = (10, 10)
+        cls._data = np.random.random((50,) + cls._img_shape)
         for i in range(50):
-            np.save(self._fname(i), self._data[i])
+            np.save(cls._fname(i), cls._data[i])
         for i in range(50, 60):
-            np.save(self._fname(i), np.random.random((20, 20)))
+            np.save(cls._fname(i), np.random.random((20, 20)))
 
-    def tearDown(self):
-        shutil.rmtree(self._path)
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+
+    @classmethod
+    def _fname(cls, i: int):
+        return cls._path.joinpath(f"test_{i:02d}.npy")
+
+    def setUp(self):
+        self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:02d}.npy"))
 
     def test_creation(self):
         fm = FilelistManager()
@@ -90,9 +98,9 @@ class TestFilelistManager(unittest.TestCase):
 
     def test_update_params_ii(self):
         fm = FilelistManager()
-        fm._update_params(self._fname(0), self._fname(50), False, 2)
+        fm._update_params(self._fname(0), self._fname(49), False, 2)
         self.assertEqual(fm.get_param_value("first_file"), self._fname(0))
-        self.assertEqual(fm.get_param_value("last_file"), self._fname(50))
+        self.assertEqual(fm.get_param_value("last_file"), self._fname(49))
         self.assertEqual(fm.get_param_value("live_processing"), False)
         self.assertEqual(fm.get_param_value("file_stepping"), 2)
 
@@ -112,12 +120,13 @@ class TestFilelistManager(unittest.TestCase):
     def test_check_files__all_good(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
-        fm.set_param_value("last_file", self._fname(50))
+        fm.set_param_value("last_file", self._fname(49))
+        fm._check_files()
 
     def test_check_files__different_extension(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
-        fm.set_param_value("last_file", str(self._fname(50)) + ".test")
+        fm.set_param_value("last_file", str(self._fname(49)) + ".test")
         with self.assertRaises(UserConfigError):
             fm._check_files()
 
@@ -129,7 +138,7 @@ class TestFilelistManager(unittest.TestCase):
     def test_check_only_first_file_selected_false(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
-        fm.set_param_value("last_file", self._fname(50))
+        fm.set_param_value("last_file", self._fname(49))
         self.assertFalse(fm._check_only_first_file_selected())
 
     def test_create_one_file_list(self):

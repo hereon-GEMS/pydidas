@@ -36,6 +36,7 @@ from qtpy import QtTest, QtWidgets
 from pydidas import IS_QT6
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.selection import Hdf5DatasetSelector
+from pydidas_qtcore import PydidasQApplication
 
 
 class TestWidget(QtWidgets.QWidget):
@@ -61,7 +62,7 @@ class TestHdf5DatasetSelector(unittest.TestCase):
     def setUpClass(cls):
         cls.q_app = QtWidgets.QApplication.instance()
         if cls.q_app is None:
-            cls.q_app = QtWidgets.QApplication([])
+            cls.q_app = PydidasQApplication([])
         cls.widgets = []
 
         cls._path = tempfile.mkdtemp()

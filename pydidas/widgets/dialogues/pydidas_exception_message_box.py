@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with UserConfigErrorMessageBox class for handling user config exceptions in a
+Module with PydidasExceptionMessageBox class for handling user config exceptions in a
 lighter way.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["UserConfigErrorMessageBox"]
+__all__ = ["PydidasExceptionMessageBox"]
 
 
 from qtpy import QtCore, QtWidgets
@@ -41,7 +41,7 @@ from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
 
 
-class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
+class PydidasExceptionMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
     """
     Show a dialogue box with exception information.
 
@@ -50,21 +50,27 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
     *args : tuple
         Arguments passed to QtWidgets.QDialogue instanciation.
     **kwargs : dict
-        Keyword arguments passed to QtWidgets.QDialogue instanciation.
+        Supported keyword arguments are:
+
+        text : str, optional
+            The error string. The default is an empty string.
+        title : str, optional
+            The window title. The default is "Configuration error".
     """
 
     def __init__(self, *args: tuple, **kwargs: dict):
         _text = kwargs.pop("text", "")
+        _title = kwargs.pop("title", "Configuration error")
         _font_height = QtWidgets.QApplication.instance().font_height
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
-        self.setWindowTitle("Configuration error")
+        self.setWindowTitle(_title)
         self.setWindowIcon(icons.pydidas_error_icon_with_bg())
         _layout = QtWidgets.QGridLayout()
         self.setLayout(_layout)
         self.create_label(
             "title",
-            "Configuration error:",
+            f"{_title}:",
             bold=True,
             fontsize_offset=2,
         )

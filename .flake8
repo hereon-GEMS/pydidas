@@ -23,6 +23,8 @@ per-file-ignores =
     hdf5_io.py: F401
     base_app.py: E731
     pydidas_plot2d_with_integration_regions.py: C901
+    pydidas_gui.py: F401
+    workflow_run_frame.py: E722
 # E203 whitespace before ':'
 ignore =  E121, E123, E126, E133, E203, W503, W504
 max-line-length = 88

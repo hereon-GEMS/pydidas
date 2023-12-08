@@ -10,7 +10,7 @@ name = "pydidas"
 authors = [{name = "Malte Storm"}]
 description = "pydidas - the PYthon DIffraction Data Analysis Suite"
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = {text = "GNU General Public License v3"}
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
 classifiers = [
@@ -36,6 +36,7 @@ dependencies = [
     "hdf5plugin>=4.0.1",
     "pyyaml>=6.0",
     "requests>=2.31.0",
+    "PyQt5",
 ]
 
 [project.urls]
@@ -55,6 +56,7 @@ pydidas-clear-qsettings = "pydidas_scripts.clear_pydidas_qsettings:clear_pydidas
 pydidas-updater = "pydidas_scripts.pydidas_updater_script:run_update"
 pydidas-documentation = "pydidas_scripts.pydidas_documentation:open_pydidas_documentation"
 pydidas-remove-gui-state-files = "pydidas_scripts.pydidas_remove_local_files:pydidas_remove_stored_gui_states"
+run-pydidas-workflow = "pydidas_scripts.run_pydidas_workflow:run_workflow" 
 
 [project.gui-scripts]
 pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"

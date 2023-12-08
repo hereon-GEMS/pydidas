@@ -28,7 +28,9 @@ __all__ = ["PydidasQApplication"]
 
 
 import argparse
+import signal
 import sys
+import weakref
 from typing import Tuple
 
 import matplotlib as mpl
@@ -48,7 +50,7 @@ QtCore.QLocale.setDefault(_LOCALE)
 
 
 _TEST_TEXT = (
-    "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " "abcdefghijklmnopqrstuvwxyz"
+    "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z abcdefghijklmnopqrstuvwxyz"
 )
 
 
@@ -79,6 +81,24 @@ def parse_cmd_args():
     return _kwargs
 
 
+def sigint_signal_handler(signal_num: int, frame: object):
+    """
+    Handle the SIGINT signal to gracefully shut down when pressing Ctrl+C.
+
+    Parameters
+    ----------
+    signal_num : int
+        The signal number.
+    frame : object
+        The calling frame object.
+    """
+    _app = QtWidgets.QApplication.instance()
+    _app.sig_exit_pydidas.emit()
+    _app.terminate_registered_threads()
+    _app.quit()
+    sys.exit()
+
+
 class PydidasQApplication(QtWidgets.QApplication):
     """
     A subclassed QApplication used in pydidas for controlling the UI and event loops.
@@ -87,7 +107,7 @@ class PydidasQApplication(QtWidgets.QApplication):
     font metrics.
     """
 
-    sig_close_gui = QtCore.Signal()
+    sig_exit_pydidas = QtCore.Signal()
     sig_new_fontsize = QtCore.Signal(float)
     sig_font_size_changed = QtCore.Signal()
     sig_new_font_family = QtCore.Signal(str)
@@ -96,14 +116,18 @@ class PydidasQApplication(QtWidgets.QApplication):
     sig_font_metrics_changed = QtCore.Signal()
     sig_mpl_font_change = QtCore.Signal()
     sig_mpl_font_setting_error = QtCore.Signal(str)
+    sig_status_message = QtCore.Signal(str)
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
+        signal.signal(signal.SIGINT, sigint_signal_handler)
         self.setOrganizationName("Hereon")
         self.setOrganizationDomain("Hereon/WPI")
         self.setApplicationName("pydidas")
         self.__settings = QtCore.QSettings()
+        self.__status = ""
         self.__standard_font = self.font()
+        self.__worker_threads = []
         self.__available_mpl_fonts = mpl_font_manager.get_font_names()
         self.__font_config = {
             "size": float(
@@ -159,7 +183,7 @@ class PydidasQApplication(QtWidgets.QApplication):
     @QtCore.Slot()
     def send_gui_close_signal(self):
         """Send the signal that the GUI is about to close to all Windows."""
-        self.sig_close_gui.emit()
+        self.sig_exit_pydidas.emit()
 
     @property
     def font_size(self) -> float:
@@ -303,3 +327,71 @@ class PydidasQApplication(QtWidgets.QApplication):
             self.__font_config["font_metric_width"],
             self.__font_config["font_metric_height"],
         )
+
+    def set_status_message(self, status: str):
+        """
+        Set a status message.
+
+        Parameters
+        ----------
+        status : str
+            The new status message.
+        """
+        self.__status = status
+        self.sig_status_message.emit(status)
+
+    @property
+    def status(self) -> str:
+        """
+        Get the status string.
+
+        Returns
+        -------
+        str
+            The current status string.
+        """
+        return self.__status
+
+    def register_thread(self, controller: QtCore.QThread):
+        """
+        Register a started thread as active.
+
+        Registering the thread allows for shutting it down gracefully in case of
+        a SIGINT signal (e.g. pressing Ctrl+C).
+
+        Parameters
+        ----------
+        controller : QtCore.QThread
+            The thread to be registered.
+        """
+        _ref = weakref.ref(controller)
+        self.__worker_threads.append(_ref)
+
+    @QtCore.Slot(object)
+    def unregister_thread(self, controller: QtCore.QThread):
+        """
+        Unregister the given thread from the list of active threads.
+
+        Parameters
+        ----------
+        controller : QtCore.QThread
+            The controller thread which is about to finish.
+        """
+        _index = None
+        for _ref in self.__worker_threads:
+            if _ref() == controller:
+                _index = self.__worker_threads.index(_ref)
+                break
+        if _index is not None:
+            _ = self.__worker_threads.pop(_index)
+
+    def terminate_registered_threads(self):
+        """
+        Terminate all running and registered threads.
+
+        This method should only be called by signal handlers because by default,
+        all worker threads should shut down normally.
+        """
+        for _ref in self.__worker_threads:
+            _thread = _ref()
+            _thread.requestInterruption()

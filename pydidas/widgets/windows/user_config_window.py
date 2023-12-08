@@ -46,7 +46,7 @@ from ...core.constants import (
     QSETTINGS_USER_KEYS,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
-from ..dialogues import AcknowledgeBox, QuestionBox, UserConfigErrorMessageBox
+from ..dialogues import AcknowledgeBox, PydidasExceptionMessageBox, QuestionBox
 from ..factory import SquareButton
 from ..framework import PydidasWindow
 
@@ -168,6 +168,16 @@ class _UserConfigWindow(PydidasWindow):
             sizePolicy=POLICY_EXP_FIX,
             writingSystem=QtGui.QFontDatabase.Latin,
         )
+        self.create_spacer(None, parent_widget="config_canvas")
+
+        self.create_label("section_updates", "Update settings", **_section_options)
+        self.create_param_widget(
+            self.get_param("auto_check_for_updates"),
+            parent_widget="config_canvas",
+            width_io=0.25,
+            width_text=0.7,
+        )
+
         self.create_spacer(None, parent_widget="config_canvas")
 
         self.create_label(
@@ -320,9 +330,9 @@ class _UserConfigWindow(PydidasWindow):
             "Do you want to reset the PluginCollection paths and lose all changes?",
         ).exec_()
         if _reply:
-            self.set_param_value_and_widget(
-                "plugin_path", str(get_generic_plugin_path()[0])
-            )
+            _path = str(get_generic_plugin_path()[0])
+            self.set_param_value_and_widget("plugin_path", _path)
+            self.update_qsetting("plugin_path", _path)
             PLUGINS.clear_collection(True)
             PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 
@@ -460,7 +470,7 @@ class _UserConfigWindow(PydidasWindow):
         error : str
             The error description.
         """
-        _ = UserConfigErrorMessageBox(text=error).exec_()
+        _ = PydidasExceptionMessageBox(text=error).exec_()
 
 
 UserConfigWindow = SingletonFactory(_UserConfigWindow)

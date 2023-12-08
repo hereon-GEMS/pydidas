@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _execute_workflow_app:
 
 Tutorial for the ExecuteWorkflowApp
@@ -18,7 +24,7 @@ but by the global objects for
 :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`,
 :py:class:`DiffractionExperimentContext 
 <pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext>`,
-and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
+and :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`.
 
 Documentation on the use of these objects is given in :ref:`scan_context`,
 :ref:`diffraction_exp_context` and :ref:`workflow_tree`, respectively.
@@ -77,7 +83,7 @@ uses the aforementioned objects (
 :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`,
 :py:class:`DiffractionExperimentContext 
 <pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext>`,
-and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`)
+and :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`)
 which include most of the required configuration.
 
 In the app, only the flags for *live processing* and for automatic saving of

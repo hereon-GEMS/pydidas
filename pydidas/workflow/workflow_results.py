@@ -40,8 +40,9 @@ from ..contexts import DiffractionExperimentContext, ScanContext
 from ..contexts.diffraction_exp_context import DiffractionExperiment
 from ..contexts.scan_context import Scan
 from ..core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
+from .processing_tree import ProcessingTree
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER
-from .workflow_tree import WorkflowTree, _WorkflowTree
+from .workflow_tree import WorkflowTree
 
 
 class WorkflowResults(QtCore.QObject):
@@ -74,7 +75,7 @@ class WorkflowResults(QtCore.QObject):
         self,
         diffraction_exp_context: Union[None, DiffractionExperiment] = None,
         scan_context: Union[None, Scan] = None,
-        workflow_tree: Union[None, _WorkflowTree] = None,
+        workflow_tree: Union[None, ProcessingTree] = None,
     ) -> Self:
         super().__init__()
         self._SCAN = ScanContext() if scan_context is None else scan_context
@@ -464,7 +465,7 @@ class WorkflowResults(QtCore.QObject):
     def save_results_to_disk(
         self,
         save_dir: Union[str, Path],
-        *save_formats: tuple,
+        *save_formats: tuple[str],
         overwrite: bool = False,
         node_id: Union[None, int] = None,
     ):
@@ -483,7 +484,7 @@ class WorkflowResults(QtCore.QObject):
         ----------
         save_dir : Union[str, pathlib.Path]
             The basepath for all saved data.
-        save_formats : str
+        save_formats : tuple[str]
             Strings of all formats to be written. Individual formats can be
             also be given in a single string if they are separated by comma
             (","), ampersand ("&") or slash ("/") characters.

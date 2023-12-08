@@ -2,8 +2,67 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v23.12.08
+=========
 
-v23.mm.dd
+Improvements
+------------
+
+- Added an exporter for SpecFile .dat format and merged all exporters for 
+  ASCII-type files in a single plugin.
+- Added additional keyword options to the AcknowledgeBox.
+- Added update checks to the menu and to the pydidas_gui startup script.
+- Added an option to change the logging level with a command line calling 
+  option '-logging-level LEVEL'.
+- Added the ExecuteWorkflowRunner class to handle running workflows from the 
+  command line.
+
+- Programmatic improvements:
+
+    - Renamed the _WorkflowTree to ProcessingTree to allow easier direct 
+      access  the class and updated references.
+    - Added a feature to the AppRunner which automatically calls the 
+      multiprocessing_pre_run method of the input app if it has not yet 
+      been called manually by the user.
+    - Added a status property to the PydidasQApplication and connected 
+      it to the PydidasStatusWidget for easier submission of status 
+      messages.
+    - Added a FileReadError exception class and exception catching in 
+      the file reading.
+    - Changed the names of the Scan import/export registry classes to more 
+      consistent names.
+    - Added a context manager to handle file reading errors more
+      generically.
+
+Bugfixes
+--------
+
+- Fixed an issue where boolean QSettings could not be read automatically
+  without explicit dtype.
+- Fixed a Qt5 issue with font scaling in the AcknowledgeBox widget.
+- Fixed an issue with persistent plugin paths which were not updated in case
+  that pydidas has been moved to a new location.
+- Fixed an issue where tweaking a Plugin in the WorkflowTree would clear the 
+  plugin's node_id.
+- Fixed an issue where the result selection would reset after processing 
+  when results were already selected during processing in the 
+  WorkflowRunFrame.
+- Fixed an issue in the RunWorkflowFrame where aborting the processing would
+  lead to a frozen GUI.
+- Fixed an issue with plugin paths during unittests when production and 
+  development versions are installed on the same machine.
+- Fixed an issue with consistency signals in PluginInWorkflowBox widget.
+- Fixed an issue with unsorted files in the filelist manager in Unix.
+- Fixed an issue with QSettings storage of bool values in Unix.
+- Fixed an issue when copying a plugin would create a new 
+  DiffractionExperiment and not keep the global context
+- Fixed an issue with updating the PluginCollection from the GUI's 
+  UserConfigWindow.
+- Fixed an issue where running the sphinx-build externally would trigger 
+  building the documentation twice.
+
+
+v23.10.20
 =========
 
 Improvements

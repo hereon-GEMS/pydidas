@@ -32,7 +32,7 @@ import copy
 
 from qtpy import QtCore
 
-from ...contexts import ScanContext
+from ...contexts import DiffractionExperimentContext, ScanContext
 from ...core import (
     Dataset,
     Parameter,
@@ -53,6 +53,7 @@ from .builders import WorkflowTestFrameBuilder
 
 SCAN = ScanContext()
 TREE = WorkflowTree()
+EXP = DiffractionExperimentContext()
 
 
 IMAGE_SELECTION_PARAM = Parameter(
@@ -167,7 +168,6 @@ class WorkflowTestFrame(BaseFrame):
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
-        self.__source_hash = -1
         self._tree = None
         self._active_node = -1
         self._results = {}
@@ -179,6 +179,8 @@ class WorkflowTestFrame(BaseFrame):
                 "plot_active": False,
                 "plot_dim": 1,
                 "details_active": False,
+                "exp_hash": -1,
+                "scan_tree_hash": -1,
             }
         )
 
@@ -219,8 +221,11 @@ class WorkflowTestFrame(BaseFrame):
         Check if the WorkflowTree has changed and update the local Tree if
         it has changed.
         """
-        if self.__source_hash != hash((hash(SCAN), hash(TREE))):
-            self.__source_hash = hash((hash(SCAN), hash(TREE)))
+        if self._config["scan_tree_hash"] != hash(
+            (hash(SCAN), hash(TREE))
+        ) or self._config["exp_hash"] != hash(EXP):
+            self._config["scan_tree_hash"] = hash((hash(SCAN), hash(TREE)))
+            self._config["EXP_hash"] = hash(EXP)
             self.reload_workflow()
 
     @QtCore.Slot()
@@ -257,7 +262,7 @@ class WorkflowTestFrame(BaseFrame):
             if self._active_node != -1:
                 self.__update_text_description_of_node_results()
                 self.__plot_results()
-            self.__source_hash = hash((hash(SCAN), hash(TREE)))
+            self._config["scan_tree_hash"] = hash((hash(SCAN), hash(TREE)))
 
     @QtCore.Slot()
     def __update_image_selection_visibility(self):

@@ -32,6 +32,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import warnings
 from contextlib import redirect_stdout
 from pathlib import Path
 
@@ -43,11 +44,11 @@ from pydidas.plugins.plugin_collection_util_funcs import get_generic_plugin_path
 from pydidas.unittest_objects import DummyPluginCollection, create_plugin_class
 
 
-class TestPluginCollection(unittest.TestCase):
+class TestPluginRegistry(unittest.TestCase):
     def setUp(self):
         self._pluginpath = Path(tempfile.mkdtemp())
         self._otherpaths = []
-        self._class_names = ["BasePlugin", "InputPlugin", "ProcPlugin", "OutputPlugin"]
+        self._class_names = []
         self.n_per_type = 8
         self.n_plugin = 3 * self.n_per_type
         self._good_filenames = [Path("test.py"), Path("test_2.py"), Path("test3.py")]
@@ -131,12 +132,23 @@ class TestPluginCollection(unittest.TestCase):
         return set(_mods)
 
     def test_init__empty(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path="")
+        PC = DummyPluginCollection(n_plugins=0, plugin_path="", test_mode=True)
         self.assertIsInstance(PC, PluginRegistry)
         self.assertEqual(len(PC.get_all_plugins()), 0)
 
     def test_init__empty_path(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
+        self.assertIsInstance(PC, PluginRegistry)
+        self.assertEqual(len(PC.get_all_plugins()), 0)
+
+    def test_init__wrong_path(self):
+        PC = DummyPluginCollection(
+            n_plugins=0,
+            plugin_path=self._pluginpath.joinpath("no_such_path"),
+            test_mode=True,
+        )
         self.assertIsInstance(PC, PluginRegistry)
         self.assertEqual(len(PC.get_all_plugins()), 0)
 
@@ -169,7 +181,7 @@ class TestPluginCollection(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _plugins = PC.get_all_plugins_of_type("base")
-        self.assertEqual(_plugins, [])
+        self.assertTrue(len(_plugins) >= 4)
 
     def test_get_all_plugins_of_type__input(self):
         PC = DummyPluginCollection(
@@ -218,6 +230,14 @@ class TestPluginCollection(unittest.TestCase):
         )
         _name = list(PC.plugins.keys())[0]
         _plugin = PC.get_plugin_by_name(_name)
+        self.assertTrue(issubclass(_plugin, BasePlugin))
+
+    def test_get_plugin_by_name__base_plugin(self):
+        PC = DummyPluginCollection(
+            n_plugins=self.n_plugin, plugin_path=self._pluginpath
+        )
+        PC.verify_is_initialized()
+        _plugin = PC.get_plugin_by_name("BasePlugin")
         self.assertTrue(issubclass(_plugin, BasePlugin))
 
     def test_get_all_plugin_names(self):
@@ -355,7 +375,9 @@ class TestPluginCollection(unittest.TestCase):
         self.assertEqual(_modules, _target)
 
     def test_store_plugin_path__no_path(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         PC.verify_is_initialized()
         _path = self._pluginpath.joinpath(get_random_string(8))
         PC._store_plugin_path(_path)
@@ -364,7 +386,9 @@ class TestPluginCollection(unittest.TestCase):
         self.assertNotIn(_path, sys.path)
 
     def test_store_plugin_path__existing_paths(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         PC.verify_is_initialized()
         for _ in range(3):
             self._otherpaths.append(Path(tempfile.mkdtemp()))
@@ -378,13 +402,17 @@ class TestPluginCollection(unittest.TestCase):
 
     def test_find_and_register_plugins_in_path__path_does_not_exist(self):
         _path = self._pluginpath.joinpath(get_random_string(8))
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         PC.clear_collection(True)
         PC._find_and_register_plugins_in_path(_path)
         self.assertEqual(len(PC.plugins), 0)
 
     def test_find_and_register_plugins_in_path__path_empty(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         PC.clear_collection(True)
         PC._find_and_register_plugins_in_path(self._pluginpath)
         self.assertEqual(len(PC.plugins), 0)
@@ -395,39 +423,45 @@ class TestPluginCollection(unittest.TestCase):
         _dirs, _mods = self.create_plugin_file_tree(depth=1, width=1)
         _fname = _dirs[0].joinpath(self._good_filenames[0])
         PC._find_and_register_plugins_in_path(_fname)
-        self.assertEqual(len(PC.plugins), 5)
+        self.assertEqual(len(PC.plugins), 1)
 
     def test_find_and_register_plugins_in_path__populated(self):
         self.populate_with_python_files(self._pluginpath)
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         PC.clear_collection(True)
         PC._find_and_register_plugins_in_path(self._pluginpath)
-        self.assertEqual(len(PC.plugins), len(self._good_filenames) + 4)
+        self.assertEqual(len(PC.plugins), len(self._good_filenames))
 
     def test_find_and_register_plugins_in_path__w_pathlib_Path(self):
         self.populate_with_python_files(self._pluginpath)
         PC = DummyPluginCollection(n_plugins=0, plugin_path=Path(self._pluginpath))
         PC.clear_collection(True)
         PC._find_and_register_plugins_in_path(self._pluginpath)
-        self.assertEqual(len(PC.plugins), len(self._good_filenames) + 4)
+        self.assertEqual(len(PC.plugins), len(self._good_filenames))
 
     def test_find_and_register_plugins__single_path(self):
         _dirs, _mods = self.create_plugin_file_tree()
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         PC.clear_collection(True)
         PC.find_and_register_plugins(self._pluginpath)
-        self.assertEqual(len(_mods), len(PC.plugins) - 4)
+        self.assertEqual(len(_mods), len(PC.plugins))
         self.assertEqual(set(PC.plugins.keys()), set(self._class_names))
 
     def test_find_and_register_plugins__multiple_paths(self):
         _dirs, _mods = self.create_plugin_file_tree()
         self._otherpaths.append(Path(tempfile.mkdtemp()))
         _dirs2, _mods2 = self.create_plugin_file_tree(self._otherpaths[0])
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         PC.clear_collection(True)
         PC.find_and_register_plugins(self._pluginpath, self._otherpaths[0])
         _newmods = _mods | _mods2
-        self.assertEqual(len(_newmods), len(PC.plugins) - 4)
+        self.assertEqual(len(_newmods), len(PC.plugins))
         self.assertEqual(set(PC.plugins.keys()), set(self._class_names))
 
     def test_find_and_register_plugins__multiple_paths_w_pathlib_Path(self):
@@ -438,45 +472,84 @@ class TestPluginCollection(unittest.TestCase):
         PC.clear_collection(True)
         PC.find_and_register_plugins(Path(self._pluginpath), Path(self._otherpaths[0]))
         _newmods = _mods | _mods2
-        self.assertEqual(len(_newmods), len(PC.plugins) - 4)
+        self.assertEqual(len(_newmods), len(PC.plugins))
         self.assertEqual(set(PC.plugins.keys()), set(self._class_names))
 
     def test_get_q_settings_plugin_paths__no_path_set(self):
-        PC = DummyPluginCollection(
-            n_plugins=0, plugin_path=self._pluginpath, force_initialization=True
-        )
+        self._qsettings.set_value("user/plugin_path", None)
+        PC = DummyPluginCollection(n_plugins=0, test_mode=True)
         _qplugin_path = PC.get_q_settings_plugin_paths()
-        self.assertEqual(_qplugin_path, [self._pluginpath])
+        self.assertEqual(_qplugin_path, [None])
 
     def test_get_q_settings_plugin_paths__single_path(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self._qsettings.set_value("user/plugin_path", self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
+        self._qsettings.set_value("user/plugin_path", str(self._pluginpath))
         _qplugin_path = PC.get_q_settings_plugin_paths()
         self.assertEqual([self._pluginpath], _qplugin_path)
 
     def test_get_q_settings_plugin_paths__multiple_paths(self):
-        _paths = [Path("test1"), Path("some/other/path"), Path("test_23.456")]
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        _paths = [
+            self._pluginpath.joinpath("test1"),
+            self._pluginpath.joinpath("some/other/path"),
+            self._pluginpath.joinpath("test_23.456"),
+        ]
+        for _path in _paths:
+            os.makedirs(_path)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         self._qsettings.set_value("user/plugin_path", ";;".join(str(p) for p in _paths))
         _qplugin_path = PC.get_q_settings_plugin_paths()
         self.assertEqual(_paths, _qplugin_path)
 
+    def test_get_q_settings_plugin_paths__multiple_nonexistent_paths(self):
+        _paths = [
+            self._pluginpath.joinpath("test1"),
+            self._pluginpath.joinpath("some/other/path"),
+            self._pluginpath.joinpath("test_23.456"),
+        ]
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
+        self._qsettings.set_value("user/plugin_path", ";;".join(str(p) for p in _paths))
+        _qplugin_path = PC.get_q_settings_plugin_paths()
+        self.assertEqual([], _qplugin_path)
+        self.assertEqual(self._qsettings.value("user/plugin_path"), "")
+
     def test_get_generic_plugin_path__no_q_path(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         self._qsettings.set_value("user/plugin_path", None)
         _path = PC._PluginRegistry__get_generic_plugin_paths()
         self.assertEqual(_path, get_generic_plugin_path())
 
     def test_get_generic_plugin_path__empty_q_path(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         self._qsettings.set_value("user/plugin_path", "")
         _path = PC._PluginRegistry__get_generic_plugin_paths()
         self.assertEqual(_path, get_generic_plugin_path())
 
-    def test_get_generic_plugin_path__q_path(self):
+    def test_get_generic_plugin_path__q_path_nonexistent(self):
         _path = Path("some/path/to/nowhere")
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self._qsettings.set_value("user/plugin_path", _path)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
+        self._qsettings.set_value("user/plugin_path", str(_path))
+        _newpath = PC._PluginRegistry__get_generic_plugin_paths()
+        self.assertEqual([], _newpath)
+
+    def test_get_generic_plugin_path__q_path_existent(self):
+        _path = self._pluginpath.joinpath("some/path/to/nowhere")
+        os.makedirs(_path)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
+        self._qsettings.set_value("user/plugin_path", str(_path))
         _newpath = PC._PluginRegistry__get_generic_plugin_paths()
         self.assertEqual([_path], _newpath)
 
@@ -530,7 +603,9 @@ class TestPluginCollection(unittest.TestCase):
 
     def test_unregister_plugin_path(self):
         self.create_plugin_file_tree()
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         # add two paths after initialization
         self._otherpaths.append(Path(tempfile.mkdtemp()))
         self._otherpaths.append(Path(tempfile.mkdtemp()))
@@ -549,18 +624,21 @@ class TestPluginCollection(unittest.TestCase):
 
     def test_unregister_plugin_path__wrong_path(self):
         self.create_plugin_file_tree()
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(
+            n_plugins=0, plugin_path=self._pluginpath, test_mode=True
+        )
         self._otherpaths.append(Path(tempfile.mkdtemp()))
         with self.assertRaises(UserConfigError):
             PC.unregister_plugin_path(self._otherpaths[0])
 
     def test__wrong_path_in_qsettings(self):
         _path = self._pluginpath.joinpath(get_random_string(8))
-        self._qsettings.set_value("user/plugin_path", _path)
+        self._qsettings.set_value("user/plugin_path", str(_path))
         PC = DummyPluginCollection(n_plugins=0)
-        self.assertIn(_path, PC.get_q_settings_plugin_paths())
         self.assertNotIn(_path, PC.registered_paths)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        unittest.main()

@@ -48,40 +48,51 @@ from pydidas.managers import CompositeImageManager
 
 
 class TestCompositeCreatorApp(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f"test{i:02d}.npy"))
-        self._img_shape = (10, 10)
-        self._n = 50
-        self._data = np.random.random((self._n,) + self._img_shape)
-        for i in range(self._n):
-            np.save(self._fname(i), self._data[i])
-        self._hdf5_fnames = [
-            Path(os.path.join(self._path, f"test_{i:03d}.h5")) for i in range(10)
+    @classmethod
+    def setUpClass(cls):
+        cls._path = Path(tempfile.mkdtemp())
+        cls._img_shape = (10, 10)
+        cls._n_total = 50
+        cls._n_files = 10
+        cls._data = np.random.random((cls._n_total,) + cls._img_shape)
+        for i in range(cls._n_total):
+            np.save(cls._fname(i), cls._data[i])
+        cls._hdf5_fnames = [
+            cls._path.joinpath(f"test_{i:03d}.h5") for i in range(cls._n_files)
         ]
-        for i in range(10):
-            with h5py.File(self._hdf5_fnames[i], "w") as f:
-                f["/entry/data/data"] = self._data
+        _n_per_file = int(cls._n_total / cls._n_files)
+        for i in range(cls._n_files):
+            with h5py.File(cls._hdf5_fnames[i], "w") as f:
+                f["/entry/data/data"] = cls._data[
+                    slice(i * _n_per_file, (i + 1) * _n_per_file)
+                ]
 
-        self._q_settings = PydidasQsettings()
-        self._border = self._q_settings.value("user/mosaic_border_width", int)
-        self._bgvalue = self._q_settings.value("user/mosaic_border_value", float)
-        _mask = np.zeros((self._img_shape), dtype=np.bool_)
-        _maskfile = Path(os.path.join(self._path, "mask.npy"))
+        cls._q_settings = PydidasQsettings()
+        cls._border = cls._q_settings.value("user/mosaic_border_width", int)
+        cls._bgvalue = cls._q_settings.value("user/mosaic_border_value", float)
+        _mask = np.zeros((cls._img_shape), dtype=np.bool_)
+        _maskfile = cls._path.joinpath("mask.npy")
         np.save(_maskfile, _mask)
-        self._maskfile = _maskfile
+        cls._maskfile = _maskfile
 
-    def tearDown(self):
-        shutil.rmtree(self._path)
-        self._q_settings = PydidasQsettings()
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+        cls._q_settings = PydidasQsettings()
+
+    @classmethod
+    def _fname(cls, i: int):
+        return cls._path.joinpath(f"test{i:02d}.npy")
 
     def get_default_app(self):
         self._ny = 5
-        self._nx = self._n // self._ny + int(np.ceil((self._n % self._ny) / self._ny))
+        self._nx = self._n_total // self._ny + int(
+            np.ceil((self._n_total % self._ny) / self._ny)
+        )
         setattr(CompositeCreatorApp, "parse_func", lambda obj: {})
         app = CompositeCreatorApp()
         app.set_param_value("first_file", self._fname(0))
-        app.set_param_value("last_file", self._fname(self._n - 1))
+        app.set_param_value("last_file", self._fname(self._n_total - 1))
         app.set_param_value("composite_nx", self._nx)
         app.set_param_value("composite_ny", self._ny)
         app.set_param_value("use_roi", True)
@@ -326,7 +337,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("last_file", Path())
         app._filelist.update()
         app._image_metadata.update(filename=self._hdf5_fnames[0])
-        _index = 7
+        _index = 3
         app._store_args_for_read_image(_index)
         self.assertEqual(app._config["current_fname"], self._hdf5_fnames[0])
         self.assertEqual(app._config["current_kwargs"]["frame"], _index)
@@ -375,12 +386,12 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._CompositeCreatorApp__update_composite_image_params()
         _old_shape = app.composite.shape
         _img_shape2 = (self._img_shape[0] + 2, self._img_shape[1] + 2)
-        _data2 = np.random.random((self._n,) + _img_shape2)
-        for i in range(self._n):
-            np.save(self._fname(i + self._n), _data2[i])
-        app.set_param_value("first_file", self._fname(self._n))
-        app.set_param_value("last_file", self._fname(2 * self._n - 1))
-        app._image_metadata.update(filename=self._fname(self._n))
+        _data2 = np.random.random((self._n_total,) + _img_shape2)
+        for i in range(self._n_total):
+            np.save(self._fname(i + self._n_total), _data2[i])
+        app.set_param_value("first_file", self._fname(self._n_total))
+        app.set_param_value("last_file", self._fname(2 * self._n_total - 1))
+        app._image_metadata.update(filename=self._fname(self._n_total))
         app._CompositeCreatorApp__update_composite_image_params()
         _new_shape = app.composite.shape
         self.assertEqual(_old_shape[0] + 2 * self._ny, _new_shape[0])
@@ -538,7 +549,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_pre_run(self):
         app = self.get_default_app()
         app.multiprocessing_pre_run()
-        self.assertTrue(app._config["mp_pre_run_called"])
+        self.assertTrue(app._config["run_prepared"])
         self.assertIsNotNone(app._config["mp_tasks"])
 
 

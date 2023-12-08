@@ -34,8 +34,9 @@ import unittest
 from collections.abc import Iterable
 from pathlib import Path
 
-from pydidas.core import UserConfigError
+from pydidas.core import FileReadError, UserConfigError
 from pydidas.core.utils import (
+    CatchFileErrors,
     find_valid_python_files,
     flatten,
     get_extension,
@@ -221,6 +222,28 @@ class Test_file_utils(unittest.TestCase):
         _file2 = f"/foo/path/test_0001_file_{_index1:03d}.txt"
         with self.assertRaises(UserConfigError):
             _fnames, _range = get_file_naming_scheme(_file1, _file2)
+
+    def test_catchfileerrors__no_exception(self):
+        with CatchFileErrors("dummy"):
+            a = 123
+            _ = f"{a} + abc"
+
+    def test_catchfileerrors__standard_exception(self):
+        for _ex in (ValueError, FileNotFoundError, OSError):
+            with self.subTest(_ex):
+                with self.assertRaises(FileReadError):
+                    with CatchFileErrors("dummy"):
+                        raise _ex("dummy")
+
+    def test_catchfileerrors__uncaught_exception(self):
+        with self.assertRaises(RuntimeError):
+            with CatchFileErrors("dummy"):
+                raise RuntimeError("dummy")
+
+    def test_catchfileerrors__additional_exception(self):
+        with self.assertRaises(FileReadError):
+            with CatchFileErrors("dummy", RuntimeError):
+                raise RuntimeError("dummy")
 
 
 if __name__ == "__main__":

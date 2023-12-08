@@ -28,16 +28,23 @@ import itertools
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset
 from pydidas.core.fitting.gaussian import Gaussian
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestFitSinglePeak(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
+
     def setUp(self):
         self._peakpos = 42
         self._data = Dataset(

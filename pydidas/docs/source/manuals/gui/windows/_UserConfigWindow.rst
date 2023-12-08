@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _user_config_window:
 
 The User config window
@@ -59,7 +65,7 @@ Plugins
 
 The *Plugin paths* allows to modify the path where pydidas plugins are located
 or to add additional paths, for example for custom plugins. **Entries must be 
-separated by a double semicolor ";;".**
+separated by a double semicolon ";;".**
         
 Changes to the plugin path will only take effect after using the 
 :py:data:`Update plugin collection` button.

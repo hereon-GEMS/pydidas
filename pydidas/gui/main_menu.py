@@ -38,7 +38,7 @@ import yaml
 from qtpy import QtCore, QtGui, QtWidgets
 
 from ..contexts import GLOBAL_CONTEXTS
-from ..core import UserConfigError
+from ..core import PydidasQsettingsMixin, UserConfigError
 from ..core.constants import PYDIDAS_STANDARD_CONFIG_PATH
 from ..core.utils import (
     DOC_HOME_QURL,
@@ -48,7 +48,7 @@ from ..core.utils import (
 from ..resources import icons
 from ..version import VERSION
 from ..widgets import PydidasFileDialog
-from ..widgets.dialogues import QuestionBox, critical_warning
+from ..widgets.dialogues import AcknowledgeBox, QuestionBox, critical_warning
 from ..widgets.framework import PydidasFrameStack
 from ..widgets.windows import (
     AboutWindow,
@@ -68,7 +68,7 @@ from .gui_excepthook_ import gui_excepthook
 TREE = WorkflowTree()
 
 
-class MainMenu(QtWidgets.QMainWindow):
+class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
     """
     Inherits from :py:class:`qtpy.QtWidgets.QMainWindow`.
 
@@ -91,6 +91,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None, geometry=None):
         QtWidgets.QMainWindow.__init__(self, parent)
+        PydidasQsettingsMixin.__init__(self)
         sys.excepthook = gui_excepthook
 
         self._child_windows = {}
@@ -239,6 +240,7 @@ class MainMenu(QtWidgets.QMainWindow):
         )
         self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
         self._actions["open_paths"] = QtWidgets.QAction("Pydidas paths", self)
+        self._actions["check_for_update"] = QtWidgets.QAction("Check for update", self)
         self._actions["open_feedback"] = QtWidgets.QAction("Open feedback form", self)
 
     def _connect_menu_actions(self):
@@ -277,6 +279,9 @@ class MainMenu(QtWidgets.QMainWindow):
         )
         self._actions["open_paths"].triggered.connect(
             partial(self.create_and_show_temp_window, QtPathsWindow)
+        )
+        self._actions["check_for_update"].triggered.connect(
+            partial(self.check_for_updates, force_check=True)
         )
         self._actions["open_feedback"].triggered.connect(
             partial(self.create_and_show_temp_window, FeedbackWindow)
@@ -319,6 +324,7 @@ class MainMenu(QtWidgets.QMainWindow):
         _help_menu.addAction(self._actions["open_feedback"])
         _help_menu.addAction(self._actions["open_paths"])
         _help_menu.addSeparator()
+        _help_menu.addAction(self._actions["check_for_update"])
         _help_menu.addAction(self._actions["open_about"])
         _menu.addMenu(_help_menu)
 
@@ -386,6 +392,59 @@ class MainMenu(QtWidgets.QMainWindow):
         _fname = self.__import_dialog.get_user_response()
         if _fname is not None:
             self.restore_gui_state(state="manual", filename=_fname)
+
+    @QtCore.Slot()
+    def check_for_updates(self, force_check: bool = False, auto_check: bool = False):
+        """
+        Check if the pydidas version is up to date and show a dialog if not.
+
+        Parameters
+        ----------
+        force_check : bool, optional
+            Flag to force a check even when the user disabled checking for
+            updates. The default is False.
+        auto_check : bool, optional
+            Flag to signalize an automatic update check. This will only display
+            a notice when the local and remote versions differ. The default is False.
+        """
+        if (
+            not self.q_settings_get("user/check_for_updates", default=True)
+            and not force_check
+        ):
+            return
+        _remote_v = utils.get_remote_version()
+        _ack_version = self.q_settings_get(
+            "user/update_version_acknowledged", default=""
+        )
+        _text = (
+            (
+                "A new version of pydidas is available.\n\n"
+                f"    Locally installed version: {VERSION}\n"
+                f"    Latest release: {_remote_v}.\n\n"
+            )
+            if _remote_v > VERSION
+            else (
+                f"The locally installed version of pydidas (version {VERSION}) \n"
+                "is the latest available version. No actions required."
+            )
+        )
+        if auto_check and _remote_v > VERSION and _remote_v not in [-1, _ack_version]:
+            _text += "Please update pydidas to benefit from the latest improvements."
+        if (
+            auto_check and _remote_v > VERSION and _remote_v not in [-1, _ack_version]
+        ) or not auto_check:
+            _ack = AcknowledgeBox(
+                show_checkbox=auto_check,
+                text=_text,
+                text_preformatted=True,
+                title=(
+                    "Pydidas update available"
+                    if _remote_v > VERSION
+                    else "Pydidas version information"
+                ),
+            ).exec_()
+            if _ack:
+                self.q_settings_set("user/update_version_acknowledged", _remote_v)
 
     @QtCore.Slot(str)
     def update_status(self, text):

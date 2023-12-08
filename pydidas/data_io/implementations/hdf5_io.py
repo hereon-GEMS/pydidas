@@ -38,6 +38,7 @@ from numpy import amax, ndarray, squeeze
 
 from ...core import Dataset
 from ...core.constants import HDF5_EXTENSIONS
+from ...core.utils import CatchFileErrors
 from ..low_level_readers import read_hdf5_dataset
 from .io_base import IoBase
 
@@ -107,8 +108,8 @@ class Hdf5Io(IoBase):
                 (_tmpframe.pop(0) if _i in slicing_axes else None)
                 for _i in range(amax(slicing_axes) + 1)
             ]
-
-        _data = squeeze(read_hdf5_dataset(filename, dataset, _slicer))
+        with CatchFileErrors(filename):
+            _data = squeeze(read_hdf5_dataset(filename, dataset, _slicer))
         cls._data = Dataset(
             _data,
             metadata={"slicing_axes": slicing_axes, "frame": frame, "dataset": dataset},

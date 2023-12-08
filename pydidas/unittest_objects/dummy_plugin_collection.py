@@ -30,8 +30,19 @@ __all__ = ["DummyPluginCollection"]
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
+from pydidas import plugins
 from pydidas.plugins.plugin_collection import PluginRegistry
 from pydidas.unittest_objects.create_dummy_plugins import create_plugin_class
+
+
+_base_plugins = [
+    plugins.BasePlugin,
+    plugins.BaseFitPlugin,
+    plugins.InputPlugin,
+    plugins.InputPlugin1d,
+    plugins.ProcPlugin,
+    plugins.OutputPlugin,
+]
 
 
 class DummyPluginCollection(PluginRegistry):
@@ -47,3 +58,5 @@ class DummyPluginCollection(PluginRegistry):
         for num in range(_nplugins):
             _class = create_plugin_class(num % 3, number=num // 3)
             self._PluginRegistry__add_new_class(_class)
+        for _plugin in _base_plugins:
+            self._PluginRegistry__check_and_register_class(_plugin)

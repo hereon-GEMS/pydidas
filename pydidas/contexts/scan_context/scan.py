@@ -37,7 +37,7 @@ from ...core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from .scan_context_io_meta import ScanContextIoMeta
+from .scan_io import ScanIo
 
 
 SCAN_DEFAULT_PARAMS = get_generic_param_collection(
@@ -350,7 +350,7 @@ class Scan(ObjectWithParameterCollection):
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        ScanContextIoMeta.import_from_file(filename, scan=self)
+        ScanIo.import_from_file(filename, scan=self)
 
     def export_to_file(self, filename: Union[str, Path], overwrite: bool = False):
         """
@@ -364,4 +364,4 @@ class Scan(ObjectWithParameterCollection):
             Keyword to allow overwriting of existing files. The default is
             False.
         """
-        ScanContextIoMeta.export_to_file(filename, scan=self, overwrite=overwrite)
+        ScanIo.export_to_file(filename, scan=self, overwrite=overwrite)

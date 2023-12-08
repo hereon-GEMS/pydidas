@@ -29,7 +29,7 @@ __all__ = ["PydidasQsettingsMixin"]
 
 
 from numbers import Integral, Real
-from typing import Self, Union
+from typing import Optional, Self, Union
 
 from qtpy import QtCore
 
@@ -64,10 +64,16 @@ class PydidasQsettingsMixin:
 
     This class can be inherited by any class which requires access to the
     global QSettings defined in pydidas.
+
+    Parameters
+    ----------
+    version : Optional[str]
+        An optional version string. The default is the pydidas version number.
     """
 
-    def __init__(self):
+    def __init__(self, version: Optional[str] = None):
         self.q_settings = _CopyablePydidasQSettings()
+        self.q_settings_version = version if version is not None else VERSION
 
     def q_settings_get(
         self,
@@ -96,16 +102,20 @@ class PydidasQsettingsMixin:
             The value, converted to the type associated with the Parameter
             referenced by param_key or dtype, if given.
         """
-        _value = self.q_settings.value(f"{VERSION}/{key}")
+        _value = self.q_settings.value(f"{self.q_settings_version}/{key}")
         if _value is None:
             return default
         if dtype is not None:
             if dtype == Integral:
+                if _value in ["true", "True", True]:
+                    return 1
+                if _value in ["false", "False", False]:
+                    return 0
                 return int(_value)
             if dtype == Real:
                 return float(_value)
             if dtype == bool:
-                return _value == "true"
+                return _value in ["true", "True", True]
             return dtype(_value)
         return _value
 
@@ -120,4 +130,4 @@ class PydidasQsettingsMixin:
         value : object
             The value to be stored.
         """
-        self.q_settings.setValue(f"{VERSION}/{key}", value)
+        self.q_settings.setValue(f"{self.q_settings_version}/{key}", value)

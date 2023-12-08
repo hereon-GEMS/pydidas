@@ -26,9 +26,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["OutputPlugin"]
 
+
 import os
 
-from ..core import get_generic_parameter
+from ..core import UserConfigError, get_generic_param_collection
 from ..core.constants import OUTPUT_PLUGIN
 from .base_plugin import BasePlugin
 
@@ -41,7 +42,9 @@ class OutputPlugin(BasePlugin):
     plugin_type = OUTPUT_PLUGIN
     plugin_name = "Base output plugin"
     generic_params = BasePlugin.generic_params.copy()
-    generic_params.add_param(get_generic_parameter("directory_path"))
+    generic_params.add_params(
+        get_generic_param_collection("directory_path", "enable_overwrite")
+    )
     default_params = BasePlugin.default_params.copy()
 
     def pre_execute(self):
@@ -49,13 +52,25 @@ class OutputPlugin(BasePlugin):
         Prepare loading images from a file series.
         """
         self._path = self.get_param_value("directory_path")
+        _overwrite = self.get_param_value("enable_overwrite")
+        if self._path.is_dir() and len(os.listdir(self._path)) > 0 and (not _overwrite):
+            raise UserConfigError(
+                f"The given output path {self._path} is not empty and overwriting "
+                "was not enabled. Please check the path or enable overwriting of "
+                "existing files."
+            )
         if not os.path.exists(self._path):
             os.makedirs(self._path)
 
-    def _get_base_output_filename(self) -> str:
+    def get_output_filename(self, extension: str = "txt") -> str:
         """
         Get the output filename from the global frame index and the Plugin
         label.
+
+        Parameters
+        ----------
+        extension : str, optional
+            The file extension. The default is txt.
 
         Returns
         -------
@@ -68,8 +83,12 @@ class OutputPlugin(BasePlugin):
                 "The plugin does not know how to get the filename."
             )
         _label = self.get_param_value("label")
-        if _label is None or _label == "":
+        if _label == "":
             _name = f"node_{self.node_id:02d}_" + "{:06d}"
         else:
             _name = f"{_label}_" + "{:06d}"
-        return os.path.join(self._path, _name.format(self._config["global_index"]))
+        return str(
+            self._path.joinpath(
+                _name.format(self._config["global_index"]) + f".{extension}"
+            )
+        )

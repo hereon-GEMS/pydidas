@@ -29,16 +29,18 @@ __all__ = [
     "get_extension",
     "find_valid_python_files",
     "get_file_naming_scheme",
+    "CatchFileErrors",
 ]
 
 
 import os
 import re
+from numbers import Integral
 from pathlib import Path
 from typing import List, Tuple, Union
 
 from ..constants import FILENAME_DELIMITERS
-from ..exceptions import UserConfigError
+from ..exceptions import FileReadError, UserConfigError
 from .iterable_utils import flatten
 
 
@@ -192,3 +194,52 @@ def get_file_naming_scheme(
     _index1 = int(_name_parts_1[_change_index])
     _index2 = int(_name_parts_2[_change_index])
     return _fnames, range(_index1, _index2 + 1)
+
+
+class CatchFileErrors:
+    """
+    A context manager which allows to catch generic file reading errors.
+
+    The CatchFileErrors context manager allows to raise file reading errors
+    as pydidas' FileReadError exception. Additional
+
+    Parameters
+    ----------
+    filename : Union[Path, str]
+        The filename of the file to be handled.
+    *additional_exceptions : tuple
+        Additional exception types to be handled.
+    """
+
+    def __init__(self, filename: Union[Path, str], *additional_exceptions: tuple):
+        self._exceptions = additional_exceptions + (
+            ValueError,
+            FileNotFoundError,
+            OSError,
+        )
+        self._filename = str(filename)
+
+    def __enter__(self):
+        """
+        Enter the context.
+
+        The CatchFileErrors has an empty __enter__ method.
+        """
+
+    def __exit__(self, ex_type, ex_value, traceback):
+        """
+        Check the exception type and raise it as FileReadError.
+        """
+        if ex_type is None:
+            return
+        if issubclass(ex_type, self._exceptions):
+            _index = 1 if isinstance(ex_value.args[0], Integral) else 0
+            if len(self._filename) > 60:
+                self._filename = "[...]" + self._filename[-55:]
+            _msg = (
+                ex_type.__class__.__name__
+                + ": "
+                + ex_value.args[_index]
+                + f"\n\nFilename: {self._filename}"
+            )
+            raise FileReadError(_msg)

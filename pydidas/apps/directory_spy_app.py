@@ -40,6 +40,7 @@ from qtpy import QtCore
 from ..core import (
     BaseApp,
     Dataset,
+    FileReadError,
     PydidasConfigError,
     UserConfigError,
     get_generic_param_collection,
@@ -209,7 +210,7 @@ class DirectorySpyApp(BaseApp):
         try:
             _mask = np.load(_mask_file)
             return _mask
-        except (FileNotFoundError, ValueError, PermissionError):
+        except (FileNotFoundError, ValueError, PermissionError, FileReadError):
             self.set_param_value("use_detector_mask", False)
             return None
         raise PydidasConfigError("Unknown error when reading detector mask file.")
@@ -445,12 +446,12 @@ class DirectorySpyApp(BaseApp):
             _image = self.get_image(_fname)
             if _image.shape == 0:
                 raise ValueError("Empty image.")
-        except (ValueError, KeyError, FileNotFoundError, UserConfigError):
+        except (ValueError, KeyError, FileNotFoundError, FileReadError):
             try:
                 _fname = self._config["2nd_latest_file"]
                 _image = self.get_image(_fname)
-            except (ValueError, KeyError, FileNotFoundError, UserConfigError):
-                raise UserConfigError(
+            except (ValueError, KeyError, FileNotFoundError, FileReadError):
+                raise FileReadError(
                     "Cannot read either of the last two files. Please check the "
                     "directory and filenames."
                 )

@@ -38,7 +38,6 @@ from ..core.utils import LOGGING_LEVEL, pydidas_logger
 
 
 logger = pydidas_logger()
-logger.setLevel(LOGGING_LEVEL)
 
 
 def app_processor_without_tasks(
@@ -80,9 +79,17 @@ def app_processor_without_tasks(
         The dictionary which is used for overwriting the app._config
         dictionary.
     **kwargs : dict
-        Any keyword arguments passed to the app processor.
+        Supported keyword arguments are:
+
+        wait_for_output_queue : bool, optional
+            Flag to wait for the output queue to be empty before shutting down the
+            worker. The default is True.
+        logging_level : int, optional
+            The logger's logging level. The default is the pydidas default logging
+            level.
     """
     _wait_for_output = kwargs.get("wait_for_output_queue", True)
+    logger.setLevel(kwargs.get("logging_level", LOGGING_LEVEL))
     _app_carryon = True
     logger.debug("Started process")
     _app = app(app_params, slave_mode=True)
@@ -94,6 +101,7 @@ def app_processor_without_tasks(
             stop_queue.get_nowait()
             logger.debug("Received stop queue signal")
             aborted_queue.put(1)
+            _wait_for_output = False
             break
         except queue.Empty:
             pass
@@ -105,7 +113,11 @@ def app_processor_without_tasks(
             output_queue.put([_index, _results])
         else:
             time.sleep(0.005)
-    logger.debug("Worker finished with all tasks. Waiting for output queue to empty.")
+    logger.debug("Worker finished with all tasks.")
+    _carry_on = False
     while _wait_for_output and not output_queue.empty():
+        if not _carry_on:
+            logger.debug("Waiting for output queue to empty.")
+            _carry_on = True
         time.sleep(0.05)
-    logger.debug("Output queue empty. Worker shutting down.")
+    logger.debug("Worker shutting down.")

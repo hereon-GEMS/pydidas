@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,21 +18,21 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 import unittest
-import os
+from pathlib import Path
 
 import pydidas
-from pydidas.unittest_objects import create_plugin_class
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
 from pydidas.plugins.plugin_collection_util_funcs import (
     get_generic_plugin_path,
     plugin_type_check,
 )
-from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
+from pydidas.unittest_objects import create_plugin_class
 
 
 class TestPluginCollectionUtilFuncs(unittest.TestCase):
@@ -41,7 +43,9 @@ class TestPluginCollectionUtilFuncs(unittest.TestCase):
         ...
 
     def test_get_generic_plugin_path(self):
-        _target = os.path.join(os.path.dirname(pydidas.__path__[0]), "pydidas_plugins")
+        _target = (
+            Path(pydidas.__path__[0]).absolute().parent.joinpath("pydidas_plugins")
+        )
         self.assertEqual(get_generic_plugin_path()[0], _target)
 
     def test_plugin_type_check__w_base_plugin(self):

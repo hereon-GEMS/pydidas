@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,16 +20,21 @@ Module with the FabioIo class for reading ESRF-type images, e.g. EDF.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
+
+
+from pathlib import Path
+from typing import Union
 
 import fabio
 
-from ...core.constants import FABIO_EXTENSIONS
 from ...core import Dataset
+from ...core.constants import FABIO_EXTENSIONS
+from ...core.utils import CatchFileErrors
 from .io_base import IoBase
 
 
@@ -40,7 +47,7 @@ class FabioIo(IoBase):
     dimensions = [2]
 
     @classmethod
-    def import_from_file(cls, filename, **kwargs):
+    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict):
         """
         Read an image from a FabIO-supported file format.
 
@@ -66,8 +73,10 @@ class FabioIo(IoBase):
         image : pydidas.core.Dataset
             The image in form of a Dataset (with embedded metadata)
         """
-        with fabio.open(filename) as _file:
-            _data = _file.data
-            _header = _file.header
+        with CatchFileErrors(filename, Exception):
+            with fabio.open(filename) as _file:
+                _data = _file.data
+                _header = _file.header
+
         cls._data = Dataset(_data, metadata=_header)
         return cls.return_data(**kwargs)

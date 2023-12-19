@@ -1,0 +1,24 @@
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC0-1.0
+
+cff-version: 1.2.0
+message: If you use this software, please cite it using the metadata from this file.
+title: "pydidas - Python Diffraction Data Analysis Suite"
+type: software
+authors:
+  - given-names: Malte
+    family-names: Storm
+    email: malte.storm@hereon.de
+    affiliation: Helmholtz-Zentrum Hereon
+    orcid: 'https://orcid.org/0000-0002-1602-781X'
+url: 'https://ms.hereon.de/pydidas/'
+keywords:
+  - X-ray diffraction
+license: GPL-3.0
+date-released: 2023-12-08
+repository-code: "https://github.com/hereon-GEMS/pydidas"
+identifiers:
+  - description: The pydidas project DOI
+    type: doi
+    value: "10.5281/zenodo.7568610"
+version: 23.12.08

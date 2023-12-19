@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,22 +20,24 @@ Module with PydidasImageView class which adds configurations to the base silx Im
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasImageView"]
 
-from qtpy import QtCore
-from silx.gui.plot import ImageView, tools, Plot2D
+
+from numpy import ndarray
+from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
+from silx.gui.plot import ImageView, Plot2D, tools
 from silx.utils.weakref import WeakMethodProxy
 
+from ...contexts import DiffractionExperimentContext
 from ...core import PydidasQsettingsMixin
-from ...experiment import SetupExperiment
-from .silx_actions import CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
+from .silx_actions import AutoscaleToMeanAndThreeSigma, CropHistogramOutliers
 
 
 SNAP_MODE = (
@@ -44,19 +48,34 @@ SNAP_MODE = (
     | tools.PositionInfo.SNAPPING_SCATTER
 )
 
-EXP_SETUP = SetupExperiment()
+DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 class PydidasImageView(ImageView, PydidasQsettingsMixin):
     """
     A customized silx.gui.plot.ImageView with an additional configuration.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Supported keyword arguments are:
+
+        parent : Union[QWidget, None], optional
+            The parent widget or None for no parent. The default is None.
+        backend : Union[None, silx.gui.plot.backends.BackendBase], optional
+            The silx backend to use. If None, this defaults to the standard
+            silx settings. The default is None.
+        show_cs_transform : bool, optional
+            Flag whether to show the coordinate transform action. The default
+            is True.
     """
 
     _getImageValue = Plot2D._getImageValue
 
-    def __init__(self, parent=None, backend=None):
-
-        ImageView.__init__(self, parent, backend)
+    def __init__(self, **kwargs: dict):
+        ImageView.__init__(
+            self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
+        )
         PydidasQsettingsMixin.__init__(self)
 
         posInfo = [
@@ -68,46 +87,72 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         self.cropHistOutliersAction = self.group.addAction(
             CropHistogramOutliers(self, parent=self)
         )
-
-        self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
-        self._toolbar.addWidget(self.cs_transform)
-
         self.cropHistOutliersAction.setVisible(True)
         self.addAction(self.cropHistOutliersAction)
         self._toolbar.insertAction(
             self.keepDataAspectRatioAction, self.cropHistOutliersAction
         )
 
+        self.autoscaleToMeanAndThreeSigmaAction = self.group.addAction(
+            AutoscaleToMeanAndThreeSigma(self, parent=self)
+        )
+        self.autoscaleToMeanAndThreeSigmaAction.setVisible(True)
+        self.addAction(self.autoscaleToMeanAndThreeSigmaAction)
+        self._toolbar.insertAction(
+            self.keepDataAspectRatioAction, self.autoscaleToMeanAndThreeSigmaAction
+        )
+
+        if kwargs.get("show_cs_transform", True):
+            self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
+            self._toolbar.addWidget(self.cs_transform)
+        else:
+            self.cs_transform = None
+
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         _position_widget = PydidasPositionInfo(plot=self, converters=posInfo)
         _position_widget.setSnappingMode(SNAP_MODE)
-        self.cs_transform.sig_new_coordinate_system.connect(
-            _position_widget.new_coordinate_system
-        )
+        if kwargs.get("show_cs_transform", True):
+            self.cs_transform.sig_new_coordinate_system.connect(
+                _position_widget.new_coordinate_system
+            )
         _layout = self.centralWidget().layout()
         _layout.addWidget(_position_widget, 2, 0, 1, 3)
 
         self._positionWidget = _position_widget
-        self.get_detector_size()
+        DIFFRACTION_EXP.sig_params_changed.connect(self.update_from_diffraction_exp)
+        self.update_from_diffraction_exp()
 
-        _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
+        _cmap_name = self.q_settings_get("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
             )
+        self._qtapp = QtWidgets.QApplication.instance()
+        if hasattr(self._qtapp, "sig_mpl_font_change"):
+            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
 
     @QtCore.Slot()
-    def get_detector_size(self):
+    def update_from_diffraction_exp(self):
         """
-        Get the detector size from the SetupExperiment and store it.
+        Get the detector size from the DiffractionExperimentContext and store it.
         """
-        self._detector_size = (
-            EXP_SETUP.get_param_value("detector_npixy"),
-            EXP_SETUP.get_param_value("detector_npixx"),
+        if self.cs_transform is None:
+            return
+        self._cs_transform_valid = (
+            DIFFRACTION_EXP.get_param_value("detector_pxsizex") > 0
+            and DIFFRACTION_EXP.get_param_value("detector_pxsizey") > 0
+            and DIFFRACTION_EXP.get_param_value("detector_npixx") > 0
+            and DIFFRACTION_EXP.get_param_value("detector_npixy") > 0
         )
+        self._detector_size = (
+            DIFFRACTION_EXP.get_param_value("detector_npixy"),
+            DIFFRACTION_EXP.get_param_value("detector_npixx"),
+        )
+        self.cs_transform.set_coordinates("cartesian")
+        self.cs_transform.setEnabled(self._cs_transform_valid)
 
-    def setData(self, data, **kwargs):
+    def setData(self, data: ndarray, **kwargs: dict):
         """
         Set the image data, handle the coordinate system and forward the data to
         plotting.
@@ -119,12 +164,16 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         **kwargs : dict
             Optional kwargs for the ImageView.setImage method.
         """
-        self._check_data_shape(data.shape)
+        if self.cs_transform is not None:
+            self._check_data_shape(data.shape)
+        self._plot_kwargs = kwargs
         ImageView.setImage(self, data, **kwargs)
 
-    def _check_data_shape(self, data_shape):
+    def _check_data_shape(self, data_shape: tuple[int, ...]):
         """
-        Check the data shape and reset the coordinate system to cartesian if it differs
+        Check the data shape coordinate system.
+
+        This method will reset the coordinate system to cartesian if it differs
         from the defined detector geometry.
 
         Parameters
@@ -132,10 +181,22 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         data_shape : tuple
             The shape of the input data.
         """
-        if data_shape != self._detector_size:
+        _valid = data_shape == self._detector_size and self._cs_transform_valid
+        if not _valid:
             self.cs_transform.set_coordinates("cartesian")
-            for _action in self.cs_transform.menu().actions()[1:]:
-                _action.setEnabled(False)
-        else:
-            for _action in self.cs_transform.menu().actions()[1:]:
-                _action.setEnabled(True)
+        self.cs_transform.setEnabled(_valid)
+
+    @QtCore.Slot()
+    def update_mpl_fonts(self):
+        """
+        Update the plot's fonts.
+        """
+        _image = self.getImage()
+        if _image is None:
+            return
+        self.getBackend().fig.gca().cla()
+        ImageView.setImage(self, _image.getData(), **self._plot_kwargs)
+        for _histo in [self._histoHPlot, self._histoVPlot]:
+            _profile = _histo.getProfile()
+            _histo.getBackend().fig.gca().cla()
+            _histo.setProfile(_profile)

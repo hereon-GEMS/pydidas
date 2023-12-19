@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,14 +18,14 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
 import copy
+import unittest
 
 from pydidas.core import Parameter, ParameterCollection
 
@@ -58,6 +60,8 @@ class TestParameterCollection(unittest.TestCase):
         obj = ParameterCollection(*self._params)
         _ps = obj.get_params("Test0", "Test1")
         self.assertEqual(_ps, self._params[0:2])
+        self.assertEqual(id(_ps[0]), id(self._params[0]))
+        self.assertEqual(id(_ps[1]), id(self._params[1]))
 
     def test_get_params__wrong_key(self):
         obj = ParameterCollection(*self._params)
@@ -83,7 +87,7 @@ class TestParameterCollection(unittest.TestCase):
         with self.assertRaises(KeyError):
             obj.get_value("TEST")
 
-    def test_get_copy(self):
+    def test_copy(self):
         obj = ParameterCollection(*self._params)
         _copy = copy.copy(obj)
         self.assertNotEqual(obj, _copy)
@@ -98,14 +102,6 @@ class TestParameterCollection(unittest.TestCase):
         obj = ParameterCollection(*self._params)
         with self.assertRaises(KeyError):
             obj.delete_param("TEST")
-
-    def test_add_kwarg_params(self):
-        obj = ParameterCollection()
-        obj._ParameterCollection__add_kwarg_params(
-            Test0=self._params[0], Test1=self._params[1]
-        )
-        self.assertEqual(obj.__getitem__("Test0"), self._params[0])
-        self.assertEqual(obj.__getitem__("Test1"), self._params[1])
 
     def test_add_arg_params__with_param_collection(self):
         tester = ParameterCollection(*self._params)
@@ -148,65 +144,10 @@ class TestParameterCollection(unittest.TestCase):
         with self.assertRaises(KeyError):
             obj._ParameterCollection__check_duplicate_keys(*self._params)
 
-    def test_check_duplicate_keys__only_kwargs(self):
-        obj = ParameterCollection()
-        obj._ParameterCollection__check_duplicate_keys(
-            Test0=self._params[0], Test1=self._params[1]
-        )
-        # assert passes
-
-    def test_check_duplicate_keys__mixed_no_duplicate(self):
-        obj = ParameterCollection()
-        obj._ParameterCollection__check_duplicate_keys(
-            self._params[0], Test1=self._params[1]
-        )
-        # assert passes
-
-    def test_check_duplicate_keys__mixed_with_duplicate(self):
-        obj = ParameterCollection()
-        with self.assertRaises(KeyError):
-            obj._ParameterCollection__check_duplicate_keys(
-                self._params[0], Test0=Parameter("Test0", int, 42)
-            )
-
-    def test_check_kwarg_types(self):
-        obj = ParameterCollection()
-        obj._ParameterCollection__check_kwarg_types(
-            Test0=self._params[0], Test1=self._params[1]
-        )
-
-    def test_check_kwarg_types__wrong_type(self):
-        obj = ParameterCollection()
-        with self.assertRaises(TypeError):
-            obj._ParameterCollection__check_kwarg_types(dict(test=0))
-
     def test_add_params__with_args(self):
         obj = ParameterCollection(*self._params)
         obj.add_params(
             Parameter("Test5", int, default=12), Parameter("Test6", float, default=-1)
-        )
-        for index in range(5, 6):
-            self.assertIsInstance(obj[f"Test{index}"], Parameter)
-
-    def test_add_params__with_kwargs(self):
-        obj = ParameterCollection(*self._params)
-        obj.add_params(
-            Test5=Parameter("Test5", int, default=12),
-            Test6=Parameter("Test6", float, default=-1),
-        )
-        for index in range(5, 6):
-            self.assertIsInstance(obj[f"Test{index}"], Parameter)
-
-    def test_add_params__with_kwarg_wrong_type(self):
-        obj = ParameterCollection(*self._params)
-        with self.assertRaises(TypeError):
-            obj.add_params(Test5=1)
-
-    def test_add_params__mixed(self):
-        obj = ParameterCollection(*self._params)
-        obj.add_params(
-            Parameter("Test5", int, default=12),
-            Test6=Parameter("Test6", float, default=-1),
         )
         for index in range(5, 6):
             self.assertIsInstance(obj[f"Test{index}"], Parameter)
@@ -220,7 +161,7 @@ class TestParameterCollection(unittest.TestCase):
         obj.add_params(
             Parameter("Test5", int, default=12),
             coll,
-            Test6=Parameter("Test6", float, default=-1),
+            Parameter("Test6", float, default=-1),
         )
         for index in range(5, 9):
             self.assertIsInstance(obj[f"Test{index}"], Parameter)
@@ -237,11 +178,6 @@ class TestParameterCollection(unittest.TestCase):
 
     def test_add_params__duplicate(self):
         obj = ParameterCollection(*self._params)
-        with self.assertRaises(KeyError):
-            obj.add_params(
-                Parameter("Test5", float, default=-1),
-                Test5=Parameter("Test5", int, default=12),
-            )
         with self.assertRaises(KeyError):
             obj.add_params(
                 Parameter("Test5", float, default=-1),
@@ -333,12 +269,12 @@ class TestParameterCollection(unittest.TestCase):
 
     def test_hash__comparison_of_equal_collections(self):
         obj = ParameterCollection(*self._params)
-        obj2 = ParameterCollection(*[_p.get_copy() for _p in self._params])
+        obj2 = ParameterCollection(*[_p.copy() for _p in self._params])
         self.assertEqual(hash(obj), hash(obj2))
 
     def test_hash__comparison_w_different_param_value(self):
         obj = ParameterCollection(*self._params)
-        obj2 = ParameterCollection(*[_p.get_copy() for _p in self._params])
+        obj2 = ParameterCollection(*[_p.copy() for _p in self._params])
         obj.set_value("Test0", 13)
         self.assertNotEqual(hash(obj), hash(obj2))
 
@@ -348,16 +284,6 @@ class TestParameterCollection(unittest.TestCase):
 
     def test_creation_with_args(self):
         obj = ParameterCollection(*self._params)
-        for index in range(4):
-            self.assertEqual(obj[f"Test{index}"], self._params[index])
-
-    def test_creation_params_with_kwargs(self):
-        obj = ParameterCollection(
-            Test0=self._params[0],
-            Test1=self._params[1],
-            Test2=self._params[2],
-            Test3=self._params[3],
-        )
         for index in range(4):
             self.assertEqual(obj[f"Test{index}"], self._params[index])
 

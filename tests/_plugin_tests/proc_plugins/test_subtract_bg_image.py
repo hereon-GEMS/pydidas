@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,27 +18,34 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 import os
-import unittest
-import tempfile
 import shutil
+import tempfile
+import unittest
 
 import h5py
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core.utils import get_random_string, rebin2d
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestSubtractBgImage(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
+
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
         self._shape = (20, 20)
@@ -77,12 +86,12 @@ class TestSubtractBgImage(unittest.TestCase):
     def test_pre_execute__simple_bg_image(self):
         plugin = self.create_plugin(hdf5=False)
         plugin.pre_execute()
-        self.assertTrue(np.alltrue(plugin._bg_image == self._bg))
+        self.assertTrue(np.all(plugin._bg_image == self._bg))
 
     def test_pre_execute__hdf5_bg_image(self):
         plugin = self.create_plugin(hdf5=True)
         plugin.pre_execute()
-        self.assertTrue(np.alltrue(plugin._bg_image == self._bg))
+        self.assertTrue(np.all(plugin._bg_image == self._bg))
 
     def test_pre_execute__None_threshold(self):
         plugin = self.create_plugin(hdf5=True)
@@ -111,8 +120,8 @@ class TestSubtractBgImage(unittest.TestCase):
         plugin.pre_execute()
         _new_data, _new_kwargs = plugin.execute(self._data, **_kwargs)
         self.assertEqual(_kwargs, _new_kwargs)
-        self.assertTrue(np.alltrue(_new_data >= _thresh))
-        self.assertTrue(np.alltrue(self._data - self._bg <= _new_data))
+        self.assertTrue(np.all(_new_data >= _thresh))
+        self.assertTrue(np.all(self._data - self._bg <= _new_data))
 
     def test_execute__with_legacy_ops(self):
         _thresh = 0.12
@@ -131,7 +140,7 @@ class TestSubtractBgImage(unittest.TestCase):
         self.assertEqual(
             _new_data.shape, ((self._shape[0] - 1) // 2, (self._shape[1] - 3) // 2)
         )
-        self.assertTrue(np.alltrue(_new_data >= _thresh))
+        self.assertTrue(np.all(_new_data >= _thresh))
 
 
 if __name__ == "__main__":

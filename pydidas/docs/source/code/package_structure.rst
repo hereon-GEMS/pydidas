@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _package_structure:
 
 Package structure
@@ -23,21 +29,21 @@ given below:
 +-------------------+------------------------------------------------+
 | data_io           | core                                           |      
 +-------------------+------------------------------------------------+
-| experiment        | core                                           |
+| contexts          | core                                           |
 +-------------------+------------------------------------------------+
 | managers          | core, data_io                                  |
 +-------------------+------------------------------------------------+
 | plugins           | core, data_io, managers                        |
 +-------------------+------------------------------------------------+
-| workflow          | core, experiment, plugins                      |
+| workflow          | core, contexts, plugins                        |
 +-------------------+------------------------------------------------+
-| apps              | core, data_io, experiment, managers, workflow  |
+| apps              | core, data_io, contexts, managers, workflow    |
 +-------------------+------------------------------------------------+
-| widgets           | core, experiment, workflow, apps               |
+| widgets           | core, contexts, workflow, apps                 |
 +-------------------+------------------------------------------------+
 | unittest_objects  | core, data_io, plugins, apps                   |
 +-------------------+------------------------------------------------+
-| gui               | core, multiprocessing, data_io, experiment,    |
+| gui               | core, multiprocessing, data_io, contexts,      |
 |                   | workflow, apps, widgets                        |
 +-------------------+------------------------------------------------+
 
@@ -81,17 +87,17 @@ Sub-package descriptions
         Low-level implementations of file readers used by *implementations*
         (e.g. reading slices out of hdf5 files).
 
-- **pydidas.experiment** 
+- **pydidas.contexts** 
     
     Singleton classes which manage global settings for the experimental setup 
     and the scan setup. This information can be used by plugins or apps to query 
     the global processing parameters.
 
-  - *pydidas.experiment.setup_experiment* 
+  - *pydidas.contexts.experiment_context* 
         
         Classes for the global experimental settings and import/export.
   
-  - *pydidas.experiment.setup_scan* 
+  - *pydidas.contexts.scan_context* 
         
         Classes for the global scan settings and import/export.
 
@@ -116,7 +122,7 @@ Sub-package descriptions
         Classes to handle writing the results of the workflow execution to 
         files.
 
-  - *pydidas.workflow.workflow_tree_io* 
+  - *pydidas.workflow.processing_tree_io* 
         
         Registry with importers/exporters and the importer/exporter 
         implementations.

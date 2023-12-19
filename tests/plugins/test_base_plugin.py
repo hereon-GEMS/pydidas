@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,26 +18,39 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
-import tempfile
-import shutil
 import copy
 import pickle
+import shutil
+import tempfile
+import unittest
 
 import numpy as np
 
-from pydidas.core import Parameter, get_generic_parameter, utils
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
+from pydidas.core import Parameter, UserConfigError, get_generic_parameter, utils
 from pydidas.core.constants import BASE_PLUGIN
 from pydidas.core.utils import rebin2d
-from pydidas.unittest_objects import create_plugin_class
-from pydidas.plugins import BasePlugin
 from pydidas.data_io.utils import RoiSliceManager
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import create_plugin_class
+
+
+EXP = DiffractionExperimentContext()
+
+
+class TestLinkedObject:
+    def __init__(self, params):
+        self.params = params
+
+    def get_param_value(self, key):
+        return self.params.get_value(key)
 
 
 class TestBasePlugin(unittest.TestCase):
@@ -318,7 +333,14 @@ class TestBasePlugin(unittest.TestCase):
     def test_input_shape_setter__wrong_type(self):
         _shape = 123
         plugin = create_plugin_class(BASE_PLUGIN)()
-        with self.assertRaises(TypeError):
+        with self.assertRaises(UserConfigError):
+            plugin.input_shape = _shape
+
+    def test_input_shape_setter__input_data_dim_None(self):
+        _shape = (123, 456)
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.input_data_dim = None
+        with self.assertRaises(UserConfigError):
             plugin.input_shape = _shape
 
     def test_input_shape_setter__input_data_dim_neg(self):
@@ -331,7 +353,7 @@ class TestBasePlugin(unittest.TestCase):
         _shape = (123, 534, 245)
         plugin = create_plugin_class(BASE_PLUGIN)()
         plugin.input_data_dim = 2
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             plugin.input_shape = _shape
 
     def test_input_shape_setter__input_data_dim_correct(self):
@@ -404,7 +426,7 @@ class TestBasePlugin(unittest.TestCase):
         }
         for _key, _val in _new_params.items():
             plugin.add_param(Parameter(_key, str, ""))
-        _state = {"params": plugin.params.get_copy()}
+        _state = {"params": plugin.params.copy()}
         for _key, _param in _new_params.items():
             _state["params"][_key].value = _new_params[_key]
         plugin.__setstate__(_state)
@@ -432,10 +454,43 @@ class TestBasePlugin(unittest.TestCase):
     def test_copy(self):
         plugin = create_plugin_class(BASE_PLUGIN)
         obj = plugin()
+        obj.node_id = 42
         obj.set_param_value("label", "Test 12423536")
         cp = copy.copy(obj)
         self.assertEqual(obj.__class__, cp.__class__)
         self.assertEqual(obj.get_param_value("label"), cp.get_param_value("label"))
+        self.assertNotEqual(id(obj.params), id(cp.params))
+        self.assertEqual(obj.node_id, cp.node_id)
+
+    def test_copy__with_linked_object(self):
+        plugin = create_plugin_class(BASE_PLUGIN)
+        obj = plugin()
+        obj.dummy = TestLinkedObject(obj.params)
+        obj.set_param_value("label", "Test 12423536")
+        self.assertEqual(
+            obj.dummy.get_param_value("label"), obj.get_param_value("label")
+        )
+        cp = copy.copy(obj)
+        self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
+        cp.set_param_value("label", "Test 12423536")
+        self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
+
+    def test_copy__with_exp_attribute(self):
+        plugin = create_plugin_class(BASE_PLUGIN)
+        obj = plugin()
+        obj._EXP = EXP
+        _copy = copy.copy(obj)
+        self.assertEqual(obj._EXP, EXP)
+        self.assertEqual(_copy._EXP, EXP)
+
+    def test_copy__with_local_exp_attribute(self):
+        plugin = create_plugin_class(BASE_PLUGIN)
+        obj = plugin()
+        obj._EXP = DiffractionExperiment()
+        _copy = copy.copy(obj)
+        self.assertNotEqual(obj._EXP, EXP)
+        self.assertNotEqual(obj._EXP, _copy._EXP)
+        self.assertNotEqual(_copy._EXP, EXP)
 
     def test_init__plain(self):
         plugin = create_plugin_class(BASE_PLUGIN)()

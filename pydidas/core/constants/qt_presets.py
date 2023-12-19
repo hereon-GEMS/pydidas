@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,52 +21,51 @@ graphical user interface of the application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
-    "QT_STYLES",
-    "STANDARD_FONT_SIZE",
-    "QT_DEFAULT_ALIGNMENT",
-    "QT_TOP_RIGHT_ALIGNMENT",
-    "QT_BOTTOM_LEFT_ALIGNMENT",
-    "QT_BOTTOM_RIGHT_ALIGNMENT",
-    "QT_CENTER_LEFT_ALIGNMENT",
-    "QT_CENTER_RIGHT_ALIGNMENT",
+    "ALIGN_TOP_LEFT",
+    "ALIGN_TOP_CENTER",
+    "ALIGN_TOP_RIGHT",
+    "ALIGN_CENTER_LEFT",
+    "ALIGN_CENTER",
+    "ALIGN_CENTER_RIGHT",
+    "ALIGN_BOTTOM_CENTER",
+    "ALIGN_BOTTOM_LEFT",
+    "ALIGN_BOTTOM_RIGHT",
     "QT_COMBO_BOX_SIZE_POLICY",
     "QT_REG_EXP_FLOAT_VALIDATOR",
     "QT_REG_EXP_INT_VALIDATOR",
     "QT_REG_EXP_SLICE_VALIDATOR",
     "QT_REG_EXP_FLOAT_SLICE_VALIDATOR",
-    "FIX_EXP_POLICY",
-    "EXP_EXP_POLICY",
-    "EXP_FIX_POLICY",
+    "POLICY_FIX_EXP",
+    "POLICY_EXP_EXP",
+    "POLICY_EXP_FIX",
+    "POLICY_MIN_MIN",
 ]
 
-from qtpy import QtGui, QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 
-STANDARD_FONT_SIZE = 10
+ALIGN_TOP_LEFT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 
-QT_STYLES = {
-    "title": "QWidget {font: bold; font-size: " + f"{STANDARD_FONT_SIZE + 4}" + "pt}",
-    "subtitle": "QWidget {font: bold; font-size: "
-    + f"{STANDARD_FONT_SIZE + 1}"
-    + "pt}",
-}
+ALIGN_TOP_CENTER = QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop
 
-QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+ALIGN_TOP_RIGHT = QtCore.Qt.AlignRight | QtCore.Qt.AlignTop
 
-QT_TOP_RIGHT_ALIGNMENT = QtCore.Qt.AlignRight | QtCore.Qt.AlignTop
+ALIGN_CENTER_LEFT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
 
-QT_BOTTOM_LEFT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom
+ALIGN_CENTER = QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter
 
-QT_BOTTOM_RIGHT_ALIGNMENT = QtCore.Qt.AlignRight | QtCore.Qt.AlignBottom
+ALIGN_CENTER_RIGHT = QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
 
-QT_CENTER_LEFT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+ALIGN_BOTTOM_LEFT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom
 
-QT_CENTER_RIGHT_ALIGNMENT = QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
+ALIGN_BOTTOM_CENTER = QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom
+
+ALIGN_BOTTOM_RIGHT = QtCore.Qt.AlignRight | QtCore.Qt.AlignBottom
 
 QT_COMBO_BOX_SIZE_POLICY = QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon
 
@@ -88,8 +89,10 @@ QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression("((-?\\d*\\.?\\d*:?){1,3},?)*")
 )
 
-FIX_EXP_POLICY = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+POLICY_FIX_EXP = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
 
-EXP_EXP_POLICY = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+POLICY_EXP_EXP = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-EXP_FIX_POLICY = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+POLICY_EXP_FIX = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+
+POLICY_MIN_MIN = (QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,16 +21,21 @@ tree-like structure.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GenericTree"]
+
 
 import copy
 import time
 import warnings
+from typing import Self, Union
 
+from qtpy import QtCore
+
+from ..core import UserConfigError
 from ..core.utils import get_random_string
 from .generic_node import GenericNode
 
@@ -38,16 +45,7 @@ class GenericTree:
     A generic tree used for organising items.
     """
 
-    def __init__(self, **kwargs):
-        """
-        Setup method.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            Arbitrary keyword arguments. These will be stored internally
-            in an self._config dictionary.
-        """
+    def __init__(self, **kwargs: dict):
         self.root = None
         self.node_ids = []
         self.nodes = {}
@@ -55,10 +53,9 @@ class GenericTree:
         self._starthash = hash((get_random_string(12), time.time()))
 
     @property
-    def tree_has_changed(self):
+    def tree_has_changed(self) -> bool:
         """
-        Get a flag which tells whether the Tree has changed since the last
-        flag reset.
+        Get a flag which tells whether the Tree has changed since the last flag reset.
 
         Returns
         -------
@@ -68,7 +65,7 @@ class GenericTree:
         return self._config["tree_changed"]
 
     @property
-    def active_node(self):
+    def active_node(self) -> Union[GenericNode, None]:
         """
         Get the active node.
 
@@ -84,9 +81,9 @@ class GenericTree:
         return self.nodes[self.active_node_id]
 
     @property
-    def active_node_id(self):
+    def active_node_id(self) -> int:
         """
-        Get the active node ID
+        Get the active node ID.
 
         Returns
         -------
@@ -96,7 +93,7 @@ class GenericTree:
         return self._config["active_node_id"]
 
     @active_node_id.setter
-    def active_node_id(self, new_id):
+    def active_node_id(self, new_id: Union[None, int]):
         """
         Set the active node ID.
 
@@ -111,19 +108,18 @@ class GenericTree:
         ValueError
             If new_id is not inluded in the tree's node ids.
         """
-        if not (new_id is None or new_id in self.node_ids):
-            raise ValueError(
-                f"The given node ID '{new_id}' is not included in the stored node ids."
-            )
-        self._config["active_node_id"] = new_id
+        if new_id is None or new_id in self.node_ids:
+            self._config["active_node_id"] = new_id
+            return
+        raise ValueError(
+            f"The given node ID '{new_id}' is not included in the stored node ids."
+        )
 
     def reset_tree_changed_flag(self):
-        """
-        Reset the "has changed" flag for this Tree.
-        """
+        """Reset the "has changed" flag for this Tree."""
         self._config["tree_changed"] = False
 
-    def set_root(self, node):
+    def set_root(self, node: GenericNode):
         """
         Set the tree root node.
 
@@ -144,7 +140,7 @@ class GenericTree:
     @staticmethod
     def verify_node_type(node):
         """
-        Check that the node is a GenericNode
+        Check that the node is a GenericNode.
 
         Parameters
         ----------
@@ -162,15 +158,20 @@ class GenericTree:
             )
 
     def clear(self):
-        """
-        Clear all items from the tree.
-        """
+        """Clear all items from the tree."""
         self.nodes = {}
         self.node_ids = []
         self._config["active_node_id"] = None
+        self._config["tree_changed"] = True
+        self._starthash = hash((get_random_string(12), time.time()))
         self.root = None
 
-    def register_node(self, node, node_id=None, check_ids=True):
+    def register_node(
+        self,
+        node: GenericNode,
+        node_id: Union[None, int] = None,
+        check_ids: bool = True,
+    ):
         """
         Register a node with the tree.
 
@@ -185,16 +186,16 @@ class GenericTree:
 
         Parameters
         ----------
-        node : object
+        node : GenericNode
             The node object to be registered.
-        node_id : int, optional
+        node_id : Union[None, int}, optional
             A supplied node_id. If None, the tree will select the next
             suitable node_id automatically. The default is None.
         check_ids : bool, optional
-            Keyword to enable/disable node_id checking. By default, this should
-            always be on if called by the user. If node trees are added to the
-            GenericTree, the check will only be performed once for the newly
-            added node and not again during registering of its children.
+            Keyword to enable/disable node_id checking. By default, this should always
+            be on if called by the user. If node trees are added to the GenericTree,
+            the check will only be performed once for the newly added node and not
+            again during registering of its children. The default is True.
         """
         self.verify_node_type(node)
         _ids = node.get_recursive_ids()
@@ -213,10 +214,9 @@ class GenericTree:
             self.register_node(_child, _child.node_id, check_ids=False)
         self._config["tree_changed"] = True
 
-    def _check_node_ids(self, node_ids):
+    def _check_node_ids(self, node_ids: Union[list, tuple, set]):
         """
-        Check the node_ids of a node (and its children) and verify they are
-        compatible with the tree.
+        Check the compatibility of a node's (and its children) ID with the tree.
 
         Parameters
         ----------
@@ -234,7 +234,7 @@ class GenericTree:
         for _id in node_ids:
             if _id in self.node_ids:
                 raise ValueError(
-                    "Duplicate node ID detected. Tree node has " "not been registered!"
+                    "Duplicate node ID detected. Tree node has not been registered!"
                 )
             if _id is not None and self.node_ids and _id < max(self.node_ids):
                 raise ValueError(
@@ -243,7 +243,7 @@ class GenericTree:
                     "Tree node has not been registered!"
                 )
 
-    def get_new_nodeid(self):
+    def get_new_nodeid(self) -> int:
         """
         Get a new integer node id.
 
@@ -260,9 +260,9 @@ class GenericTree:
             return 0
         return max(self.node_ids) + 1
 
-    def get_node_by_id(self, node_id):
+    def get_node_by_id(self, node_id: int) -> GenericNode:
         """
-        Get the node from the node_id
+        Get the node from the node_id.
 
         Parameters
         ----------
@@ -276,7 +276,9 @@ class GenericTree:
         """
         return self.nodes[node_id]
 
-    def delete_node_by_id(self, node_id, recursive=True, keep_children=False):
+    def delete_node_by_id(
+        self, node_id: int, recursive: bool = True, keep_children: bool = False
+    ):
         """
         Remove a node from the tree and delete its object.
 
@@ -302,8 +304,24 @@ class GenericTree:
         """
         if recursive and keep_children:
             raise ValueError(
-                "Conflicting selection of 'recursive' and 'keep_children' arguments."
+                "Conflicting selection of *recursive* and *keep_children* arguments."
             )
+        if not recursive and not keep_children and self.nodes[node_id].n_children > 0:
+            raise UserConfigError(
+                "Cannot delete a node with children without either the *recursive* or "
+                "the *keep_children* flag set."
+            )
+        if self.nodes[node_id] == self.root:
+            if self.root.n_children == 0 or recursive:
+                self.root = None
+            elif self.root.n_children == 1 and keep_children:
+                self.root = self.root.get_children()[0]
+            else:
+                raise UserConfigError(
+                    "Cannot delete the root node of the tree because it has multiple "
+                    "children which would become separate roots. Please make sure that "
+                    "the root node only has one child before deleting it."
+                )
         _subtree_ids = self.nodes[node_id].get_recursive_ids()
         if self.active_node_id in _subtree_ids:
             _parent_id = (
@@ -323,7 +341,7 @@ class GenericTree:
                 self.node_ids.remove(_id)
         self._config["tree_changed"] = True
 
-    def change_node_parent(self, node_id, new_parent_id):
+    def change_node_parent(self, node_id: int, new_parent_id: int):
         """
         Change the parent of the selected node.
 
@@ -345,18 +363,19 @@ class GenericTree:
         self._config["tree_changed"] = True
 
     def order_node_ids(self):
-        """
-        Order the node ids of all of the tree's nodes.
-        """
+        """Order the node ids of all of the tree's nodes."""
         _root = self.root
+        _active_node = self.active_node
         if _root is None:
             return
         for _node in self.nodes.values():
             _node.node_id = None
         self.clear()
         self.set_root(_root)
+        if _active_node is not None:
+            self.active_node_id = _active_node.node_id
 
-    def get_all_leaves(self):
+    def get_all_leaves(self) -> list:
         """
         Get all tree nodes which are leaves.
 
@@ -371,7 +390,7 @@ class GenericTree:
                 _leaves.append(_node)
         return _leaves
 
-    def get_copy(self):
+    def copy(self) -> Self:
         """
         Get a copy of the WorkflowTree.
 
@@ -385,9 +404,11 @@ class GenericTree:
         pydidas.workflow.WorkflowTree
             A new instance of the WorkflowTree
         """
-        return self.__copy__()
+        return copy.copy(self)
 
-    def __copy__(self):
+    deepcopy = copy
+
+    def __copy__(self) -> Self:
         """
         Get a copy of the GenericTree.
 
@@ -398,18 +419,30 @@ class GenericTree:
         """
         cls = self.__class__
         _copy = cls.__new__(cls)
-        for key, val in self.__dict__.items():
-            _copy.__dict__[key] = copy.deepcopy(val)
-        _copy.clear()
+        _copy.__dict__.update(
+            {
+                _key: copy.deepcopy(_value)
+                for _key, _value in self.__dict__.items()
+                if not (
+                    isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
+                    or _key in ["nodes", "root"]
+                )
+            }
+        )
         if self.root is not None:
             _copy.set_root(copy.deepcopy(self.root))
         return _copy
 
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo: dict) -> Self:
         """
         Get a deep copy of the GenericTree.
 
         Note: The implementation of copy and deepcopy is the same for Trees.
+
+        Parameters
+        ----------
+        memo : dict
+            copy.deepcopy's dict of already copied values.
 
         Returns
         -------
@@ -418,7 +451,7 @@ class GenericTree:
         """
         return self.__copy__()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Get the hash value for the GenericTree.
 

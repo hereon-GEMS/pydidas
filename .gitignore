@@ -1,3 +1,6 @@
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC0-1.0
+
 # local files from running pydidas
 .pylint.d
 .pylint.d/*
@@ -18,8 +21,3 @@ htmlcov
 # logging
 *.log
 !change.log
-
-# svg files
-*.svg
-!pydidas_images/**/*.svg
-!pydidas*.svg

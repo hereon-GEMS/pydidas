@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,10 +20,10 @@ The menu_utils module includes functions used in the pydidas main_menu.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "find_toolbar_bases",
     "get_generic_menu_entries",
@@ -90,8 +92,16 @@ def create_generic_toolbar_entry(entry):
     if entry in _generic_entries:
         return _generic_entries[entry]
     return {
-        "label": format_input_to_multiline_str(entry, max_line_length=12),
+        "label": format_input_to_multiline_str("Expand " + entry, max_line_length=12),
+        "label_invisible": format_input_to_multiline_str(
+            "Expand " + entry, max_line_length=12
+        ),
+        "label_visible": format_input_to_multiline_str(
+            "Hide " + entry, max_line_length=12
+        ),
         "icon": get_pyqt_icon_from_str("qta::mdi.arrow-right-circle"),
+        "icon_invisible": get_pyqt_icon_from_str("qta::mdi.arrow-right-circle"),
+        "icon_visible": get_pyqt_icon_from_str("qta::mdi.arrow-left-circle"),
         "menu_tree": [
             ("" if _path == Path() else _path.as_posix())
             for _path in reversed(Path(entry).parents)
@@ -114,8 +124,16 @@ def get_generic_menu_entries():
     """
     return {
         "Workflow processing": {
-            "label": "Workflow\nprocessing",
-            "icon": get_pyqt_icon_from_str("qta::mdi.cogs"),
+            "label": "Expand\nWorkflow\nprocessing",
+            "label_visible": "Hide\nWorkflow\nProcessing",
+            "label_invisible": "Expand\nWorkflow\nProcessing",
+            "icon": get_pyqt_icon_from_str("pydidas::workflow_processing_expand.png"),
+            "icon_visible": get_pyqt_icon_from_str(
+                "pydidas::workflow_processing_hide.png"
+            ),
+            "icon_invisible": get_pyqt_icon_from_str(
+                "pydidas::workflow_processing_expand.png"
+            ),
             "menu_tree": ["", "Workflow processing"],
         }
     }

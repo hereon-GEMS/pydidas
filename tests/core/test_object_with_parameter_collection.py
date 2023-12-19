@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,22 +18,27 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
+import copy
+import io
+import multiprocessing as mp
+import pathlib
+import pickle
+import sys
 import unittest
 import warnings
-import pathlib
-import io
-import sys
-import copy
-import pickle
-import multiprocessing as mp
 
-from pydidas.core import ObjectWithParameterCollection, Parameter, ParameterCollection
+from pydidas.core import (
+    ObjectWithParameterCollection,
+    Parameter,
+    ParameterCollection,
+    UserConfigError,
+)
 
 
 class TestObjectWithParameterCollection(unittest.TestCase):
@@ -72,18 +79,22 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         with self.assertRaises(TypeError):
             obj.add_params(["test"])
 
-    def test_add_params__with_kwargs(self):
+    def test_update_param_values_from_kwargs__empty(self):
         obj = ObjectWithParameterCollection()
-        obj.add_params(
-            param1=self._params.get("Test0"),
-            param2=self._params.get("Test1"),
-            param3=self._params.get("Test2"),
-            param4=self._params.get("Test3"),
-        )
-        for index in range(4):
-            self.assertEqual(
-                obj.params[f"Test{index}"], self._params.get(f"Test{index}")
-            )
+        obj.add_params(*self._params.values())
+        _vals = obj.get_param_values_as_dict()
+        obj.update_param_values_from_kwargs()
+        _new_vals = obj.get_param_values_as_dict()
+        for _key, _val in _vals.items():
+            self.assertEqual(_val, _new_vals[_key])
+
+    def test_update_param_values_from_kwargs__use_case(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(*self._params.values())
+        _new_vals = dict(Test0=42, Test1="new", Test2=17, Test3=3.15)
+        obj.update_param_values_from_kwargs(**_new_vals)
+        for _key, _val in _new_vals.items():
+            self.assertEqual(_val, obj.get_param_value(_key))
 
     def test_add_param(self):
         obj = ObjectWithParameterCollection()
@@ -269,8 +280,8 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj.set_param_value("Test2", 12)
-        obj.restore_all_defaults()
-        self.assertEqual(obj.get_param_value("Test2"), 12)
+        with self.assertRaises(UserConfigError):
+            obj.restore_all_defaults()
 
     def test_restore_all_defaults(self):
         obj = ObjectWithParameterCollection()
@@ -284,6 +295,32 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj2 = copy.copy(obj)
         self.assertIsInstance(obj2, ObjectWithParameterCollection)
+
+    def test_explicity_copy(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config = {"a": "123", "b": [1, 2, 3], "c": ("A", "C")}
+        obj2 = obj.copy()
+        for _param in obj.params.values():
+            self.assertNotIn(_param, obj2.params.values())
+        for _key, _val in obj._config.items():
+            self.assertIn(_key, obj2._config)
+            obj._config[_key] = 42
+            self.assertNotEqual(id(obj._config[_key]), id(obj2._config[_key]))
+
+    def test_explicity_deepcopy(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config = {"a": 123, "b": [1, 2, 3], "c": ("A", "C")}
+        obj2 = obj.deepcopy()
+        obj2._config["a"] = 42
+        obj2._config["b"].append(42)
+        obj2._config["c"] = ("A", "a", "C")
+        for _param in obj.params.values():
+            self.assertNotIn(_param, obj2.params.values())
+        for _key, _val in obj._config.items():
+            self.assertIn(_key, obj2._config)
+            self.assertNotEqual(id(_val), id(obj2._config[_key]))
 
     def test_getstate(self):
         obj = ObjectWithParameterCollection()
@@ -313,7 +350,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         _state = {
-            "params": obj.params.get_copy(),
+            "params": obj.params.copy(),
             "_config": {"test_key": True, "another_key": "entry"},
         }
         obj.__setstate__(_state)
@@ -346,8 +383,8 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj._config["Test"] = [1, 2, 3, 4, 5]
         obj2 = ObjectWithParameterCollection()
-        obj2._config["Test"] = [1, 2, 3, 4, 5, 6]
-        obj2.add_params(self._params.get_copy())
+        obj2._config["Test"] = [1, 2, 3, 4, 5]
+        obj2.add_params(self._params.copy())
         self.assertEqual(hash(obj), hash(obj2))
 
     def test_hash__complex_comparison_w_difference(self):
@@ -356,7 +393,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj._config["Test"] = [1, 2, 3, 4, 5]
         obj2 = ObjectWithParameterCollection()
         obj2._config["Test"] = [1, 2, 3, 4, 5, 6]
-        obj2.add_params(self._params.get_copy())
+        obj2.add_params(self._params.copy())
         obj2.set_param_value("Test0", 13)
         self.assertNotEqual(hash(obj), hash(obj2))
 

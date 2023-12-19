@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,23 +21,22 @@ single images in each, e.g. tiff files or numpy files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["FrameLoader"]
 
 
+from pydidas.core import Dataset
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core import get_generic_param_collection
-from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
+from pydidas.plugins import InputPlugin
 
 
 class FrameLoader(InputPlugin):
     """
-    Load data frames from files with a single image in each, for example tif
-    or cif files.
+    Load data frames from files with a single image in each, for example tif files.
 
     This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.
@@ -44,31 +45,15 @@ class FrameLoader(InputPlugin):
 
     A region of interest and image binning can be supplied to apply directly
     to the raw image.
-
-    Parameters
-    ----------
-    first_file : Union[str, pathlib.Path]
-        The name of the first file in the file series.
-    last_file : Union[str, pathlib.Path]
-        The name of the last file in the file series.
-    images_per_file : int
-        The number of images per file.
-    live_processing : bool, optional
-        Flag to toggle file system checks. In live_processing mode, checks
-        for the size and existance of files are disabled. The default is False.
-    file_stepping : int, optional
-        The stepping width through all files in the file list, determined
-        by fist and last file. The default is 1.
     """
 
     plugin_name = "Single frame loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
-    default_params = get_generic_param_collection("file_stepping")
     input_data_dim = None
     output_data_dim = 2
 
-    def get_frame(self, frame_index, **kwargs):
+    def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Load a frame and pass it on.
 
@@ -84,6 +69,8 @@ class FrameLoader(InputPlugin):
         -------
         data : pydidas.core.Dataset
             The image data.
+        kwargs : dict
+            The updated calling keyword arguments.
         """
         _fname = self.get_filename(frame_index)
         _data = import_data(_fname, **kwargs)

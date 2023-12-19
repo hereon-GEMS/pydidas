@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 Tutorial for the DirectorySpyApp
 ================================
 
@@ -100,21 +106,21 @@ Detector mask and background image
 Using a mask file
 ^^^^^^^^^^^^^^^^^
 
-A mask file can be used by activating the :py:data:`use_global_det_mask` 
-Parameter. This will instruct the app to apply the global mask to the data 
+A mask file can be used by activating the :py:data:`use_det_mask` 
+Parameter. This will instruct the app to apply the detector mask to the data 
 frame. 
 
-To modify the globally controlled detector mask used by the DirectorySpyApp,
-the global QSetting :py:data:`user/det_mask` key must be used.
-
-To modify this value, the user needs to create a QSettings instance and adjust 
-the values, if required:
+To modify the detector mask used by the DirectorySpyApp, set the 
+:py:data:`detector_mask_file` Parameter to point to the mask file. The value
+taken for masked pixels is controlled by the :py:data:`det_mask_val` Parameter. 
+The default value is 0.
 
 .. code-block::
 
     >>> import pydidas
-    >>> config = pydidas.core.PydidasQsettings()
-    >>> config.set_value('user/det_mask', '/home/user/data/detector_mask.npy')
+    >>> app = pydidas.apps.DirectorySpyApp()
+    >>> app.set_param_value("use_detector_mask", True)
+    >>> app.set_param_value("detector_mask_file", '/home/user/data/detector_mask.npy')   
 
     
 Using a background file

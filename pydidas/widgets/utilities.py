@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,28 +20,33 @@ Module with various utility functions for widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
+    "BlockUpdates",
     "delete_all_items_in_layout",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
+    "update_param_and_widget_choices",
 ]
 
 
-from qtpy import QtWidgets, QtCore, QtGui
-from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
+from typing import Union
+
 import qtawesome
+from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
 from ..core import PydidasGuiError
+from ..resources import icons
 
 
-def delete_all_items_in_layout(layout):
+def delete_all_items_in_layout(layout: QtWidgets.QLayout):
     """
-    Function to recursively delete items in a QLayout.
+    Recursively delete items in a QLayout.
 
     Parameters
     ----------
@@ -49,15 +56,17 @@ def delete_all_items_in_layout(layout):
     if layout is not None:
         while layout.count():
             item = layout.takeAt(0)
+            if item.spacerItem() is not None:
+                layout.removeItem(item)
+            if item.layout() is not None:
+                delete_all_items_in_layout(item.layout())
+                layout.remove(item)
             widget = item.widget()
             if widget is not None:
-                widget.setParent(None)
                 widget.deleteLater()
-            else:
-                delete_all_items_in_layout(item.layout())
 
 
-def create_default_grid_layout():
+def create_default_grid_layout() -> QGridLayout:
     """
     Create a QGridLayout with default parameters.
 
@@ -72,23 +81,25 @@ def create_default_grid_layout():
     layout : QGridLayout
         The layout.
     """
-    _layout = QtWidgets.QGridLayout()
+    _layout = QGridLayout()
     _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
     _layout.setHorizontalSpacing(5)
     _layout.setVerticalSpacing(5)
     return _layout
 
 
-def get_pyqt_icon_from_str(ref_string):
+def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
     """
     Get a QIcon from the reference string.
 
-    Three types of strings can be processsed:
+    Four types of strings can be processsed:
         1. References to a qtawesome icon. The reference must be preceeded
            by 'qta::'.
         2. A reference number of a QStandardIcon, preceeded by a 'qt-std::'.
         3. A reference to a image file in the file system. This must be
            preceeded by 'path::'.
+        4. A reference to a icon in pydidas.core.icons with the filename preceded
+           by a 'pydidas::'
 
     Parameters
     ----------
@@ -110,9 +121,11 @@ def get_pyqt_icon_from_str(ref_string):
     if _type == "qta":
         _menu_icon = qtawesome.icon(_ref)
     elif _type == "qt-std":
-        _num = int(_ref)
+        _ref = getattr(QStyle, _ref)
         app = QtWidgets.QApplication.instance()
-        _menu_icon = app.style().standardIcon(_num)
+        _menu_icon = app.style().standardIcon(_ref)
+    elif _type == "pydidas":
+        _menu_icon = icons.get_pydidas_qt_icon(_ref)
     elif _type == "path":
         _menu_icon = QtGui.QIcon(_ref)
     else:
@@ -120,7 +133,7 @@ def get_pyqt_icon_from_str(ref_string):
     return _menu_icon
 
 
-def get_max_pixel_width_of_entries(entries):
+def get_max_pixel_width_of_entries(entries: Union[str, tuple, list]) -> int:
     """
     Get the maximum width from a number of entries.
 
@@ -141,11 +154,11 @@ def get_max_pixel_width_of_entries(entries):
 
     font = QtWidgets.QApplication.instance().font()
     metrics = QtGui.QFontMetrics(font)
-    _width = max([metrics.boundingRect(_item).width() for _item in entries])
+    _width = max(metrics.boundingRect(_item).width() for _item in entries)
     return _width
 
 
-def get_widget_layout_args(parent, **kwargs):
+def get_widget_layout_args(parent: QtWidgets.QWidget, **kwargs: dict):
     """
     Get the arguments for adding a widget to the layout of the parent.
 
@@ -187,7 +200,7 @@ def get_widget_layout_args(parent, **kwargs):
     return [*_grid_pos]
 
 
-def get_grid_pos(parent, **kwargs):
+def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: dict):
     """
     Get the gridPos format from the kwargs or create it.
 
@@ -227,4 +240,50 @@ def get_grid_pos(parent, **kwargs):
         )
     if _grid_pos[0] == -1:
         _grid_pos = (_default_row,) + _grid_pos[1:4]
+    if _grid_pos[1] == -1:
+        _grid_pos = (_grid_pos[0], parent.layout().columnCount()) + _grid_pos[2:]
     return _grid_pos
+
+
+def update_param_and_widget_choices(param_widget, new_choices):
+    """
+    Update the choices for the given Parameter and in its widget.
+
+    This function will update the choices and also set the combo box widget to an
+    allowed choice.
+
+    Parameters
+    ----------
+    param_widget : pydidas.widgets.parameter_config.ParameterWidget
+        The pydidas ParameterWidget instance.
+    new_choices : list
+        The list of new choices.
+    """
+    _param = param_widget.param
+    if len(new_choices) == 0:
+        _param.choices = None
+        _param.value = ""
+    else:
+        _param.update_value_and_choices(new_choices[0], new_choices)
+    param_widget.io_widget.setEnabled(len(new_choices) != 0)
+    with QtCore.QSignalBlocker(param_widget.io_widget):
+        if len(new_choices) == 0:
+            param_widget.io_widget.update_choices([""])
+            param_widget.io_widget.setCurrentText("")
+            return
+        param_widget.io_widget.update_choices(new_choices)
+        param_widget.io_widget.setCurrentText(new_choices[0])
+
+
+class BlockUpdates:
+    """Class to block UI updates from a QWidget."""
+
+    def __init__(self, caller):
+        self._caller = caller
+        self._update_status = caller.updatesEnabled()
+
+    def __enter__(self):
+        self._caller.setUpdatesEnabled(False)
+
+    def __exit__(self, type_, value, traceback):
+        self._caller.setUpdatesEnabled(self._update_status)

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,21 +21,22 @@ images with a spline-based distortion field.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["CorrectSplineDistortion"]
 
-import warnings
+
 import os
+import warnings
 from pathlib import Path
 
+import numpy as np
 import pyFAI
 from pyFAI.distortion import Distortion
-import numpy as np
 
-from pydidas.core import ParameterCollection, Parameter, UserConfigError
+from pydidas.core import Dataset, Parameter, ParameterCollection, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.plugins import ProcPlugin
 
@@ -83,7 +86,7 @@ class CorrectSplineDistortion(ProcPlugin):
     plugin_name = "Correct spline distortion"
     basic_plugin = False
     plugin_subtype = PROC_PLUGIN_IMAGE
-    default_params = _SPLINE_PARAMS.get_copy()
+    default_params = _SPLINE_PARAMS.copy()
     input_data_dim = 2
     output_data_dim = 2
     output_data_label = "Distortion-corrected image"
@@ -113,7 +116,7 @@ class CorrectSplineDistortion(ProcPlugin):
             _dummy = self._correction.correct(np.ones(self._detector.max_shape))
             self._nan_mask = np.where(_dummy < 0.8, 1, 0)
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Apply a distortion correction to an image (2d data-array).
 

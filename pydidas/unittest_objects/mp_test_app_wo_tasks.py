@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,22 +21,23 @@ application without tasks in real multiprocessing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["MpTestAppWoTasks"]
+
 
 import time
 
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.core import get_generic_param_collection, BaseApp
+from pydidas.core import BaseApp, get_generic_param_collection
 from pydidas.managers import CompositeImageManager
 
 
-def get_test_image(index, **kwargs):
+def get_test_image(index: int, **kwargs: dict) -> np.ndarray:
     """
     Get a random test image.
 
@@ -72,21 +75,21 @@ class MpTestAppWoTasks(BaseApp):
         super().__init__(*args, **kwargs)
         self.set_default_params()
         self._composite = None
-        self._config = {
-            "n_image": None,
-            "datatype": None,
-            "mp_pre_run_called": False,
-            "mp_post_run_called": False,
-            "calls": 0,
-            "min_index": 0,
-            "max_index": 40,
-        }
+        self._config.update(
+            {
+                "n_image": None,
+                "datatype": None,
+                "mp_post_run_called": False,
+                "calls": 0,
+                "min_index": 0,
+                "max_index": 40,
+            }
+        )
 
     def multiprocessing_pre_run(self):
         """
         The pre-run method sets up the tasks and creates a compositite image.
         """
-        self._config["mp_pre_run_called"] = True
         self._composite = CompositeImageManager(
             image_shape=(20, 20),
             composite_nx=10,
@@ -94,8 +97,9 @@ class MpTestAppWoTasks(BaseApp):
             composite_dir="x",
             datatype=np.float64,
         )
+        self._config["run_prepared"] = True
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> list:
         """
         Get the tasks of the Application.
 
@@ -109,7 +113,7 @@ class MpTestAppWoTasks(BaseApp):
         """
         return []
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Check for carryon calls.
 
@@ -127,7 +131,7 @@ class MpTestAppWoTasks(BaseApp):
             return False
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int) -> tuple[int, np.ndarray]:
         """
         Perform the multiprocessing computation.
 
@@ -140,6 +144,8 @@ class MpTestAppWoTasks(BaseApp):
 
         Returns
         -------
+        index : int
+            The image index,
         image : np.ndarray
             The image data.
         """
@@ -150,7 +156,9 @@ class MpTestAppWoTasks(BaseApp):
         return index, _image
 
     @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, image, *args):
+    def multiprocessing_store_results(
+        self, index: int, image: np.ndarray, *args: tuple
+    ):
         """
         Store the result of the multiprocessing function call.
 

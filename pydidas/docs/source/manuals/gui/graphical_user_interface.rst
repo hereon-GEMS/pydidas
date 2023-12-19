@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 Graphical user interface
 ========================
 
@@ -5,12 +11,12 @@ Graphical user interface
     :depth: 2
     :local:
     :backlinks: none
-    
-The graphical user interface is organized in *Frames* which are independent of 
-each other and which each hold persistent information during each session. 
 
-The individual :ref:`gui_frames` and :ref:`gui_windows` are presented below before 
-:ref:`gui_recipes` are described which give a detailed guide on individual use 
+The graphical user interface is organized in *Frames* which are independent of
+each other and which each hold persistent information during each session.
+
+The individual :ref:`gui_frames` and :ref:`gui_windows` are presented below before
+:ref:`gui_recipes` are described which give a detailed guide on individual use
 cases.
 
 Overview
@@ -23,8 +29,8 @@ The general pydidas GUI layout is shown below:
     :align: center
 
 - The menu
-    The menu bar allows access to global functionality like state import and 
-    export, global and user settings as well as help and bug reporting. The 
+    The menu bar allows access to global functionality like state import and
+    export, global and user settings as well as help and bug reporting. The
     details are described in the :ref:`Menu manual <gui_menu>`.
 - The status & logging area
     This dockable area is used by all frames to send status updates and to
@@ -32,13 +38,13 @@ The general pydidas GUI layout is shown below:
 - The Frame selection toolbar
     This toolbar is used to select which frame to display in the central widget
     of the GUI. Some entries can open a submenu with additional choices.
-    Clicking on the icon will open the frame. Frames are persistent within a 
+    Clicking on the icon will open the frame. Frames are persistent within a
     session and information is stored when switching between different frames.
 - The central frame
     This widget displays the active frame and the main interaction with the user
     happens here.
 
-After starting the GUI, the home frame gives links to the documentation and a 
+After starting the GUI, the home frame gives links to the documentation and a
 very brief reminder how to user the pydidas GUI.
 
 
@@ -49,16 +55,16 @@ The state of the interface, including all configurations of frames and apps, can
 be stored and restored by the user. This is handled in the **File > GUI state**
 menu and details are explained in detail :ref:`Menu manual <gui_menu>`.
 
-This function allows to either store the state in a automatically controlled 
-file in the OS-specific user's application config directory or in a file 
+This function allows to either store the state in a automatically controlled
+file in the OS-specific user's application config directory or in a file
 specified by the user itself. For restoring, similar options exist.
-In addition, pydidas stores the GUI's state when closing the GUI properly (i.e. 
-a regular exit), allowing the user to pick up where they left. 
+In addition, pydidas stores the GUI's state when closing the GUI properly (i.e.
+a regular exit), allowing the user to pick up where they left.
 
 .. note::
     The automatically-controlled files are user-specific and if users log in
     on the same machine using a different user account, the file will not be
-    accessible. 
+    accessible.
 
 
 Generic GUI information
@@ -66,9 +72,10 @@ Generic GUI information
 
 .. toctree::
     :maxdepth: 1
-    
+
     menu
     editing_parameters
+    silx/plots
 
 .. _gui_frames:
 
@@ -79,19 +86,20 @@ Detailed descriptions of the individual frames are given here.
 
 .. toctree::
     :maxdepth: 1
-    
+
     frames/DataBrowsingFrame
     frames/PyfaiCalibFrame
-    frames/CompositeCreatorFrame
     frames/DirectorySpyFrame
-    frames/SetupExperimentFrame
-    frames/SetupScanFrame
+    frames/QuickIntegrationFrame
+    frames/ImageMathFrame
+    frames/DefineDiffractionExpFrame
+    frames/DefineScanFrame
     frames/WorkflowEditFrame
     frames/WorkflowTestFrame
     frames/WorkflowRunFrame
     frames/ViewResultsFrame
     frames/UtilitiesFrame
-    
+
 
 .. _gui_windows:
 
@@ -110,9 +118,16 @@ Detailed information about the individual windows is given here.
     windows/_GlobalSettingsWindow
     windows/TweakPluginParameterWindow
     windows/ShowDetailedPluginResultsWindow
+    windows/ManuallySetBeamcenterWindow
+    windows/SelectIntegrationRegionWindow
+    frames/CompositeCreatorFrame
 
 .. _gui_recipes:
 
 Recipes
 -------
-to be added upon request
+
+.. toctree::
+    :maxdepth: 1
+
+    recipes/pydidas_processing

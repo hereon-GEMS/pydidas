@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 The gui submodule
 ==================
 
@@ -36,8 +42,8 @@ Frames
     gui/frames/data_browsing_frame
     gui/frames/pyfai_calib_frame
     gui/frames/composite_creator_frame
-    gui/frames/setup_experiment_frame
-    gui/frames/setup_scan_frame
+    gui/frames/define_diffraction_exp_frame
+    gui/frames/define_scan_frame
     gui/frames/workflow_edit_frame
     gui/frames/workflow_test_frame
     gui/frames/workflow_run_frame
@@ -50,4 +56,4 @@ Windows
 .. toctree::
     :maxdepth: 3
     
-    gui/windows/global_settings_window
+    widgets/windows/global_settings_window

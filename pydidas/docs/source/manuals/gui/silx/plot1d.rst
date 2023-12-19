@@ -1,5 +1,10 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
 
-Pydidas 1d plot
+Pydidas 1D plot
 ^^^^^^^^^^^^^^^ 
 
 The :py:class:`PydidasPlot1d <pydidas.widgets.silx_plot.PydidasPlot1d>` is a 

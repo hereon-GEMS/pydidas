@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,39 +21,34 @@ and access files based on their index.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["FilelistManager"]
 
-import os
-import re
-import copy
-from pathlib import Path
-from natsort import natsorted
 
-import numpy as np
+import copy
+import os
+from pathlib import Path
+from typing import Union
 
 from ..core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
-from ..core.constants import FILENAME_DELIMITERS
+from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     check_file_exists,
+    get_file_naming_scheme,
     verify_files_in_same_directory,
     verify_files_of_range_are_same_size,
-    get_extension,
 )
 
 
 class FilelistManager(ObjectWithParameterCollection):
     """
-    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
-    <pydidas.core.ObjectWithParameterCollection>`
-
     The FilelistManager creates and manages a file list from which to select
     items for processing.
 
@@ -90,17 +87,18 @@ class FilelistManager(ObjectWithParameterCollection):
         "live_processing", "first_file", "last_file", "file_stepping"
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         """
         Create a FilelistManager instance.
         """
         ObjectWithParameterCollection.__init__(self)
-        self.add_params(*args, **kwargs)
+        self.add_params(*args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         self._config = {"file_list": [], "file_size": None, "n_files": 0}
 
     @property
-    def n_files(self):
+    def n_files(self) -> int:
         """
         Get the number of files.
 
@@ -112,7 +110,7 @@ class FilelistManager(ObjectWithParameterCollection):
         return self._config["n_files"]
 
     @property
-    def filesize(self):
+    def filesize(self) -> float:
         """
         Get the file size of the processed files.
 
@@ -123,7 +121,7 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         return self._config["file_size"]
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the full _config dictionary.
 
@@ -136,53 +134,42 @@ class FilelistManager(ObjectWithParameterCollection):
         return copy.copy(self._config)
 
     def update(
-        self, first_file=None, last_file=None, live_processing=None, file_stepping=None
+        self,
+        first_file: Union[None, str, Path] = None,
+        last_file: Union[None, str, Path] = None,
+        live_processing: Union[None, bool] = None,
+        file_stepping: Union[None, int] = None,
     ):
         """
         Create a filelist with updated parameters.
 
         Parameters
         ----------
-        first_file : Union[str, Path], optional
+        first_file : Union[None, str, Path], optional
             The path to the first file. If None, the stored Parameter for
             'first_file' will be used. The default is None.
-        last_file : Union[str, Path], optional
+        last_file : Union[None, str, Path], optional
             The path to the last file. If None, the stored Parameter for
             'last_file' will be used. The default is None.
-        live_processing : bool, optional
+        live_processing : Union[None. bool], optional
             Flag for live processing (i.e. disable file system checks.)
             If None, the stored Parameter 'live_processing' will be used.
             The default is None.
-        file_stepping : int, optional
+        file_stepping : Union[None, int], optional
             The file stepping number. If None, the stored Parameter
-            'file_stepping' will be used.  The default is None.
+            'file_stepping' will be used. The default is None.
         """
         self._update_params(first_file, last_file, live_processing, file_stepping)
         self._check_files()
         self._create_filelist()
 
-    def _update_params(self, first_file, last_file, live_processing, file_stepping):
-        """
-        Update the internally stored Parameters if new values have been
-        provided.
-
-        Parameters
-        ----------
-        first_file : Union[str, None]
-            The name of the first file. If None, the Parameter value will not
-            be updated.
-        last_file : Union[str, None]
-            The name of the last file. If None, the Parameter value will not
-            be updated.
-        live_processing : Union[bool, None]
-            Flag to enable or disable live processing. If live processing is
-            True, checks for file existance and size will be performed.
-            If None, the Parameter value will not be updated.
-        file_stepping : Union[int, None]
-            The file stepping determined which files will be processed. A value
-            of n means that only every n-th file will be read. If None, the
-            Parameter value will not be updated.
-        """
+    def _update_params(
+        self,
+        first_file: Union[None, str, Path] = None,
+        last_file: Union[None, str, Path] = None,
+        live_processing: Union[None, bool] = None,
+        file_stepping: Union[None, int] = None,
+    ):
         if first_file is not None:
             self.set_param_value("first_file", first_file)
         if last_file is not None:
@@ -194,8 +181,7 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _check_files(self):
         """
-        Check the file names, paths and (for hdf5 images), the size of the
-        dataset with respect to the selected image numbers.
+        Check the file names and paths.
 
         Raises
         ------
@@ -206,12 +192,22 @@ class FilelistManager(ObjectWithParameterCollection):
         verify_files_in_same_directory(
             self.get_param_value("first_file"), self.get_param_value("last_file")
         )
+        if (
+            self.get_param_value("first_file").suffix
+            != self.get_param_value("last_file").suffix
+            and self.get_param_value("last_file") != Path()
+        ):
+            raise UserConfigError(
+                "The selected files do not have the same extension. Please check the "
+                "selection."
+            )
 
     def _create_filelist(self):
         """
-        Create a list of files to be processed. This method will select the
-        required method based on the live_processing settings and the number
-        of selected files.
+        Create a list of files to be processed.
+
+        This method will select the required method based on the live_processing
+        settings and the number of selected files.
         """
         if self._check_only_first_file_selected():
             self._create_one_file_list()
@@ -223,18 +219,14 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _check_only_first_file_selected(self):
         """
-        Check whether a second file has been selected or the selection is
-        empty.
+        Check whether a second file has been selected or the selection is empty.
 
         Returns
         -------
         bool
             Flag whether only the first file points to a valid path.
         """
-        _path2, _fname2 = os.path.split(self.get_param_value("last_file"))
-        if _path2 == "":
-            return True
-        return False
+        return self.get_param_value("last_file").parent == Path()
 
     def _create_one_file_list(self):
         """
@@ -247,28 +239,29 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _create_filelist_static(self):
         """
-        Create the list of files for static processing,
+        Create the list of files for static processing.
 
         The list of files to be processed is created based on the filenames
         of the first and last files. The directory content will be sorted
         and the first and last files names will be used to select the part
         of filesnames to be stored.
         """
-        _path1, _fname1 = os.path.split(self.get_param_value("first_file"))
-        _, _fname2 = os.path.split(self.get_param_value("last_file"))
-        _list = natsorted(os.listdir(_path1))
-        if _fname2 not in _list:
+        _file1 = self.get_param_value("first_file")
+        _file2 = self.get_param_value("last_file")
+        _list = sorted(_file1.parent.rglob(f"*{_file1.suffix}"))
+        if _file2 not in _list:
             raise UserConfigError(
-                f"No file with the selected name {_fname2} exists in the directory "
-                f"{_path1}."
+                f"No file with the selected name {_file2.name} exists in the directory "
+                f"{_file1.parent}."
             )
-        _i1 = _list.index(_fname1)
-        _i2 = _list.index(_fname2)
+        _i1 = _list.index(_file1)
+        _i2 = _list.index(_file2)
         _list = _list[_i1 : _i2 + 1 : self.get_param_value("file_stepping")]
-        verify_files_of_range_are_same_size(_path1, _list)
-        self._config["file_list"] = [Path(os.path.join(_path1, f)) for f in _list]
+        if not _file1.suffix[1:] in HDF5_EXTENSIONS:
+            verify_files_of_range_are_same_size(_list)
+        self._config["file_list"] = _list
         self._config["n_files"] = len(_list)
-        self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
+        self._config["file_size"] = os.stat(_file1).st_size
 
     def _create_filelist_live_processing(self):
         """
@@ -277,67 +270,14 @@ class FilelistManager(ObjectWithParameterCollection):
         This method will filter the compare the names of the first and last
         file and try to interprete the selected range.
         """
-        _fnames, _range = self._get_live_processing_naming_scheme()
+        _fnames, _range = get_file_naming_scheme(
+            self.get_param_value("first_file"), self.get_param_value("last_file")
+        )
         self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
         self._config["file_list"] = [Path(_fnames.format(index=i)) for i in _range]
         self._config["n_files"] = len(_range)
 
-    def _get_live_processing_naming_scheme(self):
-        """
-        Get the naming scheme for live processing files.
-
-        This method tries to find the single difference in the filenames and
-        builds a formattable string from it.
-
-        Returns
-        -------
-        fnames : str
-            The formattable string (keyword "index") to get the file name.
-        range : range
-            The range iteratable which points to all file names.
-        """
-
-        def raise_error():
-            raise UserConfigError(
-                "Could not interprete the filenames. The filenames do not "
-                "differ in exactly one item, as determined by the delimiters."
-                f'Delimiters considered are: {FILENAME_DELIMITERS.split("|")}'
-            )
-
-        _path1, _fname1 = os.path.split(self.get_param_value("first_file"))
-        _fname2 = os.path.split(self.get_param_value("last_file"))[1]
-        _items1 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname1)[0])
-        _items2 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname2)[0])
-        if len(_items1) != len(_items2) or get_extension(_fname1) != get_extension(
-            _fname2
-        ):
-            raise_error()
-        diff_index = []
-        for index, item in enumerate(_items1):
-            item2 = _items2[index]
-            if item != item2 and len(item) == len(item2):
-                diff_index.append(index)
-        if len(diff_index) != 1:
-            raise_error()
-        diff_index = diff_index[0]
-        _n = len(_items1[diff_index])
-        _strindex = int(
-            np.sum(np.r_[[len(_items1[index]) + 1 for index in range(diff_index)]])
-        )
-        _fnames = (
-            _path1
-            + os.sep
-            + _fname1[:_strindex]
-            + "{index:0"
-            + f"{_n}"
-            + "d}"
-            + _fname1[_strindex + _n :]
-        )
-        _index1 = int(_items1[diff_index])
-        _index2 = int(_items2[diff_index])
-        return _fnames, range(_index1, _index2 + 1)
-
-    def get_filename(self, index):
+    def get_filename(self, index: int) -> Path:
         """
         Get the filename of the image file numbered with index.
 

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,10 +20,10 @@ Module with utility functions required for the Dataset class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "update_dataset_properties_from_kwargs",
     "dataset_property_default_val",
@@ -37,14 +39,17 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from numbers import Integral
-
+from typing import List, Literal, NewType, Tuple, Union
 
 import numpy as np
 
 from ..exceptions import PydidasConfigError
 
 
-def update_dataset_properties_from_kwargs(obj, kwargs):
+Dataset = NewType("Dataset", np.ndarray)
+
+
+def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset:
     """
     Update the required properties for the Dataset from the given keyword arguments.
 
@@ -71,7 +76,7 @@ def update_dataset_properties_from_kwargs(obj, kwargs):
     return obj
 
 
-def dataset_property_default_val(entry):
+def dataset_property_default_val(entry: str) -> Union[dict, str, tuple]:
     """
     Generate default values for the properties in a Dataset.
 
@@ -96,7 +101,7 @@ def dataset_property_default_val(entry):
     raise ValueError(f"No default available for '{entry}'.")
 
 
-def dataset_ax_str_default(ndim):
+def dataset_ax_str_default(ndim: int) -> dict:
     """
     Generate default values for the string-based axis properties in a Dataset.
 
@@ -114,7 +119,7 @@ def dataset_ax_str_default(ndim):
     return {i: "" for i in range(ndim)}
 
 
-def dataset_ax_default_ranges(shape):
+def dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
     """
     Generate default values for the axis ranges in a Dataset.
 
@@ -134,7 +139,7 @@ def dataset_ax_default_ranges(shape):
     return {index: np.arange(length) for index, length in enumerate(shape)}
 
 
-def get_number_of_entries(obj):
+def get_number_of_entries(obj: object) -> int:
     """
     Get the number of entries / items of an object.
 
@@ -142,7 +147,7 @@ def get_number_of_entries(obj):
 
     Parameters
     ----------
-    obj : type
+    obj : object
         The object to be analyzed.
 
     Raises
@@ -164,14 +169,17 @@ def get_number_of_entries(obj):
     raise TypeError(f"Cannot calculate the number of entries for type {type(obj)}.")
 
 
-def get_axis_item_representation(key, item, use_key=True):
+def get_axis_item_representation(
+    key: Literal["axis_labels", "axis_ranges", "axis_units"],
+    item: object,
+    use_key: bool = True,
+) -> List[str]:
     """
-    Get a string representation for a dictionary item of 'axis_labels',
-    'axis_ranges' or 'axis_units'
+    Get a string representation for a dictionary item.
 
     Parameters
     ----------
-    key : str
+    key : Literal['axis_labels', 'axis_ranges', 'axis_units']
         The key (i.e. reference name) for the item.
     item : object
         The item to be represented as a string.
@@ -202,8 +210,11 @@ def get_axis_item_representation(key, item, use_key=True):
 
 
 def convert_data_to_dict(
-    data, target_shape, entry_type="str", calling_method_name="undefined method"
-):
+    data: Union[dict, Iterable[float, ...]],
+    target_shape: Tuple[int],
+    entry_type: Literal["str", "array"] = "str",
+    calling_method_name: str = "undefined method",
+) -> dict:
     """
     Get an ordered dictionary with the axis keys for the input data.
 
@@ -213,9 +224,9 @@ def convert_data_to_dict(
 
     Parameters
     ----------
-    data : Union[dict, Iterable]
+    data : Union[dict, Iterable[float, ...]]
         The keys for the axis meta data.
-    target_shape: tuple
+    target_shape: Tuple[int]
         The shape of the target Dataset. This number is needed to sanity-check that
         the input has the correct length.
     entry_type : str, optional
@@ -261,14 +272,14 @@ def convert_data_to_dict(
     )
 
 
-def item_is_iterable_but_not_array(item):
+def item_is_iterable_but_not_array(item: object) -> bool:
     """
     Check whether an item is iterable (ignoring strings) but not an array.
 
     Parameters
     ----------
-    item : type
-        Any object
+    item : object
+        Any object.
 
     Returns
     -------

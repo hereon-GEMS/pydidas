@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,16 +21,21 @@ a header.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
+
+
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 
-from ...core.constants import BINARY_EXTENSIONS
 from ...core import Dataset
+from ...core.constants import BINARY_EXTENSIONS
+from ...core.utils import CatchFileErrors
 from .io_base import IoBase
 
 
@@ -41,7 +48,13 @@ class RawIo(IoBase):
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
-    def import_from_file(cls, filename, datatype=None, shape=(), **kwargs):
+    def import_from_file(
+        cls,
+        filename: Union[Path, str],
+        datatype: Union[None, type],
+        shape: tuple = (),
+        **kwargs: dict,
+    ) -> Dataset:
         """
         Read data from a raw binary data without a header.
 
@@ -76,15 +89,20 @@ class RawIo(IoBase):
         """
         if datatype is None:
             raise KeyError("The datatype has not been specified.")
-
-        _data = np.fromfile(filename, dtype=datatype)
+        with CatchFileErrors(filename):
+            _data = np.fromfile(filename, dtype=datatype)
         if _data.size != np.prod(shape):
-            raise ValueError("The given shape does not match the data size.")
+            cls.raise_filereaderror_from_exception(
+                ValueError("The given shape does not match the data size."),
+                str(filename),
+            )
         cls._data = Dataset(_data.reshape(shape))
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(cls, filename, data, **kwargs):
+    def export_to_file(
+        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
+    ):
         """
         Export data to raw binary file without a header.
 

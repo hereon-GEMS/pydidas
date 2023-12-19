@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,13 +21,14 @@ a registry of classes for a specific application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GenericIoMeta"]
 
 
+from ..exceptions import UserConfigError
 from ..utils.file_utils import get_extension
 
 
@@ -112,8 +115,9 @@ class GenericIoMeta(type):
             If the extension is not registered.
         """
         if not cls.is_extension_registered(ext):
-            raise KeyError(
-                f'The extension "{ext}" is not registered with ' "the MetaClass."
+            _name = cls.__name__[:-6]
+            raise UserConfigError(
+                f'The extension "{ext}" is not a registered extension for {_name}.'
             )
 
     @classmethod
@@ -201,11 +205,6 @@ class GenericIoMeta(type):
         ----------
         filename : str
             The full filename and path.
-
-        Returns
-        -------
-        pydidas.workflow.WorkflowTree
-            The new WorkflowTree instance.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)

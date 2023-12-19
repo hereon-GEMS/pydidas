@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,14 +18,15 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
 import copy
+import unittest
+from unittest import mock
 
 import numpy as np
 
@@ -148,6 +151,24 @@ class TestGenericNode(unittest.TestCase):
         obj._children = [1, 2, 3]
         self.assertFalse(obj.is_leaf)
 
+    def test_add_child__with_previous_parent(self):
+        obj = GenericNode()
+        old_parent = GenericNode()
+        new_parent = GenericNode()
+        old_parent.add_child(obj)
+        new_parent.add_child(obj)
+        self.assertEqual(old_parent.get_children(), [])
+        self.assertEqual(obj.parent, new_parent)
+        self.assertIn(obj, new_parent.get_children())
+
+    def test_add_child__same_parent(self):
+        obj = GenericNode()
+        _parent = GenericNode()
+        _parent.add_child(obj)
+        _parent.add_child(obj)
+        self.assertEqual(obj.parent, _parent)
+        self.assertIn(obj, _parent.get_children())
+
     def test_n_children__empty(self):
         obj = GenericNode()
         self.assertEqual(obj.n_children, 0)
@@ -239,13 +260,21 @@ class TestGenericNode(unittest.TestCase):
 
     def test_connect_parent_to_children__no_parent_no_children(self):
         root = GenericNode(node_id=0)
-        root._parent = unittest.mock.MagicMock()
+        root._parent = mock.MagicMock()
         root.connect_parent_to_children()
         self.assertIsNone(root.parent)
 
     def test_connect_parent_to_children__no_parent(self):
         root = GenericNode(node_id=0)
+        _child = GenericNode(node_id=1, parent=root)
+        root.connect_parent_to_children()
+        self.assertIsNone(_child.parent)
+        self.assertEqual(root.get_children(), [])
+
+    def test_connect_parent_to_children__no_parent_multie_children(self):
+        root = GenericNode(node_id=0)
         _ = GenericNode(node_id=1, parent=root)
+        _ = GenericNode(node_id=2, parent=root)
         with self.assertRaises(UserConfigError):
             root.connect_parent_to_children()
 
@@ -324,14 +353,6 @@ class TestGenericNode(unittest.TestCase):
         self.assertNotEqual(root, root_copy)
         self.assertNotEqual(root._children, root_copy._children)
 
-    def test_get_copy(self):
-        root = GenericNode(node_id=0)
-        GenericNode(node_id=1, parent=root)
-        GenericNode(node_id=2, parent=root)
-        root_copy = root.get_copy()
-        self.assertNotEqual(root, root_copy)
-        self.assertNotEqual(root._children, root_copy._children)
-
     def test_copy__with_parent(self):
         root = GenericNode(node_id=0)
         node = GenericNode(node_id=1, parent=root)
@@ -341,6 +362,28 @@ class TestGenericNode(unittest.TestCase):
         self.assertNotEqual(node, node_copy)
         self.assertEqual(node._parent, node_copy._parent)
         self.assertFalse(node3 in node_copy._children)
+
+    def test_copy__with_children(self):
+        root = GenericNode(node_id=0)
+        _node1 = GenericNode(node_id=1, parent=root)
+        _node2 = GenericNode(node_id=2, parent=root)
+        node_copy = copy.copy(root)
+        self.assertNotEqual(root, node_copy)
+        self.assertEqual(len(node_copy.get_children()), 2)
+        self.assertEqual(len(root.get_children()), 2)
+        for _node in [_node1, _node2]:
+            self.assertFalse(_node in node_copy._children)
+
+    def test_copy__with_recursive_children(self):
+        root = GenericNode(node_id=0)
+        _node1 = GenericNode(node_id=1, parent=root)
+        _node2 = GenericNode(node_id=2, parent=root)
+        _ = GenericNode(node_id=3, parent=_node1)
+        _ = GenericNode(node_id=4, parent=_node2)
+        node_copy = copy.copy(root)
+        self.assertNotEqual(root, node_copy)
+        self.assertEqual(len(node_copy.get_children()), 2)
+        self.assertEqual(len(root.get_children()), 2)
 
     def test_hash__simple_node(self):
         node = GenericNode(node_id=0)

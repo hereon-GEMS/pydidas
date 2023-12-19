@@ -1,5 +1,13 @@
-The Run full workflow frame
-===========================
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+.. _workflow_run_frame:
+
+Run full workflow frame
+=======================
 
 .. contents::
     :depth: 2
@@ -85,7 +93,14 @@ processes and - depending on the type of calculations - may take a while to take
 effect because the current process might not accept the termination signal 
 until it starts a new job.
 
+Workflow result selection
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. include:: ./workflow_result_selection.rst
+
+
+Export of results
+^^^^^^^^^^^^^^^^^
 
 .. include:: ./workflow_result_export.rst
 
@@ -95,4 +110,3 @@ Data display
 .. include:: ../silx/plot1d.rst
 
 .. include:: ../silx/plot2d.rst
-

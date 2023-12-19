@@ -1,15 +1,17 @@
 # This file is part of pydidas.
-
+#
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# Pydidas is distributed in the hope that it oowill be useful,
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -19,28 +21,28 @@ structure.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GenericNode"]
 
 import copy
 from numbers import Integral
+from typing import List, Self, Union
+
+from qtpy import QtCore
 
 from ..core import UserConfigError
 
 
 class GenericNode:
-    """
-    The GenericNode class is used by trees to manage connections between
-    items.
-    """
+    """The GenericNode class is used by trees to manage connections between items."""
 
     kwargs_for_copy_creation = []
 
     @staticmethod
-    def _verify_type(item, allowNone=False):
+    def _verify_type(item: object, allowNone: bool = False):
         """
         Check that an item is of type class and raise a TypeError if not.
 
@@ -64,17 +66,16 @@ class GenericNode:
                 "GenericNode (or subclasses)."
             )
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         """
         Setup the generic node.
 
-        Any keywords will be stored as class attributes. This behaviour is
-        motivated by the requirements of subclasses with specific calling
-        arguments.
+        Any keywords will be stored as class attributes. This behaviour is motivated
+        by the requirements of subclasses with specific calling arguments.
 
         Parameters
         ----------
-        **kwargs : type
+        **kwargs : dict
             Any keywords required for this node.
         """
         self._parent = None
@@ -83,7 +84,7 @@ class GenericNode:
             setattr(self, _key, _value)
         self._children = []
 
-    def add_child(self, child):
+    def add_child(self, child: Self):
         """
         Add a child to the node.
 
@@ -95,14 +96,12 @@ class GenericNode:
             The child object to be registered.
         """
         self._verify_type(child)
-        # need to use the child's private _parent variable to prevent
-        # recursive calls between child and parent:
-        child._parent = self
         if child not in self._children:
             self._children.append(child)
+        child.parent = self
 
     @property
-    def node_id(self):
+    def node_id(self) -> Union[None, int]:
         """
         Get the node_id.
 
@@ -114,7 +113,7 @@ class GenericNode:
         return self._node_id
 
     @node_id.setter
-    def node_id(self, new_id):
+    def node_id(self, new_id: Union[None, int]):
         """
         Set the node_id.
 
@@ -136,7 +135,7 @@ class GenericNode:
         )
 
     @property
-    def parent_id(self):
+    def parent_id(self) -> Union[None, int]:
         """
         Get the parent's node ID.
 
@@ -150,7 +149,7 @@ class GenericNode:
         return self.parent.node_id
 
     @property
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         """
         Check if node has children.
 
@@ -167,7 +166,7 @@ class GenericNode:
         return True
 
     @property
-    def n_children(self):
+    def n_children(self) -> int:
         """
         Get the number of children.
 
@@ -182,7 +181,7 @@ class GenericNode:
         return len(self._children)
 
     @property
-    def parent(self):
+    def parent(self) -> Union[None, Self]:
         """
         Get the node's parent.
 
@@ -194,7 +193,7 @@ class GenericNode:
         return self._parent
 
     @parent.setter
-    def parent(self, parent):
+    def parent(self, parent: Union[None, Self]):
         """
         Set the node's parent.
 
@@ -205,14 +204,16 @@ class GenericNode:
         parent : pydidas.workflow.GenericNode
             The parent object
         """
+        if parent == self._parent:
+            return
         self._verify_type(parent, allowNone=True)
-        if self._parent is not None:
-            self._parent.remove_child_reference(self)
+        if self.parent is not None:
+            self.parent.remove_child_reference(self)
+        self._parent = parent
         if parent is not None:
             parent.add_child(self)
-        self._parent = parent
 
-    def get_children(self):
+    def get_children(self) -> list:
         """
         Get the child objects.
 
@@ -225,7 +226,7 @@ class GenericNode:
         """
         return self._children
 
-    def get_recursive_connections(self):
+    def get_recursive_connections(self) -> List[int]:
         """
         Get recursive connections between the node and all children.
 
@@ -245,7 +246,7 @@ class GenericNode:
             conns += child.get_recursive_connections()
         return conns
 
-    def get_recursive_ids(self):
+    def get_recursive_ids(self) -> List[int]:
         """
         Get the node ids of the node and all children in its branch.
 
@@ -263,10 +264,9 @@ class GenericNode:
             res += child.get_recursive_ids()
         return res
 
-    def delete_node_references(self, recursive=True):
+    def delete_node_references(self, recursive: bool = True):
         """
-        Delete all references to the node from its parent and children and
-        unreference all children.
+        Delete all references to the node from its parent and children.
 
         If the node has a parent, the reference to itself is removed from the
         parent. If the node has children, references to these children are
@@ -297,24 +297,29 @@ class GenericNode:
 
     def connect_parent_to_children(self):
         """
-        Connect the own parent to the children.
+        Connect the node's parent to the node's children.
 
         Raises
         ------
         UserConfigError
-            If the node does not have a parent.
+            If the node does not have a parent and multiple children.
         """
-        if self.parent is None and len(self._children) > 0:
+        if self.parent is None and len(self._children) > 1:
             raise UserConfigError(
                 "Cannot delete the node and connect its parent and children because "
-                "the node does not have a parent."
+                "the node does not have a parent and the new tree would have multiple "
+                "roots."
             )
-        for _child in self._children:
-            self.parent.add_child(_child)
+        if self.parent is None:
+            for _child in self._children:
+                _child.parent = None
+        else:
+            for _child in self._children[:]:
+                self.parent.add_child(_child)
         self._children = []
         self.parent = None
 
-    def remove_child_reference(self, child):
+    def remove_child_reference(self, child: Self):
         """
         Remove reference to an object from the node.
 
@@ -338,7 +343,7 @@ class GenericNode:
             raise ValueError("Instance is not a child!")
         self._children.remove(child)
 
-    def change_node_parent(self, new_parent):
+    def change_node_parent(self, new_parent: Self):
         """
         Change the parent of the selected node.
 
@@ -357,10 +362,10 @@ class GenericNode:
             )
         if self._parent is not None:
             self._parent.remove_child_reference(self)
-        new_parent.add_child(self)
         self._parent = new_parent
+        new_parent.add_child(self)
 
-    def get_copy(self):
+    def copy(self) -> Self:
         """
         Get a copy of the Node.
 
@@ -369,9 +374,11 @@ class GenericNode:
         pydidas.workflow.GenericNode
             The nodes's copy.
         """
-        return self.__copy__()
+        return copy.copy(self)
 
-    def __copy__(self):
+    deepcopy = copy
+
+    def __copy__(self) -> Self:
         """
         Copy the generic node including any children.
 
@@ -382,16 +389,30 @@ class GenericNode:
         """
         kwargs = {arg: getattr(self, arg) for arg in self.kwargs_for_copy_creation}
         _copy = self.__class__(**kwargs)
-        for _key in set(self.__dict__.keys()) - {"_children", "_parent"}:
-            _copy.__dict__[_key] = copy.copy(self.__dict__[_key])
+        _copy.__dict__ = {
+            _key: copy.copy(_value)
+            for _key, _value in self.__dict__.items()
+            if not (
+                isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
+                or _key in ["_children", "_parent"]
+            )
+        }
         _copy._children = []
-        _copy._parent = self.parent
+        _copy._parent = None
+        if self.parent is not None:
+            self.parent.add_child(_copy)
         for _child in self._children:
             _child_copy = copy.copy(_child)
             _copy.add_child(_child_copy)
         return _copy
 
-    def __hash__(self):
+    def __deepcopy__(self, memo: dict) -> Self:
+        """
+        Overwrite generic deepcopy with copy.
+        """
+        return self.__copy__()
+
+    def __hash__(self) -> int:
         """
         Get a hash value for the GenericNode.
 

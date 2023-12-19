@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,30 +18,28 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import os
 import shutil
-import unittest
 import tempfile
+import unittest
 
 import numpy as np
 
-from pydidas.core import Dataset
-from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.experiment import SetupScan
-from pydidas.workflow.result_io import (
-    WorkflowResultIoBase,
-    WorkflowResultIoMeta,
-)
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.core import Dataset, UserConfigError
+from pydidas.workflow import WorkflowResults, WorkflowTree
+from pydidas.workflow.result_io import WorkflowResultIoBase, WorkflowResultIoMeta
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
+EXP = DiffractionExperimentContext()
+SCAN = ScanContext()
 RESULTS = WorkflowResults()
 META = WorkflowResultIoMeta
 
@@ -52,14 +52,24 @@ def export_frame_to_file(saver, index, frame_result_dict, **kwargs):
     }
 
 
-def export_full_data_to_file(saver, full_data):
+def export_full_data_to_file(saver, full_data, scan):
     saver._exported = {"full_data": full_data}
 
 
-def prepare_files_and_directories(saver, save_dir, node_info):
+def prepare_files_and_directories(
+    saver,
+    save_dir,
+    node_info,
+    scan_context=None,
+    diffraction_exp_context=None,
+    workflow_tree=None,
+):
     saver._prepared = {
         "save_dir": save_dir,
         "node_info": node_info,
+        "scan": scan_context,
+        "exp": diffraction_exp_context,
+        "tree": workflow_tree,
     }
 
 
@@ -86,11 +96,10 @@ def import_results(saver, fname):
             "node_label": "HAM and EGGS",
         },
     }
-    _scan = {"key": 1, "ham": "eggs"}
-    return _data[_id], _node_info[_id], _scan
+    return _data[_id], _node_info[_id], SCAN, EXP, TREE
 
 
-def update_frame_metadata(saver, metadata):
+def update_frame_metadata(saver, metadata, scan):
     saver._metadata = metadata
 
 
@@ -179,7 +188,7 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
 
     def test_set_active_savers_and_title__not_registered(self):
         self.create_saver_class("SAVER", ".Test")
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             META.set_active_savers_and_title(["TEST", "TEST2"])
 
     def test_export_frame_to_file(self):
@@ -255,28 +264,15 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
         self.assertEqual(_Saver._prepared["save_dir"], _save_dir)
         self.assertEqual(_Saver._prepared["node_info"], _node_info)
 
-    def test_prepare_saver(self):
-        _save_dir, _node_info = self.get_save_dir_and_node_info()
-        _Saver = self.create_saver_class("SAVER", "Test")
-        _Saver.prepare_files_and_directories = classmethod(
-            prepare_files_and_directories
-        )
-        META.prepare_saver("TEST", _save_dir, _node_info)
-        self.assertEqual(_Saver._prepared["save_dir"], _save_dir)
-        self.assertEqual(_Saver._prepared["node_info"], _node_info)
-
-    def test_prepare_saver__no_such_saver(self):
-        _save_dir, _node_info = self.get_save_dir_and_node_info()
-        with self.assertRaises(KeyError):
-            META.prepare_saver("TEST", _save_dir, _node_info)
-
     def test_import_data_from_directory(self):
         _Saver = self.create_saver_class("SAVER", "Test")
         _Saver.import_results_from_file = classmethod(import_results)
         for _id in [1, 3]:
             with open(os.path.join(self._dir, f"node_{_id:02d}.TEST"), "w") as _file:
                 _file.write("dummy")
-        _data, _node_info, _scan = META.import_data_from_directory(self._dir)
+        _data, _node_info, _scan, exp, _tree = META.import_data_from_directory(
+            self._dir
+        )
         for _id in [1, 3]:
             self.assertTrue(
                 np.allclose(

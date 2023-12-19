@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,34 +16,35 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the CompositeCreatorApp class which allows to combine
-images to mosaics.
+Module with the CompositeCreatorApp class which allows to combine images to mosaics.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["CompositeCreatorApp"]
+
 
 import os
 import time
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore
 
-from ..core import Dataset, UserConfigError, get_generic_param_collection, BaseApp
+from ..core import BaseApp, Dataset, UserConfigError, get_generic_param_collection
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     check_file_exists,
     check_hdf5_key_exists_in_file,
     copy_docstring,
-    rebin2d,
     get_extension,
+    rebin2d,
 )
 from ..data_io import import_data
-from ..managers import FilelistManager, ImageMetadataManager, CompositeImageManager
+from ..managers import CompositeImageManager, FilelistManager, ImageMetadataManager
 from .parsers import composite_creator_app_parser
 
 
@@ -58,7 +61,9 @@ COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(
     "bg_file",
     "bg_hdf5_key",
     "bg_hdf5_frame",
-    "use_global_det_mask",
+    "use_detector_mask",
+    "detector_mask_file",
+    "detector_mask_val",
     "use_roi",
     "roi_xlow",
     "roi_xhigh",
@@ -79,8 +84,7 @@ COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(
 
 class CompositeCreatorApp(BaseApp):
     """
-    The CompositeCreatorApp can compose mosaic images of a large number of
-    individual image files.
+    Compose mosaic images of a large number of individual image files.
 
     Parameters can be passed either through the argparse module during
     command line calls or through keyword arguments in scripts.
@@ -151,7 +155,6 @@ class CompositeCreatorApp(BaseApp):
         self._config = {
             "current_fname": None,
             "current_kwargs": {},
-            "det_mask_val": None,
         }
 
     def multiprocessing_pre_run(self):
@@ -159,13 +162,9 @@ class CompositeCreatorApp(BaseApp):
         Perform operations prior to running main parallel processing function.
         """
         self.prepare_run()
-        self._config["mp_pre_run_called"] = True
         _ntotal = self._image_metadata.images_per_file * self._filelist.n_files
         self._config["mp_tasks"] = range(_ntotal)
-        self._config["det_mask_val"] = float(
-            self.q_settings_get_value("user/det_mask_val")
-        )
-        self._det_mask = self.__get_detector_mask()
+        self._store_detector_mask()
 
     def prepare_run(self):
         """
@@ -200,24 +199,22 @@ class CompositeCreatorApp(BaseApp):
             return
         self.__update_composite_image_params()
         self.__check_and_store_thresholds()
+        self._config["run_prepared"] = True
 
-    def __get_detector_mask(self):
+    def _store_detector_mask(self):
         """
-        Get the detector mask from the file specified in the global QSettings.
-
-        Returns
-        -------
-        _mask : Union[None, np.ndarray]
-            If the mask could be loaded from a numpy file, return the mask.
-            Else, None is returned.
+        Get the detector mask, if used, based on the given Parameters.
         """
-        if not self.get_param_value("use_global_det_mask"):
-            return None
-        _maskfile = self.q_settings_get_value("user/det_mask")
+        if not self.get_param_value("use_detector_mask"):
+            self._det_mask = None
+            return
+        _mask_file = self.get_param_value("detector_mask_file")
         try:
-            _mask = np.load(_maskfile)
-        except (FileNotFoundError, ValueError):
-            return None
+            _mask = np.load(_mask_file)
+        except (FileNotFoundError, ValueError, PermissionError):
+            self.set_param_value("use_detector_mask", False)
+            self._det_mask = None
+            return
         if self._image_metadata.roi is not None:
             _mask = _mask[self._image_metadata.roi]
         _bin = self.get_param_value("binning")
@@ -225,7 +222,7 @@ class CompositeCreatorApp(BaseApp):
             _mask = rebin2d(_mask, _bin)
             _mask = np.where(_mask > 0, 1, 0)
             _mask = _mask.astype(np.bool_)
-        return _mask
+        self._det_mask = _mask
 
     def __verify_number_of_images_fits_composite(self):
         """
@@ -254,8 +251,8 @@ class CompositeCreatorApp(BaseApp):
             )
         if (_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal:
             raise UserConfigError(
-                "The selected composite dimensions are too large for all"
-                f" images. (nx={_nx}, ny={_ny}, n={_ntotal})"
+                "The selected composite dimensions are too large for all "
+                f"images. (nx={_nx}, ny={_ny}, n={_ntotal})"
             )
 
     def _check_and_set_bg_file(self):
@@ -314,7 +311,7 @@ class CompositeCreatorApp(BaseApp):
                 "threshold_high", self.get_param_value("threshold_high")
             )
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> np.ndarray:
         """
         Return all tasks required in multiprocessing.
         """
@@ -325,7 +322,7 @@ class CompositeCreatorApp(BaseApp):
             )
         return self._config["mp_tasks"]
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Run preparatory functions in the cycle prior to the main function.
 
@@ -336,10 +333,9 @@ class CompositeCreatorApp(BaseApp):
         """
         self._store_args_for_read_image(index)
 
-    def _store_args_for_read_image(self, index):
+    def _store_args_for_read_image(self, index: int):
         """
-        Create the required kwargs to pass to the read_image function and store
-        them internally.
+        Create the required kwargs to pass to the read_image function.
 
         Parameters
         ----------
@@ -363,7 +359,7 @@ class CompositeCreatorApp(BaseApp):
         self._config["current_fname"] = _fname
         self._config["current_kwargs"] = _params
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Get the flag value whether to carry on processing.
 
@@ -380,7 +376,7 @@ class CompositeCreatorApp(BaseApp):
             return self._image_exists_check(self._config["current_fname"], timeout=0.02)
         return True
 
-    def _image_exists_check(self, fname, timeout=-1):
+    def _image_exists_check(self, fname: str, timeout: float = -1) -> True:
         """
         Wait for the file to exist in the file system.
 
@@ -409,9 +405,14 @@ class CompositeCreatorApp(BaseApp):
                 return False
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int) -> Dataset:
         """
         Perform key operation with parallel processing.
+
+        Parameters
+        ----------
+        index : int
+            The image frame index.
 
         Returns
         -------
@@ -424,7 +425,7 @@ class CompositeCreatorApp(BaseApp):
         _image = self.__apply_mask(_image)
         return _image
 
-    def __apply_mask(self, image):
+    def __apply_mask(self, image: Union[np.ndarray, Dataset]) -> np.ndarray:
         """
         Apply the detector mask to the image.
 
@@ -440,15 +441,13 @@ class CompositeCreatorApp(BaseApp):
         """
         if self._det_mask is None:
             return image
-        if self._config["det_mask_val"] is None:
+        _mask_val = self.get_param_value("detector_mask_val")
+        if _mask_val is None:
             raise UserConfigError("No numerical value has been defined for the mask!")
-        return Dataset(
-            np.where(self._det_mask, self._config["det_mask_val"], image),
-            axis_ranges=image.axis_ranges,
-            axis_labels=image.axis_labels,
-            axis_units=image.axis_units,
-            metadata=image.metadata,
-        )
+        _masked_image = np.where(self._det_mask, _mask_val, image)
+        if isinstance(image, Dataset):
+            return Dataset(_masked_image, **image.property_dict)
+        return _masked_image
 
     def multiprocessing_post_run(self):
         """
@@ -458,9 +457,9 @@ class CompositeCreatorApp(BaseApp):
             self.apply_thresholds()
 
     @copy_docstring(CompositeImageManager)
-    def apply_thresholds(self, **kwargs):
+    def apply_thresholds(self, **kwargs: dict):
         """
-        Please refer to pydidas.managers.CompositeImageManager docstring.
+        Refer to the pydidas.managers.CompositeImageManager docstring.
         """
         if (
             self.get_param_value("use_thresholds")
@@ -476,8 +475,8 @@ class CompositeCreatorApp(BaseApp):
                 high=self.get_param_value("threshold_high"),
             )
 
-    @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, image, *args):
+    @QtCore.Slot(object, object)
+    def multiprocessing_store_results(self, index: int, image: np.ndarray):
         """
         Store the results of the multiprocessing operation.
 
@@ -495,7 +494,7 @@ class CompositeCreatorApp(BaseApp):
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
 
-    def export_image(self, output_fname, **kwargs):
+    def export_image(self, output_fname: str, **kwargs: dict):
         """
         Export the composite image to a file.
 
@@ -513,7 +512,7 @@ class CompositeCreatorApp(BaseApp):
         self._composite.export(output_fname, **kwargs)
 
     @property
-    def composite(self):
+    def composite(self) -> Union[None, np.ndarray]:
         """
         Get the composite image.
 

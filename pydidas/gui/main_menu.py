@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,50 +21,54 @@ manages the pydidas GUI menu.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["MainMenu"]
+
 
 import os
 import sys
 from functools import partial
+from pathlib import Path
+from typing import Union
 
 import yaml
-from qtpy import QtWidgets, QtGui, QtCore
+from qtpy import QtCore, QtGui, QtWidgets
 
-from ..core import PydidasGuiError, UserConfigError
+from ..contexts import GLOBAL_CONTEXTS
+from ..core import PydidasQsettingsMixin, UserConfigError
+from ..core.constants import PYDIDAS_STANDARD_CONFIG_PATH
 from ..core.utils import (
-    get_doc_home_qurl,
-    get_pydidas_icon_w_bg,
-    get_doc_qurl_for_frame_manual,
-    get_doc_filename_for_frame_manual,
+    DOC_HOME_QURL,
+    doc_filename_for_frame_manual,
+    doc_qurl_for_frame_manual,
 )
-from ..experiment import SetupScan, SetupExperiment
-from ..workflow import WorkflowTree
-from ..widgets import PydidasFrameStack
-from ..widgets.dialogues import QuestionBox
+from ..resources import icons
 from ..version import VERSION
-from . import utils
-from .gui_excepthook_ import gui_excepthook
-from .windows import (
-    GlobalSettingsWindow,
-    UserConfigWindow,
-    ExportEigerPixelmaskWindow,
+from ..widgets import PydidasFileDialog
+from ..widgets.dialogues import AcknowledgeBox, QuestionBox, critical_warning
+from ..widgets.framework import PydidasFrameStack
+from ..widgets.windows import (
     AboutWindow,
+    ExportEigerPixelmaskWindow,
     FeedbackWindow,
+    GlobalSettingsWindow,
     ImageSeriesOperationsWindow,
     MaskEditorWindow,
+    QtPathsWindow,
+    UserConfigWindow,
 )
+from ..workflow import WorkflowTree
+from . import utils
+from .gui_excepthook_ import gui_excepthook
 
 
-SCAN = SetupScan()
-EXP = SetupExperiment()
 TREE = WorkflowTree()
 
 
-class MainMenu(QtWidgets.QMainWindow):
+class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
     """
     Inherits from :py:class:`qtpy.QtWidgets.QMainWindow`.
 
@@ -85,11 +91,9 @@ class MainMenu(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None, geometry=None):
         QtWidgets.QMainWindow.__init__(self, parent)
+        PydidasQsettingsMixin.__init__(self)
         sys.excepthook = gui_excepthook
 
-        self.config_path = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )[0]
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
@@ -97,6 +101,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
         self._setup_mainwindow_widget(geometry)
         self._add_config_windows()
+        self._create_gui_state_dialogs()
         self._create_menu()
 
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
@@ -124,7 +129,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.setCentralWidget(PydidasFrameStack())
         self.statusBar().showMessage("pydidas started")
         self.setWindowTitle("pydidas GUI")
-        self.setWindowIcon(get_pydidas_icon_w_bg())
+        self.setWindowIcon(icons.pydidas_icon_with_bg())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
     def _add_config_windows(self):
@@ -138,6 +143,26 @@ class MainMenu(QtWidgets.QMainWindow):
         _frame = UserConfigWindow()
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["user_config"] = _frame
+
+    def _create_gui_state_dialogs(self):
+        """
+        Create the persistent dialogues for import/export of the GUI state.
+        """
+        self.__import_dialog = PydidasFileDialog(
+            parent=self,
+            dialog_type="open_file",
+            caption="Import GUI state file",
+            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            qsettings_ref="MainWindowGuiState__import",
+        )
+        self.__export_dialog = PydidasFileDialog(
+            parent=self,
+            dialog_type="save_file",
+            caption="Export GUI state file",
+            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            default_extension="yaml",
+            qsettings_ref="MainWindowGuiState__export",
+        )
 
     def _create_menu(self):
         """
@@ -214,6 +239,8 @@ class MainMenu(QtWidgets.QMainWindow):
             "Open documentation in default web browser", self
         )
         self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
+        self._actions["open_paths"] = QtWidgets.QAction("Pydidas paths", self)
+        self._actions["check_for_update"] = QtWidgets.QAction("Check for update", self)
         self._actions["open_feedback"] = QtWidgets.QAction("Open feedback form", self)
 
     def _connect_menu_actions(self):
@@ -249,6 +276,12 @@ class MainMenu(QtWidgets.QMainWindow):
         )
         self._actions["open_about"].triggered.connect(
             partial(self.create_and_show_temp_window, AboutWindow)
+        )
+        self._actions["open_paths"].triggered.connect(
+            partial(self.create_and_show_temp_window, QtPathsWindow)
+        )
+        self._actions["check_for_update"].triggered.connect(
+            partial(self.check_for_updates, force_check=True)
         )
         self._actions["open_feedback"].triggered.connect(
             partial(self.create_and_show_temp_window, FeedbackWindow)
@@ -289,7 +322,9 @@ class MainMenu(QtWidgets.QMainWindow):
         _help_menu.addAction(self._actions["open_documentation_browser"])
         _help_menu.addSeparator()
         _help_menu.addAction(self._actions["open_feedback"])
+        _help_menu.addAction(self._actions["open_paths"])
         _help_menu.addSeparator()
+        _help_menu.addAction(self._actions["check_for_update"])
         _help_menu.addAction(self._actions["open_about"])
         _menu.addMenu(_help_menu)
 
@@ -310,18 +345,18 @@ class MainMenu(QtWidgets.QMainWindow):
             "(and overwrite any previous states)?",
         ).exec_()
         if _reply:
-            self.export_gui_state(os.path.join(self.config_path, self.STATE_FILENAME))
+            self.export_gui_state(
+                PYDIDAS_STANDARD_CONFIG_PATH.joinpath(self.STATE_FILENAME)
+            )
 
     @QtCore.Slot()
     def _action_export_state(self):
         """
         Store the current GUI state in a user-defined file.
         """
-        fname = QtWidgets.QFileDialog.getSaveFileName(
-            self, "Name of file for export", None, "YAML (*.yaml *.yml)"
-        )[0]
-        if fname != "":
-            self.export_gui_state(fname)
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is not None:
+            self.export_gui_state(_fname)
 
     @QtCore.Slot()
     def _action_restore_state(self):
@@ -354,11 +389,62 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         Restore the GUI state from a user-defined file.
         """
-        fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Name of file", None, "YAML (*.yaml *.yml)"
-        )[0]
-        if fname != "":
-            self.restore_gui_state(state="manual", filename=fname)
+        _fname = self.__import_dialog.get_user_response()
+        if _fname is not None:
+            self.restore_gui_state(state="manual", filename=_fname)
+
+    @QtCore.Slot()
+    def check_for_updates(self, force_check: bool = False, auto_check: bool = False):
+        """
+        Check if the pydidas version is up to date and show a dialog if not.
+
+        Parameters
+        ----------
+        force_check : bool, optional
+            Flag to force a check even when the user disabled checking for
+            updates. The default is False.
+        auto_check : bool, optional
+            Flag to signalize an automatic update check. This will only display
+            a notice when the local and remote versions differ. The default is False.
+        """
+        if (
+            not self.q_settings_get("user/check_for_updates", default=True)
+            and not force_check
+        ):
+            return
+        _remote_v = utils.get_remote_version()
+        _ack_version = self.q_settings_get(
+            "user/update_version_acknowledged", default=""
+        )
+        _text = (
+            (
+                "A new version of pydidas is available.\n\n"
+                f"    Locally installed version: {VERSION}\n"
+                f"    Latest release: {_remote_v}.\n\n"
+            )
+            if _remote_v > VERSION
+            else (
+                f"The locally installed version of pydidas (version {VERSION}) \n"
+                "is the latest available version. No actions required."
+            )
+        )
+        if auto_check and _remote_v > VERSION and _remote_v not in [-1, _ack_version]:
+            _text += "Please update pydidas to benefit from the latest improvements."
+        if (
+            auto_check and _remote_v > VERSION and _remote_v not in [-1, _ack_version]
+        ) or not auto_check:
+            _ack = AcknowledgeBox(
+                show_checkbox=auto_check,
+                text=_text,
+                text_preformatted=True,
+                title=(
+                    "Pydidas update available"
+                    if _remote_v > VERSION
+                    else "Pydidas version information"
+                ),
+            ).exec_()
+            if _ack:
+                self.q_settings_set("user/update_version_acknowledged", _remote_v)
 
     @QtCore.Slot(str)
     def update_status(self, text):
@@ -424,31 +510,30 @@ class MainMenu(QtWidgets.QMainWindow):
         if name in self._child_windows:
             del self._child_windows[name]
 
-    def export_gui_state(self, filename=None):
+    def export_gui_state(self, filename: Union[Path, str]):
         """
-        This function
+        This function exports the GUI state.
 
         Parameters
         ----------
-        filename : Union[None, str]
-            The full file system path of the configuration file. If None, a
-            generic file will be created by pydidas. The default is None.
+        filename : Union[Path, str]
+            The full file system path of the configuration file.
         """
-        _config_dir = os.path.dirname(filename)
-        if not os.path.exists(_config_dir):
-            os.makedirs(_config_dir)
+        if isinstance(filename, str):
+            filename = Path(filename)
+        if not filename.parent.is_dir():
+            filename.parent.mkdir(parents=True)
         _state = self.__get_window_states()
-        for _index, _widget in enumerate(self.centralWidget().frames):
-            _frameindex, _widget_state = _widget.export_state()
+        for _index, _frame in enumerate(self.centralWidget().frames):
+            _frameindex, _frame_state = _frame.export_state()
             assert _index == _frameindex
-            _state[f"frame_{_index:02d}"] = _widget_state
-        _state["setup_scan"] = SCAN.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
-        _state["setup_experiment"] = EXP.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
+            _state[f"frame_{_index:02d}"] = _frame_state
+        for _key, _context in GLOBAL_CONTEXTS.items():
+            _state[_key] = _context.get_param_values_as_dict(
+                filter_types_for_export=True
+            )
         _state["workflow_tree"] = TREE.export_to_string()
+        _state["pydidas_version"] = VERSION
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
 
@@ -466,10 +551,10 @@ class MainMenu(QtWidgets.QMainWindow):
         for _key, _window in self._child_windows.items():
             if _key != "tmp":
                 _window_states[_key] = _window.export_window_state()
-        _window_states["main"] = self.__export_mainwindow_state()
+        _window_states["main"] = self.export_mainwindow_state()
         return _window_states
 
-    def __export_mainwindow_state(self):
+    def export_mainwindow_state(self):
         """
         Export the main window's state.
 
@@ -515,6 +600,13 @@ class MainMenu(QtWidgets.QMainWindow):
             return
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
+        if _state is None:
+            return
+        if _state.get("pydidas_version", "0.0.0") != VERSION:
+            raise UserConfigError(
+                "The saved state was not created with the current pydidas version and "
+                "cannot be imported."
+            )
         self._restore_global_objects(_state)
         self._restore_frame_states(_state)
         self._restore_window_states(_state)
@@ -522,8 +614,8 @@ class MainMenu(QtWidgets.QMainWindow):
     @staticmethod
     def _restore_global_objects(state):
         """
-        Get the states of pydidas' global objects (SetupScan,
-        SetupExperiment, WorkflowTree)
+        Get the states of pydidas' global objects (ScanContext,
+        DiffractionExperimentContext, WorkflowTree)
 
         Parameters
         ----------
@@ -531,11 +623,13 @@ class MainMenu(QtWidgets.QMainWindow):
             The restored global states which includes the states for the
             global objects.
         """
-        TREE.restore_from_string(state["workflow_tree"])
-        for _key, _val in state["setup_scan"].items():
-            SCAN.set_param_value(_key, _val)
-        for _key, _val in state["setup_experiment"].items():
-            EXP.set_param_value(_key, _val)
+        try:
+            TREE.restore_from_string(state["workflow_tree"])
+        except KeyError:
+            raise UserConfigError("Cannot import Workflow. Not all plugins found.")
+        for _contex_key, _context in GLOBAL_CONTEXTS.items():
+            for _key, _val in state[_contex_key].items():
+                _context.set_param_value(_key, _val)
 
     def _restore_window_states(self, state):
         """
@@ -550,9 +644,9 @@ class MainMenu(QtWidgets.QMainWindow):
         for _key, _window in self._child_windows.items():
             if not _key.startswith("temp_window"):
                 _window.restore_window_state(state[_key])
-        self.__restore_mainwindow_state(state["main"])
+        self.restore_mainwindow_state(state["main"])
 
-    def __restore_mainwindow_state(self, state):
+    def restore_mainwindow_state(self, state):
         """
         Restore the main window's state from saved information.
 
@@ -580,7 +674,11 @@ class MainMenu(QtWidgets.QMainWindow):
             for _index, _ in enumerate(self.centralWidget().frames)
         ]
         if False in _frame_info:
-            raise PydidasGuiError("The state is not defined for all frames.")
+            critical_warning(
+                "Error",
+                "The state is not defined for all frames. Aborting Frame state import.",
+            )
+            return
         for _index, _frame in enumerate(self.centralWidget().frames):
             _frame.restore_state(state[f"frame_{_index:02d}"])
 
@@ -593,12 +691,12 @@ class MainMenu(QtWidgets.QMainWindow):
         the respective helpfile if it exits or the main documentation if it does not.
         """
         _frame_class = self.centralWidget().currentWidget().__class__.__name__
-        _docfile = get_doc_filename_for_frame_manual(_frame_class)
+        _docfile = doc_filename_for_frame_manual(_frame_class)
 
         if os.path.exists(_docfile):
-            _url = get_doc_qurl_for_frame_manual(_frame_class)
+            _url = doc_qurl_for_frame_manual(_frame_class)
         else:
-            _url = get_doc_home_qurl()
+            _url = DOC_HOME_QURL
         _ = QtGui.QDesktopServices.openUrl(_url)
 
     def deleteLater(self):
@@ -623,6 +721,14 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        self.export_gui_state(os.path.join(self.config_path, self.EXIT_STATE_FILENAME))
+        _reply = QuestionBox(
+            "Exit confirmation", "Do you want to close the pydidas window?"
+        ).exec_()
+        if not _reply:
+            event.ignore()
+            return
+        self.export_gui_state(
+            PYDIDAS_STANDARD_CONFIG_PATH.joinpath(self.EXIT_STATE_FILENAME)
+        )
         self.sig_close_main_window.emit()
         event.accept()

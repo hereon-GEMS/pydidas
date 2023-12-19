@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,20 +21,23 @@ objects for ROI cropping.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["RoiSliceManager"]
 
+
 import copy
+from numbers import Integral
+from typing import Union
 
 from numpy import mod
 
 from ...core.utils import flatten_all
 
 
-def error_msg(roi, exception=""):
+def error_msg(roi: object, exception: Exception = "") -> str:
     """
     Get a formatted error message.
 
@@ -80,36 +85,35 @@ class RoiSliceManager:
         initialization, this value can be supplied through the .roi property.
     """
 
-    def __init__(self, **kwargs):
-        """Initialization"""
+    def __init__(self, **kwargs: dict):
         self._roi = None
         self._original_roi = None
         self._input_shape = kwargs.get("input_shape", None)
-        self._dim = kwargs.get("dim", 2)
+        self._ndim = kwargs.get("dim", 2)
         self._original_input_shape = None
         self._roi_key = kwargs.get("roi", None)
         self.create_roi_slices()
 
     @property
-    def input_shape(self):
+    def input_shape(self) -> Union[None, tuple[float, float]]:
         """
         Get the shape of the input image, if given.
 
         Returns
         -------
-        Union[None, tuple]
+        Union[None, tuple[float, float]]
             The shape of the input image.
         """
         return self._input_shape
 
     @input_shape.setter
-    def input_shape(self, shape):
+    def input_shape(self, shape: Union[None, tuple[float, float]]):
         """
         Set the input shape of the image.
 
         Parameters
         ----------
-        shape : tuple
+        shape : Union[None, tuple[float, float]]
             The shape of the input image.
         """
         if not isinstance(shape, tuple):
@@ -117,7 +121,7 @@ class RoiSliceManager:
         self._input_shape = shape
 
     @property
-    def roi(self):
+    def roi(self) -> tuple[slice, ...]:
         """
         Get the ROI slice objects
 
@@ -159,6 +163,34 @@ class RoiSliceManager:
             [[_roi.start, _roi.stop] for _roi in self._roi], astype=tuple
         )
         return _coords
+
+    @property
+    def ndim(self) -> int:
+        """
+        Get the number of dimensions.
+
+        Returns
+        -------
+        int
+            The number of dimensions.
+        """
+        return self._ndim
+
+    @ndim.setter
+    def ndim(self, ndim: int):
+        """
+        Set the number of dimensions.
+
+        Parameters
+        ----------
+        ndim : int
+            The new number of dimensions.
+        """
+        if ndim == self._ndim:
+            return
+        self._ndim = ndim
+        self._roi = None
+        self._roi_key = None
 
     def apply_second_roi(self, roi2):
         """
@@ -202,7 +234,7 @@ class RoiSliceManager:
         # https://stackoverflow.com/questions/19257498/
         # combining-two-slicing-operations
         _roi = []
-        for _axis in range(self._dim):
+        for _axis in range(self._ndim):
             _slice1 = self._original_roi[_axis]
             _slice2 = self._roi[_axis]
             _step1 = _slice1.step if _slice1.step is not None else 1
@@ -248,11 +280,10 @@ class RoiSliceManager:
             return
         if isinstance(self._roi_key, str):
             self._convert_str_roi_key()
-        if isinstance(self._roi_key, tuple):
+        elif isinstance(self._roi_key, (list, tuple)):
             self._roi_key = list(self._roi_key)
-        if not isinstance(self._roi_key, list):
-            _msg = error_msg(self._roi_key, "Not of type (list, tuple).")
-            raise ValueError(_msg)
+        else:
+            raise ValueError(error_msg(self._roi_key, "Not of type (list, tuple)."))
 
     def _convert_str_roi_key(self):
         """
@@ -294,8 +325,11 @@ class RoiSliceManager:
         ValueError
             If datatypes apart from integer and slice are encountered.
         """
-        roi_dtypes = {type(e) for e in self._roi_key}
-        roi_dtypes.discard(int)
+        roi_dtypes = {
+            (Integral if issubclass(type(e), Integral) else type(e))
+            for e in self._roi_key
+        }
+        roi_dtypes.discard(Integral)
         roi_dtypes.discard(slice)
         roi_dtypes.discard(str)
         roi_dtypes.discard(type(None))
@@ -323,7 +357,7 @@ class RoiSliceManager:
         try:
             while len(_tmpkeys) > 0:
                 key = _tmpkeys.pop(0)
-                if isinstance(key, (int, slice, type(None))):
+                if isinstance(key, (Integral, slice, type(None))):
                     _newkeys.append(key)
                     continue
                 if key.startswith("slice("):
@@ -355,13 +389,13 @@ class RoiSliceManager:
         """
         _n = 0
         for key in self._roi_key:
-            if isinstance(key, (int, type(None))):
+            if isinstance(key, (Integral, type(None))):
                 _n += 1
             elif isinstance(key, slice):
                 _n += 2
-        if _n != 2 * self._dim:
+        if _n != 2 * self._ndim:
             _msg = error_msg(
-                self._roi_key, "The input does not have the correct length"
+                self._roi_key, "The input does not have the correct length."
             )
             raise ValueError(_msg)
 
@@ -376,10 +410,10 @@ class RoiSliceManager:
         """
         _roi = copy.copy(self._roi_key)
         _out = []
-        for _dim in range(1, self._dim + 1):
+        for _dim in range(1, self._ndim + 1):
             try:
-                if isinstance(_roi[0], (int, type(None))) and isinstance(
-                    _roi[1], (int, type(None))
+                if isinstance(_roi[0], (Integral, type(None))) and isinstance(
+                    _roi[1], (Integral, type(None))
                 ):
                     _index0 = _roi.pop(0)
                     _index0 = _index0 if _index0 is not None else 0
@@ -390,7 +424,7 @@ class RoiSliceManager:
                 else:
                     _msg = error_msg(
                         self._roi_key,
-                        "Cannot create the slice " f"object for dimension {_dim}.",
+                        f"Cannot create the slice object for dimension {_dim}.",
                     )
                     raise ValueError(_msg)
             except ValueError as _ve:
@@ -413,7 +447,7 @@ class RoiSliceManager:
             return value
 
         _new_roi = []
-        for _axis in range(self._dim):
+        for _axis in range(self._ndim):
             _mod = self.input_shape[_axis]
             _start = apply_neg_mod(self._roi[_axis].start, _mod, True)
             _step = self._roi[_axis].step

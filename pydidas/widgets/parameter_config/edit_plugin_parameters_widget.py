@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,28 +16,34 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the EditPluginParametersWidget class used to edit plugin
-Parameters.
+Module with the EditPluginParametersWidget widget used to display and edit the
+Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["EditPluginParametersWidget"]
+
 
 from pathlib import Path
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
+from qtpy.QtWidgets import QStyle
 
-from ...core import Hdf5key, constants
-from ..factory import CreateWidgetsMixIn
+from ...core import Hdf5key
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
+from ...plugins import BasePlugin
+from ..factory import CreateWidgetsMixIn, EmptyWidget
 from ..utilities import delete_all_items_in_layout
-from .parameter_edit_canvas import ParameterEditCanvas
+from .parameter_widgets_mixin import ParameterWidgetsMixIn
 
 
-class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
+class EditPluginParametersWidget(
+    EmptyWidget, ParameterWidgetsMixIn, CreateWidgetsMixIn
+):
     """
     The EditPluginParametersWidget widget creates the composite widget for
     updating and changing values of all Parameters in a Plugin.
@@ -45,7 +53,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
 
     sig_new_label = QtCore.Signal(int, str)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         """
         Setup method.
 
@@ -56,13 +64,23 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         parent : QtWidget, optional
             The parent widget. The default is None.
         """
-        ParameterEditCanvas.__init__(self, **kwargs)
+        if "font_metric_width_factor" not in kwargs:
+            kwargs["font_metric_width_factor"] = FONT_METRIC_PARAM_EDIT_WIDTH
+        EmptyWidget.__init__(self, **kwargs)
+        ParameterWidgetsMixIn.__init__(self)
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
-        self.setFixedWidth(constants.PLUGIN_PARAM_WIDGET_WIDTH)
+        self.setFixedWidth(
+            int(
+                QtWidgets.QApplication.instance().font_char_width
+                * FONT_METRIC_PARAM_EDIT_WIDTH
+            )
+        )
+        self.__qtapp = QtWidgets.QApplication.instance()
+        self.__qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
-    def configure_plugin(self, node_id, plugin):
+    def configure_plugin(self, node_id: int, plugin: BasePlugin):
         """
         Update the panel to show the Parameters of a different Plugin.
 
@@ -73,73 +91,114 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         ----------
         node_id : int
             The node_id in the workflow edit tree.
-        plugin : object
+        plugin : BasePlugin
             The instance of the Plugin to be edited.
         """
         self.clear_layout()
         self.plugin = plugin
         self.node_id = node_id
-        self.__create_widgets_for_new_plugin()
+        self.__advanced_hidden = True
+        self.__add_header()
+        if self.plugin.has_unique_parameter_config_widget:
+            self.__add_unique_config_widget()
+        else:
+            self.__add_generic_param_widgets()
+        self.create_empty_widget("final_spacer", sizePolicy=POLICY_FIX_EXP)
 
     def clear_layout(self):
         """
-        Delete all widgets and items which currently populate the
-        EditPluginParametersWidget.
+        Clear all items from the layout and generate a new layout.
         """
-        _layout = self.layout()
-        for i in reversed(range(_layout.count())):
-            item = _layout.itemAt(i)
-            if isinstance(item, QtWidgets.QLayout):
-                delete_all_items_in_layout(item)
-                _layout.removeItem(item)
-                item.deleteLater()
-            elif isinstance(item.widget(), QtWidgets.QWidget):
-                _widget_to_remove = item.widget()
-                _layout.removeWidget(_widget_to_remove)
-                _widget_to_remove.setParent(None)
-                _widget_to_remove.deleteLater()
-            elif isinstance(item, QtWidgets.QSpacerItem):
-                _layout.removeItem(item)
         self.param_widgets = {}
         self.param_composite_widgets = {}
+        self._widgets = {}
+        delete_all_items_in_layout(self.layout())
+        QtWidgets.QApplication.instance().sendPostedEvents(
+            None, QtCore.QEvent.DeferredDelete
+        )
 
-    def __create_widgets_for_new_plugin(self):
+    def __add_header(self):
         """
-        Create the required widgets for the new plugin.
+        Add the header with label and a restore default button.
         """
         self.create_label(
             "plugin_name",
-            f"\nPlugin: {self.plugin.plugin_name}",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            f"Plugin: {self.plugin.plugin_name}",
             bold=True,
-            fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH,
+            fontsize_offset=1,
             gridPos=(0, 0, 1, 2),
         )
         if self.node_id is not None:
             self.create_label(
                 "node_id",
                 f"Node ID: {self.node_id}",
-                fontsize=constants.STANDARD_FONT_SIZE + 2,
+                fontsize_offset=2,
                 gridPos=(1, 0, 1, 2),
             )
         self.create_spacer("spacer", gridPos=(2, 0, 1, 2))
         self.create_label(
             "params",
             "Parameters:",
-            fontsize=constants.STANDARD_FONT_SIZE + 2,
+            fontsize_offset=2,
             gridPos=(3, 0, 1, 1),
         )
-        if self.plugin.has_unique_parameter_config_widget:
-            self.layout().add(self.plugin.get_parameter_config_widget())
-        else:
-            self.__add_restore_default_button()
-            for param in self.plugin.params.values():
-                _kwargs = self.__get_param_creation_kwargs(param)
+        self.create_button(
+            "restore_defaults",
+            "Restore default parameters",
+            gridPos=(2, 0, 1, 2),
+            icon="qt-std::SP_BrowserReload",
+        )
+        self._widgets["restore_defaults"].clicked.connect(self.__restore_defaults)
+
+    def __add_unique_config_widget(self):
+        """
+        Add the unique config widget for the selected plugin.
+        """
+        self.add_any_widget(
+            "plugin_widget",
+            self.plugin.get_parameter_config_widget(),
+            gridPos=(-1, 0, 1, 2),
+        )
+        self._widgets["plugin_widget"].param_widgets["label"].io_edited.connect(
+            self._label_updated
+        )
+
+    def __add_generic_param_widgets(self):
+        """
+        Add the generic param widgets for standard plugins.
+        """
+        for param in self.plugin.params.values():
+            if (
+                param.refkey not in self.plugin.advanced_parameters
+                and not param.refkey.startswith("_")
+            ):
+                _kwargs = {
+                    "linebreak": param.dtype in [Hdf5key, Path]
+                    or param.refkey == "label"
+                }
                 self.create_param_widget(param, **_kwargs)
-            self.param_widgets["label"].io_edited.connect(self._label_updated)
+        if len(self.plugin.advanced_parameters) > 0:
+            self.__advanced_hidden = True
+            self.create_button(
+                "but_toggle_advanced_params",
+                "Display advanced Parameters",
+                icon="qt-std::SP_TitleBarUnshadeButton",
+                font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            )
+            for _key in self.plugin.advanced_parameters:
+                _param = self.plugin.get_param(_key)
+                _kwargs = {
+                    "linebreak": param.dtype in [Hdf5key, Path],
+                    "visible": False,
+                }
+                self.create_param_widget(_param, **_kwargs)
+            self._widgets["but_toggle_advanced_params"].clicked.connect(
+                self.__toggle_advanced_params
+            )
+        self.param_widgets["label"].io_edited.connect(self._label_updated)
 
     @QtCore.Slot(str)
-    def _label_updated(self, label):
+    def _label_updated(self, label: str):
         """
         Process the updated label and emit a signal.
 
@@ -150,69 +209,38 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         """
         self.sig_new_label.emit(self.plugin.node_id, label)
 
-    def __add_restore_default_button(self):
-        """
-        Add a "Restore default values" button for all Parameters.
-
-        This method will create a button to restore the defaults and connect
-        the required slot.
-        """
-        self.create_button(
-            "restore_defaults",
-            "Restore default parameters",
-            icon=self.style().standardIcon(59),
-            fixedHeight=25,
-            fixedWidth=225,
-            layout_kwargs={"gridPos": (2, 0, 1, 2), "alignment": QtCore.Qt.AlignRight},
-        )
-        self._widgets["restore_defaults"].clicked.connect(self.__restore_defaults)
-
     @QtCore.Slot()
     def __restore_defaults(self):
         """
         Restore the default values to all Plugin Parameters.
+
+        This method will update both the plugin Parameters as well as the displayed
+        widget values.
         """
         self.plugin.restore_all_defaults(confirm=True)
-        self.update_edits()
-
-    def __get_param_creation_kwargs(self, param):
-        """
-        Get the kwargs to create the widgets for the Parameter in different
-        styles for the different types of keys.
-
-        Parameters
-        ----------
-        param : pydidas.core.Parameter
-            The Parameter for which an I/O widget shall be created.
-
-        Returns
-        -------
-        _kwargs : dict
-            The kwargs to be used for widget creation.
-        """
-        # The total width is reduced by 10 because of the margins
-        if param.dtype in [Hdf5key, Path]:
-            _kwargs = {
-                "width_text": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
-                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
-                "width_unit": 0,
-                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
-                "linebreak": True,
-            }
-        else:
-            _kwargs = {
-                "width_text": 200,
-                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 240,
-                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
-            }
-        return _kwargs
-
-    def update_edits(self):
-        """
-        Update the input fields with the stored parameter values.
-
-        This method will go through all plugin parameters and populates
-        the input fields with the stores parameter values.
-        """
+        if self.plugin.has_unique_parameter_config_widget:
+            self._widgets["plugin_widget"].update_edits()
+            return
         for param in self.plugin.params.values():
-            self.param_widgets[param.refkey].set_value(param.value)
+            self.update_widget_value(param.refkey, param.value)
+
+    @QtCore.Slot()
+    def __toggle_advanced_params(self):
+        """
+        Toggle the visiblity of the advanced Parameters.
+        """
+        self.__advanced_hidden = not self.__advanced_hidden
+        for _key in self.plugin.advanced_parameters:
+            self.toggle_param_widget_visibility(_key, not self.__advanced_hidden)
+        self._widgets["but_toggle_advanced_params"].setText(
+            "Display advanced Parameters"
+            if self.__advanced_hidden
+            else "Hide advanced Parameters"
+        )
+        self._widgets["but_toggle_advanced_params"].setIcon(
+            self.style().standardIcon(
+                QStyle.SP_TitleBarUnshadeButton
+                if self.__advanced_hidden
+                else QStyle.SP_TitleBarShadeButton
+            )
+        )

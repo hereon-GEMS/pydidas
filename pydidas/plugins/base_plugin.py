@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,24 +22,32 @@ and OutputPlugin base classes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["BasePlugin"]
+
 
 import copy
 from numbers import Integral
+from typing import Self, Union
 
+import numpy as np
+from qtpy import QtCore
+
+from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import (
-    ParameterCollection,
+    Dataset,
     ObjectWithParameterCollection,
-    get_generic_param_collection,
+    ParameterCollection,
     UserConfigError,
+    get_generic_param_collection,
 )
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
 from pydidas.core.utils import rebin2d
 from pydidas.data_io.utils import RoiSliceManager
-from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
+from pydidas.managers import ImageMetadataManager
 
 
 ptype = {
@@ -46,6 +56,15 @@ ptype = {
     PROC_PLUGIN: "Processing plugin",
     OUTPUT_PLUGIN: "Output plugin",
 }
+
+_TYPES_NOT_TO_COPY = (
+    QtCore.SignalInstance,
+    QtCore.QMetaObject,
+    ParameterCollection,
+    ImageMetadataManager,
+)
+
+EXP = DiffractionExperimentContext()
 
 
 def _data_dim(entry):
@@ -71,21 +90,36 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_type : int
         A key to discriminate between the different types of plugins
         (input, processing, output)
-    default_params : ParameterCollection
-        A ParameterCollection with the class parameters which are required
-        to perform the execute operation.
-    generic_params : ParameterCollection
-        A ParameterCollection with the generic parameters for all plugins of
-        a specific type.
-    input_data_dim : int
-        The dimensionality of the input data. Use -1 for arbitraty
-        dimensionality.
-    output_data_dim : int
-        The dimensionality of the output data. Use -1 for arbitraty
-        dimensionality.
+    plugin_name : str
+        The plugin name key in hunman-readable form for referencing the plugin.
+    default_params : ParameterCollection, optional
+        A ParameterCollection with the class parameters which are required to use the
+        plugin. The default is an empty ParameterCollection.
+    generic_params : ParameterCollection, optinoal
+        A ParameterCollection with the generic parameters for all plugins of a specific
+        type. The default are the Parameters "keep_results" and "label" for all plugins.
+    input_data_dim : int, optional
+        The dimensionality of the input data. Use -1 for arbitraty dimensionality or
+        None if the plugin does not accept any input data. The default is -1.
+    output_data_dim : int, optional
+        The dimensionality of the output data. Use -1 for arbitraty dimensionality or
+        None if the plugin does not create any output data. The default is -1.
+    output_data_label : str, optional
+        The label for the output Dataset. The default is an empty string.
+    output_data_unit : str, optional
+        The unit of the output Dataset. The default is an empty string.
     new_dataset : bool
         Keyword that the Plugin creates a new dataset. This will trigger a
         re-evaluation of the output data shape.
+    has_unique_parameter_config_widget : bool, optional
+        Flag to use a unique ParameterConfigWidget for this plugin. The widget must be
+        made accessible through the "get_parameter_config_widget" method. the default
+        is False.
+    advanced_parameters : list[str, ...], optional
+        A list with the keys of "advanced parameters". These Parameters are hidden in
+        the plugin's Parameter configuration widget be default and can be accessed
+        through the associated button for "advances parameters" not to overwhelm
+        users with too many options. The default is an empty list [].
     """
 
     basic_plugin = True
@@ -93,14 +127,17 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_name = "Base plugin"
     default_params = ParameterCollection()
     generic_params = get_generic_param_collection("keep_results", "label")
+
     input_data_dim = -1
     output_data_dim = -1
     output_data_label = ""
     output_data_unit = ""
     new_dataset = False
+    has_unique_parameter_config_widget = False
+    advanced_parameters = []
 
     @classmethod
-    def get_class_description(cls):
+    def get_class_description(cls) -> str:
         """
         Get a description of the plugin as a multi-line string.
 
@@ -134,7 +171,7 @@ class BasePlugin(ObjectWithParameterCollection):
         return _desc
 
     @classmethod
-    def get_class_description_as_dict(cls):
+    def get_class_description_as_dict(cls) -> dict:
         """
         Get a description of the plugin as a dictionary of entries.
 
@@ -164,7 +201,7 @@ class BasePlugin(ObjectWithParameterCollection):
         }
 
     @classmethod
-    def input_data_dim_str(cls):
+    def input_data_dim_str(cls) -> str:
         """
         Get the input data dimensionality as string.
 
@@ -178,7 +215,7 @@ class BasePlugin(ObjectWithParameterCollection):
         return str(cls.input_data_dim)
 
     @classmethod
-    def output_data_dim_str(cls):
+    def output_data_dim_str(cls) -> str:
         """
         Get the output data dimensionality as string.
 
@@ -202,9 +239,9 @@ class BasePlugin(ObjectWithParameterCollection):
             OUTPUT_PLUGIN,
         ]:
             raise ValueError("Unknown value for the plugin type")
-        self.add_params(self.generic_params.get_copy())
-        self.add_params(*args)
+        self.add_params(self.generic_params.copy(), *args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         for _kw, _item in kwargs.items():
             if _kw in self.params.keys():
                 self.set_param_value(_kw, _item)
@@ -214,7 +251,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._original_input_shape = None
         self.node_id = None
 
-    def __copy__(self):
+    def __copy__(self) -> Self:
         """
         Implement a (deep)copy routine for Plugins.
 
@@ -224,11 +261,36 @@ class BasePlugin(ObjectWithParameterCollection):
             The copy of the plugin.
         """
         _obj_copy = type(self)()
-        for _key, _item in self.__dict__.items():
-            _obj_copy.__dict__[_key] = copy.copy(_item)
+        _obj_copy.__dict__.update(
+            {
+                _key: copy.copy(_value)
+                for _key, _value in self.__dict__.items()
+                if not isinstance(_value, _TYPES_NOT_TO_COPY)
+            }
+        )
+        for _key, _param in self.params.items():
+            _obj_copy.set_param_value(_key, _param.value)
+        if hasattr(self, "_EXP") and self._EXP == EXP:
+            _obj_copy._EXP = EXP
         return _obj_copy
 
-    def __getstate__(self):
+    def __deepcopy__(self, memo: dict) -> Self:
+        """
+        Create a deep copy of the Plugin.
+
+        Parameters
+        ----------
+        memo : dict
+            The dictionary of already copied objects.
+
+        Returns
+        -------
+        BasePlugin
+            The deep copy of the plugin.
+        """
+        return self.__copy__()
+
+    def __getstate__(self) -> dict:
         """
         Get the state of the Plugin for pickling.
 
@@ -237,10 +299,14 @@ class BasePlugin(ObjectWithParameterCollection):
         dict
             A dictionary with Parameter refkeys and the associated values.
         """
-        _state = self.__dict__.copy()
+        _state = {
+            _key: _value
+            for _key, _value in self.__dict__.items()
+            if not isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
+        }
         return _state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict):
         """
         Set the Plugin state after pickling.
 
@@ -252,10 +318,9 @@ class BasePlugin(ObjectWithParameterCollection):
         for key, val in state.items():
             setattr(self, key, val)
 
-    def __reduce__(self):
+    def __reduce__(self) -> tuple:
         """
-        Redefine the __reduce__ method to allow picking of classes dynamically
-        loaded through the PluginCollection.
+        Allow picking of classes dynamically loaded through the PluginCollection.
 
         Returns
         -------
@@ -270,16 +335,33 @@ class BasePlugin(ObjectWithParameterCollection):
 
         return (plugin_getter, (self.__class__.__name__,), self.__getstate__())
 
-    def execute(self, data, **kwargs):
+    def copy(self) -> Self:
+        """
+        Create a copy of itself.
+
+        Returns
+        -------
+        BasePlugin :
+            The plugins's copy.
+        """
+        return copy.copy(self)
+
+    def execute(self, data: Union[int, Dataset], **kwargs: dict):
         """
         Execute the processing step.
+
+        Parameters
+        ----------
+        data : Union[int, Dataset]
+            The input data to be processed.
+        kwargs : dict
+            Keyword arguments passed to the processing.
         """
         raise NotImplementedError("Execute method has not been implemented.")
 
     def pre_execute(self):
         """
-        Run code which needs to be run only once prior to the execution of
-        multiple frames.
+        Run the pre-execution code before processing individual datapoints.
         """
 
     def get_parameter_config_widget(self):
@@ -305,20 +387,7 @@ class BasePlugin(ObjectWithParameterCollection):
         )
 
     @property
-    def has_unique_parameter_config_widget(self):
-        """
-        Get the flag whether the Plugin has a unique configuration widget.
-
-        Returns
-        -------
-        bool
-            The flag value whether the plugin has a unique configuration
-            widget associated with it.
-        """
-        return False
-
-    @property
-    def input_data(self):
+    def input_data(self) -> Union[int, Dataset]:
         """
         Get the current input data.
 
@@ -330,7 +399,7 @@ class BasePlugin(ObjectWithParameterCollection):
         return self._config["input_data"]
 
     @property
-    def result_data_label(self):
+    def result_data_label(self) -> str:
         """
         Get the combined result data label, consisting of the formatted
         output_data_label and output_data_unit.
@@ -345,7 +414,7 @@ class BasePlugin(ObjectWithParameterCollection):
         )
 
     @property
-    def result_title(self):
+    def result_title(self) -> str:
         """
         Get the formatted title of the plugin's results.
 
@@ -361,7 +430,7 @@ class BasePlugin(ObjectWithParameterCollection):
             else f"[{self.plugin_name}] (node #{_id:03d})"
         )
 
-    def store_input_data_copy(self, data, **kwargs):
+    def store_input_data_copy(self, data: Dataset, **kwargs: dict):
         """
         Store a copy of the input data internally in the plugin.
 
@@ -376,7 +445,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["input_kwargs"] = copy.deepcopy(kwargs)
 
     @property
-    def input_shape(self):
+    def input_shape(self) -> Union[tuple, None]:
         """
         Get the shape of the Plugin's input.
 
@@ -388,9 +457,9 @@ class BasePlugin(ObjectWithParameterCollection):
         return self._config["input_shape"]
 
     @input_shape.setter
-    def input_shape(self, new_shape):
+    def input_shape(self, new_shape: tuple[int, ...]):
         """
-        The the shape of the Plugin's input.
+        Set the shape of the Plugin's input.
 
         Parameters
         ----------
@@ -400,19 +469,32 @@ class BasePlugin(ObjectWithParameterCollection):
 
         Returns
         -------
-        Union[tuple, None]
+        Union[tuple[int, ...], None]
             The shape of the plugin's input.
         """
         if not isinstance(new_shape, tuple):
-            raise TypeError("The new shape must be a tuple.")
+            raise UserConfigError(
+                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
+                f"\nThe new shape must be a tuple, but received {new_shape} which is "
+                f"of type {type(new_shape)}."
+            )
+        if self.input_data_dim is None:
+            raise UserConfigError(
+                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
+                "\nThe plugin is an input plugin and cannot accept any input. This is "
+                "due to an incorrect and inconsistent workflow tree. Please check the "
+                "full workflow."
+            )
         if self.input_data_dim > 0 and len(new_shape) != self.input_data_dim:
-            raise ValueError(
-                f"The new shape must be a tuple of length {self.input_data_dim}."
+            raise UserConfigError(
+                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
+                f"\nThe new shape must be a tuple of length {self.input_data_dim} but "
+                f"received a tuple of length {len(new_shape)}."
             )
         self._config["input_shape"] = new_shape
 
     @property
-    def result_shape(self):
+    def result_shape(self) -> tuple:
         """
         Get the shape of the plugin result.
 
@@ -451,10 +533,9 @@ class BasePlugin(ObjectWithParameterCollection):
         else:
             self._config["result_shape"] = _shape
 
-    def apply_legacy_image_ops_to_data(self, data):
+    def apply_legacy_image_ops_to_data(self, data: np.ndarray) -> np.ndarray:
         """
-        Apply the legacy image operations to a new data frame and return the
-        updated data.
+        Apply the legacy image operations to a new data frame.
 
         Parameters
         ----------
@@ -489,7 +570,7 @@ class BasePlugin(ObjectWithParameterCollection):
             self._legacy_image_ops_meta["num"] += 1
         self._legacy_image_ops_meta["included"] = True
 
-    def _get_own_roi(self):
+    def _get_own_roi(self) -> Union[tuple[slice, slice], None]:
         """
         Get the ROI defined within the plugin.
 
@@ -499,7 +580,7 @@ class BasePlugin(ObjectWithParameterCollection):
 
         Returns
         -------
-        tuple
+        Union[tuple[slice. slice], None]
             The tuple with two slice objects which define the image ROI.
         """
         if self.input_data_dim == 1:
@@ -524,14 +605,16 @@ class BasePlugin(ObjectWithParameterCollection):
         _roi = RoiSliceManager(roi=_roi_bounds, input_shape=self.input_shape, dim=_dim)
         return _roi.roi
 
-    def get_single_ops_from_legacy(self):
+    def get_single_ops_from_legacy(self) -> tuple[tuple[slice, ...], int]:
         """
-        Get the parameters for a single ROI and binning operation from
-        combining all legacy operations on the data.
+        Get the parameters for a single ROI and binning operation.
+
+        This method combines all legacy operations on the data into one set of
+        operations to be applied..
 
         Returns
         -------
-        roi : tuple
+        roi : tuple[slice, ...]
             The ROI which needs to be applied to the original image.
         binning : int
             The binning factor which needs to be applied to the original image.
@@ -541,14 +624,13 @@ class BasePlugin(ObjectWithParameterCollection):
         else:
             return self.__get_legacy_op_for_2d_input()
 
-    def __get_legacy_op_for_1d_input(self):
+    def __get_legacy_op_for_1d_input(self) -> tuple[slice, int]:
         """
-        Get the single legacy operation that transforms the raw input to the input
-        of this plugin.
+        Get a single operation that converts the raw input to the input shape.
 
         Returns
         -------
-        roi : tuple
+        roi : tuple[slice, slice]
             The ROI which needs to be applied to the original image.
         binning : int
             The binning factor which needs to be applied to the original image.
@@ -575,14 +657,13 @@ class BasePlugin(ObjectWithParameterCollection):
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning
 
-    def __get_legacy_op_for_2d_input(self):
+    def __get_legacy_op_for_2d_input(self) -> tuple[tuple[slice, ...], int]:
         """
-        Get the single legacy operation that transforms the raw input to the input
-        of this plugin.
+        Get a single operation that converts the raw input to the input shape.
 
         Returns
         -------
-        roi : tuple
+        roi : tuple[slice, ...]
             The ROI which needs to be applied to the original image.
         binning : int
             The binning factor which needs to be applied to the original image.

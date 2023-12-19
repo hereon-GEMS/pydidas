@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,30 +18,30 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
-import tempfile
-import shutil
-import os
 import copy
+import os
 import pickle
+import shutil
+import tempfile
+import unittest
+from pathlib import Path
 
 import numpy as np
 
 from pydidas import unittest_objects
-from pydidas.core import UserConfigError, Dataset, Parameter
-from pydidas.workflow import WorkflowNode, WorkflowTree, GenericNode
-from pydidas.workflow.workflow_tree import _WorkflowTree
+from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import PluginCollection
+from pydidas.workflow import GenericNode, ProcessingTree, WorkflowNode, WorkflowTree
 
 
 COLL = PluginCollection()
-_PLUGIN_PATHS = COLL.get_all_registered_paths()
+_PLUGIN_PATHS = COLL.registered_paths
 
 
 class TestWorkflowTree(unittest.TestCase):
@@ -52,7 +54,7 @@ class TestWorkflowTree(unittest.TestCase):
     def setUp(self):
         self.tree = WorkflowTree()
         self.tree.clear()
-        self._tmpdir = tempfile.mkdtemp()
+        self._tmpdir = Path(tempfile.mkdtemp())
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
@@ -79,6 +81,22 @@ class TestWorkflowTree(unittest.TestCase):
                     _tiernodes.append(_node)
             _nodes.append(_tiernodes)
         return _nodes, _index
+
+    def test_active_plugin_header__no_nodes(self):
+        self.assertEqual(self.tree.active_plugin_header, "")
+
+    def test_active_plugin_header__no_active_node(self):
+        _nodes, _index = self.create_node_tree()
+        self.tree.register_node(_nodes[0][0])
+        self.tree.active_node_id = None
+        self.assertEqual(self.tree.active_plugin_header, "")
+
+    def test_active_plugin_header__w_active_node(self):
+        _nodes, _index = self.create_node_tree()
+        _root = _nodes[0][0]
+        self.tree.register_node(_root)
+        self.tree.active_node_id = 0
+        self.assertEqual(self.tree.active_plugin_header, "#000 [Dummy loader Plugin]")
 
     def test_get_all_result_shapes__no_nodes(self):
         with self.assertRaises(UserConfigError):
@@ -121,7 +139,7 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(_shapes[2], _shape)
 
     def test_export_to_file(self):
-        _fname = os.path.join(self._tmpdir, "export.yaml")
+        _fname = self._tmpdir.joinpath("export.yaml")
         _nodes, _index = self.create_node_tree()
         self.tree.register_node(_nodes[0][0])
         self.tree.export_to_file(_fname)
@@ -134,7 +152,7 @@ class TestWorkflowTree(unittest.TestCase):
         tree = WorkflowTree()
         _nodes, _index = self.create_node_tree()
         tree.register_node(_nodes[0][0])
-        _fname = os.path.join(self._tmpdir, "export.yaml")
+        _fname = self._tmpdir.joinpath("export.yaml")
         tree.export_to_file(_fname)
         self.tree.import_from_file(_fname)
         for node_id in tree.nodes:
@@ -270,20 +288,26 @@ class TestWorkflowTree(unittest.TestCase):
             unittest_objects.DummyProc(), parent=self.tree.root
         )
         tree2 = copy.copy(self.tree)
-        self.assertIsInstance(tree2, _WorkflowTree)
+        self.assertIsInstance(tree2, ProcessingTree)
         for _node in tree2.nodes.values():
             self.assertIsInstance(_node, WorkflowNode)
         for _node in tree2.root._children:
             self.assertTrue(_node in tree2.nodes.values())
-        for key in set(self.tree.__dict__.keys()) - {"root", "nodes"}:
+        for key in set(self.tree.__dict__.keys()) - {"root", "nodes", "_starthash"}:
             self.assertEqual(getattr(self.tree, key), getattr(tree2, key))
+        for _id, _node in self.tree.nodes.items():
+            self.assertEqual(_id, _node.node_id)
+            self.assertEqual(_id, _node.plugin.node_id)
+        for _id, _node in tree2.nodes.items():
+            self.assertEqual(_id, _node.node_id)
+            self.assertEqual(_id, _node.plugin.node_id)
 
     def test_tree_pickling(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         tree2 = pickle.loads(pickle.dumps(self.tree))
-        self.assertIsInstance(tree2, _WorkflowTree)
+        self.assertIsInstance(tree2, ProcessingTree)
         for _node in tree2.nodes.values():
             self.assertIsInstance(_node, WorkflowNode)
 
@@ -305,6 +329,8 @@ class TestWorkflowTree(unittest.TestCase):
             self.assertIsInstance(
                 self.tree.nodes[_id].plugin, tree.nodes[_id].plugin.__class__
             )
+            self.assertEqual(_node.node_id, _id)
+            self.assertEqual(_node.plugin.node_id, _id)
 
     def test_restore_from_list_of_nodes__wrong_type(self):
         with self.assertRaises(TypeError):
@@ -323,12 +349,27 @@ class TestWorkflowTree(unittest.TestCase):
                 self.tree.nodes[_id].plugin, tree.nodes[_id].plugin.__class__
             )
 
+    def test_update_from_tree(self):
+        tree = WorkflowTree()
+        _nodes, _index = self.create_node_tree()
+        tree.set_root(_nodes[0][0])
+        _new_tree = WorkflowTree()
+        _new_tree.create_and_add_node(unittest_objects.DummyLoader())
+        _new_tree.create_and_add_node(unittest_objects.DummyProc())
+        _new_tree.create_and_add_node(unittest_objects.DummyProc(), node_id=42)
+        tree.update_from_tree(_new_tree)
+        for _id, _node in tree.nodes.items():
+            self.assertEqual(set(tree.node_ids), set(_new_tree.node_ids))
+            self.assertIsInstance(
+                tree.nodes[_id].plugin, _new_tree.nodes[_id].plugin.__class__
+            )
+
     def test_restore_from_string__empty(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.create_and_add_node(unittest_objects.DummyProc())
-        self.tree.restore_from_string("")
-        self.assertEqual(self.tree.nodes, dict())
+        with self.assertRaises(UserConfigError):
+            self.tree.restore_from_string("")
 
     def test_restore_from_string__empty_list(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())
@@ -394,27 +435,51 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(hash(tree), hash(tree2))
 
     def test_hash___full_tree(self):
-        tree = _WorkflowTree()
+        tree = ProcessingTree()
         tree.create_and_add_node(unittest_objects.DummyLoader())
         tree.create_and_add_node(unittest_objects.DummyProc())
         tree.create_and_add_node(unittest_objects.DummyProc())
-        tree2 = _WorkflowTree()
+        tree2 = ProcessingTree()
         tree2.create_and_add_node(unittest_objects.DummyLoader())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         self.assertNotEqual(hash(tree), hash(tree2))
 
     def test_hash___full_tree_w_different_plugin_param(self):
-        tree = _WorkflowTree()
+        tree = ProcessingTree()
         tree.create_and_add_node(unittest_objects.DummyLoader())
         tree.create_and_add_node(unittest_objects.DummyProc())
         tree.create_and_add_node(unittest_objects.DummyProc())
-        tree2 = _WorkflowTree()
+        tree2 = ProcessingTree()
         tree2.create_and_add_node(unittest_objects.DummyLoader())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         tree2.root.plugin.set_param_value("image_height", 127)
         self.assertNotEqual(hash(tree), hash(tree2))
+
+    def test_register_node(self):
+        tree = ProcessingTree()
+        node = WorkflowNode(plugin=unittest_objects.DummyLoader())
+        tree.register_node(node)
+        self.assertEqual(node.node_id, 0)
+        self.assertEqual(node.plugin.node_id, 0)
+
+    def test_register_node__with_children(self):
+        tree = ProcessingTree()
+        nodes = [WorkflowNode(plugin=unittest_objects.DummyLoader())]
+        nodes.append(WorkflowNode(plugin=unittest_objects.DummyProc(), parent=nodes[0]))
+        nodes.append(WorkflowNode(plugin=unittest_objects.DummyProc(), parent=nodes[0]))
+        tree.register_node(nodes[0])
+        for _i in range(2):
+            self.assertEqual(nodes[_i].node_id, _i)
+            self.assertEqual(nodes[_i].plugin.node_id, _i)
+
+    def test_set_root(self):
+        tree = ProcessingTree()
+        node = WorkflowNode(plugin=unittest_objects.DummyLoader())
+        tree.set_root(node)
+        self.assertEqual(node.node_id, 0)
+        self.assertEqual(node.plugin.node_id, 0)
 
 
 if __name__ == "__main__":

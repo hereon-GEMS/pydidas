@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,180 +21,149 @@ populate the CompositeCreatorFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["CompositeCreatorFrameBuilder"]
 
-from qtpy import QtWidgets, QtCore
+
+from qtpy import QtWidgets
 
 from ....core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    FIX_EXP_POLICY,
-    EXP_EXP_POLICY,
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    POLICY_EXP_EXP,
+    POLICY_FIX_EXP,
 )
-from ....core import constants
-from ....widgets import ScrollArea, BaseFrameWithApp, silx_plot
-from ....widgets.parameter_config import ParameterEditCanvas
-from ...mixins import SilxPlotWindowMixIn
+from ....widgets import ScrollArea, silx_plot
+from ....widgets.framework import BaseFrame
 
 
-class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
+_KEYS_TO_INSERT_LINES = [
+    "n_files",
+    "images_per_file",
+    "bg_hdf5_frame",
+    "detector_mask_val",
+    "roi_yhigh",
+    "threshold_high",
+    "binning",
+    "output_fname",
+    "n_total",
+    "composite_ydir_orientation",
+]
+
+
+class CompositeCreatorFrameBuilder:
     """
-    Create the layout and add all widgets required for the
-    CompositeCreatorFrame.
+    Create the layout and add all widgets required for the CompositeCreatorFrame.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrameWithApp.__init__(self, parent, **kwargs)
-        SilxPlotWindowMixIn.__init__(self)
-
-    def build_frame(self):
+    @classmethod
+    def build_frame(cls, frame: BaseFrame):
         """
-        Create all widgets for the CompositeCreatorFrame and initialize their
-        state.
+        Create and initialize all widgets for the CompositeCreatorFrame.
+
+        Parameters
+        ----------
+        frame : BaseFrame
+            The BaseFrame instance in which the widgets shall be added.
         """
-        self.layout().setContentsMargins(0, 0, 0, 0)
-
-        self._widgets["config"] = ParameterEditCanvas(
-            self, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+        frame.layout().setContentsMargins(10, 0, 0, 0)
+        frame.setMinimumHeight(800)
+        frame.create_empty_widget(
+            "config_canvas",
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
-
-        self.create_label(
-            "title",
-            "Composite image creator",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
-            bold=True,
-            gridPos=(0, 0, 1, 2),
-            parent_widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-        )
-        self.create_spacer(
-            "spacer1",
-            gridPos=(-1, 0, 1, 2),
-            parent_widget=self._widgets["config"],
-        )
-        self.create_any_widget(
+        frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH + 40,
-            stretch=(1, 0),
-            sizePolicy=FIX_EXP_POLICY,
-            gridPos=(-1, 0, 1, 1),
             layout_kwargs={"alignment": None},
+            stretch=(1, 0),
+            sizePolicy=POLICY_FIX_EXP,
+            widget=frame._widgets["config_canvas"],
         )
-        self.create_button(
+        frame.create_label(
+            "title",
+            "Composite image creator",
+            bold=True,
+            fontsize_offset=4,
+            parent_widget="config_canvas",
+        )
+        frame.create_spacer(
+            "spacer1",
+            parent_widget="config_canvas",
+        )
+        frame.create_button(
             "but_clear",
             "Clear all entries",
-            gridPos=(-1, 0, 1, 2),
-            parent_widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(59),
+            icon="qt-std::SP_BrowserReload",
+            parent_widget="config_canvas",
         )
-        self.create_any_widget(
+        frame.create_any_widget(
             "plot_window",
             silx_plot.PydidasPlot2D,
             alignment=None,
-            stretch=(1, 1),
-            gridPos=(0, 3, 1, 1),
-            visible=False,
-            sizePolicy=EXP_EXP_POLICY,
             cs_transform=False,
+            gridPos=(0, 1, 1, 1),
+            minimumWidth=900,
+            visible=False,
+            stretch=(1, 1),
+            sizePolicy=POLICY_EXP_EXP,
         )
 
-        for _key in self.params:
-            _options = self.__get_param_widget_config(_key)
-            self.create_param_widget(self.params[_key], **_options)
-
+        for _key in frame.params:
+            _options = cls.__get_param_widget_config(_key)
+            frame.create_param_widget(frame.params[_key], **_options)
             # add spacers between groups:
-            if _key in [
-                "n_files",
-                "images_per_file",
-                "bg_hdf5_frame",
-                "use_global_det_mask",
-                "roi_yhigh",
-                "threshold_high",
-                "binning",
-                "output_fname",
-                "n_total",
-                "composite_ydir_orientation",
-            ]:
-                self.create_line(
-                    f"line_{_key}",
-                    parent_widget=self._widgets["config"],
-                    fixedWidth=CONFIG_WIDGET_WIDTH,
+            if _key in _KEYS_TO_INSERT_LINES:
+                frame.create_line(f"line_{_key}", parent_widget="config_canvas")
+            if _key in ["first_file", "last_file", "bg_file"]:
+                frame.param_widgets[_key].set_unique_ref_name(
+                    f"CompositeCreatorFrame__{_key}"
                 )
 
-        for _name in [
-            "first_file",
-            "last_file",
-            "bg_file",
-        ]:
-            self.param_widgets[_name].set_unique_ref_name(
-                f"CompositeCreatorFrame__{_name}"
-            )
-
-        self.create_button(
+        frame.create_button(
             "but_exec",
             "Generate composite",
-            gridPos=(-1, 0, 1, 2),
-            parent_widget=self._widgets["config"],
             enabled=False,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(61),
+            icon="qt-std::SP_MediaPlay",
+            parent_widget="config_canvas",
         )
-
-        self.create_progress_bar(
+        frame.create_progress_bar(
             "progress",
-            parent_widget=self._widgets["config"],
-            gridPos=(-1, 0, 1, 2),
-            visible=False,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            minimum=0,
             maximum=100,
+            minimum=0,
+            parent_widget="config_canvas",
+            visible=False,
         )
-
-        self.create_button(
+        frame.create_button(
             "but_abort",
             "Abort composite creation",
-            gridPos=(-1, 0, 1, 2),
-            parent_widget=self._widgets["config"],
             enabled=True,
+            icon="qt-std::SP_BrowserStop",
+            parent_widget="config_canvas",
             visible=False,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(60),
         )
-
-        self.create_button(
+        frame.create_button(
             "but_show",
             "Show composite",
-            gridPos=(-1, 0, 1, 2),
-            parent_widget=self._widgets["config"],
             enabled=False,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(13),
+            icon="qt-std::SP_DesktopIcon",
+            parent_widget="config_canvas",
         )
-
-        self.create_button(
+        frame.create_button(
             "but_save",
             "Export composite image to file",
-            parent_widget=self._widgets["config"],
-            gridPos=(-1, 0, 1, 2),
             enabled=False,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(43),
+            icon="qt-std::SP_DialogSaveButton",
+            parent_widget="config_canvas",
         )
-
-        self.create_spacer(
+        frame.create_spacer(
             "spacer_bottom",
-            parent_widget=self._widgets["config"],
-            gridPos=(-1, 0, 1, 2),
-            policy=QtWidgets.QSizePolicy.Expanding,
             height=300,
+            parent_widget="config_canvas",
+            policy=QtWidgets.QSizePolicy.Expanding,
         )
-
         for _key in [
             "n_total",
             "hdf5_dataset_shape",
@@ -200,7 +171,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             "raw_image_shape",
             "images_per_file",
         ]:
-            self.param_widgets[_key].setEnabled(False)
+            frame.param_widgets[_key].setEnabled(False)
         for _key in [
             "hdf5_key",
             "hdf5_first_image_num",
@@ -210,12 +181,13 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             "hdf5_dataset_shape",
             "hdf5_stepping",
         ]:
-            self.toggle_param_widget_visibility(_key, False)
+            frame.toggle_param_widget_visibility(_key, False)
 
-        self.toggle_param_widget_visibility("hdf5_dataset_shape", False)
-        self.toggle_param_widget_visibility("raw_image_shape", False)
+        frame.toggle_param_widget_visibility("hdf5_dataset_shape", False)
+        frame.toggle_param_widget_visibility("raw_image_shape", False)
 
-    def __get_param_widget_config(self, param_key):
+    @classmethod
+    def __get_param_widget_config(cls, param_key):
         """
         Get Formatting options for create_param_widget instances.
 
@@ -229,31 +201,25 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         dict
             The keyword dictionary to be passed to the ParamWidget creation.
         """
-        # special formatting for some parameters:
-        if param_key in [
-            "first_file",
-            "last_file",
-            "hdf5_key",
-            "bg_file",
-            "bg_hdf5_key",
-            "output_fname",
-        ]:
-            _config = dict(
-                linebreak=True,
-                halign_text=QtCore.Qt.AlignLeft,
-                valign_text=QtCore.Qt.AlignBottom,
-                width_total=CONFIG_WIDGET_WIDTH,
-                width_io=CONFIG_WIDGET_WIDTH - 50,
-                width_text=CONFIG_WIDGET_WIDTH - 20,
-                width_unit=0,
-                parent_widget=self._widgets["config"],
-            )
-        else:
-            _config = dict(
-                width_io=100,
-                width_unit=0,
-                parent_widget=self._widgets["config"],
-                width_text=CONFIG_WIDGET_WIDTH - 100,
-                width_total=CONFIG_WIDGET_WIDTH,
-            )
-        return _config
+        return {
+            "linebreak": param_key
+            in [
+                "first_file",
+                "last_file",
+                "hdf5_key",
+                "bg_file",
+                "bg_hdf5_key",
+                "output_fname",
+                "detector_mask_file",
+                "composite_image_op",
+            ],
+            "enabled": param_key
+            not in [
+                "n_total",
+                "hdf5_dataset_shape",
+                "n_files",
+                "raw_image_shape",
+                "images_per_file",
+            ],
+            "parent_widget": "config_canvas",
+        }

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,24 +18,31 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestSum1dData(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
+
     def setUp(self):
         self._n = 120
         self._data = np.arange(self._n)
@@ -55,18 +64,18 @@ class TestSum1dData(unittest.TestCase):
         plugin.pre_execute()
         # assert does not raise an Error
 
-    def test_get_index_range__w_indices(self):
+    def test_get_slice__w_indices(self):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
-    def test_get_index_range__w_data(self):
+    def test_get_slice__w_data(self):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -75,11 +84,11 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_low])
         plugin.set_param_value("upper_limit", self._x[_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
-    def test_get_index_range__w_empty_range(self):
+    def test_get_slice__w_empty_range(self):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -88,10 +97,10 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_high])
         plugin.set_param_value("upper_limit", self._x[_low])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range, slice(0, 0))
 
-    def test_get_index_range__w_sinple_point_range(self):
+    def test_get_slice__w_sinple_point_range(self):
         _low = 42
         _high = 42
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -100,7 +109,7 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_high])
         plugin.set_param_value("upper_limit", self._x[_low])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _low + 1)
 
@@ -115,7 +124,7 @@ class TestSum1dData(unittest.TestCase):
         _data, _ = plugin.execute(data)
         self.assertEqual(_data[0], 0)
 
-    def test_execute__sinlge_item_selection(self):
+    def test_execute__single_item_selection(self):
         _low = 42
         _high = 42
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -136,6 +145,28 @@ class TestSum1dData(unittest.TestCase):
         data = self.create_dataset()
         _data, _ = plugin.execute(data)
         self.assertTrue(_data[0], np.sum(self._data[_low : _high + 1]))
+
+    def test_execute__None_lower_bounds(self):
+        _low = None
+        _high = 47
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
+        self.assertTrue(_data[0], np.sum(self._data[: _high + 1]))
+
+    def test_execute__None_upper_bounds(self):
+        _low = 42
+        _high = None
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
+        self.assertTrue(_data[0], np.sum(self._data[_low:]))
 
 
 if __name__ == "__main__":

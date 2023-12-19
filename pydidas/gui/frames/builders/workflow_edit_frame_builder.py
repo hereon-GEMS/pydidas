@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,66 +21,95 @@ WorkflowEditFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowEditFrameBuilder"]
 
-from ....core.constants import EXP_EXP_POLICY
+
+from qtpy.QtWidgets import QAbstractScrollArea
+
+from ....core import constants
+from ....core.constants import FONT_METRIC_HALF_CONSOLE_WIDTH
 from ....core.utils import update_size_policy
-from ....widgets import ScrollArea, BaseFrame
+from ....widgets import ScrollArea
+from ....widgets.framework import BaseFrame
 from ....widgets.parameter_config import EditPluginParametersWidget
-from ....widgets.workflow_edit import WorkflowTreeCanvas, PluginCollectionBrowser
+from ....widgets.workflow_edit import PluginCollectionBrowser, WorkflowTreeCanvas
 
 
-class WorkflowEditFrameBuilder(BaseFrame):
+class WorkflowEditFrameBuilder:
     """
-    Mix-in class which includes the build_self method to populate the
-    base class's UI and initialize all widgets.
+    Builder for the WorkflowEditFrame.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
-
-    def build_frame(self):
+    @classmethod
+    def populate_frame(cls, frame: BaseFrame):
         """
-        Create all widgets and initialize their state.
-        """
-        self._widgets["workflow_canvas"] = WorkflowTreeCanvas()
+        Build the frame by creating all required widgets and placing them in the layout.
 
-        self.create_any_widget(
+        Parameters
+        ----------
+        frame : BaseFrame
+            The frame instance.
+        """
+        frame._widgets["workflow_canvas"] = WorkflowTreeCanvas()
+
+        frame.create_label(
+            "label_title",
+            "Workflow tree editor",
+            fontsize_offset=4,
+            bold=True,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            gridPos=(0, 0, 1, 2),
+        )
+        frame.create_any_widget(
             "workflow_area",
             ScrollArea,
-            minimumHeight=500,
-            widget=self._widgets["workflow_canvas"],
-            gridPos=(0, 0, 1, 1),
+            alignment=constants.ALIGN_TOP_CENTER,
+            gridPos=(1, 0, 3, 2),
+            minimumHeight=450,
+            sizePolicy=constants.POLICY_EXP_EXP,
+            sizeAdjustPolicy=QAbstractScrollArea.AdjustToContents,
+            widget=frame._widgets["workflow_canvas"],
         )
-        self.create_any_widget(
-            "plugin_collection", PluginCollectionBrowser, gridPos=(1, 0, 3, 1)
+        frame.create_label(
+            "plugin_title",
+            "Available plugins:",
+            fontsize_offset=3,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            gridPos=(4, 0, 1, 2),
+            underline=True,
         )
-        self._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
-        self.create_any_widget(
+        frame.create_any_widget(
+            "plugin_collection", PluginCollectionBrowser, gridPos=(5, 0, 1, 2)
+        )
+        frame._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
+        frame.create_any_widget(
             "plugin_edit_area",
             ScrollArea,
-            minimumHeight=500,
-            widget=self._widgets["plugin_edit_canvas"],
-            fixedWidth=400,
-            sizePolicy=EXP_EXP_POLICY,
-            gridPos=(0, 1, 2, 1),
+            gridPos=(1, 2, 5, 1),
+            minimumHeight=450,
+            resize_to_widget_width=True,
+            sizePolicy=constants.POLICY_EXP_EXP,
+            widget=frame._widgets["plugin_edit_canvas"],
         )
-        self.create_button(
+        frame.create_button(
             "but_load",
             "Import workflow from file",
-            gridPos=(2, 1, 1, 1),
-            icon=self.style().standardIcon(42),
+            gridPos=(1, 0, 1, 1),
+            icon="qt-std::SP_DialogOpenButton",
         )
-        self.create_button(
+        frame.create_button(
             "but_save",
             "Export workflow to file",
-            gridPos=(3, 1, 1, 1),
-            icon=self.style().standardIcon(43),
+            gridPos=(2, 0, 1, 1),
+            icon="qt-std::SP_DialogSaveButton",
         )
 
-        update_size_policy(self._widgets["workflow_area"], verticalStretch=2)
-        update_size_policy(self._widgets["plugin_collection"], verticalStretch=1)
+        update_size_policy(frame._widgets["workflow_area"], verticalStretch=2)
+        update_size_policy(frame._widgets["plugin_collection"], verticalStretch=1)
+        frame.layout().setRowStretch(3, 10)
+        frame.layout().setRowStretch(5, 5)
+        frame.layout().setColumnStretch(1, 10)

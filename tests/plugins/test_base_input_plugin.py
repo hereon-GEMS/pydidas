@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,35 +18,35 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
-import tempfile
-import shutil
-import h5py
 import os
 import pickle
-from unittest import mock
+import shutil
+import tempfile
+import unittest
 from functools import partial
+from unittest import mock
 
+import h5py
 import numpy as np
 
-from pydidas.core import Parameter, get_generic_parameter, Dataset
+from pydidas.contexts import ScanContext
+from pydidas.core import Dataset, Parameter, get_generic_parameter
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.data_io import import_data
-from pydidas.experiment import SetupScan
-from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins import InputPlugin
+from pydidas.unittest_objects import create_plugin_class
 
 
 _DUMMY_SHAPE = (130, 140)
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class TestInputPlugin(InputPlugin):
@@ -53,7 +55,9 @@ class TestInputPlugin(InputPlugin):
         self.filename_string = filename
 
     def get_frame(self, index, **kwargs):
-        _frame = index + SCAN.get_param_value("scan_start_index")
+        _frame = index * SCAN.get_param_value(
+            "scan_index_stepping"
+        ) + SCAN.get_param_value("scan_start_index")
         kwargs["frame"] = _frame
         return import_data(self.filename_string, **kwargs), kwargs
 
@@ -65,7 +69,7 @@ class TestInputPlugin(InputPlugin):
 
 
 def dummy_update_filename_string(plugin):
-    plugin.filename_string = plugin._image_metadata.filename
+    plugin.filename_string = str(plugin._image_metadata.filename)
 
 
 class TestBaseInputPlugin(unittest.TestCase):
@@ -76,12 +80,12 @@ class TestBaseInputPlugin(unittest.TestCase):
         cls._fname = os.path.join(cls._testpath, "test.h5")
         with h5py.File(cls._fname, "w") as f:
             f["entry/data/data"] = np.repeat(
-                np.arange(15, dtype=np.uint16), np.prod(_DUMMY_SHAPE)
-            ).reshape((15,) + _DUMMY_SHAPE)
+                np.arange(30, dtype=np.uint16), np.prod(_DUMMY_SHAPE)
+            ).reshape((30,) + _DUMMY_SHAPE)
 
     @classmethod
     def tearDownClass(cls):
-        SetupScan._reset_instance()
+        ScanContext._reset_instance()
         shutil.rmtree(cls._testpath)
 
     def setUp(self):
@@ -213,6 +217,14 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 6))
+
+    def test_execute__w_multiplicity_and_max(self):
+        SCAN.set_param_value("scan_multiplicity", 4)
+        SCAN.set_param_value("scan_multi_image_handling", "Maximum")
+        plugin = TestInputPlugin(filename=self._fname)
+        plugin.pre_execute()
+        _data, _ = plugin.execute(0)
+        self.assertTrue(np.allclose(_data, 3))
 
     def test_execute__w_start_index(self):
         SCAN.set_param_value("scan_start_index", 4)

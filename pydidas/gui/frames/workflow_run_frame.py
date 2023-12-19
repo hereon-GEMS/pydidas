@@ -1,9 +1,11 @@
-# This file is part of pydidas.
+# This file is part of pydidas
+#
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -11,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+# along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the WorkflowRunFrame which allows to run the full
@@ -19,35 +21,35 @@ processing workflow and visualize the results.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowRunFrame"]
+
 
 import time
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...apps import ExecuteWorkflowApp
-from ...core import get_generic_param_collection
-from ...core.utils import pydidas_logger
+from ...core import UserConfigError, get_generic_param_collection
+from ...core.utils import ShowBusyMouse, pydidas_logger
 from ...multiprocessing import AppRunner
 from ...widgets.dialogues import WarningBox
-from ...workflow import WorkflowResults, WorkflowTree
-from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
+from ...widgets.framework import BaseFrameWithApp
+from ...workflow import WorkflowTree
 from ..mixins import ViewResultsMixin
+from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
 
 
-RESULTS = WorkflowResults()
 TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
-class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
+class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     """
-    The WorkflowRunFrame is used to start processing of the WorkflowTree
-    and visualize the results.
+    A widget for running the ExecuteWorkflowApp  and visualizing the results.
     """
 
     menu_icon = "qta::msc.run-all"
@@ -58,10 +60,11 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         "selected_results", "saving_format", "enable_overwrite"
     )
     params_not_to_restore = ["selected_results"]
+    sig_processing_running = QtCore.Signal(bool)
 
-    def __init__(self, parent=None, **kwargs):
-        WorkflowRunFrameBuilder.__init__(self, parent, **kwargs)
-        _global_plot_update_time = self.q_settings_get_value(
+    def __init__(self, **kwargs: dict):
+        BaseFrameWithApp.__init__(self, **kwargs)
+        _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
         self._config.update(
@@ -76,6 +79,12 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         self.set_default_params()
         self.add_params(self._app.params)
 
+    def build_frame(self):
+        """
+        Populate the frame with widgets.
+        """
+        WorkflowRunFrameBuilder.build_frame(self)
+
     def connect_signals(self):
         """
         Connect all required Qt slots and signals.
@@ -85,6 +94,9 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
+        self._widgets["plot"].sig_get_more_info_for_data.connect(
+            self._widgets["result_selector"].show_info_popup
+        )
 
     def finalize_ui(self):
         """
@@ -93,7 +105,7 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         ViewResultsMixin.__init__(self)
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 
@@ -107,26 +119,45 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         """
         super().frame_activated(index)
         if index == self.frame_index:
-            self._update_choices_of_selected_results()
-            self._update_export_button_activation()
+            self.update_choices_of_selected_results()
+            self.update_export_button_activation()
         self._config["frame_active"] = index == self.frame_index
 
     def __abort_execution(self):
         """
         Abort the execution of the AppRunner.
         """
+        self._widgets["but_abort"].setEnabled(False)
         if self._runner is not None:
-            self._runner.send_stop_signal()
+            with ShowBusyMouse():
+                logger.debug("WorkflowRunFrame: Sending stop signal")
+                self._runner.requestInterruption()
+                _t0 = time.time()
+                while self._runner is not None:
+                    if time.time() - _t0 > 5:
+                        raise UserConfigError(
+                            "Timeout while waiting for AppRunner to abort workflow "
+                            "execution. Please consider restarting pydidas before "
+                            "processing a workflow again."
+                        )
+                        break
+                    time.sleep(0.02)
+                    QtWidgets.QApplication.instance().processEvents()
         self.set_status("Aborted processing of full workflow.")
-        self._finish_processing()
 
     @QtCore.Slot()
     def __execute(self):
         """
         Execute the Application in the chosen type (GUI or command line).
         """
+        logger.debug("WorkflowRunFrame: Clicked execute")
         self._verify_result_shapes_uptodate()
-        self._run_app()
+        self.sig_processing_running.emit(True)
+        try:
+            self._run_app()
+        except:
+            self.sig_processing_running.emit(False)
+            raise
 
     def _run_app(self):
         """
@@ -134,25 +165,27 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         """
         if not self._check_tree_is_populated():
             return
-        logger.debug("Starting workflow")
+        logger.debug("WorkflowRunFrame: Starting workflow")
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
         self._config["last_update"] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
-        logger.debug("Starting AppRunner")
+        logger.debug("WorkflowRunFrame: Starting AppRunner")
         self._runner = AppRunner(self._app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_results.connect(self._app.multiprocessing_store_results)
         self._runner.sig_results.connect(self.__update_result_node_information)
         self._runner.sig_results.connect(self.__check_for_plot_update)
-        self._runner.sig_finished.connect(self._apprunner_finished)
+        self._runner.finished.connect(self._apprunner_finished)
         self._runner.sig_final_app_state.connect(self._set_app)
+        QtWidgets.QApplication.instance().aboutToQuit.connect(
+            self._runner.send_stop_signal
+        )
         self._config["update_node_information_connected"] = True
-        logger.debug("Running AppRunner")
+        logger.debug("WorkflowRunFrame: Running AppRunner")
         self._runner.start()
 
     @staticmethod
-    def _check_tree_is_populated():
+    def _check_tree_is_populated() -> bool:
         """
         Check if the WorkflowTree is populated, i.e. not empty.
 
@@ -186,11 +219,14 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         """
         Clean up after AppRunner is done.
         """
-        logger.debug("Telling AppRunner to exit.")
-        self._runner.exit()
+        logger.debug("WorkflowRunFrame: Handle AppRunner loop finished signal.")
+        self._runner.sig_final_app_state.disconnect()
+        self._runner.sig_progress.disconnect()
+        self._runner.sig_results.disconnect()
+        self._runner.deleteLater()
         self._runner = None
-        logger.debug("AppRunner successfully shut down.")
-        self.set_status("Finished processing of full workflow.")
+        logger.debug("WorkflowRunFrame: AppRunner successfully shut down.")
+        self.set_status("WorkflowRunFrame: Finished processing of full workflow.")
         self._finish_processing()
         self.update_plot()
 
@@ -217,9 +253,11 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         Perform finishing touches after the processing has terminated.
         """
         self.__set_proc_widget_visibility_for_running(False)
-        self._update_choices_of_selected_results()
+        self.sig_processing_running.emit(False)
+        QtWidgets.QApplication.instance().processEvents()
+        logger.debug("WorkflowRunFrame: Finished processing")
 
-    def __set_proc_widget_visibility_for_running(self, running):
+    def __set_proc_widget_visibility_for_running(self, running: bool):
         """
         Set the visibility of all widgets which need to be updated for/after
         procesing
@@ -232,6 +270,7 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         """
         self._widgets["but_exec"].setEnabled(not running)
         self._widgets["but_abort"].setVisible(running)
+        self._widgets["but_abort"].setEnabled(running)
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)

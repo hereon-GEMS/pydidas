@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,23 +18,25 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
-import unittest
-import tempfile
-import shutil
+
 import os
+import shutil
+import tempfile
+import unittest
+from pathlib import Path
 
-import numpy as np
 import h5py
+import numpy as np
 
 from pydidas.core import UserConfigError
 from pydidas.core.utils.file_checks import (
-    check_hdf5_key_exists_in_file,
     check_file_exists,
+    check_hdf5_key_exists_in_file,
     file_is_writable,
     verify_files_in_same_directory,
     verify_files_of_range_are_same_size,
@@ -87,7 +91,9 @@ class TestFileCheckFunctions(unittest.TestCase):
         _fnames = [f"test{i:02d}.npy" for i in range(10)]
         for _name in _fnames:
             np.save(os.path.join(self._path, _name), _data)
-        verify_files_of_range_are_same_size(self._path, _fnames)
+        verify_files_of_range_are_same_size(
+            [Path(self._path).joinpath(_name) for _name in _fnames]
+        )
 
     def test_verify_files_of_range_are_same_size_wrong(self):
         _data = np.random.random((10, 10))
@@ -95,7 +101,9 @@ class TestFileCheckFunctions(unittest.TestCase):
         for i, _name in enumerate(_fnames):
             np.save(os.path.join(self._path, _name), _data[:i, :i])
         with self.assertRaises(UserConfigError):
-            verify_files_of_range_are_same_size(self._path, _fnames)
+            verify_files_of_range_are_same_size(
+                [Path(self._path).joinpath(_name) for _name in _fnames]
+            )
 
     def test_file_is_writable_simple(self):
         self.assertFalse(file_is_writable(self._hdf5_fname))

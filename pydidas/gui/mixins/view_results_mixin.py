@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,30 +21,28 @@ WorkflowTree results when running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ViewResultsMixin"]
 
+
 import os
+from typing import Self, Union
 
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
-from ...core import UserConfigError
-from ...contexts import PydidasDirDialog
+from ...core import Dataset, UserConfigError
+from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
-from ...workflow import WorkflowResults
-
-
-RESULTS = WorkflowResults()
+from ...workflow import WorkflowResultsContext
 
 
 class ViewResultsMixin:
     """
-    The ViewResultsMixin has all the necessary functionality to show and
-    export results.
+    The ViewResultsMixin adds functionality to show and export results.
 
     It requires the following widgets which need to be created by the
     parent frame:
@@ -65,7 +65,9 @@ class ViewResultsMixin:
       - enable_overwrite
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict) -> Self:
+        _results = kwargs.get("workflow_results", None)
+        self._RESULTS = _results if _results is not None else WorkflowResultsContext()
         self._config.update(
             {
                 "data_use_timeline": False,
@@ -74,18 +76,20 @@ class ViewResultsMixin:
                 "active_node": None,
                 "data_slices": (),
                 "frame_active": True,
-                "source_hash": RESULTS.source_hash,
+                "source_hash": self._RESULTS.source_hash,
             }
         )
-        self._data_axlabels = ["", ""]
-        self._data_axunits = ["", ""]
         self.connect_view_results_mixin_signals()
-        self._update_choices_of_selected_results()
-        self.__export_dialog = PydidasDirDialog(
-            self,
+        self.update_choices_of_selected_results()
+        self.__export_dialog = PydidasFileDialog(
+            parent=self,
+            dialog_type="open_directory",
             caption="Export results",
-            dialog=QtWidgets.QFileDialog.getExistingDirectory,
             qsettings_ref="WorkflowResults__export",
+            info_string=(
+                "<b>Please select an empty an empty directory to export all "
+                "results<br> or enable overwriting of results:</b>"
+            ),
         )
 
     def connect_view_results_mixin_signals(self):
@@ -94,27 +98,31 @@ class ViewResultsMixin:
         """
         self._widgets["but_export_current"].clicked.connect(self._export_current)
         self._widgets["but_export_all"].clicked.connect(self._export_all)
-        self._widgets["result_selector"].new_selection.connect(
+        self._widgets["result_selector"].sig_new_selection.connect(
             self.update_result_selection
         )
 
     def _verify_result_shapes_uptodate(self):
         """
-        Verify that the underlying information for the WorkflowResults
-        (i.e. the SetupScan and WorkflowTree) have not changed.
+        Verify the consistency of the underlying information.
+
+        The information for the WorkflowResults is defined by the Singletons
+        (i.e. the ScanContext and WorkflowTree) and must be checked to detect
+        any changes.
         """
-        _hash = RESULTS.source_hash
+        _hash = self._RESULTS.source_hash
         if _hash != self._config["source_hash"]:
-            RESULTS.update_shapes_from_scan_and_workflow()
-            self._config["source_hash"] = RESULTS.source_hash
+            self._RESULTS.update_shapes_from_scan_and_workflow()
+            self._config["source_hash"] = self._RESULTS.source_hash
             self._clear_selected_results_entries()
             self._clear_plot()
-            self._update_choices_of_selected_results()
+            self.update_choices_of_selected_results()
 
     def _clear_selected_results_entries(self):
         """
-        Clear the selection of the results and reset the view. This method
-        will hide the data selection widgets.
+        Clear the selection of the results and reset the view.
+
+        This method will hide the data selection widgets.
         """
         self.set_param_value("selected_results", "No selection")
         self.params["selected_results"].choices = ["No selection"]
@@ -125,12 +133,16 @@ class ViewResultsMixin:
         Clear all curves / images from the plot and disable any new updates.
         """
         self._config["plot_active"] = False
-        for _plot in [self._widgets["plot1d"], self._widgets["plot2d"]]:
-            _plot.clear_plot()
+        self._widgets["plot"].clear_plots()
 
     @QtCore.Slot(bool, object, int, object, str)
     def update_result_selection(
-        self, use_timeline, active_plot_dims, node_id, slices, plot_type
+        self,
+        use_timeline: bool,
+        active_plot_dims: list,
+        node_id: int,
+        slices: tuple,
+        plot_type: str,
     ):
         """
         Update the selection of results to show in the plot.
@@ -170,28 +182,21 @@ class ViewResultsMixin:
         """
         if not self._config["plot_active"]:
             return
-        _dim = 1 if self._config["plot_type"] in ["1D plot", "group of 1D plots"] else 2
         _node = self._config["active_node"]
-        _data = RESULTS.get_result_subset(
+        _data = self._RESULTS.get_result_subset(
             _node,
             self._config["data_slices"],
             flattened_scan_dim=self._config["data_use_timeline"],
             squeeze=True,
         )
-        self._data_axlabels = _data.axis_labels.copy()
-        self._data_axunits = _data.axis_units.copy()
         if self._config["plot_type"] == "group of 1D plots":
-            self._widgets["plot_stack"].setCurrentIndex(0)
             self._plot_group_of_curves(_data)
         elif self._config["plot_type"] == "1D plot":
-            self._widgets["plot_stack"].setCurrentIndex(0)
             self._plot1d(_data, replace=True)
         elif self._config["plot_type"] in ["2D full axes", "2D data subset"]:
-            self._widgets["plot_stack"].setCurrentIndex(1)
             self._plot_2d(_data)
-        self._widgets[f"plot{_dim}d"].setGraphTitle(RESULTS.result_titles[_node])
 
-    def _plot_group_of_curves(self, data):
+    def _plot_group_of_curves(self, data: Dataset):
         """
         Plot a group of 1D curves.
 
@@ -204,8 +209,7 @@ class ViewResultsMixin:
         def _legend(i):
             return (
                 data.axis_labels[0]
-                + "="
-                + f"{data.axis_ranges[0][i]:.4f}"
+                + f"= {data.axis_ranges[0][i]:.4f}"
                 + data.axis_units[0]
             )
 
@@ -217,7 +221,9 @@ class ViewResultsMixin:
         for _index in range(1, data.shape[0]):
             self._plot1d(data[_index], replace=False, legend=_legend(_index))
 
-    def _plot1d(self, data, replace=True, legend=None):
+    def _plot1d(
+        self, data: Dataset, replace: bool = True, legend: Union[None, str] = None
+    ):
         """
         Plot a 1D-dataset in the 1D plot widget.
 
@@ -231,24 +237,21 @@ class ViewResultsMixin:
         legend : Union[None, str], optional
             If desired, a legend entry for this curve. If None, no legend
             entry will be added. The default is None.
-        label_dim : int, optional
-            The dimension of the X-axis label. For 1D-Datasets, this is 0.
-            The default is 0.
         """
         if data.ndim != 1:
             raise UserConfigError(
                 "The selected data is not one-dimensional. Cannot create a line plot."
             )
         if not isinstance(data.axis_ranges[0], np.ndarray):
-            data.update_axis_ranges(0, np.arange(data.size))
-        self._widgets["plot1d"].plot_pydidas_dataset(
+            data.update_axis_range(0, np.arange(data.size))
+        self._widgets["plot"].plot_data(
             data,
             replace=replace,
             legend=legend,
-            title=RESULTS.result_titles[self._config["active_node"]],
+            title=self._RESULTS.result_titles[self._config["active_node"]],
         )
 
-    def _plot_2d(self, data):
+    def _plot_2d(self, data: Dataset):
         """
         Plot a 2D dataset as an image.
 
@@ -259,29 +262,26 @@ class ViewResultsMixin:
         """
         for _dim in [0, 1]:
             if not isinstance(data.axis_ranges[_dim], np.ndarray):
-                data.update_axis_ranges(_dim, np.arange(data.shape[_dim]))
+                data.update_axis_range(_dim, np.arange(data.shape[_dim]))
         _dim0, _dim1 = self._config["active_dims"]
         if _dim0 > _dim1:
             data = data.transpose()
-        self._widgets["plot2d"].plot_pydidas_dataset(
-            data, title=RESULTS.result_titles[self._config["active_node"]]
+        self._widgets["plot"].plot_data(
+            data, title=self._RESULTS.result_titles[self._config["active_node"]]
         )
 
-    def _update_choices_of_selected_results(self):
+    def update_choices_of_selected_results(self):
         """
-        Update the choices of the "selected_results" Parameter based on the
-        latest WorkflowResults.
+        Update the "selected_results" Parameter choices based on the WorkflowResults.
         """
-        _param = self.get_param("selected_results")
-        RESULTS.update_param_choices_from_labels(_param)
+        self._widgets["result_selector"].reset()
         self._widgets["result_selector"].get_and_store_result_node_labels()
 
-    def _update_export_button_activation(self):
+    def update_export_button_activation(self):
         """
-        Update the enabled state of the export buttons based on available
-        results.
+        Update the enabled state of the export buttons based on available results.
         """
-        _active = RESULTS.shapes != {}
+        _active = self._RESULTS.shapes != {}
         self._widgets["but_export_current"].setEnabled(_active)
         self._widgets["but_export_all"].setEnabled(_active)
 
@@ -306,9 +306,11 @@ class ViewResultsMixin:
         """
         self._export(None)
 
-    def _export(self, node):
+    def _export(self, node: Union[None, int]):
         """
-        Export data of
+        Export data of the specified node.
+
+        If no node is chosen (i.e. None), all nodes will be exported.
 
         Parameters
         ----------
@@ -329,15 +331,15 @@ class ViewResultsMixin:
         _overwrite = self.get_param_value("enable_overwrite")
         while True:
             _dirname = self.__export_dialog.get_user_response()
-            if _dirname == "" or len(os.listdir(_dirname)) == 0 or _overwrite:
+            if _dirname is None or len(os.listdir(_dirname)) == 0 or _overwrite:
                 break
             critical_warning(
                 "Directory not empty",
                 "The selected directory is not empty. Please "
                 "select an empty directory or cancel.",
             )
-        if _dirname == "":
+        if _dirname is None:
             return
-        RESULTS.save_results_to_disk(
+        self._RESULTS.save_results_to_disk(
             _dirname, _formats, overwrite=_overwrite, node_id=node
         )

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,17 +21,18 @@ test workflows and Plugins without any file system operations.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DummyLoader"]
+
 
 import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import Parameter, ParameterCollection, Dataset, get_generic_parameter
+from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.plugins import InputPlugin
 
@@ -63,7 +66,7 @@ class DummyLoader(InputPlugin):
         get_generic_parameter("filename"),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         InputPlugin.__init__(self, *args, **kwargs)
         self._preexecuted = False
         self._config["input_available"] = 12
@@ -85,7 +88,7 @@ class DummyLoader(InputPlugin):
 
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 
-    def get_first_file_size(self):
+    def get_first_file_size(self) -> int:
         """
         Reimplement the "get_first_file_size" and return a dummy value.
 
@@ -96,7 +99,7 @@ class DummyLoader(InputPlugin):
         """
         return 1
 
-    def get_filename(self, index):
+    def get_filename(self, index: int) -> int:
         """
         Get the filename associated with the input index.
 
@@ -114,7 +117,7 @@ class DummyLoader(InputPlugin):
         """
         return index
 
-    def input_available(self, index):
+    def input_available(self, index: int) -> bool:
         """
         Check if input is available for the given index.
 
@@ -142,7 +145,7 @@ class DummyLoader(InputPlugin):
         """
         self._preexecuted = True
 
-    def execute(self, index, **kwargs):
+    def execute(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Execute the actual computations.
 

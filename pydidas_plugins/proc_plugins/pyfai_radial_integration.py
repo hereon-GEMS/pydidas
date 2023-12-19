@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,19 +16,20 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PyFAIradialIntegration Plugin which allows radial integration
-to acquire azimuthal profiles.
+The PyFAIradialIntegration Plugin performs radial integrations to acquire azimuthal
+profiles.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PyFAIradialIntegration"]
 
-from pydidas.plugins import pyFAIintegrationBase
+
 from pydidas.core import Dataset
+from pydidas.plugins import pyFAIintegrationBase
 
 
 class PyFAIradialIntegration(pyFAIintegrationBase):
@@ -45,7 +48,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
-        self.set_param_value("rad_npoint", 1000)
+        self.set_param_value("rad_npoint", 100)
 
     def pre_execute(self):
         """
@@ -54,7 +57,8 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         pyFAIintegrationBase.pre_execute(self)
         self._ai_params = {
             "npt_rad": self.get_param_value("rad_npoint"),
-            "polarization_factor": 1,
+            "polarization_factor": self.get_param_value("polarization_factor"),
+            "correctSolidAngle": self.get_param_value("correct_solid_angle"),
             "unit": self.get_pyFAI_unit_from_param("azi_unit"),
             "radial_unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),
@@ -69,24 +73,25 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             "data_unit": "counts",
         }
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Apply a mask to an image (2d data-array).
+        Perform a radial integration on the input dataset.
 
         Parameters
         ----------
         data : Union[pydidas.core.Dataset, np.ndarray]
-            The image / frame data .
+            The image / frame data.
         **kwargs : dict
             Any calling keyword arguments.
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The image data.
+        data : pydidas.core.Dataset
+            The azimuthal integration profile.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        self.check_and_set_custom_mask(**kwargs)
         _newdata = self._ai.integrate_radial(
             data, self.get_param_value("azi_npoint"), **self._ai_params
         )

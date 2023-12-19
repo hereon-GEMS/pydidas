@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,22 +20,21 @@ Module with the InputPlugin base class for 1 dim-data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["InputPlugin1d"]
 
-import numpy as np
 
-from ..core import get_generic_parameter, UserConfigError
+from ..contexts import ScanContext
+from ..core import get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
-from ..experiment import SetupScan
-from .base_plugin import BasePlugin
 from .base_input_plugin import InputPlugin
+from .base_plugin import BasePlugin
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class InputPlugin1d(InputPlugin):
@@ -44,21 +45,24 @@ class InputPlugin1d(InputPlugin):
     plugin_type = INPUT_PLUGIN
     plugin_name = "Base input plugin 1d"
     input_data_dim = 1
-    generic_params = BasePlugin.generic_params.get_copy()
+    generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
         get_generic_parameter("use_roi"),
         get_generic_parameter("roi_xlow"),
         get_generic_parameter("roi_xhigh"),
         get_generic_parameter("binning"),
     )
-    default_params = InputPlugin.default_params.get_copy()
+    default_params = InputPlugin.default_params.copy()
+    advanced_parameters = ["use_roi", "roi_xlow", "roi_xhigh", "binning"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         """
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
+        self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
+        self._original_input_shape = None
 
     def calculate_result_shape(self):
         """
@@ -68,48 +72,20 @@ class InputPlugin1d(InputPlugin):
         self._config["result_shape"] = (_n,)
         self._original_input_shape = (_n,)
 
-    def execute(self, index, **kwargs):
+    def pre_execute(self):
         """
-        Import the data and pass it on after (optionally) handling image multiplicity.
-
-        Parameters
-        ----------
-        index : int
-            The index of the scan point.
-        **kwargs : dict
-            Keyword arguments passed to the execute method.
-
-        Returns
-        -------
-        pydidas.core.Dataset
-            The image data frame.
+        Run generic pre-execution routines.
         """
-        if "n_multi" not in self._config:
-            raise UserConfigError(
-                "Calling plugin execution without prior pre-execution is not allowed."
-            )
-        _data = None
-        if "roi" not in kwargs and self.get_param_value("use_roi"):
-            kwargs["roi"] = slice(
-                self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
-            )
-        _frames = self._config["n_multi"] * self._config[
-            "delta_index"
-        ] * index + self._config["delta_index"] * np.arange(self._config["n_multi"])
-        for _frame_index in _frames:
-            if _data is None:
-                _data, kwargs = self.get_frame(_frame_index, **kwargs)
-            else:
-                _data += self.get_frame(_frame_index, **kwargs)[0]
-        if SCAN.get_param_value("scan_multi_image_handling") == "Average":
-            _data = _data / self._config["n_multi"]
-        if _frames.size > 1:
-            kwargs["frames"] = _frames
-        return _data, kwargs
+        self.update_filename_string()
+        if self._original_input_shape is None:
+            self.calculate_result_shape()
+        self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
+        self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
+        self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
 
     def get_raw_input_size(self):
         """
-        Get the raw input size.
+        Get the number of data points in the raw input.
 
         Raises
         ------
@@ -119,6 +95,18 @@ class InputPlugin1d(InputPlugin):
         Returns
         -------
         int
-            The raw input size in bins.
+            The raw input size in data points.
         """
         raise NotImplementedError
+
+    def update_required_kwargs(self, kwargs: dict):
+        """
+        Update the kwargs dict in place.
+        """
+        if "roi" not in kwargs and self.get_param_value("use_roi"):
+            kwargs["ndim"] = 1
+            kwargs["roi"] = [
+                slice(
+                    self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
+                )
+            ]

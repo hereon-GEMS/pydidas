@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,70 +18,81 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
+
 
 import os
-import unittest
-import tempfile
 import shutil
+import tempfile
 import time
+import unittest
 from pathlib import Path
 
-import numpy as np
 import h5py
+import numpy as np
 from qtpy import QtTest
 
+from pydidas import IS_QT6
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (
-    ParameterCollection,
     Dataset,
+    ParameterCollection,
+    PydidasQsettings,
     UserConfigError,
     get_generic_parameter,
-    PydidasQsettings,
 )
 from pydidas.managers import CompositeImageManager
 
 
 class TestCompositeCreatorApp(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f"test{i:02d}.npy"))
-        self._img_shape = (10, 10)
-        self._n = 50
-        self._data = np.random.random((self._n,) + self._img_shape)
-        for i in range(self._n):
-            np.save(self._fname(i), self._data[i])
-        self._hdf5_fnames = [
-            Path(os.path.join(self._path, f"test_{i:03d}.h5")) for i in range(10)
+    @classmethod
+    def setUpClass(cls):
+        cls._path = Path(tempfile.mkdtemp())
+        cls._img_shape = (10, 10)
+        cls._n_total = 50
+        cls._n_files = 10
+        cls._data = np.random.random((cls._n_total,) + cls._img_shape)
+        for i in range(cls._n_total):
+            np.save(cls._fname(i), cls._data[i])
+        cls._hdf5_fnames = [
+            cls._path.joinpath(f"test_{i:03d}.h5") for i in range(cls._n_files)
         ]
-        for i in range(10):
-            with h5py.File(self._hdf5_fnames[i], "w") as f:
-                f["/entry/data/data"] = self._data
+        _n_per_file = int(cls._n_total / cls._n_files)
+        for i in range(cls._n_files):
+            with h5py.File(cls._hdf5_fnames[i], "w") as f:
+                f["/entry/data/data"] = cls._data[
+                    slice(i * _n_per_file, (i + 1) * _n_per_file)
+                ]
 
-        self._q_settings = PydidasQsettings()
-        self._border = self._q_settings.value("user/mosaic_border_width", int)
-        self._bgvalue = self._q_settings.value("user/mosaic_border_value", float)
-        self._globalmask = self._q_settings.value("user/det_mask")
-        _mask = np.zeros((self._img_shape), dtype=np.bool_)
-        _maskfile = Path(os.path.join(self._path, "mask.npy"))
+        cls._q_settings = PydidasQsettings()
+        cls._border = cls._q_settings.value("user/mosaic_border_width", int)
+        cls._bgvalue = cls._q_settings.value("user/mosaic_border_value", float)
+        _mask = np.zeros((cls._img_shape), dtype=np.bool_)
+        _maskfile = cls._path.joinpath("mask.npy")
         np.save(_maskfile, _mask)
-        self._q_settings.set_value("user/det_mask", _maskfile)
-        self._maskfile = _maskfile
+        cls._maskfile = _maskfile
 
-    def tearDown(self):
-        self._q_settings.set_value("user/det_mask", self._globalmask)
-        shutil.rmtree(self._path)
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+        cls._q_settings = PydidasQsettings()
+
+    @classmethod
+    def _fname(cls, i: int):
+        return cls._path.joinpath(f"test{i:02d}.npy")
 
     def get_default_app(self):
         self._ny = 5
-        self._nx = self._n // self._ny + int(np.ceil((self._n % self._ny) / self._ny))
+        self._nx = self._n_total // self._ny + int(
+            np.ceil((self._n_total % self._ny) / self._ny)
+        )
         setattr(CompositeCreatorApp, "parse_func", lambda obj: {})
         app = CompositeCreatorApp()
         app.set_param_value("first_file", self._fname(0))
-        app.set_param_value("last_file", self._fname(self._n - 1))
+        app.set_param_value("last_file", self._fname(self._n_total - 1))
         app.set_param_value("composite_nx", self._nx)
         app.set_param_value("composite_ny", self._ny)
         app.set_param_value("use_roi", True)
@@ -173,7 +186,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
         self.assertTrue(np.isclose(app.composite, _image).all())
-        self.assertEqual(len(_spy), 1)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 1)
 
     def test_multiprocessing_store_results__with_bg(self):
         _image = np.random.random(self._img_shape)
@@ -187,7 +201,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
         self.assertTrue((app.composite == 0).all())
-        self.assertEqual(len(_spy), 1)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 1)
 
     def test_multiprocessing_store_results__as_slave(self):
         app = self.get_default_app()
@@ -195,7 +210,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _spy = QtTest.QSignalSpy(app.updated_composite)
         app.multiprocessing_store_results(0, 0)
         time.sleep(0.02)
-        self.assertEqual(len(_spy), 0)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 0)
 
     def test_apply_thresholds__plain(self):
         app = self.get_default_app()
@@ -235,17 +251,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue(np.isclose(_image, _newimage).all())
 
-    def test_apply_mask__with_mask_and_no_value(self):
-        _shape = (50, 50)
-        rng = np.random.default_rng(12345)
-        _mask = rng.integers(low=0, high=2, size=_shape)
-        app = CompositeCreatorApp()
-        app._det_mask = _mask
-        app._config["det_mask_val"] = None
-        _image = np.random.random(_shape)
-        with self.assertRaises(UserConfigError):
-            app._CompositeCreatorApp__apply_mask(_image)
-
     def test_apply_mask__with_mask_and_finite_mask_val(self):
         _shape = (50, 50)
         rng = np.random.default_rng(12345)
@@ -253,7 +258,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _val = rng.random() * 1e3
         app = CompositeCreatorApp()
         app._det_mask = _mask
-        app._config["det_mask_val"] = _val
+        app.set_param_value("detector_mask_val", _val)
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         _delta = _newimage - _image
@@ -267,7 +272,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _mask = rng.integers(low=0, high=2, size=_shape)
         app = CompositeCreatorApp()
         app._det_mask = _mask
-        app._config["det_mask_val"] = _val
+        app.set_param_value("detector_mask_val", _val)
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue(np.isnan(_newimage[_mask == 1]).all())
@@ -332,7 +337,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("last_file", Path())
         app._filelist.update()
         app._image_metadata.update(filename=self._hdf5_fnames[0])
-        _index = 7
+        _index = 3
         app._store_args_for_read_image(_index)
         self.assertEqual(app._config["current_fname"], self._hdf5_fnames[0])
         self.assertEqual(app._config["current_kwargs"]["frame"], _index)
@@ -381,12 +386,12 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._CompositeCreatorApp__update_composite_image_params()
         _old_shape = app.composite.shape
         _img_shape2 = (self._img_shape[0] + 2, self._img_shape[1] + 2)
-        _data2 = np.random.random((self._n,) + _img_shape2)
-        for i in range(self._n):
-            np.save(self._fname(i + self._n), _data2[i])
-        app.set_param_value("first_file", self._fname(self._n))
-        app.set_param_value("last_file", self._fname(2 * self._n - 1))
-        app._image_metadata.update(filename=self._fname(self._n))
+        _data2 = np.random.random((self._n_total,) + _img_shape2)
+        for i in range(self._n_total):
+            np.save(self._fname(i + self._n_total), _data2[i])
+        app.set_param_value("first_file", self._fname(self._n_total))
+        app.set_param_value("last_file", self._fname(2 * self._n_total - 1))
+        app._image_metadata.update(filename=self._fname(self._n_total))
         app._CompositeCreatorApp__update_composite_image_params()
         _new_shape = app.composite.shape
         self.assertEqual(_old_shape[0] + 2 * self._ny, _new_shape[0])
@@ -465,21 +470,25 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_get_detector_mask__no_file(self):
         app = CompositeCreatorApp()
-        app.q_settings_set_key("user/det_mask", "no/such/file.tif")
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         self.assertIsNone(_mask)
 
     def test_get_detector_mask__wrong_file(self):
         app = CompositeCreatorApp()
         with open(self._maskfile, "w") as f:
             f.write("this is not a numpy file.")
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         self.assertIsNone(_mask)
 
     def test_get_detector_mask__with_binning(self):
         app = CompositeCreatorApp()
         app.set_param_value("binning", 2)
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._maskfile)
+        app._store_detector_mask()
+        _mask = app._det_mask
         _binned_shape = (self._img_shape[0] // 2, self._img_shape[1] // 2)
         self.assertEqual(_mask.shape, _binned_shape)
 
@@ -488,8 +497,11 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("roi_xlow", 5)
         app.set_param_value("use_roi", True)
         app.set_param_value("first_file", self._hdf5_fnames[0])
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._maskfile)
         app._image_metadata.update(filename=self._hdf5_fnames[0])
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         _target_shape = (self._img_shape[0], self._img_shape[1] - 5)
         self.assertEqual(_mask.shape, _target_shape)
 
@@ -499,8 +511,11 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("use_roi", True)
         app.set_param_value("binning", 2)
         app.set_param_value("first_file", self._hdf5_fnames[0])
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._maskfile)
         app._image_metadata.update(filename=self._hdf5_fnames[0])
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         self.assertEqual(_mask.shape, app._image_metadata.final_shape)
 
     def test_prepare_run__plain(self):
@@ -534,9 +549,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_pre_run(self):
         app = self.get_default_app()
         app.multiprocessing_pre_run()
-        self.assertTrue(app._config["mp_pre_run_called"])
+        self.assertTrue(app._config["run_prepared"])
         self.assertIsNotNone(app._config["mp_tasks"])
-        self.assertIsNotNone(app._config["det_mask_val"])
 
 
 if __name__ == "__main__":

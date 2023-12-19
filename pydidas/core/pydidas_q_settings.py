@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,23 +21,31 @@ modify the globally stored QSettings for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasQsettings"]
 
+
+from typing import Optional, Union
+
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin
-from ..version import VERSION
 
 
 class PydidasQsettings(PydidasQsettingsMixin):
     """
     A modified version of the QSettings with some additional convenience methods.
+
+    Parameters
+    ----------
+    version : Optional[str]
+        An optional version string. If None, the pydidas version will be used.
+        The default is None.
     """
 
-    def __init__(self):
-        PydidasQsettingsMixin.__init__(self)
+    def __init__(self, version: Optional[str] = None):
+        PydidasQsettingsMixin.__init__(self, version=version)
 
     def show_all_stored_q_settings(self):
         """
@@ -45,7 +55,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         for _key, _val in _sets.items():
             print(f"{_key}: {_val}")
 
-    def get_all_stored_q_settings(self):
+    def get_all_stored_q_settings(self) -> dict:
         """
         Get all stored QSettings values as a dictionary.
 
@@ -55,9 +65,17 @@ class PydidasQsettings(PydidasQsettingsMixin):
             The dict with (key: stored_value) pairs.
         """
         _keys = self.q_settings.allKeys()
-        return {_key: self.q_settings.value(_key) for _key in _keys}
+        _prefix = f"{self.q_settings_version}/"
+        return {
+            _key.removeprefix(_prefix): self.q_settings.value(_key)
+            for _key in _keys
+            if (
+                (_key.startswith(_prefix) or _key.startswith("font/"))
+                and not (_key.startswith(f"{_prefix}dialogues"))
+            )
+        }
 
-    def set_value(self, key, val):
+    def set_value(self, key: str, val: object):
         """
         Set the value of a QSettings key.
 
@@ -68,9 +86,9 @@ class PydidasQsettings(PydidasQsettingsMixin):
         val : object
             The new value stored for the key.
         """
-        self.q_settings.setValue(f"{VERSION}/{key}", val)
+        self.q_settings.setValue(f"{self.q_settings_version}/{key}", val)
 
-    def value(self, key, dtype=None):
+    def value(self, key: str, dtype: Union[None, type] = None) -> object:
         """
         Get the value from a QSetting key.
 
@@ -91,4 +109,4 @@ class PydidasQsettings(PydidasQsettingsMixin):
             The value, converted to the type associated with the Parameter
             referenced by param_key or dtype, if given.
         """
-        return self.q_settings_get_value(key, dtype)
+        return self.q_settings_get(key, dtype)

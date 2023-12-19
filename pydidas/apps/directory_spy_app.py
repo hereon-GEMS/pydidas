@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,33 +21,38 @@ file or file of a specific pattern.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DirectorySpyApp"]
 
-import os
+
 import glob
 import multiprocessing as mp
+import os
+from pathlib import Path
+from typing import Tuple, Union
 
 import numpy as np
 from qtpy import QtCore
 
 from ..core import (
     BaseApp,
-    get_generic_param_collection,
+    Dataset,
+    FileReadError,
     PydidasConfigError,
     UserConfigError,
+    get_generic_param_collection,
 )
+from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     check_file_exists,
     check_hdf5_key_exists_in_file,
+    get_extension,
     get_hdf5_metadata,
     pydidas_logger,
-    get_extension,
 )
-from ..core.constants import HDF5_EXTENSIONS
 from ..data_io import import_data
 from .parsers import directory_spy_app_parser
 
@@ -55,14 +62,14 @@ logger = pydidas_logger()
 
 class DirectorySpyApp(BaseApp):
     """
-    The DirectorySpy is an App to scan a folder and load the latest image
-    and keep it in shared memory. To run the app in the background, please
-    refer to the :py:class:`pydidas.multiprocessing.AppRunner`.
+    An App to scan a folder and load the latest image and keep it in shared memory.
+
+    To run the app in the background, please refer to the
+    :py:class:`pydidas.multiprocessing.AppRunner` documentation.
 
     Notes
     -----
-
-    The full list of Parameters used by the DirectorySpyApp:
+    The full list of keyword arguments used by the DirectorySpyApp:
 
     scan_for_all : bool, optional
         Flag to toggle scanning for all new files or only for files matching
@@ -79,9 +86,14 @@ class DirectorySpyApp(BaseApp):
     hdf5_key : Hdf5key, optional
         Used only for hdf5 files: The dataset key. The default is
         entry/data/data.
-    use_global_det_mask : bool, optional
+    use_det_mask : bool, optional
         Keyword to enable or disable using the global detector mask as
         defined by the global mask file and mask value. The default is True.
+    detector_mask_file : Union[pathlib.Path, str], optional
+        The full path to the detector mask file.
+    det_mask_val : float, optional
+        The display value for masked pixels. The default is 0.
+
     use_bg_file : bool, optional
         Keyword to toggle usage of background subtraction. The default is
         False.
@@ -110,7 +122,9 @@ class DirectorySpyApp(BaseApp):
         "filename_pattern",
         "directory_path",
         "hdf5_key",
-        "use_global_det_mask",
+        "use_detector_mask",
+        "detector_mask_file",
+        "detector_mask_val",
         "use_bg_file",
         "bg_file",
         "bg_hdf5_key",
@@ -145,9 +159,6 @@ class DirectorySpyApp(BaseApp):
         """
         self._shared_array = None
         self._index = -1
-        self._config["det_mask_val"] = float(
-            self.q_settings_get_value("user/det_mask_val")
-        )
 
     def multiprocessing_pre_run(self):
         """
@@ -164,7 +175,7 @@ class DirectorySpyApp(BaseApp):
 
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the SetupScan.
+            2. Get all multiprocessing tasks from the ScanContext.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.
@@ -183,7 +194,7 @@ class DirectorySpyApp(BaseApp):
         if not self.get_param_value("scan_for_all"):
             self.__find_current_index()
 
-    def _get_detector_mask(self):
+    def _get_detector_mask(self) -> Union[None, Dataset]:
         """
         Get the detector mask from the file specified in the global QSettings.
 
@@ -193,14 +204,14 @@ class DirectorySpyApp(BaseApp):
             If the mask could be loaded from a numpy file, return the mask.
             Else, None is returned.
         """
-        if not self.get_param_value("use_global_det_mask"):
+        if not self.get_param_value("use_detector_mask"):
             return None
-        _maskfile = self.q_settings_get_value("user/det_mask")
+        _mask_file = self.get_param_value("detector_mask_file")
         try:
-            _mask = np.load(_maskfile)
+            _mask = np.load(_mask_file)
             return _mask
-        except (FileNotFoundError, ValueError, PermissionError):
-            self.set_param_value("use_global_det_mask", False)
+        except (FileNotFoundError, ValueError, PermissionError, FileReadError):
+            self.set_param_value("use_detector_mask", False)
             return None
         raise PydidasConfigError("Unknown error when reading detector mask file.")
 
@@ -257,7 +268,7 @@ class DirectorySpyApp(BaseApp):
         _bg_image = import_data(_bg_file, **_params)
         self._bg_image = self._apply_mask(_bg_image)
 
-    def _apply_mask(self, image):
+    def _apply_mask(self, image: np.ndarray) -> np.ndarray:
         """
         Apply the detector mask to an image.
 
@@ -273,7 +284,8 @@ class DirectorySpyApp(BaseApp):
         """
         if self._det_mask is None:
             return image
-        return np.where(self._det_mask, self._config["det_mask_val"], image)
+        _val = self.get_param_value("detector_mask_val")
+        return np.where(self._det_mask, _val, image)
 
     def initialize_shared_memory(self):
         """
@@ -295,7 +307,7 @@ class DirectorySpyApp(BaseApp):
             self._config["shared_memory"]["array"].get_obj(), dtype=np.float32
         ).reshape((10000, 10000))
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Wait for specific tasks to give the clear signal.
 
@@ -307,10 +319,10 @@ class DirectorySpyApp(BaseApp):
             Flag whether processing can continue or should wait.
         """
         if self.get_param_value("scan_for_all"):
-            return self.__find_latest_file()
-        return self.__find_latest_file_of_pattern()
+            return self.__check_for_new_file()
+        return self.__check_for_new_file_of_pattern()
 
-    def __find_latest_file(self):
+    def __check_for_new_file(self) -> bool:
         """
         Find the file with the last timestamp in a directory.
         """
@@ -322,11 +334,11 @@ class DirectorySpyApp(BaseApp):
         _new_items = self.__process_filenames(_file_one, _file_two)
         return _new_items
 
-    def __process_filenames(self, latest, second_latest):
+    def __process_filenames(self, latest: str, second_latest: str) -> bool:
         """
         Process the filenames.
 
-        This method will take the filenames and file sized and check whether
+        This method will take the filenames and file sizes and check whether
         any values have changed since the last call. The result of the check
         will be returned.
 
@@ -352,12 +364,14 @@ class DirectorySpyApp(BaseApp):
             return True
         return False
 
-    def __find_latest_file_of_pattern(self):
+    def __check_for_new_file_of_pattern(self) -> bool:
         """
         Find the latest file matching the defined file pattern.
         """
         while os.path.isfile(self._fname(self._index + 1)):
             self._index += 1
+        if not os.path.isfile(self._fname(self._index)):
+            self.__find_current_index()
         _file_one = self._fname(self._index) if self._index >= 0 else None
         _file_two = self._fname(self._index - 1) if self._index > 0 else None
         _new_items = self.__process_filenames(_file_one, _file_two)
@@ -367,21 +381,27 @@ class DirectorySpyApp(BaseApp):
         """
         Find the current index of files matching the pattern.
         """
-        _files = glob.glob(self._config["glob_pattern"])
+        _files = glob.glob(self._config["path"] + os.sep + self._config["glob_pattern"])
         _index = self._config["glob_pattern"].find("*")
         _prefix = self._config["glob_pattern"][:_index]
         _suffix = self._config["glob_pattern"][_index + 1 :]
         _files = [
             _f
             for _f in _files
-            if (os.path.isfile(_f) and _f.startswith(_prefix) and _f.endswith(_suffix))
+            if (
+                os.path.isfile(_f)
+                and os.path.basename(_f).startswith(_prefix)
+                and _f.endswith(_suffix)
+            )
         ]
         if len(_files) == 0:
             self._index = -1
             return
         _files.sort()
         if len(_files) > 0:
-            _index = _files[-1].removeprefix(_prefix).removesuffix(_suffix)
+            _index = (
+                os.path.basename(_files[-1]).removeprefix(_prefix).removesuffix(_suffix)
+            )
             self._index = int(_index)
 
     def multiprocessing_post_run(self):
@@ -396,13 +416,18 @@ class DirectorySpyApp(BaseApp):
         """
         return []
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Perform operations in the pre-cycle of every task.
+
+        Parameters
+        ----------
+        index : int
+            The image iamge.
         """
         return
 
-    def multiprocessing_func(self, index=-1):
+    def multiprocessing_func(self, index: int = -1) -> Tuple[int, str]:
         """
         Read the latest image. If the latest image cannot be read (e.g. the
         file is currently being written), the 2nd latest file will be read.
@@ -419,19 +444,24 @@ class DirectorySpyApp(BaseApp):
         try:
             _fname = self._config["latest_file"]
             _image = self.get_image(_fname)
-        except (ValueError, KeyError, FileNotFoundError):
+            if _image.shape == 0:
+                raise ValueError("Empty image.")
+        except (ValueError, KeyError, FileNotFoundError, FileReadError):
             try:
                 _fname = self._config["2nd_latest_file"]
                 _image = self.get_image(_fname)
-            except (ValueError, KeyError, FileNotFoundError):
-                raise RuntimeError("Cannot read either of the last to files.")
+            except (ValueError, KeyError, FileNotFoundError, FileReadError):
+                raise FileReadError(
+                    "Cannot read either of the last two files. Please check the "
+                    "directory and filenames."
+                )
         _image = self._apply_mask(_image)
         if self.get_param_value("use_bg_file"):
             _image -= self._bg_image
         self.__store_image_in_shared_memory(_image)
         return index, _fname
 
-    def get_image(self, fname):
+    def get_image(self, fname: Union[Path, str]) -> Dataset:
         """
         Get an image from the given filename.
 
@@ -454,7 +484,7 @@ class DirectorySpyApp(BaseApp):
             self.__update_hdf5_metadata(fname)
         return import_data(fname, **self.__read_image_meta)
 
-    def __update_hdf5_metadata(self, fname):
+    def __update_hdf5_metadata(self, fname: str):
         """
         Get the metadata parameters to read a frame from an HDF5 file.
 
@@ -472,7 +502,7 @@ class DirectorySpyApp(BaseApp):
         _shape = get_hdf5_metadata(fname, meta="shape", dset=_dataset)
         self.__read_image_meta = {"frame": _shape[0] - 1, "dataset": _dataset}
 
-    def __store_image_in_shared_memory(self, image):
+    def __store_image_in_shared_memory(self, image: np.ndarray):
         """
         Store the image data in the shared memory.
 
@@ -491,7 +521,7 @@ class DirectorySpyApp(BaseApp):
             self._config["shared_memory"]["metadata"].value = bytes(_meta, "utf-8")
             self._shared_array[:_height, :_width] = image
 
-    def __get_image_metadata_string(self):
+    def __get_image_metadata_string(self) -> str:
         """
         Get the metadata string from the metadata dictionary.
 
@@ -507,8 +537,8 @@ class DirectorySpyApp(BaseApp):
             f'dataset: {self.__read_image_meta["dataset"]})'
         )
 
-    @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, fname, *args):
+    @QtCore.Slot(object, object)
+    def multiprocessing_store_results(self, index: int, fname: str, *args):
         """
         Store the multiprocessing results for other pydidas apps and processes.
 
@@ -531,7 +561,7 @@ class DirectorySpyApp(BaseApp):
             ].value.decode()
 
     @property
-    def image(self):
+    def image(self) -> np.ndarray:
         """
         Get the currently stored image.
 
@@ -543,7 +573,7 @@ class DirectorySpyApp(BaseApp):
         return self.__current_image
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         """
         Get the curently stored filename.
 
@@ -555,7 +585,7 @@ class DirectorySpyApp(BaseApp):
         return self.__current_fname
 
     @property
-    def image_metadata(self):
+    def image_metadata(self) -> dict:
         """
         Get the currently stored image metadata.
 

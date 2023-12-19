@@ -1,5 +1,13 @@
-The Workflow test frame
-=======================
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+.. _workflow_test_frame:
+
+Workflow test frame
+===================
 
 .. contents::
     :depth: 2
@@ -7,7 +15,7 @@ The Workflow test frame
     :backlinks: none
     
 The Workflow test frame can be used to run the 
-:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` locally
+:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` locally
 for a single scan point and visualize all results, including intermediate 
 results.
 
@@ -21,11 +29,11 @@ canvas for data visualization on the right.
 Keeping the Workflow up to date
 -------------------------------
 
-The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
-is automatically kept up to date. If any Plugin, Plugin Parameter or SetupScan
+The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`
+is automatically kept up to date. If any Plugin, Plugin Parameter or ScanContext
 Parameter changes, the WorkflowTree is automatically updated.
 In these instances, it is not required to manually update the 
-:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
+:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`.
 
 .. image: images/workflow_test_reset.png
     :align: right
@@ -42,24 +50,31 @@ Data source selection
 
 
 A single frame must be selected to test the 
-:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`. Two 
+:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`. Three 
 options exist for selecting the frame which can be toggled by the "Image 
 selection" Parameter (see image on the right). 
 
-.. image:: images/workflow_test_image_number.png
+.. image:: images/workflow_test_use_global_index.png
     :align: left
 
-Using the "Image number" entry, a datapoint can be selected by its absolute 
-number in the acquisition sequence (i.e. chronologically). This number must be
-given in the "Image number" Parameter field.
+Using the "Global index" entry, a datapoint can be selected by its absolute 
+number in the acquisition sequence (i.e. chronologically starting with 0). 
+This number must be given in the "Global frame index" Parameter field.
 
 
-.. image:: images/workflow_test_scan_indices.png
+.. image:: images/workflow_test_use_scan_indices.png
     :align: left
 
 Selecting the "Use scan indices" will allow the user to pick a datapoint based
 on its position in the scan. Parameters for all defined scan dimensions are 
 shown and must be used to select the desired datapoint.
+
+.. image:: images/workflow_test_use_det_number.png
+    :align: left
+
+Selecting the "Use detector image number" will allow the user to pick a 
+datapoint based on the detector image number. This accounts for offsets in 
+image numbers, as defined by the "Starting index" in the Scan settings.
 
 Processing
 ----------

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,10 +22,10 @@ GUI is included in the gui module.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 
@@ -34,6 +36,7 @@ from . import parsers
 from .composite_creator_app import *
 from .directory_spy_app import *
 from .execute_workflow_app import *
+from .execute_workflow_runner import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -51,3 +54,8 @@ from . import execute_workflow_app
 
 __all__.extend(execute_workflow_app.__all__)
 del execute_workflow_app
+
+from . import execute_workflow_runner
+
+__all__.extend(execute_workflow_runner.__all__)
+del execute_workflow_runner

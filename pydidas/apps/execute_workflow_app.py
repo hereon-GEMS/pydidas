@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,36 +21,44 @@ for processing diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ExecuteWorkflowApp"]
 
+
+import multiprocessing as mp
 import time
 import warnings
-import multiprocessing as mp
+from typing import Tuple, Union
 
 import numpy as np
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
-from ..core import get_generic_param_collection, Dataset, BaseApp, UserConfigError
-from ..experiment import SetupScan, SetupExperiment
-from ..workflow import WorkflowTree, WorkflowResults
+from ..contexts import DiffractionExperimentContext, ScanContext
+from ..core import (
+    BaseApp,
+    Dataset,
+    FileReadError,
+    UserConfigError,
+    get_generic_param_collection,
+)
+from ..workflow import WorkflowResultsContext, WorkflowTree
 from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
-EXP = SetupExperiment()
-RESULTS = WorkflowResults()
+SCAN = ScanContext()
+EXP = DiffractionExperimentContext()
+RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
 
 
 class ExecuteWorkflowApp(BaseApp):
     """
-    Inherits from :py:class:`pydidas.apps.BaseApp<pydidas.apps.BaseApp>`
+    Inherits from :py:class:`pydidas.apps.BaseApp<pydidas.apps.BaseApp>`.
 
     The ExecuteWorkflowApp is used to run workflows which can be any operation
     which can be written as Plugin.
@@ -106,13 +116,15 @@ class ExecuteWorkflowApp(BaseApp):
     sig_results_updated = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        BaseApp.__init__(self, *args, **kwargs)
         self._config.update(
             {
+                "result_metadata_set": False,
                 "result_shapes": {},
                 "shared_memory": {},
                 "tree_str_rep": "[]",
                 "buffer_n": 4,
+                "run_prepared": False,
             }
         )
         self._index = -1
@@ -123,6 +135,7 @@ class ExecuteWorkflowApp(BaseApp):
         Reset the runtime variables for a new run.
         """
         self._config["result_metadata_set"] = False
+        self._config["run_prepared"] = False
         self._shared_arrays = {}
         self._result_metadata = {}
         self._mp_tasks = np.array(())
@@ -143,7 +156,7 @@ class ExecuteWorkflowApp(BaseApp):
 
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the SetupScan.
+            2. Get all multiprocessing tasks from the ScanContext.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.
@@ -154,21 +167,12 @@ class ExecuteWorkflowApp(BaseApp):
         self.reset_runtime_vars()
         self._mp_tasks = np.arange(SCAN.n_points)
         if self.slave_mode:
-            TREE.restore_from_string(self._config["tree_str_rep"])
-            for _key, _val in self._config["scan_vals"].items():
-                SCAN.set_param_value(_key, _val)
-            for _key, _val in self._config["exp_vals"].items():
-                EXP.set_param_value(_key, _val)
-        if not self.slave_mode:
+            self._recreate_context()
+        else:
             RESULTS.update_shapes_from_scan_and_workflow()
             RESULT_SAVER.set_active_savers_and_title([])
-            self._config["tree_str_rep"] = TREE.export_to_string()
-            self._config["scan_vals"] = SCAN.get_param_values_as_dict(
-                filter_types_for_export=True
-            )
-            self._config["exp_vals"] = EXP.get_param_values_as_dict()
-            self.__check_and_store_result_shapes()
-            self.__check_size_of_results_and_buffer()
+            self._store_context()
+            self._check_size_of_results_and_buffer()
             self.initialize_shared_memory()
             if self.get_param_value("autosave_results"):
                 RESULTS.prepare_files_for_saving(
@@ -178,29 +182,45 @@ class ExecuteWorkflowApp(BaseApp):
         self.__initialize_arrays_from_shared_memory()
         self._redefine_multiprocessing_carryon()
         TREE.prepare_execution()
+        self._config["run_prepared"] = True
         if self.get_param_value("live_processing"):
             TREE.root.plugin.prepare_carryon_check()
 
-    def __check_and_store_result_shapes(self):
+    def _recreate_context(self):
         """
-        Run through the WorkflowTree to get the shapes of all results.
+        Recreate the required context from the config for slave apps.
         """
-        _shapes = TREE.get_all_result_shapes()
-        self._config["result_shapes"] = _shapes
+        TREE.restore_from_string(self._config["tree_str_rep"])
+        for _key, _val in self._config["scan_context"].items():
+            SCAN.set_param_value(_key, _val)
+        for _key, _val in self._config["exp_context"].items():
+            EXP.set_param_value(_key, _val)
 
-    def __check_size_of_results_and_buffer(self):
+    def _store_context(self):
         """
-        Check the size of results and calculate the number of datasets which
-        can be stored in the buffer.
+        Store the current context for slave app instances.
+        """
+        self._config["tree_str_rep"] = TREE.export_to_string()
+        self._config["scan_context"] = SCAN.get_param_values_as_dict(
+            filter_types_for_export=True
+        )
+        self._config["exp_context"] = EXP.get_param_values_as_dict(
+            filter_types_for_export=True
+        )
+        self._config["result_shapes"] = TREE.get_all_result_shapes()
+
+    def _check_size_of_results_and_buffer(self):
+        """
+        Check the size of results and the buffer size.
 
         Raises
         ------
         UserConfigError
             If the buffer is too small to store a one dataset per MP worker.
         """
-        _buffer = self.q_settings_get_value("global/shared_buffer_size", float)
-        _n_worker = self.q_settings_get_value("global/mp_n_workers", int)
-        _n_data = self.q_settings_get_value("global/shared_buffer_max_n", int)
+        _buffer = self.q_settings_get("global/shared_buffer_size", float)
+        _n_worker = self.q_settings_get("global/mp_n_workers", int)
+        _n_data = self.q_settings_get("global/shared_buffer_max_n", int)
         _req_points_per_dataset = sum(
             np.prod(s) for s in self._config["result_shapes"].values()
         )
@@ -209,10 +229,11 @@ class ExecuteWorkflowApp(BaseApp):
         if _n_dataset_in_buffer < _n_worker:
             _min_buffer = _req_mem_per_dataset * _n_worker
             _error = (
-                "The defined buffer is too small. The required memory "
-                f"per diffraction image is {_req_mem_per_dataset:.3f} "
-                f"MB and {_n_worker} workers have been defined. The "
-                f"minimum buffer size must be {_min_buffer:.2f} MB."
+                "The defined buffer is too small. The required memory per diffraction "
+                f"image is {_req_mem_per_dataset:.3f} MB and {_n_worker} workers have "
+                f"been defined. The minimum buffer size must be {_min_buffer:.2f} MB. "
+                "\nPlease update the buffer size or change number of workers in the "
+                "global settings."
             )
             raise UserConfigError(_error)
         self._config["buffer_n"] = min(
@@ -221,12 +242,12 @@ class ExecuteWorkflowApp(BaseApp):
 
     def initialize_shared_memory(self):
         """
-        Initialize the shared memory arrays based on the buffer size and
-        the result shapes.
+        Initialize the shared arrays from the buffer size and result shapes.
         """
         _n = self._config["buffer_n"]
         _share = self._config["shared_memory"]
-        _share["flag"] = mp.Array("I", _n, lock=mp.Lock())
+        self._config["shared_memory"]["lock"] = mp.Lock()
+        _share["flag"] = mp.Array("I", _n, lock=self._config["shared_memory"]["lock"])
         for _key in self._config["result_shapes"]:
             _num = int(_n * np.prod(self._config["result_shapes"][_key]))
             _share[_key] = mp.Array("f", _num, lock=mp.Lock())
@@ -247,23 +268,21 @@ class ExecuteWorkflowApp(BaseApp):
 
     def _redefine_multiprocessing_carryon(self):
         """
-        Redefine the multiprocessing_carryon method based on the the
-        live_processing settings.
+        Redefine multiprocessing_carryon based on the the live_processing settings.
 
-        To speed up processing, this method will link the required function
-        directly to multiprocessing_carryon. If live_processing is used,
-        this will be the input_available check of the input plugin. If not,
-        the return value will always be True.
+        To speed up processing, this method will link the required function directly to
+        multiprocessing_carryon. If live_processing is used, this will be the
+        input_available check of the input plugin. If not, the return value will always
+        be True.
         """
         if self.get_param_value("live_processing"):
             self.multiprocessing_carryon = self.__live_mp_carryon
         else:
             self.multiprocessing_carryon = lambda: True
 
-    def __live_mp_carryon(self):
+    def __live_mp_carryon(self) -> bool:
         """
-        Check the state of the latest file to allow continuation of the
-        processing.
+        Check the state of the latest file to allow continuation of the processing.
 
         Returns
         -------
@@ -272,13 +291,18 @@ class ExecuteWorkflowApp(BaseApp):
         """
         return TREE.root.plugin.input_available(self._index)
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> np.ndarray:
         """
         Return all tasks required in multiprocessing.
+
+        Returns
+        -------
+        np.ndarray
+            The specified input tasks.
         """
         return self._mp_tasks
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Store the reference to the frame index internally.
 
@@ -289,7 +313,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         self._index = index
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Get the flag value whether to carry on processing.
 
@@ -306,28 +330,49 @@ class ExecuteWorkflowApp(BaseApp):
         """
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int) -> Union[int, Tuple[int, dict]]:
         """
         Perform key operation with parallel processing.
+
+        Parameters
+        ----------
+        index : int
+            The task index to be executed.
 
         Returns
         -------
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            TREE.execute_process(index)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                TREE.execute_process(index)
+        except FileReadError:
+            return -1
         self.__write_results_to_shared_arrays()
         if self._config["result_metadata_set"]:
             return self._config["buffer_pos"]
         self.__store_result_metadata()
         return (self._config["buffer_pos"], self._result_metadata)
 
+    def __write_results_to_shared_arrays(self):
+        """Write the results from the WorkflowTree execution to the shared array."""
+        while True:
+            with self._config["shared_memory"]["lock"]:
+                _zeros = np.where(self._shared_arrays["flag"] == 0)[0]
+                if _zeros.size > 0:
+                    _buffer_pos = _zeros[0]
+                    self._config["buffer_pos"] = _buffer_pos
+                    self._shared_arrays["flag"][_buffer_pos] = 1
+                    break
+            time.sleep(0.01)
+        for _node_id in self._config["result_shapes"]:
+            self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[_node_id].results
+
     def __store_result_metadata(self):
         """
-        Store the result metadata because it cannot be broadcast to the shared
-        array.
+        Store the result metadata because it cannot be broadcast to the shared array.
         """
         for _node_id in self._config["result_shapes"]:
             _res = TREE.nodes[_node_id].results
@@ -336,58 +381,38 @@ class ExecuteWorkflowApp(BaseApp):
                     "axis_labels": _res.axis_labels,
                     "axis_ranges": _res.axis_ranges,
                     "axis_units": _res.axis_units,
+                    "data_unit": _res.data_unit,
+                    "data_label": _res.data_label,
                 }
             else:
                 self._result_metadata[_node_id] = {
                     "axis_labels": {i: None for i in range(_res.ndim)},
                     "axis_ranges": {i: None for i in range(_res.ndim)},
                     "axis_units": {i: None for i in range(_res.ndim)},
+                    "data_unit": "",
+                    "data_label": "",
                 }
         self._config["result_metadata_set"] = True
         if not self.slave_mode:
             RESULT_SAVER.push_frame_metadata_to_active_savers(self._result_metadata)
 
-    def __write_results_to_shared_arrays(self):
-        """
-        Write the results from the WorkflowTree execution to the shared array.
-        """
-        _flag_lock = self._config["shared_memory"]["flag"]
-        while True:
-            _flag_lock.acquire()
-            _zeros = np.where(self._shared_arrays["flag"] == 0)[0]
-            if _zeros.size > 0:
-                _buffer_pos = _zeros[0]
-                self._config["buffer_pos"] = _buffer_pos
-                self._shared_arrays["flag"][_buffer_pos] = 1
-                break
-            _flag_lock.release()
-            time.sleep(0.01)
-        for _node_id in self._config["result_shapes"]:
-            self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[_node_id].results
-        _flag_lock.release()
-
-    def multiprocessing_post_run(self):
-        """
-        Perform operations after running main parallel processing function.
-        """
-
-    @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, *data):
+    @QtCore.Slot(object, object)
+    def multiprocessing_store_results(self, index: int, *data: tuple):
         """
         Store the results of the multiprocessing operation.
 
         Parameters
         ----------
         index : int
-            The index in the composite image.
+            The index of the processed task.
         data : tuple
             The results from multiprocessing_func. This can be either a tuple
             with (buffer_pos, metadata) or the integer buffer_pos.
         """
         # the ExecutiveWorkflowApp only uses the first argument of the variadict data:
-        data = data[0]
         if self.slave_mode:
             return
+        data = data[0]
         if isinstance(data, tuple):
             buffer_pos = data[0]
             if not RESULTS._config["metadata_complete"]:
@@ -395,19 +420,24 @@ class ExecuteWorkflowApp(BaseApp):
                 self._store_frame_metadata(data[1])
         else:
             buffer_pos = data
+        if buffer_pos == -1:
+            _filename = TREE.root.plugin.get_filename(index)
+            QtWidgets.QApplication.instance().set_status_message(
+                f"File reading error during processing of scan index #{index}."
+                f" (filename: {_filename})"
+            )
+            return
         _new_results = {_key: None for _key in self._config["result_shapes"]}
-        _flag_lock = self._config["shared_memory"]["flag"]
-        _flag_lock.acquire()
-        for _key in _new_results:
-            _new_results[_key] = self._shared_arrays[_key][buffer_pos]
-        self._shared_arrays["flag"][buffer_pos] = 0
-        _flag_lock.release()
+        with self._config["shared_memory"]["lock"]:
+            for _key in _new_results:
+                _new_results[_key] = self._shared_arrays[_key][buffer_pos]
+            self._shared_arrays["flag"][buffer_pos] = 0
         RESULTS.store_results(index, _new_results)
         if self.get_param_value("autosave_results"):
             RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
         self.sig_results_updated.emit()
 
-    def _store_frame_metadata(self, metadata):
+    def _store_frame_metadata(self, metadata: dict):
         """
         Store the (separate) metadata from a frame internally.
 

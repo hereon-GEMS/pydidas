@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,20 +20,20 @@ Module with the Sum1dData Plugin which can be used to sum over 1D data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Sum1dData"]
 
 
 import numpy as np
 
+from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import Dataset, ParameterCollection, Parameter, get_generic_parameter
 from pydidas.core.utils import (
-    process_1d_with_multi_input_dims,
     calculate_result_shape_for_multi_input_dims,
+    process_1d_with_multi_input_dims,
 )
 from pydidas.plugins import ProcPlugin
 
@@ -44,33 +46,11 @@ class Sum1dData(ProcPlugin):
     plugin_name = "Sum 1D data"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    default_params = ParameterCollection(
-        get_generic_parameter("process_data_dim"),
-        get_generic_parameter("type_selection"),
-        Parameter(
-            "lower_limit",
-            float,
-            0,
-            name="Lower limit",
-            tooltip=(
-                "The lower limit of data selection. This point is "
-                "included in the data. Note that the selection is either"
-                " in indices or data range, depending on the value of "
-                '"type_selection".'
-            ),
-        ),
-        Parameter(
-            "upper_limit",
-            float,
-            0,
-            name="Upper limit",
-            tooltip=(
-                "The upper limit of data selection. This point is "
-                "included in the data. Note that the selection is either"
-                " in indices or data range, depending on the value of "
-                '"type_selection".'
-            ),
-        ),
+    default_params = get_generic_param_collection(
+        "process_data_dim",
+        "type_selection",
+        "lower_limit",
+        "upper_limit",
     )
     input_data_dim = -1
     output_data_dim = 0
@@ -80,10 +60,16 @@ class Sum1dData(ProcPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._data = None
+        self._config["slice"] = None
+
+    def pre_execute(self):
+        """
+        Reset the index range slices before starting a new processing run.
+        """
+        self._config["slice"] = None
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Sum data.
 
@@ -96,25 +82,25 @@ class Sum1dData(ProcPlugin):
 
         Returns
         -------
-        sum : np.ndarray
-            The data sum in form of an array of shape (1,).
+        sum : Dataset
+            The data sum in form of a Dataset of shape (1,).
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
-        _selection = self._data[self._get_index_range()]
+        _selection = self._data[self._get_slice()]
         _sum = np.sum(_selection)
         _new_data = Dataset(
             [_sum],
             axis_labels=["Data sum"],
             axis_units=[""],
             metadata=data.metadata,
-            axis_label="data sum",
-            axis_unit="a.u.",
+            data_label="data sum",
+            data_unit=data.data_unit,
         )
         return _new_data, kwargs
 
-    def _get_index_range(self):
+    def _get_slice(self) -> slice:
         """
         Get the indices for the selected data range.
 
@@ -123,21 +109,44 @@ class Sum1dData(ProcPlugin):
         slice
             The slice object to select the range from the input data.
         """
-        _low = self.get_param_value("lower_limit")
-        _high = self.get_param_value("upper_limit")
+        if self._config["slice"] is not None:
+            return self._config["slice"]
         if self.get_param_value("type_selection") == "Indices":
-            return slice(int(_low), int(_high) + 1)
-        _x = self._data.axis_ranges[0]
-        assert isinstance(_x, np.ndarray), (
-            "The data does not have a correct range and using the data range "
-            "for selection is only available using the indices."
-        )
-        _bounds = np.where((_x >= _low) & (_x <= _high))[0]
-        if _bounds.size == 0:
-            return slice(0, 0)
-        elif _bounds.size == 1:
-            return slice(_bounds[0], _bounds[0] + 1)
-        return slice(_bounds[0], _bounds[-1] + 1)
+            _low = (
+                self.get_param_value("lower_limit")
+                if self.get_param_value("lower_limit") is not None
+                else 0
+            )
+            _high = (
+                self.get_param_value("upper_limit")
+                if self.get_param_value("upper_limit") is not None
+                else self._data.size
+            )
+            self._config["slice"] = slice(int(_low), int(_high) + 1)
+        else:
+            _x = self._data.axis_ranges[0]
+            assert isinstance(_x, np.ndarray), (
+                "The data does not have a correct range and using the data range "
+                "for selection is only available using the indices."
+            )
+            _low = (
+                self.get_param_value("lower_limit")
+                if self.get_param_value("lower_limit") is not None
+                else _x[0]
+            )
+            _high = (
+                self.get_param_value("upper_limit")
+                if self.get_param_value("upper_limit") is not None
+                else _x[-1]
+            )
+            _bounds = np.where((_x >= _low) & (_x <= _high))[0]
+            if _bounds.size == 0:
+                self._config["slice"] = slice(0, 0)
+            elif _bounds.size == 1:
+                self._config["slice"] = slice(_bounds[0], _bounds[0] + 1)
+            else:
+                self._config["slice"] = slice(_bounds[0], _bounds[-1] + 1)
+        return self._config["slice"]
 
     @calculate_result_shape_for_multi_input_dims
     def calculate_result_shape(self):

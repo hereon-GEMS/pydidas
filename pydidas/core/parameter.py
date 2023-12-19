@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,24 +21,25 @@ consistent interface for various data types.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Parameter"]
 
 
 import numbers
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
+from typing import Dict, List, Self, Set, Tuple, Type, Union
 
 from .hdf5_key import Hdf5key
 
 
-def _get_base_class(cls):
+def _get_base_class(cls) -> type:
     """
-    Filter numerical classes and return the corresponding
-    abstract base class.
+    Filter numerical classes and return the corresponding abstract base class.
 
     This function checks whether cls is a numerical class and returns the
     numerical abstract base class from the numbers module for type-checking.
@@ -113,7 +116,7 @@ class Parameter:
         performed. If any integer or float value is used, this will be
         changed to the abstract base class of numbers.Integral or
         numbers.Real.
-    default : Union[type, None]
+    default : Union[None, type]
         The default value. The data type must be of the same type as
         param_type. None is only accepted if param_type is None as well.
     meta : Union[dict, None], optional
@@ -143,7 +146,14 @@ class Parameter:
         is False.
     """
 
-    def __init__(self, refkey, param_type, default, meta=None, **kwargs):
+    def __init__(
+        self,
+        refkey: str,
+        param_type: Union[None, Type],
+        default: object,
+        meta: Union[None, Dict] = None,
+        **kwargs: Dict,
+    ):
         super().__init__()
         self.__refkey = refkey
         self.__type = _get_base_class(param_type)
@@ -161,13 +171,13 @@ class Parameter:
         self.__process_choices_input(kwargs)
         self.value = kwargs.get("value", self.__meta["default"])
 
-    def __process_default_input(self, default):
+    def __process_default_input(self, default: Type):
         """
         Process the default value.
 
         Parameters
         ----------
-        default : type
+        default : Type
             The default attribute passed to init.
 
         Raises
@@ -178,11 +188,11 @@ class Parameter:
         default = self.__convenience_type_conversion(default)
         if not self.__typecheck(default):
             raise TypeError(
-                f'Default value "{default}" does not have data' f"type {self.__type}!"
+                f"Default value '{default}' does not have data type {self.__type}!"
             )
         self.__meta["default"] = default
 
-    def __process_choices_input(self, kwargs):
+    def __process_choices_input(self, kwargs: Dict):
         """
         Process the choices input.
 
@@ -208,18 +218,17 @@ class Parameter:
         _def = self.__meta["default"]
         if self.__meta["choices"] is not None and _def not in self.__meta["choices"]:
             raise ValueError(
-                f'The default value "{_def}" does not '
-                "correspond to any of the defined choices: "
-                f'{self.__meta["choices"]}.'
+                f"The default value '{_def}' does not correspond to any of the defined "
+                f"choices: {self.__meta['choices']}."
             )
 
-    def __typecheck(self, val):
+    def __typecheck(self, val: object) -> bool:
         """
         Check the type of a new input.
 
         Parameters
         ----------
-        val : any
+        val : object
             The value of the parameter to be checked.
 
         Returns
@@ -237,7 +246,7 @@ class Parameter:
             return True
         return False
 
-    def __convenience_type_conversion(self, value):
+    def __convenience_type_conversion(self, value: object) -> object:
         """
         Convert the value to the defined type.
 
@@ -275,7 +284,7 @@ class Parameter:
         return value
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Return the parameter name.
 
@@ -287,7 +296,7 @@ class Parameter:
         return self.__meta["name"]
 
     @property
-    def allow_None(self):
+    def allow_None(self) -> bool:
         """
         Returns the flag to allow "None" as value.
 
@@ -299,7 +308,7 @@ class Parameter:
         return self.__meta["allow_None"]
 
     @property
-    def refkey(self):
+    def refkey(self) -> str:
         """
         Return the paramter reference key.
 
@@ -311,7 +320,7 @@ class Parameter:
         return self.__refkey
 
     @property
-    def default(self):
+    def default(self) -> object:
         """
         Return the default value.
 
@@ -323,7 +332,7 @@ class Parameter:
         return self.__meta["default"]
 
     @property
-    def unit(self):
+    def unit(self) -> str:
         """
         Get the Parameter unit.
 
@@ -335,7 +344,7 @@ class Parameter:
         return self.__meta["unit"]
 
     @property
-    def tooltip(self):
+    def tooltip(self) -> str:
         """
         Get the Parameter tooltip.
 
@@ -362,7 +371,7 @@ class Parameter:
         return _t.replace(") (", ", ")
 
     @property
-    def choices(self):
+    def choices(self) -> Union[None, List]:
         """
         Get or set the allowed choices for the Parameter value.
 
@@ -381,7 +390,7 @@ class Parameter:
         return self.__meta["choices"]
 
     @choices.setter
-    def choices(self, choices):
+    def choices(self, choices: Union[None, List, Tuple, Set]):
         """
         Update the allowed choices of a Parameter.
 
@@ -395,6 +404,9 @@ class Parameter:
             If the current Parameter value is not included in the list of
             new choices.
         """
+        if choices is None:
+            self.__meta["choices"] = None
+            return
         if not isinstance(choices, (list, tuple, set)):
             raise TypeError("New choices must be a list, set or tuple.")
         for _c in choices:
@@ -410,7 +422,7 @@ class Parameter:
         self.__meta["choices"] = list(choices)
 
     @property
-    def optional(self):
+    def optional(self) -> bool:
         """
         Get the flag whether the parameter is optional or not.
 
@@ -422,7 +434,7 @@ class Parameter:
         return self.__meta["optional"]
 
     @property
-    def dtype(self):
+    def dtype(self) -> Type:
         """
         Get the data type of the Parameter value.
 
@@ -434,14 +446,9 @@ class Parameter:
         return self.__type
 
     @property
-    def value(self):
+    def value(self) -> object:
         """
-        Get or set the parameter value.
-
-        Parameters
-        ----------
-        val : type
-            The new value for the parameter.
+        Get the Parameter value.
 
         Returns
         -------
@@ -451,9 +458,14 @@ class Parameter:
         return self.__value
 
     @value.setter
-    def value(self, val):
+    def value(self, val: object):
         """
         Set a new value for the parameter.
+
+        Parameters
+        ----------
+        val : type
+            The new value for the parameter.
 
         Raises
         ------
@@ -464,21 +476,20 @@ class Parameter:
         val = self.__convenience_type_conversion(val)
         if self.__meta["choices"] and val not in self.__meta["choices"]:
             raise ValueError(
-                f'The selected value "{val}" does not correspond'
-                " to any of the allowed choices: "
-                f'{self.__meta["choices"]}'
+                f"The selected value '{val}' does not correspond to any of the allowed "
+                f"choices: {self.__meta['choices']}"
             )
         if not (self.__typecheck(val) or self.__meta["optional"] and (val is None)):
+            _name = self.__meta["name"]
             raise ValueError(
-                f"Cannot set Parameter (object ID:{id(self)}, refkey: "
-                f'"{self.__refkey}", name: "{self.__meta["name"]}")'
-                " because it is of the wrong data type. (expected: "
+                f"Cannot set Parameter (object ID:{id(self)}, refkey: '{self.__refkey}'"
+                f", name: '{_name}') because it is of the wrong data type. (expected: "
                 f"{self.__type}, input type: {type(val)}"
             )
         self.__value = val
 
     @property
-    def value_for_export(self):
+    def value_for_export(self) -> object:
         """
         Get the value in a pickleable format for exporting.
 
@@ -502,13 +513,34 @@ class Parameter:
             return self.value
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
+    def update_value_and_choices(self, value: object, choices: Iterable[object, ...]):
+        """
+        Update the value and choices of the Parameter to prevent illegal selections.
+
+        Parameters
+        ----------
+        value : object
+            The new Parameter values
+        choices : Iterable[object, ...]
+            The new choices for the Parameter.
+        """
+        if not self.__typecheck(value):
+            raise ValueError(
+                f"The new value '{value}' of type '{type(value)}' is of the wrong "
+                f"type. Expected '{self.__type}'."
+            )
+        if value not in choices:
+            raise ValueError("The new value must be included in the new choices.")
+        self.__value = value
+        self.choices = choices
+
     def restore_default(self):
         """
         Restore the parameter to its default value.
         """
         self.value = self.__meta["default"]
 
-    def get_copy(self):
+    def copy(self) -> Self:
         """
         A method to get the a copy of the Parameter object.
 
@@ -519,26 +551,33 @@ class Parameter:
         """
         return Parameter(*self.dump())
 
-    def dump(self):
+    deepcopy = copy
+
+    def dump(self) -> Tuple:
         """
         A method to get the full class information for saving.
 
         Returns
         -------
-        str
+        refkey : str
             The name of the Parameter
-        type
+        type : type
             The data type of the Parameter.
-        meta
-            A dictionary with all the metadata information about the
-            Parameter (value, unit, tooltip, refkey, default, choices)
+        default : object
+            The default value
+        meta : dict
+            A dictionary with all the metadata information about the Parameter
+            (value, unit, tooltip, refkey, default, choices)
         """
         _meta = self.__meta.copy()
         _meta.update({"value": self.__value})
         del _meta["default"]
-        return (self.__refkey, self.__type, self.__meta["default"], _meta)
+        _default = self.__meta["default"]
+        if self.choices is not None and self.__meta["default"] not in self.choices:
+            _default = self.value
+        return (self.__refkey, self.__type, _default, _meta)
 
-    def export_refkey_and_value(self):
+    def export_refkey_and_value(self) -> Tuple:
         """
         Export the refkey and value (in a pickleable format) for saving
         in YAML files.
@@ -550,7 +589,7 @@ class Parameter:
         """
         return (self.__refkey, self.value_for_export)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Get a short string representation of the parameter.
 
@@ -578,7 +617,7 @@ class Parameter:
             f'default: {_def} {self.__meta["unit"]})'
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Get the representation of the Parameter instance.
 
@@ -605,11 +644,11 @@ class Parameter:
         _s += f"): {_val} {_unit}(default: {_def})>"
         return _s
 
-    def __copy__(self):
+    def __copy__(self) -> Self:
         """
         Copy the Parameter object.
 
-        This method is a wrapper for the "get_copy" method to allow the generic
+        This method is a wrapper for the "copy" method to allow the generic
         Python copy module to make copies of Parameters as well.
 
         Returns
@@ -617,11 +656,11 @@ class Parameter:
         Parameter
             A copy of the Parameter.
         """
-        return self.get_copy()
+        return self.copy()
 
-    def __call__(self):
+    def __call__(self) -> object:
         """
-        Calling method to get the value.
+        Get the stored Parameter value.
 
         Returns
         -------
@@ -630,7 +669,7 @@ class Parameter:
         """
         return self.__value
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Get a hash value for the Parameter.
 

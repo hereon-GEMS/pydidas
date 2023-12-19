@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,86 +21,73 @@ the DataBrowsingFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DataBrowsingFrameBuilder"]
 
-from qtpy import QtWidgets, QtCore
-import qtawesome as qta
 
-from ....core import constants
-from ....widgets import BaseFrame
+import qtawesome as qta
+from qtpy import QtWidgets
+
+from ....core.constants import POLICY_EXP_EXP
+from ....widgets.factory import SquareButton
+from ....widgets.framework import BaseFrame
 from ....widgets.selection import DirectoryExplorer, Hdf5DatasetSelector
 from ....widgets.silx_plot import PydidasImageView
 
 
-class DataBrowsingFrameBuilder(BaseFrame):
+class DataBrowsingFrameBuilder:
     """
-    Mix-in class which includes the build_frame method to populate the
-    base class's UI and initialize all widgets.
+    Class to populate the DataBrowsingFrame with widgets.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
-
-    def build_frame(self):
+    @classmethod
+    def build_frame(cls, frame: BaseFrame):
         """
         Build the frame and create all required widgets.
         """
-        self.create_label(
-            None, "Data browser", fontsize=constants.STANDARD_FONT_SIZE + 4, bold=True
-        )
+        frame.create_label(None, "Data browser", fontsize_offset=4, bold=True)
 
-        _button_iconsize = 25
-        self._widgets["selection"] = QtWidgets.QFrame()
-        self._widgets["selection"].setSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
-        )
-        self._widgets["selection"].setLayout(QtWidgets.QGridLayout())
-        self._widgets["selection"].layout().setRowStretch(0, 10)
-
-        self.create_any_widget(
-            "tree",
+        frame.create_empty_widget("browser", sizePolicy=POLICY_EXP_EXP)
+        frame.create_any_widget(
+            "explorer",
             DirectoryExplorer,
-            parent_widget=self._widgets["selection"],
             gridPos=(0, 0, 3, 1),
+            parent_widget="browser",
         )
-        self.create_any_widget(
+        frame.create_any_widget(
             "hdf_dset",
             Hdf5DatasetSelector,
-            parent_widget=self._widgets["selection"],
             gridPos=(3, 0, 1, 1),
+            parent_widget="browser",
         )
-        self.create_button(
+        frame.create_any_widget(
             "but_minimize",
-            "",
-            icon=qta.icon("fa.chevron-left"),
-            iconSize=QtCore.QSize(_button_iconsize, _button_iconsize),
-            fixedHeight=_button_iconsize,
-            fixedWidth=_button_iconsize,
+            SquareButton,
             gridPos=(0, 1, 1, 1),
-            parent_widget=self._widgets["selection"],
+            icon=qta.icon("fa.chevron-left"),
+            parent_widget="browser",
         )
-        self.create_button(
+        frame.create_any_widget(
             "but_maximize",
-            "",
-            icon=qta.icon("fa.chevron-right"),
-            iconSize=QtCore.QSize(_button_iconsize, _button_iconsize),
-            fixedHeight=_button_iconsize,
-            fixedWidth=_button_iconsize,
+            SquareButton,
             gridPos=(2, 1, 1, 1),
-            parent_widget=self._widgets["selection"],
+            icon=qta.icon("fa.chevron-right"),
+            parent_widget="browser",
         )
 
-        self._widgets["viewer"] = PydidasImageView()
+        frame._widgets["viewer"] = PydidasImageView()
 
-        self._widgets["hdf_dset"].register_view_widget(self._widgets["viewer"])
-        self._widgets["splitter"] = QtWidgets.QSplitter()
-        self._widgets["splitter"].setSizePolicy(
+        frame._widgets["hdf_dset"].register_view_widget(frame._widgets["viewer"])
+
+        frame._widgets["splitter"] = QtWidgets.QSplitter()
+        frame._widgets["splitter"].setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
-        self._widgets["splitter"].addWidget(self._widgets["selection"])
-        self._widgets["splitter"].addWidget(self._widgets["viewer"])
-        self.layout().addWidget(self._widgets["splitter"])
+        frame._widgets["splitter"].setStretchFactor(0, 10)
+        frame._widgets["splitter"].setStretchFactor(1, 20)
+        frame._widgets["splitter"].addWidget(frame._widgets["browser"])
+        frame._widgets["splitter"].addWidget(frame._widgets["viewer"])
+        frame.layout().addWidget(frame._widgets["splitter"])

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,14 +18,14 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
 import copy
+import unittest
 
 from pydidas.data_io.utils import RoiSliceManager
 
@@ -535,6 +537,21 @@ class TestRoiSliceManager(unittest.TestCase):
         obj = self.create_RoiSliceManager1d(_roi)
         with self.assertRaises(ValueError):
             obj._convert_roi_key_to_slice_objects()
+
+    def test_ndim_setter_simple(self):
+        _roi = [slice(0, 5)]
+        obj = RoiSliceManager(roi=_roi, dim=1)
+        obj.ndim = 2
+        self.assertEqual(obj.ndim, 2)
+        obj.roi
+
+    def test_ndim_setter_previous_roi(self):
+        _roi = (slice(0, 5), slice(10, 20))
+        obj = RoiSliceManager(roi=_roi, dim=2)
+        self.assertEqual(obj.roi, _roi)
+        obj.ndim = 1
+        obj.roi = [4, 12]
+        self.assertEqual(obj.roi, (slice(4, 12),))
 
     def test_full_init_1d(self):
         _roi = [slice(0, 5)]

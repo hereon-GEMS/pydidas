@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,27 +18,27 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
+import multiprocessing as mp
+import os
+import random
+import shutil
+import tempfile
 import time
 import unittest
-import tempfile
-import shutil
-import random
-import os
-import multiprocessing as mp
 
 import h5py
 import numpy as np
 
-from pydidas.core import get_generic_parameter, UserConfigError, PydidasQsettings
-from pydidas.core.utils import get_random_string
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.apps.parsers import directory_spy_app_parser
+from pydidas.core import FileReadError, UserConfigError, get_generic_parameter
+from pydidas.core.utils import get_random_string
 
 
 class TestDirectorySpyApp(unittest.TestCase):
@@ -44,9 +46,8 @@ class TestDirectorySpyApp(unittest.TestCase):
         self._path = tempfile.mkdtemp()
         self._pname = "test_12345_#####_suffix.npy"
         self._ppath = os.path.join(self._path, self._pname)
-        self._glob_str = self._ppath.replace("#####", "*")
-        self.q_settings = PydidasQsettings()
-        self._original_mask_file = self.q_settings.value("user/det_mask")
+        self._glob_str = self._pname.replace("#####", "*")
+        self._full_glob_str = self._ppath.replace("#####", "*")
         self._shape = (20, 20)
         self._mask = np.asarray(
             [
@@ -57,7 +58,6 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._path)
-        self.q_settings.set_value("user/det_mask", self._original_mask_file)
         DirectorySpyApp.parse_func = directory_spy_app_parser
 
     def get_test_image(self, shape=None):
@@ -134,7 +134,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.assertEqual(app._index, -1)
 
     def test_apply_mask__no_mask(self):
-        _param = get_generic_parameter("use_global_det_mask")
+        _param = get_generic_parameter("use_detector_mask")
         _param.value = False
         _image = self.get_test_image()
         app = DirectorySpyApp(_param)
@@ -143,15 +143,16 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.assertTrue(np.allclose(_image, _newimage))
 
     def test_apply_mask__with_mask(self):
+        _val = 42
         app = DirectorySpyApp()
         app._det_mask = self._mask
-        _val = app._config["det_mask_val"]
+        app.set_param_value("detector_mask_val", _val)
         _image = self.get_test_image()
         _newimage = app._apply_mask(_image)
         self.assertTrue(np.allclose(_newimage[self._mask], _val))
 
     def test_get_detector_mask__no_mask(self):
-        _param = get_generic_parameter("use_global_det_mask")
+        _param = get_generic_parameter("use_detector_mask")
         _param.value = False
         app = DirectorySpyApp(_param)
         _mask = app._get_detector_mask()
@@ -159,8 +160,9 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_get_detector_mask__with_mask(self):
         self.create_temp_mask_file()
-        self.q_settings.set_value("user/det_mask", self._mask_fname)
         app = DirectorySpyApp()
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._mask_fname)
         _mask = app._get_detector_mask()
         self.assertTrue((_mask == self._mask).all())
 
@@ -178,14 +180,28 @@ class TestDirectorySpyApp(unittest.TestCase):
         os.remove(_names[-3])
         os.remove(_names[-7])
         app = DirectorySpyApp()
+        app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._DirectorySpyApp__find_current_index()
         self.assertEqual(app._index, _num - 1)
+
+    def test_find_current_index__missing_at_start(self):
+        _num = 21
+        _names = self.create_pattern_files(n=_num)
+        for _ in range(4):
+            _name = _names.pop(0)
+            os.remove(_name)
+        app = DirectorySpyApp()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
+        app._DirectorySpyApp__find_current_index()
+        self.assertEqual(app._index, 20)
 
     def test_find_current_index__simple(self):
         _num = 21
         _ = self.create_pattern_files(n=_num)
         app = DirectorySpyApp()
+        app._config["path"] = self._path
         app._config["glob_pattern"] = self._glob_str
         app._DirectorySpyApp__find_current_index()
         self.assertEqual(app._index, _num - 1)
@@ -193,14 +209,17 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_current_index__empty(self):
         app = DirectorySpyApp()
         app._index = None
-        app._config["glob_pattern"] = os.path.join(self._path, "*")
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = "*"
         app._DirectorySpyApp__find_current_index()
         self.assertEqual(app._index, -1)
 
     def test_find_latest_file_of_pattern__empty(self):
         app = DirectorySpyApp()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
         app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertFalse(_ret)
@@ -208,8 +227,10 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file_of_pattern__single_file(self):
         _names = self.create_pattern_files(n=1)
         app = DirectorySpyApp()
-        app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
+        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertEqual(app._config["latest_file"], _names[0])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertTrue(_ret)
@@ -217,8 +238,24 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file_of_pattern__multiple_files(self):
         _names = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
-        app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
+        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
+        self.assertEqual(app._config["latest_file"], _names[-1])
+        self.assertEqual(app._config["2nd_latest_file"], _names[-2])
+        self.assertTrue(_ret)
+
+    def test_find_latest_file_of_pattern__multiple_files_not_starting_with_0(self):
+        _names = self.create_pattern_files(n=32)
+        for _ in range(4):
+            _name = _names.pop(0)
+            os.remove(_name)
+        app = DirectorySpyApp()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
+        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertEqual(app._config["latest_file"], _names[-1])
         self.assertEqual(app._config["2nd_latest_file"], _names[-2])
         self.assertTrue(_ret)
@@ -226,23 +263,27 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file_of_pattern__same_files_again(self):
         _ = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
-        app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
+        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertFalse(_ret)
 
     def test_find_latest_file_of_pattern__same_files_with_changed_size(self):
         _names = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
-        app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
+        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertFalse(_ret)
         with open(_names[-1], "w") as f:
             f.write("other content")
-        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertTrue(_ret)
 
     def test_find_latest_file_of_pattern__missing_files(self):
@@ -250,15 +291,17 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=32)
         os.remove(_names[_index])
         app = DirectorySpyApp()
-        app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        app._DirectorySpyApp__find_latest_file_of_pattern()
+        app._config["path"] = self._path
+        app._config["glob_pattern"] = self._glob_str
+        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
+        app._DirectorySpyApp__check_for_new_file_of_pattern()
         self.assertEqual(app._config["latest_file"], _names[_index - 1])
         self.assertEqual(app._config["2nd_latest_file"], _names[_index - 2])
 
     def test_find_latest_file__empty(self):
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertFalse(_ret)
@@ -268,7 +311,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         os.makedirs(os.path.join(self._path, "dir2"))
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertFalse(_ret)
@@ -277,7 +320,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=1)
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertEqual(app._config["latest_file"], _names[0])
         self.assertIsNone(app._config["2nd_latest_file"])
         self.assertTrue(_ret)
@@ -286,7 +329,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertEqual(app._config["latest_file"], _names[-1])
         self.assertEqual(app._config["2nd_latest_file"], _names[-2])
         self.assertTrue(_ret)
@@ -295,9 +338,9 @@ class TestDirectorySpyApp(unittest.TestCase):
         _ = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
         app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__check_for_new_file()
         self.assertFalse(_ret)
 
     def test_initialize_shared_memory(self):
@@ -398,7 +441,7 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_prepare_run__slave(self):
         app = self.create_default_app()
         app.prepare_run()
-        slave_app = app.get_copy(slave_mode=True)
+        slave_app = app.copy(slave_mode=True)
         slave_app.prepare_run()
         for _key in ["flag", "width", "height", "array"]:
             self.assertEqual(
@@ -467,7 +510,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_multiprocessing_func__no_files(self):
         app = self.create_default_app()
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(UserConfigError):
             app.multiprocessing_func(None)
 
     def test_multiprocessing_func__last_file_not_readable(self):
@@ -496,7 +539,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         for _name in _names:
             with open(_name, "w") as f:
                 f.write("no image file")
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(FileReadError):
             app.multiprocessing_func(None)
 
     def test_multiprocessing_func__both_files_readable(self):
@@ -532,7 +575,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
         app.set_param_value("use_bg_file", True)
-        app.set_param_value("use_global_det_mask", False)
+        app.set_param_value("use_detector_mask", False)
         app.set_param_value("bg_file", _bg_fname)
         app._config["latest_file"] = _names[1]
         app.prepare_run()

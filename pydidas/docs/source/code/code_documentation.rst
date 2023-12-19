@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 Code documentation
 ==================
 
@@ -62,7 +68,7 @@ API documentation
     api/core
     api/multiprocessing
     api/data_io
-    api/experiment
+    api/contexts
     api/managers
     api/plugins
     api/workflow

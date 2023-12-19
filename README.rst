@@ -1,65 +1,105 @@
+.. 
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+
 pydidas
 =======
 
+|zenodo_DOI|
+
 pydidas (the Python DIffraction Data Analysis Suite) is a toolkit for
-the analysis of diffraction datasets, both live at the beamline and
+the analysis of diffraction datasets, both live at beamlines and
 offline for in-depth analysis.
 
+pydidas uses the pyFAI engine for fast azimuthal integration, developed at
+the ESRF (https://github.com/silx-kit/pyFAI).
 
-Module structure
-----------------
 
-There are several subfolders included in the distribution
+References
+----------
+* Please check the citation file CITATION.cff
 
-* pydidas: The code for the python module.
-* pydidas/docs: the documentation.
-* tests: unit tests for the code. This should not concern the generic user.
-* plugins: Individual processing plugins
-* scripts: ready-to-use scripts to run the software.
+
 
 Installation
 ------------
 
-For now, the pydidas package is not yet available through Anaconda. To install 
-it, navigate to the directory with the source files and run the following
-command:
+Preparing the environment
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block::
+Using mamba/conda
+.................
+
+Use the provided pydidas-env.yml file to create the conda environment::
+
+    conda env create --name pydidas --file .\pydidas-env.yml
+
+Using pip
+.........
+
+When using pip, all dependencies will be installed together with the package.
+There is no need to prepare the environment further.
+
+
+Building and installing pydidas
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You will require a pydidas wheel file to install it using pip. If you have not 
+downloaded a build wheel file, you need to prepare one prior to installation.
+
+Download the pydidas source code or clone the git repository and navigate to the
+folder with the project metadata files (like the README.rst). Then, install 
+the package and any missing dependencies::
 
     python -m pip install .
 
-Then, install the required dependencies using anaconda by running this command
-in the same directory:
 
-.. code-block::
+Note that pip might need to build a wheel from pydidas first which will take
+some time. If you want to build the wheel manually, for example to keep it for 
+later use, simply use the following commands (again, in the pydidas folder)::
 
-    conda install --file requirements.txt
+    python -m build
+    python -m pip install dist\pydidas--YY.MM.DD-py3-none-any.whl
+    
+where YY.MM.DD would be substituted with the currrent version number.
 
-.. note::
-
-    If you do not want to use Anaconda for dependency management, you can also
-    install pydidas and all required modules using 
-    `python -m pip install -r requirements.txt .`
 
 Documentation
 -------------
 
 The documentation is included with the distribution, but it must be compiled by
-the user first. The rational behind this is to keep the distribution light-weight.
+the user first. The rational behind this is to keep the distribution 
+light-weight. 
 
-To make the documentation, make sure sphinx is installed. It is shipped with the
-Anaconda python distribution or can be installed via pip.
+The documentation will be created automatically the first time, pydidas is
+imported in python. This will take some time (about 30 seconds, depending on 
+the system) and a notification will be displayed.
 
-1. Navigate to the "pydidas/docs" sub-folder
-2. Run "make html" to create the html documentation. (Note, on windows you might
-   need to call ".\make html".)
-3. Navigate to the "pydidas/docs/build/html" folder and open "index.html".
+The compiled documentation can be found in the "pydidas/docs/build/html" folder 
+and the "index.html" is the main entry point.
 
-Note that you will have many warning during "make" because sphinx will detect
-the overloaded methods with the same name as in parent classes.
+Alternatively, a pydidas-documentation entrypoint exists to open the 
+documentation.
+
+Referencing pydidas
+-------------------
+
+For the full citation  information of pydidas, please see the CITATION.cff file.
+
+Pydidas can also be cited by its DOI on zenodo: 10.5281/zenodo.7568392 |zenodo_DOI|
+
 
 License
 -------
 
-pydidas is released under the GNU GENERAL PUBLIC LICENSE Version 3. A copy
-of the full license is provided with the pydidas.
+The pydidas source code is released under the GNU General Public License 
+Version 3. 
+The documentation is licensed under the Creative Commons Attribution 4.0 
+International Public License (CC-BY-4.0). 
+Images and logos are licensed under Creative Commons Attribution-NoDerivatives 
+4.0 International Public License (CC-BY-ND-4.0).
+Insignificant files (e.g. changelog) are released under the CC0 1.0 Universal
+Public Domain Dedication (CC0-1.0).
+
+.. |zenodo_DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7568611.svg

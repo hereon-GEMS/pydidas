@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,28 +15,30 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 The pydidas.gui.frames subpackage includes all GUI frames which allow to access all of
 pydidas's functionality from within a graphical user interface.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 
 # import __all__ items from modules:
 from .composite_creator_frame import *
 from .data_browsing_frame import *
+from .define_diffraction_exp_frame import *
+from .define_scan_frame import *
 from .directory_spy_frame import *
 from .home_frame import *
 from .image_math_frame import *
 from .pyfai_calib_frame import *
-from .setup_experiment_frame import *
-from .setup_scan_frame import *
+from .quick_integration_frame import *
 from .utilities_frame import *
 from .view_results_frame import *
 from .workflow_edit_frame import *
@@ -52,6 +56,16 @@ from . import data_browsing_frame
 
 __all__.extend(data_browsing_frame.__all__)
 del data_browsing_frame
+
+from . import define_diffraction_exp_frame
+
+__all__.extend(define_diffraction_exp_frame.__all__)
+del define_diffraction_exp_frame
+
+from . import define_scan_frame
+
+__all__.extend(define_scan_frame.__all__)
+del define_scan_frame
 
 from . import directory_spy_frame
 
@@ -73,15 +87,10 @@ from . import pyfai_calib_frame
 __all__.extend(pyfai_calib_frame.__all__)
 del pyfai_calib_frame
 
-from . import setup_experiment_frame
+from . import quick_integration_frame
 
-__all__.extend(setup_experiment_frame.__all__)
-del setup_experiment_frame
-
-from . import setup_scan_frame
-
-__all__.extend(setup_scan_frame.__all__)
-del setup_scan_frame
+__all__.extend(quick_integration_frame.__all__)
+del quick_integration_frame
 
 from . import utilities_frame
 

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,21 +21,22 @@ path type.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParamIoWidgetFile"]
 
+
 import os
-import pathlib
+from pathlib import Path
+from typing import Union
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore
 
-from ...core.constants import PARAM_INPUT_EDIT_WIDTH
-from ...contexts import PydidasDirDialog, PydidasFileDialog
 from ...data_io import IoMaster
 from ..dialogues import critical_warning
+from ..file_dialog import PydidasFileDialog
 from .param_io_widget_with_button import ParamIoWidgetWithButton
 
 
@@ -45,7 +48,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
 
     io_edited = QtCore.Signal(str)
 
-    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
+    def __init__(self, param, **kwargs):
         """
         Setup the widget.
 
@@ -58,25 +61,27 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             A QWidget instance.
         param : Parameter
             A Parameter instance.
-        width : int, optional
-            The width of the IOwidget.
+        **kwargs : dict
+            Optional keyword arguments. Supported kwargs are "width" (in pixels) for
+            the with of the I/O widget and  "persistent_qsettings_ref" for the
+            persistent reference label of the open directory.
         """
-        super().__init__(parent, param, width)
+        ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self.setAcceptDrops(True)
         self._flag_pattern = "pattern" in param.refkey
         if "directory" in param.refkey:
-            self.io_dialog = PydidasDirDialog(self, caption="Name of directory")
+            _dialog_type = "open_directory"
         else:
             if param.refkey.startswith("output"):
-                _dialog = QtWidgets.QFileDialog.getSaveFileName
+                _dialog_type = "save_file"
             else:
-                _dialog = QtWidgets.QFileDialog.getOpenFileName
-            self.io_dialog = PydidasFileDialog(
-                self,
-                caption="Name of File",
-                formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
-                dialog=_dialog,
-            )
+                _dialog_type = "open_file"
+        self.io_dialog = PydidasFileDialog(
+            parent=self,
+            dialog_type=_dialog_type,
+            formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
+            qsettings_ref=kwargs.get("persistent_qsettings_ref"),
+        )
 
     def button_function(self):
         """
@@ -86,37 +91,37 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         and opens a QFileDialog widget to select a filename.
         """
         _result = self.io_dialog.get_user_response()
-        if _result:
+        if _result is not None:
             if self._flag_pattern:
                 self.io_dialog.set_curr_dir(_result)
                 _result = os.path.basename(_result)
             self.setText(_result)
             self.emit_signal()
 
-    def get_value(self):
+    def get_value(self) -> Path:
         """
         Get the current value from the combobox to update the Parameter value.
 
         Returns
         -------
         Path
-            The text converted to a pathlib.Path to update the Parameter value.
+            The text converted to a Path to update the Parameter value.
         """
-        text = self.ledit.text()
-        return pathlib.Path(self.get_value_from_text(text))
+        text = self._io_lineedit.text()
+        return Path(self.get_value_from_text(text))
 
-    def set_value(self, value):
+    def set_value(self, value: Union[str, Path]):
         """
         Set the input field's value.
 
         This method changes the combobox selection to the specified value.
         """
         self._old_value = self.get_value()
-        self.ledit.setText(f"{value}")
-        if not self._flag_pattern:
+        self._io_lineedit.setText(f"{value}")
+        if not self._flag_pattern and value != Path() and os.path.exists(value):
             self.io_dialog.set_curr_dir(value)
 
-    def modify_file_selection(self, list_of_choices):
+    def modify_file_selection(self, list_of_choices: list):
         """
         Modify the file selection choices in the popup window.
 
@@ -128,14 +133,12 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         self._file_selection = ";;".join(list_of_choices)
 
-    def dragEnterEvent(self, event):
-        """
-        Allow to drag files from, for example, the explorer.
-        """
+    def dragEnterEvent(self, event: QtCore.QEvent):
+        """Allow to drag files from, for example, the explorer."""
         if event.mimeData().hasFormat("text/uri-list"):
             event.acceptProposedAction()
 
-    def dropEvent(self, event):
+    def dropEvent(self, event: QtCore.QEvent):
         """
         Allow to drop files from, for example, the explorer.
         """
@@ -150,8 +153,9 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             critical_warning("Not a file", "Can only accept single files.")
             return
         self.set_value(_path)
+        self.emit_signal()
 
-    def set_unique_ref_name(self, name):
+    def set_unique_ref_name(self, name: str):
         """
         Set a unique reference name to allow keeping track of the active working
         directory.

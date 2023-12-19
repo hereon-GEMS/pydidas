@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,22 +20,26 @@ Module with the WorkflowEditFrame which is used to create the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowEditFrame"]
 
+
+import os
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import PydidasFileDialog
 from ...plugins import PluginCollection
+from ...widgets import PydidasFileDialog
+from ...widgets.framework import BaseFrame
 from ...workflow import WorkflowTree
-from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
+from ...workflow.processing_tree_io import ProcessingTreeIoMeta
 from ..managers import WorkflowTreeEditManager
 from .builders import WorkflowEditFrameBuilder
+
 
 TREE = WorkflowTree()
 PLUGIN_COLLECTION = PluginCollection()
@@ -41,10 +47,13 @@ WORKFLOW_EDIT_MANAGER = WorkflowTreeEditManager()
 
 
 @QtCore.Slot(int, str)
-def workflow_add_plugin_at_parent(parent_id, name):
+def workflow_add_plugin_at_parent(parent_id: int, name: str):
     """
-    Get the signal that a new Plugin has been selected and must be added
-    to the WorkflowTree and forward it to the WorkflowTreeEditManager.
+    Add a plugin to the given parent node.
+
+    This function handles the signal that a new Plugin has been selected and
+    must be added to the WorkflowTree and forwards the signal to the
+    WorkflowTreeEditManager.
 
     Parameters
     ----------
@@ -60,7 +69,7 @@ def workflow_add_plugin_at_parent(parent_id, name):
     WORKFLOW_EDIT_MANAGER.add_new_plugin_node(name, parent_node_id=parent_id)
 
 
-class WorkflowEditFrame(WorkflowEditFrameBuilder):
+class WorkflowEditFrame(BaseFrame):
     """
     The WorkflowEditFrame includes three major objects:
         a. The editing canvas which shows the WorkflowTree structure.
@@ -72,31 +81,39 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
 
     menu_title = "Workflow editing"
     menu_entry = "Workflow processing/Workflow editing"
-    menu_icon = "qta::ph.share-network-fill"
+    menu_icon = "pydidas::frame_icon_workflow_edit.png"
     sig_workflow_edit_frame_activated = QtCore.Signal()
 
-    def __init__(self, parent=None, **kwargs):
-        WorkflowEditFrameBuilder.__init__(self, parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
         self.__import_dialog = PydidasFileDialog(
-            self,
+            parent=self,
+            dialog_type="open_file",
             caption="Import workflow tree file",
-            formats=WorkflowTreeIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getOpenFileName,
+            formats=ProcessingTreeIoMeta.get_string_of_formats(),
             qsettings_ref="WorkflowEditFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
-            self,
+            parent=self,
+            dialog_type="save_file",
             caption="Export workflow tree file",
-            formats=WorkflowTreeIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getSaveFileName,
+            formats=ProcessingTreeIoMeta.get_string_of_formats(),
+            default_extension="yaml",
             qsettings_ref="WorkflowEditFrame__export",
         )
+        self.__qtapp = QtWidgets.QApplication.instance()
+
+    def build_frame(self):
+        """
+        Build the frame and create all widgets.
+        """
+        WorkflowEditFrameBuilder.populate_frame(self)
 
     def connect_signals(self):
         """
         Connect all signals and slots in the frame.
         """
-        _app = QtWidgets.QApplication.instance()
+        WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
         self._widgets["plugin_collection"].sig_add_plugin_to_tree.connect(
             partial(workflow_add_plugin_at_parent, -1)
         )
@@ -106,17 +123,17 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         self._widgets["plugin_collection"].sig_append_to_specific_node.connect(
             workflow_add_plugin_at_parent
         )
-        _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
         WORKFLOW_EDIT_MANAGER.sig_plugin_selected.connect(self.configure_plugin)
         WORKFLOW_EDIT_MANAGER.sig_plugin_class_selected.connect(
             self._widgets["plugin_collection"].display_plugin_description
         )
-        WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
         self._widgets["but_save"].clicked.connect(self.save_tree_to_file)
         self._widgets["but_load"].clicked.connect(self.load_tree_from_file)
+        _app = QtWidgets.QApplication.instance()
+        _app.sig_exit_pydidas.connect(WORKFLOW_EDIT_MANAGER.reset)
 
     @QtCore.Slot(int)
-    def configure_plugin(self, node_id):
+    def configure_plugin(self, node_id: int):
         """
         Get the signal that a new Plugin has been selected to be edited and
         pass the information to the PluginEditCanvas.
@@ -140,23 +157,25 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         Open a QFileDialog to geta save name and export the WorkflowTree to
         the selected file with the specified format.
         """
-        fname = self.__export_dialog.get_user_response()
-        if fname in ["", None]:
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is None:
             return
-        TREE.export_to_file(fname, overwrite=True)
+        TREE.export_to_file(_fname, overwrite=True)
 
     def load_tree_from_file(self):
         """
         Open a Qdialog to select a filename, read the file and import an
         existing WorkflowTree from the retrieved information.
         """
-        fname = self.__import_dialog.get_user_response()
-        if fname in ["", None]:
+        _fname = self.__import_dialog.get_user_response()
+        if _fname is None:
             return
-        TREE.import_from_file(fname)
+        if os.path.splitext(_fname)[1] == "":
+            _fname = _fname + ".yaml"
+        TREE.import_from_file(_fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
-    def export_state(self):
+    def export_state(self) -> tuple[int, dict]:
         """
         Export the state of the Frame for saving.
 
@@ -174,7 +193,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         }
         return (self.frame_index, {"params": _params, "widgets": _widgets})
 
-    def restore_state(self, state):
+    def restore_state(self, state: dict):
         """
         Restore the frame's state from stored information.
 
@@ -189,16 +208,12 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
-        if not self._config["built"]:
-            self._config["state"] = state
-            return
-        super().restore_state(state)
-        for _key, _coords in state["widgets"].items():
-            self._widgets[_key].setGeometry(*_coords)
-        WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
+        BaseFrame.restore_state(self, state)
+        if self._config["built"]:
+            WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 
@@ -210,6 +225,19 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         index : int
             The index of the newly activated frame.
         """
-        super().frame_activated(index)
+        BaseFrame.frame_activated(self, index)
         if self.frame_index == index:
-            WORKFLOW_EDIT_MANAGER.update_from_tree()
+            WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
+
+    def resizeEvent(self, event):
+        """
+        Handle the resizeEvent and also update the node positions in the WorkflowTree.
+
+        Parameters
+        ----------
+        event : QtCore.QEvent
+            The calling event.
+        """
+        QtWidgets.QWidget.resizeEvent(self, event)
+        if self._config["built"]:
+            WORKFLOW_EDIT_MANAGER.update_node_positions()

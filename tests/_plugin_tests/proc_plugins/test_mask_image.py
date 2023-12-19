@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,34 +18,37 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import os
-import unittest
-import tempfile
-import shutil
 import random
+import shutil
+import tempfile
+import unittest
 
 import numpy as np
+from qtpy import QtCore
 
-from pydidas.core import PydidasQsettings
 from pydidas.core.utils import rebin2d
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestMaskImage(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
+
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
-        self._qsettings = PydidasQsettings()
-        self._qsettings_det_mask = self._qsettings.value("user/det_mask")
-        self._qsettings.set_value("user/det_mask", "")
         self._shape = (20, 20)
         _n = self._shape[0] * self._shape[1]
         self._mask = np.asarray([random.choice([0, 1]) for _ in range(_n)]).reshape(
@@ -53,7 +58,6 @@ class TestMaskImage(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._temppath)
-        self._qsettings.set_value("user/det_mask", self._qsettings_det_mask)
 
     def create_mask(self):
         _maskfilename = os.path.join(self._temppath, "mask.npy")
@@ -67,39 +71,28 @@ class TestMaskImage(unittest.TestCase):
     def test_pre_execute__local_mask(self):
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", False)
-        plugin.set_param_value("det_mask", _maskfilename)
+        plugin.set_param_value("detector_mask_file", _maskfilename)
         plugin.pre_execute()
         self.assertTrue((plugin._mask == self._mask).all())
-
-    def test_pre_execute__q_settings_mask(self):
-        _maskfilename = self.create_mask()
-        self._qsettings.set_value("user/det_mask", _maskfilename)
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", True)
-        plugin.pre_execute()
-        self.assertTrue(np.equal(plugin._mask, self._mask).all())
 
     def test_execute__simple(self):
         _maskval = 0.42
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", False)
-        plugin.set_param_value("det_mask", _maskfilename)
-        plugin.set_param_value("det_mask_val", _maskval)
+        plugin.set_param_value("detector_mask_file", _maskfilename)
+        plugin.set_param_value("detector_mask_val", _maskval)
         plugin.pre_execute()
         kwargs = {"key": 1, "another_key": "another_val"}
         _masked, _kwargs = plugin.execute(self._data, **kwargs)
         self.assertEqual(kwargs, _kwargs)
-        self.assertTrue(np.alltrue(_masked[self._mask == 1] == _maskval))
+        self.assertTrue(np.all(_masked[self._mask == 1] == _maskval))
 
     def test_execute__with_legacy_ops(self):
         _maskval = 0.42
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", False)
-        plugin.set_param_value("det_mask", _maskfilename)
-        plugin.set_param_value("det_mask_val", _maskval)
+        plugin.set_param_value("detector_mask_file", _maskfilename)
+        plugin.set_param_value("detector_mask_val", _maskval)
         plugin._legacy_image_ops = [
             ["roi", (1, self._shape[0], 3, self._shape[1])],
             ["binning", 2],
@@ -114,7 +107,7 @@ class TestMaskImage(unittest.TestCase):
         self.assertEqual(
             _masked.shape, ((self._shape[0] - 1) // 2, (self._shape[1] - 3) // 2)
         )
-        self.assertTrue(np.alltrue(_masked[_mask == 1] == _maskval))
+        self.assertTrue(np.all(_masked[_mask == 1] == _maskval))
 
 
 if __name__ == "__main__":

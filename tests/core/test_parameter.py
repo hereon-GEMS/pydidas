@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,22 +18,22 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
+import copy
 import unittest
 import warnings
-import copy
 from numbers import Integral, Real
 from pathlib import Path
 
 import numpy as np
 
 from pydidas.core import Hdf5key
-from pydidas.core.parameter import _get_base_class, Parameter
+from pydidas.core.parameter import Parameter, _get_base_class
 from pydidas.core.utils import get_random_string
 
 
@@ -183,6 +185,13 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         self.assertEqual(obj.choices, [0, 12])
 
+    def test_choices_setter__update_to_None(self):
+        obj = Parameter("Test0", int, 12, choices=[0, 12])
+        obj.choices = [0, 12, 24]
+        obj.choices = None
+        obj.value = 127
+        self.assertIsNone(obj.choices)
+
     def test_choices_setter__update(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         obj.choices = [0, 12, 24]
@@ -260,9 +269,9 @@ class TestParameter(unittest.TestCase):
         obj.restore_default()
         self.assertEqual(obj.value, 12)
 
-    def test_get_copy(self):
+    def test_copy(self):
         obj = Parameter("Test0", int, 12)
-        copy = obj.get_copy()
+        copy = obj.copy()
         self.assertNotEqual(obj, copy)
         self.assertIsInstance(copy, Parameter)
 
@@ -311,6 +320,29 @@ class TestParameter(unittest.TestCase):
         with self.assertRaises(TypeError):
             obj.value_for_export
 
+    def test_update_value_and_choices__wrong_type(self):
+        obj = Parameter("Test0", float, 27.7)
+        with self.assertRaises(ValueError):
+            obj.update_value_and_choices("test", [12, 14])
+
+    def test_update_value_and_choices__None_type_allowed(self):
+        obj = Parameter("Test0", float, 27.7, allow_None=True)
+        with self.assertRaises(ValueError):
+            obj.update_value_and_choices(None, [12, 14])
+
+    def test_update_value_and_choices__value_not_in_choices(self):
+        obj = Parameter("Test0", float, 27.7)
+        with self.assertRaises(ValueError):
+            obj.update_value_and_choices(3, [12, 14])
+
+    def test_update_value_and_choices__valid(self):
+        _val = 3.12
+        _choices = [3.12, 34.2, 42.1]
+        obj = Parameter("Test0", float, 27.7)
+        obj.update_value_and_choices(_val, _choices)
+        self.assertEqual(obj.value, _val)
+        self.assertEqual(obj.choices, _choices)
+
     def test_dump(self):
         obj = Parameter("Test0", int, 12)
         self.assertEqual(obj.refkey, "Test0")
@@ -339,6 +371,13 @@ class TestParameter(unittest.TestCase):
 
     def test_copy__(self):
         obj = Parameter("Test0", int, 12)
+        _copy = copy.copy(obj)
+        self.assertNotEqual(obj, _copy)
+        self.assertIsInstance(_copy, Parameter)
+
+    def test_copy__with_choices(self):
+        obj = Parameter("Test0", int, 12, choices=[12, 15, 18])
+        obj.update_value_and_choices(16, [16, 19, 22])
         _copy = copy.copy(obj)
         self.assertNotEqual(obj, _copy)
         self.assertIsInstance(_copy, Parameter)

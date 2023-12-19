@@ -1,17 +1,26 @@
-# Configuration file for the Sphinx documentation builder.
+# This file is part of pydidas.
 #
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import os
 import sys
+
+import pydidas
+
 
 sys.path.insert(0, os.path.abspath("./../.."))
 sys.path.insert(1, os.path.abspath("./../../.."))
@@ -20,12 +29,13 @@ sys.path.insert(1, os.path.abspath("./../../.."))
 # -- Project information -----------------------------------------------------
 
 project = "pydidas"
-copyright = "2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
+copyright = "2023, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 # The full version, including alpha/beta/rc tags
-release = "beta"
-version = "0.1.13"
+
+release = pydidas.VERSION
+version = release
 
 # -- General configuration ---------------------------------------------------
 

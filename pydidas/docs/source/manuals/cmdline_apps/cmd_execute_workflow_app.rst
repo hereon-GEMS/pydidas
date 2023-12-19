@@ -1,3 +1,9 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _execute_workflow_app:
 
 Tutorial for the ExecuteWorkflowApp
@@ -15,22 +21,19 @@ The :py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>` is one of
 the most important objects in pydidas as it allows to process workflows. Note 
 that most of the configuration is not performed by the ExecuteWorkflowApp itself
 but by the global objects for 
-:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
-:py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
-and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
+:py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`,
+:py:class:`DiffractionExperimentContext 
+<pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext>`,
+and :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`.
 
-Documentation on the use of these objects is given in :ref:`setup_scan`,
-:ref:`setup_experiment` and :ref:`workflow_tree`, respectively.
+Documentation on the use of these objects is given in :ref:`scan_context`,
+:ref:`diffraction_exp_context` and :ref:`workflow_tree`, respectively.
 
 Globally controlled settings
 ----------------------------
 
-Some settings used by the ExecuteWorkflowApp are controlled globally by pydidas. 
-These are:
-
-- The file path for the global detector mask file (`user/det_mask`)
-
-and for parallel processing additionally:
+Some settings for parallel processing additionally used by the 
+ExecuteWorkflowApp are controlled globally by pydidas. These are:
 
 - The number of parallel worker processes (`global/mp_n_workers`)
 - The size of the data exchange buffer (in MB) (`global/shared_buffer_size`)
@@ -70,7 +73,6 @@ these values, if required:
 
     >>> import pydidas
     >>> config = pydidas.core.PydidasQsettings()
-    >>> config.set_value('user/det_mask', '/scratch/config/det_mask.npy')
     >>> config.set_value('global/mp_n_workers', 2)
 
 Setup of the ExecuteWorkflowApp
@@ -78,10 +80,10 @@ Setup of the ExecuteWorkflowApp
 
 The ExecuteWorkflowApp has only a very limited number of Parameters because it 
 uses the aforementioned objects (
-:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
-:py:class:`SetupExperiment 
-<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
-and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`)
+:py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`,
+:py:class:`DiffractionExperimentContext 
+<pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext>`,
+and :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`)
 which include most of the required configuration.
 
 In the app, only the flags for *live processing* and for automatic saving of
@@ -178,9 +180,9 @@ Accessing results within Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The results from the ExecuteWorkflowApp are written in the global 
-:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` (the Singleton 
-instance of :py:class:`_WorkflowResults 
-<pydidas.workflow.workflow_results._WorkflowResults>`) which is described in 
+:py:class:`WorkflowResults <pydidas.workflow.WorkflowResultsContext>` (the 
+Singleton instance of :py:class:`WorkflowResults 
+<pydidas.workflow.WorkflowResults>`) which is described in 
 detail in :ref:`workflow_results`.
 
 List of all ExecuteWorkflowApp Parameters

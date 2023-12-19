@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,34 +21,30 @@ populate the DirectorySpyFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DirectorySpyFrameBuilder"]
 
+
 from ....core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
-    FIX_EXP_POLICY,
-    EXP_EXP_POLICY,
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    POLICY_EXP_EXP,
+    POLICY_FIX_EXP,
 )
-from ....core import constants
-from ....widgets import ScrollArea, BaseFrameWithApp
-from ....widgets.parameter_config import ParameterEditCanvas
+from ....widgets import ScrollArea
+from ....widgets.framework import BaseFrameWithApp
 from ....widgets.silx_plot import PydidasPlot2D
 
 
-class DirectorySpyFrameBuilder(BaseFrameWithApp):
+class DirectorySpyFrameBuilder:
     """
-    Mix-in class which includes the build_frame method to populate the
-    base class's UI and initialize all widgets.
+    Builder to populate the DirectorySpyFrame with widgets.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrameWithApp.__init__(self, parent, **kwargs)
-
-    def __param_widget_config(self, param_key):
+    @staticmethod
+    def __param_widget_config(param_key):
         """
         Get Formatting options for create_param_widget calls.
 
@@ -60,133 +58,91 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
         dict :
             The dictionary with the formatting options.
         """
-        if param_key in [
-            "filename_pattern",
-            "directory_path",
-            "bg_file",
-            "hdf5_key",
-            "bg_hdf5_key",
-        ]:
-            _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
-            _dict.update({"parent_widget": self._widgets["config"]})
-        else:
-            _dict = dict(
-                parent_widget=self._widgets["config"],
-                width_io=100,
-                width_unit=0,
-                width_text=CONFIG_WIDGET_WIDTH - 100,
-                width_total=CONFIG_WIDGET_WIDTH,
-            )
-        if param_key in [
-            "hdf5_key",
-            "bg_file",
-            "bg_hdf5_key",
-            "bg_hdf5_frame",
-        ]:
-            _dict["visible"] = False
-        return _dict
+        return {
+            "parent_widget": "config",
+            "linebreak": param_key
+            in [
+                "filename_pattern",
+                "directory_path",
+                "detector_mask_file",
+                "bg_file",
+                "hdf5_key",
+                "bg_hdf5_key",
+            ],
+        }
 
-    def build_frame(self):
+    @classmethod
+    def build_frame(cls, frame: BaseFrameWithApp):
         """
         Build the frame and create all widgets.
+
+        Parameters
+        ----------
+        frame : BaseFrameWithApp
+            The frame instance.
         """
-        self.create_label(
+        frame.create_label(
             "title",
             "Directory spy",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
-            gridPos=(0, 0, 1, 5),
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
 
-        self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
-
-        self._widgets["config"] = ParameterEditCanvas(
-            parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+        frame.create_empty_widget(
+            "config",
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            parent_widget=None,
         )
-
-        self.create_spacer(
-            "spacer1", gridPos=(-1, 0, 1, 2), parent_widget=self._widgets["config"]
-        )
-
-        self.create_any_widget(
+        frame.create_spacer("spacer1", parent_widget=frame._widgets["config"])
+        frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH + 40,
-            sizePolicy=FIX_EXP_POLICY,
-            gridPos=(-1, 0, 1, 1),
-            stretch=(1, 0),
             layout_kwargs={"alignment": None},
+            sizePolicy=POLICY_FIX_EXP,
+            stretch=(1, 0),
+            widget=frame._widgets["config"],
         )
 
-        for _param in [
+        for _param_key in [
             "directory_path",
             "scan_for_all",
             "filename_pattern",
             "hdf5_key",
-            "use_global_det_mask",
+            "use_detector_mask",
+            "detector_mask_file",
+            "detector_mask_val",
             "use_bg_file",
             "bg_file",
             "bg_hdf5_key",
             "bg_hdf5_frame",
         ]:
-            self.create_param_widget(
-                self.get_param(_param), **self.__param_widget_config(_param)
+            frame.create_param_widget(
+                frame.get_param(_param_key), **cls.__param_widget_config(_param_key)
             )
+            if _param_key in ["hdf5_key", "detector_mask_val"]:
+                frame.create_line(f"line_{_param_key}", parent_widget="config")
 
-        self.create_line(
-            "line_buttons", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
+        frame.create_line("line_buttons", parent_widget="config")
+
+        frame.create_button("but_once", "Show latest image", parent_widget="config")
+        frame.create_button("but_show", "Force plot update", parent_widget="config")
+        frame.create_button("but_exec", "Start scanning", parent_widget="config")
+
+        frame.create_button(
+            "but_stop", "Stop scanning", enabled=False, parent_widget="config"
         )
 
-        self.create_button(
-            "but_once",
-            "Show latest image",
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-        )
+        frame.create_spacer("config_terminal_spacer", parent_widget="config")
 
-        self.create_button(
-            "but_show",
-            "Force plot update",
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-        )
+        frame.create_spacer("menu_bottom_spacer")
 
-        self.create_button(
-            "but_exec",
-            "Start scanning",
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-        )
-
-        self.create_button(
-            "but_stop",
-            "Stop scanning",
-            gridPos=(-1, 0, 1, 1),
-            enabled=False,
-            visible=True,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-        )
-
-        self.create_spacer(
-            "config_terminal_spacer",
-            height=20,
-            gridPos=(-1, 0, 1, 1),
-            parent_widget=self._widgets["config"],
-        )
-
-        self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
-
-        self.add_any_widget(
+        frame.add_any_widget(
             "plot",
             PydidasPlot2D(),
             alignment=None,
             gridPos=(0, 1, 3, 1),
             visible=True,
             stretch=(1, 1),
-            sizePolicy=EXP_EXP_POLICY,
+            sizePolicy=POLICY_EXP_EXP,
         )

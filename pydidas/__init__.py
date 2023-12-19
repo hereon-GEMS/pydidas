@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,28 +23,42 @@ It is being developed by Helmholtz-Zentrum Hereon.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
+import os as __os
+import sys as __sys
+import logging as __logging
+
 import qtpy.QtCore as __QtCore
+import qtpy.QtWidgets as __QtWidgets
+import qtpy as __qtpy
+
+# must import h5py here to have the dll libraries linked correctly
+import h5py as __h5py
+import hdf5plugin as __hdf5plugin
+
+
+if __QtWidgets.QApplication.instance() is None:
+    import pydidas_qtcore
+
+    __app = pydidas_qtcore.PydidasQApplication(__sys.argv)
+
 
 # import local modules
-from . import version
-
-# Change the multiprocessing Process spawn method to handle silx/pyFAI in linux
-import multiprocessing as __mp
-import warnings as __warnings
+from .version import version, VERSION
+from .logging_level import LOGGING_LEVEL
 
 # import sub-packages:
 from . import core
+from . import resources
 from . import contexts
 from . import data_io
 from . import multiprocessing
 from . import managers
-from . import experiment
 from . import plugins
 from . import workflow
 from . import apps
@@ -50,20 +66,26 @@ from . import unittest_objects
 from . import widgets
 from . import gui
 
+
+IS_QT6 = __qtpy.QT_VERSION[0] == "6"
+
 __all__.extend(
     [
-        "apps",
         "core",
-        "experiment",
-        "gui",
+        "contexts",
         "data_io",
-        "managers",
         "multiprocessing",
+        "managers",
         "plugins",
-        "unittest_objects",
-        "utils",
-        "widgets",
         "workflow",
+        "apps",
+        "unittest_objects",
+        "widgets",
+        "gui",
+        "IS_QT6",
+        "version",
+        "VERSION",
+        "LOGGING_LEVEL",
     ]
 )
 
@@ -77,10 +99,6 @@ if not core.utils.check_sphinx_html_docs():
 core.utils.set_default_plugin_dir()
 
 # Disable the pyFAI logging to console
-import os as __os
-import logging as __logging
-
-
 __os.environ["PYFAI_NO_LOGGING"] = "1"
 # Change the pyFAI logging level to ERROR and above
 pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")
@@ -93,15 +111,14 @@ silx_opencl_logger.setLevel(__logging.ERROR)
 
 # if not existing, initialize all QSettings with the default values from the
 # default Parameters to avoid having "None" keys returned.
-__version = version.VERSION
 __settings = __QtCore.QSettings("Hereon", "pydidas")
 for _prefix, _keys in (
     ("global", core.constants.QSETTINGS_GLOBAL_KEYS),
     ("user", core.constants.QSETTINGS_USER_KEYS),
 ):
     for _key in _keys:
-        _val = __settings.value(f"{__version}/{_prefix}/{_key}")
+        _val = __settings.value(f"{VERSION}/{_prefix}/{_key}")
         if _val is None:
             _param = core.get_generic_parameter(_key)
-            __settings.setValue(f"{__version}/{_prefix}/{_key}", _param.default)
+            __settings.setValue(f"{VERSION}/{_prefix}/{_key}", _param.default)
 del __settings

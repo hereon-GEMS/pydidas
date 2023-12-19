@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ which are used throughout the package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 # import __all__ items from modules:
@@ -33,15 +35,14 @@ from .file_utils import *
 from .iterable_utils import *
 from .format_arguments_ import *
 from .get_documentation_targets import *
-from .get_pydidas_icons import *
 from .hdf5_dataset_utils import *
 from .logger import *
 from .math_utils import *
+from .no_print import *
 from .qt_utilities import *
 from .rebin_ import *
 from .set_default_plugin_dir_ import *
 from .show_busy_mouse import *
-from .signal_blocker import *
 from .sphinx_html import *
 from .str_utils import *
 from .timer import *
@@ -78,11 +79,6 @@ from . import get_documentation_targets
 __all__.extend(get_documentation_targets.__all__)
 del get_documentation_targets
 
-from . import get_pydidas_icons
-
-__all__.extend(get_pydidas_icons.__all__)
-del get_pydidas_icons
-
 from . import hdf5_dataset_utils
 
 __all__.extend(hdf5_dataset_utils.__all__)
@@ -103,6 +99,11 @@ from . import math_utils
 __all__.extend(math_utils.__all__)
 del math_utils
 
+from . import no_print
+
+__all__.extend(no_print.__all__)
+del no_print
+
 from . import qt_utilities
 
 __all__.extend(qt_utilities.__all__)
@@ -122,11 +123,6 @@ from . import show_busy_mouse
 
 __all__.extend(show_busy_mouse.__all__)
 del show_busy_mouse
-
-from . import signal_blocker
-
-__all__.extend(signal_blocker.__all__)
-del signal_blocker
 
 from . import sphinx_html
 

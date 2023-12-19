@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,39 +18,40 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
-import tempfile
-import shutil
-import random
+import multiprocessing as mp
 import os
+import shutil
+import tempfile
 import threading
 import time
-import multiprocessing as mp
+import unittest
 
 import numpy as np
+from qtpy import QtWidgets
 
 from pydidas import unittest_objects
-from pydidas.core import get_generic_parameter, UserConfigError, utils, PydidasQsettings
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
-from pydidas.experiment import SetupScan
-from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.workflow.result_io import WorkflowResultIoMeta
+from pydidas.contexts import ScanContext
+from pydidas.core import PydidasQsettings, UserConfigError, get_generic_parameter, utils
 from pydidas.plugins import PluginCollection
+from pydidas.workflow import WorkflowResultsContext, WorkflowTree
+from pydidas.workflow.result_io import WorkflowResultIoMeta
+from pydidas_qtcore import PydidasQApplication
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
-RESULTS = WorkflowResults()
+SCAN = ScanContext()
+RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
 COLL = PluginCollection()
-_PLUGIN_PATHS = COLL.get_all_registered_paths()
+_PLUGIN_PATHS = COLL.registered_paths
 
 
 class TestLock(threading.Thread):
@@ -81,6 +84,12 @@ class TestLock(threading.Thread):
 class TestExecuteWorkflowApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        _app = QtWidgets.QApplication.instance()
+        if _app is None:
+            _ = PydidasQApplication([])
+        RESULTS.clear_all_results()
+        TREE.clear()
+        cls._path = tempfile.mkdtemp()
         cls.generate_scan(cls)
         cls.q_settings = PydidasQsettings()
         cls._buf_size = cls.q_settings.value("global/shared_buffer_size", float)
@@ -91,6 +100,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        shutil.rmtree(cls._path)
         cls.q_settings.set_value("global/shared_buffer_size", cls._buf_size)
         cls.q_settings.set_value("global/mp_n_workers", cls._n_workers)
         COLL.clear_collection(True)
@@ -98,11 +108,10 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def setUp(self):
         RESULT_SAVER.set_active_savers_and_title([])
-        self._path = tempfile.mkdtemp()
         self.generate_tree()
+        self.reset_scan_params()
 
     def tearDown(self):
-        shutil.rmtree(self._path)
         ExecuteWorkflowApp.parse_func = execute_workflow_app_parser
 
     def generate_tree(self):
@@ -114,13 +123,11 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def generate_scan(self):
         SCAN.restore_all_defaults(True)
         SCAN.set_param_value("scan_dim", 3)
-        self._nscan = (
-            random.choice([5, 7, 9, 11]),
-            random.choice([2, 4, 5]),
-            random.choice([5, 6, 7, 8]),
-        )
+        self._nscan = (9, 5, 7)
         self._scandelta = (0.1, -0.2, 1.1)
         self._scanoffset = (-5, 0, 1.2)
+
+    def reset_scan_params(self):
         for i in range(3):
             SCAN.set_param_value("scan_dim", 3)
             SCAN.set_param_value(f"scan_dim{i}_n_points", self._nscan[i - 1])
@@ -142,14 +149,53 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         self.assertTrue(app.get_param_value("autosave_results"))
 
+    def test_multiprocessing_carryon(self):
+        app = ExecuteWorkflowApp()
+        self.assertTrue(app.multiprocessing_carryon())
+
+    def test_store_context(self):
+        app = ExecuteWorkflowApp()
+        app._store_context()
+        self.assertEqual(app._config["result_shapes"], TREE.get_all_result_shapes())
+
+    def test_get_and_store_tasks(self):
+        app = ExecuteWorkflowApp()
+        app._mp_tasks = np.arange(SCAN.n_points)
+        self.assertTrue(np.allclose(app._mp_tasks, np.arange(np.prod(self._nscan))))
+
+    def test_check_size_of_results_and_calc_buffer_size__all_okay(self):
+        app = ExecuteWorkflowApp()
+        app._store_context()
+        app._mp_tasks = np.arange(SCAN.n_points)
+        app._check_size_of_results_and_buffer()
+        self.assertTrue(app._config["buffer_n"] > 0)
+
+    def test_check_size_of_results_and_calc_buffer_size__res_too_large(self):
+        app = ExecuteWorkflowApp()
+        app._config["result_shapes"] = {1: (10000, 10000), 2: (15000, 20000)}
+        with self.assertRaises(UserConfigError):
+            app._check_size_of_results_and_buffer()
+
+    def test_multiprocessing_pre_cycle(self):
+        _index = int(np.ceil(np.random.random() * 1e5))
+        app = ExecuteWorkflowApp()
+        app.multiprocessing_pre_cycle(_index)
+        self.assertEqual(_index, app._index)
+
+    def test_multiprocesssing_post_run(self):
+        app = ExecuteWorkflowApp()
+        app.multiprocessing_post_run()
+        # assert does not raise an Exception
+
+    def test_redefine_multiprocessing_carryon__not_live(self):
+        app = ExecuteWorkflowApp()
+        app._redefine_multiprocessing_carryon()
+        self.assertTrue(app.multiprocessing_carryon())
+
     def test_multiprocessing_pre_run(self):
         app = ExecuteWorkflowApp()
         app.multiprocessing_pre_run()
         # assert does not raise error
-
-    def test_multiprocessing_carryon(self):
-        app = ExecuteWorkflowApp()
-        self.assertTrue(app.multiprocessing_carryon())
 
     def test_prepare_run__master_not_live_no_autosave(self):
         app = ExecuteWorkflowApp()
@@ -175,7 +221,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.set_param_value("live_processing", False)
         app.prepare_run()
         SCAN.set_param_value("scan_dim3_offset", -12345)
-        app2 = app.get_copy(slave_mode=True)
+        app2 = app.copy(slave_mode=True)
         SCAN.set_param_value("scan_dim3_offset", 0)
         app2.prepare_run()
         self.assertIsInstance(app2._shared_arrays[1], np.ndarray)
@@ -198,45 +244,27 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertIsInstance(app._shared_arrays[2], np.ndarray)
         self.assertTrue(app.multiprocessing_carryon())
 
-    def test_check_and_store_results_shapes(self):
-        app = ExecuteWorkflowApp()
-        app._ExecuteWorkflowApp__check_and_store_result_shapes()
-        self.assertEqual(app._config["result_shapes"], TREE.get_all_result_shapes())
-
-    def test_get_and_store_tasks(self):
-        app = ExecuteWorkflowApp()
-        app._mp_tasks = np.arange(SCAN.n_points)
-        self.assertTrue(np.allclose(app._mp_tasks, np.arange(np.prod(self._nscan))))
-
-    def test_check_size_of_results_and_calc_buffer_size__all_okay(self):
-        app = ExecuteWorkflowApp()
-        app._ExecuteWorkflowApp__check_and_store_result_shapes()
-        app._mp_tasks = np.arange(SCAN.n_points)
-        app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
-        self.assertTrue(app._config["buffer_n"] > 0)
-
-    def test_check_size_of_results_and_calc_buffer_size__res_too_large(self):
-        app = ExecuteWorkflowApp()
-        app._config["result_shapes"] = {1: (10000, 10000), 2: (15000, 20000)}
-        with self.assertRaises(UserConfigError):
-            app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
-
     def test_initialize_shared_memory(self):
         app = ExecuteWorkflowApp()
         app._mp_tasks = np.arange(SCAN.n_points)
-        app._ExecuteWorkflowApp__check_and_store_result_shapes()
-        app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
+        app._store_context()
+        app._check_size_of_results_and_buffer()
         app.initialize_shared_memory()
         for key in app._config["shared_memory"]:
-            self.assertIsInstance(
-                app._config["shared_memory"][key], mp.sharedctypes.SynchronizedArray
-            )
+            if key == "lock":
+                self.assertIsInstance(
+                    app._config["shared_memory"][key], mp.synchronize.Lock
+                )
+            else:
+                self.assertIsInstance(
+                    app._config["shared_memory"][key], mp.sharedctypes.SynchronizedArray
+                )
 
     def test_initialize_arrays_from_shared_memory(self):
         app = ExecuteWorkflowApp()
         app._mp_tasks = np.arange(SCAN.n_points)
-        app._ExecuteWorkflowApp__check_and_store_result_shapes()
-        app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
+        app._store_context()
+        app._check_size_of_results_and_buffer()
         app.initialize_shared_memory()
         app._ExecuteWorkflowApp__initialize_arrays_from_shared_memory()
         _n = app._config["buffer_n"]
@@ -246,11 +274,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             else:
                 _target = (_n,) + app._config["result_shapes"][key]
             self.assertEqual(app._shared_arrays[key].shape, _target)
-
-    def test_redefine_multiprocessing_carryon__not_live(self):
-        app = ExecuteWorkflowApp()
-        app._redefine_multiprocessing_carryon()
-        self.assertTrue(app.multiprocessing_carryon())
 
     def test_redefine_multiprocessing_carryon__live(self):
         TREE.root.plugin.input_available = lambda x: x
@@ -271,12 +294,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def test_multiprocessing_get_tasks__no_tasks(self):
         app = ExecuteWorkflowApp()
         app.prepare_run()
-
-    def test_multiprocessing_pre_cycle(self):
-        _index = int(np.ceil(np.random.random() * 1e5))
-        app = ExecuteWorkflowApp()
-        app.multiprocessing_pre_cycle(_index)
-        self.assertEqual(_index, app._index)
 
     def test_multiprocessing_func__no_metadata(self):
         _index = 12
@@ -346,11 +363,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertEqual(app._shared_arrays["flag"][0], 1)
         app.multiprocessing_store_results(_index, _pos)
         self.assertEqual(app._shared_arrays["flag"][0], 0)
-
-    def test_multiprocesssing_post_run(self):
-        app = ExecuteWorkflowApp()
-        app.multiprocessing_post_run()
-        # assert does not raise an Exception
 
     def test_store_result_metadata__with_dataset(self):
         _index = 12

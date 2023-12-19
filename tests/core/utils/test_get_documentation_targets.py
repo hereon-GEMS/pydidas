@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,23 +18,22 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
 import os
-
+import unittest
 
 from qtpy import QtCore
 
 from pydidas.core.utils import (
-    get_doc_make_directory,
-    get_doc_home_filename,
-    get_doc_home_address,
-    get_doc_home_qurl,
+    DOC_HOME_ADDRESS,
+    DOC_HOME_FILENAME,
+    DOC_HOME_QURL,
+    DOC_MAKE_DIRECTORY,
 )
 
 
@@ -43,20 +44,20 @@ class TestGetDocQUrl(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def test_get_doc_make_directory(self):
-        _dir = get_doc_make_directory()
+    def test_DOC_MAKE_DIRECTORY(self):
+        _dir = DOC_MAKE_DIRECTORY
         self.assertIn("Makefile", os.listdir(_dir))
 
-    def test_get_doc_home_filename(self):
-        _fname = get_doc_home_filename()
+    def test_DOC_HOME_FILENAME(self):
+        _fname = DOC_HOME_FILENAME
         self.assertTrue(os.path.exists(_fname))
 
-    def test_get_doc_home_address(self):
-        _address = get_doc_home_address()
+    def test_DOC_HOME_ADDRESS(self):
+        _address = DOC_HOME_ADDRESS
         self.assertTrue(_address.startswith(r"file:///"))
 
     def test_get_doc_qurl(self):
-        _url = get_doc_home_qurl()
+        _url = DOC_HOME_QURL
         self.assertIsInstance(_url, QtCore.QUrl)
 
 

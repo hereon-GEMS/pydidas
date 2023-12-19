@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,20 +21,23 @@ to select the different frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["MainWindow"]
 
+
 import os
+import warnings
 from functools import partial
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
 from ..core import PydidasGuiError
-from ..widgets import InfoWidget
+from ..widgets.framework import FontScalingToolbar, PydidasStatusWidget
 from . import utils
+from .frames import DefineDiffractionExpFrame, DefineScanFrame, WorkflowEditFrame
 from .main_menu import MainMenu
 
 
@@ -61,14 +66,17 @@ class MainWindow(MainMenu):
 
         self._toolbars = {}
         self._toolbar_actions = {}
-        self.__configuration = {"toolbars_created": False}
+        self.__configuration = {
+            "toolbars_created": False,
+            "toolbar_visibility": {"": True},
+        }
         self.__create_logging_info_box()
 
     def __create_logging_info_box(self):
         """
-        Create the InfoWidget for logging and status messages.
+        Create the PydidasStatusWidget for logging and status messages.
         """
-        self.__info_widget = InfoWidget()
+        self.__info_widget = PydidasStatusWidget()
         _dock_widget = QtWidgets.QDockWidget("Logging && information")
         _dock_widget.setWidget(self.__info_widget)
         _dock_widget.setFeatures(
@@ -88,7 +96,6 @@ class MainWindow(MainMenu):
             self.create_toolbar_menu()
         QtWidgets.QMainWindow.show(self)
         self.centralWidget().currentChanged.emit(0)
-        self.centralWidget().sig_mouse_entered.connect(self._reset_toolbar_menu)
 
     def create_frame_instances(self):
         """
@@ -117,74 +124,115 @@ class MainWindow(MainMenu):
         self._create_toolbars()
         self._create_toolbar_actions()
 
-        for _toolbar_name, _toolbar in self._toolbars.items():
-            if _toolbar_name != "":
-                self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
-            self.addToolBar(QtCore.Qt.LeftToolBarArea, _toolbar)
-            # only make the root toolbar visible to start with:
-            _toolbar.setVisible(_toolbar_name == "")
+        self._update_toolbar_visibility()
         self.select_item(self.centralWidget().currentWidget().menu_entry)
         self.__configuration["toolbars_created"] = True
+        self.__connect_workflow_processing_signals()
 
     def _create_toolbar_menu_entries(self):
         """
         Create the required toolbar menu entries to populate the menu.
         """
-        _menu_entries = []
+        self.__configuration["menu_entries"] = []
         for _key in self.centralWidget().frame_toolbar_entries:
             _items = _key.split("/")
-            _entries = ["/".join(_items[: _i + 1]) for _i in range(len(_items))]
-            for _entry in _entries:
-                if _entry not in _menu_entries:
-                    _menu_entries.append(_entry)
+            for _entry in ["/".join(_items[: _i + 1]) for _i in range(len(_items))]:
+                if _entry not in self.__configuration["menu_entries"]:
+                    self.__configuration["menu_entries"].append(_entry)
                 if _entry not in self._toolbar_metadata:
                     self._toolbar_metadata[_entry] = utils.create_generic_toolbar_entry(
                         _entry
                     )
-        self.__configuration["menu_entries"] = _menu_entries
+                    self.__configuration["toolbar_visibility"][_entry] = False
 
     def _create_toolbars(self):
         """
         Create the toolbar widgets for the toolbar menu.
         """
-        self._toolbars = {}
         for _tb in utils.find_toolbar_bases(self.__configuration["menu_entries"]):
             tb_title = _tb if _tb else "Main toolbar"
-            self._toolbars[_tb] = QtWidgets.QToolBar(tb_title, self)
-            self._toolbars[_tb].setStyleSheet("QToolBar{spacing:20px;}")
-            self._toolbars[_tb].setIconSize(QtCore.QSize(45, 45))
-            self._toolbars[_tb].setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-            self._toolbars[_tb].setFixedWidth(90)
-            self._toolbars[_tb].setMovable(False)
-            self._toolbars[_tb].toggleViewAction().setEnabled(False)
+            self._toolbars[_tb] = FontScalingToolbar(tb_title, self)
+        for _toolbar_name, _toolbar in self._toolbars.items():
+            if _toolbar_name != "":
+                self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
+            self.addToolBar(QtCore.Qt.LeftToolBarArea, _toolbar)
 
     def _create_toolbar_actions(self):
         """
         Create the toolbar actions to swtich between frames.
         """
-        for item in self.__configuration["menu_entries"]:
-            _icon = self._toolbar_metadata[item]["icon"]
-            _label = self._toolbar_metadata[item]["label"]
-            _action = QtWidgets.QAction(_icon, _label, self)
+        for _entry in self.__configuration["menu_entries"]:
+            _metadata = self._toolbar_metadata[_entry]
+            _action = QtWidgets.QAction(_metadata["icon"], _metadata["label"], self)
             _action.setCheckable(True)
-            _action.triggered.connect(partial(self.select_item, item))
-            self._toolbar_actions[item] = _action
-            itembase = os.path.dirname(item)
+            _action.triggered.connect(partial(self.select_item, _entry))
+            self._toolbar_actions[_entry] = _action
+            itembase = os.path.dirname(_entry)
             self._toolbars[itembase].addAction(_action)
+
+    def _update_toolbar_visibility(self):
+        """
+        Update the toolbar visibility based on the stored information.
+        """
+        for _name, _toolbar in self._toolbars.items():
+            _visible = self.__configuration["toolbar_visibility"].get(_name, False)
+            _toolbar.setVisible(_visible)
+            if _name != "":
+                self._auto_update_toolbar_entry(_name)
+
+    def __connect_workflow_processing_signals(self):
+        """
+        Connect the signals from the WorkflowProcessing which block changes.
+        """
+        try:
+            _proc_frame = self.centralWidget().get_widget_by_name(
+                "Workflow processing/Run full workflow"
+            )
+        except KeyError:
+            return
+        for _key, _action in self._toolbar_actions.items():
+            if _key in [
+                WorkflowEditFrame.menu_entry,
+                DefineScanFrame.menu_entry,
+                DefineDiffractionExpFrame.menu_entry,
+            ]:
+                _proc_frame.sig_processing_running.connect(_action.setDisabled)
+
+    def _auto_update_toolbar_entry(self, label):
+        """
+        Run an automatic update of the toolbar entry referenced by name.
+
+        This method toggles the expand/hide of the toolbar entry.
+
+        Parameters
+        ----------
+        label : str
+            The toolbar entry reference label.
+        """
+        _action = self._toolbar_actions[label]
+        _suffix = (
+            "_visible"
+            if self.__configuration["toolbar_visibility"][label]
+            else "_invisible"
+        )
+        _text = self._toolbar_metadata[label][f"label{_suffix}"]
+        _action.setText(_text)
+        _icon = self._toolbar_metadata[label][f"icon{_suffix}"]
+        _action.setIcon(_icon)
 
     def register_frame(self, frame):
         """
         Register a frame class with the MainWindow and add it to the
         PydidasFrameStack.
 
-        This method takes a :py:class:`BaseFrame <pydidas.widgets.BaseFrame>`
+        This method takes a :py:class:`BaseFrame <pydidas.widgets.framework.BaseFrame>`
         and creates an instance which is registeres with the
         PydidasFrameStack. It also stores the required metadata to create
         a actionbar link to open the frame.
 
         Parameters
         ----------
-        frame : type[pydidas.widgets.BaseFrame]
+        frame : type[pydidas.widgets.framework.BaseFrame]
             The class of the Frame. This must be a subclass of BaseFrame.
             If a string is passed, an empty frame class with the metadata
             given by title, menu_entry and icon is created.
@@ -208,34 +256,28 @@ class MainWindow(MainMenu):
         Select an item from the left toolbar and select the corresponding
         frame in the centralWidget.
 
+        For labels that have frames attached to them, this method will show the frame.
+        For labels which are only entries in the menu tree, this method will show/hide
+        the respective toolbar.
+
         Parameters
         ----------
         label : str
             The label of the selected item.
         """
         self.setUpdatesEnabled(False)
-        for _name, _toolbar in self._toolbars.items():
-            _toolbar.setVisible(_name in self._toolbar_metadata[label]["menu_tree"])
-        for _name, _action in self._toolbar_actions.items():
-            _action.setChecked(
-                _name in self._toolbar_metadata[label]["menu_tree"] or _name == label
-            )
         if label in self.centralWidget().frame_indices:
+            for _name, _action in self._toolbar_actions.items():
+                _action.setChecked(_name == label)
             self.centralWidget().activate_widget_by_name(label)
+        else:
+            _toolbar = self._toolbars[label]
+            _new_visibility = not _toolbar.isVisible()
+            _toolbar.setVisible(_new_visibility)
+            self._toolbar_actions[label].setChecked(False)
+            self.__configuration["toolbar_visibility"][label] = _new_visibility
+            self._auto_update_toolbar_entry(label)
         self.setUpdatesEnabled(True)
-
-    @QtCore.Slot()
-    def _reset_toolbar_menu(self):
-        """
-        Reset the toolbar menu to highlight the current Frame.
-        """
-        _label = self.centralWidget().active_widget_name
-        for _name, _toolbar in self._toolbars.items():
-            _toolbar.setVisible(_name in self._toolbar_metadata[_label]["menu_tree"])
-        for _name, _action in self._toolbar_actions.items():
-            _action.setChecked(
-                _name in self._toolbar_metadata[_label]["menu_tree"] or _name == _label
-            )
 
     def restore_gui_state(self, state="saved", filename=None):
         """
@@ -253,8 +295,41 @@ class MainWindow(MainMenu):
             The filename to be used to restore the state. This kwarg will only be used
             if the state kwarg is set to "manual".
         """
-        MainMenu.restore_gui_state(self, state, filename)
+        try:
+            MainMenu.restore_gui_state(self, state, filename)
+        except Exception as exc:
+            warnings.warn(
+                "Error during GUI state restoration:\n"
+                + str(exc)
+                + "\nSkipping restoration..."
+            )
         self.select_item(self.centralWidget().currentWidget().menu_entry)
+
+    def export_mainwindow_state(self):
+        """
+        Export the main window's state.
+
+        Returns
+        -------
+        dict
+            The state of the main window required to restore the look.
+        """
+        return MainMenu.export_mainwindow_state(self) | {
+            "toolbar_visibility": self.__configuration["toolbar_visibility"],
+        }
+
+    def restore_mainwindow_state(self, state):
+        """
+        Restore the main window's state from saved information.
+
+        Parameters
+        ----------
+        state : dict
+            The stored state of the main window.
+        """
+        self.__configuration["toolbar_visibility"] = state["toolbar_visibility"]
+        self._update_toolbar_visibility()
+        MainMenu.restore_mainwindow_state(self, state)
 
     @QtCore.Slot(str)
     def update_status(self, text):
@@ -270,6 +345,4 @@ class MainWindow(MainMenu):
             The status message.
         """
         self.statusBar().showMessage(text)
-        if text[-1] != "\n":
-            text += "\n"
-        self.__info_widget.add_status(text)
+        self.__info_widget.add_status(text if text[-1] == "\n" else text + "\n")

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,35 +22,23 @@ diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Subtract1dBackgroundProfile"]
+
 
 from pathlib import Path
 
 import numpy as np
 
+from pydidas.core import Dataset, Parameter, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims
-from pydidas.core import Parameter, get_generic_param_collection
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
 
-
-_PARAM_THRESH = Parameter(
-    "threshold_low",
-    float,
-    None,
-    allow_None=True,
-    name="Lower threshold",
-    tooltip=(
-        "The lower threhold. Any values in the corrected"
-        " dataset smaller than the threshold will be set "
-        "to the threshold value."
-    ),
-)
 
 _PARAM_PROFILE_FILE = Parameter(
     "profile_file",
@@ -71,8 +61,10 @@ class Subtract1dBackgroundProfile(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
-    default_params = get_generic_param_collection("process_data_dim")
-    default_params.add_params(_PARAM_THRESH.get_copy(), _PARAM_PROFILE_FILE.get_copy())
+    default_params = get_generic_param_collection(
+        "process_data_dim", "threshold_low", "multiplicator"
+    )
+    default_params.add_param(_PARAM_PROFILE_FILE.copy())
     input_data_dim = 1
     output_data_dim = 1
     output_data_label = "Background-corrected data"
@@ -91,12 +83,12 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             self._thresh = None
 
         _fname = self.get_param_value("profile_name")
-        _profile = import_data(_fname)
-
-        self._profile = _profile
+        self._profile = import_data(_fname)
+        if self.get_param_value("multiplicator") != 1.0:
+            self._profile *= self.get_param_value("multiplicator")
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Subtract a one-dimensional background profile.
 
@@ -109,7 +101,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        data : pydidas.core.Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

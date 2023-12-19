@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,38 +18,46 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import copy
 import os
-import unittest
-import tempfile
 import shutil
+import tempfile
+import unittest
 from pathlib import Path
 
 import numpy as np
 
-from pydidas.core import get_generic_parameter, UserConfigError
+from pydidas.core import UserConfigError, get_generic_parameter
 from pydidas.managers import FilelistManager
 
 
 class TestFilelistManager(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:02d}.npy"))
-        self._img_shape = (10, 10)
-        self._data = np.random.random((50,) + self._img_shape)
+    @classmethod
+    def setUpClass(cls):
+        cls._path = Path(tempfile.mkdtemp())
+        cls._img_shape = (10, 10)
+        cls._data = np.random.random((50,) + cls._img_shape)
         for i in range(50):
-            np.save(self._fname(i), self._data[i])
+            np.save(cls._fname(i), cls._data[i])
         for i in range(50, 60):
-            np.save(self._fname(i), np.random.random((20, 20)))
+            np.save(cls._fname(i), np.random.random((20, 20)))
 
-    def tearDown(self):
-        shutil.rmtree(self._path)
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+
+    @classmethod
+    def _fname(cls, i: int):
+        return cls._path.joinpath(f"test_{i:02d}.npy")
+
+    def setUp(self):
+        self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:02d}.npy"))
 
     def test_creation(self):
         fm = FilelistManager()
@@ -88,29 +98,37 @@ class TestFilelistManager(unittest.TestCase):
 
     def test_update_params_ii(self):
         fm = FilelistManager()
-        fm._update_params(self._fname(0), self._fname(50), False, 2)
+        fm._update_params(self._fname(0), self._fname(49), False, 2)
         self.assertEqual(fm.get_param_value("first_file"), self._fname(0))
-        self.assertEqual(fm.get_param_value("last_file"), self._fname(50))
+        self.assertEqual(fm.get_param_value("last_file"), self._fname(49))
         self.assertEqual(fm.get_param_value("live_processing"), False)
         self.assertEqual(fm.get_param_value("file_stepping"), 2)
 
-    def test_check_files_wrong_name(self):
+    def test_check_files__wrong_name(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(100))
         with self.assertRaises(UserConfigError):
             fm._check_files()
 
-    def test_check_files_wrong_dir(self):
+    def test_check_files__wrong_dir(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
         fm.set_param_value("last_file", "/foo/bar/dummy.npy")
         with self.assertRaises(UserConfigError):
             fm._check_files()
 
-    def test_check_files_all_good(self):
+    def test_check_files__all_good(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
-        fm.set_param_value("last_file", self._fname(50))
+        fm.set_param_value("last_file", self._fname(49))
+        fm._check_files()
+
+    def test_check_files__different_extension(self):
+        fm = FilelistManager()
+        fm.set_param_value("first_file", self._fname(0))
+        fm.set_param_value("last_file", str(self._fname(49)) + ".test")
+        with self.assertRaises(UserConfigError):
+            fm._check_files()
 
     def test_check_only_first_file_selected_true(self):
         fm = FilelistManager()
@@ -120,7 +138,7 @@ class TestFilelistManager(unittest.TestCase):
     def test_check_only_first_file_selected_false(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
-        fm.set_param_value("last_file", self._fname(50))
+        fm.set_param_value("last_file", self._fname(49))
         self.assertFalse(fm._check_only_first_file_selected())
 
     def test_create_one_file_list(self):
@@ -151,6 +169,20 @@ class TestFilelistManager(unittest.TestCase):
             fm._config["file_list"], [self._fname(i) for i in range(50)]
         )
 
+    def test_create_filelist_static__metadata_files(self):
+        fm = FilelistManager()
+        fm.set_param_value("first_file", self._fname(0))
+        fm.set_param_value("last_file", self._fname(49))
+        for _index in range(50):
+            _fname = Path(self._path).joinpath(f"test_{_index:02d}.npy.metadata")
+            _len = int(np.random.random() * 1e3)
+            np.savetxt(_fname, np.arange(_len))
+        fm._create_filelist_static()
+        self.assertEqual(fm._config["n_files"], 50)
+        self.assertListEqual(
+            fm._config["file_list"], [self._fname(i) for i in range(50)]
+        )
+
     def test_create_filelist_static_stepping(self):
         _stepping = 7
         fm = FilelistManager()
@@ -162,57 +194,6 @@ class TestFilelistManager(unittest.TestCase):
         self.assertListEqual(
             fm._config["file_list"], [self._fname(i) for i in range(0, 50, _stepping)]
         )
-
-    def test_get_live_processing_naming_scheme(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:03d}.txt")
-        _fnames, _range = fm._get_live_processing_naming_scheme()
-        self.assertEqual(_range[0], _index0)
-        self.assertEqual(_range[-1], _index1)
-        self.assertEqual(
-            Path(_fnames.format(index=0)), fm.get_param_value("first_file")
-        )
-
-    def test_get_live_processing_naming_scheme_wrong_ext(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:03d}.text")
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
-
-    def test_get_live_processing_naming_scheme_wrong_length(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value(
-            "last_file", f"/foo/path/test_0000_file_{_index1:03d}_test.txt"
-        )
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
-
-    def test_get_live_processing_naming_scheme_wrong_length_ii(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:05d}.txt")
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
-
-    def test_get_live_processing_naming_scheme_too_many_changes(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0001_file_{_index1:03d}.txt")
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
 
     def test_update_params(self):
         fm = FilelistManager()

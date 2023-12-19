@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,23 +20,26 @@ Module with the Hdf5Io class for importing and exporting Hdf5 data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
+
 
 import os
 from copy import copy
 from numbers import Integral
+from pathlib import Path
+from typing import Union
 
-from numpy import amax, squeeze
 import h5py
-import hdf5plugin
+from numpy import amax, ndarray, squeeze
 
-from ...core.constants import HDF5_EXTENSIONS
 from ...core import Dataset
-from ..low_level_readers.read_hdf5_dataset import read_hdf5_dataset
+from ...core.constants import HDF5_EXTENSIONS
+from ...core.utils import CatchFileErrors
+from ..low_level_readers import read_hdf5_dataset
 from .io_base import IoBase
 
 
@@ -47,7 +52,7 @@ class Hdf5Io(IoBase):
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
-    def import_from_file(cls, filename, **kwargs):
+    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
         """
         Read data from a Hdf5 file.
 
@@ -68,7 +73,7 @@ class Hdf5Io(IoBase):
         roi : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
-            as 2-tuples of integers or slice  objects. If None, the full image
+            as 2-tuples of integers or slice objects. If None, the full image
             will be returned. The default is None.
         returnType : Union[datatype, 'auto'], optional
             If 'auto', the image will be returned in its native data type.
@@ -103,8 +108,8 @@ class Hdf5Io(IoBase):
                 (_tmpframe.pop(0) if _i in slicing_axes else None)
                 for _i in range(amax(slicing_axes) + 1)
             ]
-
-        _data = squeeze(read_hdf5_dataset(filename, dataset, _slicer))
+        with CatchFileErrors(filename):
+            _data = squeeze(read_hdf5_dataset(filename, dataset, _slicer))
         cls._data = Dataset(
             _data,
             metadata={"slicing_axes": slicing_axes, "frame": frame, "dataset": dataset},
@@ -112,7 +117,7 @@ class Hdf5Io(IoBase):
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(cls, filename, data, **kwargs):
+    def export_to_file(cls, filename: Union[Path, str], data: ndarray, **kwargs: dict):
         """
         Export data to an Hdf5 file.
 

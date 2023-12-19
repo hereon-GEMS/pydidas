@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,14 +16,14 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The constants module holds constant nmumber defitions needed in pydidas.
+The constants module holds constant number defitions needed in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "LAMBDA_IN_A_TO_E",
     "LAMBDA_IN_M_TO_E",
@@ -29,11 +31,11 @@ __all__ = [
     "INPUT_PLUGIN",
     "PROC_PLUGIN",
     "OUTPUT_PLUGIN",
-    "pyFAI_UNITS",
-    "pyFAI_METHOD",
     "PROC_PLUGIN_GENERIC",
     "PROC_PLUGIN_IMAGE",
     "PROC_PLUGIN_INTEGRATED",
+    "PROC_PLUGIN_TYPE_NAMES",
+    "PLUGIN_TYPE_NAMES",
     "FLOAT_REGEX",
 ]
 
@@ -68,22 +70,18 @@ PROC_PLUGIN_GENERIC = 10
 PROC_PLUGIN_IMAGE = 11
 PROC_PLUGIN_INTEGRATED = 12
 
-pyFAI_UNITS = {
-    "Q / nm^-1": "q_nm^-1",
-    "Q / A^-1": "q_A^-1",
-    "2theta / deg": "2th_deg",
-    "2theta / rad": "2th_rad",
-    "r / mm": "r_mm",
-    "chi / deg": "chi_deg",
-    "chi / rad": "chi_rad",
+PROC_PLUGIN_TYPE_NAMES = {
+    PROC_PLUGIN_GENERIC: "Generic processing plugins",
+    PROC_PLUGIN_IMAGE: "Processing plugins for image data",
+    PROC_PLUGIN_INTEGRATED: "Processing plugins for integrated data",
 }
 
-pyFAI_METHOD = {
-    "CSR": "csr",
-    "CSR OpenCL": "csr ocl",
-    "LUT": "lut",
-    "LUT OpenCL": "lut ocl",
-}
+PLUGIN_TYPE_NAMES = {
+    INPUT_PLUGIN: "Input plugins",
+    PROC_PLUGIN: "Processing plugins",
+    OUTPUT_PLUGIN: "Output plugins",
+} | PROC_PLUGIN_TYPE_NAMES
+
 
 FLOAT_REGEX = re.compile(
     r"\s*[+-]?[0-9]*\.?[0-9]+(?:[e][+-]?[0-9]+)?\s*"

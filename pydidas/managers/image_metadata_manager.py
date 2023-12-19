@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,28 +21,29 @@ image metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ImageMetadataManager"]
 
-import os
 
-from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file, get_extension
+from pathlib import Path
+from typing import Union
+
 from ..core import (
+    ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
-    ObjectWithParameterCollection,
 )
+from ..core.constants import HDF5_EXTENSIONS
+from ..core.utils import check_hdf5_key_exists_in_file, get_extension, get_hdf5_metadata
 from ..data_io import import_data
 
 
 class ImageMetadataManager(ObjectWithParameterCollection):
     """
-    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
-    <pydidas.core.ObjectWithParameterCollection>`
+    Class to handle image metadata.
 
     The ImageMetadataManager is responsible for keeping track of the
     metadata (shape, datatype, imager per file) of image files. All the
@@ -50,7 +53,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
     ----
     The ImageMetadataManager uses the following generic Parameters:
 
-    filename : pathlib.Path
+    filename : Path
         The name of the first file for a file series or of the hdf5 file in
         case of hdf5 file input.
     hdf5_key : Hdf5key, optional
@@ -88,13 +91,11 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         "roi_xhigh",
     )
 
-    def __init__(self, *args, **kwargs):
-        """
-        Create a ImageMetadataManager instance.
-        """
+    def __init__(self, *args: tuple, **kwargs: dict):
         ObjectWithParameterCollection.__init__(self)
-        self.add_params(*args, **kwargs)
+        self.add_params(*args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         self._config = {
             "raw_img_shape_x": None,
             "raw_img_shape_y": None,
@@ -108,97 +109,147 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         }
 
     @property
-    def raw_size_x(self):
+    def raw_size_x(self) -> int:
         """
         Get the x-size of the raw image.
+
+        Returns
+        -------
+        int
+            The number of pixels in x-direction.
         """
         return self._config["raw_img_shape_x"]
 
     @property
-    def raw_size_y(self):
+    def raw_size_y(self) -> int:
         """
         Get the y-size of the raw image.
+
+        Returns
+        -------
+        int
+            The number of pixels in y-direction.
         """
         return self._config["raw_img_shape_y"]
 
     @property
-    def datatype(self):
+    def datatype(self) -> type:
         """
         Get the datatype of the raw image.
+
+        Returns
+        -------
+        type
+            The datatype class.
         """
         return self._config["datatype"]
 
     @property
-    def numbers(self):
+    def numbers(self) -> Union[range, int]:
         """
-        Get the numbers pointing to the selected images.
+        Get the frame numbers pointing to the selected images.
+
+        Returns
+        -------
+        Union[range, int]
+            The selected frame numbers.
         """
         return self._config["numbers"]
 
     @property
-    def final_shape(self):
+    def final_shape(self) -> tuple[float, float]:
         """
         Get the final shape of the processed image (cropped & binned).
+
+        Returns
+        -------
+        tuple[float, float]
+            The final shape of the image.
         """
         return self._config["final_shape"]
 
     @property
-    def roi(self):
+    def roi(self) -> Union[None, tuple[slice, slice]]:
         """
         Get the ROI object required to achieve the final image shape.
+
+        Returns
+        -------
+        Union[None, tuple[slice, slice]]
+            Either None, if no ROI has been defined or a tuple with the slice
+            objects for y and x dimensions.
         """
         return self._config["roi"]
 
     @property
-    def images_per_file(self):
+    def images_per_file(self) -> int:
         """
         Get the number of images per file.
+
+        Returns
+        -------
+        int
+            The number of images per file.
         """
         return self._config["images_per_file"]
 
     @property
-    def hdf5_dset_shape(self):
+    def hdf5_dset_shape(self) -> tuple[int, ...]:
         """
         Get the shape of the hdf5 dataset.
+
+        Returns
+        -------
+        tuple[int, ...]
+            The shape (number of datapoints) of the dataset.
         """
         return self._config["hdf5_dset_shape"]
 
     @property
-    def filename(self):
+    def filename(self) -> Path:
         """
         Get the currently stored reference filename.
+
+        Returns
+        -------
+        Path
+            The filename.
         """
         return self._config["filename"]
 
     @filename.setter
-    def filename(self, filename):
+    def filename(self, filename: Union[Path, str]):
         """
         Set the filename for processing.
 
         Parameters
         ----------
-        filename : Union[str, pathlib.Path]
+        filename : Union[str, Path]
             The full path of the selected file.
 
         Raises
         ------
-        FileNotFoundError
+        UserConfigError
             If the filename cannot be found in the file system.
         """
-        if not os.path.isfile(filename):
+        filename = Path(filename) if isinstance(filename, str) else filename
+        if not filename.is_file():
             raise UserConfigError(
-                f"Cannot find the file {filename} specified for the "
+                f"Cannot find the file *{str(filename)}* specified for the "
                 "ImageMetadataManager."
             )
         self._config["filename"] = filename
 
-    def update(self, filename=None):
+    def update(self, filename: Union[str, Path, None] = None):
         """
         Perform a full update.
 
+        If a new filename is specified, it will be set as first action. Otherwise,
+        the metadata will be extracted from the current file.
+
         Parameters
         ----------
-        filename : Union[str, pathlib.Path, None], optional
+        filename : Union[str, Path, None], optional
             The filename to be updated. If None, the current filename will be used.
             The default is None.
         """
@@ -241,9 +292,9 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _n_per_file = (_n1 - _n0 - 1) // _step + 1
         self._config["numbers"] = range(_n0, _n1, _step)
         self._config["hdf5_dset_shape"] = _meta["shape"]
-        self._store_image_data(_meta["shape"][1:3], _meta["dtype"], _n_per_file)
+        self.store_image_data(_meta["shape"][1:3], _meta["dtype"], _n_per_file)
 
-    def __verify_selection_range(self, dset_length):
+    def __verify_selection_range(self, dset_length: int):
         """
         Verify the selection is valid for the size of the hdf5 dataset.
 
@@ -272,17 +323,19 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _test_image = import_data(self._config["filename"])
         self._config["numbers"] = [0]
         self._config["hdf5_dset_shape"] = (0, 0, 0)
-        self._store_image_data(_test_image.shape, _test_image.dtype, 1)
+        self.store_image_data(_test_image.shape, _test_image.dtype, 1)
 
-    def _store_image_data(self, img_shape, img_dtype, n_image):
+    def store_image_data(
+        self, img_shape: tuple[int, int], img_dtype: type, n_image: int
+    ):
         """
         Store the data about the image shape and datatype.
 
         Parameters
         ----------
-        img_shape : tuple
+        img_shape : tuple[int, int]
             The shape of the image.
-        img_dtype : datatype
+        img_dtype : type
             The python datatype of the image.
         n_image : int
             The number of images per file.
@@ -326,7 +379,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         if _warning:
             raise UserConfigError(_warning)
 
-    def __get_modulated_roi(self):
+    def __get_modulated_roi(self) -> tuple[int, int, int, int]:
         """
         Get the ROI modulated by the image size.
 

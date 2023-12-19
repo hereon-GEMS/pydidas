@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,21 +18,23 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import LocalPluginCollection
 
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = LocalPluginCollection()
 
 
 class TestSum2dData(unittest.TestCase):
@@ -42,6 +46,11 @@ class TestSum2dData(unittest.TestCase):
         cls._data = np.arange(cls._n).reshape(cls._ny, cls._nx)
         cls._x = np.arange(cls._nx) * 2.4 - 12
         cls._y = np.arange(cls._ny) * 1.7 + 42
+
+    @classmethod
+    def tearDownClass(cls):
+        qs = QtCore.QSettings("Hereon", "pydidas")
+        qs.remove("unittesting")
 
     def tearDown(self):
         ...
@@ -63,10 +72,11 @@ class TestSum2dData(unittest.TestCase):
         _low = 3
         _high = 8
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low)
-        plugin.set_param_value("upper_limit_x", _high)
+        plugin.set_param_value("lower_limit_ax1", _low)
+        plugin.set_param_value("upper_limit_ax1", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_index_range("x")
+        plugin._data = self.create_dataset()
+        _range = plugin._get_index_ranges()[1]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -74,10 +84,11 @@ class TestSum2dData(unittest.TestCase):
         _low = 5
         _high = 13
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_y", _low)
-        plugin.set_param_value("upper_limit_y", _high)
+        plugin.set_param_value("lower_limit_ax0", _low)
+        plugin.set_param_value("upper_limit_ax0", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_index_range("y")
+        plugin._data = self.create_dataset()
+        _range = plugin._get_index_ranges()[0]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -87,10 +98,10 @@ class TestSum2dData(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value("lower_limit_x", self._x[_low])
-        plugin.set_param_value("upper_limit_x", self._x[_high])
+        plugin.set_param_value("lower_limit_ax1", self._x[_low])
+        plugin.set_param_value("upper_limit_ax1", self._x[_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range("x")
+        _range = plugin._get_index_ranges()[1]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -100,10 +111,10 @@ class TestSum2dData(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value("lower_limit_y", self._y[_low])
-        plugin.set_param_value("upper_limit_y", self._y[_high])
+        plugin.set_param_value("lower_limit_ax0", self._y[_low])
+        plugin.set_param_value("upper_limit_ax0", self._y[_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range("y")
+        _range = plugin._get_index_ranges()[0]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -111,10 +122,10 @@ class TestSum2dData(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value("lower_limit_x", 120)
-        plugin.set_param_value("upper_limit_x", 420)
+        plugin.set_param_value("lower_limit_ax1", 120)
+        plugin.set_param_value("upper_limit_ax1", 420)
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range("x")
+        _range = plugin._get_index_ranges()[1]
         self.assertEqual(_range, slice(0, 0))
 
     def test_execute__empty_selection(self):
@@ -123,10 +134,10 @@ class TestSum2dData(unittest.TestCase):
         _low_x = 8
         _high_x = 3
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low_x)
-        plugin.set_param_value("upper_limit_x", _high_x)
-        plugin.set_param_value("lower_limit_y", _low_y)
-        plugin.set_param_value("upper_limit_y", _high_y)
+        plugin.set_param_value("lower_limit_ax1", _low_x)
+        plugin.set_param_value("upper_limit_ax1", _high_x)
+        plugin.set_param_value("lower_limit_ax0", _low_y)
+        plugin.set_param_value("upper_limit_ax0", _high_y)
         plugin.set_param_value("type_selection", "Indices")
         data = self.create_dataset()
         _data, _ = plugin.execute(data)
@@ -138,10 +149,10 @@ class TestSum2dData(unittest.TestCase):
         _low_x = 7
         _high_x = 7
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low_x)
-        plugin.set_param_value("upper_limit_x", _high_x)
-        plugin.set_param_value("lower_limit_y", _low_y)
-        plugin.set_param_value("upper_limit_y", _high_y)
+        plugin.set_param_value("lower_limit_ax1", _low_x)
+        plugin.set_param_value("upper_limit_ax1", _high_x)
+        plugin.set_param_value("lower_limit_ax0", _low_y)
+        plugin.set_param_value("upper_limit_ax0", _high_y)
         plugin.set_param_value("type_selection", "Indices")
         data = self.create_dataset()
         _data, _ = plugin.execute(data)
@@ -153,10 +164,10 @@ class TestSum2dData(unittest.TestCase):
         _low_x = 1
         _high_x = 7
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low_x)
-        plugin.set_param_value("upper_limit_x", _high_x)
-        plugin.set_param_value("lower_limit_y", _low_y)
-        plugin.set_param_value("upper_limit_y", _high_y)
+        plugin.set_param_value("lower_limit_ax1", _low_x)
+        plugin.set_param_value("upper_limit_ax1", _high_x)
+        plugin.set_param_value("lower_limit_ax0", _low_y)
+        plugin.set_param_value("upper_limit_ax0", _high_y)
         plugin.set_param_value("type_selection", "Indices")
         data = self.create_dataset()
         _data, _ = plugin.execute(data)

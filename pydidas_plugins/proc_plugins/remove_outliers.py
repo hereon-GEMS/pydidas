@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,18 +21,17 @@ a defined width.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["RemoveOutliers"]
 
-import warnings
 
 import numpy as np
 
+from pydidas.core import Dataset, Parameter, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
-from pydidas.core import get_generic_param_collection, Parameter
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
 
@@ -38,6 +39,9 @@ from pydidas.plugins import ProcPlugin
 class RemoveOutliers(ProcPlugin):
     """
     Remove outlier points from a 1D dataset.
+
+    This plugin detects any data points which differ by more than the threshold from
+    its neighbors and replaces them with the surrounding average.
     """
 
     plugin_name = "Remove Outliers"
@@ -59,12 +63,13 @@ class RemoveOutliers(ProcPlugin):
         Parameter(
             "outlier_threshold",
             float,
-            1,
-            name="Relative outlier threshold",
+            10,
+            name="Outlier threshold",
+            unit="a.u.",
             tooltip=(
-                "The threshold for outliers. Any points which "
-                "differ more than the threshold from the background"
-                " will be removed."
+                "The threshold for outliers. Any points which differ more than the "
+                "threshold from the background (i.e. the surrounding data values) "
+                "will be removed and replaced by average from the surroundings."
             ),
         ),
     )
@@ -79,9 +84,9 @@ class RemoveOutliers(ProcPlugin):
         self._details = None
 
     @property
-    def detailed_results(self):
+    def detailed_results(self) -> dict:
         """
-        Get the detailed results for the Remove1dPolynomialBackground plugin.
+        Get the detailed results for the RemoveOutliers plugin.
 
         Returns
         -------
@@ -94,11 +99,14 @@ class RemoveOutliers(ProcPlugin):
         """
         Set up the required functions and fit variable labels.
         """
+        self._config["index_offset"] = self.get_param_value("kernel_width") + 1
+        self._config["threshold"] = self.get_param_value("outlier_threshold")
+        self._config["width"] = self.get_param_value("kernel_width")
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Crop 1D data.
+        Remove outliers from a 1d Dataset.
 
         Parameters
         ----------
@@ -114,42 +122,122 @@ class RemoveOutliers(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self._input_data = data.copy()
-        _width = self.get_param_value("kernel_width")
-        _threshold = self.get_param_value("outlier_threshold")
-        _data_p = np.roll(data, _width)
-        _data_m = np.roll(data, -_width)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            _data_p_norm = ((data - _data_p) / data)[_width:-_width]
-            _data_m_norm = ((data - _data_m) / data)[_width:-_width]
-            _low_outliers_same_sign = np.where(
-                (_data_p_norm <= -_threshold) & (_data_m_norm <= -_threshold)
-            )[0]
-            _data_p_norm_p = ((data - _data_p) / _data_p)[_width:-_width]
-            _data_m_norm_m = ((data - _data_m) / _data_m)[_width:-_width]
-            _high_outliers_same_sign = np.where(
-                (_data_p_norm_p >= _threshold) & (_data_m_norm_m >= _threshold)
-            )[0]
-            _high_outliers_opposize_sign = np.where(
-                (_data_p_norm_p <= -_threshold) & (_data_m_norm_m <= -_threshold)
-            )[0]
-        _outliers = (
-            np.concatenate(
-                (
-                    _high_outliers_same_sign,
-                    _high_outliers_opposize_sign,
-                    _low_outliers_same_sign,
-                )
-            )
-            + _width
-        )
-        data[_outliers] = (_data_p[_outliers] + _data_m[_outliers]) / 2
+        self._input_data = data
+        self._create_derived_data()
+        self._outliers = np.array(())
+        self._find_and_store_high_outliers()
+        self._find_and_store_low_outliers()
+        _outliers_index_cropped = self._outliers.astype(int)
+        _outliers_index_data = _outliers_index_cropped + self._config["index_offset"]
+        data[_outliers_index_data] = self._config["ref_outer"][_outliers_index_cropped]
+
         self._results = data
         self._details = {None: self._create_detailed_results()}
         return data, kwargs
 
-    def _create_detailed_results(self):
+    def _create_derived_data(self):
+        """
+        Create the required derived data to identify outliers.
+        """
+        _width = self.get_param_value("kernel_width")
+        _slice = slice(_width + 1, self._input_data.size - _width - 1)
+        _cfg = self._config
+        _data_offset = -np.amin(self._input_data) + 1
+        _data = self._input_data + _data_offset
+
+        _cfg["rolled_p"] = np.roll(_data, _width)[_slice]
+        _cfg["rolled_pp"] = np.roll(_data, _width + 1)[_slice]
+        _cfg["rolled_m"] = np.roll(_data, -_width)[_slice]
+        _cfg["rolled_mm"] = np.roll(_data, -_width - 1)[_slice]
+        _cfg["ref_outer"] = 0.5 * (_cfg["rolled_pp"] + _cfg["rolled_mm"]) - _data_offset
+        _data = _data[_slice]
+        _cfg["cropped_working_data"] = _data
+        _cfg["ref_corrected_data"] = _data - _cfg["ref_outer"] - _data_offset
+
+    def _find_and_store_high_outliers(self):
+        """
+        Identify the high data outliers and store their indices.
+        """
+        _cfg = self._config
+        _outliers = np.where(
+            (self._config["ref_corrected_data"] >= _cfg["threshold"])
+            & (
+                _cfg["cropped_working_data"]
+                > _cfg["rolled_p"] + 0.3 * _cfg["threshold"]
+            )
+            & (
+                _cfg["cropped_working_data"]
+                > _cfg["rolled_m"] + 0.3 * _cfg["threshold"]
+            )
+        )[0]
+        _outliers = self._filter_for_outliers_on_flank(_outliers, high_peak=True)
+        self._outliers = np.unique(np.concatenate((self._outliers, _outliers)))
+
+    def _find_and_store_low_outliers(self):
+        """
+        Identify the low data outliers and store their indices.
+        """
+        _cfg = self._config
+        _outliers = np.where(
+            (_cfg["ref_corrected_data"] <= -1 * _cfg["threshold"])
+            & (
+                _cfg["cropped_working_data"]
+                < _cfg["rolled_p"] - 0.3 * _cfg["threshold"]
+            )
+            & (
+                _cfg["cropped_working_data"]
+                < _cfg["rolled_m"] - 0.3 * _cfg["threshold"]
+            )
+        )[0]
+        _outliers = self._filter_for_outliers_on_flank(_outliers, high_peak=False)
+        self._outliers = np.unique(np.concatenate((self._outliers, _outliers)))
+
+    def _filter_for_outliers_on_flank(
+        self, outliers: np.ndarray, high_peak: bool = True
+    ) -> np.ndarray:
+        """
+        Filter for outlier points which are not true outliers but sit on the flank.
+
+        Parameters
+        ----------
+        outliers : np.ndarray
+            The array with outlier indices.
+        high_peak : bool, optional
+            Set the flag for high peak (or low peak) to use the correct comparator.
+
+        Returns
+        -------
+        np.ndarray
+            The filtered outlier index array.
+        """
+        _neighbor_indices = (
+            np.where(
+                self._config["ref_corrected_data"] >= 0.3 * self._config["threshold"]
+            )[0]
+            if high_peak
+            else np.where(
+                self._config["ref_corrected_data"] <= -0.3 * self._config["threshold"]
+            )[0]
+        )
+        for _ in range(2):
+            _neighbor_outliers = np.array(
+                [
+                    _index
+                    for _index in _neighbor_indices
+                    if _index - 1 in outliers or _index + 1 in outliers
+                ]
+            )
+            outliers = np.unique(np.concatenate((outliers, _neighbor_outliers)))
+        _neighbors = np.zeros(outliers.shape, dtype=np.int16)
+        for _index, _outlier in enumerate(outliers):
+            if _neighbors[_index] == 0:
+                while _outlier + _neighbors[_index] in outliers:
+                    _neighbors[_index] += 1
+                _neighbors[_index : _index + _neighbors[_index]] = _neighbors[_index]
+        outliers = outliers[np.where(_neighbors <= self._config["width"])[0]]
+        return outliers
+
+    def _create_detailed_results(self) -> dict:
         """
         Get the detailed results for the outlier removal.
 

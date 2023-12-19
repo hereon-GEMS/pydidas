@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,36 +18,62 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
 import os
 import shutil
 import tempfile
+import unittest
 from numbers import Real
+from pathlib import Path
 
-import numpy as np
 import h5py
+import numpy as np
+from qtpy import QtWidgets
 
-from pydidas.core import Dataset, get_generic_parameter, Parameter
-from pydidas.core.utils import get_random_string, create_hdf5_dataset
-from pydidas.experiment import SetupScan
-from pydidas.unittest_objects import DummyProc, DummyLoader
-from pydidas.workflow import WorkflowTree, WorkflowResults
+import pydidas
+from pydidas.contexts.diffraction_exp_context import DiffractionExperimentContext
+from pydidas.contexts.scan_context import Scan, ScanContext
+from pydidas.core import Dataset, Parameter, UserConfigError, get_generic_parameter
+from pydidas.core.utils import get_random_string
+from pydidas.plugins import PluginCollection
+from pydidas.unittest_objects import DummyLoader, DummyProc, create_hdf5_io_file
+from pydidas.workflow import WorkflowResults, WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
+from pydidas_qtcore import PydidasQApplication
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
+EXP = DiffractionExperimentContext()
 TREE = WorkflowTree()
-RES = WorkflowResults()
+RES = WorkflowResultsContext()
 SAVER = WorkflowResultIoMeta
+PLUGINS = PluginCollection()
 
 
 class TestWorkflowResults(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        _paths = [Path(pydidas.__file__).parent.joinpath("unittest_objects/")]
+        cls._plugin_paths = PLUGINS.registered_paths
+        PLUGINS.find_and_register_plugins(*_paths)
+        global SCAN, TREE, EXP, RES
+        RES._TREE = TREE
+        RES.SCAN = SCAN
+        RES._EXP = EXP
+        _app = QtWidgets.QApplication.instance()
+        if _app is None:
+            _ = PydidasQApplication([])
+
+    @classmethod
+    def tearDownClass(cls):
+        PLUGINS.unregister_all_paths(True)
+        PLUGINS.find_and_register_plugins(*PLUGINS.registered_paths)
+
     def setUp(self):
         self.set_up_scan()
         self.set_up_tree()
@@ -92,93 +120,47 @@ class TestWorkflowResults(unittest.TestCase):
         _shape2 = self._result2_shape
         _res2 = Dataset(
             np.random.random(_shape2),
-            axis_units=["m", "Test", None],
+            axis_units=["m", "Test", ""],
             axis_labels=["dim1", "2nd dim", "dim #3"],
             axis_ranges=[12 + np.arange(_shape2[0]), None, None],
         )
         _results = {1: _res1, 2: _res2}
         return _shape1, _shape2, _results
 
-    def create_h5_test_file(self, filename):
-        _data_label = get_random_string(12)
-        _data_unit = get_random_string(4)
-        _label = get_random_string(9)
-        _data = np.random.random((9, 9, 27))
-        _data_ax_labels = {0: "None", 1: None, 2: "Label"}
-        _data_ax_units = {0: "u1", 1: "u2", 2: None}
+    def create_h5_test_file(self, filename, _RESULTS):
+        _data = Dataset(
+            np.random.random((9, 9, 27)),
+            data_label=get_random_string(12),
+            data_unit=get_random_string(4),
+            axis_labels={0: "None", 1: None, 2: "Label"},
+            axis_units={0: "u1", 1: "u2", 2: None},
+            axis_ranges={
+                0: None,
+                1: np.arange(9) - 3,
+                2: np.linspace(12, -5, num=27),
+            },
+        )
+        _node_label = get_random_string(9)
         _plugin_name = get_random_string(7)
-        _data_ranges = {
-            0: None,
-            1: np.arange(9) - 3,
-            2: np.linspace(12, -5, num=27),
+        create_hdf5_io_file(
+            filename,
+            _data,
+            _RESULTS._SCAN.get_param_values_as_dict(filter_types_for_export=True),
+            _RESULTS._EXP.get_param_values_as_dict(filter_types_for_export=True),
+            _RESULTS._TREE,
+            node_label=_node_label,
+            plugin_name=_plugin_name,
+        )
+        _meta = {
+            "data": _data,
+            "data_labels": _data.data_label,
+            "node_labels": _node_label,
+            "axlabels": _data.axis_labels,
+            "axunits": _data.axis_units,
+            "axranges": _data.axis_ranges,
+            "plugin_name": _plugin_name,
         }
-        with h5py.File(filename, "w") as _file:
-            _file.create_group("entry")
-            _file.create_group("entry/data")
-            _file.create_group("entry/scan")
-            _file["entry"].create_dataset("data_label", data=_data_label)
-            _file["entry"].create_dataset("data_unit", data=_data_unit)
-            _file["entry"].create_dataset("plugin_name", data=_plugin_name)
-            _file["entry"].create_dataset("label", data=_label)
-            _file["entry"].create_dataset("scan_title", data=get_random_string(8))
-            _file["entry"].create_dataset("node_id", data=6)
-            _file["entry/data"].create_dataset("data", data=_data)
-            _file["entry/scan"].create_dataset("scan_dim", data=2)
-            _file["entry/scan"].create_dataset("scan_title", data="dummy")
-            _file["entry/scan"].create_dataset("scan_base_directory", data="/dummy")
-            _file["entry/scan"].create_dataset("scan_name_pattern", data="dummy_###")
-            _file["entry/scan"].create_dataset("scan_start_index", data=12)
-            _file["entry/scan"].create_dataset("scan_index_stepping", data=1)
-            _file["entry/scan"].create_dataset("scan_multiplicity", data=1)
-            _file["entry/scan"].create_dataset("scan_multi_image_handling", data="Sum")
-            for _dim in range(3):
-                create_hdf5_dataset(
-                    _file,
-                    f"entry/data/axis_{_dim}",
-                    "label",
-                    data=_data_ax_labels[_dim],
-                )
-                create_hdf5_dataset(
-                    _file,
-                    f"entry/data/axis_{_dim}",
-                    "unit",
-                    data=_data_ax_units[_dim],
-                )
-                create_hdf5_dataset(
-                    _file,
-                    f"entry/data/axis_{_dim}",
-                    "range",
-                    data=_data_ranges[_dim],
-                )
-            for _dim in range(2):
-                create_hdf5_dataset(
-                    _file,
-                    f"entry/scan/dim_{_dim}",
-                    "range",
-                    data=_data_ranges[_dim],
-                )
-                create_hdf5_dataset(
-                    _file,
-                    f"entry/scan/dim_{_dim}",
-                    "label",
-                    data=_data_ax_labels[_dim],
-                )
-                create_hdf5_dataset(
-                    _file,
-                    f"entry/scan/dim_{_dim}",
-                    "unit",
-                    data=_data_ax_units[_dim],
-                )
-            _meta = {
-                "data": _data,
-                "data_labels": _data_label,
-                "labels": _label,
-                "axlabels": _data_ax_labels,
-                "axunits": _data_ax_units,
-                "axranges": _data_ranges,
-                "plugin_name": _plugin_name,
-            }
-            return _meta
+        return _meta
 
     def create_composites(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -200,7 +182,7 @@ class TestWorkflowResults(unittest.TestCase):
         _shape2 = self._result2_shape
         _res2 = Dataset(
             np.random.random(_shape2),
-            axis_units=["m", "Test", None],
+            axis_units=["m", "Test", ""],
             axis_labels=["dim1", "2nd dim", "dim #3"],
             axis_ranges=[
                 12 + np.arange(_shape2[0]),
@@ -244,7 +226,7 @@ class TestWorkflowResults(unittest.TestCase):
         self.create_composites()
         with open(os.path.join(self._tmpdir, "node_01.h5"), "w") as _file:
             _file.write("test")
-        with self.assertRaises(FileExistsError):
+        with self.assertRaises(UserConfigError):
             RES.prepare_files_for_saving(self._tmpdir, "HDF5")
 
     def test_prepare_files_for_saving__w_existing_file_w_overwrite(self):
@@ -315,8 +297,26 @@ class TestWorkflowResults(unittest.TestCase):
 
     def test_get_result_metadata(self):
         _tmpres = np.random.random((50, 50))
-        RES._WorkflowResults__composites[0] = Dataset(_tmpres)
+        RES._WorkflowResults__composites[0] = Dataset(
+            _tmpres,
+            axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
+            axis_units=[["unit_" + chr(_i + 97)] for _i in range(_tmpres.ndim)],
+        )
         _res = RES.get_result_metadata(0)
+        self.assertIsInstance(_res, dict)
+        for _key in ["axis_labels", "axis_ranges", "axis_units", "metadata"]:
+            self.assertEqual(
+                _res[_key], getattr(RES._WorkflowResults__composites[0], _key)
+            )
+
+    def test_get_result_metadata__use_scan_timeline(self):
+        _tmpres = np.random.random(SCAN.shape + (50, 50))
+        RES._WorkflowResults__composites[0] = Dataset(
+            _tmpres,
+            axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
+            axis_units=[["unit_" + chr(_i + 97)] for _i in range(_tmpres.ndim)],
+        )
+        _res = RES.get_result_metadata(0, use_scan_timeline=True)
         self.assertIsInstance(_res, dict)
         for _key in ["axis_labels", "axis_ranges", "axis_units", "metadata"]:
             self.assertTrue(_key in _res)
@@ -534,7 +534,7 @@ class TestWorkflowResults(unittest.TestCase):
         RES.update_param_choices_from_labels(_param)
         _choices = _param.choices
         self.assertIn("No selection", _choices)
-        for _key, _label in RES.labels.items():
+        for _key, _label in RES.node_labels.items():
             if len(_label) > 0:
                 _item = f"{_label} (node #{_key:03d})"
             else:
@@ -547,7 +547,7 @@ class TestWorkflowResults(unittest.TestCase):
         RES.update_param_choices_from_labels(_param)
         _choices = _param.choices
         self.assertIn("No selection", _choices)
-        for _key, _label in RES.labels.items():
+        for _key, _label in RES.node_labels.items():
             if len(_label) > 0:
                 _item = f"{_label} (node #{_key:03d})"
             else:
@@ -599,36 +599,70 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertNotEqual(_hash, _new_hash)
 
     def test_import_data_from_directory__empty_dir(self):
-        RES.update_shapes_from_scan_and_workflow()
-        RES.import_data_from_directory(self._tmpdir)
         _scan_title = get_random_string(8)
         SCAN.set_param_value("scan_title", _scan_title)
-        self.assertEqual(RES.shapes, {})
-        self.assertEqual(SCAN.get_param_value("scan_title"), _scan_title)
+        _res = WorkflowResults(
+            scan_context=SCAN.deepcopy(),
+            diffraction_exp_context=EXP.deepcopy(),
+            workflow_tree=TREE.deepcopy(),
+        )
+        _res.update_shapes_from_scan_and_workflow()
+        _res.import_data_from_directory(self._tmpdir)
+        self.assertEqual(_res.shapes, {})
+        self.assertEqual(_res._SCAN.get_param_value("scan_title"), _scan_title)
 
     def test_import_data_from_directory__with_files(self):
-        RES.update_shapes_from_scan_and_workflow()
-        _meta11 = self.create_h5_test_file(os.path.join(self._tmpdir, "node_11.h5"))
-        _meta5 = self.create_h5_test_file(os.path.join(self._tmpdir, "node_05.h5"))
-        RES.import_data_from_directory(self._tmpdir)
+        _res = WorkflowResults(
+            scan_context=SCAN.deepcopy(),
+            diffraction_exp_context=EXP.deepcopy(),
+            workflow_tree=TREE.deepcopy(),
+        )
+        _res.update_shapes_from_scan_and_workflow()
+        _meta11 = self.create_h5_test_file(
+            os.path.join(self._tmpdir, "node_11.h5"), _res
+        )
+        _meta5 = self.create_h5_test_file(
+            os.path.join(self._tmpdir, "node_05.h5"), _res
+        )
+        _res.import_data_from_directory(self._tmpdir)
         for _id, _local in [[5, _meta5], [11, _meta11]]:
-            for _key in ["labels", "data_labels"]:
-                self.assertEqual(getattr(RES, _key)[_id], _local[_key])
+            for _key in ["node_labels", "data_labels"]:
+                self.assertEqual(getattr(_res, _key)[_id], _local[_key])
             for _key in ["shapes", "ndims"]:
                 self.assertEqual(
-                    getattr(RES, _key)[_id], getattr(_local["data"], _key[:-1])
+                    getattr(_res, _key)[_id], getattr(_local["data"], _key[:-1])
                 )
-            _res = RES.get_results(_id)
-            self.assertTrue(np.allclose(_res, _local["data"]))
-            self.assertEqual(_res.axis_labels, _local["axlabels"])
-            self.assertEqual(_res.axis_units, _local["axunits"])
-            for _dim in range(_res.ndim):
-                if isinstance(_res.axis_ranges[_dim], np.ndarray):
+            _results = _res.get_results(_id)
+            self.assertTrue(np.allclose(_results, _local["data"]))
+            self.assertEqual(_results.axis_labels, _local["axlabels"])
+            self.assertEqual(_results.axis_units, _local["axunits"])
+            for _dim in range(_results.ndim):
+                if isinstance(_results.axis_ranges[_dim], np.ndarray):
                     self.assertTrue(
-                        np.allclose(_res.axis_ranges[_dim], _local["axranges"][_dim])
+                        np.allclose(
+                            _results.axis_ranges[_dim], _local["axranges"][_dim]
+                        )
                     )
                 else:
-                    self.assertEqual(_res.axis_ranges[_dim], _local["axranges"][_dim])
+                    self.assertEqual(
+                        _results.axis_ranges[_dim], _local["axranges"][_dim]
+                    )
+
+    def test_creation_with_local_scan_context(self):
+        _title = "The local scan title."
+        _local_scan = Scan()
+        _local_scan.set_param_value("scan_title", _title)
+        _RES = WorkflowResults(scan_context=_local_scan)
+        SCAN.set_param_value("scan_title", "New title")
+        self.assertEqual(_RES._SCAN.get_param_value("scan_title"), _title)
+
+    def test_creation_with_local_workflow_tree(self):
+        _label = "A new plugin label"
+        _local_tree = TREE.deepcopy()
+        _local_tree.root.plugin.set_param_value("label", _label)
+        _RES = WorkflowResults(workflow_tree=_local_tree)
+        TREE.root.plugin.set_param_value("label", "main label")
+        self.assertEqual(_RES._TREE.root.plugin.get_param_value("label"), _label)
 
 
 if __name__ == "__main__":

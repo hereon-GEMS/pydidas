@@ -1,0 +1,45 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: pydidas tests
+
+on:
+  push:
+    branches: [ "github-workflows" ]
+  pull_request:
+    branches: [ "github-workflows" ]
+
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    python-version: "3.11"
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+    - name: Install dependencies
+      run: |
+        python -m pip install  sphinx sphinx_rtd_theme myst_parser
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Sphinx build
+      run: |
+        sphinx-build pydidas/docs/source _build
+
+  deploy:
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: _build
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to Github Pages
+      id: deployment
+      uses: actions/deploy-pages@v3

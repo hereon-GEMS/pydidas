@@ -29,7 +29,7 @@ jobs:
         sphinx-build pydidas/docs/source _build
 
   deploy:
-    needs: build
+    needs: docs
 
     permissions:
       pages: write

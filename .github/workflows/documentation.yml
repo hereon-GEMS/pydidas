@@ -1,5 +1,10 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+# This file is part of pydidas.
+#
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# This workflow will create the github pages documentation for pydidas
+# which is accessible at https://hereon-gems.github.io/pydidas/
 
 name: Pydidas Github-pages documentation
 
@@ -33,7 +38,7 @@ jobs:
           echo "::warning title=Invalid file permissions automatically fixed::$line"
         done
     - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v4
 
   deploy_docs:
     needs: create_docs

@@ -1,5 +1,11 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+# This file is part of pydidas.
+#
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# This workflow will check the formatting of the newly pushed commits
+# to verify that all files are corretly formatted.
+
 
 name: pydidas formatting checks
 

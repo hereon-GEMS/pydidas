@@ -109,6 +109,7 @@ class TestAppRunner(unittest.TestCase):
         _new_app = _spy.at(0)[0] if IS_QT6 else _spy[0][0]
         _image = _new_app._composite.image
         print("image:", _image)
+        print("app runner image:", self._runner._AppRunner__app._composite.image)
         self.assertTrue((_image > 0).all())
         if IS_QT6:
             self.assertTrue(_spy2.count() >= 1)

@@ -1,5 +1,9 @@
 @ECHO OFF
+
 REM Command file for Sphinx documentation
+REM Copyright 2024, Helmholtz-Zentrum Hereon
+REM
+REM SPDX-License-Identifier: CC-BY-4.0
 
 pushd %~dp0
 
@@ -9,16 +13,8 @@ IF "%SPHINXBUILD%" == "" (
 
 set SOURCEDIR=source
 set BUILDDIR=build
-set DOCSDIR=pydidas/docs
+
 IF "%1" == "" goto help
-IF "%1" == "gh-pages" (
-	set USE_BRANCH=master
-	goto gh-pages
-)
-IF "%1" == "gh-pages-dev" (
-	set USE_BRANCH=develop
-	goto gh-pages
-)
 
 %SPHINXBUILD% >NUL 2>NUL
 IF errorlevel 9009 (
@@ -34,38 +30,6 @@ IF errorlevel 9009 (
 )
 
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
-goto end
-
-:gh-pages
-CD ../..
-git fetch origin gh-pages
-git checkout gh-pages
-git clean -xfdq
-git checkout %USE_BRANCH% pydidas
-git reset HEAD
-ECHO Checked out required files from %USE_BRANCH%.
-%SPHINXBUILD% -M html %DOCSDIR%/%SOURCEDIR% %DOCSDIR%\%BUILDDIR% %SPHINXOPTS% %O%
-ECHO Finished creating html docs.
-REM Need to handle every item separately because directories cannot
-REM be moved with wildcards:
-ROBOCOPY %DOCSDIR%\%BUILDDIR%\html . *.* /S /MOVE /NFL /NDL
-FOR /d %%a IN ("%CD%\pydidas\*") DO IF /i NOT "%%a"=="%CD%\pydidas\docs" RMDIR /S /Q "%%a"
-FOR %%a IN ("%CD%\pydidas\*") DO DEL /F /Q "%%a"
-RMDIR /S /Q pydidas\docs\source 
-RMDIR /S /Q pydidas\docs\build
-ECHO Deleted local files
-git add --all ":!logs"
-ECHO Added all files to staging
-git commit -m "Generated gh-pages for %USE_BRANCH%"
-ECHO Commited to git
-git push origin gh-pages
-ECHO Pushed to origin
-git add --all
-git stash
-git checkout %USE_BRANCH%
-git stash clear
-git clean -xfdq
-ECHO Changed back to %USE_BRANCH% branch.
 goto end
 
 :help

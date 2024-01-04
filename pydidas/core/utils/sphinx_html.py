@@ -79,7 +79,7 @@ def run_sphinx_html_build(
     verbose : bool, optional
         Flag to control printing of a message. The default is True.
     """
-    if "sphinx-build" in sys.argv[0]:
+    if "sphinx-build" in sys.argv[0] or "-m unittest" in sys.argv[0]:
         return
     if build_dir is None:
         build_dir = os.path.join(DOC_MAKE_DIRECTORY, "build", "html")

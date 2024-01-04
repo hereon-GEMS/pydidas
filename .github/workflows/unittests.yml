@@ -35,4 +35,5 @@ jobs:
         python -m pip install opencv-python-headless
     - name: Test with unittest
       run: |
+        export QT_QPA_PLATFORM=offscreen
         python -m unittest

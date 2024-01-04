@@ -166,6 +166,14 @@ class TestAppRunner(unittest.TestCase):
         with self.assertRaises(TypeError):
             self._runner._AppRunner__check_app_is_set()
 
+    def test_copy__app_with_composite(self):
+        self.app.multiprocessing_pre_run()
+        self.app._composite.image[0, 0] = -1.23
+        app2 = self.app.copy()
+        self.assertEqual(app2._composite.image[0, 0], self.app._composite.image[0, 0])
+        print("original: ", self.app._composite.image)
+        print("copy: ", app2._composite.image)
+
 
 if __name__ == "__main__":
     unittest.main()

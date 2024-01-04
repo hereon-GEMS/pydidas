@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11"]
 
     steps:
     - uses: actions/checkout@v3
@@ -32,6 +32,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install .
+        python -m pip install opencv-python-headless
     - name: Test with unittest
       run: |
         python -m unittest

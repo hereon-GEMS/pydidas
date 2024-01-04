@@ -1,0 +1,37 @@
+# This file is part of pydidas.
+#
+# Copyright 2024, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# This workflow will run the unittests for pydidas with python 3.11 and 3.12
+
+name: Pydidas unittests
+
+on:
+  push:
+    branches: [ "github-workflows" ]
+  pull_request:
+    branches: [ "github-workflows" ]
+
+jobs:
+  unittest:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install .
+    - name: Test with unittest
+      run: |
+        python -m unittest

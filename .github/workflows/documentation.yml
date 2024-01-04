@@ -6,7 +6,7 @@
 # This workflow will create the github pages documentation for pydidas
 # which is accessible at https://hereon-gems.github.io/pydidas/
 
-name: Pydidas Github-pages documentation
+name: Github-pages documentation
 
 on:
   push:

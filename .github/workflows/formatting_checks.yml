@@ -7,7 +7,7 @@
 # to verify that all files are corretly formatted.
 
 
-name: pydidas formatting checks
+name: formatting checks
 
 on:
   push:

@@ -44,7 +44,9 @@ class Test_sphinx_html(unittest.TestCase):
         sys.argv = self._argv
 
     def test_check_sphinx_html_docs__generic_case(self):
-        self.assertTrue(sphinx_html.check_sphinx_html_docs())
+        with open(os.path.join(self._tmpdir, "index.html"), "w") as f:
+            f.write("0")
+        self.assertTrue(sphinx_html.check_sphinx_html_docs(self._tmpdir))
 
     def test_check_sphinx_html_docs__empty_folder(self):
         self.assertFalse(sphinx_html.check_sphinx_html_docs(self._tmpdir))

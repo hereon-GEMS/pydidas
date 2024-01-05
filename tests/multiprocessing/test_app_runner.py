@@ -30,7 +30,7 @@ import unittest
 from qtpy import QtCore, QtTest, QtWidgets
 
 from pydidas import IS_QT6
-from pydidas.core import BaseApp
+from pydidas.core import BaseApp, PydidasQsettings
 from pydidas.multiprocessing import AppRunner
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 
@@ -41,9 +41,16 @@ class TestAppRunner(unittest.TestCase):
         cls.qt_app = QtWidgets.QApplication.instance()
         if cls.qt_app is None:
             cls.qt_app = QtWidgets.QApplication([])
+        cls.q_settings = PydidasQsettings()
+        cls._mosaic_border_width = cls.q_settings.value("user/mosaic_border_width")
+        cls._mosaic_border_value = cls.q_settings.value("user/mosaic_border_value")
+        cls.q_settings.set_value("user/mosaic_border_width", 0)
+        cls.q_settings.set_value("user/mosaic_border_value", 1)
 
     @classmethod
     def tearDownClass(cls):
+        cls.q_settings.set_value("user/mosaic_border_width", cls._mosaic_border_width)
+        cls.q_settings.set_value("user/mosaic_border_value", cls._mosaic_border_value)
         if cls.qt_app is not None:
             cls.qt_app.quit()
 
@@ -106,9 +113,10 @@ class TestAppRunner(unittest.TestCase):
             self.wait_for_spy_signal_qt6(_spy2)
         else:
             self.wait_for_spy_signal(_spy2)
+        time.sleep(1)
         _new_app = _spy.at(0)[0] if IS_QT6 else _spy[0][0]
         _image = _new_app._composite.image
-        self.assertTrue((_image > 0).all())  #
+        self.assertTrue((_image > 0).all())
         if IS_QT6:
             self.assertTrue(_spy2.count() >= 1)
         else:
@@ -161,6 +169,12 @@ class TestAppRunner(unittest.TestCase):
         self._runner._AppRunner__app = None
         with self.assertRaises(TypeError):
             self._runner._AppRunner__check_app_is_set()
+
+    def test_copy__app_with_composite(self):
+        self.app.multiprocessing_pre_run()
+        self.app._composite.image[0, 0] = -1.23
+        app2 = self.app.copy()
+        self.assertEqual(app2._composite.image[0, 0], self.app._composite.image[0, 0])
 
 
 if __name__ == "__main__":

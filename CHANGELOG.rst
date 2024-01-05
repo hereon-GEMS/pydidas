@@ -1,6 +1,16 @@
 .. Copyright 2023, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
+v24.01.XX
+=========
+
+Improvements
+------------
+
+- Added Github actions for formatting, unittesting and automatic deployment
+  of github pages.
+- Updated metadata files (README, sphinx make-files, .flake8)
+
 
 v23.12.08
 =========

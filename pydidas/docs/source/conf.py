@@ -18,8 +18,7 @@
 
 import os
 import sys
-
-import pydidas
+from pathlib import Path
 
 
 sys.path.insert(0, os.path.abspath("./../.."))
@@ -32,9 +31,17 @@ project = "pydidas"
 copyright = "2023, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
-# The full version, including alpha/beta/rc tags
 
-release = pydidas.VERSION
+# The full version, including alpha/beta/rc tags
+with open(Path(__file__).parents[2].joinpath("version.py"), "r") as f:
+    _lines = f.readlines()
+
+    for _line in _lines:
+        if _line.startswith("__version__"):
+            pydidas_version = _line.split("=")[1].strip()
+            break
+
+release = pydidas_version
 version = release
 
 # -- General configuration ---------------------------------------------------

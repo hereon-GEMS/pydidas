@@ -107,6 +107,7 @@ class TestAppRunner(unittest.TestCase):
         else:
             self.wait_for_spy_signal(_spy2)
         _new_app = _spy.at(0)[0] if IS_QT6 else _spy[0][0]
+        print("spy:", _spy[0])
         _image = _new_app._composite.image
         print("new app image:", _image)
         print("new app config:", _new_app._config)
@@ -171,8 +172,6 @@ class TestAppRunner(unittest.TestCase):
         self.app._composite.image[0, 0] = -1.23
         app2 = self.app.copy()
         self.assertEqual(app2._composite.image[0, 0], self.app._composite.image[0, 0])
-        print("original: ", self.app._composite.image)
-        print("copy: ", app2._composite.image)
 
 
 if __name__ == "__main__":

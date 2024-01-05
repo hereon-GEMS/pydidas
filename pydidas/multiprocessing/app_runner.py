@@ -186,6 +186,8 @@ class AppRunner(WorkerController):
         """
         WorkerController.cycle_post_run(self, timeout)
         self.__app.multiprocessing_post_run()
+        if hasattr(self.__app, "_composite"):
+            print("AppRunner app composite image:", self.__app._composite.image)
         self.sig_final_app_state.emit(self.__app.copy())
         logger.debug("AppRunner: Finished cycle post run")
 

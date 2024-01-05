@@ -36,5 +36,5 @@ jobs:
     - name: Test with unittest
       run: |
         export QT_QPA_PLATFORM=offscreen
-        # python -m unittest
-        python tests/multiprocessing/test_app_runner.py
+        python -m unittest
+        # python tests/multiprocessing/test_app_runner.py

@@ -45,7 +45,6 @@ class TestAppRunner(unittest.TestCase):
         cls._mosaic_border_width = cls.q_settings.value("user/mosaic_border_width")
         cls.q_settings.set_value("user/mosaic_border_width", 0)
 
-
     @classmethod
     def tearDownClass(cls):
         cls.q_settings.set_value("user/mosaic_border_width", cls._mosaic_border_width)

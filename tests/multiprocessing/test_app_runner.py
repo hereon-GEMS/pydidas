@@ -30,7 +30,7 @@ import unittest
 from qtpy import QtCore, QtTest, QtWidgets
 
 from pydidas import IS_QT6
-from pydidas.core import BaseApp
+from pydidas.core import BaseApp, PydidasQsettings
 from pydidas.multiprocessing import AppRunner
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 
@@ -41,9 +41,14 @@ class TestAppRunner(unittest.TestCase):
         cls.qt_app = QtWidgets.QApplication.instance()
         if cls.qt_app is None:
             cls.qt_app = QtWidgets.QApplication([])
+        cls.q_settings = PydidasQsettings()
+        cls._mosaic_border_width = cls.q_settings.value("user/mosaic_border_width")
+        cls.q_settings.set_value("user/mosaic_border_width", 0)
+
 
     @classmethod
     def tearDownClass(cls):
+        cls.q_settings.set_value("user/mosaic_border_width", cls._mosaic_border_width)
         if cls.qt_app is not None:
             cls.qt_app.quit()
 
@@ -106,13 +111,12 @@ class TestAppRunner(unittest.TestCase):
             self.wait_for_spy_signal_qt6(_spy2)
         else:
             self.wait_for_spy_signal(_spy2)
-        _new_app = _spy.at(0)[0] if IS_QT6 else _spy[0][0]
+        time.sleep(1)
         print("spy:", _spy[0])
+        _new_app = _spy.at(0)[0] if IS_QT6 else _spy[0][0]
         _image = _new_app._composite.image
-        print("new app image:", _image)
-        print("new app config:", _new_app._config)
-        print("app runner image:", self._runner._AppRunner__app._composite.image)
-        print("app runner config:", self._runner._AppRunner__app._config)
+        print("\nnew app image:\n", _image)
+        print("\napp runner image:\n", self._runner._AppRunner__app._composite.image)
         self.assertTrue((_image > 0).all())
         if IS_QT6:
             self.assertTrue(_spy2.count() >= 1)

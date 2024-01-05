@@ -13,10 +13,13 @@ on:
     branches: [ "github-workflows" ]
   pull_request:
     branches: [ "github-workflows" ]
+    types:
+      - closed
 
 
 jobs:
   create_docs:
+    if: (github.event.pull_request.merged == true) || (github.event.push == true)
     runs-on: ubuntu-latest
 
     steps:
@@ -40,19 +43,19 @@ jobs:
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v2
 
-  deploy_docs:
-    needs: create_docs
+  # deploy_docs:
+  #   needs: create_docs
 
-    permissions:
-      pages: write
-      id-token: write
+  #   permissions:
+  #     pages: write
+  #     id-token: write
 
-    environment:
-      name: github-pages
-      url: _site
+  #   environment:
+  #     name: github-pages
+  #     url: _site
 
-    runs-on: ubuntu-latest
-    steps:
-    - name: Deploy to Github Pages
-      id: deployment
-      uses: actions/deploy-pages@v3
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Deploy to Github Pages
+  #     id: deployment
+  #     uses: actions/deploy-pages@v3

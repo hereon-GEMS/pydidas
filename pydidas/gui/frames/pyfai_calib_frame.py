@@ -108,15 +108,19 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar)[0]
         _histo_crop_action = silx_plot.CropHistogramOutliers(_plot, parent=_plot)
+        _autoscale_action = silx_plot.AutoscaleToMeanAndThreeSigma(_plot, parent=_plot)
         _widget_action = [
             _action
             for _action in _toolbar.actions()
             if isinstance(_action, QtWidgets.QWidgetAction)
         ][0]
         _toolbar.addAction(_histo_crop_action)
+        _toolbar.addAction(_autoscale_action)
         _toolbar.insertAction(_widget_action, _histo_crop_action)
+        _toolbar.insertAction(_widget_action, _autoscale_action)
     # explicitly hide the toolbar with the 3D visualization:
     tasks[0]._ExperimentTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
+    tasks[2]._PeakPickingTask__createNewRingOption.setChecked(False)
     tasks[3]._GeometryTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
     # insert button for exporting to DiffractionExperimentContext:
     _parent = tasks[4]._savePoniButton.parent()

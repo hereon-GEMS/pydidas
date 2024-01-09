@@ -68,7 +68,7 @@ class MaskEditorWindow(PydidasWindow):
         )
         self.create_label(
             "title",
-            "Input reference data file (not the mask)",
+            "Input reference file (not the mask)",
             fontsize_offset=1,
             font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             bold=True,

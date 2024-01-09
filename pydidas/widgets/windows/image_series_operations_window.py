@@ -156,7 +156,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         Build the frame and create all widgets.
         """
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
-        # self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
+        self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
         QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )

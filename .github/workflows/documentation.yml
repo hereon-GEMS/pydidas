@@ -29,6 +29,7 @@ jobs:
         python -m pip install .
     - name: Sphinx build
       run: |
+        export QT_QPA_PLATFORM=offscreen
         sphinx-build pydidas/docs/source _site
     - name: Set permissions
       run: |

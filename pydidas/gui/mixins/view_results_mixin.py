@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ WorkflowTree results when running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -81,16 +81,7 @@ class ViewResultsMixin:
         )
         self.connect_view_results_mixin_signals()
         self.update_choices_of_selected_results()
-        self.__export_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_directory",
-            caption="Export results",
-            qsettings_ref="WorkflowResults__export",
-            info_string=(
-                "<b>Please select an empty an empty directory to export all "
-                "results<br> or enable overwriting of results:</b>"
-            ),
-        )
+        self.__export_dialog = PydidasFileDialog()
 
     def connect_view_results_mixin_signals(self):
         """
@@ -330,7 +321,14 @@ class ViewResultsMixin:
             return
         _overwrite = self.get_param_value("enable_overwrite")
         while True:
-            _dirname = self.__export_dialog.get_user_response()
+            _dirname = self.__export_dialog.get_existing_directory(
+                caption="Export results",
+                qsettings_ref="WorkflowResults__export",
+                info_string=(
+                    "<b>Please select an empty an empty directory to export all "
+                    "results<br> or enable overwriting of results:</b>"
+                ),
+            )
             if _dirname is None or len(os.listdir(_dirname)) == 0 or _overwrite:
                 break
             critical_warning(

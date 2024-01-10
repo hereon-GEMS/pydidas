@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ mosaics.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -386,7 +386,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
         self._image_metadata.filename = self.get_param_value("first_file")
-        self.param_widgets["last_file"].io_dialog.set_curr_dir(
+        self.param_widgets["last_file"].update_io_directory(
             self.get_param_value("first_file")
         )
         if self.__check_if_hdf5_file():

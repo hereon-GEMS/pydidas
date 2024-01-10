@@ -10,7 +10,8 @@ Improvements
 - Added Github actions for formatting, unittesting and automatic deployment
   of github pages.
 - Updated metadata files (README, sphinx make-files, .flake8)
-
+- Changed the behaviour of the GUI file dialogues to (re)use only one instance
+  of the file dialog to mitigate issues with slow file systems.
 
 v23.12.08
 =========

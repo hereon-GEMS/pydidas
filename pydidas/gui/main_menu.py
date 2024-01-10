@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ manages the pydidas GUI menu.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -101,7 +101,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
         self._setup_mainwindow_widget(geometry)
         self._add_config_windows()
-        self._create_gui_state_dialogs()
+        self._io_dialog = PydidasFileDialog()
         self._create_menu()
 
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
@@ -143,26 +143,6 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _frame = UserConfigWindow()
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["user_config"] = _frame
-
-    def _create_gui_state_dialogs(self):
-        """
-        Create the persistent dialogues for import/export of the GUI state.
-        """
-        self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            caption="Import GUI state file",
-            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
-            qsettings_ref="MainWindowGuiState__import",
-        )
-        self.__export_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="save_file",
-            caption="Export GUI state file",
-            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
-            default_extension="yaml",
-            qsettings_ref="MainWindowGuiState__export",
-        )
 
     def _create_menu(self):
         """
@@ -354,7 +334,12 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         """
         Store the current GUI state in a user-defined file.
         """
-        _fname = self.__export_dialog.get_user_response()
+        _fname = self._io_dialog.get_saving_filename(
+            caption="Export GUI state file",
+            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            default_extension="yaml",
+            qsettings_ref="MainWindowGuiState__export",
+        )
         if _fname is not None:
             self.export_gui_state(_fname)
 
@@ -389,7 +374,11 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         """
         Restore the GUI state from a user-defined file.
         """
-        _fname = self.__import_dialog.get_user_response()
+        _fname = self._io_dialog.get_existing_filename(
+            caption="Import GUI state file",
+            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            qsettings_ref="MainWindowGuiState__import",
+        )
         if _fname is not None:
             self.restore_gui_state(state="manual", filename=_fname)
 
@@ -534,7 +523,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             )
         _state["workflow_tree"] = TREE.export_to_string()
         _state["pydidas_version"] = VERSION
-        with open(filename, "w") as _file:
+        with open(filename, "wt", encoding="UTF-8") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
 
     def __get_window_states(self):
@@ -598,7 +587,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
         if not os.path.isfile(filename):
             return
-        with open(filename, "r") as _file:
+        with open(filename, "rt", encoding="UTF-8") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         if _state is None:
             return

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the WorkflowEditFrame which is used to create the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -86,21 +86,7 @@ class WorkflowEditFrame(BaseFrame):
 
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
-        self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            caption="Import workflow tree file",
-            formats=ProcessingTreeIoMeta.get_string_of_formats(),
-            qsettings_ref="WorkflowEditFrame__import",
-        )
-        self.__export_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="save_file",
-            caption="Export workflow tree file",
-            formats=ProcessingTreeIoMeta.get_string_of_formats(),
-            default_extension="yaml",
-            qsettings_ref="WorkflowEditFrame__export",
-        )
+        self.__io_dialog = PydidasFileDialog()
         self.__qtapp = QtWidgets.QApplication.instance()
 
     def build_frame(self):
@@ -157,7 +143,12 @@ class WorkflowEditFrame(BaseFrame):
         Open a QFileDialog to geta save name and export the WorkflowTree to
         the selected file with the specified format.
         """
-        _fname = self.__export_dialog.get_user_response()
+        _fname = self.__io_dialog.get_saving_filename(
+            caption="Export workflow tree file",
+            formats=ProcessingTreeIoMeta.get_string_of_formats(),
+            default_extension="yaml",
+            qsettings_ref="WorkflowEditFrame__export",
+        )
         if _fname is None:
             return
         TREE.export_to_file(_fname, overwrite=True)
@@ -167,7 +158,11 @@ class WorkflowEditFrame(BaseFrame):
         Open a Qdialog to select a filename, read the file and import an
         existing WorkflowTree from the retrieved information.
         """
-        _fname = self.__import_dialog.get_user_response()
+        _fname = self.__io_dialog.get_existing_filename(
+            caption="Import workflow tree file",
+            formats=ProcessingTreeIoMeta.get_string_of_formats(),
+            qsettings_ref="WorkflowEditFrame__import",
+        )
         if _fname is None:
             return
         if os.path.splitext(_fname)[1] == "":

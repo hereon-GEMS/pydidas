@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ hdf5) files dataset and frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -66,13 +66,8 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
     def __init__(self, *input_params: tuple[Parameter, ...], **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(*input_params)
-        self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            caption="Import image",
-            formats=IoMaster.get_string_of_formats(),
-            qsettings_ref=kwargs.get("import_reference", None),
-        )
+        self.__import_dialog = PydidasFileDialog()
+        self.__import_qref = kwargs.get("import_reference", None)
         self.create_button(
             "but_open",
             "Select image file",
@@ -107,7 +102,11 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         """
         Open the image selected through the filename.
         """
-        _fname = self.__import_dialog.get_user_response()
+        _fname = self.__import_dialog.get_existing_filename(
+            caption="Import image",
+            formats=IoMaster.get_string_of_formats(),
+            qsettings_ref=self.__import_qref,
+        )
         if _fname is not None:
             self.set_param_value_and_widget("filename", _fname)
             self.process_new_filename_input(_fname)

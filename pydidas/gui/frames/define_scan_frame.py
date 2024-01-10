@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ settings like dimensionality, number of points and labels.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -74,21 +74,7 @@ class DefineScanFrame(BaseFrame):
 
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
-        self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            caption="Import scan context file",
-            formats=ScanIo.get_string_of_formats(),
-            qsettings_ref="DefineScanFrame__import",
-        )
-        self.__export_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="save_file",
-            caption="Export scan context file",
-            formats=ScanIo.get_string_of_formats(),
-            default_extension="yaml",
-            qsettings_ref="DefineScanFrame__export",
-        )
+        self._io_dialog = PydidasFileDialog()
         self._qtapp = QtWidgets.QApplication.instance()
         self.__info_window = ScanDimensionInformationWindow()
 
@@ -164,7 +150,11 @@ class DefineScanFrame(BaseFrame):
 
         This method will open a QFileDialog to select the file to be read.
         """
-        _fname = self.__import_dialog.get_user_response()
+        _fname = self._io_dialog.get_existing_filename(
+            caption="Import scan context file",
+            formats=ScanIo.get_string_of_formats(),
+            qsettings_ref="DefineScanFrame__import",
+        )
         if _fname is not None:
             SCAN.import_from_file(_fname)
             for param in SCAN.params.values():
@@ -178,7 +168,12 @@ class DefineScanFrame(BaseFrame):
         This method will open a QFileDialog to select a filename for the
         file in which the information shall be written.
         """
-        _fname = self.__export_dialog.get_user_response()
+        _fname = self._io_dialog.get_saving_filename(
+            caption="Export scan context file",
+            formats=ScanIo.get_string_of_formats(),
+            default_extension="yaml",
+            qsettings_ref="DefineScanFrame__export",
+        )
         if _fname is not None:
             SCAN.export_to_file(_fname, overwrite=True)
 
@@ -234,7 +229,7 @@ class DefineScanFrame(BaseFrame):
         basedir : str
             The new base directory
         """
-        self.param_widgets["scan_name_pattern"].io_dialog.set_curr_dir(basedir)
+        self.q_settings_set("dialogues/DefineScanFrame__scan_name_pattern", basedir)
 
     @QtCore.Slot()
     def _show_info_window(self):

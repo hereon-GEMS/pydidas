@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ implemented typechecks and a button to browse through all included data sets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -66,13 +66,8 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self._button.setToolTip("Select a dataset from all dataset keys in a file.")
-        self.io_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            formats=("Hdf5 files (*." + " *.".join(HDF5_EXTENSIONS) + ")"),
-            qsettings_ref=kwargs.get("persistent_qsettings_ref", None),
-            default_extension="Hdf5",
-        )
+        self.io_dialog = PydidasFileDialog()
+        self._io_qsettings_ref = kwargs.get("persistent_qsettings_ref", None)
 
     def button_function(self):
         """
@@ -81,7 +76,11 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
         """
-        _result = self.io_dialog.get_user_response()
+        _result = self.io_dialog.get_existing_filename(
+            formats=("Hdf5 files (*." + " *.".join(HDF5_EXTENSIONS) + ")"),
+            qsettings_ref=self._io_qsettings_ref,
+            default_extension="Hdf5",
+        )
         if _result is not None:
             dset = Hdf5DatasetSelectionPopup(self, _result).get_dset()
             if dset is not None:

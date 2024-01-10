@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ without fully defining Scan, DiffractionExperiment and Workflow.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -90,13 +90,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._EXP = DiffractionExperiment(detector_pxsizex=100, detector_pxsizey=100)
         self.add_params(self._EXP.params)
         self.set_default_params()
-        self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            caption="Import diffraction experiment configuration",
-            formats=DiffractionExperimentIo.get_string_of_formats(),
-            qsettings_ref="QuickIntegrationFrame__diffraction_exp_import",
-        )
+        self.__import_dialog = PydidasFileDialog()
         self._config["scroll_width"] = 350
         self._config["custom_det_pxsize"] = 100
         self._config["previous_det_pxsize"] = 100
@@ -465,7 +459,11 @@ class QuickIntegrationFrame(BaseFrame):
 
         Note: This method will overwrite all current settings.
         """
-        _fname = self.__import_dialog.get_user_response()
+        _fname = self.__import_dialog.get_existing_filename(
+            caption="Import diffraction experiment configuration",
+            formats=DiffractionExperimentIo.get_string_of_formats(),
+            qsettings_ref="QuickIntegrationFrame__diffraction_exp_import",
+        )
         if _fname is not None:
             self._EXP.import_from_file(_fname)
             for _key, _param in self._EXP.params.items():

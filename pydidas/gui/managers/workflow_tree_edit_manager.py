@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ with the editing Canvas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -81,9 +81,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_widgets = {}
         self._nodes = {}
         self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_font_size_changed.connect(self.__app_font_changed)
-        self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
-        self.__app_font_changed()
+        if hasattr(self.__qtapp, "sig_font_size_changed"):
+            self.__qtapp.sig_font_size_changed.connect(self.__app_font_changed)
+            self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
+            self.__app_font_changed()
         PLUGIN_COLLECTION.sig_updated_plugins.connect(
             self.__delete_all_nodes_and_widgets
         )

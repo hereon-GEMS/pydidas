@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ be used to display scrollable text.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -60,7 +60,8 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         if "fixedHeight" in kwargs and "minimumHeight" in kwargs:
             del kwargs["minimumHeight"]
         PydidasWidgetMixin.__init__(self, **kwargs)
-        self._qtapp.sig_font_size_changed.connect(self.reprint)
+        if hasattr(self._qtapp, "sig_font_size_changed"):
+            self._qtapp.sig_font_size_changed.connect(self.reprint)
         self.__text = ""
         self.__title = None
 

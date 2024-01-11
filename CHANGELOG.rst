@@ -13,6 +13,11 @@ Improvements
 - Changed the behaviour of the GUI file dialogues to (re)use only one instance
   of the file dialog to mitigate issues with slow file systems.
 
+Bugfixes
+--------
+- Fixed an issue with ipython where pydidas could not be imported in the 
+  ipython console due to ipython's running QApplication.
+
 v23.12.08
 =========
 

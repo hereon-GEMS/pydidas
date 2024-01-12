@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the Lorentzian class for fitting a Lorentzian peak to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -101,11 +101,16 @@ class Lorentzian(FitFuncBase):
         if amin(y) < 0:
             y = y + max(amin(y), -0.2 * amax(y))
             y[y < 0] = 0
-        index = "" if index is None else str(index)
         _center_start = kwargs.get(f"center{index}_start", x[y.argmax()])
-        _ycenter = cls.get_y_value(_center_start, x, y)
+        if "bounds" in kwargs:
+            _bounds_index = 2 if index is None else 3 * index - 1
+            _center_start = max(kwargs.get("bounds")[0][_bounds_index], _center_start)
+            _center_start = min(kwargs.get("bounds")[1][_bounds_index], _center_start)
 
+        _ycenter = cls.get_y_value(_center_start, x, y)
         _high_x = cls.get_fwhm_indices(_center_start, _ycenter, x, y)
+
+        index = "" if index is None else str(index)
         _gamma_start = kwargs.get(f"width{index}_start", None)
         if _gamma_start is None:
             if _high_x.size > 1:

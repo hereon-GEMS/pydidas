@@ -19,7 +19,8 @@ Bugfixes
 --------
 - Fixed an issue with ipython where pydidas could not be imported in the 
   ipython console due to ipython's running QApplication.
-
+- Fixed an issue with fitting plugins where peak boundaries could lead to
+  an exception when the initial peak fit was outside of the boundaries.
 
 
 v23.12.08

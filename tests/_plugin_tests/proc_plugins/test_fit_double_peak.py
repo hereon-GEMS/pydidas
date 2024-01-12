@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -196,7 +196,7 @@ class TestFitDoublePeak(unittest.TestCase):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
+        _data, _kwargs = plugin.execute(self._data - 0.5)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
         self.assertIn(self._data.axis_units[0], _data.data_label)
 

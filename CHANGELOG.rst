@@ -21,6 +21,8 @@ Bugfixes
   ipython console due to ipython's running QApplication.
 - Fixed an issue with fitting plugins where peak boundaries could lead to
   an exception when the initial peak fit was outside of the boundaries.
+- Fixed an issue in the TweakPluginParameterWindow where the stratch scaling
+  was wrong.
 
 
 v23.12.08

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ accepted by the Parameter is valid.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -84,8 +84,11 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
             The text converted to the required datatype (int, float, path)
             to update the Parameter value.
         """
-        text = self.text()
-        return self.get_value_from_text(text)
+        _text = self.text()
+        _value = self.get_value_from_text(_text)
+        if _text == "" and _value is None:
+            self.setText("None")
+        return _value
 
     def set_value(self, value: object):
         """

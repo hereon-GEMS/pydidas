@@ -12,11 +12,15 @@ Improvements
 - Updated metadata files (README, sphinx make-files, .flake8)
 - Changed the behaviour of the GUI file dialogues to (re)use only one instance
   of the file dialog to mitigate issues with slow file systems.
+- ParameterWidgets with numbers which allow None now treat an empty string
+  as None.
 
 Bugfixes
 --------
 - Fixed an issue with ipython where pydidas could not be imported in the 
   ipython console due to ipython's running QApplication.
+
+
 
 v23.12.08
 =========

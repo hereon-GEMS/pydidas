@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters should inherit from (in addition to their respective QWidget).
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -66,6 +66,7 @@ class BaseParamIoWidgetMixIn:
 
     def __init__(self, param: Parameter, **kwargs: dict):
         self._ptype = param.dtype
+        self._allow_None = param.allow_None
         self._old_value = None
         self.__hint_factor = 1 + int(kwargs.get("linebreak", False))
 
@@ -126,6 +127,12 @@ class BaseParamIoWidgetMixIn:
         if text.upper() == "NONE":
             return None
         try:
+            if (
+                text == ""
+                and self._allow_None
+                and self._ptype in [numbers.Integral, numbers.Real]
+            ):
+                return None
             if self._ptype == numbers.Integral:
                 return int(text)
             if self._ptype == numbers.Real:

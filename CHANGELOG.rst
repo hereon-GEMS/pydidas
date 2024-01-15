@@ -1,7 +1,7 @@
-.. Copyright 2023, Helmholtz-Zentrum Hereon
+.. Copyright 2024, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
-v24.01.XX
+v24.01.18
 =========
 
 Improvements
@@ -14,6 +14,10 @@ Improvements
   of the file dialog to mitigate issues with slow file systems.
 - ParameterWidgets with numbers which allow None now treat an empty string
   as None.
+- Multi-peak fitting plugins now start numbering peaks with zero to be 
+  consistent with python style.
+- Prepared the structure for fitting plugins with an arbitrary number of
+  peaks.
 
 Bugfixes
 --------

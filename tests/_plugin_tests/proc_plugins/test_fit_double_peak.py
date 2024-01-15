@@ -100,14 +100,14 @@ class TestFitDoublePeak(unittest.TestCase):
         self.assertTrue("fit_params" in fit_result_data.metadata)
         self.assertTrue("fit_func" in fit_result_data.metadata)
         self.assertTrue("fit_residual_std" in fit_result_data.metadata)
-        self.assertTrue(abs(params["amplitude1"] - self._amp1) <= 20)
-        self.assertTrue(abs(params["amplitude2"] - self._amp2) <= 20)
+        self.assertTrue(abs(params["amplitude0"] - self._amp1) <= 20)
+        self.assertTrue(abs(params["amplitude1"] - self._amp2) <= 20)
         if "sigma" in params:
-            self.assertTrue(abs(params["sigma1"] - self._sigma) < 0.5)
+            self.assertTrue(abs(params["sigma0"] - self._sigma) < 0.5)
         if "gamma" in params:
-            self.assertTrue(abs(params["gamma1"] - self._sigma) < 0.5)
-        self.assertTrue(abs(params["center1"] - self._peak_x1) < 1)
-        self.assertTrue(abs(params["center2"] - self._peak_x2) < 2)
+            self.assertTrue(abs(params["gamma0"] - self._sigma) < 0.5)
+        self.assertTrue(abs(params["center0"] - self._peak_x1) < 1)
+        self.assertTrue(abs(params["center1"] - self._peak_x2) < 2)
         if bg_order in [0, 1]:
             self.assertTrue(abs(params["background_p0"] - 1) < 1)
         if bg_order == 1:

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the DoubleLorentzian class for fitting a double Lorentzian peak to d
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,41 +29,36 @@ __all__ = ["DoubleLorentzian"]
 
 from typing import Tuple
 
-from numpy import inf, pi
+from numpy import pi
 
 from .lorentzian import Lorentzian
-from .utils import DoublePeakMixin
+from .multi_peak_mixin import MultiPeakMixin
 
 
-class DoubleLorentzian(DoublePeakMixin, Lorentzian):
+class DoubleLorentzian(MultiPeakMixin, Lorentzian):
     """
     Class for fitting a double Lorentzian function.
 
     The double Lorentzian function has the general form
 
     L(x) = (
-        A1 / pi * (Gamma1/ 2) / ((x - center1)**2 + (Gamma1/ 2)**2 )
-        + A2 / pi * (Gamma2/ 2) / ((x - center2)**2 + (Gamma2/ 2)**2 )
+        A0 / pi * (Gamma0/ 2) / ((x - center0)**2 + (Gamma0/ 2)**2 )
+        + A1 / pi * (Gamma1/ 2) / ((x - center1)**2 + (Gamma1/ 2)**2 )
         + bg_0 + x * bg_1
     )
 
-    where A1, A2 are the amplitudes, Gamma1, Gamma2 are the FWHMs, center1, center2
+    where A0, A1 are the amplitudes, Gamma0, Gamma1 are the FWHMs, center0, center1
     are the centers. bg_0 is an optional background offset and bg_1 is the (optional)
     first order term for the background.
     """
 
     name = "Double Lorentzian"
-    param_bounds_low = [0, 0, -inf, 0, 0, -inf]
-    param_bounds_high = [inf, inf, inf, inf, inf, inf]
-    param_labels = [
-        "amplitude1",
-        "gamma1",
-        "center1",
-        "amplitude2",
-        "gamma2",
-        "center2",
-    ]
     num_peaks = 2
+    param_bounds_low = Lorentzian.param_bounds_low * num_peaks
+    param_bounds_high = Lorentzian.param_bounds_high * num_peaks
+    param_labels = [
+        f"{key}{i}" for i in range(num_peaks) for key in Lorentzian.param_labels
+    ]
 
     @staticmethod
     def fwhm(c: Tuple[float]) -> Tuple[float]:

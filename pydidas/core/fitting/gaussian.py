@@ -107,7 +107,7 @@ class Gaussian(FitFuncBase):
 
         _center_start = kwargs.get(f"center{index}_start", x[y.argmax()])
         if "bounds" in kwargs:
-            _bounds_index = 2 if index is None else 3 * index - 1
+            _bounds_index = 2 if index is None else 3 * index + 2
             _center_start = max(kwargs.get("bounds")[0][_bounds_index], _center_start)
             _center_start = min(kwargs.get("bounds")[1][_bounds_index], _center_start)
 

@@ -66,6 +66,24 @@ class TestDoubleGaussian(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_profile__no_bg(self):
+        _x = np.linspace(0, 5, 100)
+        _c = (0, 1, 1, 0, 3, 3)
+        _profile = DoubleGaussian.profile(_c, _x)
+        self.assertTrue(np.allclose(_profile, 0))
+
+    def test_profile__0order_bg(self):
+        _x = np.linspace(0, 5, 100)
+        _c = (0, 1, 1, 0, 3, 3, 2)
+        _profile = DoubleGaussian.profile(_c, _x)
+        self.assertTrue(np.allclose(_profile, 2))
+
+    def test_profile__1order_bg(self):
+        _x = np.linspace(0, 5, 100)
+        _c = (0, 1, 1, 0, 3, 3, 2, 1)
+        _profile = DoubleGaussian.profile(_c, _x)
+        self.assertTrue(np.allclose(_profile, 2 + _x))
+
     def test_guess_peak_start_params__simple(self):
         _params = DoubleGaussian.guess_fit_start_params(self._x, self._data)
         self.assertTrue(abs(_params[2] - self._x1) < 0.01)

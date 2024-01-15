@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the TripleGaussian class for fitting a triple Gaussian peak to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,26 +29,24 @@ __all__ = ["TripleGaussian"]
 
 from typing import Tuple
 
-from numpy import inf
-
 from .gaussian import Gaussian
-from .utils import TriplePeakMixin
+from .multi_peak_mixin import MultiPeakMixin
 
 
-class TripleGaussian(TriplePeakMixin, Gaussian):
+class TripleGaussian(MultiPeakMixin, Gaussian):
     """
     Class for fitting a triple Gaussian function to data.
 
     The triple Gaussian function has the general form
 
-    f(x) = A1 * (2 * pi)**(-0.5) / sigma1 * exp(-(x - mu1)**2 / ( 2 * sigma1**2))
+    f(x) = A0 * (2 * pi)**(-0.5) / sigma0 * exp(-(x - mu0)**2 / ( 2 * sigma0**2))
+           + A1 * (2 * pi)**(-0.5) / sigma1 * exp(-(x - mu1)**2 / ( 2 * sigma1**2))
            + A2 * (2 * pi)**(-0.5) / sigma2 * exp(-(x - mu2)**2 / ( 2 * sigma2**2))
-           + A3 * (2 * pi)**(-0.5) / sigma3 * exp(-(x - mu3)**2 / ( 2 * sigma3**2))
            + bg_0 + x * bg_1
 
-    where A1, A2 are the amplitudes, mu1, mu2 are the expectation values, and
-    sigma1, sigma2 is the variance. A polinomial background of 0th or 1st order
-    can be added by using additional coefficients.
+    where A0, A1, A2 are the amplitudes, mu0mu0, , mu1 are the expectation values,
+    and sigma0, sigma1, sigma2 is the variance. A polinomial background of 0th or
+    1st order can be added by using additional coefficients.
     bg_0 is an optional background offset and bg_1 is the (optional) first order
     term for the background.
 
@@ -56,34 +54,26 @@ class TripleGaussian(TriplePeakMixin, Gaussian):
 
     c : tuple
         The tuple with the function parameters.
-        c[0] : amplitude 1
-        c[1] : sigma 1
-        c[2] : expectation value 1
-        c[3] : amplitude 2
-        c[4] : sigma 2
-        c[5] : expectation value 2
-        c[6] : amplitude 3
-        c[7] : sigma 3
-        c[8] : expectation value 3
+        c[0] : amplitude 0
+        c[1] : sigma 0
+        c[2] : expectation value 0
+        c[3] : amplitude 1
+        c[4] : sigma 1
+        c[5] : expectation value 1
+        c[6] : amplitude 2
+        c[7] : sigma 2
+        c[8] : expectation value 2
         c[9], optional : A background offset.
         c[10], optional : The polynomial coefficient for a first order background.
     """
 
     name = "Triple Gaussian"
-    param_bounds_low = [0, 0, -inf, 0, 0, -inf, 0, 0, -inf]
-    param_bounds_high = [inf, inf, inf, inf, inf, inf, inf, inf, inf]
-    param_labels = [
-        "amplitude1",
-        "sigma1",
-        "center1",
-        "amplitude2",
-        "sigma2",
-        "center2",
-        "amplitude3",
-        "sigma3",
-        "center3",
-    ]
     num_peaks = 3
+    param_bounds_low = Gaussian.param_bounds_low * num_peaks
+    param_bounds_high = Gaussian.param_bounds_high * num_peaks
+    param_labels = [
+        f"{key}{i}" for i in range(num_peaks) for key in Gaussian.param_labels
+    ]
 
     @staticmethod
     def fwhm(c: Tuple) -> Tuple[float]:

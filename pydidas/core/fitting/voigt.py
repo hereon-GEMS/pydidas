@@ -102,10 +102,9 @@ class Voigt(FitFuncBase):
             y[y < 0] = 0
         _center_start = kwargs.get(f"center{index}_start", x[y.argmax()])
         if "bounds" in kwargs:
-            _bounds_index = 3 if index is None else 4 * index - 1
+            _bounds_index = 3 if index is None else 4 * index + 3
             _center_start = max(kwargs.get("bounds")[0][_bounds_index], _center_start)
             _center_start = min(kwargs.get("bounds")[1][_bounds_index], _center_start)
-
         _ycenter = cls.get_y_value(_center_start, x, y)
         _high_x = cls.get_fwhm_indices(_center_start, _ycenter, x, y)
 

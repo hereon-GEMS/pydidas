@@ -1,4 +1,4 @@
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
 [build-system]
@@ -17,6 +17,7 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Physics",
@@ -40,8 +41,8 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://ms.hereon.de/pydidas"
-# documentation = "https://readthedocs.org"
+homepage = "https://pydidas.hereon.de/"
+documentation = "https://hereon-gems.github.io/pydidas"
 repository = "https://github.com/hereon-GEMS/pydidas"
 changelog = "https://github.com/hereon-GEMS/pydidas/blob/master/CHANGELOG.md"
 
@@ -52,11 +53,12 @@ version = {attr = "pydidas.version.VERSION"}
 packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]
 
 [project.scripts]
-pydidas-clear-qsettings = "pydidas_scripts.clear_pydidas_qsettings:clear_pydidas_QSettings"
+pydidas-clear-settings = "pydidas_scripts.clear_local_settings:clear_local_settings"
 pydidas-updater = "pydidas_scripts.pydidas_updater_script:run_update"
-pydidas-documentation = "pydidas_scripts.pydidas_documentation:open_pydidas_documentation"
-pydidas-remove-gui-state-files = "pydidas_scripts.pydidas_remove_local_files:pydidas_remove_stored_gui_states"
+pydidas-documentation = "pydidas_scripts.open_documentation:open_documentation"
+pydidas-remove-local-files = "pydidas_scripts.remove_local_files:run"
 run-pydidas-workflow = "pydidas_scripts.run_pydidas_workflow:run_workflow" 
+remove-pydidas = "pydidas_scripts.remove_pydidas_from_system:remove_pydidas_from_system"
 
 [project.gui-scripts]
 pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
@@ -71,4 +73,4 @@ lines_after_imports = 2
 
 [tool.black]
 line-length = 88
-target-version = ['py39']
+target-version = ['py311']

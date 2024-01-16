@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,11 +20,11 @@ Script to remove all files with stored GUI states, for example if they are broke
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["pydidas_remove_stored_gui_states", "pydidas_remove_log_files"]
+__all__ = ["remove_pydidas_stored_gui_states", "remove_pydidas_log_files"]
 
 
 import os
@@ -35,7 +35,7 @@ from typing import Union
 from qtpy import QtCore
 
 
-def pydidas_remove_stored_gui_states(
+def remove_pydidas_stored_gui_states(
     version: Union[None, str] = None, confirm_finish: bool = True, verbose: bool = True
 ):
     """
@@ -79,7 +79,7 @@ def pydidas_remove_stored_gui_states(
         input("Press <Enter> to exit the script. ")
 
 
-def pydidas_remove_log_files(
+def remove_pydidas_log_files(
     version: Union[None, str] = None, confirm_finish: bool = True, verbose: bool = True
 ):
     """
@@ -112,7 +112,7 @@ def pydidas_remove_log_files(
         print(
             "\n"
             + "=" * 80
-            + "\n=== Successfully removed the files with pydidas's stored GUI states.\n"
+            + "\n=== Successfully removed pydidas's logfiles.\n"
             + "=" * 80
             + "\n"
         )
@@ -120,6 +120,13 @@ def pydidas_remove_log_files(
         input("Press <Enter> to exit the script. ")
 
 
+def run():
+    """
+    Remove local files from the system.
+    """
+    remove_pydidas_stored_gui_states(confirm_finish=False, verbose=True)
+    remove_pydidas_log_files(confirm_finish=True, verbose=True)
+
+
 if __name__ == "__main__":
-    pydidas_remove_stored_gui_states(confirm_finish=False, verbose=True)
-    pydidas_remove_log_files(confirm_finish=True, verbose=True)
+    run()

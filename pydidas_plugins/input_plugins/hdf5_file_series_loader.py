@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ images from single Hdf5 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -42,7 +42,6 @@ class Hdf5fileSeriesLoader(InputPlugin):
     This class is designed to load data from a series of hdf5 file. The file
     series is defined through the SCAN's base directory, filename pattern and
     start index.
-
 
     The final filename is
     <SCAN base directory>/<SCAN name pattern with index subsituted for hashes>.

@@ -27,6 +27,8 @@ Bugfixes
   an exception when the initial peak fit was outside of the boundaries.
 - Fixed an issue in the TweakPluginParameterWindow where the stratch scaling
   was wrong.
+- Fixed an issue with the error message due to missing parameters in the 
+  run_pydidas_workflow script.
 
 
 v23.12.08

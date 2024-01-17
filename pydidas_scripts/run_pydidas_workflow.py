@@ -31,7 +31,7 @@ import sys
 
 from pydidas.apps import ExecuteWorkflowRunner
 from pydidas.core import FileReadError, UserConfigError
-from pydidas.core.utils import get_warning, timed_print
+from pydidas.core.utils import print_warning, timed_print
 
 
 def run_workflow():
@@ -59,7 +59,10 @@ def run_workflow():
         )
         runner.execute_workflow_in_apprunner()
     except (UserConfigError, FileReadError, KeyboardInterrupt) as _error:
-        get_warning(_error.args[0], severe=True)
+        _error_text = _error.args[0]
+        if "\n" in _error_text:
+            _error_text = _error_text.split("\n")
+        print_warning(_error_text, leading_dash=False, severe=True)
         return
     timed_print(
         "Finished ExecuteWorkflowRunner processing.", new_lines=1, verbose=verbose

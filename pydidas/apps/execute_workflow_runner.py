@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Class to run pydidas workflows with an event loop from the command line.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -245,12 +245,12 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             If the configuration is incomplete or problematic.
         """
         _missing_keys = [
-            _name
-            for _key, _name in [
-                ["scan", "Scan"],
-                ["workflow", "WorkfromTree"],
-                ["diffraction_exp", "DiffractionExperiment"],
-                ["output_dir", "Output directory"],
+            f"{_name}: -{_key} {_val}"
+            for _key, _name, _val in [
+                ["scan", "Scan", "filename"],
+                ["workflow", "WorkfromTree", "filename"],
+                ["diffraction_exp", "DiffractionExperiment", "filename"],
+                ["output_dir", "Output directory", "directory"],
             ]
             if self.parsed_args[_key] is None
         ]

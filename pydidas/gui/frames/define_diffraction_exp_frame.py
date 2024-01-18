@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ global experimental settings like detector, geometry and energy.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -75,22 +75,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         BaseFrame.__init__(self, **kwargs)
         self.params = EXP.params
         self._bc_params = get_generic_param_collection("beamcenter_x", "beamcenter_y")
-        self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            caption="Import experiment context file",
-            formats=DiffractionExperimentIo.get_string_of_formats(),
-            qsettings_ref="DefineDiffractionExpFrame__import",
-        )
-        self.__export_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="save_file",
-            caption="Export experiment context file",
-            formats=DiffractionExperimentIo.get_string_of_formats(),
-            default_extension="yaml",
-            dialog=QtWidgets.QFileDialog.getSaveFileName,
-            qsettings_ref="DefineDiffractionExpFrame__export",
-        )
+        self._io_dialog = PydidasFileDialog()
         self._select_beamcenter_window = None
         self._fit2d_window = None
 
@@ -347,7 +332,11 @@ class DefineDiffractionExpFrame(BaseFrame):
 
         Note: This method will overwrite all current settings.
         """
-        _fname = self.__import_dialog.get_user_response()
+        _fname = self._io_dialog.get_existing_filename(
+            caption="Import experiment context file",
+            formats=DiffractionExperimentIo.get_string_of_formats(),
+            qsettings_ref="DefineDiffractionExpFrame__import",
+        )
         if _fname is not None:
             EXP.import_from_file(_fname)
             for param in EXP.params.values():
@@ -358,7 +347,13 @@ class DefineDiffractionExpFrame(BaseFrame):
         Open a dialog to select a filename and write all currrent settings
         for the DiffractionExperimentContext to file.
         """
-        _fname = self.__export_dialog.get_user_response()
+        _fname = self._io_dialog.get_saving_filename(
+            caption="Export experiment context file",
+            formats=DiffractionExperimentIo.get_string_of_formats(),
+            default_extension="yaml",
+            dialog=QtWidgets.QFileDialog.getSaveFileName,
+            qsettings_ref="DefineDiffractionExpFrame__export",
+        )
         if _fname is not None:
             EXP.export_to_file(_fname, overwrite=True)
 

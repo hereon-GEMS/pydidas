@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the FitTriplePeak Plugin which can be used to fit a triple peak in 1
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,40 +29,18 @@ __all__ = ["FitTriplePeak"]
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.fitting import FitFuncMeta
+from pydidas.core.generic_params import fit_multi_peak_params
 from pydidas.plugins import FitMultiPeak
 
 
+_3PEAK_PARAMS = fit_multi_peak_params(3)
 _FUNC_CHOICES = FitFuncMeta.get_fitter_names_with_num_peaks(3)
 _DEFAULTS = FitMultiPeak.default_params.copy() | get_generic_param_collection(
-    "fit_peak1_xlow",
-    "fit_peak1_xhigh",
-    "fit_peak1_xstart",
-    "fit_peak1_width",
-    "fit_peak2_xlow",
-    "fit_peak2_xhigh",
-    "fit_peak2_xstart",
-    "fit_peak2_width",
-    "fit_peak3_xlow",
-    "fit_peak3_xhigh",
-    "fit_peak3_xstart",
-    "fit_peak3_width",
+    *_3PEAK_PARAMS
 )
 _DEFAULTS["fit_func"].update_value_and_choices(_FUNC_CHOICES[0], _FUNC_CHOICES)
 
-_ADVANCED = FitMultiPeak.advanced_parameters + [
-    "fit_peak1_xlow",
-    "fit_peak1_xhigh",
-    "fit_peak1_xstart",
-    "fit_peak1_width",
-    "fit_peak2_xlow",
-    "fit_peak2_xhigh",
-    "fit_peak2_xstart",
-    "fit_peak2_width",
-    "fit_peak3_xlow",
-    "fit_peak3_xhigh",
-    "fit_peak3_xstart",
-    "fit_peak3_width",
-]
+_ADVANCED = FitMultiPeak.advanced_parameters + _3PEAK_PARAMS
 
 
 class FitTriplePeak(FitMultiPeak):

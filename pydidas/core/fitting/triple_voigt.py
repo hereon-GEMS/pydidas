@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Module with the TripleVoigt class for fitting a triple Voigt peak to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,35 +30,55 @@ __all__ = ["TripleVoigt"]
 
 from typing import Tuple
 
-from numpy import inf
 from scipy.special import voigt_profile
 
-from .utils import TriplePeakMixin
+from .multi_peak_mixin import MultiPeakMixin
 from .voigt import Voigt
 
 
-class TripleVoigt(TriplePeakMixin, Voigt):
+class TripleVoigt(MultiPeakMixin, Voigt):
     """
     Class for fitting a triple Voigt function.
+
+    This class uses the scipy.special.voigt_profile to calculate the function values.
+
+    V(x) = (
+        A0 * voigt_profile(x - center0, sigma0, gamma0)
+        + A1 * voigt_profile(x - center1, sigma1, gamma1)
+        + A2 * voigt_profile(x - center2, sigma2, gamma2)
+        + bg_0 + x * bg_1
+    )
+
+    where A<i> is the amplitude, sigma<i> and gamma<i> are the widths of the
+    Gaussian and Lorentzian shares and center<i> are the center positions. bg_0
+    is an optional background offset and bg_1 is the (optional) first order term
+    for the background.
+
+    The fit results will be given in form of a tuple c:
+
+    c : tuple
+        The tuple with the function parameters.
+        c[0] : amplitude 0
+        c[1] : sigma 0
+        c[2] : gamma 0
+        c[3] : center 0
+        c[4] : amplitude 1
+        c[5] : sigma 1
+        c[6] : gamma 1
+        c[7] : center 1
+        c[8] : amplitude 2
+        c[9] : sigma 2
+        c[10] : gamma 2
+        c[11] : center 2
+        c[12], optional : A background offset.
+        c[13], optional : The polynomial coefficient for a first order background.
     """
 
     name = "Triple Voigt"
-    param_bounds_low = [0, 0, 0, -inf, 0, 0, 0, -inf, 0, 0, 0, -inf]
-    param_bounds_high = [inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf]
-    param_labels = [
-        "amplitude1",
-        "sigma1",
-        "gamma1",
-        "center1",
-        "amplitude2",
-        "sigma2",
-        "gamma2",
-        "center2",
-        "amplitude3",
-        "sigma3",
-        "gamma3",
-        "center3",
-    ]
+    num_peaks = 3
+    param_bounds_low = Voigt.param_bounds_low * num_peaks
+    param_bounds_high = Voigt.param_bounds_high * num_peaks
+    param_labels = [f"{key}{i}" for i in range(num_peaks) for key in Voigt.param_labels]
 
     @staticmethod
     def fwhm(c: Tuple) -> Tuple[float]:

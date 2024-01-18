@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ generate the Sphinx html documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -79,7 +79,7 @@ def run_sphinx_html_build(
     verbose : bool, optional
         Flag to control printing of a message. The default is True.
     """
-    if "sphinx-build" in sys.argv[0]:
+    if "sphinx-build" in sys.argv[0] or "-m unittest" in sys.argv[0]:
         return
     if build_dir is None:
         build_dir = os.path.join(DOC_MAKE_DIRECTORY, "build", "html")

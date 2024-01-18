@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -100,14 +100,14 @@ class TestFitDoublePeak(unittest.TestCase):
         self.assertTrue("fit_params" in fit_result_data.metadata)
         self.assertTrue("fit_func" in fit_result_data.metadata)
         self.assertTrue("fit_residual_std" in fit_result_data.metadata)
-        self.assertTrue(abs(params["amplitude1"] - self._amp1) <= 20)
-        self.assertTrue(abs(params["amplitude2"] - self._amp2) <= 20)
+        self.assertTrue(abs(params["amplitude0"] - self._amp1) <= 20)
+        self.assertTrue(abs(params["amplitude1"] - self._amp2) <= 20)
         if "sigma" in params:
-            self.assertTrue(abs(params["sigma1"] - self._sigma) < 0.5)
+            self.assertTrue(abs(params["sigma0"] - self._sigma) < 0.5)
         if "gamma" in params:
-            self.assertTrue(abs(params["gamma1"] - self._sigma) < 0.5)
-        self.assertTrue(abs(params["center1"] - self._peak_x1) < 1)
-        self.assertTrue(abs(params["center2"] - self._peak_x2) < 2)
+            self.assertTrue(abs(params["gamma0"] - self._sigma) < 0.5)
+        self.assertTrue(abs(params["center0"] - self._peak_x1) < 1)
+        self.assertTrue(abs(params["center1"] - self._peak_x2) < 2)
         if bg_order in [0, 1]:
             self.assertTrue(abs(params["background_p0"] - 1) < 1)
         if bg_order == 1:
@@ -196,7 +196,7 @@ class TestFitDoublePeak(unittest.TestCase):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
+        _data, _kwargs = plugin.execute(self._data - 0.5)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
         self.assertIn(self._data.axis_units[0], _data.data_label)
 

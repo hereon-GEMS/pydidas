@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ operations on a number of images.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -156,7 +156,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         Build the frame and create all widgets.
         """
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
-        # self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
+        self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
         QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )

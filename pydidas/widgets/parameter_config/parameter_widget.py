@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ GridLayout to add the label, I/O and unit widgets for a Parameter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -249,8 +249,9 @@ class ParameterWidget(EmptyWidget):
         widget : QWidget
             The input widget used for editing the parameter value.
         """
+        _new_value = self._widgets["io"].get_value()
         try:
-            self.param.value = self._widgets["io"].get_value()
+            self.param.value = _new_value
         except ValueError:
             self._widgets["io"].set_value(self.param.value)
             raise

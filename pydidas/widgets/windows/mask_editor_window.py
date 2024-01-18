@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ mask editor in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -68,7 +68,7 @@ class MaskEditorWindow(PydidasWindow):
         )
         self.create_label(
             "title",
-            "Input reference data file (not the mask)",
+            "Input reference file (not the mask)",
             fontsize_offset=1,
             font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             bold=True,

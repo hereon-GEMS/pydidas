@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ calling arguments for simplified formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -78,7 +78,7 @@ class ScrollArea(QScrollArea):
         """
         if self.widget() is not None:
             _hint = self.widget().sizeHint()
-            return QSize(_hint.width() + self.__scrollbar_width + 5, _hint.height())
+            return QSize(_hint.width() + self.__scrollbar_width + 12, _hint.height())
         return super().sizeHint()
 
     @Slot()

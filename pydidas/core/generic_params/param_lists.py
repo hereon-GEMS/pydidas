@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,11 @@ Parameters in an object.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["FIT_OUTPUT_OPTIONS", "SCAN_GENERIC_PARAM_NAMES"]
+__all__ = ["FIT_OUTPUT_OPTIONS", "SCAN_GENERIC_PARAM_NAMES", "fit_multi_peak_params"]
 
 
 SCAN_GENERIC_PARAM_NAMES = [
@@ -48,3 +48,24 @@ FIT_OUTPUT_OPTIONS = [
     "background at peak",
     "total count intensity",
 ]
+
+
+def fit_multi_peak_params(num_peaks: int) -> list[str]:
+    """
+    Get the parameter names for multi-peak fitting Parameters.
+
+    Parameters
+    ----------
+    num_peaks : int
+        The number of peaks to be used.
+
+    Returns
+    -------
+    list[str]
+        The list of the Parameter names for the given number of peaks.
+    """
+    return [
+        f"fit_peak{i}_{key}"
+        for i in range(num_peaks)
+        for key in ["xlow", "xhigh", "xstart", "width"]
+    ]

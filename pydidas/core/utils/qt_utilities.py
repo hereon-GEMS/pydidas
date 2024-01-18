@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,11 +20,12 @@ Module with utility functions for Qt objects.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "update_child_qobject",
     "update_size_policy",
     "apply_qt_properties",
     "update_palette",
@@ -63,9 +64,12 @@ def _get_args_as_list(args: Iterable):
     return args
 
 
-def update_size_policy(obj: QWidget, **kwargs: dict):
+def update_child_qobject(obj: QObject, attr: str, **kwargs: dict):
     """
-    Update the sizePolicy of an object with various keywords.
+    Update the objects given atttribute in place.
+
+    This function allows to update a QObjects attribute, which is a QObject itself,
+    in place and update the original object after the update.
 
     This function takes a dictionary (ie. keyword arguments) and iterates
     through all keys. Keys will be interpreted in Qt style: A "property: 12"
@@ -78,14 +82,31 @@ def update_size_policy(obj: QWidget, **kwargs: dict):
 
     Parameters
     ----------
+    obj : QObject
+        The parent QObject.
+    attr : str
+        The name of the child QObject.
+    **kwargs : dict
+        A dictionary with properties to set.
+    """
+    _child_obj = getattr(obj, attr)()
+    apply_qt_properties(_child_obj, **kwargs)
+    _child_setter = getattr(obj, "set" + attr[0].upper() + attr[1:])
+    _child_setter(_child_obj)
+
+
+def update_size_policy(obj: QWidget, **kwargs: dict):
+    """
+    Update the sizePolicy of an object with various keywords.
+
+    Parameters
+    ----------
     obj : QtWidgets.QWidget
         Any QWidget (because other QObjects do not have a sicePolicy).
     **kwargs : dict
         A dictionary with properties to set.
     """
-    _policy = obj.sizePolicy()
-    apply_qt_properties(_policy, **kwargs)
-    obj.setSizePolicy(_policy)
+    update_child_qobject(obj, "sizePolicy", **kwargs)
 
 
 def apply_qt_properties(obj: QObject, **kwargs: dict):

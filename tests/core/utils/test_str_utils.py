@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -43,6 +43,7 @@ from pydidas.core.utils.str_utils import (
     get_short_time_string,
     get_time_string,
     get_warning,
+    print_warning,
     timed_print,
     update_separators,
 )
@@ -184,33 +185,28 @@ class Test_str_utils(unittest.TestCase):
 
     def test_get_warning__simple(self):
         _teststr = "test"
-        w = get_warning(_teststr, return_warning=True, print_warning=False)
+        w = get_warning(_teststr)
         w_parts = w.split("\n")
         w_lens = [len(_w) for _w in w_parts]
         self.assertEqual(len(w_parts), 3)
         self.assertEqual(w_parts[0], "-" * 60)
-        self.assertEqual(w_lens, [60] * len(w_parts))
-        self.assertTrue(w_parts[1].startswith(f"- {_teststr} -"))
+        self.assertEqual(w_lens, [60, len(_teststr) + 2, 60])
+        self.assertTrue(w_parts[1].startswith(f"- {_teststr}"))
 
-    def test_get_warning__w_print(self):
+    def test_print_warning(self):
         _teststr = "test"
         _fname = os.path.join(self._tmpdir, "out.txt")
         with open(_fname, "w") as _f:
             with redirect_stdout(_f):
-                get_warning(_teststr, return_warning=False, print_warning=True)
+                print_warning(_teststr)
         with open(_fname, "r") as _f:
             _text = _f.read().strip()
         w_parts = _text.split("\n")
         w_lens = [len(_w) for _w in w_parts]
         self.assertEqual(len(w_parts), 3)
         self.assertEqual(w_parts[0], "-" * 60)
-        self.assertEqual(w_lens, [60] * len(w_parts))
-        self.assertTrue(w_parts[1].startswith(f"- {_teststr} -"))
-
-    def test_get_warning__no_return(self):
-        _teststr = "test"
-        w = get_warning(_teststr, return_warning=False, print_warning=False)
-        self.assertIsNone(w)
+        self.assertEqual(w_lens, [60, len(_teststr) + 2, 60])
+        self.assertTrue(w_parts[1].startswith(f"- {_teststr}"))
 
     def test_get_warning__multiline(self):
         _teststr = ["test", "test2"]
@@ -219,30 +215,49 @@ class Test_str_utils(unittest.TestCase):
         w_lens = [len(_w) for _w in w_parts]
         self.assertEqual(len(w_parts), 4)
         self.assertEqual(w_parts[0], "-" * 60)
-        self.assertEqual(w_lens, [60] * len(w_parts))
-        self.assertTrue(w_parts[1].startswith(f"- {_teststr[0]} -"))
-        self.assertTrue(w_parts[2].startswith(f"- {_teststr[1]} -"))
+        self.assertEqual(w_lens, [60] + [2 + len(_str) for _str in _teststr] + [60])
+        self.assertTrue(w_parts[1].startswith(f"- {_teststr[0]}"))
+        self.assertTrue(w_parts[2].startswith(f"- {_teststr[1]}"))
 
     def test_get_warning__multiline_with_empty_line(self):
         _teststr = ["test", "", "test2"]
-        w = get_warning(_teststr, return_warning=True, print_warning=False)
+        w = get_warning(_teststr)
         w_parts = w.split("\n")
         w_lens = [len(_w) for _w in w_parts]
         self.assertEqual(len(w_parts), 5)
-        self.assertEqual(w_lens, [60] * len(w_parts))
+        self.assertEqual(w_lens, [60] + [2 + len(_str) for _str in _teststr] + [60])
         self.assertEqual(w_parts[0], "-" * 60)
-        self.assertTrue(w_parts[1].startswith(f"- {_teststr[0]} -"))
-        self.assertEqual(w_parts[2], "-" * 60)
-        self.assertTrue(w_parts[3].startswith(f"- {_teststr[2]} -"))
+        self.assertTrue(w_parts[1].startswith(f"- {_teststr[0]}"))
+        self.assertEqual(w_parts[2], "- ")
+        self.assertTrue(w_parts[3].startswith(f"- {_teststr[2]}"))
 
-    def test_get_warning_long(self):
+    def test_get_warning__long_w_defaults(self):
         _teststr = "".join(random.choice(string.ascii_letters) for i in range(64))
-        w = get_warning(_teststr, return_warning=True, print_warning=False)
+        w = get_warning(_teststr)
+        w_parts = w.split("\n")
+        self.assertEqual(len(w_parts), 3)
+        self.assertEqual(w_parts[0], "-" * 80)
+        self.assertEqual(w_parts[2], "-" * 80)
+        self.assertTrue(w_parts[1].startswith(f"- {_teststr}"))
+
+    def test_get_warning__no_dashes(self):
+        _teststr = "".join(random.choice(string.ascii_letters) for i in range(64))
+        w = get_warning(_teststr, leading_dash=False, fill_dashes=False)
+        w_parts = w.split("\n")
+        self.assertEqual(len(w_parts), 3)
+        self.assertEqual(w_parts[0], "-" * 80)
+        self.assertEqual(w_parts[1], _teststr)
+        self.assertEqual(w_parts[2], "-" * 80)
+
+    def test_get_warning__long_fill_dashes(self):
+        _teststr = "".join(random.choice(string.ascii_letters) for i in range(64))
+        w = get_warning(_teststr, fill_dashes=True)
         w_parts = w.split("\n")
         w_lens = [len(_w) for _w in w_parts]
         self.assertEqual(len(w_parts), 3)
         self.assertEqual(w_parts[0], "-" * 80)
-        self.assertEqual(w_lens, [80] * len(w_parts))
+        self.assertEqual(w_parts[2], "-" * 80)
+        self.assertEqual(w_lens, [80] * 3)
         self.assertTrue(w_parts[1].startswith(f"- {_teststr} -"))
 
     def test_get_warning_very_long(self):
@@ -257,14 +272,14 @@ class Test_str_utils(unittest.TestCase):
 
     def test_get_warning_severe(self):
         _teststr = "test"
-        w = get_warning(_teststr, return_warning=True, print_warning=False, severe=True)
+        w = get_warning(_teststr, severe=True)
         w_parts = w.split("\n")
         w_lens = [len(_w) for _w in w_parts]
         self.assertEqual(len(w_parts), 5)
         self.assertTrue(w_parts[0] == w_parts[4] == "=" * 60)
         self.assertTrue(w_parts[1] == w_parts[3] == "-" * 60)
-        self.assertEqual(w_lens, [60] * len(w_parts))
-        self.assertTrue(w_parts[2].startswith(f"- {_teststr} -"))
+        self.assertEqual(w_lens, [60, 60, len(_teststr) + 2, 60, 60])
+        self.assertTrue(w_parts[2].startswith(f"- {_teststr}"))
 
     def test_get_warning_newlines(self):
         _teststr = "test"

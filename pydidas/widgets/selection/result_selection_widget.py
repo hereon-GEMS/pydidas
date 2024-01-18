@@ -687,7 +687,7 @@ class ResultSelectionWidget(
             "use_timeline": _timeline,
         }
         if self.__result_window is None:
-            self.__result_window = ShowInformationForResult(None)
+            self.__result_window = ShowInformationForResult()
         self.__result_window.display_information(
             (data_y, data_x), _selection_config, _node_metadata, _loader_plugin
         )

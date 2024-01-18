@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The pydidas_gui module includes a function to run the default pydidas processing
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -111,7 +111,11 @@ def run_gui():
         app = PydidasQApplication([])
     _splash = PydidasSplashScreen()
 
-    _ = start_pydidas_gui(_splash, restore_state="exit")
+    try:
+        _ = start_pydidas_gui(_splash, restore_state="exit")
+    except Exception:
+        _splash.close()
+        raise
     app.deleteLater()
 
 

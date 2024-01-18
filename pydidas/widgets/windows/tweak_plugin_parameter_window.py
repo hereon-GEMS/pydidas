@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -17,11 +17,11 @@
 
 """
 Module with the TweakPluginParameterWindow class which is a stand-alone frame
-to store the Parameters of a Plugin.
+to modify and store the Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -121,7 +121,11 @@ class TweakPluginParameterWindow(PydidasWindow):
             "Cancel parameter editing and discard changes",
             parent_widget=self._widgets["config_area"],
         )
-        self.create_any_widget("plot", PydidasPlotStack, gridPos=(1, 1, 1, 1))
+        self.create_any_widget(
+            "plot",
+            PydidasPlotStack,
+            gridPos=(1, 1, 1, 1),
+        )
         self._widgets["detailed_results"] = ShowDetailedPluginResultsWindow()
 
     def connect_signals(self):
@@ -131,6 +135,12 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._widgets["but_run_plugin"].clicked.connect(self.run_plugin)
         self._widgets["but_confirm"].clicked.connect(self.confirm_parameters)
         self._widgets["but_cancel"].clicked.connect(self.discard_parameter_changes)
+
+    def finalize_ui(self):
+        """
+        finalize the UI initialization.
+        """
+        self._widgets["config_scroll_area"].force_width_from_size_hint()
 
     def tweak_plugin(self, plugin, results):
         """

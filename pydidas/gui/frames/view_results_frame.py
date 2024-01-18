@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -70,12 +70,7 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
         )
         BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
-        self.__import_dialog = PydidasFileDialog(
-            caption="Workflow results directory",
-            dialog_type="open_directory",
-            parent=self,
-            qsettings_ref="WorkflowResults__import",
-        )
+        self.__import_dialog = PydidasFileDialog()
 
     def build_frame(self):
         """
@@ -115,7 +110,10 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
         """
         Import data to the workflow results.
         """
-        _dir = self.__import_dialog.get_user_response()
+        _dir = self.__import_dialog.get_existing_directory(
+            caption="Workflow results directory",
+            qsettings_ref="WorkflowResults__import",
+        )
         if _dir is not None:
             self._RESULTS.import_data_from_directory(_dir)
             self._RESULTS._TREE.root.plugin._SCAN = self._RESULTS._SCAN

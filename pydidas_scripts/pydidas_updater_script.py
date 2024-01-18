@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ pydidas from github and replace the available version.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -39,9 +39,9 @@ from pathlib import Path
 import build
 import requests
 
-from pydidas_scripts.pydidas_remove_local_files import (
-    pydidas_remove_log_files,
-    pydidas_remove_stored_gui_states,
+from pydidas_scripts.remove_local_files import (
+    remove_pydidas_log_files,
+    remove_pydidas_stored_gui_states,
 )
 
 
@@ -373,8 +373,8 @@ def run_update():
         _wheel = build_wheel(_path)
         print_status("Installing wheel")
         install_wheel(_wheel)
-        pydidas_remove_log_files(_local_version, verbose=False, confirm_finish=False)
-        pydidas_remove_stored_gui_states(
+        remove_pydidas_log_files(_local_version, verbose=False, confirm_finish=False)
+        remove_pydidas_stored_gui_states(
             _local_version, verbose=False, confirm_finish=False
         )
         _success = True

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters which are are used for fitting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -140,7 +140,13 @@ GENERIC_PARAMS_FIT = (
                 "to be fitted."
             ),
         }
-        for _num, _key in [["", ""], ["1", "first "], ["2", "second "], ["3", "third "]]
+        for _num, _key in [
+            ["", ""],
+            ["0", "0th"],
+            ["1", "1st"],
+            ["2", "2nd"],
+            ["3", "3rd"],
+        ]
     }
     | {
         f"fit_peak{_num}_xhigh": {
@@ -155,7 +161,13 @@ GENERIC_PARAMS_FIT = (
                 "to be fitted."
             ),
         }
-        for _num, _key in [["", ""], ["1", "first "], ["2", "second "], ["3", "third "]]
+        for _num, _key in [
+            ["", ""],
+            ["0", "0th"],
+            ["1", "1st"],
+            ["2", "2nd"],
+            ["3", "3rd"],
+        ]
     }
     | {
         f"fit_peak{_num}_xstart": {
@@ -173,7 +185,13 @@ GENERIC_PARAMS_FIT = (
                 "a fixed value."
             ),
         }
-        for _num, _key in [["", ""], ["1", "first "], ["2", "second "], ["3", "third "]]
+        for _num, _key in [
+            ["", ""],
+            ["0", "0th"],
+            ["1", "1st"],
+            ["2", "2nd"],
+            ["3", "3rd"],
+        ]
     }
     | {
         f"fit_peak{_num}_width": {
@@ -194,6 +212,12 @@ GENERIC_PARAMS_FIT = (
                 "fixed value."
             ),
         }
-        for _num, _key in [["", ""], ["1", "first "], ["2", "second "], ["3", "third "]]
+        for _num, _key in [
+            ["", ""],
+            ["0", "0th"],
+            ["1", "1st"],
+            ["2", "2nd"],
+            ["3", "3rd"],
+        ]
     }
 )

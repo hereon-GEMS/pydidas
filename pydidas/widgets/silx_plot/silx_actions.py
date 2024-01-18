@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -244,17 +244,24 @@ class PydidasLoadImageAction(QtWidgets.QAction):
     Action to load an image using the pydidas file dialog.
 
     This action is used as additional option in the pyFAI calibration widgets.
+
+    Parameters
+    ----------
+    caption : str, optional
+        The caption string for the file dialog. The default is 'Select image file.'
+    ref : str, optional
+        The reference for a persistent QSettings reference to the directory.
+        The default is None.
     """
 
     def __init__(self, parent, caption="Select image file", ref=None):
         QtWidgets.QAction.__init__(self, parent)
         self.triggered.connect(self.__execute)
-        self._dialog = PydidasFileDialog(
-            caption=caption,
-            dialog_type="open_file",
-            extensions=IoMaster.get_string_of_formats(),
-            qsettings_ref=ref,
-        )
+        self._dialog = PydidasFileDialog()
+        self._dialog_kwargs = {
+            "caption": caption,
+            "qsettings_ref": ref,
+        }
         self.setText("Use pydidas file dialog")
 
     @QtCore.Slot()
@@ -262,7 +269,11 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         """
         Execute the dialog and select a filename.
         """
-        _filename = self._dialog.get_user_response()
+        _filename = self._dialog.get_existing_filename(
+            caption=self._dialog_kwargs["caption"],
+            extensions=IoMaster.get_string_of_formats(),
+            qsettings_ref=self._dialog_kwargs["qsettings_ref"],
+        )
         if _filename is not None:
             _image = import_data(_filename)
             self.parent()._setValue(filename=_filename, data=_image)

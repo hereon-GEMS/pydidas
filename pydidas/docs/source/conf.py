@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,12 +18,11 @@
 
 import os
 import sys
+from pathlib import Path
 
-import pydidas
 
-
+sys.path.insert(0, os.path.abspath("./../../.."))
 sys.path.insert(0, os.path.abspath("./../.."))
-sys.path.insert(1, os.path.abspath("./../../.."))
 
 
 # -- Project information -----------------------------------------------------
@@ -32,9 +31,17 @@ project = "pydidas"
 copyright = "2023, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
-# The full version, including alpha/beta/rc tags
 
-release = pydidas.VERSION
+# The full version, including alpha/beta/rc tags
+with open(Path(__file__).parents[2].joinpath("version.py"), "r") as f:
+    _lines = f.readlines()
+
+    for _line in _lines:
+        if _line.startswith("__version__"):
+            pydidas_version = _line.split("=")[1].strip()
+            break
+
+release = pydidas_version
 version = release
 
 # -- General configuration ---------------------------------------------------

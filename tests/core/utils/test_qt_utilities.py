@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,33 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-The pydidas_documentation script allows to open the pydidas documentation in a
-webbrowser.
-"""
+"""Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["open_pydidas_documentation"]
 
 
-from qtpy import QtGui, QtWidgets
+import unittest
+
+from qtpy import QtWidgets
+
+from pydidas.core.utils import update_child_qobject
 
 
-def open_pydidas_documentation():
-    """
-    Open the pydidas documentation in the system's default browser.
-    """
-    from pydidas.core.utils import DOC_HOME_QURL
-
-    _app = QtWidgets.QApplication.instance()
-    if _app is None:
-        _app = QtWidgets.QApplication([])
-    _ = QtGui.QDesktopServices.openUrl(DOC_HOME_QURL)
+class Test_Qt_Utilities(unittest.TestCase):
+    def test_update_child_qobject(self):
+        _width = 100
+        _left = 42
+        obj = QtWidgets.QWidget()
+        update_child_qobject(obj, "geometry", left=_left, width=_width)
+        _geo = obj.geometry()
+        self.assertEqual(_geo.width(), _width)
+        self.assertEqual(_geo.left(), _left)
 
 
 if __name__ == "__main__":
-    open_pydidas_documentation()
+    unittest.main()

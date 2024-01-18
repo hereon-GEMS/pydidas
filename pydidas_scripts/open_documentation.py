@@ -15,18 +15,33 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-
 """
-Module with the pydidas Version number.
+The pydidas_documentation script allows to open the pydidas documentation in a
+webbrowser.
 """
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
-__version__ = "24.01.18"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+__all__ = ["open_documentation"]
 
 
-version = __version__
-VERSION = __version__
+from qtpy import QtGui, QtWidgets
+
+
+def open_documentation():
+    """
+    Open the pydidas documentation in the system's default browser.
+    """
+    from pydidas.core.utils import DOC_HOME_QURL
+
+    _app = QtWidgets.QApplication.instance()
+    if _app is None:
+        _app = QtWidgets.QApplication([])
+    _ = QtGui.QDesktopServices.openUrl(DOC_HOME_QURL)
+
+
+if __name__ == "__main__":
+    open_documentation()

@@ -1,5 +1,36 @@
-.. Copyright 2023, Helmholtz-Zentrum Hereon
+.. Copyright 2024, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
+
+v24.01.18
+=========
+
+Improvements
+------------
+
+- Added Github actions for formatting, unittesting and automatic deployment
+  of github pages.
+- Updated metadata files (README, sphinx make-files, .flake8)
+- Changed the behaviour of the GUI file dialogues to (re)use only one instance
+  of the file dialog to mitigate issues with slow file systems.
+- ParameterWidgets with numbers which allow None now treat an empty string
+  as None.
+- Multi-peak fitting plugins now start numbering peaks with zero to be 
+  consistent with python style.
+- Prepared the structure for fitting plugins with an arbitrary number of
+  peaks.
+
+Bugfixes
+--------
+- Fixed an issue with ipython where pydidas could not be imported in the 
+  ipython console due to ipython's running QApplication.
+- Fixed an issue with fitting plugins where peak boundaries could lead to
+  an exception when the initial peak fit was outside of the boundaries.
+- Fixed an issue in the TweakPluginParameterWindow where the stratch scaling
+  was wrong.
+- Fixed an issue with the error message due to missing parameters in the 
+  run_pydidas_workflow script.
+- Fixed an issue with the ResultSelectionWidget call of the 
+  ShowInformationForResult window.
 
 
 v23.12.08

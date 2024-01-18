@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the ImageMathFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -285,7 +285,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_combo_box(
             "ops_operator_target",
-            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 4.8,
             gridPos=(0, 0, 1, 1),
             items=cls._images,
             parent_widget="ops_operator",
@@ -296,7 +296,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "ops_operator_func",
             currentIndex=4,
-            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 4.8,
             gridPos=(0, -1, 1, 1),
             items=UFUNCS,
             parent_widget="ops_operator",
@@ -367,7 +367,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_combo_box(
             "ops_arithmetic_target",
-            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 4.8,
             gridPos=(0, 0, 1, 1),
             items=cls._images,
             parent_widget="ops_arithmetic",
@@ -378,7 +378,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "combo_ops_arithmetic_input",
             alignment=constants.ALIGN_CENTER_LEFT,
-            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.2,
             gridPos=(0, -1, 1, 1),
             items=cls._current_images,
             parent_widget="ops_arithmetic",
@@ -393,7 +393,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_lineedit(
             "io_ops_arithmetic_input",
-            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 4.8,
             font_metric_height_factor=1,
             gridPos=(0, -1, 1, 1),
             parent_widget="ops_arithmetic",
@@ -432,7 +432,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_combo_box(
             "ops_image_arithmetic_target",
-            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 4.8,
             items=cls._images,
             parent_widget="ops_image_arithmetic",
         )

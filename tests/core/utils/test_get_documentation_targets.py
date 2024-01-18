@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import os
 import unittest
+from pathlib import Path
 
 from qtpy import QtCore
 
@@ -49,8 +50,8 @@ class TestGetDocQUrl(unittest.TestCase):
         self.assertIn("Makefile", os.listdir(_dir))
 
     def test_DOC_HOME_FILENAME(self):
-        _fname = DOC_HOME_FILENAME
-        self.assertTrue(os.path.exists(_fname))
+        _fname = Path(DOC_HOME_FILENAME)
+        self.assertEqual(_fname.parents[3].name, "pydidas")
 
     def test_DOC_HOME_ADDRESS(self):
         _address = DOC_HOME_ADDRESS

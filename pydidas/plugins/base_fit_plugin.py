@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the BaseFitPlugin Plugin which holds generic methods for fitting plu
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -167,6 +167,7 @@ class BaseFitPlugin(ProcPlugin):
             self._data_x,
             self._data,
             bg_order=self.get_param_value("fit_bg_order"),
+            bounds=(self._config["bounds_low"], self._config["bounds_high"]),
             **self._fit_presets,
         )
         _res = least_squares(

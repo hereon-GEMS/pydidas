@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the Gaussian class for fitting a Gaussian peak to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -90,7 +90,7 @@ class Gaussian(FitFuncBase):
             The x data points.
         y : np.ndarray
             The function data points to be fitted.
-        index : Union[None, str]
+        index : Union[None, int]
             The peak index. Use None for a non-indexed single peak or the integer peak
             number (starting with 1).
         **kwargs : dict
@@ -106,9 +106,14 @@ class Gaussian(FitFuncBase):
             y[y < 0] = 0
 
         _center_start = kwargs.get(f"center{index}_start", x[y.argmax()])
-        _ycenter = cls.get_y_value(_center_start, x, y)
+        if "bounds" in kwargs:
+            _bounds_index = 2 if index is None else 3 * index + 2
+            _center_start = max(kwargs.get("bounds")[0][_bounds_index], _center_start)
+            _center_start = min(kwargs.get("bounds")[1][_bounds_index], _center_start)
 
+        _ycenter = cls.get_y_value(_center_start, x, y)
         _high_x = cls.get_fwhm_indices(_center_start, _ycenter, x, y)
+
         index = "" if index is None else str(index)
         _sigma_start = kwargs.get(f"width{index}_start", None)
         if _sigma_start is None:

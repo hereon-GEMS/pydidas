@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ to be used within pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -108,15 +108,19 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar)[0]
         _histo_crop_action = silx_plot.CropHistogramOutliers(_plot, parent=_plot)
+        _autoscale_action = silx_plot.AutoscaleToMeanAndThreeSigma(_plot, parent=_plot)
         _widget_action = [
             _action
             for _action in _toolbar.actions()
             if isinstance(_action, QtWidgets.QWidgetAction)
         ][0]
         _toolbar.addAction(_histo_crop_action)
+        _toolbar.addAction(_autoscale_action)
         _toolbar.insertAction(_widget_action, _histo_crop_action)
+        _toolbar.insertAction(_widget_action, _autoscale_action)
     # explicitly hide the toolbar with the 3D visualization:
     tasks[0]._ExperimentTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
+    tasks[2]._PeakPickingTask__createNewRingOption.setChecked(False)
     tasks[3]._GeometryTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
     # insert button for exporting to DiffractionExperimentContext:
     _parent = tasks[4]._savePoniButton.parent()
@@ -149,19 +153,7 @@ class PyfaiCalibFrame(BaseFrame):
         BaseFrame.__init__(self, **kwargs)
         self._setup_pyfai_context()
         self._tasks = _create_calib_tasks()
-        self.__export_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="save_file",
-            caption="Export experiment context file",
-            formats=DiffractionExperimentIo.get_string_of_formats(),
-            default_extension="yaml",
-            dialog=QtWidgets.QFileDialog.getSaveFileName,
-            qsettings_ref="PyfaiCalibFrame__export",
-            info_string=(
-                "<b>Note:</b> Using yaml format allows to export the mask file name as "
-                "well. pyFAI's poni format does not include the mask file."
-            ),
-        )
+        self.__export_dialog = PydidasFileDialog()
 
     def _setup_pyfai_context(self):
         """
@@ -304,7 +296,17 @@ class PyfaiCalibFrame(BaseFrame):
         """
         Export the poni settings to a file.
         """
-        _fname = self.__export_dialog.get_user_response()
+        _fname = self.__export_dialog.get_saving_filename(
+            caption="Export experiment context file",
+            formats=DiffractionExperimentIo.get_string_of_formats(),
+            default_extension="yaml",
+            dialog=QtWidgets.QFileDialog.getSaveFileName,
+            qsettings_ref="PyfaiCalibFrame__export",
+            info_string=(
+                "<b>Note:</b> Using yaml format allows to export the mask file name as "
+                "well. pyFAI's poni format does not include the mask file."
+            ),
+        )
         if _fname is None:
             return
         _experiment = DiffractionExperiment()

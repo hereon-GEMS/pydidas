@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The str_utils module includes convenience functions for string formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,6 +30,7 @@ __all__ = [
     "get_short_time_string",
     "timed_print",
     "get_warning",
+    "print_warning",
     "convert_unicode_to_ascii",
     "convert_special_chars_to_unicode",
     "get_range_as_formatted_string",
@@ -198,13 +199,7 @@ def timed_print(string: str, new_lines: int = 0, verbose: bool = True):
         print("\n" * new_lines + f"{get_time_string()}: {string}")
 
 
-def get_warning(
-    string: str,
-    severe: bool = False,
-    new_lines: int = 0,
-    print_warning: bool = True,
-    return_warning: bool = False,
-) -> Union[str, None]:
+def get_warning(message: Union[str, Iterable[str]], **kwargs: dict) -> str:
     """
     Generate a warning message (formatted string in a "box" of dashes).
 
@@ -214,48 +209,78 @@ def get_warning(
 
     Parameters
     ----------
-    string : Union[str, list, tuple]
+    message: Union[str, Iterable[str]]
         The input string to be formatted. A multi-line string can be passed
-        as a list or tuple of strings.
-    severe : bool, optional
-        Keyword to add an additional frame of double dashes. The default is
-        False.
-    new_lines : int, optional
-        The number of preceding empty lines. The default is 0.
-    print_warning : bool, optional
-        Keyword to print the warning to sys.stdout. The default is True.
-    return_warning: bool, optional
-        Keyword to get the formatted string as return argument. The default
-        is False.
+        as an Iterable.
+    **kwargs : dict
+        Additional keyword arguments for formatting:
+        severe : bool, optional
+            Keyword to add an additional frame of double dashes. The default is
+            False.
+        new_lines : int, optional
+            The number of preceding empty lines. The default is 0.
+        leading_dash : bool, optional
+            Flag to add a leading dash in front of the warning text. The default
+            is True.
+        fill_dashes : bool, optional
+            Flag to fill the width of the console with dashes behind the warning.
+            The default is False.
 
     Returns
     -------
-    Union[None, str]
-        If "return_warning" is True, the function returns the formatted string.
-        Else, it will return None.
+    str
+        The formatted warning string.
     """
-    if isinstance(string, str):
-        _max = len(string)
-        string = [string]
-    elif isinstance(string, (list, tuple)):
-        _max = np.amax(np.r_[[len(_s) for _s in string]])
+    _severe = kwargs.get("severe", False)
+    _new_lines = kwargs.get("new_lines", 0)
+    _lead_dash = kwargs.get("leading_dash", True)
+    _fill_dashes = kwargs.get("fill_dashes", False)
+    _prefix = "- " if _lead_dash else ""
+
+    if isinstance(message, str):
+        _max = len(message)
+        message = [message]
+    elif isinstance(message, Iterable):
+        _max = np.amax(np.r_[[len(_s) for _s in message]])
     _length = 60 if _max <= 54 else 80
-    _s = "\n" * new_lines + severe * ("=" * _length + "\n") + "-" * _length + "\n"
-    for item in string:
+    _s = "\n" * _new_lines + _severe * ("=" * _length + "\n") + "-" * _length + "\n"
+    for item in message:
         _ll = len(item)
         if _ll == 0:
-            _s += "-" * _length + "\n"
+            _s += _prefix + "-" * (_length - len(_prefix)) * _fill_dashes + "\n"
         elif _ll <= 77:
-            _filler = "-" * (_length - _ll - 3)
-            _s += f"- {item} {_filler}\n"
+            _filler = " " * _fill_dashes + "-" * (_length - _ll - 3) * _fill_dashes
+            _s += f"{_prefix}{item}{_filler}\n"
         else:
-            _s += f"- {item[:73]}[...]\n"
-    _s += "-" * _length + severe * ("\n" + "=" * _length)
-    if print_warning:
-        print(_s)
-    if return_warning:
-        return _s
-    return None
+            _s += f"{_prefix}{item[:73]}[...]\n"
+    _s += "-" * _length + _severe * ("\n" + "=" * _length)
+    return _s
+
+
+def print_warning(message: Union[str, Iterable[str]], **kwargs):
+    """
+    Print the given warning message.
+
+    Parameters
+    ----------
+    message: Union[str, Iterable[str]]
+        The message to be printed.
+    **kwargs : dict
+        Additional keyword arguments for formatting:
+        severe : bool, optional
+            Keyword to add an additional frame of double dashes. The default is
+            False.
+        new_lines : int, optional
+            The number of preceding empty lines. The default is 0.
+        leading_dash : bool, optional
+            Flag to add a leading dash in front of the warning text. The default
+            is True.
+        fill_dashes : bool, optional
+            Flag to fill the width of the console with dashes behind the warning.
+            The default is False.
+    """
+    _warning = get_warning(message, **kwargs)
+    print(_warning)
 
 
 def convert_special_chars_to_unicode(obj: Union[str, list]) -> Union[str, list]:

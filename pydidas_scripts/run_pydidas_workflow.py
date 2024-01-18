@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,11 +16,11 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The ExecuteWorkflowRunner is a class to
+The run_workflow script allows to run pydidas workflows in the console.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,7 @@ import sys
 
 from pydidas.apps import ExecuteWorkflowRunner
 from pydidas.core import FileReadError, UserConfigError
-from pydidas.core.utils import get_warning, timed_print
+from pydidas.core.utils import print_warning, timed_print
 
 
 def run_workflow():
@@ -59,7 +59,10 @@ def run_workflow():
         )
         runner.execute_workflow_in_apprunner()
     except (UserConfigError, FileReadError, KeyboardInterrupt) as _error:
-        get_warning(_error.args[0], severe=True)
+        _error_text = _error.args[0]
+        if "\n" in _error_text:
+            _error_text = _error_text.split("\n")
+        print_warning(_error_text, leading_dash=False, severe=True)
         return
     timed_print(
         "Finished ExecuteWorkflowRunner processing.", new_lines=1, verbose=verbose

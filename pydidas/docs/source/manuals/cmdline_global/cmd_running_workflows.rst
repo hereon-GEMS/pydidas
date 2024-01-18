@@ -85,7 +85,7 @@ All keywords also have a parsed equivalent, as described below:
         |Scan| instances.
     * - diffraction_exp
       - Path, str, |DiffractionExperiment|
-      - -workflow / -w
+      - -diffraction_exp / -d
       - The parsed argument can only be used to point to files with exported
         |DiffractionExperiment| instances.
     * - output_directory

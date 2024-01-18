@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ path type.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -69,19 +69,19 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self.setAcceptDrops(True)
         self._flag_pattern = "pattern" in param.refkey
+        self.io_dialog = PydidasFileDialog()
         if "directory" in param.refkey:
-            _dialog_type = "open_directory"
+            self.io_dialog_call = self.io_dialog.get_existing_directory
         else:
             if param.refkey.startswith("output"):
-                _dialog_type = "save_file"
+                self.io_dialog_call = self.io_dialog.get_saving_filename
             else:
-                _dialog_type = "open_file"
-        self.io_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type=_dialog_type,
-            formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
-            qsettings_ref=kwargs.get("persistent_qsettings_ref"),
-        )
+                self.io_dialog_call = self.io_dialog.get_existing_filename
+        self._io_dialog_config = {
+            "reference": id(self),
+            "formats": "All files (*.*);;" + IoMaster.get_string_of_formats(),
+            "qsettings_ref": kwargs.get("persistent_qsettings_ref"),
+        }
 
     def button_function(self):
         """
@@ -90,10 +90,10 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
         """
-        _result = self.io_dialog.get_user_response()
+        _result = self.io_dialog_call(**self._io_dialog_config)
         if _result is not None:
             if self._flag_pattern:
-                self.io_dialog.set_curr_dir(_result)
+                self.io_dialog.set_curr_dir(id(self), _result)
                 _result = os.path.basename(_result)
             self.setText(_result)
             self.emit_signal()
@@ -119,7 +119,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         self._old_value = self.get_value()
         self._io_lineedit.setText(f"{value}")
         if not self._flag_pattern and value != Path() and os.path.exists(value):
-            self.io_dialog.set_curr_dir(value)
+            self.io_dialog.set_curr_dir(id(self), value)
 
     def modify_file_selection(self, list_of_choices: list):
         """
@@ -165,4 +165,15 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         name : str
             The unique identifier to reference this Parameter in the QSettings.
         """
-        self.io_dialog.qsettings_ref = name
+        self._io_dialog_config["qsettings_ref"] = name
+
+    def update_io_directory(self, path: str):
+        """
+        Update the file dialog's IO directory for the given Parameter.
+
+        Parameters
+        ----------
+        path : str
+            The path to the new directory.
+        """
+        self.io_dialog.set_curr_dir(id(self), path)

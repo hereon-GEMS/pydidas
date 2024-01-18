@@ -29,6 +29,8 @@ Bugfixes
   was wrong.
 - Fixed an issue with the error message due to missing parameters in the 
   run_pydidas_workflow script.
+- Fixed an issue with the ResultSelectionWidget call of the 
+  ShowInformationForResult window.
 
 
 v23.12.08

@@ -37,7 +37,11 @@ from typing import Union
 from qtpy import QtWidgets
 from sphinx.cmd import build
 
-from .get_documentation_targets import DOC_HOME_FILENAME, DOC_MAKE_DIRECTORY
+from .get_documentation_targets import (
+    DOC_BUILD_DIRECTORY,
+    DOC_HOME_FILENAME,
+    DOC_SOURCE_DIRECTORY,
+)
 
 
 def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
@@ -82,7 +86,7 @@ def run_sphinx_html_build(
     if "sphinx-build" in sys.argv[0] or "-m unittest" in sys.argv[0]:
         return
     if build_dir is None:
-        build_dir = os.path.join(DOC_MAKE_DIRECTORY, "build", "html")
+        build_dir = os.path.join(DOC_BUILD_DIRECTORY, "html")
     if verbose:
         print("=" * 60)
         print("-" * 60)
@@ -102,4 +106,4 @@ def run_sphinx_html_build(
                         "Building html documentation (required only once during first "
                         "startup)"
                     )
-    build.main([os.path.join(DOC_MAKE_DIRECTORY, "source"), build_dir])
+    build.main([os.path.join(DOC_SOURCE_DIRECTORY, "src"), build_dir])

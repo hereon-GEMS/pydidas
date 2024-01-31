@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,13 @@ URLs for the documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "DOC_MAKE_DIRECTORY",
+    "DOC_BUILD_DIRECTORY",
+    "DOC_SOURCE_DIRECTORY",
     "DOC_HOME_FILENAME",
     "DOC_HOME_ADDRESS",
     "DOC_HOME_QURL",
@@ -75,9 +76,7 @@ def doc_filename_for_window_manual(name: str) -> str:
     str
         The full filename for the window manual.
     """
-    _docdir = os.path.join(
-        DOC_MAKE_DIRECTORY, "build", "html", "manuals", "gui", "windows"
-    )
+    _docdir = os.path.join(DOC_BUILD_DIRECTORY, "html", "manuals", "gui", "windows")
     return os.path.join(_docdir, f"{name}.html")
 
 
@@ -115,7 +114,7 @@ def doc_filename_for_frame_manual(name: str) -> str:
         The full filename for the frame manual.
     """
     return os.path.join(
-        DOC_MAKE_DIRECTORY, "build", "html", "manuals", "gui", "frames", f"{name}.html"
+        DOC_BUILD_DIRECTORY, "html", "manuals", "gui", "frames", f"{name}.html"
     )
 
 
@@ -142,18 +141,33 @@ def _doc_home_filename() -> str:
     _docfile : str
         The full path and filename of the index.html file.
     """
-    _docfile = os.path.join(_doc_make_directory(), "build", "html", "index.html")
+    _docfile = os.path.join(_doc_make_directory(), "html", "index.html")
     return _docfile
 
 
 def _doc_make_directory() -> str:
     """
-    Get the directory with the documentation make files.
+    Get the output directory for the sphinx documentation.
 
     Returns
     -------
     str
-        The directory name of the directory with the make files.
+        The sphinx output directory.
+    """
+    _name = __file__
+    for _ in range(3):
+        _name = os.path.dirname(_name)
+    return os.path.join(_name, "sphinx")
+
+
+def _doc_source_directory() -> str:
+    """
+    Get the source directory of the sphinx documentation.
+
+    Returns
+    -------
+    str
+        The directory with name of the directory with the make files.
     """
     _name = __file__
     for _ in range(3):
@@ -174,6 +188,7 @@ def _get_doc_home_qurl() -> QtCore.QUrl:
 
 
 DOC_HOME_QURL = _get_doc_home_qurl()
-DOC_MAKE_DIRECTORY = _doc_make_directory()
+DOC_BUILD_DIRECTORY = _doc_make_directory()
+DOC_SOURCE_DIRECTORY = _doc_source_directory()
 DOC_HOME_FILENAME = _doc_home_filename()
 DOC_HOME_ADDRESS = _doc_home_address()

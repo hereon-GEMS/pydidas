@@ -362,9 +362,9 @@ Improvements
       python main.
     - The PluginCollection now uses the pathlib library instead of strings for 
       management of files and paths.
-    - contexts.scan_contexts importers can now select which Scan instance to 
+    - contexts.scans importers can now select which Scan instance to 
       import to.
-    - contexts.diffraction_exp_context importers can now select which 
+    - contexts.diff_exp importers can now select which 
       DiffractionExperiment instance to import to.
     - Added an update_from_tree method to the WorkflowTree.
     - Added 'counted_images_per_file' Parameter to hdf5 loaders to allow 

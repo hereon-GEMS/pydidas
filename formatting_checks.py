@@ -26,12 +26,18 @@ __status__ = "Production"
 
 import fnmatch
 import os
+import re
 import subprocess
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
 from pydidas.core.utils import timed_print
+
+
+THIS_YEAR = datetime.fromtimestamp(time.time()).year
+SUFFIX_WHITELIST = [".py", ".rst", "", ".cff", ".md", ".in", ".toml"]
 
 
 def run_black():
@@ -67,39 +73,92 @@ def run_reuse():
     try:
         subprocess.run(["python", "-m", "reuse", "--root", ".", "lint"], check=True)
     except subprocess.CalledProcessError as e:
-        print(f"Checking with flake8 failed. Error: {e}")
+        print(f"Checking with reuse failed. Error: {e}")
+
+
+def _update_long_copyright(match: re.Match) -> str:
+    """
+    Update the matched string with the current year.
+
+    Parameters
+    ----------
+    match : re.Match
+        The regular expression match.
+
+    Returns
+    -------
+    str
+        The updated string.
+    """
+    return match.group()[:-5] + f"{THIS_YEAR},"
+
+
+def _update_short_copyright(match: re.Match) -> str:
+    """
+    Update the matched short string with the current year.
+
+    Parameters
+    ----------
+    match : re.Match
+        The regular expression match.
+
+    Returns
+    -------
+    str
+        The updated string.
+    """
+    _input = match.group()
+    if _input[-5:] == f"{THIS_YEAR},":
+        return _input
+    return match.group()[:-1] + f" - {THIS_YEAR},"
 
 
 def run_update_copyright():
     """Update the copyright year based on the files modification date"""
+    timed_print("Checking pydidas copyright information...", new_lines=1)
+
     _check_copyright = "--check-copyright" in sys.argv
     _display_copyright = "--display-copyright" in sys.argv
     _update_copyright = "--update-copyright" in sys.argv or "--all" in sys.argv
 
-    timed_print("Checking pydidas copyright information...", new_lines=1)
-    _current_year = datetime.fromtimestamp(time.time()).year
+    _regex_full = re.compile("Copyright 20[0-9][0-9][ ]?-[ ]?20[0-9][0-9],")
+    _regex_short = re.compile("Copyright 20\d\d,")
+    _this_dir = Path(__file__).parent
+    os.chdir(_this_dir)
+    _git_files = (
+        subprocess.check_output("git ls-files", shell=True).decode().strip().split("\n")
+    )
     _filelist = []
-    for _base, _dirs, _files in os.walk(os.path.dirname(__file__)):
+    for _base, _dirs, _files in os.walk(_this_dir):
         if ".git" in _dirs:
             _dirs.remove(".git")
-        _matches = fnmatch.filter(_files, "*.py")
-        _filelist.extend(os.path.join(_base, _fname) for _fname in _matches)
+        _matches = fnmatch.filter(_files, "*.py") + fnmatch.filter(_files, "*.rst")
+        _filelist.extend(Path(_base).joinpath(_fname) for _fname in _matches)
+
+    for _name in _git_files:
+        _fname = _this_dir.joinpath(_name)
+        if _fname.suffix not in SUFFIX_WHITELIST or "LICENSES" in str(_fname):
+            continue
+        if _fname.is_file() and _fname not in _filelist:
+            _filelist.append(_fname)
+    _filelist.remove(Path(__file__))
     for _fname in _filelist:
-        _modified_year = datetime.fromtimestamp(os.path.getmtime(_fname)).year
-        if _modified_year < _current_year:
+        if datetime.fromtimestamp(os.path.getmtime(_fname)).year < THIS_YEAR:
             continue
         with open(_fname, "r") as f:
             _contents = f.read()
-        if f"Copyright {_current_year - 1}" not in _contents:
+        _original = _contents[:]
+        if _regex_full.search(_contents) is not None:
+            _contents = re.sub(_regex_full, _update_long_copyright, _contents)
+        if _regex_short.search(_contents) is not None:
+            _contents = re.sub(_regex_short, _update_short_copyright, _contents)
+        if _contents == _original:
             continue
         if _check_copyright:
             sys.exit(os.EX_SOFTWARE)
         if _display_copyright:
             print("Outdated copyright on file:", _fname)
         if _update_copyright:
-            _contents = _contents.replace(
-                f"Copyright {_current_year - 1}", f"Copyright {_current_year}"
-            )
             with open(_fname, "w") as f:
                 f.write(_contents)
             print("Updated copyright on file:", _fname)

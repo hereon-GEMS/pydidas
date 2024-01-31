@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["remove_pydidas_from_system"]
+__all__ = ["remove_pydidas"]
 
 
 import os
@@ -35,7 +35,7 @@ import sys
 from qtpy import QtCore
 
 
-def remove_pydidas_from_system():
+def remove_pydidas():
     """
     Clear all stored pydidas QSettings and all local logs and config files.
     """
@@ -104,4 +104,4 @@ def remove_pydidas_from_system():
 
 
 if __name__ == "__main__":
-    remove_pydidas_from_system()
+    remove_pydidas()

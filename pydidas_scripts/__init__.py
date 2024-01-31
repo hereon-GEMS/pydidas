@@ -31,5 +31,5 @@ __status__ = "Production"
 
 from . import clear_local_settings
 from . import pydidas_gui
-from . import remove_pydidas_from_system
+from . import remove_pydidas
 from . import remove_local_files

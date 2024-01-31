@@ -35,8 +35,8 @@ from qtpy import QtCore
 from pydidas_qtcore import PydidasQApplication
 
 from ..contexts import DiffractionExperimentContext, ScanContext
-from ..contexts.diffraction_exp_context import DiffractionExperiment
-from ..contexts.scan_context import Scan
+from ..contexts.diff_exp import DiffractionExperiment
+from ..contexts.scan import Scan
 from ..core import UserConfigError
 from ..multiprocessing import AppRunner
 from ..workflow import ProcessingTree, WorkflowResultsContext, WorkflowTree

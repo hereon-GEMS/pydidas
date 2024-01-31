@@ -36,7 +36,7 @@ import numpy as np
 from qtpy import QtCore
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
-from ...contexts.diffraction_exp_context import DiffractionExperiment
+from ...contexts.diff_exp import DiffractionExperiment
 from ...core import get_generic_param_collection
 from ...core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
 from ...core.utils import ShowBusyMouse

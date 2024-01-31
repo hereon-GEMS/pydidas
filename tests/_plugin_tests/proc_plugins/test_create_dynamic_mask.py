@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,7 @@ import numpy as np
 import scipy.ndimage
 from qtpy import QtCore
 
-from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
+from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import UserConfigError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection

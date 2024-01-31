@@ -47,7 +47,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.plot.tools import ImageToolBar
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
-from ...contexts.diffraction_exp_context import DiffractionExperiment
+from ...contexts.diff_exp import DiffractionExperiment
 from ...core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
 from ...widgets import PydidasFileDialog, silx_plot
 from ...widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin

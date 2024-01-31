@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ singleton class for storing and accessing the composite results of the processin
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,8 +37,8 @@ import numpy as np
 from qtpy import QtCore
 
 from ..contexts import DiffractionExperimentContext, ScanContext
-from ..contexts.diffraction_exp_context import DiffractionExperiment
-from ..contexts.scan_context import Scan
+from ..contexts.diff_exp import DiffractionExperiment
+from ..contexts.scan import Scan
 from ..core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
 from .processing_tree import ProcessingTree
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER

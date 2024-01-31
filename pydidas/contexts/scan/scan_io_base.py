@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ ScanContext should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,8 @@ from typing import Optional
 from ...core import UserConfigError
 from ...core.generic_params import SCAN_GENERIC_PARAM_NAMES
 from ...core.io_registry import GenericIoBase
-from .scan_context import Scan, ScanContext
+from .scan import Scan
+from .scan_context import ScanContext
 from .scan_io import ScanIo
 
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ DiffractionExperimentContext metadata from a pyFAI poni file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,9 +33,9 @@ from typing import Union
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_M_TO_E
-from .diffraction_experiment import DiffractionExperiment
-from .diffraction_experiment_context import DiffractionExperimentContext
-from .diffraction_experiment_io_base import DiffractionExperimentIoBase
+from .diff_exp import DiffractionExperiment
+from .diff_exp_context import DiffractionExperimentContext
+from .diff_exp_io_base import DiffractionExperimentIoBase
 
 
 EXP = DiffractionExperimentContext()

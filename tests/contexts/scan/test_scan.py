@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-noly"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,13 +28,12 @@ import unittest
 
 import numpy as np
 
-from pydidas.contexts import ScanContext
-from pydidas.contexts.scan_context import Scan
+from pydidas.contexts import Scan
 from pydidas.core import UserConfigError
 from pydidas.core.utils import get_random_string
 
 
-class TestScanContext(unittest.TestCase):
+class TestScan(unittest.TestCase):
     def setUp(self):
         self._scan_shape = (5, 7, 3, 2)
         self._scan_delta = (0.1, 0.5, 1, 1.5)
@@ -69,10 +68,6 @@ class TestScanContext(unittest.TestCase):
 
     def test_init(self):
         SCAN = Scan()
-        self.assertIsInstance(SCAN, Scan)
-
-    def test_init_singleton(self):
-        SCAN = ScanContext()
         self.assertIsInstance(SCAN, Scan)
 
     def test_n_total(self):

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,24 +18,26 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
-import shutil
-import tempfile
 import unittest
 
-from pydidas.contexts.scan_context import Scan, ScanContext, ScanIo, ScanIoBase
+from pydidas.contexts.diff_exp import (
+    DiffractionExperiment,
+    DiffractionExperimentContext,
+    DiffractionExperimentIo,
+    DiffractionExperimentIoBase,
+)
 
 
-SCAN = ScanContext()
+EXP = DiffractionExperimentContext()
 
 
-class TestIo(ScanIoBase):
+class TestIo(DiffractionExperimentIoBase):
     extensions = ["test"]
     format_name = "Test"
 
@@ -45,6 +47,7 @@ class TestIo(ScanIoBase):
         cls.exported = False
         cls.export_filename = None
         cls.import_filename = None
+        cls.diffraction_exp = None
 
     @classmethod
     def export_to_file(cls, filename, **kwargs):
@@ -52,53 +55,51 @@ class TestIo(ScanIoBase):
         cls.export_filename = filename
 
     @classmethod
-    def import_from_file(cls, filename, scan):
+    def import_from_file(cls, filename, diffraction_exp=None):
         cls.imported = True
-        cls.scan = SCAN if scan is None else scan
+        cls.diffraction_exp = EXP if diffraction_exp is None else diffraction_exp
         cls.import_filename = filename
 
 
-class TestScanIo(unittest.TestCase):
+class TestDiffractionExperimentIo(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._original_registry = ScanIo.registry.copy()
-        ScanIo.clear_registry()
-        ScanIo.register_class(TestIo)
+        cls._original_registry = DiffractionExperimentIo.registry.copy()
+        DiffractionExperimentIo.clear_registry()
+        DiffractionExperimentIo.register_class(TestIo)
 
     @classmethod
     def tearDownClass(cls):
-        ScanIo.registry = cls._original_registry
+        DiffractionExperimentIo.registry = cls._original_registry
 
     def setUp(self):
-        self._tmppath = tempfile.mkdtemp()
         TestIo.reset()
 
     def tearDown(self):
-        shutil.rmtree(self._tmppath)
-        SCAN.restore_all_defaults(True)
+        EXP.restore_all_defaults(True)
 
     def test_export_to_file(self):
-        _fname = os.path.join(self._tmppath, "test.test")
-        ScanIo.export_to_file(_fname)
+        _fname = "test.test"
+        DiffractionExperimentIo.export_to_file(_fname)
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
 
-    def test_import_from_file__generic_ScanContext(self):
-        _fname = os.path.join(self._tmppath, "test.test")
-        ScanIo.import_from_file(_fname)
+    def test_import_from_file__generic(self):
+        _fname = "test.test"
+        DiffractionExperimentIo.import_from_file(_fname)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
-        self.assertEqual(TestIo.scan, SCAN)
+        self.assertEqual(TestIo.diffraction_exp, EXP)
 
-    def test_import_from_file__given_Scan(self):
-        _fname = os.path.join(self._tmppath, "test.test")
-        _scan = Scan()
-        ScanIo.import_from_file(_fname, scan=_scan)
+    def test_import_from_file__given_Exp(self):
+        _exp = DiffractionExperiment()
+        _fname = "test.test"
+        DiffractionExperimentIo.import_from_file(_fname, diffraction_exp=_exp)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
-        self.assertEqual(TestIo.scan, _scan)
+        self.assertEqual(TestIo.diffraction_exp, _exp)
 
 
 if __name__ == "__main__":
     unittest.main()
-    ScanIo.clear_registry()
+    DiffractionExperimentIo.clear_registry()

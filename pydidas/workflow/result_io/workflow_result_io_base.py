@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,7 +32,7 @@ import re
 from pathlib import Path
 from typing import Union
 
-from ...contexts.scan_context import Scan
+from ...contexts.scan import Scan
 from ...core import Dataset
 from ...core.io_registry import GenericIoBase
 from .workflow_result_io_meta import WorkflowResultIoMeta
@@ -216,7 +216,7 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         ----------
         metadata : dict
             The metadata dictionary with results of one frame for each node.
-        scan : Union[pydidas.contexts.scan_context.Scan, None], optional
+        scan : Union[pydidas.contexts.scan.Scan, None], optional
             The Scan instance. If None, this will default to the generic ScanContext.
             The default is None.
         """

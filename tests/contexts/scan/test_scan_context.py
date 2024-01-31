@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,35 +18,28 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0-only"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-noly"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import logging
 import unittest
 
-from pydidas.contexts.diffraction_exp_context import (
-    DiffractionExperiment,
-    DiffractionExperimentContext,
-)
+from pydidas.contexts import ScanContext
+from pydidas.contexts.scan import Scan
 
 
-logger = logging.getLogger("pyFAI.detectors._common")
-logger.setLevel(logging.CRITICAL)
-
-
-class TestDiffractionExperimentContext(unittest.TestCase):
+class TestScanContext(unittest.TestCase):
     def setUp(self):
         ...
 
     def tearDown(self):
         ...
 
-    def test_creation(self):
-        obj = DiffractionExperimentContext()
-        self.assertIsInstance(obj, DiffractionExperiment)
+    def test_init_singleton(self):
+        SCAN = ScanContext()
+        self.assertIsInstance(SCAN, Scan)
 
 
 if __name__ == "__main__":

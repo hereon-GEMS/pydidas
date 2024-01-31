@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ ScanContext metadata from a YAML file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,8 @@ from typing import Union
 import yaml
 
 from ...core.constants import YAML_EXTENSIONS
-from .scan_context import Scan, ScanContext
+from .scan import Scan
+from .scan_context import ScanContext
 from .scan_io_base import ScanIoBase
 
 
@@ -73,7 +74,7 @@ class ScanIoYaml(ScanIoBase):
         ----------
         filename : str
             The filename of the file to be written.
-        scan : Union[None, pydidas.contexts.scan_context.Scan], optional
+        scan : Union[None, pydidas.contexts.scan.Scan], optional
             The Scan instance to be updated. If None, the ScanContext instance is used.
             The default is None.
         """

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ about the experiment independant from the individual frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -43,7 +43,7 @@ from ...core import (
 )
 from ...core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
 from ...core.utils import NoPrint
-from .diffraction_experiment_io import DiffractionExperimentIo
+from .diff_exp_io import DiffractionExperimentIo
 
 
 class DiffractionExperiment(ObjectWithParameterCollection):
@@ -55,7 +55,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
     The singleton factory will allow access to the single instance through
     :py:class:`
-    pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext`.
+    pydidas.contexts.diff_exp.DiffractionExperimentContext`.
     """
 
     default_params = get_generic_param_collection(

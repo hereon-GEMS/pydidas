@@ -11,12 +11,12 @@ name: formatting checks
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "develop" ]
 
 jobs:
-  code_checks:
+  code_check_setup:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -36,15 +36,34 @@ jobs:
         python -m pip install reuse
         python -m pip install isort
 
+  check_black:
+    needs: code_check_setup
+    runs-on: ubuntu-latest
+    steps:
     - name: Code formatting with black
-      run: |
-        python -m black . --check
+        run: |
+          python -m black . --check
+
+  check_flake8:
+    needs: code_check_setup
+    runs-on: ubuntu-latest
+    steps:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         python -m flake8 --config .flake8 --exit-zero
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+
+  check_reuse:
+    needs: code_check_setup
+    runs-on: ubuntu-latest
+    steps:
     - name: Reuse check
       uses: fsfe/reuse-action@v2
+
+  check_isort:
+    needs: code_check_setup
+    runs-on: ubuntu-latest
+    steps:
     - name: isort checks
       uses: isort/isort-action@master

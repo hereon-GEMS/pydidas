@@ -122,7 +122,7 @@ def run_update_copyright():
     _update_copyright = "--update-copyright" in sys.argv or "--all" in sys.argv
 
     _regex_full = re.compile("Copyright 20[0-9][0-9][ ]?-[ ]?20[0-9][0-9],")
-    _regex_short = re.compile("Copyright 20\d\d,")
+    _regex_short = re.compile("Copyright 20[0-9][0-9],")
     _this_dir = Path(__file__).parent
     os.chdir(_this_dir)
     _git_files = (
@@ -148,10 +148,8 @@ def run_update_copyright():
         with open(_fname, "r") as f:
             _contents = f.read()
         _original = _contents[:]
-        if _regex_full.search(_contents) is not None:
-            _contents = re.sub(_regex_full, _update_long_copyright, _contents)
-        if _regex_short.search(_contents) is not None:
-            _contents = re.sub(_regex_short, _update_short_copyright, _contents)
+        _contents = re.sub(_regex_full, _update_long_copyright, _contents)
+        _contents = re.sub(_regex_short, _update_short_copyright, _contents)
         if _contents == _original:
             continue
         if _check_copyright:

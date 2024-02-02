@@ -41,8 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Code formatting with black
-        run: |
-          python -m black . --check
+      run: |
+        python -m black . --check
 
   check_flake8:
     needs: code_check_setup

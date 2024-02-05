@@ -33,14 +33,6 @@ jobs:
       run: |
         python -m black . --check
   
-  check_black_action:
-    runs-on: ubuntu-latest   
-    steps:
-    - name: Check out source repository
-      uses: actions/checkout@v3
-    - name: Black linting
-      uses: psf/black@stable
-
   check_flake8:
     runs-on: ubuntu-latest
     steps:

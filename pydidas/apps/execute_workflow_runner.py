@@ -50,7 +50,6 @@ EXP = DiffractionExperimentContext()
 
 
 class ExecuteWorkflowRunner(QtCore.QObject):
-
     """
     Class to run pydidas workflows from the command line with parallelization.
 

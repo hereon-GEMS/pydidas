@@ -40,8 +40,7 @@ class TestScan(unittest.TestCase):
         self._scan_offset = (3, -1, 0, 0.5)
         self._scan_dim = 4
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def set_scan_params(self, _scan):
         _scan.set_param_value("scan_dim", self._scan_dim)

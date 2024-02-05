@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -160,11 +160,9 @@ class TestRemoveOutliers(unittest.TestCase):
             cls._data[_i0:_i_end] += _noise[_i0:_i_end]
             cls._is_noisy[_i0:_i_end] = True
 
-    def setUp(self):
-        ...
+    def setUp(self): ...
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def get_peak_positions(self, threshold, kernel_width):
         _correct_peaks = []

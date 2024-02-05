@@ -31,19 +31,17 @@ from pathlib import Path
 from qtpy import QtCore
 
 from pydidas.core.utils import (
-    DOC_SOURCE_DIRECTORY,
     DOC_HOME_ADDRESS,
     DOC_HOME_FILENAME,
     DOC_HOME_QURL,
+    DOC_SOURCE_DIRECTORY,
 )
 
 
 class TestGetDocQUrl(unittest.TestCase):
-    def setUp(self):
-        ...
+    def setUp(self): ...
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def test_DOC_SOURCE_DIRECTORY(self):
         _dir = DOC_SOURCE_DIRECTORY

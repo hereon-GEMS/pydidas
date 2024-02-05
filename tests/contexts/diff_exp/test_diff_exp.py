@@ -61,11 +61,9 @@ class TestDiffractionExperiment(unittest.TestCase):
         cls._xpos_abs = cls._xpos * 75e-6
         cls._ypos_abs = cls._ypos * 75e-6
 
-    def setUp(self):
-        ...
+    def setUp(self): ...
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def prepare_context_with_Eiger(self):
         obj = DiffractionExperiment()

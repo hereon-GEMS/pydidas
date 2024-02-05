@@ -41,7 +41,12 @@ from pydidas.contexts.scan import Scan, ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError, get_generic_parameter
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
-from pydidas.unittest_objects import DummyLoader, DummyProc, create_hdf5_io_file
+from pydidas.unittest_objects import (
+    DummyLoader,
+    DummyProc,
+    DummyProcNewDataset,
+    create_hdf5_io_file,
+)
 from pydidas.workflow import WorkflowResults, WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas_qtcore import PydidasQApplication
@@ -105,9 +110,10 @@ class TestWorkflowResults(unittest.TestCase):
         TREE.nodes[0].plugin.set_param_value("image_height", self._input_shape[0])
         TREE.nodes[0].plugin.set_param_value("image_width", self._input_shape[1])
         TREE.create_and_add_node(DummyProc())
-        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
+        TREE.create_and_add_node(
+            DummyProcNewDataset(output_shape=self._result2_shape), parent=TREE.root
+        )
         TREE.prepare_execution()
-        TREE.nodes[2]._result_shape = self._result2_shape
 
     def generate_test_datasets(self):
         _shape1 = self._input_shape
@@ -202,8 +208,7 @@ class TestWorkflowResults(unittest.TestCase):
         }
         return {1: _meta1, 2: _meta2}
 
-    def test_init(self):
-        ...
+    def test_init(self): ...
 
     def test_prepare_files_for_saving__simple(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -291,9 +296,7 @@ class TestWorkflowResults(unittest.TestCase):
         _ndim = RES.ndims[_node] - SCAN.get_param_value("scan_dim") + 1
         _data = RES.get_results_for_flattened_scan(_node)
         self.assertEqual(_data.ndim, _ndim)
-        self.assertEqual(
-            _data.shape, (SCAN.n_points,) + TREE.nodes[_node]._result_shape
-        )
+        self.assertEqual(_data.shape, (SCAN.n_points,) + TREE.nodes[_node].result_shape)
 
     def test_get_result_metadata(self):
         _tmpres = np.random.random((50, 50))

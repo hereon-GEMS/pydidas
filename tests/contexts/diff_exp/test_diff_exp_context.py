@@ -38,11 +38,9 @@ logger.setLevel(logging.CRITICAL)
 
 
 class TestDiffractionExperimentContext(unittest.TestCase):
-    def setUp(self):
-        ...
+    def setUp(self): ...
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def test_creation(self):
         obj = DiffractionExperimentContext()

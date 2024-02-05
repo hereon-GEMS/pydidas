@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -47,31 +47,25 @@ class TestClass:
 
 
 class Test_copy_docstring(unittest.TestCase):
-    def setUp(self):
-        ...
+    def setUp(self): ...
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def test_copy_from_class(self):
         class NewTest:
-            def __init__(self):
-                ...
+            def __init__(self): ...
 
             @copy_docstring(TestClass)
-            def method1(self):
-                ...
+            def method1(self): ...
 
         self.assertEqual(NewTest.method1.__doc__, TestClass.method1.__doc__)
 
     def test_copy_from_method(self):
         class NewTest:
-            def __init__(self):
-                ...
+            def __init__(self): ...
 
             @copy_docstring(TestClass.method2)
-            def method3(self):
-                ...
+            def method3(self): ...
 
         self.assertEqual(NewTest.method3.__doc__, TestClass.method2.__doc__)
 

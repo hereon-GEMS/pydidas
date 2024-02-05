@@ -1,6 +1,22 @@
 .. Copyright 2024, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
+v24.
+=========
+
+
+Improvements
+------------
+
+- Changed a number of filenames and paths (mainly in the documentation) to 
+  reduce the total length of the file names.
+- Updated files to new black 2024 style.
+
+Bugfixes
+--------
+- 
+
+
 v24.01.18
 =========
 

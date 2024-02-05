@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,7 @@ import numpy as np
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError
-from pydidas.unittest_objects import DummyLoader, DummyProc
+from pydidas.unittest_objects import DummyLoader, DummyProc, DummyProcNewDataset
 from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
@@ -86,11 +86,13 @@ class TestWorkflowResultSelector(unittest.TestCase):
         TREE.nodes[0].plugin.set_param_value("image_height", self._result1_shape[0])
         TREE.nodes[0].plugin.set_param_value("image_width", self._result1_shape[1])
         TREE.create_and_add_node(DummyProc())
-        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
-        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
+        TREE.create_and_add_node(
+            DummyProcNewDataset(output_shape=self._result2_shape), parent=TREE.root
+        )
+        TREE.create_and_add_node(
+            DummyProcNewDataset(output_shape=(1,)), parent=TREE.root
+        )
         TREE.prepare_execution()
-        TREE.nodes[2]._result_shape = self._result2_shape
-        TREE.nodes[3]._result_shape = (1,)
 
     def populate_WorkflowResults(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -125,8 +127,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
             np.random.random(self._scan_n + self._result2_shape) + 0.0001
         )
 
-    def test_unitttest_setUp(self):
-        ...
+    def test_unitttest_setUp(self): ...
 
     def test_populate_WorkflowResults(self):
         self.populate_WorkflowResults()

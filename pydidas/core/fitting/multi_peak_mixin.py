@@ -34,7 +34,6 @@ from numpy import delete, ndarray, r_
 
 
 class MultiPeakMixin:
-
     """
     Mix-In class with common functionality for FitFuncs with multiple peaks.
     """

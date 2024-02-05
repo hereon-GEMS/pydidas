@@ -31,11 +31,9 @@ from pydidas.contexts.scan import Scan
 
 
 class TestScanContext(unittest.TestCase):
-    def setUp(self):
-        ...
+    def setUp(self): ...
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def test_init_singleton(self):
         SCAN = ScanContext()

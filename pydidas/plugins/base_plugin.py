@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ and OutputPlugin base classes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -494,7 +494,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["input_shape"] = new_shape
 
     @property
-    def result_shape(self) -> tuple:
+    def result_shape(self) -> Union[tuple, None]:
         """
         Get the shape of the plugin result.
 
@@ -508,9 +508,10 @@ class BasePlugin(ObjectWithParameterCollection):
 
         Returns
         -------
-        tuple
+        Union[tuple, None]
             The shape of the results with a value for each dimension. Unknown
-            dimensions are represented as -1 value.
+            dimensions are represented as -1 value. If no result shape has been
+            calculated yet, return None.
         """
         return self._config["result_shape"]
 

@@ -63,13 +63,13 @@ def parse_cmd_args():
     dict :
         The parsed command line arguments.
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog="pydidas", add_help=False)
     parser.add_argument(
         "-fontsize",
         type=int,
         help="The standard font size in points.",
     )
-    parser.add_argument("--qt6", action="store_true")
+    parser.add_argument("--qt6", action="store_true", help="Use Qt6 instead of Qt5.")
 
     _args, _unknown = parser.parse_known_args()
     _kwargs = {_key: _val for _key, _val in vars(_args).items() if _val is not None}

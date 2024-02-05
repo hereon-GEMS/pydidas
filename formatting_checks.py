@@ -38,22 +38,64 @@ from pydidas.core.utils import timed_print
 
 THIS_YEAR = datetime.fromtimestamp(time.time()).year
 SUFFIX_WHITELIST = [".py", ".rst", "", ".cff", ".md", ".in", ".toml"]
+HELP_TEXT = """
+Formatting checks for pydidas
+=============================
+
+Supported python modules are:
+1. black for automatic code re-formatting.
+2. isort for import re-organisation.
+3. flake8 for style guide checks.
+4. reuse for copyright information checking.
+
+In addition, a function to update the copyright in changed files to be consistent
+with the year of the change is included.
+
+Usage
+-----
+Individual modules can be selected by the '--<modulename>' argument.
+The copyright update can be selected with the '--copyright' argument.
+All modules can be run with the '--all' argument.
+
+If only a check but no update is desired, use the '--check' argument. Omitting
+the '--check' argument will update files to comply with the formatting
+(for black, isort and copyright).
+
+Examples
+--------
+1. Check all formatting modules (without updating any files):
+    python formatting_checks.py --all --check
+2. Run black and update all files:
+    python formatting_checks.py --black
+"""
 
 
 def run_black():
     """Run the black module for the current directory."""
-    timed_print("Starting re-formatting with black...", new_lines=1)
+    _check = "--check" in sys.argv
+    timed_print(
+        "Starting re-formatting " + ("check " if _check else "") + "with black...",
+        new_lines=1,
+    )
+    _cmd = ["python", "-m", "black", "."] + (["--check"] if _check else [])
     try:
-        subprocess.run(["python", "-m", "black", "."], check=True)
+        subprocess.run(_cmd, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Formatting with black failed. Error: {e}")
 
 
 def run_isort():
     """Run the isort module in the current directory."""
-    timed_print("Starting import re-organization with isort...", new_lines=1)
+    _check = "--check" in sys.argv
+    timed_print(
+        "Starting import re-organization "
+        + ("check " if _check else "")
+        + "with isort...",
+        new_lines=1,
+    )
+    _cmd = ["python", "-m", "isort", "."] + (["--check"] if _check else [])
     try:
-        subprocess.run(["python", "-m", "isort", "."], check=True)
+        subprocess.run(_cmd, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Formatting with isort failed. Error: {e}")
 
@@ -76,23 +118,6 @@ def run_reuse():
         print(f"Checking with reuse failed. Error: {e}")
 
 
-def _update_long_copyright(match: re.Match) -> str:
-    """
-    Update the matched string with the current year.
-
-    Parameters
-    ----------
-    match : re.Match
-        The regular expression match.
-
-    Returns
-    -------
-    str
-        The updated string.
-    """
-    return match.group()[:-5] + f"{THIS_YEAR},"
-
-
 def _update_short_copyright(match: re.Match) -> str:
     """
     Update the matched short string with the current year.
@@ -113,14 +138,38 @@ def _update_short_copyright(match: re.Match) -> str:
     return match.group()[:-1] + f" - {THIS_YEAR},"
 
 
-def run_update_copyright():
-    """Update the copyright year based on the files modification date"""
+def _update_long_copyright(match: re.Match) -> str:
+    """
+    Update the matched string with the current year.
+
+    Parameters
+    ----------
+    match : re.Match
+        The regular expression match.
+
+    Returns
+    -------
+    str
+        The updated string.
+    """
+    return match.group()[:-5] + f"{THIS_YEAR},"
+
+
+def run_copyright_check():
+    """
+    Update the copyright year based on the files modification date
+
+    Usage:
+
+    """
+
     timed_print("Checking pydidas copyright information...", new_lines=1)
 
-    _check_copyright = "--check-copyright" in sys.argv
-    _display_copyright = "--display-copyright" in sys.argv
-    _update_copyright = "--update-copyright" in sys.argv or "--all" in sys.argv
+    _check_copyright = "--check" in sys.argv
+    _display_copyright = "--display" in sys.argv or _check_copyright
+    _update_copyright = not _check_copyright
 
+    _copyright_outdated = False
     _regex_full = re.compile("Copyright 20[0-9][0-9][ ]?-[ ]?20[0-9][0-9],")
     _regex_short = re.compile("Copyright 20[0-9][0-9],")
     _this_dir = Path(__file__).parent
@@ -137,9 +186,11 @@ def run_update_copyright():
 
     for _name in _git_files:
         _fname = _this_dir.joinpath(_name)
-        if _fname.suffix not in SUFFIX_WHITELIST or "LICENSES" in str(_fname):
-            continue
-        if _fname.is_file() and _fname not in _filelist:
+        if (
+            _fname.is_file()
+            and _fname not in _filelist
+            and (_fname.suffix in SUFFIX_WHITELIST or "LICENSES" in str(_fname))
+        ):
             _filelist.append(_fname)
     _filelist.remove(Path(__file__))
     for _fname in _filelist:
@@ -152,17 +203,23 @@ def run_update_copyright():
         _contents = re.sub(_regex_short, _update_short_copyright, _contents)
         if _contents == _original:
             continue
-        if _check_copyright:
-            sys.exit(os.EX_SOFTWARE)
+        _copyright_outdated = True
         if _display_copyright:
             print("Outdated copyright on file:", _fname)
         if _update_copyright:
             with open(_fname, "w") as f:
                 f.write(_contents)
             print("Updated copyright on file:", _fname)
+    if _check_copyright and _copyright_outdated:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
+    if "--check" in sys.argv and len(sys.argv) < 3:
+        sys.argv.append("--all")
+    if "--help" in sys.argv or len(sys.argv) < 2:
+        print(HELP_TEXT)
+        sys.exit()
     if "--black" in sys.argv or "--all" in sys.argv:
         run_black()
     if "--isort" in sys.argv or "--all" in sys.argv:
@@ -171,10 +228,5 @@ if __name__ == "__main__":
         run_flake8()
     if "--reuse" in sys.argv or "--all" in sys.argv:
         run_reuse()
-    if (
-        "--check-copyright" in sys.argv
-        or "--update-copyright" in sys.argv
-        or "--display-copyright" in sys.argv
-        or "--all" in sys.argv
-    ):
-        run_update_copyright()
+    if "--copyright" in sys.argv or "--all" in sys.argv:
+        run_copyright_check()

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ with additional support for plugins and a plugin chain.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -50,7 +50,7 @@ class WorkflowNode(GenericNode):
     chain through the WorkflowTree.
     """
 
-    kwargs_for_copy_creation = ["plugin", "node_id", "_result_shape"]
+    kwargs_for_copy_creation = ["plugin", "node_id"]
 
     def __init__(self, **kwargs: dict):
         self.__preprocess_kwargs(kwargs)
@@ -59,7 +59,6 @@ class WorkflowNode(GenericNode):
         self.node_id = self.__tmp_node_id
         self.results = None
         self.result_kws = None
-        self._result_shape = None
         self.runtime = -1
 
     def __preprocess_kwargs(self, kwargs: dict):
@@ -285,7 +284,6 @@ class WorkflowNode(GenericNode):
         """
         self.plugin.update_legacy_image_ops_with_this_plugin()
         self.plugin.calculate_result_shape()
-        self._result_shape = self.plugin.result_shape
 
     def propagate_to_children(self):
         """
@@ -309,7 +307,7 @@ class WorkflowNode(GenericNode):
             Returns the shape of the Plugin's results, if it has been
             calculated. Else, returns None.
         """
-        return self._result_shape
+        return self.plugin.result_shape
 
     def __hash__(self) -> int:
         """

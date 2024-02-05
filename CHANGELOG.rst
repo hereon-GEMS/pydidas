@@ -14,7 +14,7 @@ Improvements
 
 Bugfixes
 --------
-- 
+- Fixed an issue with propagation of plugin result shapes for fitting plugins.
 
 
 v24.01.18

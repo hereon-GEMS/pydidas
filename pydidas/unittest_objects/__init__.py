@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ apart from substituting for other object in unittests.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -35,6 +35,7 @@ from .create_hdf5_io_file_ import *
 from .dummy_loader import *
 from .dummy_plugin_collection import *
 from .dummy_proc import *
+from .dummy_proc_new_dataset import *
 from .local_plugin_collection import *
 from .mp_test_app import *
 from .parametrized_sub_tests_ import *
@@ -65,6 +66,11 @@ from . import dummy_proc
 
 __all__.extend(dummy_proc.__all__)
 del dummy_proc
+
+from . import dummy_proc_new_dataset
+
+__all__.extend(dummy_proc_new_dataset.__all__)
+del dummy_proc_new_dataset
 
 from . import local_plugin_collection
 

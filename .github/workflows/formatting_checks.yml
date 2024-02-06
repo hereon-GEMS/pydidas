@@ -11,9 +11,9 @@ name: formatting checks
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "develop" ]
 
 jobs:
   check_black:
@@ -63,3 +63,17 @@ jobs:
     steps:
     - name: isort checks
       uses: isort/isort-action@master
+
+check_copyrights:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out source repository
+      uses: actions/checkout@v3
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Check copyrights
+      run: |
+        python formatting_checks.py --copyright --check
+

@@ -64,7 +64,7 @@ jobs:
     - name: isort checks
       uses: isort/isort-action@master
 
-check_copyrights:
+  check_copyrights:
     runs-on: ubuntu-latest
     steps:
     - name: Check out source repository

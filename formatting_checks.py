@@ -25,6 +25,7 @@ __status__ = "Production"
 
 
 import fnmatch
+import math
 import os
 import re
 import subprocess
@@ -32,8 +33,6 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-
-from pydidas.core.utils import timed_print
 
 
 THIS_YEAR = datetime.fromtimestamp(time.time()).year
@@ -70,10 +69,31 @@ Examples
 """
 
 
+def _timed_print(input: str, new_lines: int = 0):
+    """
+    Print the input with a prepended time string.
+
+    Parameters
+    ----------
+    input : str
+        The input to be printed.
+    new_lines : int
+        The number of new (empty) lines in front of the output. The default is 0.
+    """
+    _epoch = time.time()
+    _time = time.localtime(_epoch)
+    _sec = _time[5] + _epoch - math.floor(_epoch)
+    _time_str = (
+        f"{_time[0]:04d}/{_time[1]:02d}/{_time[2]:02d} "
+        f"{_time[3]:02d}:{_time[4]:02d}:{_sec:06.3f}"
+    )
+    print("\n" * new_lines + f"{_time_str}: {input}")
+
+
 def run_black():
     """Run the black module for the current directory."""
     _check = "--check" in sys.argv
-    timed_print(
+    _timed_print(
         "Starting re-formatting " + ("check " if _check else "") + "with black...",
         new_lines=1,
     )
@@ -87,7 +107,7 @@ def run_black():
 def run_isort():
     """Run the isort module in the current directory."""
     _check = "--check" in sys.argv
-    timed_print(
+    _timed_print(
         "Starting import re-organization "
         + ("check " if _check else "")
         + "with isort...",
@@ -102,7 +122,7 @@ def run_isort():
 
 def run_flake8():
     """Run the flake8 module in the current directory."""
-    timed_print("Running code style checks with flake8...", new_lines=1)
+    _timed_print("Running code style checks with flake8...", new_lines=1)
     try:
         subprocess.run(["python", "-m", "flake8"], check=True)
     except subprocess.CalledProcessError as e:
@@ -111,7 +131,7 @@ def run_flake8():
 
 def run_reuse():
     """Run the reuse module in the current directory."""
-    timed_print("Checking pydidas licensing with reuse...", new_lines=1)
+    _timed_print("Checking pydidas licensing with reuse...", new_lines=1)
     try:
         subprocess.run(["python", "-m", "reuse", "--root", ".", "lint"], check=True)
     except subprocess.CalledProcessError as e:
@@ -163,7 +183,7 @@ def run_copyright_check():
 
     """
 
-    timed_print("Checking pydidas copyright information...", new_lines=1)
+    _timed_print("Checking pydidas copyright information...", new_lines=1)
 
     _check_copyright = "--check" in sys.argv
     _display_copyright = "--display" in sys.argv or _check_copyright

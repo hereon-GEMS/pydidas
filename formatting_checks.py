@@ -175,12 +175,33 @@ def _update_long_copyright(match: re.Match) -> str:
     return match.group()[:-5] + f"{THIS_YEAR},"
 
 
+def _check_git_commit_year(fname: str) -> int:
+    """
+    Check the commit year of a file in git.
+
+    Parameters
+    ----------
+    fname : str
+        The filename including the path.
+
+    Returns
+    -------
+    int
+        The epoch timestamp of the commit.
+    """
+    try:
+        _output = subprocess.check_output(
+            ["git", "--no-pager", "log", "-1", "--format=%at", fname]
+        )
+        _epoch = int(_output)
+        return datetime.fromtimestamp(_epoch).year
+    except (subprocess.CalledProcessError, ValueError):
+        return -1
+
+
 def run_copyright_check():
     """
     Update the copyright year based on the files modification date
-
-    Usage:
-
     """
 
     _timed_print("Checking pydidas copyright information...", new_lines=1)
@@ -188,6 +209,7 @@ def run_copyright_check():
     _check_copyright = "--check" in sys.argv
     _display_copyright = "--display" in sys.argv or _check_copyright
     _update_copyright = not _check_copyright
+    _check_git_only = "--git-only" in sys.argv
 
     _copyright_outdated = False
     _regex_full = re.compile("Copyright 20[0-9][0-9][ ]?-[ ]?20[0-9][0-9],")
@@ -198,11 +220,12 @@ def run_copyright_check():
         subprocess.check_output("git ls-files", shell=True).decode().strip().split("\n")
     )
     _filelist = []
-    for _base, _dirs, _files in os.walk(_this_dir):
-        if ".git" in _dirs:
-            _dirs.remove(".git")
-        _matches = fnmatch.filter(_files, "*.py") + fnmatch.filter(_files, "*.rst")
-        _filelist.extend(Path(_base).joinpath(_fname) for _fname in _matches)
+    if not _check_git_only:
+        for _base, _dirs, _files in os.walk(_this_dir):
+            if ".git" in _dirs:
+                _dirs.remove(".git")
+            _matches = fnmatch.filter(_files, "*.py") + fnmatch.filter(_files, "*.rst")
+            _filelist.extend(Path(_base).joinpath(_fname) for _fname in _matches)
 
     for _name in _git_files:
         _fname = _this_dir.joinpath(_name)
@@ -213,8 +236,14 @@ def run_copyright_check():
         ):
             _filelist.append(_fname)
     _filelist.remove(Path(__file__))
+
     for _fname in _filelist:
-        if datetime.fromtimestamp(os.path.getmtime(_fname)).year < THIS_YEAR:
+        _timestamp = (
+            _check_git_commit_year(_fname)
+            if _check_git_only
+            else datetime.fromtimestamp(os.path.getmtime(_fname)).year
+        )
+        if _timestamp < THIS_YEAR:
             continue
         with open(_fname, "r") as f:
             _contents = f.read()
@@ -232,6 +261,7 @@ def run_copyright_check():
             print("Updated copyright on file:", _fname)
     if _check_copyright and _copyright_outdated:
         sys.exit(1)
+    _timed_print("Copyright check finished.")
 
 
 if __name__ == "__main__":

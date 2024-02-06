@@ -75,5 +75,5 @@ jobs:
         python-version: "3.11"
     - name: Check copyrights
       run: |
-        python formatting_checks.py --copyright --check
+        python formatting_checks.py --copyright --check --git-only
 

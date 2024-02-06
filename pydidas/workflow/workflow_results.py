@@ -111,6 +111,9 @@ class WorkflowResults(QtCore.QObject):
                 _dset.update_axis_range(index, _range)
             self.__composites[_node_id] = _dset
 
+        self._config["scan_ndim"] = self._SCAN.get_param_value("scan_dim")
+        self._config["scan_npoints"] = self._SCAN.n_points
+        self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
         self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
 
     def clear_all_results(self):
@@ -143,7 +146,7 @@ class WorkflowResults(QtCore.QObject):
             the associated data.
         """
         for node_id, _meta in metadata.items():
-            _dim_offset = self._SCAN.get_param_value("scan_dim")
+            _dim_offset = self._config["scan_ndim"]
             for _key, _item in _meta.items():
                 if isinstance(_item, dict):
                     _update_method = getattr(
@@ -191,7 +194,7 @@ class WorkflowResults(QtCore.QObject):
         for node_id, result in results.items():
             if not isinstance(result, Dataset):
                 continue
-            _dim_offset = self._SCAN.get_param_value("scan_dim")
+            _dim_offset = self._config["scan_ndim"]
             for _dim in range(result.ndim):
                 self.__composites[node_id].update_axis_label(
                     _dim + _dim_offset, result.axis_labels[_dim]
@@ -348,9 +351,9 @@ class WorkflowResults(QtCore.QObject):
         """
         _data = self.__composites[node_id].copy()
         _data.flatten_dims(
-            *range(self._SCAN.ndim),
+            *range(self._config["scan_ndim"]),
             new_dim_label="Chronological scan points",
-            new_dim_range=np.arange(self._SCAN.n_points),
+            new_dim_range=np.arange(self._config["scan_npoints"]),
         )
         if squeeze:
             return _data.squeeze()
@@ -388,7 +391,11 @@ class WorkflowResults(QtCore.QObject):
         _data = self.__composites[node_id].copy()
 
         def __dim_index(i):
-            return len(slices) - (i + 1) + flattened_scan_dim * (self._SCAN.ndim - 1)
+            return (
+                len(slices)
+                - (i + 1)
+                + flattened_scan_dim * (self._config["scan_ndim"] - 1)
+            )
 
         for _dim, _slice in enumerate(slices[flattened_scan_dim:][::-1]):
             if isinstance(_slice, slice):
@@ -408,9 +415,9 @@ class WorkflowResults(QtCore.QObject):
 
         if flattened_scan_dim:
             _data.flatten_dims(
-                *range(self._SCAN.ndim),
+                *range(self._config["scan_ndim"]),
                 new_dim_label="Chronological scan points",
-                new_dim_range=np.arange(self._SCAN.n_points),
+                new_dim_range=np.arange(self._config["scan_npoints"]),
             )
             _data = _data[slices[0]]
 
@@ -449,10 +456,10 @@ class WorkflowResults(QtCore.QObject):
         _info = {}
         for _key in ["axis_labels", "axis_units", "axis_ranges"]:
             _values = list(getattr(self.__composites[node_id], _key).values())
-            _info[_key] = _values[self._SCAN.get_param_value("scan_dim") :]
+            _info[_key] = _values[self._config["scan_ndim"] :]
         _info["axis_labels"].insert(0, "Chronological scan points")
         _info["axis_units"].insert(0, "")
-        _info["axis_ranges"].insert(0, np.arange(self._SCAN.n_points))
+        _info["axis_ranges"].insert(0, np.arange(self._config["scan_npoints"]))
         return {
             _key: dict(zip(np.arange(len(_info[_key])), _info[_key]))
             for _key in ["axis_labels", "axis_units", "axis_ranges"]
@@ -537,7 +544,7 @@ class WorkflowResults(QtCore.QObject):
             enabled.
         """
         save_formats = [s.strip() for s in re.split("&|/|,", save_formats)]
-        _name = self._SCAN.get_param_value("scan_title")
+        _name = self._config["scan_title"]
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
             _keys = list(self.shapes.keys())
@@ -619,11 +626,11 @@ class WorkflowResults(QtCore.QObject):
         str :
             The formatted string with a representation of all the metadata.
         """
-        _scandim = self._SCAN.get_param_value("scan_dim")
+        _scandim = self._config["scan_ndim"]
         _metadata = self.get_result_metadata(node_id, use_scan_timeline)
         if use_scan_timeline:
             _ax_points = list(self.shapes[node_id])[_scandim:]
-            _ax_points.insert(0, self._SCAN.n_points)
+            _ax_points.insert(0, self._config["scan_npoints"])
             _ax_types = ["(scan)"] + ["(data)"] * (self.ndims[node_id] - _scandim)
         else:
             _ax_points = list(self.shapes[node_id])

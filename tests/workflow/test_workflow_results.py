@@ -314,6 +314,7 @@ class TestWorkflowResults(unittest.TestCase):
 
     def test_get_result_metadata__use_scan_timeline(self):
         _tmpres = np.random.random(SCAN.shape + (50, 50))
+        RES.update_shapes_from_scan_and_workflow()
         RES._WorkflowResults__composites[0] = Dataset(
             _tmpres,
             axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
@@ -461,6 +462,7 @@ class TestWorkflowResults(unittest.TestCase):
     def test_store_results__no_previous_metadata(self):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
+        RES._config["scan_ndim"] = SCAN.ndim
         RES._WorkflowResults__composites[1] = Dataset(np.zeros(self._scan_n + _shape1))
         RES._WorkflowResults__composites[2] = Dataset(np.zeros(self._scan_n + _shape2))
         RES._WorkflowResults__update_composite_metadata(_results)

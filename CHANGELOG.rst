@@ -16,6 +16,8 @@ Improvements
 Bugfixes
 --------
 - Fixed an issue with propagation of plugin result shapes for fitting plugins.
+- Fixed an issue where changing the ScanContext after processing would prevent 
+  writing results to file.
 
 
 v24.01.18

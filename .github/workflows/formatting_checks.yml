@@ -11,9 +11,9 @@ name: formatting checks
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "master" ]
 
 jobs:
   check_black:
@@ -69,6 +69,8 @@ jobs:
     steps:
     - name: Check out source repository
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
     - name: Setup python
       uses: actions/setup-python@v4
       with:

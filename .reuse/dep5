@@ -10,7 +10,7 @@ Files:
     pydidas/docs/make.bat
     pydidas/docs/Makefile
     pydidas/docs/src/_static/_css/pydidas-custom.css
-Copyright: 2023-2024, Helmholtz-Zentrum Hereon
+Copyright: 2023 - 2024, Helmholtz-Zentrum Hereon
 License: CC-BY-4.0
 
 Files:
@@ -21,7 +21,7 @@ Files:
     resources/*.svg
     resources/graphics_for_gui/*
     resources/documentation/dev_guide/*
-Copyright: 2023-2024, Helmholtz-Zentrum Hereon
+Copyright: 2023 - 2024, Helmholtz-Zentrum Hereon
 License: CC-BY-ND-4.0
 
 Files:

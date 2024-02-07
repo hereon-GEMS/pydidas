@@ -32,11 +32,11 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+import multiprocessing as mp
 from pathlib import Path
+from typing import Optional, Union
 
 
-THIS_YEAR = datetime.fromtimestamp(time.time()).year
-SUFFIX_WHITELIST = [".py", ".rst", "", ".cff", ".md", ".in", ".toml"]
 HELP_TEXT = """
 Formatting checks for pydidas
 =============================
@@ -59,6 +59,7 @@ All modules can be run with the '--all' argument.
 If only a check but no update is desired, use the '--check' argument. Omitting
 the '--check' argument will update files to comply with the formatting
 (for black, isort and copyright).
+A --silent argument can be used to suppess various verbose messages.
 
 Examples
 --------
@@ -69,7 +70,7 @@ Examples
 """
 
 
-def _timed_print(input: str, new_lines: int = 0):
+def _timed_print(input: str, new_lines: int = 0, verbose: bool = True):
     """
     Print the input with a prepended time string.
 
@@ -79,7 +80,11 @@ def _timed_print(input: str, new_lines: int = 0):
         The input to be printed.
     new_lines : int
         The number of new (empty) lines in front of the output. The default is 0.
+    verbose : bool, optional
+        Flag to enable printed output. The default is True.
     """
+    if not verbose:
+        return
     _epoch = time.time()
     _time = time.localtime(_epoch)
     _sec = _time[5] + _epoch - math.floor(_epoch)
@@ -138,130 +143,257 @@ def run_reuse():
         print(f"Checking with reuse failed. Error: {e}")
 
 
-def _update_short_copyright(match: re.Match) -> str:
+class CopyrightYearUpdater:
     """
-    Update the matched short string with the current year.
+    Class to check the copyright year is up to date with the commit date.
 
-    Parameters
+    This class checks that the copyright written in the file matches the
+    commit year for files in git version control. For other whitelisted files,
+    it checks the modification year.
+
+            Parameters
     ----------
-    match : re.Match
-        The regular expression match.
+    directory : Path, optional
+        The directory to be checked. If None, this will take the parent directory
+        of the class's file. The default is None,
+    **kwargs : dict, optional
+        Additional supported keywords are:
 
-    Returns
-    -------
-    str
-        The updated string.
-    """
-    _input = match.group()
-    if _input[-5:] == f"{THIS_YEAR},":
-        return _input
-    return match.group()[:-1] + f" - {THIS_YEAR},"
-
-
-def _update_long_copyright(match: re.Match) -> str:
-    """
-    Update the matched string with the current year.
-
-    Parameters
-    ----------
-    match : re.Match
-        The regular expression match.
-
-    Returns
-    -------
-    str
-        The updated string.
-    """
-    return match.group()[:-5] + f"{THIS_YEAR},"
-
-
-def _check_git_commit_year(fname: str) -> int:
-    """
-    Check the commit year of a file in git.
-
-    Parameters
-    ----------
-    fname : str
-        The filename including the path.
-
-    Returns
-    -------
-    int
-        The epoch timestamp of the commit.
-    """
-    try:
-        _output = subprocess.check_output(
-            ["git", "--no-pager", "log", "-1", "--format=%at", fname]
-        )
-        _epoch = int(_output)
-        return datetime.fromtimestamp(_epoch).year
-    except (subprocess.CalledProcessError, ValueError):
-        return -1
-
-
-def run_copyright_check():
-    """
-    Update the copyright year based on the files modification date
+        check : bool, optional
+            Flag to check the copyright only without updating it.
+            The default is False:
+        verbose : bool, optional
+            Flag to write status messages.  The default is True.
+        git_only : bool, optional
+            Flag to check for files in git version control only.
+            The default is False.
+        autorun : bool, optional
+            Flag to automatically start the check on class instantiation.
+            The default is True.
     """
 
-    _timed_print("Checking pydidas copyright information...", new_lines=1)
-
-    _check_copyright = "--check" in sys.argv
-    _display_copyright = "--display" in sys.argv or _check_copyright
-    _update_copyright = not _check_copyright
-    _check_git_only = "--git-only" in sys.argv
-
-    _copyright_outdated = False
+    THIS_YEAR = datetime.fromtimestamp(time.time()).year
+    SUFFIX_WHITELIST = [".py", ".rst", "", ".cff", ".md", ".in", ".toml"]
     _regex_full = re.compile("Copyright 20[0-9][0-9][ ]?-[ ]?20[0-9][0-9],")
     _regex_short = re.compile("Copyright 20[0-9][0-9],")
-    _this_dir = Path(__file__).parent
-    os.chdir(_this_dir)
-    _git_files = (
-        subprocess.check_output("git ls-files", shell=True).decode().strip().split("\n")
-    )
-    _filelist = []
-    if not _check_git_only:
-        for _base, _dirs, _files in os.walk(_this_dir):
+
+    @staticmethod
+    def _check_git_commit_year(fname: str) -> tuple[str, int]:
+        """
+        Check the commit year of a file in git.
+
+        Parameters
+        ----------
+        fname : str
+            The filename including the path.
+
+        Returns
+        -------
+        str
+            The input filename.
+        int
+            The epoch timestamp of the commit.
+        """
+        try:
+            _output = subprocess.check_output(
+                ["git", "--no-pager", "log", "-1", "--format=%at", fname]
+            )
+            _epoch = int(_output)
+            return (fname, datetime.fromtimestamp(_epoch).year)
+        except (subprocess.CalledProcessError, ValueError):
+            return (fname, -1)
+
+    def __init__(self, directory: Optional[Path] = None, **kwargs):
+        self._flags = {
+            "check": kwargs.get("check", "--check" in sys.argv),
+            "git-only": kwargs.get("git_only", "--git-only" in sys.argv),
+            "autorun": kwargs.get("autorun", True),
+        }
+        self._flags["update"] = not self._flags["check"]
+        self._flags["verbose"] = kwargs.get(
+            "verbose", "--silent" not in sys.argv or self._flags["check"]
+        )
+        self._directory = (
+            Path(__file__).parent if directory is None else Path(directory)
+        )
+        self._timestamps = {}
+        os.chdir(self._directory)
+        if self._flags["autorun"]:
+            self.run_copyright_check()
+
+    def _print(self, string):
+        """
+        Print the given string if verbose.
+
+        Parameters
+        ----------
+        string : str
+            The input string to be printed.
+        """
+        if self._flags["verbose"]:
+            print(string)
+
+    def run_copyright_check(self):
+        """
+        Run the copyright check.
+        """
+        _timed_print(
+            "Checking pydidas copyright information...",
+            new_lines=1,
+            verbose=self._flags["verbose"],
+        )
+        self._timestamps = self._get_all_file_timestamps()
+        _outdated_files = self._check_and_update_file_copyrights()
+        if self._flags["check"] and len(_outdated_files) > 0:
+            sys.exit(1)
+        _timed_print("Copyright check finished.", verbose=self._flags["verbose"])
+
+    def _get_all_file_timestamps(self) -> dict:
+        """
+        Get all the files to be checked.
+
+        Returns
+        -------
+        dict
+            The filenames and timestamps for all files.
+        """
+        _timestamps = self._get_gitfile_timestamps()
+        if not self._flags["git-only"]:
+            _timestamps = _timestamps | self._get_unversioned_timestamps(_timestamps)
+        return _timestamps
+
+    def _get_gitfile_timestamps(self) -> dict:
+        """
+        Get the timestamps for git files.
+
+        Returns
+        -------
+        dict
+            The filenames and commit times of all files tracked by git.
+        """
+        _git_files = [
+            self._directory.joinpath(_fname)
+            for _fname in subprocess.check_output("git ls-files", shell=True)
+            .decode()
+            .strip()
+            .split("\n")
+            if self._directory.joinpath(_fname).suffix in self.SUFFIX_WHITELIST
+        ]
+        with mp.Pool() as _pool:
+            _timestamps = {
+                _item[0]: _item[1]
+                for _item in _pool.imap_unordered(
+                    self._check_git_commit_year, _git_files
+                )
+            }
+        return _timestamps
+
+    def _get_unversioned_timestamps(
+        self, git_files: Optional[Union[list[Path], dict]] = None
+    ) -> dict:
+        """
+        Get the timestamps of unversioned files.
+
+        If a list of files in git version control is given, these files will be
+        ignored.
+
+        Parameters
+        ----------
+        git_files : list[Path], optional
+            The list of files in git version control. Use None to check all
+            files. The default is None.
+
+        Returns
+        -------
+        dict
+            The dictionary with all filenames and modification timestamps.
+        """
+        git_files = [] if git_files is None else git_files
+        _unversioned_files = []
+        for _base, _dirs, _files in os.walk(self._directory):
             if ".git" in _dirs:
                 _dirs.remove(".git")
-            _matches = fnmatch.filter(_files, "*.py") + fnmatch.filter(_files, "*.rst")
-            _filelist.extend(Path(_base).joinpath(_fname) for _fname in _matches)
+            for _item in _files:
+                _fname = self._directory.joinpath(_item)
+                if (
+                    _fname.is_file()
+                    and _fname.suffix in self.SUFFIX_WHITELIST
+                    and _fname not in git_files
+                ):
+                    _unversioned_files.append(_fname)
+        return {
+            _fname: datetime.fromtimestamp(os.path.getmtime(_fname)).year
+            for _fname in _unversioned_files
+        }
 
-    for _name in _git_files:
-        _fname = _this_dir.joinpath(_name)
-        if (
-            _fname.is_file()
-            and _fname not in _filelist
-            and (_fname.suffix in SUFFIX_WHITELIST or "LICENSES" in str(_fname))
-        ):
-            _filelist.append(_fname)
-    _filelist.remove(Path(__file__))
+    def _check_and_update_file_copyrights(self) -> list[Path]:
+        """
+        Check the copyright year of all flagged files.
 
-    for _fname in _filelist:
-        _timestamp = (
-            _check_git_commit_year(_fname)
-            if _check_git_only
-            else datetime.fromtimestamp(os.path.getmtime(_fname)).year
-        )
-        if _timestamp < THIS_YEAR:
-            continue
-        with open(_fname, "r") as f:
-            _contents = f.read()
-        _original = _contents[:]
-        _contents = re.sub(_regex_full, _update_long_copyright, _contents)
-        _contents = re.sub(_regex_short, _update_short_copyright, _contents)
-        if _contents == _original:
-            continue
-        _copyright_outdated = True
-        if _display_copyright:
-            print("Outdated copyright on file:", _fname)
-        if _update_copyright:
-            with open(_fname, "w") as f:
-                f.write(_contents)
-            print("Updated copyright on file:", _fname)
-    if _check_copyright and _copyright_outdated:
-        sys.exit(1)
-    _timed_print("Copyright check finished.")
+        Returns
+        -------
+        list[Path]
+            A list of files which are outdated.
+        """
+        _outdated = []
+        for _fname, _timestamp in self._timestamps.items():
+            if _timestamp < self.THIS_YEAR:
+                continue
+            with open(_fname, "r", encoding="utf-8") as f:
+                try:
+                    _contents = f.read()
+                except UnicodeDecodeError:
+                    _timed_print(
+                        "Error reading file: ", _fname, verbose=self._flags["verbose"]
+                    )
+            _original = _contents[:]
+            _contents = re.sub(self._regex_full, self._update_long_regex, _contents)
+            _contents = re.sub(self._regex_short, self._update_short_regex, _contents)
+            if _contents == _original:
+                continue
+            _outdated.append(_fname)
+            if self._flags["update"]:
+                with open(_fname, "w") as f:
+                    f.write(_contents)
+                self._print(f"Updated copyright on file {_fname}")
+            else:
+                self._print(f"Outdated copyright on file {_fname}")
+        return _outdated
+
+    def _update_short_regex(self, match: re.Match) -> str:
+        """
+        Update the matched short copyright regex with the current year.
+
+        Parameters
+        ----------
+        match : re.Match
+            The regular expression match.
+
+        Returns
+        -------
+        str
+            The updated string.
+        """
+        _input = match.group()
+        if _input[-5:] == f"{self.THIS_YEAR},":
+            return _input
+        return match.group()[:-1] + f" - {self.THIS_YEAR},"
+
+    def _update_long_regex(self, match: re.Match) -> str:
+        """
+        Update the matched long copyright regex with the current year.
+
+        Parameters
+        ----------
+        match : re.Match
+            The regular expression match.
+
+        Returns
+        -------
+        str
+            The updated string.
+        """
+        return match.group()[:-5] + f"{self.THIS_YEAR},"
 
 
 if __name__ == "__main__":
@@ -279,4 +411,4 @@ if __name__ == "__main__":
     if "--reuse" in sys.argv or "--all" in sys.argv:
         run_reuse()
     if "--copyright" in sys.argv or "--all" in sys.argv:
-        run_copyright_check()
+        CopyrightYearUpdater()

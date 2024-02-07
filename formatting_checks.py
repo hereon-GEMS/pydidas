@@ -24,15 +24,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import fnmatch
 import math
+import multiprocessing as mp
 import os
 import re
 import subprocess
 import sys
 import time
 from datetime import datetime
-import multiprocessing as mp
 from pathlib import Path
 from typing import Optional, Union
 

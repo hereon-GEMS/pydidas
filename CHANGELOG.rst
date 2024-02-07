@@ -1,4 +1,4 @@
-.. Copyright 2024, Helmholtz-Zentrum Hereon
+.. Copyright 2021 - 2024, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
 v24.
@@ -18,6 +18,8 @@ Bugfixes
 - Fixed an issue with propagation of plugin result shapes for fitting plugins.
 - Fixed an issue where changing the ScanContext after processing would prevent 
   writing results to file.
+- Fixed an issue where exporting data would store wrong contexts when changing
+  the global contexts after processing.
 
 
 v24.01.18

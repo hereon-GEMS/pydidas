@@ -115,6 +115,9 @@ class WorkflowResults(QtCore.QObject):
         self._config["scan_npoints"] = self._SCAN.n_points
         self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
         self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
+        self._config["SCAN"] = self._SCAN.copy()
+        self._config["EXP"] = self._EXP.copy()
+        self._config["TREE"] = self._TREE.copy()
 
     def clear_all_results(self):
         """
@@ -508,7 +511,9 @@ class WorkflowResults(QtCore.QObject):
             _res = self.__composites
         else:
             _res = {node_id: self.__composites[node_id]}
-        RESULT_SAVER.export_full_data_to_active_savers(_res, scan_context=self._SCAN)
+        RESULT_SAVER.export_full_data_to_active_savers(
+            _res, scan_context=self._config["SCAN"]
+        )
 
     def prepare_files_for_saving(
         self,
@@ -575,9 +580,9 @@ class WorkflowResults(QtCore.QObject):
         RESULT_SAVER.prepare_active_savers(
             save_dir,
             _node_info,
-            scan_context=self._SCAN,
-            diffraction_exp=self._EXP,
-            workflow_tree=self._TREE,
+            scan_context=self._config["SCAN"],
+            diffraction_exp=self._config["EXP"],
+            workflow_tree=self._config["TREE"],
         )
 
     def update_param_choices_from_labels(

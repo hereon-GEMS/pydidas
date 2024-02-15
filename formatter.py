@@ -33,7 +33,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 
 HELP_TEXT = """
@@ -67,6 +67,18 @@ Examples
 2. Run black and update all files:
     python formatting_checks.py --black
 """
+MODULE_TASK = {
+    "black": "re-formatting",
+    "isort": "import re-organization",
+    "flake8": "code style checks",
+    "reuse": "licensing check",
+}
+MODULE_ARGS = {
+    "black": ["."],
+    "isort": ["."],
+    "flake8": [],
+    "reuse": ["--root", ".", "lint"],
+}
 
 
 def _timed_print(input: str, new_lines: int = 0, verbose: bool = True):
@@ -94,52 +106,31 @@ def _timed_print(input: str, new_lines: int = 0, verbose: bool = True):
     print("\n" * new_lines + f"{_time_str}: {input}")
 
 
-def run_black():
-    """Run the black module for the current directory."""
-    _check = "--check" in sys.argv
-    _timed_print(
-        "Starting re-formatting " + ("check " if _check else "") + "with black...",
-        new_lines=1,
-    )
-    _cmd = ["python", "-m", "black", "."] + (["--check"] if _check else [])
-    try:
-        subprocess.run(_cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Formatting with black failed. Error: {e}")
+def run_module(module_name: Literal["black", "flake8", "isort", "reuse"]):
+    """
+    Run the given module in subprocess.
 
-
-def run_isort():
-    """Run the isort module in the current directory."""
-    _check = "--check" in sys.argv
-    _timed_print(
-        "Starting import re-organization "
+    Parameters
+    ----------
+    module_name : Literal["black", "flake8", "isort", "reuse"]
+        The name of the module to be run.
+    """
+    if module_name not in ["black", "flake8", "isort", "reuse"]:
+        raise ValueError(f"Module '{module_name}' not supported.")
+    _check = "--check" in sys.argv and module_name in ["black", "isort"]
+    _check_arg = ["--check"] if _check else []
+    _job_label = (
+        f"{MODULE_TASK[module_name]} "
         + ("check " if _check else "")
-        + "with isort...",
-        new_lines=1,
+        + f"with {module_name}"
     )
-    _cmd = ["python", "-m", "isort", "."] + (["--check"] if _check else [])
+    _cmd = ["python", "-m", module_name] + MODULE_ARGS[module_name] + _check_arg
     try:
+        _timed_print(f"Starting {_job_label}...", new_lines=1)
         subprocess.run(_cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Formatting with isort failed. Error: {e}")
-
-
-def run_flake8():
-    """Run the flake8 module in the current directory."""
-    _timed_print("Running code style checks with flake8...", new_lines=1)
-    try:
-        subprocess.run(["python", "-m", "flake8"], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Checking with flake8 failed. Error: {e}")
-
-
-def run_reuse():
-    """Run the reuse module in the current directory."""
-    _timed_print("Checking pydidas licensing with reuse...", new_lines=1)
-    try:
-        subprocess.run(["python", "-m", "reuse", "--root", ".", "lint"], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Checking with reuse failed. Error: {e}")
+        _timed_print(f"Finshed {_job_label}!")
+    except subprocess.CalledProcessError:
+        _timed_print(_job_label.capitalize() + " failed.", new_lines=1)
 
 
 class CopyrightYearUpdater:
@@ -162,7 +153,7 @@ class CopyrightYearUpdater:
             Flag to check the copyright only without updating it.
             The default is False:
         verbose : bool, optional
-            Flag to write status messages.  The default is True.
+            Flag to write status messages. The default is True.
         git_only : bool, optional
             Flag to check for files in git version control only.
             The default is False.
@@ -237,7 +228,7 @@ class CopyrightYearUpdater:
         Run the copyright check.
         """
         _timed_print(
-            "Checking pydidas copyright information...",
+            "Checking copyright information...",
             new_lines=1,
             verbose=self._flags["verbose"],
         )
@@ -402,12 +393,12 @@ if __name__ == "__main__":
         print(HELP_TEXT)
         sys.exit()
     if "--black" in sys.argv or "--all" in sys.argv:
-        run_black()
+        run_module("black")
     if "--isort" in sys.argv or "--all" in sys.argv:
-        run_isort()
+        run_module("isort")
     if "--flake8" in sys.argv or "--all" in sys.argv:
-        run_flake8()
+        run_module("flake8")
     if "--reuse" in sys.argv or "--all" in sys.argv:
-        run_reuse()
+        run_module("reuse")
     if "--copyright" in sys.argv or "--all" in sys.argv:
         CopyrightYearUpdater()

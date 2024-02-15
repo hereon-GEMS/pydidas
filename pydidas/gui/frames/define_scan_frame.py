@@ -47,18 +47,18 @@ WORKFLOW = WorkflowTree()
 
 
 DIM_LABELS = {
-    1: {i: "\nScan dimension 1:" for i in range(4)},
-    2: {0: "\nScan dimension 1 (slow):", 1: "\nScan dimension 2 (fast):"},
+    1: {i: "\nScan dimension 0:" for i in range(4)},
+    2: {0: "\nScan dimension 0 (slow):", 1: "\nScan dimension 1 (fast):"},
     3: {
-        0: "\nScan dimension 1 (slowest):",
-        1: "\nScan dimension 2:",
-        2: "\nScan dimension 3 (fastest):",
+        0: "\nScan dimension 0 (slowest):",
+        1: "\nScan dimension 1:",
+        2: "\nScan dimension 2 (fastest):",
     },
     4: {
-        0: "\nScan dimension 1 (slowest):",
-        1: "\nScan dimension 2:",
-        2: "\nScan dimension 3:",
-        3: "\nScan dimension 4 (fastest):",
+        0: "\nScan dimension 0 (slowest):",
+        1: "\nScan dimension 1:",
+        2: "\nScan dimension 2:",
+        3: "\nScan dimension 3 (fastest):",
     },
 }
 

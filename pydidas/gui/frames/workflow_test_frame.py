@@ -155,10 +155,10 @@ class WorkflowTestFrame(BaseFrame):
         IMAGE_SELECTION_PARAM.copy(),
         get_generic_param_collection(
             "frame_index",
+            "scan_index0",
             "scan_index1",
             "scan_index2",
             "scan_index3",
-            "scan_index4",
             "detector_image_index",
             "selected_results",
         ),
@@ -274,9 +274,9 @@ class WorkflowTestFrame(BaseFrame):
             "frame_index", _selection == "Use global index"
         )
         _use_scan_dim = _selection == "Use scan dimensional indices"
-        for _dim in [1, 2, 3, 4]:
+        for _dim in range(4):
             self.toggle_param_widget_visibility(
-                f"scan_index{_dim}", _use_scan_dim and _dim <= SCAN.ndim
+                f"scan_index{_dim}", _use_scan_dim and _dim < SCAN.ndim
             )
         self.toggle_param_widget_visibility(
             "detector_image_index", _selection == "Use detector image number"
@@ -378,7 +378,7 @@ class WorkflowTestFrame(BaseFrame):
             The global image index.
         """
         _nums = [
-            self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
+            self.get_param_value(f"scan_index{_index}") for _index in range(SCAN.ndim)
         ]
         _index = SCAN.get_frame_from_indices(_nums)
         if _index >= SCAN.n_points:

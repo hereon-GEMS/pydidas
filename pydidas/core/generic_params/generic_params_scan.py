@@ -220,6 +220,6 @@ GENERIC_PARAMS_SCAN = (
             "allow_None": False,
             "tooltip": f"The position index for the scan dimension {_index}.",
         }
-        for _index in range(1, 5)
+        for _index in range(0, 4)
     }
 )

@@ -107,8 +107,12 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
     for _task in tasks[0:4]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar)[0]
-        _histo_crop_action = silx_plot.CropHistogramOutliers(_plot, parent=_plot)
-        _autoscale_action = silx_plot.AutoscaleToMeanAndThreeSigma(_plot, parent=_plot)
+        _histo_crop_action = silx_plot.CropHistogramOutliers(
+            _plot, parent=_plot, forced_image_legend="image"
+        )
+        _autoscale_action = silx_plot.AutoscaleToMeanAndThreeSigma(
+            _plot, parent=_plot, forced_image_legend="image"
+        )
         _widget_action = [
             _action
             for _action in _toolbar.actions()

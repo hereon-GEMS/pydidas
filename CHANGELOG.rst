@@ -20,6 +20,9 @@ Bugfixes
   writing results to file.
 - Fixed an issue where exporting data would store wrong contexts when changing
   the global contexts after processing.
+- Fixed an issue with the pyFAIcalib frame where setting the detector first
+  and then selecting an image would not allow to use the colormap adjustment 
+  buttons in the plot widget.
 
 
 v24.01.18

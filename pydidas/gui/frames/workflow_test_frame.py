@@ -180,7 +180,7 @@ class WorkflowTestFrame(BaseFrame):
                 "plot_dim": 1,
                 "details_active": False,
                 "exp_hash": -1,
-                "scan_tree_hash": -1,
+                "context_hash": -1,
             }
         )
 
@@ -221,11 +221,8 @@ class WorkflowTestFrame(BaseFrame):
         Check if the WorkflowTree has changed and update the local Tree if
         it has changed.
         """
-        if self._config["scan_tree_hash"] != hash(
-            (hash(SCAN), hash(TREE))
-        ) or self._config["exp_hash"] != hash(EXP):
-            self._config["scan_tree_hash"] = hash((hash(SCAN), hash(TREE)))
-            self._config["EXP_hash"] = hash(EXP)
+        if self._config["context_hash"] != hash((hash(SCAN), hash(TREE), hash(EXP))):
+            self._config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
             self.reload_workflow()
 
     @QtCore.Slot()
@@ -262,7 +259,7 @@ class WorkflowTestFrame(BaseFrame):
             if self._active_node != -1:
                 self.__update_text_description_of_node_results()
                 self.__plot_results()
-            self._config["scan_tree_hash"] = hash((hash(SCAN), hash(TREE)))
+            self._config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
 
     @QtCore.Slot()
     def __update_image_selection_visibility(self):

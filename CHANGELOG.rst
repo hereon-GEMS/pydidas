@@ -23,6 +23,7 @@ Bugfixes
 - Fixed an issue with the pyFAIcalib frame where setting the detector first
   and then selecting an image would not allow to use the colormap adjustment 
   buttons in the plot widget.
+- Fixed an issue with testing workflows when changing the contexts.
 
 
 v24.01.18

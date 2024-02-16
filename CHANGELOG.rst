@@ -24,6 +24,8 @@ Bugfixes
   and then selecting an image would not allow to use the colormap adjustment 
   buttons in the plot widget.
 - Fixed an issue with testing workflows when changing the contexts.
+- Fixed an issue where WorkflowTree import exceptions where not correctly 
+  handled.
 
 
 v24.01.18

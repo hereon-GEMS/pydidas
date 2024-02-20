@@ -164,6 +164,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         Parallel implementation of the execution method.
         """
         if not self._check_tree_is_populated():
+            self.sig_processing_running.emit(False)
             return
         logger.debug("WorkflowRunFrame: Starting workflow")
         self._prepare_app_run()

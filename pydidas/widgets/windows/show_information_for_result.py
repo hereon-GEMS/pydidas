@@ -106,7 +106,6 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             The parameter values of the result selections.
         """
         self._loader_plugin = loader_plugin.copy()
-        self._loader_plugin._SCAN = loader_plugin._SCAN.copy()
         self._loader_plugin.update_filename_string()
         _scan = self._loader_plugin._SCAN
         _ax_ranges = result_metadata["axis_ranges"]

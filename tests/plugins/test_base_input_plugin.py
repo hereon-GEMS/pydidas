@@ -263,6 +263,12 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin.pre_execute()
         _data, kwargs = plugin.execute(0)
 
+    def test_copy(self):
+        plugin = TestInputPlugin(filename=self._fname)
+        copy = plugin.copy()
+        self.assertEqual(plugin._SCAN, SCAN)
+        self.assertEqual(copy._SCAN, SCAN)
+
 
 if __name__ == "__main__":
     unittest.main()

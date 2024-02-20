@@ -270,7 +270,7 @@ class TestPluginRegistry(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
-        PC._PluginRegistry__remove_plugin_from_collection(_new_cls)
+        PC.remove_plugin_from_collection(_new_cls)
         self.assertEqual(len(PC.plugins), self.n_plugin)
 
     def test_remove_plugin_from_collection__existing_item(self):
@@ -278,7 +278,7 @@ class TestPluginRegistry(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _name = PC.get_all_plugin_names()[0]
-        PC._PluginRegistry__remove_plugin_from_collection(PC.plugins[_name])
+        PC.remove_plugin_from_collection(PC.plugins[_name])
         self.assertFalse(_name in PC.plugins)
 
     def test_add_new_class(self):
@@ -307,7 +307,7 @@ class TestPluginRegistry(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
-        PC._PluginRegistry__check_and_register_class(_new_cls)
+        PC.check_and_register_class(_new_cls)
         self.assertEqual(PC.plugins[_new_cls.__name__], _new_cls)
 
     def test_check_and_register_class__wrong_class(self):
@@ -316,7 +316,7 @@ class TestPluginRegistry(unittest.TestCase):
             n_plugins=self.n_plugin, plugin_path=self._pluginpath
         )
         _name = get_random_string(12)
-        PC._PluginRegistry__check_and_register_class(float)
+        PC.check_and_register_class(float)
         self.assertEqual(len(PC.get_all_plugins()), self.n_plugin)
         self.assertFalse(_name in PC.get_all_plugin_names())
 
@@ -328,8 +328,8 @@ class TestPluginRegistry(unittest.TestCase):
         _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
         _new_cls2 = create_plugin_class(0, number=self.n_plugin + 2)
         _new_cls2.__name__ = _new_cls.__name__
-        PC._PluginRegistry__check_and_register_class(_new_cls)
-        PC._PluginRegistry__check_and_register_class(_new_cls2)
+        PC.check_and_register_class(_new_cls)
+        PC.check_and_register_class(_new_cls2)
         self.assertEqual(PC.plugins[_new_cls.__name__], _new_cls)
 
     def test_check_and_register_class__new_class_with_same_name_reload(self):
@@ -341,8 +341,8 @@ class TestPluginRegistry(unittest.TestCase):
         _new_cls2 = create_plugin_class(0, number=self.n_plugin + 2)
         _new_cls2.__name__ = _new_cls.__name__
         _new_cls2.plugin_name = _new_cls.plugin_name
-        PC._PluginRegistry__check_and_register_class(_new_cls)
-        PC._PluginRegistry__check_and_register_class(_new_cls2, reload=True)
+        PC.check_and_register_class(_new_cls)
+        PC.check_and_register_class(_new_cls2, reload=True)
         self.assertEqual(PC.plugins[_new_cls2.__name__], _new_cls2)
 
     def test_import_module_and_get_classes_in_module(self):

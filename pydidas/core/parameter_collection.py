@@ -42,7 +42,7 @@ class ParameterCollection(dict):
     Ordered collection of parameters, implemented as subclass of dict.
 
     The ParameterCollection is a dictionary for Parameter instances
-    with additional convenience rountines to easily get and set Parameter
+    with additional convenience routines to easily get and set Parameter
     values.
     Items can be added at instantiation either as single Parameters,
     ParameterCollections or as keyword arguments. Keywords will be converted
@@ -151,7 +151,7 @@ class ParameterCollection(dict):
         self, param: Parameter, keys: Union[Iterable[str, ...], None] = None
     ):
         """
-        Check if the Parameter refkey is already a registed key.
+        Check if the Parameter refkey is already a registered key.
 
         Parameters
         ----------
@@ -271,7 +271,7 @@ class ParameterCollection(dict):
         for _item in args:
             if isinstance(_item, Parameter):
                 self.add_param(_item)
-            elif isinstance(_item, (ParameterCollection)):
+            elif isinstance(_item, ParameterCollection):
                 self.update(_item)
 
     def delete_param(self, key: str):
@@ -283,7 +283,7 @@ class ParameterCollection(dict):
         Parameters
         ----------
         key : str
-            The key of the dictionry entry to be removed.
+            The key of the dictionary entry to be removed.
         """
         self.__delitem__(key)
 
@@ -338,7 +338,7 @@ class ParameterCollection(dict):
         """
         Update the value of a stored parameter.
 
-        This method will verify that the entry exists and update the the
+        This method will verify that the entry exists and update the
         stored value.
 
         Parameters
@@ -416,9 +416,7 @@ class ParameterCollection(dict):
         _vals = set()
         for _arg in args:
             if _arg not in self.keys():
-                raise KeyError(
-                    f"No Parameter with the key '{_arg}' has been registered."
-                )
+                raise KeyError(f"No Parameter with the key {_arg} has been registered.")
             _vals.add(self.get_value(_arg))
         if len(_vals) == 1:
             return True

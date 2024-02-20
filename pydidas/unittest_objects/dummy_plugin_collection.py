@@ -59,4 +59,4 @@ class DummyPluginCollection(PluginRegistry):
             _class = create_plugin_class(num % 3, number=num // 3)
             self._PluginRegistry__add_new_class(_class)
         for _plugin in _base_plugins:
-            self._PluginRegistry__check_and_register_class(_plugin)
+            self.check_and_register_class(_plugin)

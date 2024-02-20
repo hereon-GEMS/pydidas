@@ -33,12 +33,14 @@ import numpy as np
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError
+from pydidas.plugins import PluginCollection
 from pydidas.unittest_objects import DummyLoader, DummyProc, DummyProcNewDataset
 from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
 
 
+PLUGINS = PluginCollection()
 SCAN = ScanContext()
 TREE = WorkflowTree()
 RES = WorkflowResultsContext()
@@ -53,6 +55,13 @@ class TestWorkflowResultSelector(unittest.TestCase):
         global SCAN, RES
         SCAN = ScanContext()
         RES = WorkflowResultsContext()
+        for _cls in (DummyLoader, DummyProc, DummyProcNewDataset):
+            PLUGINS.check_and_register_class(_cls)
+
+    @classmethod
+    def tearDownClass(cls):
+        for _cls in (DummyLoader, DummyProc, DummyProcNewDataset):
+            PLUGINS.remove_plugin_from_collection(_cls)
 
     def setUp(self):
         self.set_up_scan()
@@ -144,7 +153,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertTrue("_selection" in obj.__dict__)
         self.assertTrue("_npoints" in obj.__dict__)
         self.assertTrue("active_node" in obj._config)
-        self.assertEqual(obj._SCAN, ScanContext())
+        self.assertEqual(obj._SCAN, RES.frozen_scan)
         self.assertEqual(obj._RESULTS, RES)
 
     def test_init__with_param(self):

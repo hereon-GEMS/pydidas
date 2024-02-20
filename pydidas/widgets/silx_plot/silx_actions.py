@@ -164,7 +164,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
 
     def _actionTriggered(self, checked=False):
         if self.__forced_image_legend is None:
-            image = self.plot.getActiveImage
+            image = self.plot.getActiveImage()
         else:
             image = self.plot.getImage(legend=self.__forced_image_legend)
 
@@ -221,7 +221,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
 
     def _actionTriggered(self, checked=False):
         if self.__forced_image_legend is None:
-            image = self.plot.getActiveImage
+            image = self.plot.getActiveImage()
         else:
             image = self.plot.getImage(legend=self.__forced_image_legend)
 

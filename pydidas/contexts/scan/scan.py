@@ -142,7 +142,7 @@ class Scan(ObjectWithParameterCollection):
         _n_frames = self.n_points * multiplicity
         if not 0 <= index < _n_frames:
             raise UserConfigError(
-                f"The demanded frame number '{index}' is out of the scope of the Scan "
+                f"The demanded frame number {index} is out of the scope of the Scan "
                 f"indices (0, {_n_frames})."
             )
         _ndim = self.get_param_value("scan_dim")
@@ -180,7 +180,7 @@ class Scan(ObjectWithParameterCollection):
         ]
         if False in _indices_okay:
             raise UserConfigError(
-                f'The given indices "{tuple(indices)}" are out of the scope '
+                f"The given indices {tuple(indices)} are out of the scope "
                 f"of the scan range {self.shape}"
             )
         _factors = np.asarray([np.prod(_shapes[_i + 1 :]) for _i in range(self.ndim)])

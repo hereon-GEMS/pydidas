@@ -211,7 +211,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         for _modname, _file in _modules.items():
             _class_members = self.__get_classes_in_module(_modname, _file)
             for _name, _cls in _class_members:
-                self.__check_and_register_class(_cls, reload)
+                self.check_and_register_class(_cls, reload)
 
     def _store_plugin_path(self, plugin_path: Path, verbose: bool = False):
         """
@@ -283,7 +283,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         del spec, tmp_module
         return clsmembers
 
-    def __check_and_register_class(self, class_: type, reload: bool = False):
+    def check_and_register_class(self, class_: type, reload: bool = False):
         """
         Check whether a class is a valid plugin and register it.
 
@@ -307,7 +307,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         if class_.__name__ not in self.plugins:
             self.__add_new_class(class_)
         elif reload:
-            self.__remove_plugin_from_collection(class_)
+            self.remove_plugin_from_collection(class_)
             self.__add_new_class(class_)
 
     def __add_new_class(self, class_: type):
@@ -333,7 +333,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         self.__plugin_types[class_.__name__] = plugin_type_check(class_)
         self.__plugin_names[class_.plugin_name] = class_.__name__
 
-    def __remove_plugin_from_collection(self, class_: type):
+    def remove_plugin_from_collection(self, class_: type):
         """
         Remove a Plugin from the PluginCollection.
 

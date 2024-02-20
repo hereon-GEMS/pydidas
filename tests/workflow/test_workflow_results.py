@@ -273,6 +273,30 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertEqual(_shape1, RES.shapes[1])
         self.assertFalse(os.path.exists(os.path.join(self._tmpdir, "node_02.h5")))
 
+    def test_frozen_scan(self):
+        _params = SCAN.param_values
+        RES.update_shapes_from_scan_and_workflow()
+        SCAN.set_param_value("scan_dim", 1)
+        _frozen_scan = RES.frozen_scan
+        for _key, _val in _params.items():
+            self.assertEqual(_frozen_scan.get_param_value(_key), _val)
+
+    def test_frozen_exp(self):
+        EXP.set_param_value("xray_energy", 13)
+        _params = EXP.param_values
+        RES.update_shapes_from_scan_and_workflow()
+        EXP.set_param_value("detector_dist", 42.1)
+        _frozen_exp = RES.frozen_exp
+        for _key, _val in _params.items():
+            self.assertEqual(_frozen_exp.get_param_value(_key), _val)
+
+    def test_frozen_tree(self):
+        _tree_dump = TREE.export_to_string()
+        RES.update_shapes_from_scan_and_workflow()
+        TREE.root = None
+        _frozen_tree = RES.frozen_tree
+        self.assertEqual(_frozen_tree.export_to_string(), _tree_dump)
+
     def test_get_result_ranges(self):
         _, _, _data = self.generate_test_datasets()
         for _key, _dset in _data.items():

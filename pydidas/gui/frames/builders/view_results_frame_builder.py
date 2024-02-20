@@ -80,7 +80,6 @@ class ViewResultsFrameBuilder:
             "result_selector",
             ResultSelectionWidget,
             parent_widget="config",
-            scan_context=frame._SCAN,
             select_results_param=frame.get_param("selected_results"),
             workflow_results=frame._RESULTS,
         )

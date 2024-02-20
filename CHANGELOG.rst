@@ -26,6 +26,8 @@ Bugfixes
 - Fixed an issue with testing workflows when changing the contexts.
 - Fixed an issue where WorkflowTree import exceptions where not correctly 
   handled.
+- Fixed an issue when asking to display detailed results for a scan point and 
+  no node is currently selected.
 
 
 v24.01.18

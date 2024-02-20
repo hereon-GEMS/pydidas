@@ -30,16 +30,16 @@ __all__ = ["ResultSelectionWidget"]
 
 
 from functools import partial
-from typing import List, Self, Tuple, Union
+from typing import List, Tuple, Union
 
 import numpy as np
 from qtpy import QtCore
 
-from ...contexts import ScanContext
 from ...core import (
     Parameter,
     ParameterCollection,
     ParameterCollectionMixIn,
+    UserConfigError,
     get_generic_parameter,
     utils,
 )
@@ -87,7 +87,6 @@ class ResultSelectionWidget(
             active_node : int,
             selection : tuple,
             plot_type : str
-
         )
 
             The signal signature is: flag to use timeline or scan shape,
@@ -120,7 +119,7 @@ class ResultSelectionWidget(
 
     def __init__(
         self, select_results_param: Union[None, Parameter] = None, **kwargs: dict
-    ) -> Self:
+    ):
         self.__width_factor = kwargs.get(
             "font_metric_width_factor", FONT_METRIC_CONFIG_WIDTH
         )
@@ -136,9 +135,8 @@ class ResultSelectionWidget(
             "n_slice_params": 0,
             "selection_by_data_values": True,
             "validator": QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
+            "selected_node": -1,
         }
-        _scan_context = kwargs.get("scan_context", None)
-        self._SCAN = ScanContext() if _scan_context is None else _scan_context
         _results = kwargs.get("workflow_results", None)
         self._RESULTS = WorkflowResultsContext() if _results is None else _results
         self._active_node = -1
@@ -147,7 +145,7 @@ class ResultSelectionWidget(
         self.set_default_params()
         self._selector = WorkflowResultsSelector(
             self.get_param("use_scan_timeline"),
-            scan_context=self._SCAN,
+            scan_context=self._RESULTS.frozen_scan,
             workflow_results=self._RESULTS,
         )
         self.__result_window = None
@@ -415,12 +413,11 @@ class ResultSelectionWidget(
         Update the information about the number of dimensions the results will have.
         """
         _ndim = self._RESULTS.ndims[self._active_node]
+        _active_shape = self._RESULTS.shapes[self._active_node]
         _ndim_scan = np.where(
-            np.asarray(self._RESULTS.shapes[self._active_node][: self._SCAN.ndim]) > 1
+            np.asarray(_active_shape[: self._RESULTS.frozen_scan.ndim]) > 1
         )[0].size
-        _ndim = np.where(np.asarray(self._RESULTS.shapes[self._active_node]) > 1)[
-            0
-        ].size
+        _ndim = np.where(np.asarray(_active_shape) > 1)[0].size
         if self.get_param_value("use_scan_timeline"):
             _ndim -= _ndim_scan - 1
         self._config["result_ndim"] = _ndim
@@ -510,7 +507,7 @@ class ResultSelectionWidget(
         The signal has the following form:
             bool, int, tuple
 
-        With the first entry a flag to use a timeline (ie. flattening of scan
+        With the first entry a flag to use a timeline (i.e. flattening of scan
         dimensions) and the tuple with the slicing object. The second entry
         is the dimensionality of the resulting data. The third entry is the
         slice object required to access the selected subset of data from the
@@ -524,6 +521,7 @@ class ResultSelectionWidget(
             self._selector.selection,
             self._config["plot_type"],
         )
+        self._config["selected_node"] = self._active_node
 
     def __update_selector_dim_params(self):
         """
@@ -678,14 +676,22 @@ class ResultSelectionWidget(
         data_y : float
             the data y value.
         """
-        _loader_plugin = self._RESULTS._TREE.root.plugin
+        if self._config["selected_node"] == -1:
+            raise UserConfigError(
+                "No node has been selected. Please check the result selection"
+            )
+        _loader_plugin = self._RESULTS._TREE.root.plugin.copy()
+        _loader_plugin._SCAN = self._RESULTS.frozen_scan
         _timeline = self.get_param_value("use_scan_timeline")
-        _node_metadata = self._RESULTS.get_result_metadata(self._active_node, _timeline)
+        _node_metadata = self._RESULTS.get_result_metadata(
+            self._config["selected_node"], _timeline
+        )
         _selection_config = self.get_param_values_as_dict() | {
             "selection_by_data_values": self._config["selection_by_data_values"],
             "active_dims": self._config["active_dims"],
             "use_timeline": _timeline,
         }
+        _selection_config["selected_results"] = self._config["selected_node"]
         if self.__result_window is None:
             self.__result_window = ShowInformationForResult()
         self.__result_window.display_information(

@@ -27,12 +27,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DataBrowsingFrame"]
 
-
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import HDF5_EXTENSIONS
+from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
 from ...core.utils import get_extension
 from ...data_io import IoMaster, import_data
 from ...widgets.framework import BaseFrame
@@ -61,6 +60,12 @@ class DataBrowsingFrame(BaseFrame):
         methods.
         """
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
+        self._widgets["explorer"].sig_new_file_selected.connect(
+            self._widgets["raw_metadata_selector"].new_filename
+        )
+        self._widgets["explorer"].sig_new_file_selected.connect(
+            self._widgets["hdf5_dataset_selector"].new_filename
+        )
         self._widgets["but_minimize"].clicked.connect(
             partial(self.change_splitter_pos, False)
         )
@@ -76,9 +81,20 @@ class DataBrowsingFrame(BaseFrame):
 
     def build_frame(self):
         """
-        Build the frame and polulate it with widgets.
+        Build the frame and populate it with widgets.
         """
         DataBrowsingFrameBuilder.build_frame(self)
+
+    def finalize_ui(self):
+        """
+        Finalize UI creation.
+        """
+        self._widgets["hdf5_dataset_selector"].register_plot_widget(
+            self._widgets["viewer"]
+        )
+        self._widgets["raw_metadata_selector"].register_plot_widget(
+            self._widgets["viewer"]
+        )
 
     @QtCore.Slot(bool)
     def change_splitter_pos(self, enlarge_dir: bool = True):
@@ -112,10 +128,9 @@ class DataBrowsingFrame(BaseFrame):
         _extension = get_extension(filename)
         if _extension not in self.__supported_extensions:
             return
-        self._widgets["hdf_dset"].setVisible(_extension in HDF5_EXTENSIONS)
-        self.set_status(f"Opened file: {filename}")
-        if _extension in HDF5_EXTENSIONS:
-            self._widgets["hdf_dset"].set_filename(filename)
+        self.set_status(f"Selected file: {filename}")
+        if _extension in HDF5_EXTENSIONS + BINARY_EXTENSIONS:
+            return
         else:
             _data = import_data(filename)
             self._widgets["viewer"].setData(_data)

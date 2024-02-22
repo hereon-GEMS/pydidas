@@ -34,6 +34,7 @@ from .constants import *
 from .file_extensions import *
 from .gui_constants import *
 from .links import *
+from .numpy_names import *
 from .paths import *
 from .pyfai_names import *
 from .q_settings import *
@@ -68,6 +69,11 @@ from . import links
 
 __all__.extend(links.__all__)
 del links
+
+from . import numpy_names
+
+__all__.extend(numpy_names.__all__)
+del numpy_names
 
 from . import paths
 

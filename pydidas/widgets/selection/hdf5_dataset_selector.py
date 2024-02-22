@@ -29,14 +29,19 @@ __all__ = ["Hdf5DatasetSelector"]
 
 
 from functools import partial
+from pathlib import Path
 
 import h5py
 from qtpy import QtCore, QtWidgets
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
 from ...core import PydidasGuiError
-from ...core.constants import ALIGN_TOP_RIGHT, QT_COMBO_BOX_SIZE_POLICY
-from ...core.utils import apply_qt_properties, get_hdf5_populated_dataset_keys
+from ...core.constants import ALIGN_TOP_RIGHT, HDF5_EXTENSIONS, QT_COMBO_BOX_SIZE_POLICY
+from ...core.utils import (
+    apply_qt_properties,
+    get_extension,
+    get_hdf5_populated_dataset_keys,
+)
 from ..factory import CreateWidgetsMixIn
 from ..utilities import get_max_pixel_width_of_entries
 
@@ -59,7 +64,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     ----------
     viewWidget : Union[QWidget, None], optional
         A widget for a full view. It can also be registered later using
-        the  *register_view_widget* method. The default is None.
+        the  *register_plot_widget* method. The default is None.
     datasetKeyFilters : Union[dict, None], optional
         A dictionary with dataset keys to be filtered from the list
         of displayed datasets. Entries must be in the format
@@ -90,7 +95,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             ),
         }
         self.flags = {"slotActive": False, "autoUpdate": True}
-        self._widgets["viewer"] = viewWidget
+        self._widgets["plot"] = viewWidget
         self._frame = None
         self.__create_widgets_and_layout()
         self.__connect_slots()
@@ -155,12 +160,14 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             "Show full frame",
             alignment=ALIGN_TOP_RIGHT,
             gridPos=(3 + _row_offset, 3, 1, 2),
+            font_metric_width_factor=30,
         )
         self.create_check_box(
             "auto_update",
             "Auto update",
             checked=True,
             gridPos=(3 + _row_offset, 0, 1, 2),
+            font_metric_width_factor=30,
         )
         self.setVisible(False)
 
@@ -245,8 +252,8 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
                 return
         if self.flags["slotActive"]:
             self.new_frame_signal.emit(self._frame)
-        if self.flags["autoUpdate"] and self._widgets["viewer"] is not None:
-            self._widgets["viewer"].setData(self._frame)
+        if self.flags["autoUpdate"] and self._widgets["plot"] is not None:
+            self._widgets["plot"].setData(self._frame)
 
     def __get_frame(self):
         """
@@ -267,7 +274,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             elif _ndim == 2:
                 self._frame = _dset[...]
 
-    def register_view_widget(self, widget: QtWidgets.QWidget):
+    def register_plot_widget(self, widget: QtWidgets.QWidget):
         """
         Register a view widget to be used for full visualization of data.
 
@@ -285,7 +292,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             If the widget does not have a ``setData`` method.
         """
         if isinstance(widget, QtWidgets.QWidget) and hasattr(widget, "setData"):
-            self._widgets["viewer"] = widget
+            self._widgets["plot"] = widget
             return
         raise TypeError("Error: Object must be a widget with a setData method.")
 
@@ -333,21 +340,28 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         self.flags["slotActive"] = enable
 
-    def set_filename(self, name: str):
+    @QtCore.Slot(str)
+    def new_filename(self, name: str):
         """
-        Set the filename of the hdf5 file to be used.
+        Process the new filename.
 
-        This method stores the filename and calls the internal method to
-        populate the list of datasets included in the file.
+        If the new filename has a suffix associated with raw files,
+        show the widget.
 
         Parameters
         ----------
         name : str
-            The full file system path to the hdf5 file.
+            The full file system path to the new file.
         """
-        self._config["currentFname"] = name
-        self.__populate_dataset_list()
-        self.__update(True)
+        self.__filename = Path(name)
+        if not self.__filename.is_file():
+            return
+        _is_hdf5 = get_extension(self.__filename) in HDF5_EXTENSIONS
+        self.setVisible(_is_hdf5)
+        if _is_hdf5:
+            self._config["currentFname"] = name
+            self.__populate_dataset_list()
+            self.__update(True)
 
     def _index_changed(self, index: int):
         """
@@ -372,6 +386,6 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         if self._frame is None or not self.flags["autoUpdate"]:
             self.__get_frame()
-        if not isinstance(self._widgets["viewer"], QtWidgets.QWidget):
+        if not isinstance(self._widgets["plot"], QtWidgets.QWidget):
             raise PydidasGuiError("The reference is not a widget")
-        self._widgets["viewer"].setData(self._frame)
+        self._widgets["plot"].setData(self._frame)

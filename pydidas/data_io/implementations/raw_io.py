@@ -81,6 +81,9 @@ class RawIo(IoBase):
         binning : int, optional
             The rebinning factor to be applied to the image. The default
             is 1.
+        offset : int, optional
+            The reading offset from the file start in bytes. Using an offset
+            allows to account for file headers. The default is 0.
 
         Returns
         -------
@@ -89,8 +92,9 @@ class RawIo(IoBase):
         """
         if datatype is None:
             raise KeyError("The datatype has not been specified.")
+        _offset = kwargs.get("offset", 0)
         with CatchFileErrors(filename):
-            _data = np.fromfile(filename, dtype=datatype)
+            _data = np.fromfile(filename, dtype=datatype, offset=_offset)
         if _data.size != np.prod(shape):
             cls.raise_filereaderror_from_exception(
                 ValueError("The given shape does not match the data size."),

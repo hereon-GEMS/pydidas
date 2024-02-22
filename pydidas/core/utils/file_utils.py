@@ -87,7 +87,7 @@ def get_extension(path: Union[Path, str]) -> str:
     _ext = path.suffix
     if _ext.startswith("."):
         _ext = _ext[1:]
-    return _ext
+    return _ext.lower()
 
 
 def find_valid_python_files(path: Path) -> List[Path]:

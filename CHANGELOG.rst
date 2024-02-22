@@ -28,6 +28,7 @@ Bugfixes
   handled.
 - Fixed an issue when asking to display detailed results for a scan point and 
   no node is currently selected.
+- Fixed an issue trying to open binary (i.e. raw) files in the DataBrowsingFrame
 
 
 v24.01.18

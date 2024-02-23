@@ -967,6 +967,37 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(hash(obj), int)
         self.assertNotEqual(hash(obj), hash(obj2))
 
+    def test_data_description__no_data_unit(self):
+        _test_label = "Spam, eggs, sausage and spam"
+        obj = self.create_simple_dataset()
+        obj.data_label = _test_label
+        self.assertEqual(obj.data_description, _test_label)
+
+    def test_data_description__w_data_unit(self):
+        _test_label = "Spam, eggs, sausage and spam"
+        _test_unit = "more spam"
+        obj = self.create_simple_dataset()
+        obj.data_label = _test_label
+        obj.data_unit = _test_unit
+        self.assertEqual(obj.data_description, f"{_test_label} / {_test_unit}")
+
+    def test_get_axis_description__no_unit(self):
+        obj = self.create_simple_dataset()
+        for index in range(2):
+            with self.subTest(index=index):
+                obj.update_axis_unit(index, "")
+                _ax_str = obj.get_axis_description(index)
+                self.assertEqual(_ax_str, self._axis_labels[index])
+
+    def test_get_axis_description__w_unit(self):
+        obj = self.create_simple_dataset()
+        for index in range(2):
+            with self.subTest(index=index):
+                _ax_str = obj.get_axis_description(index)
+                self.assertEqual(
+                    _ax_str, f"{self._axis_labels[index]} / {self._axis_units[index]}"
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

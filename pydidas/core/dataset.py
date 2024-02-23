@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ embedded metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -120,7 +120,7 @@ class Dataset(np.ndarray):
 
     def __array_finalize__(self, obj: Self):
         """
-        Finalizazion of numpy.ndarray object creation.
+        Finalization of numpy.ndarray object creation.
 
         This method will delete or append dimensions to the associated
         axis_labels/_ranges/_units attributes, depending on the object
@@ -619,6 +619,40 @@ class Dataset(np.ndarray):
             )
         self._meta["axis_units"][index] = item
 
+    def get_axis_description(self, index: int) -> str:
+        """
+        Get the description for the given axis, based on the axis label and unit.
+
+        Parameters
+        ----------
+        index : int
+            The axis index.
+
+        Returns
+        -------
+        str
+            The description for the given axis.
+        """
+        return self._meta["axis_labels"][index] + (
+            " / " + self._meta["axis_units"][index]
+            if len(self._meta["axis_units"][index]) > 0
+            else ""
+        )
+
+    @property
+    def data_description(self) -> str:
+        """
+        Get a descriptive string for the data.
+
+        Returns
+        -------
+        str
+            The descriptive string for the data.
+        """
+        return self.data_label + (
+            " / " + self.data_unit if len(self.data_unit) > 0 else ""
+        )
+
     def get_description_of_point(self, indices: Iterable) -> str:
         """
         Get the metadata description of a single point in the array.
@@ -799,7 +833,7 @@ class Dataset(np.ndarray):
 
         Parameters
         ----------
-        order : {‘C’, ‘F’, ‘A’, ‘K’},, optional
+        order : Literal["C", "F", "A", "K"], optional
             The memory layout. The default is "C".
 
         Returns
@@ -912,7 +946,7 @@ class Dataset(np.ndarray):
         """
         _ndarray_reduced = np.ndarray.__reduce__(self)
         _dataset_state = _ndarray_reduced[2] + (self.__dict__,)
-        return (_ndarray_reduced[0], _ndarray_reduced[1], _dataset_state)
+        return _ndarray_reduced[0], _ndarray_reduced[1], _dataset_state
 
     def __setstate__(self, state: tuple):
         """
@@ -949,7 +983,7 @@ class Dataset(np.ndarray):
         Returns
         -------
         Union[pydidas.core.Dataset, type]
-            The output will be be a new Dataset if the output has a dimension
+            The output will be a new Dataset if the output has a dimension
             greater zero or of the basic datatype for 0-d return values.
         """
         if obj.shape == ():

@@ -12,6 +12,7 @@ Improvements
   reduce the total length of the file names.
 - Updated files to new black 2024 style.
 - Added pyFAI units for 'q / A^-1' and '2theta / rad'.
+- Added Kratky-type (x vs. y*x**2) plots to the PydidasPlot1D class.
 
 Bugfixes
 --------

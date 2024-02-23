@@ -23,7 +23,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
 import math
 import multiprocessing as mp
 import os
@@ -33,7 +32,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 
 HELP_TEXT = """
@@ -58,7 +57,7 @@ All modules can be run with the '--all' argument.
 If only a check but no update is desired, use the '--check' argument. Omitting
 the '--check' argument will update files to comply with the formatting
 (for black, isort and copyright).
-A --silent argument can be used to suppess various verbose messages.
+A --silent argument can be used to supress various verbose messages.
 
 Examples
 --------
@@ -81,13 +80,13 @@ MODULE_ARGS = {
 }
 
 
-def _timed_print(input: str, new_lines: int = 0, verbose: bool = True):
+def _timed_print(input_str: str, new_lines: int = 0, verbose: bool = True):
     """
     Print the input with a prepended time string.
 
     Parameters
     ----------
-    input : str
+    input_str : str
         The input to be printed.
     new_lines : int
         The number of new (empty) lines in front of the output. The default is 0.
@@ -103,7 +102,7 @@ def _timed_print(input: str, new_lines: int = 0, verbose: bool = True):
         f"{_time[0]:04d}/{_time[1]:02d}/{_time[2]:02d} "
         f"{_time[3]:02d}:{_time[4]:02d}:{_sec:06.3f}"
     )
-    print("\n" * new_lines + f"{_time_str}: {input}")
+    print("\n" * new_lines + f"{_time_str}: {input_str}")
 
 
 def run_module(module_name: Literal["black", "flake8", "isort", "reuse"]):
@@ -128,14 +127,14 @@ def run_module(module_name: Literal["black", "flake8", "isort", "reuse"]):
     try:
         _timed_print(f"Starting {_job_label}...", new_lines=1)
         subprocess.run(_cmd, check=True)
-        _timed_print(f"Finshed {_job_label}!")
+        _timed_print(f"Finished {_job_label}!")
     except subprocess.CalledProcessError:
         _timed_print(_job_label.capitalize() + " failed.", new_lines=1)
 
 
 class CopyrightYearUpdater:
     """
-    Class to check the copyright year is up to date with the commit date.
+    Class to check the copyright year is up-to-date with the commit date.
 
     This class checks that the copyright written in the file matches the
     commit year for files in git version control. For other whitelisted files,
@@ -164,7 +163,7 @@ class CopyrightYearUpdater:
 
     THIS_YEAR = datetime.fromtimestamp(time.time()).year
     SUFFIX_WHITELIST = [".py", ".rst", "", ".cff", ".md", ".in", ".toml"]
-    _regex_full = re.compile("Copyright 20[0-9][0-9][ ]?-[ ]?20[0-9][0-9],")
+    _regex_full = re.compile("Copyright 20[0-9][0-9] ?- ?20[0-9][0-9],")
     _regex_short = re.compile("Copyright 20[0-9][0-9],")
 
     @staticmethod
@@ -189,9 +188,9 @@ class CopyrightYearUpdater:
                 ["git", "--no-pager", "log", "-1", "--format=%at", fname]
             )
             _epoch = int(_output)
-            return (fname, datetime.fromtimestamp(_epoch).year)
+            return fname, datetime.fromtimestamp(_epoch).year
         except (subprocess.CalledProcessError, ValueError):
-            return (fname, -1)
+            return fname, -1
 
     def __init__(self, directory: Optional[Path] = None, **kwargs):
         self._flags = {
@@ -276,11 +275,10 @@ class CopyrightYearUpdater:
                     self._check_git_commit_year, _git_files
                 )
             }
+
         return _timestamps
 
-    def _get_unversioned_timestamps(
-        self, git_files: Optional[Union[list[Path], dict]] = None
-    ) -> dict:
+    def _get_unversioned_timestamps(self, git_files: Optional[dict] = None) -> dict:
         """
         Get the timestamps of unversioned files.
 
@@ -298,17 +296,22 @@ class CopyrightYearUpdater:
         dict
             The dictionary with all filenames and modification timestamps.
         """
-        git_files = [] if git_files is None else git_files
+        git_files = git_files if git_files is not None else dict()
         _unversioned_files = []
         for _base, _dirs, _files in os.walk(self._directory):
             if ".git" in _dirs:
                 _dirs.remove(".git")
             for _item in _files:
-                _fname = self._directory.joinpath(_item)
+                _fname = Path(_base).joinpath(_item)
                 if (
                     _fname.is_file()
-                    and _fname.suffix in self.SUFFIX_WHITELIST
-                    and _fname not in git_files
+                    and _fname.suffix.lower() in self.SUFFIX_WHITELIST
+                    and (
+                        _fname in git_files
+                        and datetime.fromtimestamp(os.path.getmtime(_fname)).year
+                        == self.THIS_YEAR
+                        and git_files.get(_fname, 0) < self.THIS_YEAR
+                    )
                 ):
                     _unversioned_files.append(_fname)
         return {
@@ -343,7 +346,7 @@ class CopyrightYearUpdater:
                 continue
             _outdated.append(_fname)
             if self._flags["update"]:
-                with open(_fname, "w") as f:
+                with open(_fname, "w", encoding="utf-8") as f:
                     f.write(_contents)
                 self._print(f"Updated copyright on file {_fname}")
             else:

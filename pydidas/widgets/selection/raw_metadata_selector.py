@@ -128,7 +128,7 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         self.__filename = Path(name)
         if not self.__filename.is_file():
             return
-        _is_raw = get_extension(self.__filename) in BINARY_EXTENSIONS
+        _is_raw = get_extension(self.__filename, lowercase=True) in BINARY_EXTENSIONS
         self.setVisible(_is_raw)
         if not _is_raw:
             return

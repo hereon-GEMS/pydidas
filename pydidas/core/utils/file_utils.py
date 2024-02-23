@@ -68,7 +68,7 @@ def trim_filename(path: Path) -> Path:
     return path.parent if path.is_file() else path
 
 
-def get_extension(path: Union[Path, str]) -> str:
+def get_extension(path: Union[Path, str], lowercase=False) -> str:
     """
     Get the extension to a file in the given path.
 
@@ -76,6 +76,8 @@ def get_extension(path: Union[Path, str]) -> str:
     ----------
     path : Union[pathlib.Path, str]
         The full filename and path
+    lowercase : bool, optional
+        Flag to get the extension as lower case string.
 
     Returns
     -------
@@ -87,7 +89,9 @@ def get_extension(path: Union[Path, str]) -> str:
     _ext = path.suffix
     if _ext.startswith("."):
         _ext = _ext[1:]
-    return _ext.lower()
+    if lowercase:
+        _ext.lower()
+    return _ext
 
 
 def find_valid_python_files(path: Path) -> List[Path]:

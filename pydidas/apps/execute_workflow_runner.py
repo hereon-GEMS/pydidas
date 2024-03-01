@@ -278,7 +278,6 @@ class ExecuteWorkflowRunner(QtCore.QObject):
 
         try:
             runner = AppRunner(_app)
-
             runner.sig_results.connect(_app.multiprocessing_store_results)
             if self.parsed_args["verbose"]:
                 runner.sig_progress.connect(self._print_progress)

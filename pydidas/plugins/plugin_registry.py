@@ -50,7 +50,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
     Plugins can be accessed by their class names or by their plugin_name properties.
     For details, please refer to the individual methods.
 
-    Note that the PluginRegistry is the a class which should not normally be
+    Note that the PluginRegistry is a class which should not normally be
     accessed directly but generally through its 'PluginCollection' singleton.
 
     Parameters

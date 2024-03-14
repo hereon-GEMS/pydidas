@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ software.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -50,7 +50,7 @@ PYDIDAS_INFO = (
     "A small section of code is adapted from code which is distributed with other, "
     "more permissive licenses and copyrighted by their respective "
     "owners (particularly the ESRF for pyFAI and silx)."
-    "<br><br>pydidas copyright 2023, Helmholtz-Zentrum Hereon"
+    "<br><br>pydidas Copyright 2024, Helmholtz-Zentrum Hereon"
     "<br><br>pydidas Homepage: "
     "<a href='https://pydidas.hereon.de/index.php.en'>pydidas.hereon.de</a>"
     "<br><br>pydidas github: "

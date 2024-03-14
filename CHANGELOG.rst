@@ -30,7 +30,9 @@ Bugfixes
 - Fixed an issue when asking to display detailed results for a scan point and 
   no node is currently selected.
 - Fixed an issue trying to open binary (i.e. raw) files in the DataBrowsingFrame
-
+- Fixed an issue which would not display the correct default colormap after the 
+  user changed the default.
+  
 
 v24.01.18
 =========

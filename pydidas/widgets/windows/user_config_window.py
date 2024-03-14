@@ -285,6 +285,9 @@ class _UserConfigWindow(PydidasWindow):
         self._widgets["font_family_box"].setFixedWidth(
             int(0.9 * FONT_METRIC_PARAM_EDIT_WIDTH * self.__qtapp.font_char_width)
         )
+        _default_cmap = self.q_settings_get("user/cmap_name", default="Gray")
+        with QtCore.QSignalBlocker(self._widgets["cmap_combobox"]):
+            self._widgets["cmap_combobox"].setCurrentText(_default_cmap)
 
     @QtCore.Slot(object)
     def update_qsetting(self, param_key, value):

@@ -362,7 +362,7 @@ def remove_pydidas_backup(path: Path, version: str):
         "pydidas",
         "pydidas_plugins",
         "pydidas_scripts",
-        f"pydidas-{version}.dist-info",
+        f"pydidas-{_distributed_version_in_python(version)}.dist-info",
     ]:
         if path.joinpath(f"{_name}_pre_update").is_dir():
             shutil.rmtree(path.joinpath(f"{_name}_pre_update"))

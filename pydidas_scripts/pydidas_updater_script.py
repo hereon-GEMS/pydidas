@@ -272,7 +272,7 @@ def backup_local_version(path: Path, version: str):
         "pydidas",
         "pydidas_plugins",
         "pydidas_scripts",
-        f"pydidas-{version}.dist-info",
+        f"pydidas-{_distributed_version_in_python(version)}.dist-info",
     ]:
         if path.joinpath(f"{_name}_pre_update").is_dir():
             shutil.rmtree(path.joinpath(f"{_name}_pre_update"))
@@ -280,6 +280,23 @@ def backup_local_version(path: Path, version: str):
             path.joinpath(_name),
             path.joinpath(f"{_name}_pre_update"),
         )
+
+
+def _distributed_version_in_python(version: str) -> str:
+    """
+    Get the version in python nomenclature without leading zeros.
+
+    Parameters
+    ----------
+    version : str
+        The original version string.
+
+    Returns
+    -------
+    str
+        The version string with stripped leading zeros.
+    """
+    return ".".join([_item.removeprefix("0") for _item in version.split(".")])
 
 
 def restore_pre_update_files(location: Path, version: str, remote_version: str):
@@ -299,7 +316,7 @@ def restore_pre_update_files(location: Path, version: str, remote_version: str):
         "pydidas",
         "pydidas_plugins",
         "pydidas_scripts",
-        f"pydidas-{version}.dist-info",
+        f"pydidas-{_distributed_version_in_python(version)}.dist-info",
     ]:
         if location.joinpath(f"{_name}_pre_update").is_dir():
             if location.joinpath(_name).is_dir():

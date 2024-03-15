@@ -32,6 +32,7 @@ Bugfixes
 - Fixed an issue trying to open binary (i.e. raw) files in the DataBrowsingFrame
 - Fixed an issue which would not display the correct default colormap after the 
   user changed the default.
+- Fixed an issue in the updater script with versions which had leading zeros.
   
 
 v24.01.18

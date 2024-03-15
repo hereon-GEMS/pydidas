@@ -337,14 +337,17 @@ def remove_temp_data(path: Path):
     path : Path
         The path of the update's temporary files.
     """
-    if path.is_dir():
-        shutil.rmtree(path, ignore_errors=True)
-        for _root, _dirs, _files in os.walk(path):
-            for _name in _files:
-                _fname = os.path.join(_root, _name)
-                os.chmod(_fname, stat.S_IWUSR)
-    if path.is_dir():
-        shutil.rmtree(path, ignore_errors=False)
+    try:
+        if path.is_dir():
+            shutil.rmtree(path, ignore_errors=True)
+            for _root, _dirs, _files in os.walk(path):
+                for _name in _files:
+                    _fname = os.path.join(_root, _name)
+                    os.chmod(_fname, stat.S_IWUSR)
+        if path.is_dir():
+            shutil.rmtree(path, ignore_errors=False)
+    except PermissionError:
+        pass
 
 
 def remove_pydidas_backup(path: Path, version: str):
@@ -365,7 +368,10 @@ def remove_pydidas_backup(path: Path, version: str):
         f"pydidas-{_distributed_version_in_python(version)}.dist-info",
     ]:
         if path.joinpath(f"{_name}_pre_update").is_dir():
-            shutil.rmtree(path.joinpath(f"{_name}_pre_update"))
+            try:
+                shutil.rmtree(path.joinpath(f"{_name}_pre_update"))
+            except PermissionError:
+                pass
 
 
 def run_update():

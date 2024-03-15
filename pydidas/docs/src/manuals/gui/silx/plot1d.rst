@@ -71,6 +71,15 @@ menu entries description
             :align: center
       - Change the drawing style. Repeatedly using this button will cycle 
         through lines, dots, and lines & dots styles for the curve.
+    * -  .. image:: ../silx/images/menu_plot_type_generic.png
+            :align: center
+      - Change the plotted data to the generic y vs. x plot without any special
+        operations.
+    * -  .. image:: ../silx/images/menu_plot_type_kratky.png
+            :align: center
+      - Plot data in a Kratky-type plot using y * x^2 vs. x for the y and 
+        x-axis, respectively. This plot allows, for example, to correct for the 
+        q-dependence of the scattering intensity in small angle scattering.
     * -  .. image:: ../silx/images/menu_copy_to_clipboard.png
             :align: center
       - Copy the currently visible figure to the clipboard.            

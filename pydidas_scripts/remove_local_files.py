@@ -106,7 +106,7 @@ def remove_pydidas_log_files(
     _docs_path = Path(_qt_docs_path).joinpath("pydidas", _version)
     try:
         shutil.rmtree(_docs_path)
-    except PermissionError:
+    except (FileNotFoundError, PermissionError):
         pass
     if verbose:
         print(

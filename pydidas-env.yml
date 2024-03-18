@@ -30,3 +30,6 @@ dependencies:
   - sphinx_rtd_theme=2.0.0
   - tifffile=2024.2.12
   - yaml=0.2.5
+  - pip:
+    - build==1.1.1
+  

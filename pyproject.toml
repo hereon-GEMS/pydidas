@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 [build-system]
-requires = ["setuptools", "wheel", "build"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -61,6 +61,7 @@ dependencies = [
     "pyyaml>=6.0",
     "requests>=2.31.0",
     "PyQt5>=5.15",
+    "build>=1.0.3",
 ]
 
 [tools.coverage.report]

@@ -186,6 +186,7 @@ requests==2.31.0
     # via
     #   pydidas (pyproject.toml)
     #   sphinx
+setuptools==69.2.0
 scikit-image==0.22.0
     # via pydidas (pyproject.toml)
 scipy==1.12.0

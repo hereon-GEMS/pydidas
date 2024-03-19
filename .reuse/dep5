@@ -6,7 +6,7 @@ Source: https://github.com/hereon-GEMS/pydidas
 
 Files:
     .pre-commit-config.yaml
-    pydidas-env.yml
+    requirements.txt
     pydidas/docs/make.bat
     pydidas/docs/Makefile
     pydidas/docs/src/_static/_css/pydidas-custom.css

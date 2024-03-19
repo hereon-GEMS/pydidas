@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath("./../.."))
 # -- Project information -----------------------------------------------------
 
 project = "pydidas"
-copyright = "2023, Helmholtz-Zentrum Hereon"
+copyright = "2023 - 2024, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 

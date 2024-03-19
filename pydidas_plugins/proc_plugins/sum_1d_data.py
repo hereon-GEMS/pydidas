@@ -40,7 +40,18 @@ from pydidas.plugins import ProcPlugin
 
 class Sum1dData(ProcPlugin):
     """
-    Sum up datapoints in a 1D dataset.
+    Sum up data points in a 1D dataset.
+
+    This plugin sums up the data values of the selected data points.
+    Summation limits are defined using the 'lower_limit' and 'upper_limit'
+    parameters in the plugin.
+
+    Higher-dimensional datasets can also be processed. The 'process_data_dim'
+    parameter determines which dimension to sum over. The other dimensions
+    are being kept. For example, in a 3-dimensional dataset, summing over
+    axis 1 would yield a 2-dimensional datasets with the original dimensions
+    0 and 2 kept in place. This example would be equivalent to
+    numpy.sum(dataset, axis=1).
     """
 
     plugin_name = "Sum 1D data"

@@ -55,7 +55,7 @@ class WorkflowNode(GenericNode):
     def __init__(self, **kwargs: dict):
         self.__preprocess_kwargs(kwargs)
         GenericNode.__init__(self, **kwargs)
-        self.__confirm_plugin_existance_and_type()
+        self.__confirm_plugin_existence_and_type()
         self.node_id = self.__tmp_node_id
         self.results = None
         self.result_kws = None
@@ -76,7 +76,7 @@ class WorkflowNode(GenericNode):
         self.plugin = None
         self.__tmp_node_id = kwargs.pop("node_id", None)
 
-    def __confirm_plugin_existance_and_type(self):
+    def __confirm_plugin_existence_and_type(self):
         """
         Verify that a plugin exists and is of the correct type.
 
@@ -205,7 +205,7 @@ class WorkflowNode(GenericNode):
         with TimerSaveRuntime() as _runtime:
             if kwargs.get("store_input_data", False):
                 self.plugin.store_input_data_copy(arg, **kwargs)
-            res, reskws = self.plugin.execute(deepcopy(arg), **kwargs)
+            res, reskws = self.plugin.execute(arg, **kwargs)
         if (
             self.is_leaf
             or self.plugin.get_param_value("keep_results")
@@ -246,7 +246,7 @@ class WorkflowNode(GenericNode):
 
     def dump(self) -> dict:
         """
-        Dump the node to a saveable format.
+        Dump the node to a savable format.
 
         The dump includes information about the parent and children nodes but
         not the nodes itself. References to the nodeIDs are stored to allow

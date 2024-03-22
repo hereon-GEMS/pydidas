@@ -1,6 +1,7 @@
 .. Copyright 2021 - 2024, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
+
 v24.
 =========
 
@@ -33,6 +34,10 @@ Bugfixes
 - Fixed an issue which would not display the correct default colormap after the 
   user changed the default.
 - Fixed an issue in the updater script with versions which had leading zeros.
+- Fixed an issue in the remove_local_files script when directories did not 
+  exist.  
+- Fixed an issue with accessing WorkflowResults when the PluginCollection has
+  been re-initialized.
   
 
 v24.01.18

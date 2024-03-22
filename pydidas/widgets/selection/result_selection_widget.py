@@ -680,7 +680,7 @@ class ResultSelectionWidget(
             raise UserConfigError(
                 "No node has been selected. Please check the result selection"
             )
-        _loader_plugin = self._RESULTS._TREE.root.plugin.copy()
+        _loader_plugin = self._RESULTS.frozen_tree.root.plugin.copy()
         _loader_plugin._SCAN = self._RESULTS.frozen_scan
         _timeline = self.get_param_value("use_scan_timeline")
         _node_metadata = self._RESULTS.get_result_metadata(

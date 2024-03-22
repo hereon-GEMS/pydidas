@@ -123,6 +123,7 @@ class WorkflowResults(QtCore.QObject):
         self._config["frozen_SCAN"].update_from_scan(self._SCAN)
         self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
         self._config["frozen_TREE"].update_from_tree(self._TREE)
+        self._config["frozen_TREE"].prepare_execution()
 
     def clear_all_results(self):
         """

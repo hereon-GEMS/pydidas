@@ -201,16 +201,25 @@ class ProcessingTree(GenericTree):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
-        if (not self._preexecuted) or self.tree_has_changed:
-            self.prepare_execution()
+        self.prepare_execution()
         self.root.execute_plugin_chain(arg, global_index=arg, **kwargs)
 
-    def prepare_execution(self):
+    def prepare_execution(self, forced: bool = False):
         """
         Prepare the execution of the ProcessingTree.
 
         This method calls all the nodes' prepare_execution methods.
+        If the tree has not changed, it will skip this method unless the forced
+        keyword is set to True.
+
+        Parameters
+        ----------
+        forced : bool, optional
+            Flag to force running the prepare_execution method. The default is
+            False.
         """
+        if self._preexecuted and not self.tree_has_changed and not forced:
+            return
         self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
         self._preexecuted = True

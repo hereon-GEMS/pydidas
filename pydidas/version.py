@@ -23,7 +23,7 @@ Module with the pydidas Version number.
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
-__version__ = "24.03.15"
+__version__ = "24.03.25"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 

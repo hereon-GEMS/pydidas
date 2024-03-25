@@ -35,8 +35,8 @@ from qtpy import QtCore
 from pydidas_qtcore import PydidasQApplication
 
 from ..contexts import DiffractionExperimentContext, ScanContext
-from ..contexts.diffraction_exp_context import DiffractionExperiment
-from ..contexts.scan_context import Scan
+from ..contexts.diff_exp import DiffractionExperiment
+from ..contexts.scan import Scan
 from ..core import UserConfigError
 from ..multiprocessing import AppRunner
 from ..workflow import ProcessingTree, WorkflowResultsContext, WorkflowTree
@@ -50,7 +50,6 @@ EXP = DiffractionExperimentContext()
 
 
 class ExecuteWorkflowRunner(QtCore.QObject):
-
     """
     Class to run pydidas workflows from the command line with parallelization.
 
@@ -279,7 +278,6 @@ class ExecuteWorkflowRunner(QtCore.QObject):
 
         try:
             runner = AppRunner(_app)
-
             runner.sig_results.connect(_app.multiprocessing_store_results)
             if self.parsed_args["verbose"]:
                 runner.sig_progress.connect(self._print_progress)

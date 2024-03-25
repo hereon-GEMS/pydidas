@@ -6,25 +6,25 @@ Source: https://github.com/hereon-GEMS/pydidas
 
 Files:
     .pre-commit-config.yaml
-    pydidas-env.yml
+    requirements.txt
     pydidas/docs/make.bat
     pydidas/docs/Makefile
-    pydidas/docs/source/_static/_css/pydidas-custom.css
-Copyright: 2023, Helmholtz-Zentrum Hereon
+    pydidas/docs/src/_static/_css/pydidas-custom.css
+Copyright: 2023 - 2024, Helmholtz-Zentrum Hereon
 License: CC-BY-4.0
 
 Files:
-    pydidas/docs/source/*.png
+    pydidas/docs/src/*.png
     pydidas/resources/icons/*
     pydidas/resources/*.png
     resources/*.png
     resources/*.svg
     resources/graphics_for_gui/*
     resources/documentation/dev_guide/*
-Copyright: 2023, Helmholtz-Zentrum Hereon
+Copyright: 2023 - 2024, Helmholtz-Zentrum Hereon
 License: CC-BY-ND-4.0
 
 Files:
     tests/_data/*
-Copyright: 2023, Helmholtz-Zentrum Hereon
+Copyright: 2023 - 2024, Helmholtz-Zentrum Hereon
 License: CC-BY-4.0

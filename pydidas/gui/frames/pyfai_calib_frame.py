@@ -47,7 +47,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.plot.tools import ImageToolBar
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
-from ...contexts.diffraction_exp_context import DiffractionExperiment
+from ...contexts.diff_exp import DiffractionExperiment
 from ...core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
 from ...widgets import PydidasFileDialog, silx_plot
 from ...widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
@@ -107,8 +107,12 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
     for _task in tasks[0:4]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar)[0]
-        _histo_crop_action = silx_plot.CropHistogramOutliers(_plot, parent=_plot)
-        _autoscale_action = silx_plot.AutoscaleToMeanAndThreeSigma(_plot, parent=_plot)
+        _histo_crop_action = silx_plot.CropHistogramOutliers(
+            _plot, parent=_plot, forced_image_legend="image"
+        )
+        _autoscale_action = silx_plot.AutoscaleToMeanAndThreeSigma(
+            _plot, parent=_plot, forced_image_legend="image"
+        )
         _widget_action = [
             _action
             for _action in _toolbar.actions()

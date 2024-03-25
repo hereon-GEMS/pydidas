@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -91,8 +91,7 @@ class TestBaseInputPlugin(unittest.TestCase):
     def setUp(self):
         SCAN.restore_all_defaults(True)
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def test_create_base_plugin(self):
         plugin = create_plugin_class(INPUT_PLUGIN)
@@ -263,6 +262,12 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin.set_param_value("roi_yhigh", 5)
         plugin.pre_execute()
         _data, kwargs = plugin.execute(0)
+
+    def test_copy(self):
+        plugin = TestInputPlugin(filename=self._fname)
+        copy = plugin.copy()
+        self.assertEqual(plugin._SCAN, SCAN)
+        self.assertEqual(copy._SCAN, SCAN)
 
 
 if __name__ == "__main__":

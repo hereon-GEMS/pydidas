@@ -34,19 +34,17 @@ from pydidas.core.utils import (
     DOC_HOME_ADDRESS,
     DOC_HOME_FILENAME,
     DOC_HOME_QURL,
-    DOC_MAKE_DIRECTORY,
+    DOC_SOURCE_DIRECTORY,
 )
 
 
 class TestGetDocQUrl(unittest.TestCase):
-    def setUp(self):
-        ...
+    def setUp(self): ...
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
-    def test_DOC_MAKE_DIRECTORY(self):
-        _dir = DOC_MAKE_DIRECTORY
+    def test_DOC_SOURCE_DIRECTORY(self):
+        _dir = DOC_SOURCE_DIRECTORY
         self.assertIn("Makefile", os.listdir(_dir))
 
     def test_DOC_HOME_FILENAME(self):

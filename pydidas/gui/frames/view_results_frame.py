@@ -32,8 +32,8 @@ from typing import Self
 
 from qtpy import QtCore
 
-from ...contexts.diffraction_exp_context import DiffractionExperiment
-from ...contexts.scan_context import Scan
+from ...contexts.diff_exp import DiffractionExperiment
+from ...contexts.scan import Scan
 from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame

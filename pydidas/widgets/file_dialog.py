@@ -347,9 +347,9 @@ class PydidasFileDialogWidget(
             return
         if "reference" in self._calling_kwargs:
             self._stored_dirs[self._calling_kwargs.get("reference")] = _selection
-            self._stored_selections[
-                self._calling_kwargs.get("reference")
-            ] = self._widgets["selection"].text()
+            self._stored_selections[self._calling_kwargs.get("reference")] = (
+                self._widgets["selection"].text()
+            )
 
     def get_saving_filename(self, **kwargs: dict) -> Union[None, str]:
         """

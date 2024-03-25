@@ -417,10 +417,10 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
                 "is the latest available version. No actions required."
             )
         )
-        if auto_check and _remote_v > VERSION and _remote_v not in [-1, _ack_version]:
+        if auto_check and _remote_v > VERSION and _remote_v not in ["-1", _ack_version]:
             _text += "Please update pydidas to benefit from the latest improvements."
         if (
-            auto_check and _remote_v > VERSION and _remote_v not in [-1, _ack_version]
+            auto_check and _remote_v > VERSION and _remote_v not in ["-1", _ack_version]
         ) or not auto_check:
             _ack = AcknowledgeBox(
                 show_checkbox=auto_check,

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the TiffIo class for importing and exporting tiff data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -77,7 +77,9 @@ class TiffIo(IoBase):
             The data in form of a pydidas Dataset (with embedded metadata)
         """
         with CatchFileErrors(filename, TiffFileError):
-            _data = imread(filename)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", UserWarning)
+                _data = imread(filename)
 
         cls._data = Dataset(_data)
         return cls.return_data(**kwargs)

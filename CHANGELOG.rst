@@ -1,5 +1,44 @@
-.. Copyright 2024, Helmholtz-Zentrum Hereon
+.. Copyright 2021 - 2024, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
+
+
+v24.03.25
+=========
+
+
+Improvements
+------------
+
+- Changed a number of filenames and paths (mainly in the documentation) to 
+  reduce the total length of the file names.
+- Updated files to new black 2024 style.
+- Added pyFAI units for 'q / A^-1' and '2theta / rad'.
+- Added Kratky-type (x vs. y*x**2) plots to the PydidasPlot1D class.
+
+Bugfixes
+--------
+- Fixed an issue with propagation of plugin result shapes for fitting plugins.
+- Fixed an issue where changing the ScanContext after processing would prevent 
+  writing results to file.
+- Fixed an issue where exporting data would store wrong contexts when changing
+  the global contexts after processing.
+- Fixed an issue with the pyFAIcalib frame where setting the detector first
+  and then selecting an image would not allow to use the colormap adjustment 
+  buttons in the plot widget.
+- Fixed an issue with testing workflows when changing the contexts.
+- Fixed an issue where WorkflowTree import exceptions where not correctly 
+  handled.
+- Fixed an issue when asking to display detailed results for a scan point and 
+  no node is currently selected.
+- Fixed an issue trying to open binary (i.e. raw) files in the DataBrowsingFrame
+- Fixed an issue which would not display the correct default colormap after the 
+  user changed the default.
+- Fixed an issue in the updater script with versions which had leading zeros.
+- Fixed an issue in the remove_local_files script when directories did not 
+  exist.  
+- Fixed an issue with accessing WorkflowResults when the PluginCollection has
+  been re-initialized.
+  
 
 v24.01.18
 =========
@@ -362,9 +401,9 @@ Improvements
       python main.
     - The PluginCollection now uses the pathlib library instead of strings for 
       management of files and paths.
-    - contexts.scan_contexts importers can now select which Scan instance to 
+    - contexts.scans importers can now select which Scan instance to 
       import to.
-    - contexts.diffraction_exp_context importers can now select which 
+    - contexts.diff_exp importers can now select which 
       DiffractionExperiment instance to import to.
     - Added an update_from_tree method to the WorkflowTree.
     - Added 'counted_images_per_file' Parameter to hdf5 loaders to allow 

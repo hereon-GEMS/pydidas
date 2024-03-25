@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,10 +38,10 @@ from qtpy import QtWidgets
 from pydidas import unittest_objects
 from pydidas.apps import ExecuteWorkflowRunner
 from pydidas.contexts import (
+    DiffractionExperiment,
     DiffractionExperimentContext,
+    Scan,
     ScanContext,
-    diffraction_exp_context,
-    scan_context,
 )
 from pydidas.core import PydidasQsettings, UserConfigError
 from pydidas.core.utils import get_random_string
@@ -275,7 +275,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
         self.assertTrue(_dir.joinpath("node_02.h5").is_file())
 
     def test_update_contexts_from_stored_args__scan_instance(self):
-        _scan = scan_context.Scan()
+        _scan = Scan()
         _scan_params = {
             "scan_dim": 2,
             "scan_dim1_label": get_random_string(6),
@@ -291,7 +291,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
 
     def test_update_contexts_from_stored_args__scan(self):
         _scan_fname = self._path.joinpath("dummy_scan.yml")
-        _scan = scan_context.Scan()
+        _scan = Scan()
         _scan_params = {
             "scan_dim": 2,
             "scan_dim1_label": get_random_string(6),
@@ -330,7 +330,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
 
     def test_update_contexts_from_stored_args__diffraction_exp(self):
         _exp_fname = self._path.joinpath("dummy_diffraction_exp.yml")
-        _exp = diffraction_exp_context.DiffractionExperiment()
+        _exp = DiffractionExperiment()
         _exp_params = {
             "detector_poni1": 0.1234,
             "detector_poni2": 2.12,

@@ -57,10 +57,6 @@ _DEFAULTS = ParameterCollection(
         "hdf5_key",
         "hdf5_frame",
         "current_filename",
-        "scan_index1",
-        "scan_index2",
-        "scan_index3",
-        "scan_index4",
     ),
 )
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for testing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -59,4 +59,4 @@ class DummyPluginCollection(PluginRegistry):
             _class = create_plugin_class(num % 3, number=num // 3)
             self._PluginRegistry__add_new_class(_class)
         for _plugin in _base_plugins:
-            self._PluginRegistry__check_and_register_class(_plugin)
+            self.check_and_register_class(_plugin)

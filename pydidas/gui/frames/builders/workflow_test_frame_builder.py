@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The WorkflowTestFrameBuilder class populates the the WorkflowTestFrame with widg
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -62,10 +62,10 @@ class WorkflowTestFrameBuilder:
             "linebreak": param_key in ["image_selection", "selected_results"],
             "visible": param_key
             not in [
+                "scan_index0",
                 "scan_index1",
                 "scan_index2",
                 "scan_index3",
-                "scan_index4",
                 "detector_image_index",
             ],
         }
@@ -108,10 +108,10 @@ class WorkflowTestFrameBuilder:
         for _param in [
             "image_selection",
             "frame_index",
+            "scan_index0",
             "scan_index1",
             "scan_index2",
             "scan_index3",
-            "scan_index4",
             "detector_image_index",
         ]:
             frame.create_param_widget(

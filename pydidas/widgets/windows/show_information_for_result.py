@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ information about a datapoint from a pydidas result.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -106,7 +106,6 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             The parameter values of the result selections.
         """
         self._loader_plugin = loader_plugin.copy()
-        self._loader_plugin._SCAN = loader_plugin._SCAN.copy()
         self._loader_plugin.update_filename_string()
         _scan = self._loader_plugin._SCAN
         _ax_ranges = result_metadata["axis_ranges"]

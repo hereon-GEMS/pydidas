@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ workflow on a single data frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -155,10 +155,10 @@ class WorkflowTestFrame(BaseFrame):
         IMAGE_SELECTION_PARAM.copy(),
         get_generic_param_collection(
             "frame_index",
+            "scan_index0",
             "scan_index1",
             "scan_index2",
             "scan_index3",
-            "scan_index4",
             "detector_image_index",
             "selected_results",
         ),
@@ -180,7 +180,7 @@ class WorkflowTestFrame(BaseFrame):
                 "plot_dim": 1,
                 "details_active": False,
                 "exp_hash": -1,
-                "scan_tree_hash": -1,
+                "context_hash": -1,
             }
         )
 
@@ -221,11 +221,8 @@ class WorkflowTestFrame(BaseFrame):
         Check if the WorkflowTree has changed and update the local Tree if
         it has changed.
         """
-        if self._config["scan_tree_hash"] != hash(
-            (hash(SCAN), hash(TREE))
-        ) or self._config["exp_hash"] != hash(EXP):
-            self._config["scan_tree_hash"] = hash((hash(SCAN), hash(TREE)))
-            self._config["EXP_hash"] = hash(EXP)
+        if self._config["context_hash"] != hash((hash(SCAN), hash(TREE), hash(EXP))):
+            self._config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
             self.reload_workflow()
 
     @QtCore.Slot()
@@ -262,7 +259,7 @@ class WorkflowTestFrame(BaseFrame):
             if self._active_node != -1:
                 self.__update_text_description_of_node_results()
                 self.__plot_results()
-            self._config["scan_tree_hash"] = hash((hash(SCAN), hash(TREE)))
+            self._config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
 
     @QtCore.Slot()
     def __update_image_selection_visibility(self):
@@ -274,9 +271,9 @@ class WorkflowTestFrame(BaseFrame):
             "frame_index", _selection == "Use global index"
         )
         _use_scan_dim = _selection == "Use scan dimensional indices"
-        for _dim in [1, 2, 3, 4]:
+        for _dim in range(4):
             self.toggle_param_widget_visibility(
-                f"scan_index{_dim}", _use_scan_dim and _dim <= SCAN.ndim
+                f"scan_index{_dim}", _use_scan_dim and _dim < SCAN.ndim
             )
         self.toggle_param_widget_visibility(
             "detector_image_index", _selection == "Use detector image number"
@@ -378,7 +375,7 @@ class WorkflowTestFrame(BaseFrame):
             The global image index.
         """
         _nums = [
-            self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
+            self.get_param_value(f"scan_index{_index}") for _index in range(SCAN.ndim)
         ]
         _index = SCAN.get_frame_from_indices(_nums)
         if _index >= SCAN.n_points:

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2022 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2022 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -132,6 +132,20 @@ class ExpandCanvas(PlotAction):
 class AutoscaleToMeanAndThreeSigma(PlotAction):
     """
     A new custom PlotAction to set the colormap to autoscale with mean +/- 3 sigma.
+
+    Parameters
+    ----------
+    plot : silx.gui.plot.PlotWidget
+        The associated plot widget.
+    **kwargs:
+        Supported keyword arguments are:
+
+        parent : Union[None, QObject], optional
+            The parent QObject. The default is None.
+        forced_image_legend : Union[None, str], optional
+            A fixed image legend to use for enfocing the rescaling, if multiple
+            image items are in a plot. None defaults to the active image.
+            The default is None.
     """
 
     def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
@@ -146,9 +160,14 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
             parent=kwargs.get("parent", None),
         )
         PydidasQsettingsMixin.__init__(self)
+        self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
     def _actionTriggered(self, checked=False):
-        image = self.plot.getActiveImage()
+        if self.__forced_image_legend is None:
+            image = self.plot.getActiveImage()
+        else:
+            image = self.plot.getImage(legend=self.__forced_image_legend)
+
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
         colormap = image.getColormap()
@@ -169,7 +188,21 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     and 15 bit, respective to the full range of the image. For an Eiger detector, this
     corresponds to minimal final bins of 32 counts.
 
-    The lower limit is implemented in two tiers of 12 bit
+    The lower limit is implemented in two tiers of 12 bit.
+
+    Parameters
+    ----------
+    plot : silx.gui.plot.PlotWidget
+        The associated plot widget.
+    **kwargs:
+        Supported keyword arguments are:
+
+        parent : Union[None, QObject], optional
+            The parent QObject. The default is None.
+        forced_image_legend : Union[None, str], optional
+            A fixed image legend to use for enfocing the rescaling, if multiple
+            image items are in a plot. None defaults to the active image.
+            The default is None.
     """
 
     def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
@@ -184,9 +217,14 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             parent=kwargs.get("parent", None),
         )
         PydidasQsettingsMixin.__init__(self)
+        self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
     def _actionTriggered(self, checked=False):
-        image = self.plot.getActiveImage()
+        if self.__forced_image_legend is None:
+            image = self.plot.getActiveImage()
+        else:
+            image = self.plot.getImage(legend=self.__forced_image_legend)
+
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
 
@@ -203,7 +241,6 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
 
         _data = image.getData()
         colormap = image.getColormap()
-
         _cmap_limit_low = None
         _cmap_limit_high = None
 
@@ -275,7 +312,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
             qsettings_ref=self._dialog_kwargs["qsettings_ref"],
         )
         if _filename is not None:
-            _image = import_data(_filename)
+            _image = import_data(_filename).array
             self.parent()._setValue(filename=_filename, data=_image)
 
 

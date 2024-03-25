@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ with additional support for plugins and a plugin chain.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -50,16 +50,15 @@ class WorkflowNode(GenericNode):
     chain through the WorkflowTree.
     """
 
-    kwargs_for_copy_creation = ["plugin", "node_id", "_result_shape"]
+    kwargs_for_copy_creation = ["plugin", "node_id"]
 
     def __init__(self, **kwargs: dict):
         self.__preprocess_kwargs(kwargs)
         GenericNode.__init__(self, **kwargs)
-        self.__confirm_plugin_existance_and_type()
+        self.__confirm_plugin_existence_and_type()
         self.node_id = self.__tmp_node_id
         self.results = None
         self.result_kws = None
-        self._result_shape = None
         self.runtime = -1
 
     def __preprocess_kwargs(self, kwargs: dict):
@@ -77,7 +76,7 @@ class WorkflowNode(GenericNode):
         self.plugin = None
         self.__tmp_node_id = kwargs.pop("node_id", None)
 
-    def __confirm_plugin_existance_and_type(self):
+    def __confirm_plugin_existence_and_type(self):
         """
         Verify that a plugin exists and is of the correct type.
 
@@ -206,7 +205,7 @@ class WorkflowNode(GenericNode):
         with TimerSaveRuntime() as _runtime:
             if kwargs.get("store_input_data", False):
                 self.plugin.store_input_data_copy(arg, **kwargs)
-            res, reskws = self.plugin.execute(deepcopy(arg), **kwargs)
+            res, reskws = self.plugin.execute(arg, **kwargs)
         if (
             self.is_leaf
             or self.plugin.get_param_value("keep_results")
@@ -247,7 +246,7 @@ class WorkflowNode(GenericNode):
 
     def dump(self) -> dict:
         """
-        Dump the node to a saveable format.
+        Dump the node to a savable format.
 
         The dump includes information about the parent and children nodes but
         not the nodes itself. References to the nodeIDs are stored to allow
@@ -285,7 +284,6 @@ class WorkflowNode(GenericNode):
         """
         self.plugin.update_legacy_image_ops_with_this_plugin()
         self.plugin.calculate_result_shape()
-        self._result_shape = self.plugin.result_shape
 
     def propagate_to_children(self):
         """
@@ -309,7 +307,7 @@ class WorkflowNode(GenericNode):
             Returns the shape of the Plugin's results, if it has been
             calculated. Else, returns None.
         """
-        return self._result_shape
+        return self.plugin.result_shape
 
     def __hash__(self) -> int:
         """

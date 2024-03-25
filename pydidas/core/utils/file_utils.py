@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with file utility functions pertaining to filenames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -68,7 +68,7 @@ def trim_filename(path: Path) -> Path:
     return path.parent if path.is_file() else path
 
 
-def get_extension(path: Union[Path, str]) -> str:
+def get_extension(path: Union[Path, str], lowercase=False) -> str:
     """
     Get the extension to a file in the given path.
 
@@ -76,6 +76,8 @@ def get_extension(path: Union[Path, str]) -> str:
     ----------
     path : Union[pathlib.Path, str]
         The full filename and path
+    lowercase : bool, optional
+        Flag to get the extension as lower case string.
 
     Returns
     -------
@@ -87,6 +89,8 @@ def get_extension(path: Union[Path, str]) -> str:
     _ext = path.suffix
     if _ext.startswith("."):
         _ext = _ext[1:]
+    if lowercase:
+        _ext.lower()
     return _ext
 
 

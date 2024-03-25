@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,27 +20,28 @@ Subpackage with pydidas contexts.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
 # import sub-packages:
-from . import diffraction_exp_context
-from . import scan_context
+from . import diff_exp
+from . import scan
 
-__all__.extend(["experiment_context", "scan_context"])
+__all__.extend(["diff_exp", "scan"])
 
 
 # import __all__ items from modules:
 
 # explicitly import the singleton factories from the subpackages
-from .diffraction_exp_context import (
+from .diff_exp import (
+    DiffractionExperiment,
     DiffractionExperimentContext,
     DiffractionExperimentIo,
 )
-from .scan_context import ScanContext, ScanIo
+from .scan import ScanContext, ScanIo, Scan
 
 __all__.extend(
     [
@@ -52,7 +53,7 @@ __all__.extend(
 )
 
 GLOBAL_CONTEXTS = {
-    "diffraction_experiment": DiffractionExperimentContext(),
+    "diffraction_experiment_context": DiffractionExperimentContext(),
     "scan_context": ScanContext(),
 }
 

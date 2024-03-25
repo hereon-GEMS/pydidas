@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ singleton class for storing and accessing the composite results of the processin
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,8 +37,8 @@ import numpy as np
 from qtpy import QtCore
 
 from ..contexts import DiffractionExperimentContext, ScanContext
-from ..contexts.diffraction_exp_context import DiffractionExperiment
-from ..contexts.scan_context import Scan
+from ..contexts.diff_exp import DiffractionExperiment
+from ..contexts.scan import Scan
 from ..core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
 from .processing_tree import ProcessingTree
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER
@@ -85,6 +85,11 @@ class WorkflowResults(QtCore.QObject):
             else diffraction_exp_context
         )
         self._TREE = WorkflowTree() if workflow_tree is None else workflow_tree
+        self._config = {
+            "frozen_SCAN": self._SCAN.copy(),
+            "frozen_EXP": self._EXP.copy(),
+            "frozen_TREE": self._TREE.copy(),
+        }
         self.clear_all_results()
 
     def update_shapes_from_scan_and_workflow(self):
@@ -111,7 +116,14 @@ class WorkflowResults(QtCore.QObject):
                 _dset.update_axis_range(index, _range)
             self.__composites[_node_id] = _dset
 
+        self._config["scan_ndim"] = self._SCAN.get_param_value("scan_dim")
+        self._config["scan_npoints"] = self._SCAN.n_points
+        self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
         self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
+        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
+        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
+        self._config["frozen_TREE"].update_from_tree(self._TREE)
+        self._config["frozen_TREE"].prepare_execution()
 
     def clear_all_results(self):
         """
@@ -119,16 +131,17 @@ class WorkflowResults(QtCore.QObject):
         """
         self.__composites = {}
         self.__source_hash = -1
-        self._config = {
-            "shapes": {},
-            "node_labels": {},
-            "data_labels": {},
-            "data_units": {},
-            "metadata_complete": False,
-            "plugin_names": {},
-            "result_titles": {},
-            "exported": False,
-        }
+        for _key in (
+            "shapes",
+            "plugin_names",
+            "result_titles",
+            "node_labels",
+            "data_labels",
+            "data_units",
+        ):
+            self._config[_key] = {}
+        for _key in ("metadata_complete", "exported"):
+            self._config[_key] = False
 
     def update_frame_metadata(self, metadata: dict):
         """
@@ -143,7 +156,7 @@ class WorkflowResults(QtCore.QObject):
             the associated data.
         """
         for node_id, _meta in metadata.items():
-            _dim_offset = self._SCAN.get_param_value("scan_dim")
+            _dim_offset = self._config["scan_ndim"]
             for _key, _item in _meta.items():
                 if isinstance(_item, dict):
                     _update_method = getattr(
@@ -191,7 +204,7 @@ class WorkflowResults(QtCore.QObject):
         for node_id, result in results.items():
             if not isinstance(result, Dataset):
                 continue
-            _dim_offset = self._SCAN.get_param_value("scan_dim")
+            _dim_offset = self._config["scan_ndim"]
             for _dim in range(result.ndim):
                 self.__composites[node_id].update_axis_label(
                     _dim + _dim_offset, result.axis_labels[_dim]
@@ -265,6 +278,42 @@ class WorkflowResults(QtCore.QObject):
             A dictionary with entries of the form <node_id: n_dim>
         """
         return {_key: _item.ndim for _key, _item in self.__composites.items()}
+
+    @property
+    def frozen_tree(self) -> WorkflowTree:
+        """
+        Get the frozen instance of the WorkflowTree context.
+
+        Returns
+        -------
+        WorkflowTree
+            The WorkflowTree at the time of processing.
+        """
+        return self._config["frozen_TREE"]
+
+    @property
+    def frozen_exp(self) -> DiffractionExperiment:
+        """
+        Get the frozen instance of the DiffractionExperiment context.
+
+        Returns
+        -------
+        DiffractionExperiment
+            The DiffractionExperiment at the time of processing.
+        """
+        return self._config["frozen_EXP"]
+
+    @property
+    def frozen_scan(self) -> Scan:
+        """
+        Get the frozen instance of the Scan context.
+
+        Returns
+        -------
+        Scan
+            The Scan at the time of processing.
+        """
+        return self._config["frozen_SCAN"]
 
     @property
     def source_hash(self) -> int:
@@ -348,9 +397,9 @@ class WorkflowResults(QtCore.QObject):
         """
         _data = self.__composites[node_id].copy()
         _data.flatten_dims(
-            *range(self._SCAN.ndim),
+            *range(self._config["scan_ndim"]),
             new_dim_label="Chronological scan points",
-            new_dim_range=np.arange(self._SCAN.n_points),
+            new_dim_range=np.arange(self._config["scan_npoints"]),
         )
         if squeeze:
             return _data.squeeze()
@@ -388,7 +437,11 @@ class WorkflowResults(QtCore.QObject):
         _data = self.__composites[node_id].copy()
 
         def __dim_index(i):
-            return len(slices) - (i + 1) + flattened_scan_dim * (self._SCAN.ndim - 1)
+            return (
+                len(slices)
+                - (i + 1)
+                + flattened_scan_dim * (self._config["scan_ndim"] - 1)
+            )
 
         for _dim, _slice in enumerate(slices[flattened_scan_dim:][::-1]):
             if isinstance(_slice, slice):
@@ -408,9 +461,9 @@ class WorkflowResults(QtCore.QObject):
 
         if flattened_scan_dim:
             _data.flatten_dims(
-                *range(self._SCAN.ndim),
+                *range(self._config["scan_ndim"]),
                 new_dim_label="Chronological scan points",
-                new_dim_range=np.arange(self._SCAN.n_points),
+                new_dim_range=np.arange(self._config["scan_npoints"]),
             )
             _data = _data[slices[0]]
 
@@ -437,6 +490,10 @@ class WorkflowResults(QtCore.QObject):
             A dictionary with the metadata stored using the "axis_labels",
             "axis_ranges", "axis_units" and "metadata" keys.
         """
+        if node_id not in self.__composites:
+            raise UserConfigError(
+                "The selected node ID does not have any results associated with it."
+            )
         if not use_scan_timeline:
             return {
                 "axis_labels": self.__composites[node_id].axis_labels,
@@ -449,10 +506,10 @@ class WorkflowResults(QtCore.QObject):
         _info = {}
         for _key in ["axis_labels", "axis_units", "axis_ranges"]:
             _values = list(getattr(self.__composites[node_id], _key).values())
-            _info[_key] = _values[self._SCAN.get_param_value("scan_dim") :]
+            _info[_key] = _values[self._config["scan_ndim"] :]
         _info["axis_labels"].insert(0, "Chronological scan points")
         _info["axis_units"].insert(0, "")
-        _info["axis_ranges"].insert(0, np.arange(self._SCAN.n_points))
+        _info["axis_ranges"].insert(0, np.arange(self._config["scan_npoints"]))
         return {
             _key: dict(zip(np.arange(len(_info[_key])), _info[_key]))
             for _key in ["axis_labels", "axis_units", "axis_ranges"]
@@ -501,7 +558,9 @@ class WorkflowResults(QtCore.QObject):
             _res = self.__composites
         else:
             _res = {node_id: self.__composites[node_id]}
-        RESULT_SAVER.export_full_data_to_active_savers(_res, scan_context=self._SCAN)
+        RESULT_SAVER.export_full_data_to_active_savers(
+            _res, scan_context=self._config["frozen_SCAN"]
+        )
 
     def prepare_files_for_saving(
         self,
@@ -537,7 +596,7 @@ class WorkflowResults(QtCore.QObject):
             enabled.
         """
         save_formats = [s.strip() for s in re.split("&|/|,", save_formats)]
-        _name = self._SCAN.get_param_value("scan_title")
+        _name = self._config["scan_title"]
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
             _keys = list(self.shapes.keys())
@@ -568,9 +627,9 @@ class WorkflowResults(QtCore.QObject):
         RESULT_SAVER.prepare_active_savers(
             save_dir,
             _node_info,
-            scan_context=self._SCAN,
-            diffraction_exp=self._EXP,
-            workflow_tree=self._TREE,
+            scan_context=self._config["frozen_SCAN"],
+            diffraction_exp=self._config["frozen_EXP"],
+            workflow_tree=self._config["frozen_TREE"],
         )
 
     def update_param_choices_from_labels(
@@ -619,11 +678,11 @@ class WorkflowResults(QtCore.QObject):
         str :
             The formatted string with a representation of all the metadata.
         """
-        _scandim = self._SCAN.get_param_value("scan_dim")
+        _scandim = self._config["scan_ndim"]
         _metadata = self.get_result_metadata(node_id, use_scan_timeline)
         if use_scan_timeline:
             _ax_points = list(self.shapes[node_id])[_scandim:]
-            _ax_points.insert(0, self._SCAN.n_points)
+            _ax_points.insert(0, self._config["scan_npoints"])
             _ax_types = ["(scan)"] + ["(data)"] * (self.ndims[node_id] - _scandim)
         else:
             _ax_points = list(self.shapes[node_id])
@@ -682,30 +741,39 @@ class WorkflowResults(QtCore.QObject):
         _data, _node_info, _scan, _exp, _tree = RESULT_SAVER.import_data_from_directory(
             directory
         )
-        self._config = {
-            "shapes": {_key: _item.shape for _key, _item in _data.items()},
-            "node_labels": {
-                _id: _item["node_label"] for _id, _item in _node_info.items()
-            },
-            "data_labels": {
-                _id: _item["data_label"] for _id, _item in _node_info.items()
-            },
-            "data_units": {
-                _id: _item["data_unit"] for _id, _item in _node_info.items()
-            },
-            "plugin_names": {
-                _id: _item["plugin_name"] for _id, _item in _node_info.items()
-            },
-            "result_titles": {
-                _id: _item["result_title"] for _id, _item in _node_info.items()
-            },
-            "metadata_complete": True,
-        }
+        self._config.update(
+            {
+                "shapes": {_key: _item.shape for _key, _item in _data.items()},
+                "node_labels": {
+                    _id: _item["node_label"] for _id, _item in _node_info.items()
+                },
+                "data_labels": {
+                    _id: _item["data_label"] for _id, _item in _node_info.items()
+                },
+                "data_units": {
+                    _id: _item["data_unit"] for _id, _item in _node_info.items()
+                },
+                "plugin_names": {
+                    _id: _item["plugin_name"] for _id, _item in _node_info.items()
+                },
+                "result_titles": {
+                    _id: _item["result_title"] for _id, _item in _node_info.items()
+                },
+                "metadata_complete": True,
+            }
+        )
         self.__composites = _data
         if _data != {}:
             self._SCAN.update_from_scan(_scan)
             self._EXP.update_from_diffraction_exp(_exp)
             self._TREE.update_from_tree(_tree)
+        self._config["scan_ndim"] = self._SCAN.get_param_value("scan_dim")
+        self._config["scan_npoints"] = self._SCAN.n_points
+        self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
+        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
+        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
+        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
+        self._config["frozen_TREE"].update_from_tree(self._TREE)
 
 
 WorkflowResultsContext = SingletonFactory(WorkflowResults)

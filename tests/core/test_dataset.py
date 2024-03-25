@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,8 +40,7 @@ class TestDataset(unittest.TestCase):
         self._axis_ranges = [1, 10]
         self._axis_units = {0: "m", 1: "rad"}
 
-    def tearDown(self):
-        ...
+    def tearDown(self): ...
 
     def create_simple_dataset(self):
         obj = Dataset(
@@ -967,6 +966,37 @@ class TestDataset(unittest.TestCase):
         obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])
         self.assertIsInstance(hash(obj), int)
         self.assertNotEqual(hash(obj), hash(obj2))
+
+    def test_data_description__no_data_unit(self):
+        _test_label = "Spam, eggs, sausage and spam"
+        obj = self.create_simple_dataset()
+        obj.data_label = _test_label
+        self.assertEqual(obj.data_description, _test_label)
+
+    def test_data_description__w_data_unit(self):
+        _test_label = "Spam, eggs, sausage and spam"
+        _test_unit = "more spam"
+        obj = self.create_simple_dataset()
+        obj.data_label = _test_label
+        obj.data_unit = _test_unit
+        self.assertEqual(obj.data_description, f"{_test_label} / {_test_unit}")
+
+    def test_get_axis_description__no_unit(self):
+        obj = self.create_simple_dataset()
+        for index in range(2):
+            with self.subTest(index=index):
+                obj.update_axis_unit(index, "")
+                _ax_str = obj.get_axis_description(index)
+                self.assertEqual(_ax_str, self._axis_labels[index])
+
+    def test_get_axis_description__w_unit(self):
+        obj = self.create_simple_dataset()
+        for index in range(2):
+            with self.subTest(index=index):
+                _ax_str = obj.get_axis_description(index)
+                self.assertEqual(
+                    _ax_str, f"{self._axis_labels[index]} / {self._axis_units[index]}"
+                )
 
 
 if __name__ == "__main__":

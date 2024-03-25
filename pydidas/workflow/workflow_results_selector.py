@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ results stored in the WorkflowResults.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,6 @@ import re
 import numpy as np
 from qtpy import QtCore
 
-from ..contexts import ScanContext
 from ..core import (
     ObjectWithParameterCollection,
     Parameter,
@@ -55,6 +54,12 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
     select_results_param : pydidas.core.Parameter
         The select_results Parameter instance. This instance should be
         shared between the WorkflowResultsSelector and the parent.
+    **kwargs : dict
+        Optional keyword arguments. Supported kwargs are:
+
+        workflow_results : WorkflowResults, optional
+            The WorkflowResults instance to use. If not specied, this will default
+            to the WorkflowResultsContext.
     """
 
     new_selection = QtCore.Signal(bool, int, int, object)
@@ -67,10 +72,9 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
-        _scan_context = kwargs.get("scan_context", None)
-        self._SCAN = ScanContext() if _scan_context is None else _scan_context
         _results = kwargs.get("workflow_results", None)
         self._RESULTS = WorkflowResultsContext() if _results is None else _results
+        self._SCAN = self._RESULTS.frozen_scan
         self._selection = None
         self._npoints = []
         self._config["active_node"] = -1

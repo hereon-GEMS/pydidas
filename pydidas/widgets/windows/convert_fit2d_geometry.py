@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ form which they can copy and paste to submit feedback.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,10 +30,7 @@ __all__ = ["ConvertFit2dGeometryWindow"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...contexts.diffraction_exp_context import (
-    DiffractionExperiment,
-    DiffractionExperimentContext,
-)
+from ...contexts.diff_exp import DiffractionExperiment, DiffractionExperimentContext
 from ...core import get_generic_param_collection
 from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from ..framework import PydidasWindow

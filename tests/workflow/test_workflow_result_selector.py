@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,12 +33,14 @@ import numpy as np
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError
-from pydidas.unittest_objects import DummyLoader, DummyProc
+from pydidas.plugins import PluginCollection
+from pydidas.unittest_objects import DummyLoader, DummyProc, DummyProcNewDataset
 from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
 
 
+PLUGINS = PluginCollection()
 SCAN = ScanContext()
 TREE = WorkflowTree()
 RES = WorkflowResultsContext()
@@ -53,6 +55,13 @@ class TestWorkflowResultSelector(unittest.TestCase):
         global SCAN, RES
         SCAN = ScanContext()
         RES = WorkflowResultsContext()
+        for _cls in (DummyLoader, DummyProc, DummyProcNewDataset):
+            PLUGINS.check_and_register_class(_cls)
+
+    @classmethod
+    def tearDownClass(cls):
+        for _cls in (DummyLoader, DummyProc, DummyProcNewDataset):
+            PLUGINS.remove_plugin_from_collection(_cls)
 
     def setUp(self):
         self.set_up_scan()
@@ -86,11 +95,13 @@ class TestWorkflowResultSelector(unittest.TestCase):
         TREE.nodes[0].plugin.set_param_value("image_height", self._result1_shape[0])
         TREE.nodes[0].plugin.set_param_value("image_width", self._result1_shape[1])
         TREE.create_and_add_node(DummyProc())
-        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
-        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
+        TREE.create_and_add_node(
+            DummyProcNewDataset(output_shape=self._result2_shape), parent=TREE.root
+        )
+        TREE.create_and_add_node(
+            DummyProcNewDataset(output_shape=(1,)), parent=TREE.root
+        )
         TREE.prepare_execution()
-        TREE.nodes[2]._result_shape = self._result2_shape
-        TREE.nodes[3]._result_shape = (1,)
 
     def populate_WorkflowResults(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -125,8 +136,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
             np.random.random(self._scan_n + self._result2_shape) + 0.0001
         )
 
-    def test_unitttest_setUp(self):
-        ...
+    def test_unitttest_setUp(self): ...
 
     def test_populate_WorkflowResults(self):
         self.populate_WorkflowResults()
@@ -143,7 +153,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertTrue("_selection" in obj.__dict__)
         self.assertTrue("_npoints" in obj.__dict__)
         self.assertTrue("active_node" in obj._config)
-        self.assertEqual(obj._SCAN, ScanContext())
+        self.assertEqual(obj._SCAN, RES.frozen_scan)
         self.assertEqual(obj._RESULTS, RES)
 
     def test_init__with_param(self):

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters for data import.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -226,6 +226,59 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "tooltip": (
             "The name of the sub-directory for each scan in which the"
             " Eiger detector writes its data files."
+        ),
+    },
+    "raw_datatype": {
+        "type": str,
+        "default": "float 64 bit",
+        "name": "Datatype",
+        "choices": (
+            ["boolean (1 bit integer)"]
+            + [f"float {_i} bit" for _i in [16, 32, 64, 128]]
+            + [f"int {_i} bit" for _i in [8, 16, 32, 64]]
+            + [f" unsigned int {_i} bit" for _i in [8, 16, 32, 64]]
+        ),
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The data type to be used for decoding. Note that numpy data types are "
+            "used for decoding with native byteorder."
+        ),
+    },
+    "raw_shape_x": {
+        "type": int,
+        "default": 0,
+        "name": "Raw shape x",
+        "choices": None,
+        "unit": "px",
+        "allow_None": False,
+        "tooltip": (
+            "The x shape of the raw data file. Following the python convention,"
+            "the first axis is y and the second axis is x."
+        ),
+    },
+    "raw_shape_y": {
+        "type": int,
+        "default": 0,
+        "name": "Raw shape y",
+        "choices": None,
+        "unit": "px",
+        "allow_None": False,
+        "tooltip": (
+            "The y shape of the raw data file. Following the python convention,"
+            "the first axis is y and the second axis is x."
+        ),
+    },
+    "raw_header": {
+        "type": int,
+        "default": 0,
+        "name": "Raw file header length",
+        "choices": None,
+        "unit": "bytes",
+        "allow_None": False,
+        "tooltip": (
+            "The length of the file header in bytes. The header will not be "
+            "decoded as image data."
         ),
     },
 }

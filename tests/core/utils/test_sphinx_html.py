@@ -55,22 +55,29 @@ class Test_sphinx_html(unittest.TestCase):
         sys.argv.append("sphinx-build")
         self.assertFalse(sphinx_html.check_sphinx_html_docs(self._tmpdir))
 
-    ##############
-    # The following test runs for 15 seconds + and should not
+    #############
+    # The following test runs for 30 seconds + and should not
     # be run routinely in the test suite.
-    ##############
+    #############
     # def test_run_sphinx_html_build(self):
-    #     for _fname in ['make.bat', 'Makefile']:
-    #         shutil.copyfile(os.path.join(DOC_MAKE_DIRECTORY, _fname),
-    #                         os.path.join(self._tmpdir, 'docs', _fname))
-    #     shutil.copytree(os.path.join(DOC_MAKE_DIRECTORY, 'source'),
-    #                     os.path.join(self._tmpdir, 'docs', 'source'))
-    #     with io.StringIO() as buf, redirect_stdout(buf):
+    #     import io
+    #     import warnings
+    #     from contextlib import redirect_stdout
+    #     from pydidas.core.utils import DOC_SOURCE_DIRECTORY
+
+    #     shutil.copytree(
+    #         os.path.join(DOC_SOURCE_DIRECTORY, "src"),
+    #         os.path.join(self._tmpdir, "docs", "src"),
+    #     )
+    #     with warnings.catch_warnings(), io.StringIO() as buf, redirect_stdout(buf):
+    #         warnings.simplefilter("ignore")
     #         sphinx_html.run_sphinx_html_build(
-    #             os.path.join(self._tmpdir, 'docs'))
+    #             build_dir=os.path.join(self._tmpdir, "html")
+    #         )
     #         _output = buf.getvalue()
-    #     self.assertTrue(os.path.exists(os.path.join(
-    #         self._tmpdir, 'docs', 'build', 'html', 'index.html')))
+    #     self.assertTrue(
+    #         os.path.exists(os.path.join(self._tmpdir, "html", "index.html"))
+    #     )
     #     self.assertTrue(len(_output) > 0)
 
 

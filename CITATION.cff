@@ -11,14 +11,14 @@ authors:
     email: malte.storm@hereon.de
     affiliation: Helmholtz-Zentrum Hereon
     orcid: 'https://orcid.org/0000-0002-1602-781X'
-url: 'https://ms.hereon.de/pydidas/'
+url: 'https://pydidas.hereon.de/'
 keywords:
   - X-ray diffraction
 license: GPL-3.0
-date-released: 2024-01-18
 repository-code: "https://github.com/hereon-GEMS/pydidas"
 identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-version: 24.01.18
+date-released: 2024-03-25
+version: 24.03.25

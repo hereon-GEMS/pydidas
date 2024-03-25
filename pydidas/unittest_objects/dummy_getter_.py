@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ by the __reduce__ methods of the DummyPlugins to allow pickling.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -44,9 +44,12 @@ def dummy_getter(plugin_name: str) -> object:
     """
     from .dummy_loader import DummyLoader
     from .dummy_proc import DummyProc
+    from .dummy_proc_new_dataset import DummyProcNewDataset
 
     if plugin_name == "DummyLoader":
         return DummyLoader()
     if plugin_name == "DummyProc":
         return DummyProc()
+    if plugin_name == "DummyProcNewDataset":
+        return DummyProcNewDataset()
     raise NameError(f'No DummyPlugin with the name "{plugin_name}" is known.')

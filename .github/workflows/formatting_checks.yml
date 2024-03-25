@@ -16,11 +16,25 @@ on:
     branches: [ "master" ]
 
 jobs:
-  code_checks:
+  check_black:
+    runs-on: ubuntu-latest   
+    steps:
+    - name: Check out source repository
+      uses: actions/checkout@v3
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install black
+    - name: Code formatting with black
+      run: |
+        python -m black . --check
+  
+  check_flake8:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-
     steps:
     - name: Check out source repository
       uses: actions/checkout@v3
@@ -32,19 +46,36 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8
-        python -m pip install black
-        python -m pip install reuse
-        python -m pip install isort
-
-    - name: Code formatting with black
-      run: |
-        python -m black . --check
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         python -m flake8 --config .flake8 --exit-zero
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+
+  check_reuse:
+    runs-on: ubuntu-latest
+    steps:
     - name: Reuse check
       uses: fsfe/reuse-action@v2
+
+  check_isort:
+    runs-on: ubuntu-latest
+    steps:
     - name: isort checks
       uses: isort/isort-action@master
+
+  check_copyrights:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out source repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Check copyrights
+      run: |
+        python formatter.py --copyright --check --git-only
+

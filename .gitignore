@@ -1,4 +1,4 @@
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023-2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
 # local IDE metadata files
@@ -13,7 +13,7 @@ __*
 !__init__.py
 
 # local build files
-pydidas/docs/build
+pydidas/sphinx
 *.html
 dist/*
 build/*
@@ -23,4 +23,3 @@ htmlcov
 
 # logging
 *.log
-!change.log

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -36,12 +36,17 @@ import numpy as np
 from qtpy import QtWidgets
 
 import pydidas
-from pydidas.contexts.diffraction_exp_context import DiffractionExperimentContext
-from pydidas.contexts.scan_context import Scan, ScanContext
+from pydidas.contexts.diff_exp import DiffractionExperimentContext
+from pydidas.contexts.scan import Scan, ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError, get_generic_parameter
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
-from pydidas.unittest_objects import DummyLoader, DummyProc, create_hdf5_io_file
+from pydidas.unittest_objects import (
+    DummyLoader,
+    DummyProc,
+    DummyProcNewDataset,
+    create_hdf5_io_file,
+)
 from pydidas.workflow import WorkflowResults, WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas_qtcore import PydidasQApplication
@@ -105,9 +110,10 @@ class TestWorkflowResults(unittest.TestCase):
         TREE.nodes[0].plugin.set_param_value("image_height", self._input_shape[0])
         TREE.nodes[0].plugin.set_param_value("image_width", self._input_shape[1])
         TREE.create_and_add_node(DummyProc())
-        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
+        TREE.create_and_add_node(
+            DummyProcNewDataset(output_shape=self._result2_shape), parent=TREE.root
+        )
         TREE.prepare_execution()
-        TREE.nodes[2]._result_shape = self._result2_shape
 
     def generate_test_datasets(self):
         _shape1 = self._input_shape
@@ -202,8 +208,7 @@ class TestWorkflowResults(unittest.TestCase):
         }
         return {1: _meta1, 2: _meta2}
 
-    def test_init(self):
-        ...
+    def test_init(self): ...
 
     def test_prepare_files_for_saving__simple(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -268,6 +273,30 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertEqual(_shape1, RES.shapes[1])
         self.assertFalse(os.path.exists(os.path.join(self._tmpdir, "node_02.h5")))
 
+    def test_frozen_scan(self):
+        _params = SCAN.param_values
+        RES.update_shapes_from_scan_and_workflow()
+        SCAN.set_param_value("scan_dim", 1)
+        _frozen_scan = RES.frozen_scan
+        for _key, _val in _params.items():
+            self.assertEqual(_frozen_scan.get_param_value(_key), _val)
+
+    def test_frozen_exp(self):
+        EXP.set_param_value("xray_energy", 13)
+        _params = EXP.param_values
+        RES.update_shapes_from_scan_and_workflow()
+        EXP.set_param_value("detector_dist", 42.1)
+        _frozen_exp = RES.frozen_exp
+        for _key, _val in _params.items():
+            self.assertEqual(_frozen_exp.get_param_value(_key), _val)
+
+    def test_frozen_tree(self):
+        _tree_dump = TREE.export_to_string()
+        RES.update_shapes_from_scan_and_workflow()
+        TREE.root = None
+        _frozen_tree = RES.frozen_tree
+        self.assertEqual(_frozen_tree.export_to_string(), _tree_dump)
+
     def test_get_result_ranges(self):
         _, _, _data = self.generate_test_datasets()
         for _key, _dset in _data.items():
@@ -291,9 +320,7 @@ class TestWorkflowResults(unittest.TestCase):
         _ndim = RES.ndims[_node] - SCAN.get_param_value("scan_dim") + 1
         _data = RES.get_results_for_flattened_scan(_node)
         self.assertEqual(_data.ndim, _ndim)
-        self.assertEqual(
-            _data.shape, (SCAN.n_points,) + TREE.nodes[_node]._result_shape
-        )
+        self.assertEqual(_data.shape, (SCAN.n_points,) + TREE.nodes[_node].result_shape)
 
     def test_get_result_metadata(self):
         _tmpres = np.random.random((50, 50))
@@ -311,6 +338,7 @@ class TestWorkflowResults(unittest.TestCase):
 
     def test_get_result_metadata__use_scan_timeline(self):
         _tmpres = np.random.random(SCAN.shape + (50, 50))
+        RES.update_shapes_from_scan_and_workflow()
         RES._WorkflowResults__composites[0] = Dataset(
             _tmpres,
             axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
@@ -458,6 +486,7 @@ class TestWorkflowResults(unittest.TestCase):
     def test_store_results__no_previous_metadata(self):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
+        RES._config["scan_ndim"] = SCAN.ndim
         RES._WorkflowResults__composites[1] = Dataset(np.zeros(self._scan_n + _shape1))
         RES._WorkflowResults__composites[2] = Dataset(np.zeros(self._scan_n + _shape2))
         RES._WorkflowResults__update_composite_metadata(_results)

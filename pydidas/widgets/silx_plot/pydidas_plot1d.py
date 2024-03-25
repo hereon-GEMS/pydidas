@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with PydidasPlot1D class which adds configurations to the base silx Plot1
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,6 +33,7 @@ from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
 from ...core import Dataset
+from .special_plot_types_button import SpecialPlotTypesButton
 
 
 class PydidasPlot1D(Plot1D):
@@ -58,6 +59,34 @@ class PydidasPlot1D(Plot1D):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        if kwargs.get("use_special_plots", True):
+            self._add_special_plot_actions()
+        self._y_function = SpecialPlotTypesButton.func_generic
+        self._y_label = SpecialPlotTypesButton.label_generic
+        self._current_raw_data = {}
+        self._plot_config = {}
+
+    def _add_special_plot_actions(self):
+        """
+        Add the action to change the type of the plot.
+
+        This action allows to display image coordinates in polar coordinates
+        (with r / mm, 2theta / deg or q / nm^-1) scaling.
+        """
+        self._plot_type = SpecialPlotTypesButton(parent=self, plot=self)
+        self._toolbar.addWidget(self._plot_type)
+        self._plot_type.sig_new_plot_type.connect(self._process_plot_type)
+
+    def _process_plot_type(self):
+        """
+        Process the changed plot type and set the function to update the plotted value.
+        """
+        self.clear_plot(clear_data=False)
+        self._y_function = self._plot_type.plot_yfunc
+        self._y_label = self._plot_type.plot_ylabel()
+        for _legend, (_data, _kwargs) in self._current_raw_data.items():
+            _kwargs["legend"] = _legend
+            self.plot_pydidas_dataset(_data, **_kwargs)
 
     def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
         """
@@ -74,13 +103,9 @@ class PydidasPlot1D(Plot1D):
             self.clear_plot()
 
         self._plot_config = {
-            "ax_label_x": (
-                data.axis_labels[0]
-                + (" / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else "")
-            ),
-            "ax_label_y": (
-                data.data_label
-                + (" / " + data.data_unit if len(data.data_unit) > 0 else "")
+            "ax_label_x": data.get_axis_description(0),
+            "ax_label_y": self._y_label(
+                data.axis_labels[0], data.axis_units[0], data.data_label, data.data_unit
             ),
             "kwargs": {
                 "linewidth": 1.5,
@@ -93,20 +118,31 @@ class PydidasPlot1D(Plot1D):
         }
         self.setGraphXLabel(self._plot_config["ax_label_x"])
         self.setGraphYLabel(self._plot_config["ax_label_y"])
+        self._current_raw_data[kwargs.get("legend", "Unnamed curve 1.1")] = (
+            data,
+            self._plot_config["kwargs"],
+        )
         self.addCurve(
             data.axis_ranges[0],
-            data.array,
+            self._y_function(data.axis_ranges[0], data.array),
             **self._plot_config["kwargs"],
         )
 
-    def clear_plot(self):
+    def clear_plot(self, clear_data: bool = True):
         """
         Clear the plot and remove all items.
+
+        Parameters
+        ----------
+        clear_data : bool, optional
+            Flag to remove all items from the stored data dictionary as well.
         """
         self.remove()
         self.setGraphTitle("")
         self.setGraphYLabel("")
         self.setGraphXLabel("")
+        if clear_data:
+            self._current_raw_data = {}
 
     @QtCore.Slot()
     def update_mpl_fonts(self):

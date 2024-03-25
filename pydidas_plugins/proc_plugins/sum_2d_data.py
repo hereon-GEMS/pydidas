@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the Sum2dData Plugin which can be used to sum over 2D data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,6 +37,9 @@ from pydidas.plugins import ProcPlugin
 class Sum2dData(ProcPlugin):
     """
     Sum up datapoints in a 2D dataset.
+
+    This plugin creates a single datapoint from the 2D input data. It is not
+    designed to handle higher-dimensional input data and accepts only 2D inputs.
     """
 
     plugin_name = "Sum 2D data"

@@ -132,6 +132,39 @@ def run_module(module_name: Literal["black", "flake8", "isort", "reuse"]):
         _timed_print(_job_label.capitalize() + " failed.", new_lines=1)
 
 
+def check_version_tags(directory: Optional[Path] = None):
+    """
+    Check that all version tags are consistent.
+
+    This function checks that the CHANGELOG.rst and CITATION.CFF are consistent
+    with the version given in the pydidas.version.
+
+    Parameters
+    ----------
+    directory : Path, optional
+        The pydidas source directory. If not specified, will be located relative to
+        this script file. The default is None.
+    """
+    _directory = Path(__file__).parent if directory is None else Path(directory)
+    with open(_directory.joinpath("pydidas", "version.py"), "r") as f:
+        _line = [_line for _line in f.readlines() if _line.startswith("__version__")]
+    _version = _line[0].split("=")[1].strip().strip('"')
+    _timed_print(f"Starting version tag check.", new_lines=1)
+    with open(_directory.joinpath("CHANGELOG.rst"), "r") as f:
+        _changelog_lines = f.readlines()
+    _changelog_okay = f"v{_version}" in [_line.strip() for _line in _changelog_lines]
+    if not _changelog_okay:
+        _timed_print("The CHANGELOG does not include a current version tag.")
+    with open(_directory.joinpath("CITATION.cff"), "r") as f:
+        _lines = [_line.strip() for _line in f.readlines()]
+    _citation_okay = f"version: {_version}" in _lines
+    if not _citation_okay:
+        _timed_print("The CITATION.cff does not include the latest version tag.")
+    if not (_citation_okay and _changelog_okay):
+        sys.exit(1)
+    _timed_print("Version tag check sucessfully concluded.")
+
+
 class CopyrightYearUpdater:
     """
     Class to check the copyright year is up-to-date with the commit date.
@@ -405,3 +438,5 @@ if __name__ == "__main__":
         run_module("reuse")
     if "--copyright" in sys.argv or "--all" in sys.argv:
         CopyrightYearUpdater()
+    if "--version" in sys.argv or "--all" in sys.argv:
+        check_version_tags()

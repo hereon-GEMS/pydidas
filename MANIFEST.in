@@ -24,5 +24,6 @@ include README.rst
 include LICENSE.md
 include pyproject.toml
 include CHANGELOG.rst
+include CITATION.CFF
 include pydidas/docs/make.bat
 include pydidas/docs/Makefile

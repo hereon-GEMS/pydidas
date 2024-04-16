@@ -2,9 +2,17 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v24.03.25
+v24.xx.yy
 =========
 
+Bugfixes
+--------
+- Fixed a display issue in the title of the logging dockable widget.
+
+
+
+v24.03.25
+=========
 
 Improvements
 ------------

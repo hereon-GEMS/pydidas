@@ -86,26 +86,30 @@ GENERIC_PARAMS_SCAN = (
         "scan_start_index": {
             "type": int,
             "default": 0,
-            "name": "Starting index",
+            "name": "First filename number",
             "choices": None,
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The starting index offset for the index used to identify data "
-                "points in the scan."
+                "The number of the first file to be used in processing. This number "
+                "will be applied as offset in the scan naming pattern to identify "
+                "the respective filename for scan points."
             ),
         },
         "scan_index_stepping": {
             "type": int,
             "default": 1,
-            "name": "Index stepping",
+            "name": "Frame index stepping",
             "choices": None,
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The stepping of the index. A value of n corresponds to only using "
-                "every n-th index. For example, an index stepping of 3 with an offset "
-                "of 5 would process the frames 5, 8, 11, 14 etc."
+                "The stepping of the index in frames. A value of n corresponds to only "
+                "using every n-th index. For example, an index stepping of 3 with an "
+                "offset of 5 would process the frames 5, 8, 11, 14 etc. \n"
+                "Please note that the index stepping refers to the frames, not the "
+                "filenames. In the case of container files (e.g. hdf5), the index "
+                "stepping will skip process every n-th frame, not every n-th file."
             ),
         },
         "scan_multi_image_handling": {

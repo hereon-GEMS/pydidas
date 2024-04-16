@@ -5,6 +5,12 @@
 v24.xx.yy
 =========
 
+Improvements
+------------
+- Improved the naming and tooltips of scan parameters with respect to the 
+  file numbers and indices. 
+
+
 Bugfixes
 --------
 - Fixed a display issue in the title of the logging dockable widget.
@@ -17,7 +23,6 @@ v24.03.25
 
 Improvements
 ------------
-
 - Changed a number of filenames and paths (mainly in the documentation) to 
   reduce the total length of the file names.
 - Updated files to new black 2024 style.

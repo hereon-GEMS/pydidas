@@ -8,7 +8,8 @@ v24.xx.yy
 Bugfixes
 --------
 - Fixed a display issue in the title of the logging dockable widget.
-
+- Fixed an issue in the pyFAI calibration frame where the supported file 
+  formats where not correctly available in the file dialog.
 
 
 v24.03.25

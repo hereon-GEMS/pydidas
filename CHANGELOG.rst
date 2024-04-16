@@ -8,7 +8,7 @@ v24.xx.yy
 Improvements
 ------------
 - Improved the naming and tooltips of scan parameters with respect to the 
-  file numbers and indices. 
+  file numbers and indices.
 
 
 Bugfixes

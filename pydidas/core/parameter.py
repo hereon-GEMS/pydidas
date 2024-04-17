@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,23 +21,23 @@ consistent interface for various data types.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Parameter"]
 
 
-import numbers
 import warnings
 from collections.abc import Iterable
+from numbers import Integral, Real
 from pathlib import Path
-from typing import Dict, List, Self, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Self, Set, Tuple, Type, Union
 
 from .hdf5_key import Hdf5key
 
 
-def _get_base_class(cls) -> type:
+def _get_base_class(cls: Any) -> Union[type, Real, Integral, None]:
     """
     Filter numerical classes and return the corresponding abstract base class.
 
@@ -53,14 +53,14 @@ def _get_base_class(cls) -> type:
     Returns
     -------
     object
-        The base class of the input class if the inpu.
+        The base class of the input class if the input.
     """
     if cls is None:
         return None
-    if numbers.Integral.__subclasscheck__(cls):
-        return numbers.Integral
-    if numbers.Real.__subclasscheck__(cls):
-        return numbers.Real
+    if issubclass(cls, Integral):
+        return Integral
+    if issubclass(cls, Real):
+        return Real
     return cls
 
 
@@ -70,7 +70,7 @@ class Parameter:
 
     The Parameter has the following properties which can be accessed.
     Only the value and choices properties can be edited at runtime, all other
-    properties are fixed at instanciation.
+    properties are fixed at instantiation.
 
     +------------+-----------+-------------------------------------------+
     | property   | editable  | description                               |
@@ -104,7 +104,7 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
 
     Parameters can be passed either as a complete meta_dict or as individual
-    keyword arguments. The meta_dict will take precendence.
+    keyword arguments. The meta_dict will take precedence.
 
     Parameters
     ----------
@@ -120,7 +120,7 @@ class Parameter:
         The default value. The data type must be of the same type as
         param_type. None is only accepted if param_type is None as well.
     meta : Union[dict, None], optional
-        A dictionary with meta data. Any keys specified as meta will
+        A dictionary with metadata. Any keys specified as meta will
         overwrite the kwargs dictionary. This is added merely as
         convenience to facility copying Parameter instances. If None,
         this entry will be ignored. The default is None.
@@ -171,13 +171,13 @@ class Parameter:
         self.__process_choices_input(kwargs)
         self.value = kwargs.get("value", self.__meta["default"])
 
-    def __process_default_input(self, default: Type):
+    def __process_default_input(self, default: object):
         """
         Process the default value.
 
         Parameters
         ----------
-        default : Type
+        default : object
             The default attribute passed to init.
 
         Raises
@@ -206,7 +206,7 @@ class Parameter:
         TypeError
             If choices is not of an accepted type (None, list, tuple)
         ValueError
-            If the default has been set and it is not in choices.
+            If the default has been set, and it is not in choices.
         """
         _choices = kwargs.get("choices", None)
         if not (isinstance(_choices, (list, tuple, set)) or _choices is None):
@@ -224,7 +224,7 @@ class Parameter:
 
     def __typecheck(self, val: object) -> bool:
         """
-        Check the type of a new input.
+        Check the type of new input.
 
         Parameters
         ----------
@@ -268,19 +268,22 @@ class Parameter:
         Returns
         -------
         value : any
-            The value with the above mentioned type conversions applied.
+            The value with the above-mentioned type conversions applied.
         """
         if isinstance(value, str):
             if self.__type == Path:
                 value = Path(value)
             elif self.__type == Hdf5key:
                 value = Hdf5key(value)
-        if self.__type == numbers.Real and not self.__meta["allow_None"]:
-            return float(value)
-        if isinstance(value, list) and self.__type == tuple:
-            return tuple(value)
-        if isinstance(value, tuple) and self.__type == list:
-            return list(value)
+        if self.__type in [Real, Integral] and not self.__meta["allow_None"]:
+            try:
+                value = float(value) if self.__type == Real else int(value)
+            except ValueError:
+                pass
+            finally:
+                return value
+        if isinstance(value, Iterable) and self.__type in [list, set, tuple]:
+            return self.__type(value)
         return value
 
     @property
@@ -310,7 +313,7 @@ class Parameter:
     @property
     def refkey(self) -> str:
         """
-        Return the paramter reference key.
+        Return the parameter reference key.
 
         Returns
         -------
@@ -356,9 +359,9 @@ class Parameter:
         _t = self.__meta["tooltip"]
         if self.unit:
             _t += f" (unit: {self.unit})"
-        if self.dtype == numbers.Integral:
+        if self.dtype == Integral:
             _t += " (type: integer)"
-        elif self.dtype == numbers.Real:
+        elif self.dtype == Real:
             _t += " (type: float)"
         elif self.dtype == str:
             _t += " (type: str)"
@@ -375,13 +378,6 @@ class Parameter:
         """
         Get or set the allowed choices for the Parameter value.
 
-        Parameters
-        ----------
-        choices : Union[list, tuple, set]
-            A list or tuple of allowed choices. A check will be performed that
-            all entries correspond to the defined data type and that the
-            curent parameter value is one of the allowed choices.
-
         Returns
         -------
         Union[list, None]
@@ -394,11 +390,18 @@ class Parameter:
         """
         Update the allowed choices of a Parameter.
 
+        Parameters
+        ----------
+        choices : Union[list, tuple, set]
+            A list or tuple of allowed choices. A check will be performed that
+            all entries correspond to the defined data type and that the
+            current parameter value is one of the allowed choices.
+
         Raises
         ------
         TypeError
             If the supplied choices are not of datatype list or tuple.
-        ValueErrror
+        ValueError
             If any choice in choices does not pass the datatype check.
         ValueError
             If the current Parameter value is not included in the list of
@@ -505,9 +508,9 @@ class Parameter:
             return None
         if self.__type in (str, Hdf5key, Path):
             return str(self.value)
-        if self.__type == numbers.Integral:
+        if self.__type == Integral:
             return int(self.value)
-        if self.__type == numbers.Real:
+        if self.__type == Real:
             return float(self.value)
         if self.__type in (list, tuple, dict):
             return self.value
@@ -542,7 +545,7 @@ class Parameter:
 
     def copy(self) -> Self:
         """
-        A method to get the a copy of the Parameter object.
+        A method to get a copy of the Parameter object.
 
         Returns
         -------
@@ -575,7 +578,7 @@ class Parameter:
         _default = self.__meta["default"]
         if self.choices is not None and self.__meta["default"] not in self.choices:
             _default = self.value
-        return (self.__refkey, self.__type, _default, _meta)
+        return self.__refkey, self.__type, _default, _meta
 
     def export_refkey_and_value(self) -> Tuple:
         """
@@ -587,7 +590,7 @@ class Parameter:
         tuple
             The tuple of (refkey, value as pickleable format)
         """
-        return (self.__refkey, self.value_for_export)
+        return self.__refkey, self.value_for_export
 
     def __str__(self) -> str:
         """

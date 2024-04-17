@@ -18,6 +18,7 @@ Bugfixes
   formats where not correctly available in the file dialog.
 - Fixed an issue with settings the X-ray energy / wavelength in the 
   DiffractionExperimentContext on the command line with wrong data types.
+- Fixed an issue with convenience type conversions in the Parameter class.
 
 
 v24.03.25

@@ -16,6 +16,8 @@ Bugfixes
 - Fixed a display issue in the title of the logging dockable widget.
 - Fixed an issue in the pyFAI calibration frame where the supported file 
   formats where not correctly available in the file dialog.
+- Fixed an issue with settings the X-ray energy / wavelength in the 
+  DiffractionExperimentContext on the command line with wrong data types.
 
 
 v24.03.25

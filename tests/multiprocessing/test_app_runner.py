@@ -68,7 +68,7 @@ class TestAppRunner(unittest.TestCase):
             QtTest.QTest.qWait(100)
             if len(spy) == 1:
                 break
-            if time.time() > _t0 + 6:
+            if time.time() > _t0 + timeout:
                 raise TimeoutError("Waiting too long for final app state.")
         time.sleep(0.1)
 
@@ -152,6 +152,7 @@ class TestAppRunner(unittest.TestCase):
     def test_check_if_running_false(self):
         self._runner = AppRunner(self.app)
         self._runner._AppRunner__check_is_running()
+        # assert does not raise RuntimeError
 
     def test_check_if_running_true(self):
         self._runner = AppRunner(self.app)

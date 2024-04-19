@@ -9,6 +9,8 @@ Improvements
 ------------
 - Improved the naming and tooltips of scan parameters with respect to the 
   file numbers and indices.
+- Added the ParameterCollection creation the the ParameterCollectionMixin
+  class initialization.
 
 
 Bugfixes

@@ -30,7 +30,7 @@ __all__ = ["ResultSelectionWidget"]
 
 
 from functools import partial
-from typing import List, Tuple, Union
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore
@@ -126,7 +126,7 @@ class ResultSelectionWidget(
         EmptyWidget.__init__(self, **kwargs)
         ParameterWidgetsMixIn.__init__(self)
         CreateWidgetsMixIn.__init__(self)
-        self.params = ParameterCollection()
+        ParameterCollectionMixIn.__init__(self)
         self._config = {
             "widget_visibility": False,
             "result_ndim": -1,
@@ -319,7 +319,7 @@ class ResultSelectionWidget(
                     _unit if self._config["selection_by_data_values"] else " "
                 )
 
-    def __are_axes_used(self) -> Tuple[bool]:
+    def __are_axes_used(self) -> tuple[bool, bool]:
         """
         Check whether the axes are in use and return the flags.
 
@@ -453,7 +453,7 @@ class ResultSelectionWidget(
             self._widgets["radio_plot_type"]._buttons[_id].setEnabled(_2d_enabled)
 
     @QtCore.Slot(int)
-    def __arrange_results_in_timeline_or_scan_shape(self, index):
+    def __arrange_results_in_timeline_or_scan_shape(self, index: int):
         """
         Organize the scan results in a timeline or using the ScanContext shape.
 
@@ -611,7 +611,7 @@ class ResultSelectionWidget(
         )
         self.__update_slice_param_widgets()
 
-    def _get_axis_index_labels(self) -> List[str]:
+    def _get_axis_index_labels(self) -> list[str]:
         """
         Get the indices and axis labels for the selected node ID.
 
@@ -632,13 +632,13 @@ class ResultSelectionWidget(
             for _index, _dim in enumerate(_active_dims)
         ]
 
-    def _get_axis_labels_and_units(self) -> List[List[str]]:
+    def _get_axis_labels_and_units(self) -> list[list[str]]:
         """
         Get the axis labels and units.
 
         Returns
         -------
-        List[List[str]]
+        list[list[str]]
             A list with pair entries for label and unit.
         """
         if self._active_node == -1:
@@ -649,7 +649,7 @@ class ResultSelectionWidget(
             for _dim in _active_dims
         ]
 
-    def _get_metadata_and_active_dims(self) -> Tuple[dict, list]:
+    def _get_metadata_and_active_dims(self) -> tuple[dict, list]:
         """
         Get the metadata and active dimensions of the active node.
 

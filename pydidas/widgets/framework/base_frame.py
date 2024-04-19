@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,12 @@ should inherit.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFrame"]
+
 
 from qtpy import QtCore, QtWidgets
 
@@ -78,7 +79,7 @@ class BaseFrame(
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
-        self.params = ParameterCollection()
+        ParameterCollectionMixIn.__init__(self)
 
         init_layout = kwargs.get("init_layout", True)
         if init_layout:
@@ -92,7 +93,7 @@ class BaseFrame(
         self._config = {"built": False}
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received signal that frame has been activated.
 
@@ -135,7 +136,7 @@ class BaseFrame(
         finalize the UI initialization.
         """
 
-    def set_status(self, text):
+    def set_status(self, text: str):
         """
         Emit a status message to the main window.
 
@@ -159,9 +160,9 @@ class BaseFrame(
             frame's state.
         """
         _params = self.get_param_values_as_dict(filter_types_for_export=True)
-        return (self.frame_index, {"params": _params})
+        return self.frame_index, {"params": _params}
 
-    def restore_state(self, state):
+    def restore_state(self, state: dict):
         """
         Restore the frame's state from stored information.
 
@@ -186,7 +187,7 @@ class BaseFrame(
                 else:
                     self.set_param_value(_key, _val)
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtCore.QEvent):
         """
         Reimplement the closeEvent to emit a signal about the closing.
 

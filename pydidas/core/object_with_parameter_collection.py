@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ It includes a ParameterCollection object.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -35,7 +35,6 @@ from typing import Self
 
 from qtpy import QtCore
 
-from .parameter_collection import ParameterCollection
 from .parameter_collection_mixin import ParameterCollectionMixIn
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
@@ -54,7 +53,7 @@ class ObjectWithParameterCollection(
     def __init__(self):
         QtCore.QObject.__init__(self)
         PydidasQsettingsMixin.__init__(self)
-        self.params = ParameterCollection()
+        ParameterCollectionMixIn.__init__(self)
         self._config = {}
 
     def __copy__(self) -> Self:

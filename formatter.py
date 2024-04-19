@@ -149,7 +149,7 @@ def check_version_tags(directory: Optional[Path] = None):
     with open(_directory.joinpath("pydidas", "version.py"), "r") as f:
         _line = [_line for _line in f.readlines() if _line.startswith("__version__")]
     _version = _line[0].split("=")[1].strip().strip('"')
-    _timed_print(f"Starting version tag check.", new_lines=1)
+    _timed_print("Starting version tag check.", new_lines=1)
     with open(_directory.joinpath("CHANGELOG.rst"), "r") as f:
         _changelog_lines = f.readlines()
     _changelog_okay = f"v{_version}" in [_line.strip() for _line in _changelog_lines]

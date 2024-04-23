@@ -95,7 +95,9 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             ),
         }
         self.flags = {"slotActive": False, "autoUpdate": True}
-        self._widgets["plot"] = viewWidget
+        self._show_image_method = None
+        if viewWidget is not None:
+            self.register_plot_widget(viewWidget)
         self._frame = None
         self.__create_widgets_and_layout()
         self.__connect_slots()
@@ -253,7 +255,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         if self.flags["slotActive"]:
             self.new_frame_signal.emit(self._frame)
         if self.flags["autoUpdate"] and self._widgets["plot"] is not None:
-            self._widgets["plot"].setData(self._frame)
+            self._show_image_method(self._frame, legend="pydidas image")
 
     def __get_frame(self):
         """
@@ -279,22 +281,33 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         Register a view widget to be used for full visualization of data.
 
         This method registers an external view widget for data visualization.
-        Note that the widget must accept frames through a ``setData`` method.
+        Note that the widget must accept frames through a ``addImage`` method.
 
         Parameters
         ----------
         widget : QWidget
-            A widget with a ``setData`` method to pass frames.
+            A widget with a ``addImage`` method to pass frames.
 
         Raises
         ------
         TypeError
-            If the widget does not have a ``setData`` method.
+            If the widget is not a QWidget.
+        AttributeError
+            If the widget does not have an ``addImage`` or `displayImage` method.
         """
-        if isinstance(widget, QtWidgets.QWidget) and hasattr(widget, "setData"):
-            self._widgets["plot"] = widget
-            return
-        raise TypeError("Error: Object must be a widget with a setData method.")
+        if not isinstance(widget, QtWidgets.QWidget):
+            raise TypeError("Error: Object must be a QWidget.")
+        if not (hasattr(widget, "displayImage") or hasattr(widget, "addImage")):
+            raise AttributeError(
+                "Error: The selected widget is not supported, as it does not have an "
+                "`addImage` or `displayImage` method."
+            )
+        self._widgets["plot"] = widget
+        if hasattr(widget, "displayImage"):
+            self._show_image_method = widget.displayImage
+        elif hasattr(widget, "addImage"):
+            self._show_image_method = widget.addImage
+        print("registered hdf5", self._show_image_method)
 
     def _toggle_filter_key(self, widget: QtWidgets.QWidget, key: str):
         """
@@ -388,4 +401,4 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             self.__get_frame()
         if not isinstance(self._widgets["plot"], QtWidgets.QWidget):
             raise PydidasGuiError("The reference is not a widget")
-        self._widgets["plot"].setData(self._frame)
+        self._show_image_method(self._frame, legend="pydidas_image")

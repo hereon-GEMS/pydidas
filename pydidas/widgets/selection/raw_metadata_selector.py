@@ -64,7 +64,10 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(self.default_params.copy())
         self._config = {"filename": None}
+        self._show_image_method = None
         self.__plot = kwargs.get("plot_widget", None)
+        if self.__plot is not None:
+            self.register_plot_widget(self.__plot)
         self.__create_widgets()
 
     def __create_widgets(self):
@@ -95,22 +98,30 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         Register a view widget to be used for full visualization of data.
 
         This method registers an external view widget for data visualization.
-        Note that the widget must accept frames through a ``setData`` method.
+        Note that the widget must accept frames through a ``addImage`` method.
 
         Parameters
         ----------
         widget : QWidget
-            A widget with a ``setData`` method to pass frames.
+            A widget with a ``addImage`` method to pass frames.
 
         Raises
         ------
         TypeError
-            If the widget does not have a ``setData`` method.
+            If the widget does not have a ``addImage`` method.
         """
-        if isinstance(widget, QtWidgets.QWidget) and hasattr(widget, "setData"):
-            self.__plot = widget
-            return
-        raise TypeError("Error: Object must be a widget with a setData method.")
+        if not isinstance(widget, QtWidgets.QWidget):
+            raise TypeError("Error: Object must be a QWidget.")
+        if not (hasattr(widget, "displayImage") or hasattr(widget, "addImage")):
+            raise AttributeError(
+                "Error: The selected widget is not supported, as it does not have an "
+                "`addImage` or `displayImage` method."
+            )
+        self.__plot = widget
+        if hasattr(widget, "displayImage"):
+            self._show_image_method = widget.displayImage
+        elif hasattr(widget, "addImage"):
+            self._show_image_method = widget.addImage
 
     @QtCore.Slot(str)
     def new_filename(self, name: str):
@@ -151,4 +162,4 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         _data = import_data(
             self.__filename, datatype=_datatype, offset=_offset, shape=_shape
         )
-        self.__plot.setData(_data)
+        self._show_image_method(_data, legend="pydidas image")

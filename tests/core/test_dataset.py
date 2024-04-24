@@ -278,7 +278,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _ = obj[0, 0]
         _ = obj[0]
-        self.assertEqual(obj._getitem_key, ())
+        self.assertEqual(obj._meta["getitem_key"], ())
 
     def test_array_finalize__multiple_slicing(self):
         obj = self.create_large_dataset()

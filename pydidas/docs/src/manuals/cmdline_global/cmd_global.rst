@@ -112,8 +112,15 @@ The object :py:data:`exp` will be used in all examples below.
              'detector_rot2': -0.004845626736941386,
              'detector_rot3': 5.799041608456517e-08}
 
+        .. tip::
+
+            You can also use the :py:data:`param_values` property to retrieve
+            all parameter values in a dictionary.
+
     4. Set the value of the *xray_energy*
     :py:class:`Parameter <pydidas.core.Parameter>`. This is a float value,
+    however, the :py:class:`Parameter <pydidas.core.Parameter>` will attempt
+    to convert other types to float. If successful,
     for demonstration purposes, let us set it with a string first. This will
     raise a :py:data:ValueError` and the Parameter will not be updated.
 
@@ -122,14 +129,17 @@ The object :py:data:`exp` will be used in all examples below.
             >>> exp.get_param_value('xray_energy')
             15.0
             >>> exp.set_param_value('xray_energy', '12.0')
-            ValueError: Cannot set Parameter (object ID:2506714567632,
-            refkey: "xray_energy", name: "X-ray energy") because it is of the
-            wrong data type.
-            >>> exp.get_param_value('xray_energy')
-            15.0
-            >>> exp.set_param_value('xray_energy', 12.0)
             >>> exp.get_param_value('xray_energy')
             12.0
+            >>> exp.set_param_value('xray_energy', 13)
+            >>> exp.get_param_value('xray_energy')
+            13.0
+            >>> exp.set_param_value('xray_energy', "twelve")
+            ValueError: Cannot set Parameter (object ID:2129071369296, refkey:
+            'xray_energy', name: 'X-ray energy') because it is of the wrong data type.
+            (expected: <class 'numbers.Real'>, input type: <class 'str'>
+            >>> exp.get_param_value('xray_energy')
+            13.0
 
 
 Global pydidas objects

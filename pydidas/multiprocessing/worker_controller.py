@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ control multiprocessing of computations.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -471,6 +471,7 @@ class WorkerController(QtCore.QThread):
                     break
             _queue.close()
             _queue.join_thread()
+        self._queues = {}
         logger.debug("WorkerController: Joined all queues.")
 
     def _wait_for_worker_finished_signals(self, timeout: float = 10):
@@ -520,9 +521,7 @@ class WorkerController(QtCore.QThread):
             The exit code.
         """
         logger.debug("WorkerController: Exiting thread")
-        for _queue in self._queues.values():
-            _queue.close()
-            _queue.join_thread()
+        self.join_queues()
         if code is not None:
             super().exit(code)
         else:

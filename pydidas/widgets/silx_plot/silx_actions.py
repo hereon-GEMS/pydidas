@@ -308,7 +308,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         """
         _filename = self._dialog.get_existing_filename(
             caption=self._dialog_kwargs["caption"],
-            extensions=IoMaster.get_string_of_formats(),
+            formats=IoMaster.get_string_of_formats(),
             qsettings_ref=self._dialog_kwargs["qsettings_ref"],
         )
         if _filename is not None:

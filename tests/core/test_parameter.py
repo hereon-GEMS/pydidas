@@ -105,7 +105,7 @@ class TestParameter(unittest.TestCase):
 
     def test_creation__wrong_datatype(self):
         with self.assertRaises(TypeError):
-            Parameter("Test0", int, "12")
+            Parameter("Test0", int, "12b")
 
     def test_creation__with_allow_None(self):
         param = Parameter("Test0", int, 12, allow_None=True)
@@ -245,10 +245,10 @@ class TestParameter(unittest.TestCase):
         obj.value = None
         self.assertEqual(obj.value, None)
 
-    def test_set_value_wrong_type(self):
+    def test_set_value__wrong_type(self):
         obj = Parameter("Test0", int, 12)
         with self.assertRaises(ValueError):
-            obj.value = "24"
+            obj.value = "24b"
 
     def test_set_value_wrong_choice(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
@@ -388,6 +388,30 @@ class TestParameter(unittest.TestCase):
 
     def test_convenience_type_conversion_any(self):
         _val = 42
+        obj = Parameter("Test0", int, 12)
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(_val, _newval)
+
+    def test_convenience_type_conversion__float_w_string_number_input(self):
+        _val = "42"
+        obj = Parameter("Test0", float, 12.2)
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(float(_val), _newval)
+
+    def test_convenience_type_conversion__float_w_string_input(self):
+        _val = "42a"
+        obj = Parameter("Test0", float, 12.2)
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(_val, _newval)
+
+    def test_convenience_type_conversion__int_w_string_number_input(self):
+        _val = "42"
+        obj = Parameter("Test0", int, 12)
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(int(_val), _newval)
+
+    def test_convenience_type_conversion__int_w_string_input(self):
+        _val = "42a"
         obj = Parameter("Test0", int, 12)
         _newval = obj._Parameter__convenience_type_conversion(_val)
         self.assertEqual(_val, _newval)

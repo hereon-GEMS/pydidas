@@ -60,7 +60,7 @@ hdf5plugin==4.4.0
     # via
     #   fabio
     #   pydidas (pyproject.toml)
-idna==3.6
+idna==3.7
     # via
     #   pydidas (pyproject.toml)
     #   requests
@@ -128,7 +128,7 @@ packaging==24.0
     #   scikit-image
     #   silx
     #   sphinx
-pillow==10.2.0
+pillow==10.3.0
     # via
     #   fabio
     #   imageio
@@ -186,7 +186,6 @@ requests==2.31.0
     # via
     #   pydidas (pyproject.toml)
     #   sphinx
-setuptools==69.2.0
 scikit-image==0.22.0
     # via pydidas (pyproject.toml)
 scipy==1.12.0
@@ -251,3 +250,6 @@ urllib3==2.2.1
     #   requests
 wheel==0.43.0
     # via pydidas (pyproject.toml)
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

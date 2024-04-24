@@ -49,7 +49,7 @@ class Test_dataset_utils(unittest.TestCase):
     def test_update_dataset_properties_from_kwargs__no_input(self):
         obj = Dataset(np.random.random((10, 10)))
         update_dataset_properties_from_kwargs(obj, {})
-        self.assertEqual(obj._getitem_key, ())
+        self.assertEqual(obj._meta["getitem_key"], ())
 
     def test_update_dataset_properties_from_kwargs__axis_units(self):
         _units = {0: "a", 1: "b"}

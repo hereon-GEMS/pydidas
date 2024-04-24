@@ -19,6 +19,7 @@ Files:
     pydidas/resources/*.png
     resources/*.png
     resources/*.svg
+    resources/*.ico
     resources/graphics_for_gui/*
     resources/documentation/dev_guide/*
 Copyright: 2023 - 2024, Helmholtz-Zentrum Hereon

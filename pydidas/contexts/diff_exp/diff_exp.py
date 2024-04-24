@@ -104,10 +104,10 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         self._check_key(param_key)
         if param_key == "xray_energy":
-            self.params["xray_energy"].value = value
+            self.params.set_value("xray_energy", value)
             self.params["xray_wavelength"].value = LAMBDA_IN_A_TO_E / value
         elif param_key == "xray_wavelength":
-            self.params["xray_wavelength"].value = value
+            self.params.set_value("xray_wavelength", value)
             self.params["xray_energy"].value = LAMBDA_IN_A_TO_E / value
         else:
             self.params.set_value(param_key, value)

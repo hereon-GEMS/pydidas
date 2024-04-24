@@ -37,6 +37,7 @@ from pydidas.core import (
     ObjectWithParameterCollection,
     Parameter,
     ParameterCollection,
+    ParameterCollectionMixIn,
     UserConfigError,
 )
 
@@ -56,6 +57,36 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_creation(self):
         obj = ObjectWithParameterCollection()
         self.assertIsInstance(obj, ObjectWithParameterCollection)
+
+    def test_init__simple(self):
+        obj = ObjectWithParameterCollection()
+        self.assertIsInstance(obj.params, ParameterCollection)
+
+    def test_init__mixin_with_existing_params_wrong_type(self):
+        obj = ObjectWithParameterCollection()
+        obj.params = "Test"
+        with self.assertRaises(TypeError):
+            ParameterCollectionMixIn.__init__(obj)
+
+    def test_init__mixin_with_existing_params(self):
+        obj = ObjectWithParameterCollection()
+        ParameterCollectionMixIn.__init__(obj)
+        self.assertIsInstance(obj.params, ParameterCollection)
+
+    def test_param_values(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _vals = obj.param_values
+        self.assertIsInstance(_vals, dict)
+        for _key, _param in self._params.items():
+            self.assertEqual(_vals[_key], _param.value)
+
+    def test_param_keys(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _keys = obj.param_keys
+        for _key in self._params:
+            self.assertIn(_key, _keys)
 
     def test_add_params__with_args(self):
         obj = ObjectWithParameterCollection()
@@ -190,6 +221,28 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj.set_param_value("Test2", 12)
         self.assertEqual(obj.get_param_value("Test2"), 12)
+
+    def test_set_param_values__correct(self):
+        _new_vals = {"Test0": 42, "Test1": "Spam and eggs", "Test2": 13, "Test3": 1.23}
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj.set_param_values(**_new_vals)
+        for _key, _val in _new_vals.items():
+            self.assertEqual(_val, obj.get_param_value(_key))
+
+    def test_set_param_values__single(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj.set_param_values(Test0=42)
+        self.assertEqual(42, obj.get_param_value("Test0"))
+
+    def test_set_param_values__wrong_key(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _val0 = obj.get_param_value("Test0")
+        with self.assertRaises(KeyError):
+            obj.set_param_values(Test0=42, Test5=42)
+        self.assertEqual(_val0, obj.get_param_value("Test0"))
 
     def test_get_param_keys(self):
         obj = ObjectWithParameterCollection()

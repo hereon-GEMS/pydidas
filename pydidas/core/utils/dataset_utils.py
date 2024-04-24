@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with utility functions required for the Dataset class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -65,14 +65,13 @@ def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset
     obj : pydidas.core.Dataset
         The updated Dataset.
     """
-    obj._meta = {}
+    obj._meta = {"getitem_key": ()}
     obj.axis_units = kwargs.get("axis_units", dataset_ax_str_default(obj.ndim))
     obj.axis_labels = kwargs.get("axis_labels", dataset_ax_str_default(obj.ndim))
     obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default_ranges(obj.shape))
     obj.metadata = kwargs.get("metadata", {})
     obj.data_unit = kwargs.get("data_unit", "")
     obj.data_label = kwargs.get("data_label", "")
-    obj._getitem_key = ()
     return obj
 
 

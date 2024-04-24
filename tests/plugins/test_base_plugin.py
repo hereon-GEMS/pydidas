@@ -459,6 +459,7 @@ class TestBasePlugin(unittest.TestCase):
         cp = copy.copy(obj)
         self.assertEqual(obj.__class__, cp.__class__)
         self.assertEqual(obj.get_param_value("label"), cp.get_param_value("label"))
+
         self.assertNotEqual(id(obj.params), id(cp.params))
         self.assertEqual(obj.node_id, cp.node_id)
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for testing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -35,7 +35,6 @@ from qtpy import QtCore
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import ParameterCollection
 from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import BasePlugin, InputPlugin, OutputPlugin, ProcPlugin
@@ -45,7 +44,7 @@ def create_base_class(base: type) -> type:
     """
     Create a single-use base class for a temporary plugin.
 
-    This single-use class is required to allow managemant of classs attributes.
+    This single-use class is required to allow management of class attributes.
 
     Parameters
     ----------
@@ -104,6 +103,5 @@ def create_plugin_class(plugin_type: int, number: int = 0) -> type:
     _cls.basic_plugin = False
     _cls.plugin_name = f"Plugin {_name}"
     _cls.number = number
-    _cls.params = ParameterCollection()
     _cls.__doc__ = get_random_string(600)
     return _cls

@@ -2,13 +2,33 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v24.03.25
+v24.xx.yy
 =========
-
 
 Improvements
 ------------
+- Improved the naming and tooltips of scan parameters with respect to the 
+  file numbers and indices.
+- Added the ParameterCollection creation the the ParameterCollectionMixin
+  class initialization.
 
+
+Bugfixes
+--------
+- Fixed a display issue in the title of the logging dockable widget.
+- Fixed an issue in the pyFAI calibration frame where the supported file 
+  formats where not correctly available in the file dialog.
+- Fixed an issue with settings the X-ray energy / wavelength in the 
+  DiffractionExperimentContext on the command line with wrong data types.
+- Fixed an issue with convenience type conversions in the Parameter class.
+- Fixed an issue with possibly joining queues twice on exit of WorkerController.
+
+
+v24.03.25
+=========
+
+Improvements
+------------
 - Changed a number of filenames and paths (mainly in the documentation) to 
   reduce the total length of the file names.
 - Updated files to new black 2024 style.

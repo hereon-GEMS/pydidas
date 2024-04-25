@@ -32,7 +32,7 @@ __all__ = ["ParameterCollection"]
 
 from collections.abc import Iterable
 from itertools import chain
-from typing import List, Self, Tuple, Union
+from typing import List, Self, Union
 
 from .parameter import Parameter
 
@@ -211,7 +211,7 @@ class ParameterCollection(dict):
             if not isinstance(_param, (Parameter, ParameterCollection)):
                 self.__raise_type_error(_param)
 
-    def add_params(self, *args: Tuple[Parameter, Self, dict]):
+    def add_params(self, *args: tuple[Parameter, Self, dict]):
         """
         Add parameters to the ParameterCollection.
 
@@ -221,7 +221,7 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *args : Tuple[Parameter, dict, ParameterCollection]
+        *args : tuple[Parameter, dict, ParameterCollection]
             Any dict, Parameter or ParameterCollection
         """
         # perform all type checks before adding any items:
@@ -229,7 +229,7 @@ class ParameterCollection(dict):
         self.__check_duplicate_keys(*args)
         self.__add_arg_params(*args)
 
-    def __check_duplicate_keys(self, *args: tuple):
+    def __check_duplicate_keys(self, *args: tuple[Union[dict, Parameter, Self]]):
         """
         Check for duplicate keys and raise an error if a duplicate key is found.
 
@@ -238,8 +238,8 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *args : tuple
-            Any number of Parameters.
+        *args : tuple[Union[dict, Parameter, Self]
+            Any number of Parameters or ParameterCollections.
 
         Raises
         ------
@@ -248,24 +248,24 @@ class ParameterCollection(dict):
             reference key.
         """
         # flatten arguments and add them to a list
-        _new_args = list(
+        _flattened_params = list(
             chain.from_iterable(
                 [p] if isinstance(p, Parameter) else list(p.values()) for p in args
             )
         )
         _original_keys = tuple(self.keys())
-        for _param in _new_args:
-            _other_keys = tuple(p.refkey for p in _new_args if p is not _param)
+        for _param in _flattened_params:
+            _other_keys = tuple(p.refkey for p in _flattened_params if p is not _param)
             _temp_keys = _original_keys + _other_keys
             self.__check_key_available(_param, keys=_temp_keys)
 
-    def __add_arg_params(self, *args: Tuple[Parameter, Self]):
+    def __add_arg_params(self, *args: tuple[Parameter, Self]):
         """
         Add the passed parameters to the ParameterCollection.
 
         Parameters
         ----------
-        *args : Tuple[Parameter, Self]
+        *args : tuple[Parameter, Self]
             The single Parameters or ParameterCollections to be added.
         """
         for _item in args:

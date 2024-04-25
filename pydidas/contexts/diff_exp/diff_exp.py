@@ -17,7 +17,7 @@
 
 """
 Module with the DiffractionExperiment class which is used to manage global information
-about the experiment independant from the individual frames.
+about the experiment independent of the individual frames.
 """
 
 __author__ = "Malte Storm"
@@ -29,10 +29,11 @@ __all__ = ["DiffractionExperiment"]
 
 
 import pathlib
-from typing import Self, Tuple, Union
+from typing import Self, Union
 
 import numpy as np
 import pyFAI
+from pyFAI.detectors import Detector
 from pyFAI.geometry import Geometry
 from qtpy import QtCore
 
@@ -113,7 +114,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             self.params.set_value(param_key, value)
         self.sig_params_changed.emit()
 
-    def get_detector(self) -> pyFAI.detectors.Detector:
+    def get_detector(self) -> Detector:
         """
         Get the pyFAI detector object.
 
@@ -123,14 +124,14 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
         Returns
         -------
-        det : pyFAI.detectors.Detector
+        det : Detector
             The detector object.
         """
         _name = self.get_param_value("detector_name")
         if _name in PYFAI_DETECTOR_NAMES:
             _det = pyFAI.detector_factory(_name)
         else:
-            _det = pyFAI.detectors.Detector()
+            _det = Detector()
         for key, value in [
             ["pixel1", self.get_param_value("detector_pxsizey") * 1e-6],
             ["pixel2", self.get_param_value("detector_pxsizex") * 1e-6],
@@ -144,6 +145,26 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         ]:
             setattr(_det, key, value)
         return _det
+
+    @property
+    def detector_is_valid(self) -> bool:
+        """
+         Check if the detector definition is valid.
+
+        This is determined by checking that the detector pixel sizes and numbers of
+         pixel are positive.
+
+         Returns
+         -------
+         bool
+             Flag whether the detector definition is valid.
+        """
+        return (
+            self.get_param_value("detector_pxsizex") > 0
+            and self.get_param_value("detector_pxsizey") > 0
+            and self.get_param_value("detector_npixx") > 0
+            and self.get_param_value("detector_npixy") > 0
+        )
 
     def as_pyfai_geometry(self) -> Geometry:
         """
@@ -224,7 +245,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         with QtCore.QSignalBlocker(self):
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
                 self.set_param_value(f"detector_{_key}", getattr(geometry, _key))
-            if geometry.detector.name in pyFAI.detectors.Detector.registry:
+            if geometry.detector.name in Detector.registry:
                 self.set_detector_params_from_name(geometry.detector.name)
             else:
                 _det = geometry.detector
@@ -282,7 +303,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
         R_pyfai = R_3(rot_beam) * R_2(-rot_x) * R_1(-rot_y)
 
-        Note that rot_x and rot_y directors are lefthanded (i.e. inverted.)
+        Note that rot_x and rot_y directors are left-handed (i.e. inverted.)
 
         Parameters
         ----------
@@ -292,14 +313,17 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             The position of the y beam center in pixels.
         det_dist : float
             The distance between sample and detector beam center in meters.
-        tilt : float, optional
-            The tilt of the detector, given in rotation unit. The default is 0.
-        tilt_plane: float, optional
-            The rotation of the tile plane of the detector, given in rot unit. The
-            default is 0.
-        rot_unit : str, optional
-            The unit of the rotation angles. Allowed choices are 'degree' and 'rad'.
-            The default is degree.
+        **kwargs: dict
+            Supported keyword arguments are:
+
+            tilt : float, optional
+                The tilt of the detector, given in rotation unit. The default is 0.
+            tilt_plane: float, optional
+                The rotation of the tile plane of the detector, given in rot unit. The
+                default is 0.
+            rot_unit : str, optional
+                The unit of the rotation angles. Allowed choices are 'degree' and 'rad'.
+                The default is degree.
         """
         _tilt = kwargs.get("tilt", 0)
         _tilt_plane = kwargs.get("tilt_plane", 0)
@@ -323,7 +347,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         self.sig_params_changed.emit()
 
     @property
-    def beamcenter(self) -> Tuple[float]:
+    def beamcenter(self) -> tuple[float, float]:
         """
         Get the beamcenter in detector pixel coordinates.
 
@@ -352,7 +376,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             or self.get_param_value("detector_pxsizey") == 0
         ):
             raise UserConfigError(
-                "The detector pixelsize of 0 is invalid for a fit2d geometry."
+                "The detector pixel size of 0 is invalid for a fit2d geometry."
             )
         _geo = self.as_pyfai_geometry()
         _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)

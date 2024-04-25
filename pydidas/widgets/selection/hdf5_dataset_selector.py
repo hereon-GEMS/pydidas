@@ -17,7 +17,7 @@
 
 """
 Module with the Hdf5DatasetSelector widget which allows to select a dataset
-from an Hdf5 file and to browse through its data.
+from a Hdf5 file and to browse through its data.
 """
 
 __author__ = "Malte Storm"
@@ -44,6 +44,7 @@ from ...core.utils import (
 )
 from ..factory import CreateWidgetsMixIn
 from ..utilities import get_max_pixel_width_of_entries
+from .common_selection import register_plot_widget_method
 
 
 DEFAULT_FILTERS = {
@@ -56,16 +57,16 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     A compound widget to select datasets in Hdf5 files.
 
     The Hdf5DatasetSelector is a compound widget which allows to select
-    an hdf5 dataset key and the frame number. By convention, the first
-    dimension of a n-dimensional (n >= 3) dataset is the frame number. Any
+    a hdf5 dataset key and the frame number. By convention, the first
+    dimension of an n-dimensional (n >= 3) dataset is the frame number. Any
     2-dimensional datasets will be interpreted as single frames.
 
     Parameters
     ----------
-    viewWidget : Union[QWidget, None], optional
+    plot_widget : Union[QWidget, None], optional
         A widget for a full view. It can also be registered later using
         the  *register_plot_widget* method. The default is None.
-    datasetKeyFilters : Union[dict, None], optional
+    dataset_key_filters : Union[dict, None], optional
         A dictionary with dataset keys to be filtered from the list
         of displayed datasets. Entries must be in the format
         {<Key to filter>: <Descriptive text for checkbox>}.
@@ -79,8 +80,9 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     """
 
     new_frame_signal = QtCore.Signal(object)
+    register_plot_widget = register_plot_widget_method
 
-    def __init__(self, viewWidget=None, datasetKeyFilters=None, **kwargs):
+    def __init__(self, plot_widget=None, dataset_key_filters=None, **kwargs):
         QtWidgets.QWidget.__init__(self, kwargs.pop("parent", None))
         CreateWidgetsMixIn.__init__(self)
         apply_qt_properties(self, **kwargs)
@@ -88,16 +90,18 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self._config = {
             "activeDsetFilters": [],
             "currentDset": None,
-            "currentFname": None,
+            "current_filename": None,
             "currentIndex": None,
             "dsetFilters": (
-                datasetKeyFilters if datasetKeyFilters is not None else DEFAULT_FILTERS
+                dataset_key_filters
+                if dataset_key_filters is not None
+                else DEFAULT_FILTERS
             ),
         }
         self.flags = {"slotActive": False, "autoUpdate": True}
-        self._show_image_method = None
-        if viewWidget is not None:
-            self.register_plot_widget(viewWidget)
+        self.show_image_method = None
+        if plot_widget is not None:
+            self.register_plot_widget(plot_widget)
         self._frame = None
         self.__create_widgets_and_layout()
         self.__connect_slots()
@@ -199,7 +203,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         _dset_filter_min_size = self._widgets["min_datasize"].value()
         _dset_filter_min_dim = self._widgets["min_datadim"].value()
         _datasets = get_hdf5_populated_dataset_keys(
-            self._config["currentFname"],
+            self._config["current_filename"],
             min_size=_dset_filter_min_size,
             min_dim=_dset_filter_min_dim,
             ignore_keys=self._config["activeDsetFilters"],
@@ -225,7 +229,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         accepted frame range for the sliders.
         """
         _dset = self._widgets["select_dataset"].currentText()
-        with h5py.File(self._config["currentFname"], "r") as _file:
+        with h5py.File(self._config["current_filename"], "r") as _file:
             _shape = _file[_dset].shape
         n_frames = _shape[0] if len(_shape) >= 3 else 1
         self._widgets["frame_browser"].setRange(0, n_frames - 1)
@@ -238,14 +242,14 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         Propagate an update to any consumers.
 
         This method will read a new frame from the file if any consumers
-        demand it (consumers must active the signal slot or the automatic
+        demand it (consumers must activate the signal slot or the automatic
         update). The new frame will be passed to any active view/preview
         widgets and a signal emitted if the slot is active.
 
         Parameters
         ----------
         new_frame : bool
-            A flag to tell __updateto process a new frame, e.g. after changing
+            A flag to tell this method to process a new frame, e.g. after changing
             the dataset.
         """
         if self.flags["autoUpdate"] or self.flags["slotActive"] or new_frame:
@@ -255,7 +259,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         if self.flags["slotActive"]:
             self.new_frame_signal.emit(self._frame)
         if self.flags["autoUpdate"] and self._widgets["plot"] is not None:
-            self._show_image_method(self._frame, legend="pydidas image")
+            self.show_image_method(self._frame, legend="pydidas image")
 
     def __get_frame(self):
         """
@@ -268,7 +272,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         _dset = self._widgets["select_dataset"].currentText()
         if _dset == "":
             self._frame = None
-        with h5py.File(self._config["currentFname"], "r") as _file:
+        with h5py.File(self._config["current_filename"], "r") as _file:
             _dset = _file[_dset]
             _ndim = len(_dset.shape)
             if _ndim >= 3:
@@ -276,47 +280,14 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             elif _ndim == 2:
                 self._frame = _dset[...]
 
-    def register_plot_widget(self, widget: QtWidgets.QWidget):
-        """
-        Register a view widget to be used for full visualization of data.
-
-        This method registers an external view widget for data visualization.
-        Note that the widget must accept frames through a ``addImage`` method.
-
-        Parameters
-        ----------
-        widget : QWidget
-            A widget with a ``addImage`` method to pass frames.
-
-        Raises
-        ------
-        TypeError
-            If the widget is not a QWidget.
-        AttributeError
-            If the widget does not have an ``addImage`` or `displayImage` method.
-        """
-        if not isinstance(widget, QtWidgets.QWidget):
-            raise TypeError("Error: Object must be a QWidget.")
-        if not (hasattr(widget, "displayImage") or hasattr(widget, "addImage")):
-            raise AttributeError(
-                "Error: The selected widget is not supported, as it does not have an "
-                "`addImage` or `displayImage` method."
-            )
-        self._widgets["plot"] = widget
-        if hasattr(widget, "displayImage"):
-            self._show_image_method = widget.displayImage
-        elif hasattr(widget, "addImage"):
-            self._show_image_method = widget.addImage
-        print("registered hdf5", self._show_image_method)
-
     def _toggle_filter_key(self, widget: QtWidgets.QWidget, key: str):
         """
         Add or remove the filter key from the active dataset key filters.
 
         This method will add or remove the <key> which is associated with the
         checkbox widget <widget> from the active dataset filters.
-        Note: This method should never be called by the user but it is
-        connected to the checkboxes which activate or deactive the respective
+        Note: This method should never be called by the user, but it is
+        connected to the checkboxes which activate or deactivate the respective
         filters.
 
         Parameters
@@ -358,7 +329,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         Process the new filename.
 
-        If the new filename has a suffix associated with raw files,
+        If the new filename has a suffix associated with hdf5 files,
         show the widget.
 
         Parameters
@@ -366,13 +337,13 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         name : str
             The full file system path to the new file.
         """
-        self.__filename = Path(name)
-        if not self.__filename.is_file():
+        _filename = Path(name)
+        if not _filename.is_file():
             return
-        _is_hdf5 = get_extension(self.__filename) in HDF5_EXTENSIONS
+        _is_hdf5 = get_extension(_filename) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
         if _is_hdf5:
-            self._config["currentFname"] = name
+            self._config["current_filename"] = name
             self.__populate_dataset_list()
             self.__update(True)
 
@@ -401,4 +372,4 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             self.__get_frame()
         if not isinstance(self._widgets["plot"], QtWidgets.QWidget):
             raise PydidasGuiError("The reference is not a widget")
-        self._show_image_method(self._frame, legend="pydidas_image")
+        self.show_image_method(self._frame, legend="pydidas_image")

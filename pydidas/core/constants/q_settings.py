@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,16 +21,20 @@ Definitions of variables for persistent QSettings names in use.
 The QSETTINGS_GLOBAL_KEYS and QSETTINGS_USER_KEYS constant holds the names
 of all global QSetting keys used in pydidas. These are required to verify
 that these settings have been written and exist. Pydidas will perform an
-existance check upon module holds information about the global keys used in
+existence check upon module holds information about the global keys used in
 pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["QSETTINGS_GLOBAL_KEYS", "QSETTINGS_USER_KEYS"]
+__all__ = [
+    "QSETTINGS_GLOBAL_KEYS",
+    "QSETTINGS_USER_KEYS",
+    "QSETTINGS_USER_SPECIAL_KEYS",
+]
 
 
 QSETTINGS_GLOBAL_KEYS = [
@@ -48,4 +52,9 @@ QSETTINGS_USER_KEYS = [
     "histogram_outlier_fraction_high",
     "plugin_path",
     "auto_check_for_updates",
+    "cmap_nan_color",
+]
+
+QSETTINGS_USER_SPECIAL_KEYS = [
+    "cmap_name",
 ]

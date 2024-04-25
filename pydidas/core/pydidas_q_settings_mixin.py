@@ -31,7 +31,9 @@ __all__ = ["PydidasQsettingsMixin"]
 from numbers import Integral, Real
 from typing import Optional, Self, Union
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
+
+from pydidas_qtcore import PydidasQApplication
 
 from ..version import VERSION
 
@@ -130,8 +132,11 @@ class PydidasQsettingsMixin:
         value : object
             The value to be stored.
         """
+        _current = self.q_settings_get(key)
+        if value == _current:
+            return
         self.q_settings.setValue(f"{self.q_settings_version}/{key}", value)
         if key.startswith("user/"):
             _stripped_key = key.replace("user/", "")
-            _qtapp = QtWidgets.QApplication.instance()
-            _qtapp.updated_user_config(_stripped_key, value)
+            _qtapp = PydidasQApplication.instance()
+            _qtapp.updated_user_config(_stripped_key, str(value))

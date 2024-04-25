@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ It is being developed by Helmholtz-Zentrum Hereon.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -90,7 +90,7 @@ __all__.extend(
 )
 
 
-# Check whether the sphinx documentation has been built and build it if
+# Check whether the sphinx documentation has been built and build it if it
 # has not:
 if not core.utils.check_sphinx_html_docs():
     core.utils.run_sphinx_html_build()
@@ -115,6 +115,7 @@ __settings = __QtCore.QSettings("Hereon", "pydidas")
 for _prefix, _keys in (
     ("global", core.constants.QSETTINGS_GLOBAL_KEYS),
     ("user", core.constants.QSETTINGS_USER_KEYS),
+    ("user", core.constants.QSETTINGS_USER_SPECIAL_KEYS),
 ):
     for _key in _keys:
         _val = __settings.value(f"{VERSION}/{_prefix}/{_key}")

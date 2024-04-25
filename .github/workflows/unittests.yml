@@ -8,8 +8,6 @@
 name: running unittest
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 

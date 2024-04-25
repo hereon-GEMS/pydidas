@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ additional actions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,9 +31,11 @@ __all__ = ["PydidasPlot2D"]
 import inspect
 from functools import partial
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
+
+from pydidas_qtcore import PydidasQApplication
 
 from ...contexts import DiffractionExperimentContext
 from ...core import Dataset, PydidasQsettingsMixin
@@ -47,7 +49,7 @@ from .silx_actions import (
     PydidasGetDataInfoAction,
 )
 from .silx_tickbar import tickbar_paintEvent, tickbar_paintTick
-from .utilities import get_2d_silx_plot_ax_settings
+from .utilities import get_2d_silx_plot_ax_settings, user_config_update_func
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
@@ -61,20 +63,27 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     setData = Plot2D.addImage
     sig_get_more_info_for_data = QtCore.Signal(float, float)
     init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
+    user_config_update = user_config_update_func
 
     def __init__(self, **kwargs: dict):
         PydidasQsettingsMixin.__init__(self)
         Plot2D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
-        self._qtapp = QtWidgets.QApplication.instance()
+        self._qtapp = PydidasQApplication.instance()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         if hasattr(self._qtapp, "sig_mpl_font_change"):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
+        if hasattr(self._qtapp, "sig_updated_user_config"):
+            self._qtapp.sig_updated_user_config.connect(self.user_config_update)
+        self.user_config_update("cmap_name", self.q_settings_get("user/cmap_name"))
+        self.user_config_update(
+            "cmap_nan_color", self.q_settings_get("user/cmap_nan_color")
+        )
 
         self._config = {
             "cs_transform": kwargs.get("cs_transform", True),
-            "cs_transform_valid": True,
+            "cs_transform_valid": False,
             "use_data_info_action": kwargs.get("use_data_info_action", False),
             "diffraction_exp": (
                 DiffractionExperimentContext()
@@ -179,9 +188,11 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         _cmap_name = self.q_settings_get("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
-            self.setDefaultColormap(
-                Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
+            _cmap = Colormap(
+                name=_cmap_name, normalization="linear", vmin=None, vmax=None
             )
+            _cmap.setNaNColor(self.q_settings_get("user/cmap_nan_color"))
+            self.setDefaultColormap(_cmap)
         _tb = self.getColorBarWidget().getColorScaleBar().getTickBar()
         _tb.paintEvent = partial(tickbar_paintEvent, _tb)
         _tb._paintTick = partial(tickbar_paintTick, _tb)
@@ -204,12 +215,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         Check that the detector is valid for a CS transform.
         """
-        self._config["cs_transform_valid"] = (
-            self._config["diffraction_exp"].get_param_value("detector_pxsizex") > 0
-            and self._config["diffraction_exp"].get_param_value("detector_pxsizey") > 0
-            and self._config["diffraction_exp"].get_param_value("detector_npixx") > 0
-            and self._config["diffraction_exp"].get_param_value("detector_npixy") > 0
-        )
+        _exp = self._config["diffraction_exp"]
+        self._config["cs_transform_valid"] = _exp.detector_is_valid
 
     def enable_cs_transform(self, enable: bool):
         """
@@ -254,13 +261,11 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Additional keyword arguments to be passed to the silx plot method.
         """
-        self.enable_cs_transform(
-            data.shape
-            == (
-                self._config["diffraction_exp"].get_param_value("detector_npixy"),
-                self._config["diffraction_exp"].get_param_value("detector_npixx"),
-            )
+        _has_detector_image_shape = data.shape == (
+            self._config["diffraction_exp"].get_param_value("detector_npixy"),
+            self._config["diffraction_exp"].get_param_value("detector_npixx"),
         )
+        self.enable_cs_transform(_has_detector_image_shape)
         if data.axis_units[0] != "" and data.axis_units[1] != "":
             self.update_cs_units(data.axis_units[1], data.axis_units[0])
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
@@ -276,6 +281,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 "copy": kwargs.pop("copy", False),
                 "origin": (_originx, _originy),
                 "scale": (_scalex, _scaley),
+                "legend": "pydidas image",
             }
             | {
                 _key: _val
@@ -294,10 +300,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if len(self._plot_config["cbar_legend"]) > 0:
             self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
 
-        if data.shape == (
-            self._config["diffraction_exp"].get_param_value("detector_npixy"),
-            self._config["diffraction_exp"].get_param_value("detector_npixx"),
-        ):
+        if _has_detector_image_shape:
             self.changeCanvasToDataAction._actionTriggered()
 
     def clear_plot(self):

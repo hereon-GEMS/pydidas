@@ -28,16 +28,18 @@ __all__ = ["PydidasImageView"]
 
 
 from numpy import ndarray
-from qtpy import QtCore, QtWidgets
-from silx.gui.colors import Colormap
+from qtpy import QtCore
 from silx.gui.plot import ImageView, Plot2D, tools
 from silx.utils.weakref import WeakMethodProxy
+
+from pydidas_qtcore import PydidasQApplication
 
 from ...contexts import DiffractionExperimentContext
 from ...core import PydidasQsettingsMixin
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .silx_actions import AutoscaleToMeanAndThreeSigma, CropHistogramOutliers
+from .utilities import user_config_update_func
 
 
 SNAP_MODE = (
@@ -70,6 +72,8 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
             is True.
     """
 
+    user_config_update = user_config_update_func
+
     _getImageValue = Plot2D._getImageValue
 
     def __init__(self, **kwargs: dict):
@@ -77,8 +81,16 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
         PydidasQsettingsMixin.__init__(self)
+        self._qtapp = PydidasQApplication.instance()
+        self._config = {}
+        if hasattr(self._qtapp, "sig_updated_user_config"):
+            self._qtapp.sig_updated_user_config.connect(self.user_config_update)
+        self.user_config_update("cmap_name", self.q_settings_get("user/cmap_name"))
+        self.user_config_update(
+            "cmap_nan_color", self.q_settings_get("user/cmap_nan_color")
+        )
 
-        posInfo = [
+        pos_info = [
             ("X", lambda x, y: x),
             ("Y", lambda x, y: y),
             ("Data", WeakMethodProxy(self._getImageValue)),
@@ -103,17 +115,17 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         )
 
         if kwargs.get("show_cs_transform", True):
-            self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
-            self._toolbar.addWidget(self.cs_transform)
+            self.cs_transform_button = CoordinateTransformButton(parent=self, plot=self)
+            self._toolbar.addWidget(self.cs_transform_button)
         else:
-            self.cs_transform = None
+            self.cs_transform_button = None
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-        _position_widget = PydidasPositionInfo(plot=self, converters=posInfo)
+        _position_widget = PydidasPositionInfo(plot=self, converters=pos_info)
         _position_widget.setSnappingMode(SNAP_MODE)
         if kwargs.get("show_cs_transform", True):
-            self.cs_transform.sig_new_coordinate_system.connect(
+            self.cs_transform_button.sig_new_coordinate_system.connect(
                 _position_widget.new_coordinate_system
             )
         _layout = self.centralWidget().layout()
@@ -123,12 +135,6 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         DIFFRACTION_EXP.sig_params_changed.connect(self.update_from_diffraction_exp)
         self.update_from_diffraction_exp()
 
-        _cmap_name = self.q_settings_get("user/cmap_name", default="Gray").lower()
-        if _cmap_name is not None:
-            self.setDefaultColormap(
-                Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
-            )
-        self._qtapp = QtWidgets.QApplication.instance()
         if hasattr(self._qtapp, "sig_mpl_font_change"):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
 
@@ -137,22 +143,17 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         """
         Get the detector size from the DiffractionExperimentContext and store it.
         """
-        if self.cs_transform is None:
+        if self.cs_transform_button is None:
             return
-        self._cs_transform_valid = (
-            DIFFRACTION_EXP.get_param_value("detector_pxsizex") > 0
-            and DIFFRACTION_EXP.get_param_value("detector_pxsizey") > 0
-            and DIFFRACTION_EXP.get_param_value("detector_npixx") > 0
-            and DIFFRACTION_EXP.get_param_value("detector_npixy") > 0
-        )
-        self._detector_size = (
+        self._config["cs_transform_valid"] = DIFFRACTION_EXP.detector_is_valid
+        self._config["detector_size"] = (
             DIFFRACTION_EXP.get_param_value("detector_npixy"),
             DIFFRACTION_EXP.get_param_value("detector_npixx"),
         )
-        self.cs_transform.set_coordinates("cartesian")
-        self.cs_transform.setEnabled(self._cs_transform_valid)
+        self.cs_transform_button.set_coordinates("cartesian")
+        self.cs_transform_button.setEnabled(self._config["cs_transform_valid"])
 
-    def displayImage(self, data: ndarray, **kwargs: dict):
+    def display_image(self, data: ndarray, **kwargs: dict):
         """
         Set the image data, handle the coordinate system and forward the data to
         plotting.
@@ -164,10 +165,10 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         **kwargs : dict
             Optional kwargs for the ImageView.setImage method.
         """
-        if self.cs_transform is not None:
+        if self.cs_transform_button is not None:
             self._check_data_shape(data.shape)
         _ = kwargs.pop("legend", None)
-        self._plot_kwargs = kwargs
+        self._config["plot_kwargs"] = kwargs
         ImageView.setImage(self, data, **kwargs)
 
     def _check_data_shape(self, data_shape: tuple[int, ...]):
@@ -182,10 +183,13 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         data_shape : tuple
             The shape of the input data.
         """
-        _valid = data_shape == self._detector_size and self._cs_transform_valid
+        _valid = (
+            data_shape == self._config["detector_size"]
+            and self._config["cs_transform_valid"]
+        )
         if not _valid:
-            self.cs_transform.set_coordinates("cartesian")
-        self.cs_transform.setEnabled(_valid)
+            self.cs_transform_button.set_coordinates("cartesian")
+        self.cs_transform_button.setEnabled(_valid)
 
     @QtCore.Slot()
     def update_mpl_fonts(self):
@@ -196,7 +200,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         if _image is None:
             return
         self.getBackend().fig.gca().cla()
-        ImageView.setImage(self, _image.getData(), **self._plot_kwargs)
+        ImageView.setImage(self, _image.getData(), **self._config["plot_kwargs"])
         for _histo in [self._histoHPlot, self._histoVPlot]:
             _profile = _histo.getProfile()
             _histo.getBackend().fig.gca().cla()

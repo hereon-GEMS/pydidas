@@ -51,6 +51,12 @@ _pyfai_geo_params = {
 }
 
 
+def prepare_exp_with_Eiger():
+    obj = DiffractionExperiment()
+    obj.set_detector_params_from_name("Eiger 9M")
+    return obj
+
+
 class TestDiffractionExperiment(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -64,11 +70,6 @@ class TestDiffractionExperiment(unittest.TestCase):
     def setUp(self): ...
 
     def tearDown(self): ...
-
-    def prepare_context_with_Eiger(self):
-        obj = DiffractionExperiment()
-        obj.set_detector_params_from_name("Eiger 9M")
-        return obj
 
     def assert_beamcenter_okay(self, obj, accuracy=8):
         _rot1 = obj.get_param_value("detector_rot1")
@@ -124,8 +125,38 @@ class TestDiffractionExperiment(unittest.TestCase):
         self.assertEqual(_det.pixel1, 1e-6 * _pixelsize)
         self.assertEqual(_det.pixel2, 1e-6 * _pixelsize)
 
+    def test_detector_is_valid__no_detector(self):
+        obj = DiffractionExperiment()
+        self.assertFalse(obj.detector_is_valid)
+
+    def test_detector_is_valid__pyfai_detector(self):
+        obj = DiffractionExperiment()
+        obj.set_detector_params_from_name("Eiger 9M")
+        self.assertTrue(obj.detector_is_valid)
+
+    def test_detector_is_valid__manual_detector(self):
+        obj = DiffractionExperiment()
+        _shape = (1000, 1000)
+        _pixelsize = 100
+        obj.set_param_value("detector_name", "No Eiger")
+        obj.set_param_value("detector_npixy", _shape[0])
+        obj.set_param_value("detector_npixx", _shape[1])
+        obj.set_param_value("detector_pxsizey", _pixelsize)
+        obj.set_param_value("detector_pxsizex", _pixelsize)
+        self.assertTrue(obj.detector_is_valid)
+
+    def test_detector_is_valid__incomplete_manual_detector(self):
+        obj = DiffractionExperiment()
+        _shape = (1000, 1000)
+        obj.set_param_value("detector_name", "No Eiger")
+        obj.set_param_value("detector_npixy", _shape[0])
+        obj.set_param_value("detector_npixx", _shape[1])
+        obj.set_param_value("detector_pxsizey", 0)
+        obj.set_param_value("detector_pxsizex", 100)
+        self.assertFalse(obj.detector_is_valid)
+
     def test_as_pyfai_geometry(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         for _key, _val in _pyfai_geo_params.items():
             obj.set_param_value(f"detector_{_key}", _val)
         _geo = obj.as_pyfai_geometry()
@@ -206,43 +237,43 @@ class TestDiffractionExperiment(unittest.TestCase):
         self.assertEqual(obj.get_param_value("detector_npixx"), _det["npixx"])
 
     def test_set_beamcenter_from_fit2d_params__no_rot(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         obj.set_beamcenter_from_fit2d_params(*self._beamcenter)
         self.assert_beamcenter_okay(obj)
 
     def test_set_beamcenter_from_fit2d_params__full_rot_degree(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         obj.set_beamcenter_from_fit2d_params(
             *self._beamcenter, tilt=5, tilt_plane=270, rot_unit="degree"
         )
         self.assert_beamcenter_okay(obj)
 
     def test_set_beamcenter_from_fit2d_params_full_rot_rad(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         obj.set_beamcenter_from_fit2d_params(
             *self._beamcenter, tilt=0.5, tilt_plane=1, rot_unit="rad"
         )
         self.assert_beamcenter_okay(obj)
 
     def test_as_fit2d_geometry_values(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         _f2d = obj.as_fit2d_geometry_values()
         self.assertIsInstance(_f2d, dict)
 
     def test_as_fit2d_geometry_values__invalid_exp(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         obj.set_param_value("detector_pxsizex", 0)
         with self.assertRaises(UserConfigError):
             obj.as_fit2d_geometry_values()
 
     def test_beamcenter__not_set(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         _cx, _cy = obj.beamcenter
         self.assertEqual(_cx, 0)
         self.assertEqual(_cy, 0)
 
     def test_beamcenter__set(self):
-        obj = self.prepare_context_with_Eiger()
+        obj = prepare_exp_with_Eiger()
         _cx = 1248
         _cy = 1369.75
         obj.set_param_value(

@@ -11,6 +11,8 @@ Improvements
   file numbers and indices.
 - Added the ParameterCollection creation the the ParameterCollectionMixin
   class initialization.
+- Added a setting to change the default NaN color which is used to mark
+  invalid or missing data.
 
 
 Bugfixes

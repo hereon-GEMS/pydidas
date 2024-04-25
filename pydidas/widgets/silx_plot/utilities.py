@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,16 @@ Module with utility functions used in the silx_plot package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["get_2d_silx_plot_ax_settings"]
+__all__ = ["get_2d_silx_plot_ax_settings", "user_config_update_func"]
 
+from contextlib import nullcontext
 
 from numpy import ndarray
+from qtpy import QtCore
 
 
 def get_2d_silx_plot_ax_settings(axis: ndarray) -> tuple[float, float]:
@@ -51,3 +53,31 @@ def get_2d_silx_plot_ax_settings(axis: ndarray) -> tuple[float, float]:
     _scale = (axis[-1] - axis[0] + _delta) / axis.size
     _origin = axis[0] - _delta / 2
     return _origin, _scale
+
+
+@QtCore.Slot(str, str)
+def user_config_update_func(self, key: str, value: str):
+    """
+    Handle a user config update.
+
+    Parameters
+    ----------
+    key : str
+        The name of the updated key.
+    value :
+        The new value of the updated key.
+    """
+    if key not in ["cmap_name", "cmap_nan_color"]:
+        return
+    _current_image = self.getImage()
+    if _current_image is None:
+        _current_cmap = self.getDefaultColormap()
+        _context = nullcontext()
+    else:
+        _current_cmap = _current_image.getColormap()
+        _context = QtCore.QSignalBlocker(_current_image)
+    with _context:
+        if key == "cmap_name":
+            _current_cmap.setName(value.lower())
+        elif key == "cmap_nan_color":
+            _current_cmap.setNaNColor(value)

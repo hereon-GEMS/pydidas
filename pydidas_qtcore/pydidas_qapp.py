@@ -37,7 +37,8 @@ import matplotlib as mpl
 import matplotlib.font_manager as mpl_font_manager
 import matplotlib.ft2font as mpl_ft2font
 import numpy as np
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtGui
+from qtpy.QtWidgets import QApplication, QStyle
 
 from . import fontsize
 
@@ -92,14 +93,14 @@ def sigint_signal_handler(signal_num: int, frame: object):
     frame : object
         The calling frame object.
     """
-    _app = QtWidgets.QApplication.instance()
+    _app = PydidasQApplication.instance()
     _app.sig_exit_pydidas.emit()
     _app.terminate_registered_threads()
     _app.quit()
     sys.exit()
 
 
-class PydidasQApplication(QtWidgets.QApplication):
+class PydidasQApplication(QApplication):
     """
     A subclassed QApplication used in pydidas for controlling the UI and event loops.
 
@@ -118,9 +119,14 @@ class PydidasQApplication(QtWidgets.QApplication):
     sig_mpl_font_setting_error = QtCore.Signal(str)
     sig_status_message = QtCore.Signal(str)
     sig_updated_user_config = QtCore.Signal(str, str)
+    _instance = None
+
+    @staticmethod
+    def instance():
+        return PydidasQApplication._instance
 
     def __init__(self, args):
-        QtWidgets.QApplication.__init__(self, args)
+        QApplication.__init__(self, args)
         signal.signal(signal.SIGINT, sigint_signal_handler)
         self.setOrganizationName("Hereon")
         self.setOrganizationDomain("Hereon/WPI")
@@ -136,13 +142,14 @@ class PydidasQApplication(QtWidgets.QApplication):
             ),
             "family": self.__settings.value("font/family", self.font().family()),
             "height": 20,
-            "font_metric_height": 0,
-            "font_metric_width": 0,
+            "font_metric_height": 0.0,
+            "font_metric_width": 0.0,
         }
         _kwargs = parse_cmd_args()
         self.font_size = _kwargs.get("fontsize", self.__font_config["size"])
         self.font_family = self.__font_config["family"]
         self._update_font_metrics()
+        PydidasQApplication._instance = self
 
     def _update_font_metrics(self):
         """
@@ -231,7 +238,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         int
             The height of the font.
         """
-        return self.__font_config["font_metric_height"]
+        return int(self.__font_config["font_metric_height"])
 
     @property
     def font_family(self) -> str:
@@ -252,7 +259,7 @@ class PydidasQApplication(QtWidgets.QApplication):
 
         Parameters
         ----------
-        family : str
+        font_family : str
             The font family name.
         """
         if font_family == self.font().family():
@@ -298,7 +305,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         int
             The width in pixels.
         """
-        return self.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
+        return self.style().pixelMetric(QStyle.PM_ScrollBarExtent)
 
     @property
     def font_char_width(self) -> float:
@@ -315,7 +322,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         return self.__font_config["font_metric_width"]
 
     @property
-    def font_metrics(self) -> Tuple[float]:
+    def font_metrics(self) -> Tuple[float, float]:
         """
         Get the font metrics for width and height.
 

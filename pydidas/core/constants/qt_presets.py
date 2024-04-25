@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ graphical user interface of the application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,6 +40,7 @@ __all__ = [
     "QT_REG_EXP_INT_VALIDATOR",
     "QT_REG_EXP_SLICE_VALIDATOR",
     "QT_REG_EXP_FLOAT_SLICE_VALIDATOR",
+    "QT_REG_EXP_RGB_VALIDATOR",
     "POLICY_FIX_EXP",
     "POLICY_EXP_EXP",
     "POLICY_EXP_FIX",
@@ -87,6 +88,10 @@ QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
 
 QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression("((-?\\d*\\.?\\d*:?){1,3},?)*")
+)
+
+QT_REG_EXP_RGB_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression("#[0-9A-Fa-f]{6}")
 )
 
 POLICY_FIX_EXP = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)

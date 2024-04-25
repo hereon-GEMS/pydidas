@@ -117,6 +117,7 @@ class PydidasQApplication(QtWidgets.QApplication):
     sig_mpl_font_change = QtCore.Signal()
     sig_mpl_font_setting_error = QtCore.Signal(str)
     sig_status_message = QtCore.Signal(str)
+    sig_updated_user_config = QtCore.Signal(str, str)
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
@@ -327,6 +328,19 @@ class PydidasQApplication(QtWidgets.QApplication):
             self.__font_config["font_metric_width"],
             self.__font_config["font_metric_height"],
         )
+
+    def updated_user_config(self, key: str, value: str):
+        """
+        Handle the updated user config and emit a signal with the change to all plots.
+
+        Parameters
+        ----------
+        key : str
+            The user configuration key.
+        value : str
+            The key's new value.
+        """
+        self.sig_updated_user_config.emit(key, value)
 
     def set_status_message(self, status: str):
         """

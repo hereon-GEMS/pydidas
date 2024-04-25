@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ access to global QSettings values.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,7 @@ __all__ = ["PydidasQsettingsMixin"]
 from numbers import Integral, Real
 from typing import Optional, Self, Union
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ..version import VERSION
 
@@ -131,3 +131,7 @@ class PydidasQsettingsMixin:
             The value to be stored.
         """
         self.q_settings.setValue(f"{self.q_settings_version}/{key}", value)
+        if key.startswith("user/"):
+            _stripped_key = key.replace("user/", "")
+            _qtapp = QtWidgets.QApplication.instance()
+            _qtapp.updated_user_config(_stripped_key, value)

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with PydidasImageView class which adds configurations to the base silx Im
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -152,7 +152,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(self._cs_transform_valid)
 
-    def setData(self, data: ndarray, **kwargs: dict):
+    def displayImage(self, data: ndarray, **kwargs: dict):
         """
         Set the image data, handle the coordinate system and forward the data to
         plotting.
@@ -166,6 +166,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         """
         if self.cs_transform is not None:
             self._check_data_shape(data.shape)
+        _ = kwargs.pop("legend", None)
         self._plot_kwargs = kwargs
         ImageView.setImage(self, data, **kwargs)
 

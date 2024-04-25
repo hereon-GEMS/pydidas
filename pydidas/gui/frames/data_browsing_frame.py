@@ -133,4 +133,4 @@ class DataBrowsingFrame(BaseFrame):
             return
         else:
             _data = import_data(filename)
-            self._widgets["viewer"].setData(_data)
+            self._widgets["viewer"].displayImage(_data)

@@ -30,7 +30,7 @@ jobs:
     - name: Sphinx build
       run: |
         export QT_QPA_PLATFORM=offscreen
-        sphinx-build pydidas/docs/source _site
+        sphinx-build pydidas/docs/src _site
     - name: Set permissions
       run: |
         chmod -c -R +rX "_site/" | while read line; do

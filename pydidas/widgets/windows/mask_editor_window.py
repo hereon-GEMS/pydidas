@@ -133,7 +133,7 @@ class MaskEditorWindow(PydidasWindow):
         This method checks whether a hdf5 file has been selected and shows/
         hides the required fields for selecting the dataset or the last file
         in case of a file series.
-        If an hdf5 image file has been selected, this method also opens a
+        If a hdf5 image file has been selected, this method also opens a
         pop-up for dataset selection.
 
         Parameters
@@ -165,4 +165,4 @@ class MaskEditorWindow(PydidasWindow):
         _dset = self.get_param_value("hdf5_key")
         _frame = self.get_param_value("hdf5_frame")
         _data = import_data(_fname, dataset=_dset, frame=_frame)
-        self._widgets["plot_2d"].setData(_data)
+        self._widgets["plot_2d"].addImage(_data)

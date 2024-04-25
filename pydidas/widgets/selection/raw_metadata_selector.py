@@ -38,6 +38,7 @@ from ...core.constants.numpy_names import NUMPY_DATATYPES
 from ...core.utils import get_extension
 from ...data_io import import_data
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
+from .common_selection import register_plot_widget_method
 
 
 class RawMetadataSelector(WidgetWithParameterCollection):
@@ -59,15 +60,16 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         "raw_datatype", "raw_shape_y", "raw_shape_x", "raw_header"
     )
     sig_decode_params = QtCore.Signal(object, int, int)
+    register_plot_widget = register_plot_widget_method
 
     def __init__(self, **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(self.default_params.copy())
         self._config = {"filename": None}
-        self._show_image_method = None
-        self.__plot = kwargs.get("plot_widget", None)
-        if self.__plot is not None:
-            self.register_plot_widget(self.__plot)
+        self.show_image_method = None
+        self._widgets["plot"] = kwargs.get("plot_widget", None)
+        if self._widgets["plot"] is not None:
+            self.register_plot_widget(self._widgets["plot"])
         self.__create_widgets()
 
     def __create_widgets(self):
@@ -93,36 +95,6 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         )
         self.setVisible(False)
 
-    def register_plot_widget(self, widget: QtWidgets.QWidget):
-        """
-        Register a view widget to be used for full visualization of data.
-
-        This method registers an external view widget for data visualization.
-        Note that the widget must accept frames through a ``addImage`` method.
-
-        Parameters
-        ----------
-        widget : QWidget
-            A widget with a ``addImage`` method to pass frames.
-
-        Raises
-        ------
-        TypeError
-            If the widget does not have a ``addImage`` method.
-        """
-        if not isinstance(widget, QtWidgets.QWidget):
-            raise TypeError("Error: Object must be a QWidget.")
-        if not (hasattr(widget, "displayImage") or hasattr(widget, "addImage")):
-            raise AttributeError(
-                "Error: The selected widget is not supported, as it does not have an "
-                "`addImage` or `displayImage` method."
-            )
-        self.__plot = widget
-        if hasattr(widget, "displayImage"):
-            self._show_image_method = widget.displayImage
-        elif hasattr(widget, "addImage"):
-            self._show_image_method = widget.addImage
-
     @QtCore.Slot(str)
     def new_filename(self, name: str):
         """
@@ -136,10 +108,12 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         name : str
             The full file system path to the new file.
         """
-        self.__filename = Path(name)
-        if not self.__filename.is_file():
+        self._config["filename"] = Path(name)
+        if not self._config["filename"].is_file():
             return
-        _is_raw = get_extension(self.__filename, lowercase=True) in BINARY_EXTENSIONS
+        _is_raw = (
+            get_extension(self._config["filename"], lowercase=True) in BINARY_EXTENSIONS
+        )
         self.setVisible(_is_raw)
         if not _is_raw:
             return
@@ -151,7 +125,7 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         """
         Confirm the params and send them to the calling frame.
         """
-        if not isinstance(self.__plot, QtWidgets.QWidget):
+        if not isinstance(self._widgets["plot"], QtWidgets.QWidget):
             raise PydidasGuiError("No plot widget has been registered.")
         _datatype = NUMPY_DATATYPES[self.get_param_value("raw_datatype")]
         _offset = self.get_param_value("raw_header")
@@ -160,6 +134,6 @@ class RawMetadataSelector(WidgetWithParameterCollection):
             self.get_param_value("raw_shape_x"),
         )
         _data = import_data(
-            self.__filename, datatype=_datatype, offset=_offset, shape=_shape
+            self._config["filename"], datatype=_datatype, offset=_offset, shape=_shape
         )
-        self._show_image_method(_data, legend="pydidas image")
+        self.show_image_method(_data, legend="pydidas image")

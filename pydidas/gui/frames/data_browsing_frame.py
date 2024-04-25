@@ -29,7 +29,9 @@ __all__ = ["DataBrowsingFrame"]
 
 from functools import partial
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
+
+from pydidas_qtcore import PydidasQApplication
 
 from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
 from ...core.utils import get_extension
@@ -40,6 +42,8 @@ from .builders import DataBrowsingFrameBuilder
 
 class DataBrowsingFrame(BaseFrame):
     """
+    A class to browse the filesystem tree and display data.
+
     The DataBrowsingFrame is frame with a directory explorer
     and a main data visualization window. Its main purpose is to browse
     through datasets.
@@ -51,7 +55,7 @@ class DataBrowsingFrame(BaseFrame):
 
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
-        self.__qtapp = QtWidgets.QApplication.instance()
+        self.__qtapp = PydidasQApplication.instance()
         self.__supported_extensions = set(IoMaster.registry_import.keys())
 
     def connect_signals(self):
@@ -76,7 +80,9 @@ class DataBrowsingFrame(BaseFrame):
             self._widgets["viewer"].update_from_diffraction_exp
         )
         self.sig_this_frame_activated.connect(
-            partial(self._widgets["viewer"].cs_transform.check_detector_is_set, True)
+            partial(
+                self._widgets["viewer"].cs_transform_button.check_detector_is_set, True
+            )
         )
 
     def build_frame(self):
@@ -133,4 +139,4 @@ class DataBrowsingFrame(BaseFrame):
             return
         else:
             _data = import_data(filename)
-            self._widgets["viewer"].displayImage(_data)
+            self._widgets["viewer"].display_image(_data)

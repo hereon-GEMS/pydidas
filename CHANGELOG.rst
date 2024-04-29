@@ -13,6 +13,8 @@ Improvements
   class initialization.
 - Added a setting to change the default NaN color which is used to mark
   invalid or missing data.
+- Separated the path for generic plugins from user-defined custom plugin paths
+  for greater clarity.
 
 
 Bugfixes

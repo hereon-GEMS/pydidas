@@ -25,7 +25,6 @@ __status__ = "Production"
 
 
 import io
-import os
 import shutil
 import sys
 import tempfile
@@ -37,12 +36,9 @@ from qtpy import QtWidgets
 
 from pydidas import unittest_objects
 from pydidas.apps import ExecuteWorkflowRunner
-from pydidas.contexts import (
-    DiffractionExperiment,
-    DiffractionExperimentContext,
-    Scan,
-    ScanContext,
-)
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.contexts.scan import Scan
 from pydidas.core import PydidasQsettings, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
@@ -71,9 +67,8 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
         cls.q_settings = PydidasQsettings()
         cls._n_workers = cls.q_settings.value("global/mp_n_workers", dtype=int)
         cls.q_settings.set_value("global/mp_n_workers", 1)
-        _path = os.path.dirname(unittest_objects.__file__)
-        cls.__original_plugin_paths = COLL.registered_paths
-        if _path not in cls.__original_plugin_paths:
+        _path = Path(unittest_objects.__file__).parent
+        if _path not in COLL.registered_paths:
             COLL.find_and_register_plugins(_path)
         cls.__old_stdout = sys.stdout
         sys.stdout = cls.__mystdout = io.StringIO()
@@ -83,8 +78,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls._path)
         cls.q_settings.set_value("global/mp_n_workers", cls._n_workers)
-        COLL.clear_collection(True)
-        COLL.find_and_register_plugins(*cls.__original_plugin_paths)
+        COLL.unregister_plugin_path(Path(unittest_objects.__file__).parent)
         sys.stdout = cls.__old_stdout
 
     def setUp(self):
@@ -378,7 +372,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
 
     # @unittest.skipIf(
     #     "--quick" in sys.argv,
-    #     "Skipping long running test with multiprocessing"
+    #     "Skipping long-running test with multiprocessing"
     # )
     def test_process_scan__single_run(self):
         _dir = self.get_empty_dir_name()
@@ -396,7 +390,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
 
     # @unittest.skipIf(
     #     "--quick" in sys.argv,
-    #     "Skipping long running test with multiprocessing"
+    #     "Skipping long-running test with multiprocessing"
     # )
     def test_process_scan__multiple_run(self):
         _dir = self.get_empty_dir_name()

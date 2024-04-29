@@ -95,9 +95,6 @@ __all__.extend(
 if not core.utils.check_sphinx_html_docs():
     core.utils.run_sphinx_html_build()
 
-# Check whether a plugin directory has been set or set the default one:
-core.utils.set_default_plugin_dir()
-
 # Disable the pyFAI logging to console
 __os.environ["PYFAI_NO_LOGGING"] = "1"
 # Change the pyFAI logging level to ERROR and above

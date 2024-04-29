@@ -76,3 +76,6 @@ lines_after_imports = 2
 [tool.black]
 line-length = 88
 target-version = ['py311']
+
+[tool.bandit]
+skips = ["B311"]

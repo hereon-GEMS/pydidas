@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,11 +22,18 @@ get new instances of these plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
+__all__ = ["GENERIC_PLUGIN_PATH"]
+
+
+from pathlib import Path as __Path
+
+GENERIC_PLUGIN_PATH = (
+    __Path(__file__).absolute().parent.parent.parent.joinpath("pydidas_plugins")
+)
 
 # import __all__ items from modules:
 from .base_input_plugin import *
@@ -35,7 +42,6 @@ from .base_output_plugin import *
 from .base_plugin import *
 from .base_proc_plugin import *
 from .plugin_collection import *
-from .plugin_collection_util_funcs import *
 from .plugin_getter_ import *
 
 # The base plugins with references to widgets must be imported last:
@@ -84,11 +90,6 @@ from . import plugin_collection
 
 __all__.extend(plugin_collection.__all__)
 del plugin_collection
-
-from . import plugin_collection_util_funcs
-
-__all__.extend(plugin_collection_util_funcs.__all__)
-del plugin_collection_util_funcs
 
 from . import plugin_getter_
 

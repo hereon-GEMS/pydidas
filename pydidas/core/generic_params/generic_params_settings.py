@@ -137,13 +137,13 @@ GENERIC_PARAMS_SETTINGS = {
     "plugin_path": {
         "type": str,
         "default": "",
-        "name": "Plugin paths",
+        "name": "Custom plugin paths",
         "choices": None,
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The paths to all plugin locations. Individual entries are"
-            ' separated by a double semicolon ";;".'
+            "The paths to all custom plugin locations. Individual entries must be "
+            "separated by a double semicolon `;;`."
         ),
     },
     "plot_update_time": {

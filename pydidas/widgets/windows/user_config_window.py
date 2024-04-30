@@ -49,8 +49,7 @@ from ...core.constants import (
 )
 from ...core.generic_params.generic_params_settings import GENERIC_PARAMS_SETTINGS
 from ...core.utils import update_palette
-from ...plugins import PluginCollection
-from ...plugins.plugin_registry import GENERIC_PLUGIN_PATH
+from ...plugins import GENERIC_PLUGIN_PATH, PluginCollection
 from ..dialogues import PydidasExceptionMessageBox, QuestionBox
 from ..factory import SquareButton
 from ..framework import PydidasWindow
@@ -182,9 +181,7 @@ class _UserConfigWindow(PydidasWindow):
             width_io=0.25,
             width_text=0.7,
         )
-
         self.create_spacer(None, parent_widget="config_canvas")
-
         self.create_label(
             "section_mosaic", "Composite creator settings", **_section_options
         )
@@ -201,7 +198,6 @@ class _UserConfigWindow(PydidasWindow):
             width_text=0.7,
         )
         self.create_spacer("spacer_3", parent_widget="config_canvas")
-
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
             self.get_param("histogram_outlier_fraction_low"),
@@ -296,7 +292,6 @@ class _UserConfigWindow(PydidasWindow):
         self.param_widgets["plugin_path"].update_size_hint(
             QtCore.QSize(2 * GENERIC_STANDARD_WIDGET_WIDTH, 5)
         )
-
         self.create_button(
             "but_plugins",
             "Update plugin collection",
@@ -321,10 +316,10 @@ class _UserConfigWindow(PydidasWindow):
             self.process_new_fontsize_setting
         )
         self._widgets["but_fontsize_reduce"].clicked.connect(
-            partial(self.change_fontsize, "decrease")
+            partial(self.change_fontsize, -1)
         )
         self._widgets["but_fontsize_increase"].clicked.connect(
-            partial(self.change_fontsize, "increase")
+            partial(self.change_fontsize, 1)
         )
         self._widgets["font_family_box"].currentFontChanged.connect(
             self.new_font_family_selected
@@ -352,7 +347,7 @@ class _UserConfigWindow(PydidasWindow):
             self._widgets["cmap_combobox"].setCurrentText(_default_cmap)
 
     @QtCore.Slot(object)
-    def update_qsetting(self, param_key, value):
+    def update_qsetting(self, param_key: str, value: object):
         """
         Update a QSettings value
 
@@ -434,7 +429,7 @@ class _UserConfigWindow(PydidasWindow):
             PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 
     @QtCore.Slot(str)
-    def update_cmap(self, cmap_name):
+    def update_cmap(self, cmap_name: str):
         """
         Update the default colormap.
 
@@ -446,7 +441,7 @@ class _UserConfigWindow(PydidasWindow):
         self.update_qsetting("cmap_name", cmap_name)
 
     @QtCore.Slot()
-    def change_fontsize(self, change: Literal["increase", "decrease"]):
+    def change_fontsize(self, change: int):
         """
         Process the button clicks to change the fontsize.
 
@@ -455,9 +450,9 @@ class _UserConfigWindow(PydidasWindow):
         change : Literal["increase", "decrease"]
             The change direction.
         """
-        if change == "increase":
+        if change == 1:
             _new_fontsize = min(ceil(self.__qtapp.font_size) + 1, 20)
-        elif change == "decrease":
+        elif change == -1:
             _new_fontsize = max(floor(self.__qtapp.font_size) - 1, 5)
         self._widgets["edit_fontsize"].setText(str(_new_fontsize))
         self.process_new_fontsize_setting()
@@ -488,7 +483,7 @@ class _UserConfigWindow(PydidasWindow):
         self.process_new_fontsize_setting()
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Update the frame.
 
@@ -537,7 +532,7 @@ class _UserConfigWindow(PydidasWindow):
             )
 
     @QtCore.Slot(str, object)
-    def external_update(self, param_key, value):
+    def external_update(self, param_key: str, value: object):
         """
         Perform an update after a Parameter has changed externally.
 

@@ -37,6 +37,15 @@ from pydidas.core.parameter import Parameter, _get_base_class
 from pydidas.core.utils import get_random_string
 
 
+TYPES_AND_VALS = [
+    [int, 12],
+    [float, 3.6],
+    [str, "spam"],
+    [list, [1, 2, 2]],
+    [tuple, (0, 2, 42)],
+]
+
+
 class TestParameter(unittest.TestCase):
     def setUp(self):
         warnings.simplefilter("ignore")
@@ -174,7 +183,7 @@ class TestParameter(unittest.TestCase):
 
     def test_tooltip__other(self):
         obj = Parameter(
-            "Test0", np.ndarray, np.zeros((3)), unit="m", tooltip="Test tooltip"
+            "Test0", np.ndarray, np.zeros(3), unit="m", tooltip="Test tooltip"
         )
         self.assertEqual(
             obj.tooltip, "Test tooltip (unit: m, type: <class 'numpy.ndarray'>)"
@@ -223,7 +232,7 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12)
         self.assertEqual(obj.dtype, Integral)
 
-    def test_ftype_float(self):
+    def test_dtype_float(self):
         obj = Parameter("Test0", float, 12)
         self.assertEqual(obj.dtype, Real)
 
@@ -270,9 +279,9 @@ class TestParameter(unittest.TestCase):
 
     def test_copy(self):
         obj = Parameter("Test0", int, 12)
-        copy = obj.copy()
-        self.assertNotEqual(obj, copy)
-        self.assertIsInstance(copy, Parameter)
+        _copy = obj.copy()
+        self.assertNotEqual(obj, _copy)
+        self.assertIsInstance(_copy, Parameter)
 
     def test_get_value_for_export__with_Path(self):
         obj = Parameter("Test0", Path, Path())
@@ -343,30 +352,37 @@ class TestParameter(unittest.TestCase):
         self.assertEqual(obj.choices, _choices)
 
     def test_dump(self):
-        obj = Parameter("Test0", int, 12)
-        self.assertEqual(obj.refkey, "Test0")
-        dump = obj.dump()
-        self.assertEqual(dump[0], "Test0")
-        self.assertEqual(dump[1], Integral)
-        self.assertEqual(dump[2], 12)
-        self.assertEqual(
-            dump[3],
-            {
-                "tooltip": "",
-                "unit": "",
-                "optional": False,
-                "name": "",
-                "allow_None": False,
-                "choices": None,
-                "value": 12,
-            },
-        )
+        for _type, _val in TYPES_AND_VALS:
+            _ret_type = (
+                Integral if _type == int else (Real if _type == float else _type)
+            )
+            with self.subTest(datatype=_type, value=_val):
+                obj = Parameter("Test0", _type, _val)
+                dump = obj.dump()
+                self.assertEqual(dump[0], "Test0")
+                self.assertEqual(dump[1], _ret_type)
+                self.assertEqual(dump[2], _val)
+                self.assertEqual(
+                    dump[3],
+                    {
+                        "tooltip": "",
+                        "unit": "",
+                        "optional": False,
+                        "name": "",
+                        "allow_None": False,
+                        "choices": None,
+                        "subtype": None,
+                        "value": _val,
+                    },
+                )
 
     def test_load_from_dump(self):
-        obj = Parameter("Test0", int, 12)
-        obj2 = Parameter(*obj.dump())
-        for _key in obj.__dict__:
-            self.assertEqual(obj.__dict__[_key], obj2.__dict__[_key])
+        for _type, _val in TYPES_AND_VALS:
+            with self.subTest(datatype=_type, value=_val):
+                obj = Parameter("Test0", _type, _val)
+                obj2 = Parameter(*obj.dump())
+                for _key in obj.__dict__:
+                    self.assertEqual(obj.__dict__[_key], obj2.__dict__[_key])
 
     def test_copy__(self):
         obj = Parameter("Test0", int, 12)
@@ -389,56 +405,72 @@ class TestParameter(unittest.TestCase):
     def test_convenience_type_conversion_any(self):
         _val = 42
         obj = Parameter("Test0", int, 12)
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertEqual(_val, _newval)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(_val, _new_val)
 
     def test_convenience_type_conversion__float_w_string_number_input(self):
         _val = "42"
         obj = Parameter("Test0", float, 12.2)
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertEqual(float(_val), _newval)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(float(_val), _new_val)
 
     def test_convenience_type_conversion__float_w_string_input(self):
         _val = "42a"
         obj = Parameter("Test0", float, 12.2)
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertEqual(_val, _newval)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(_val, _new_val)
 
     def test_convenience_type_conversion__int_w_string_number_input(self):
         _val = "42"
         obj = Parameter("Test0", int, 12)
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertEqual(int(_val), _newval)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(int(_val), _new_val)
 
     def test_convenience_type_conversion__int_w_string_input(self):
         _val = "42a"
         obj = Parameter("Test0", int, 12)
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertEqual(_val, _newval)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(_val, _new_val)
 
     def test_convenience_type_conversion_path(self):
         _val = __file__
         obj = Parameter("Test0", Path, "")
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertIsInstance(_newval, Path)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_new_val, Path)
 
     def test_convenience_type_conversion_list(self):
         _val = [1, 2, 3]
         obj = Parameter("Test0", tuple, (1, 2))
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertIsInstance(_newval, tuple)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_new_val, tuple)
+        self.assertEqual(_new_val, tuple(_val))
+
+    def test_convenience_type_conversion__list_w_string__no_subtype(self):
+        _val = "[1, 2, 3]"
+        obj = Parameter("Test0", tuple, (1, 2))
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_new_val, str)
+        self.assertEqual(_new_val, "[1, 2, 3]")
+
+    def test_convenience_type_conversion__iterable_w_string__w_subtype(self):
+        for _val in ["[1, 2, 3, 5]", "(1, 2, 3, 5)", "{1, 2, 3, 5}"]:
+            with self.subTest(input=_val):
+                obj = Parameter("Test0", tuple, (1, 2), subtype=int)
+                _new_val = obj._Parameter__convenience_type_conversion(_val)
+                self.assertIsInstance(_new_val, tuple)
+                self.assertEqual(_new_val, (1, 2, 3, 5))
 
     def test_convenience_type_conversion_tuple(self):
         _val = (1, 2, 3)
         obj = Parameter("Test0", list, [1])
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertIsInstance(_newval, list)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_new_val, list)
 
     def test_convenience_type_conversion_Hdf5key(self):
         _val = "/new/test"
         obj = Parameter("Test0", Hdf5key, "/test")
-        _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertIsInstance(_newval, Hdf5key)
+        _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_new_val, Hdf5key)
 
     def test_hash__simple_str(self):
         _param = Parameter("Test", str, "")

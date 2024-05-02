@@ -155,7 +155,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
             must have the following keys: shape, node_label, data_label, plugin_name
-            and the respecive values. The shape (tuple) detemines the shape of the
+            and the respective values. The shape (tuple) determines the shape of the
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
@@ -178,7 +178,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _scan = kwargs.get("scan_context", ScanContext())
         _exp = kwargs.get("diffraction_exp_context", DiffractionExperimentContext())
         _tree = kwargs.get("workflow_tree", WorkflowTree())
-        cls._save_dir = save_dir
+        cls._save_dir = save_dir if isinstance(save_dir, Path) else Path(save_dir)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
@@ -248,7 +248,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         scan_context : Union[Scan, None], optional
             The scan context to be used for exporting to file.
         kwargs : dict
-            Any kwargs which should be passed to the udnerlying exporter.
+            Any kwargs which should be passed to the underlying exporter.
         """
         _scan = ScanContext() if scan_context is None else scan_context
         _indices = _scan.get_index_position_in_scan(index)
@@ -383,7 +383,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         scan : pydidas.contexts.scan.Scan
             The imported scan configuration.
         diffraction_exp : pydidas.contexts.diffraction_exp.DiffractionExperiment
-            The inported diffraction experiment configuration.
+            The imported diffraction experiment configuration.
         tree : pydidas.workflow.WorkflowTree
             The imported workflow tree.
         """

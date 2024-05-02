@@ -65,7 +65,7 @@ class TestHdf5Io(unittest.TestCase):
 
     def test_import_from_file__default(self):
         _data = Hdf5Io.import_from_file(self._fname)
-        self.assertTrue(np.allclose(_data, self._data[0, :10, :10, 0]))
+        self.assertTrue(np.allclose(_data, self._data[:10, :10, :10, 0]))
 
     def test_import_from_file__wrong_name(self):
         with self.assertRaises(FileReadError):
@@ -80,12 +80,12 @@ class TestHdf5Io(unittest.TestCase):
 
     def test_import_from_file__w_int_slice(self):
         _slice = 7
-        _data = Hdf5Io.import_from_file(self._fname, frame=_slice)
+        _data = Hdf5Io.import_from_file(self._fname, frame=_slice, slicing_axes=[0])
         self.assertTrue(np.allclose(_data, self._data[_slice, :10, :10, 0]))
 
     def test_import_from_file__w_list_slice(self):
         _slice = [7]
-        _data = Hdf5Io.import_from_file(self._fname, frame=_slice)
+        _data = Hdf5Io.import_from_file(self._fname, frame=_slice, slicing_axes=[0])
         self.assertTrue(np.allclose(_data, self._data[_slice[0], :10, :10, 0]))
 
     def test_import_from_file__2_consecutive_slicing_axes(self):

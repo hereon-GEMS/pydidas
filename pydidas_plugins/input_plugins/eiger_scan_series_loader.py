@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ images from single Hdf5 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -68,7 +68,7 @@ class EigerScanSeriesLoader(InputPlugin):
         of images per file based on the first file. The default is -1.
     live_processing : bool, optional
         Flag to toggle file system checks. In live_processing mode, checks
-        for the size and existance of files are disabled. The default is False.
+        for the size and existence of files are disabled. The default is False.
     """
 
     plugin_name = "Eiger scan series loader"
@@ -78,12 +78,16 @@ class EigerScanSeriesLoader(InputPlugin):
         "eiger_dir",
         "eiger_filename_suffix",
         "hdf5_key",
+        "hdf5_slicing_axis",
         "images_per_file",
         "_counted_images_per_file",
     )
     input_data_dim = None
     output_data_dim = 2
-    advanced_parameters = InputPlugin.advanced_parameters.copy() + ["images_per_file"]
+    advanced_parameters = InputPlugin.advanced_parameters.copy() + [
+        "hdf5_slicing_axis",
+        "images_per_file",
+    ]
 
     def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)
@@ -96,12 +100,10 @@ class EigerScanSeriesLoader(InputPlugin):
         InputPlugin.pre_execute(self)
         _i_per_file = self.get_param_value("images_per_file")
         if _i_per_file == -1:
-            _n_per_file = get_hdf5_metadata(
+            _i_per_file = get_hdf5_metadata(
                 self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
-            )[0]
-            self.set_param_value("_counted_images_per_file", _n_per_file)
-        else:
-            self.set_param_value("_counted_images_per_file", _i_per_file)
+            )[self.get_param_value("hdf5_slicing_axis")]
+        self.set_param_value("_counted_images_per_file", _i_per_file)
 
     def update_filename_string(self):
         """
@@ -145,6 +147,7 @@ class EigerScanSeriesLoader(InputPlugin):
         kwargs["dataset"] = self.get_param_value("hdf5_key")
         kwargs["frame"] = _hdf_index
         kwargs["binning"] = self.get_param_value("binning")
+        kwargs["slicing_axes"] = [self.get_param_value("hdf5_slicing_axis")]
         _data = import_data(_fname, **kwargs)
         _data.axis_units = ["pixel", "pixel"]
         _data.axis_labels = ["detector y", "detector x"]

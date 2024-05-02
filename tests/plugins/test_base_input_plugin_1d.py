@@ -55,6 +55,7 @@ class TestInputPlugin1d(InputPlugin1d):
             "scan_index_stepping"
         ) + SCAN.get_param_value("scan_start_index")
         kwargs["frame"] = _frame
+        kwargs["slicing_axes"] = [0]
         return import_data(self.filename_string, **kwargs), kwargs
 
     def update_filename_string(self):
@@ -166,7 +167,7 @@ class TestBaseInputPlugin1d(unittest.TestCase):
 
     def test_pickle(self):
         plugin = InputPlugin1d()
-        _new_params = {get_random_string(6): get_random_string(12) for i in range(7)}
+        _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
         for _key, _val in _new_params.items():
             plugin.add_param(Parameter(_key, str, _val))
         plugin2 = pickle.loads(pickle.dumps(plugin))
@@ -242,7 +243,7 @@ class TestBaseInputPlugin1d(unittest.TestCase):
         plugin.set_param_value("use_roi", True)
         plugin.set_param_value("roi_xhigh", 5)
         plugin.pre_execute()
-        _data, kwargs = plugin.execute(0)
+        _data, _ = plugin.execute(0)
 
 
 if __name__ == "__main__":

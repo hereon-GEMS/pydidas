@@ -59,6 +59,7 @@ class TestInputPlugin(InputPlugin):
             "scan_index_stepping"
         ) + SCAN.get_param_value("scan_start_index")
         kwargs["frame"] = _frame
+        kwargs["slicing_axes"] = [0]
         return import_data(self.filename_string, **kwargs), kwargs
 
     def update_filename_string(self):
@@ -97,7 +98,7 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin = create_plugin_class(INPUT_PLUGIN)
         self.assertIsInstance(plugin(), InputPlugin)
 
-    def test_class_atributes(self):
+    def test_class_attributes(self):
         plugin = create_plugin_class(INPUT_PLUGIN)
         for att in (
             "basic_plugin",
@@ -185,7 +186,7 @@ class TestBaseInputPlugin(unittest.TestCase):
 
     def test_pickle(self):
         plugin = InputPlugin()
-        _new_params = {get_random_string(6): get_random_string(12) for i in range(7)}
+        _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
         for _key, _val in _new_params.items():
             plugin.add_param(Parameter(_key, str, _val))
         plugin2 = pickle.loads(pickle.dumps(plugin))

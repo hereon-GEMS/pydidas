@@ -15,7 +15,9 @@ Improvements
   invalid or missing data.
 - Separated the path for generic plugins from user-defined custom plugin paths
   for greater clarity.
-
+- Programmatic improvements:
+    - Changed the default behaviour of the hdf5 file loader to import the full
+      dataset instead of only a single frame.
 
 Bugfixes
 --------

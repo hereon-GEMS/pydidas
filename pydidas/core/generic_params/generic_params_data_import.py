@@ -146,6 +146,19 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "process every n-th frame."
         ),
     },
+    "hdf5_slicing_axis": {
+        "type": int,
+        "default": 0,
+        "name": "Hdf5 frame slicing axes",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The slicing axes to identify the frame by its number in the full "
+            "dataset. For example, if the frame has the axes (frame index, x, y), "
+            "the slicing axes would be 0."
+        ),
+    },
     "bg_file": {
         "type": "Path",
         "default": "",

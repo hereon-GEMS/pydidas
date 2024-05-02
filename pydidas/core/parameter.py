@@ -32,7 +32,7 @@ import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, Dict, List, Self, Set, Tuple, Type, Union
+from typing import Any, Self, Type, Union
 
 from .hdf5_key import Hdf5key
 
@@ -102,6 +102,10 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | default    | False     | The default value.                        |
     +------------+-----------+-------------------------------------------+
+    | subtype    | False     | For Iterable datatypes, a subtype can be  |
+    |            |           | defined to determine the data type inside |
+    |            |           | the iterating object, e.g. a list of int. |
+    +------------+-----------+-------------------------------------------+
 
     Parameters can be passed either as a complete meta_dict or as individual
     keyword arguments. The meta_dict will take precedence.
@@ -125,25 +129,29 @@ class Parameter:
         convenience to facility copying Parameter instances. If None,
         this entry will be ignored. The default is None.
     **kwargs : dict
-        All optional parameters can be passed as keyword arguments.
-    **name : str, optional
-        The name of the parameter. The default is None.
-    **optional : bool, optional
-        Keyword to toggle optional parameters. The default is False.
-    **tooltip : str, optional
-        A description of the parameter. It will be automatically extended
-        to include certain type and unit information. The default is ''.
-    **unit : str, optional
-        The unit of the parameter. The default is ''.
-    **choices : Union[list, tuple, None]
-        A list of allowed choices. If None, no checking will be enforced.
-        The default is None.
-    **value : type
-        The value of the parameter. This parameter should only be used
-        to restore saved parameters.
-    **allow_None : bool, optional
-        Keyword to allow None instead of the usual datatype. The default
-        is False.
+        Additional keyword arguments. Supported argument
+        name : str, optional
+            The name of the parameter. The default is None.
+        subtype : Optional[type]
+            For Iterable datatypes, a subtype can be defined to determine the
+            data type inside the iterating object, e.g. a list of int. None does
+            not enforce type checking. The default is None.
+        optional : bool, optional
+            Keyword to toggle optional parameters. The default is False.
+        tooltip : str, optional
+            A description of the parameter. It will be automatically extended
+            to include certain type and unit information. The default is ''.
+        unit : str, optional
+            The unit of the parameter. The default is ''.
+        choices : Union[list, tuple, None]
+            A list of allowed choices. If None, no checking will be enforced.
+            The default is None.
+        value : object
+            The value of the parameter. This parameter should only be used
+            to restore saved parameters.
+        allow_None : bool, optional
+            Keyword to allow None instead of the usual datatype. The default
+            is False.
     """
 
     def __init__(
@@ -151,8 +159,8 @@ class Parameter:
         refkey: str,
         param_type: Union[None, Type],
         default: object,
-        meta: Union[None, Dict] = None,
-        **kwargs: Dict,
+        meta: Union[None, dict] = None,
+        **kwargs: dict,
     ):
         super().__init__()
         self.__refkey = refkey
@@ -166,6 +174,7 @@ class Parameter:
             optional=kwargs.get("optional", False),
             name=kwargs.get("name", ""),
             allow_None=kwargs.get("allow_None", False),
+            subtype=_get_base_class(kwargs.get("subtype", None)),
         )
         self.__process_default_input(default)
         self.__process_choices_input(kwargs)
@@ -188,11 +197,11 @@ class Parameter:
         default = self.__convenience_type_conversion(default)
         if not self.__typecheck(default):
             raise TypeError(
-                f"Default value '{default}' does not have data type {self.__type}!"
+                f"Default value `{default}` does not have data type `{self.__type}`!"
             )
         self.__meta["default"] = default
 
-    def __process_choices_input(self, kwargs: Dict):
+    def __process_choices_input(self, kwargs: dict):
         """
         Process the choices input.
 
@@ -211,7 +220,7 @@ class Parameter:
         _choices = kwargs.get("choices", None)
         if not (isinstance(_choices, (list, tuple, set)) or _choices is None):
             raise TypeError(
-                'The type of choices (type: "{type(_choices)}"'
+                f"The type of choices (type: `{type(_choices)}`"
                 "is not supported. Please use list or tuple."
             )
         self.__meta["choices"] = None if _choices is None else list(_choices)
@@ -257,17 +266,18 @@ class Parameter:
 
             - str input and Path type
             - str input and Hdf5key type
+            - str input of list/tuple of numbers to list/tuple of numbers
             - list to tuple
             - tuple to list
 
         Parameters
         ----------
-        value : any
+        value : object
             The input value. This can be any datatype entered by the user.
 
         Returns
         -------
-        value : any
+        value : object
             The value with the above-mentioned type conversions applied.
         """
         if isinstance(value, str):
@@ -275,6 +285,15 @@ class Parameter:
                 value = Path(value)
             elif self.__type == Hdf5key:
                 value = Hdf5key(value)
+            elif self.__type in [list, set, tuple] and self.__meta["subtype"] in [
+                Real,
+                Integral,
+            ]:
+                value = [
+                    float(item) if self.__meta["subtype"] == Real else int(item)
+                    for item in value.strip("{[(}])").split(",")
+                    if len(item.strip()) > 0
+                ]
         if self.__type in [Real, Integral] and not self.__meta["allow_None"]:
             try:
                 value = float(value) if self.__type == Real else int(value)
@@ -282,7 +301,11 @@ class Parameter:
                 pass
             finally:
                 return value
-        if isinstance(value, Iterable) and self.__type in [list, set, tuple]:
+        if (
+            isinstance(value, Iterable)
+            and self.__type in [list, set, tuple]
+            and not isinstance(value, str)
+        ):
             return self.__type(value)
         return value
 
@@ -374,7 +397,7 @@ class Parameter:
         return _t.replace(") (", ", ")
 
     @property
-    def choices(self) -> Union[None, List]:
+    def choices(self) -> Union[None, list]:
         """
         Get or set the allowed choices for the Parameter value.
 
@@ -386,7 +409,7 @@ class Parameter:
         return self.__meta["choices"]
 
     @choices.setter
-    def choices(self, choices: Union[None, List, Tuple, Set]):
+    def choices(self, choices: Union[None, list, tuple, set]):
         """
         Update the allowed choices of a Parameter.
 
@@ -463,7 +486,7 @@ class Parameter:
     @value.setter
     def value(self, val: object):
         """
-        Set a new value for the parameter.
+        set a new value for the parameter.
 
         Parameters
         ----------
@@ -501,7 +524,7 @@ class Parameter:
 
         Returns
         -------
-        Union[str, float, int]
+        object
             The Parameter value in a pickleable format.
         """
         if self.value is None:
@@ -512,7 +535,7 @@ class Parameter:
             return int(self.value)
         if self.__type == Real:
             return float(self.value)
-        if self.__type in (list, tuple, dict):
+        if self.__type in (tuple, list, dict):
             return self.value
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
@@ -556,7 +579,7 @@ class Parameter:
 
     deepcopy = copy
 
-    def dump(self) -> Tuple:
+    def dump(self) -> tuple:
         """
         A method to get the full class information for saving.
 
@@ -580,7 +603,7 @@ class Parameter:
             _default = self.value
         return self.__refkey, self.__type, _default, _meta
 
-    def export_refkey_and_value(self) -> Tuple:
+    def export_refkey_and_value(self) -> tuple:
         """
         Export the refkey and value (in a pickleable format) for saving
         in YAML files.

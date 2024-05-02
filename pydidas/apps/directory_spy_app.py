@@ -73,7 +73,7 @@ class DirectorySpyApp(BaseApp):
 
     scan_for_all : bool, optional
         Flag to toggle scanning for all new files or only for files matching
-        the input pattern (defined with the Paramteter `filename_pattern`).
+        the input pattern (defined with the Parameter `filename_pattern`).
         The default is False.
     filename_pattern : pathlib.Path, optional
         The pattern of the filename. Use hashes "#" for wildcards which will
@@ -81,7 +81,7 @@ class DirectorySpyApp(BaseApp):
         is False. The default is an empty Path().
     directory_path : pathlib.Path, optional
         The absolute path of the directory to be used. This Parameter is only
-        used when `scan_for_all` is True but it is mandatory then. The default
+        used when `scan_for_all` is True, but it is mandatory then. The default
         is an empty Path().
     hdf5_key : Hdf5key, optional
         Used only for hdf5 files: The dataset key. The default is
@@ -122,6 +122,7 @@ class DirectorySpyApp(BaseApp):
         "filename_pattern",
         "directory_path",
         "hdf5_key",
+        "hdf5_slicing_axis",
         "use_detector_mask",
         "detector_mask_file",
         "detector_mask_val",
@@ -264,6 +265,7 @@ class DirectorySpyApp(BaseApp):
             _params = {
                 "dataset": self.get_param_value("bg_hdf5_key"),
                 "frame": self.get_param_value("bg_hdf5_frame"),
+                "slicing_axes": [self.get_param_value("hdf5_slicing_axis")],
             }
         _bg_image = import_data(_bg_file, **_params)
         self._bg_image = self._apply_mask(_bg_image)
@@ -406,7 +408,7 @@ class DirectorySpyApp(BaseApp):
 
     def multiprocessing_post_run(self):
         """
-        Perform operatinos after running main parallel processing function.
+        Perform operations after running main parallel processing function.
         """
 
     def multiprocessing_get_tasks(self):
@@ -423,7 +425,7 @@ class DirectorySpyApp(BaseApp):
         Parameters
         ----------
         index : int
-            The image iamge.
+            The image index.
         """
         return
 
@@ -500,7 +502,11 @@ class DirectorySpyApp(BaseApp):
         """
         _dataset = self.get_param_value("hdf5_key")
         _shape = get_hdf5_metadata(fname, meta="shape", dset=_dataset)
-        self.__read_image_meta = {"frame": _shape[0] - 1, "dataset": _dataset}
+        self.__read_image_meta = {
+            "frame": _shape[0] - 1,
+            "dataset": _dataset,
+            "slicing_axes": [0],
+        }
 
     def __store_image_in_shared_memory(self, image: np.ndarray):
         """
@@ -575,7 +581,7 @@ class DirectorySpyApp(BaseApp):
     @property
     def filename(self) -> str:
         """
-        Get the curently stored filename.
+        Get the currently stored filename.
 
         Returns
         -------

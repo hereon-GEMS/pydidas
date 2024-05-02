@@ -104,7 +104,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                         int,
                         0,
                         name="Total number of images",
-                        tooltip=("The total number of images."),
+                        tooltip="The total number of images.",
                     )
                 )
 
@@ -128,7 +128,12 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         for _key in ["last_file", "file_stepping"]:
             self.param_widgets[_key].io_edited.connect(self.__update_file_selection)
-        for _key in ["hdf5_first_image_num", "hdf5_last_image_num", "hdf5_stepping"]:
+        for _key in [
+            "hdf5_slicing_axis",
+            "hdf5_first_image_num",
+            "hdf5_last_image_num",
+            "hdf5_stepping",
+        ]:
             self.param_widgets[_key].io_edited.connect(self.__update_n_image)
 
         self.param_widgets["use_roi"].currentTextChanged.connect(
@@ -178,13 +183,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     def __show_composite(self):
         """
-        Show the composite image in the Viewwer.
+        Show the composite image in the Viewer.
         """
         self.show_image_in_plot(self._app.composite)
 
     def setup_initial_state(self):
         """
-        Setup the initial state for the widgets.
+        Set up the initial state for the widgets.
         """
         self.__toggle_roi_selection(False)
         self.__toggle_bg_file_selection(False)
@@ -267,7 +272,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         """
         Do preparations for running the CompositeCreatorApp.
 
-        This methods sets the required attributes both for serial and
+        This method sets the required attributes both for serial and
         parallel running of the app.
         """
         self._config["plot_scale"] = None
@@ -360,7 +365,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         This method checks whether a hdf5 file has been selected and shows/
         hides the required fields for selecting the dataset or the last file
         in case of a file series.
-        If an hdf5 image file has been selected, this method also opens a
+        If a hdf5 image file has been selected, this method also opens a
         pop-up for dataset selection.
 
         Parameters
@@ -372,6 +377,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             [
                 "last_file",
                 "hdf5_key",
+                "hdf5_slicing_axis",
                 "hdf5_first_image_num",
                 "hdf5_last_image_num",
                 "hdf5_stepping",
@@ -432,12 +438,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     def __update_widgets_after_selecting_first_file(self):
         """
-        Update widget visibilty after selecting the first file based on the
+        Update widget visibility after selecting the first file based on the
         file format (hdf5 or not).
         """
         hdf5_flag = self.__check_if_hdf5_file()
         for _key in [
             "hdf5_key",
+            "hdf5_slicing_axis",
             "hdf5_first_image_num",
             "hdf5_last_image_num",
             "hdf5_stepping",
@@ -449,7 +456,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     def __check_if_hdf5_file(self) -> bool:
         """
-        Check if the first file is an hdf5 file.
+        Check if the first file is a hdf5 file.
 
         Returns
         -------
@@ -482,6 +489,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                     "n_total",
                     "hdf5_dataset_shape",
                     "hdf5_key",
+                    "hdf5_slicing_axis",
                     "hdf5_first_image_num",
                     "hdf5_last_image_num",
                     "hdf5_stepping",
@@ -494,7 +502,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         Perform required actions after selecting background image file.
 
         This method resets the fields for hdf5 image key and image number
-        and opens a pop-up for dataset selection if an hdf5 file has been
+        and opens a pop-up for dataset selection if a hdf5 file has been
         selected.
 
         Parameters
@@ -517,7 +525,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     def __selected_hdf5_key(self):
         """
-        Perform required actions after an hdf5 key has been selected.
+        Perform required actions after a hdf5 key has been selected.
         """
         try:
             self._image_metadata.update()
@@ -686,6 +694,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__reset_params(keys)
         for _key in [
             "hdf5_key",
+            "hdf5_slicing_axis",
             "hdf5_first_image_num",
             "hdf5_last_image_num",
             "last_file",
@@ -708,9 +717,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.set_param_value_and_widget("images_per_file", _n_per_file)
         self.__update_n_total()
 
-    def __update_composite_dim(
-        self, dim: Literal["x", "y"], value: Union[None, str] = None
-    ):
+    def __update_composite_dim(self, dim: Literal["x", "y"]):
         """
         Update the composite dimension counters upon a change in one of them.
 
@@ -718,8 +725,6 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         ----------
         dim : Union['x', 'y']
             The dimension which has changed.
-        value : Union[None, str]
-            The new widget value.
         """
         _n_total = self.get_param_value("n_total")
         num1 = self.param_widgets[f"composite_n{dim}"].get_value()

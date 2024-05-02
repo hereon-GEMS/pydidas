@@ -541,6 +541,21 @@ class TestPluginRegistry(unittest.TestCase):
         with self.assertRaises(UserConfigError):
             PC.unregister_plugin_path(self._otherpaths[0])
 
+    def test_unregister_all_paths(self):
+        for _ in range(3):
+            _new_path = Path(tempfile.mkdtemp())
+            self._otherpaths.append(_new_path)
+            _, _ = self.create_plugin_file_tree(path=_new_path, width=2, depth=2)
+        PC = PluginRegistry(
+            use_generic_plugins=False,
+            plugin_path=self._otherpaths,
+            force_initialization=True,
+        )
+        for _path in self._otherpaths:
+            self.assertIn(_path, PC.registered_paths)
+        PC.unregister_all_paths(True)
+        self.assertEqual(PC.registered_paths, [])
+
     def test__wrong_path_in_qsettings(self):
         _path = self._pluginpath.joinpath(get_random_string(8))
         self._qsettings.set_value("user/plugin_path", str(_path))

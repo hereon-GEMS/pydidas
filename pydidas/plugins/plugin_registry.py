@@ -473,7 +473,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         self.verify_is_initialized()
         return self._plugin_paths[:]
 
-    def unregister_plugin_path(self, path) -> Union[str, Path]:
+    def unregister_plugin_path(self, path: Union[str, Path]):
         """
         Unregister the given path from the PluginCollection.
 
@@ -515,6 +515,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         if not confirmation:
             print("Confirmation for unregistering all paths was not given. Aborting...")
             return
+        self._config["initial_plugin_path"] = []
         self.q_settings_set("user/plugin_path", None)
         self.clear_collection(True)
 

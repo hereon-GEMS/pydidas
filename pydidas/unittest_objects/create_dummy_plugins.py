@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["create_plugin_class"]
+__all__ = ["create_base_class", "create_plugin_class"]
 
 
 import copy
@@ -48,7 +48,7 @@ def create_base_class(base: type) -> type:
 
     Parameters
     ----------
-    cls : type
+    base : type
         The base class to be duplicated.
 
     Returns

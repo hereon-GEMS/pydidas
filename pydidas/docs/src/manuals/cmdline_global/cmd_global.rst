@@ -222,7 +222,7 @@ using:
 Management of stored paths
 """"""""""""""""""""""""""
 
-Paths can be managed by three methods. New paths can be added using the
+Paths can be managed by various methods. New paths can be added using the
 :py:meth:`find_and_register_plugins
 <pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins>`
 method and a list of all currently registered paths can be obtained by the
@@ -231,20 +231,25 @@ method and a list of all currently registered paths can be obtained by the
 method. To permanently remove a stored paths, a user can use the
 :py:meth:`unregister_plugin_path
 <pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path>`
-method. To remove all stored paths and plugins from the current instance, use
-the :py:meth:`clear_collection
-<pydidas.plugins.plugin_collection.PluginRegistry.clear_collection>` method.
+method. To remove all stored paths and plugin, use
+the :py:meth:`unregister_all_paths
+<pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths>` method.
 This method must be called with a :py:data:`True` flag to take effect and is
 ignored otherwise.
 
-.. Warning::
-    Using the :py:meth:`clear_collection
-    <pydidas.plugins.plugin_collection.PluginRegistry.clear_collection>`
-    method will remove all paths which have ever been registered and the user is
-    responsible to add all new paths again.
 
-    Also, if a user tries to access the  empty PluginCollection, the default
-    plugin path will be added automatically.
+.. note::
+    Note that the generic plugin path is always included and cannot be removed from
+    the collection by the user.
+
+.. Warning::
+    Using the :py:meth:`unregister_all_paths
+    <pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths>`
+    method will remove all custom paths which have ever been registered and the
+    user is responsible to add all required paths again.
+
+    This method will not keep any references to the original stored paths and they
+    are truly lost.
 
 An example of the use of stored paths is given below.
 
@@ -272,20 +277,21 @@ An example of the use of stored paths is given below.
     [Path('/home/someuser/path/to/plugins'), 
      Path('/home/someuser/another/path'),
      Path(''/home/someuser/yet/another/path')]
-
-    # Using the ``clear_collection`` method without the confirmation flag
+    # Using the ``unregister_plugin_path`` method allows to remove a single path:
+    >>> COLLECTION.unregister_plugin_path(Path('/home/someuser/another/path'))
+    >>> COLLECTION.registered_paths
+    [Path('/home/someuser/path/to/plugins'),
+     Path(''/home/someuser/yet/another/path')]
+    # Using the ``unregister_all_paths`` method without the confirmation flag
     # will be ignored:
-    >>> COLLECTION.clear_collection()
-    'The confirmation flag was not given. The PluginCollection has not been reset.'
+    >>> COLLECTION.unregister_all_paths()
+    'Confirmation for unregistering all paths was not given. Aborting...'
     >>> COLLECTION.registered_paths
     [Path('/home/someuser/path/to/plugins'), 
-     Path('/home/someuser/another/path'),
      Path('/home/someuser/yet/another/path')]
-    >>> COLLECTION.clear_collection(True)
-    # When accessing the COLLECTION with no paths registered, the default
-    # Path will be added:
+    >>> COLLECTION.unregister_all_paths(True)
     >>> COLLECTION.registered_paths
-    [Path('/generic/plugin/path')]
+    []
 
 
 Plugin references
@@ -304,6 +310,8 @@ name for the Plugin.
     a path further down in the list will take precedence over an earlier path.
     The loading of Plugins can be controlled by organizing the sequence
     of paths.
+
+    The generic plugins are always loaded first.
 
 .. warning::
     Trying to register a second class with a different class name but the same

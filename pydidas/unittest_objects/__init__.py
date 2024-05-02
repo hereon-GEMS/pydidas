@@ -33,7 +33,6 @@ __all__ = []
 from .create_dummy_plugins import *
 from .create_hdf5_io_file_ import *
 from .dummy_loader import *
-from .dummy_plugin_collection import *
 from .dummy_proc import *
 from .dummy_proc_new_dataset import *
 from .local_plugin_collection import *
@@ -56,11 +55,6 @@ from . import dummy_loader
 
 __all__.extend(dummy_loader.__all__)
 del dummy_loader
-
-from . import dummy_plugin_collection
-
-__all__.extend(dummy_plugin_collection.__all__)
-del dummy_plugin_collection
 
 from . import dummy_proc
 

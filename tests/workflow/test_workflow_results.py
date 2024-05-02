@@ -35,7 +35,7 @@ import h5py
 import numpy as np
 from qtpy import QtWidgets
 
-import pydidas
+from pydidas import unittest_objects
 from pydidas.contexts.diff_exp import DiffractionExperimentContext
 from pydidas.contexts.scan import Scan, ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError, get_generic_parameter
@@ -63,9 +63,9 @@ PLUGINS = PluginCollection()
 class TestWorkflowResults(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        _paths = [Path(pydidas.__file__).parent.joinpath("unittest_objects/")]
-        cls._plugin_paths = PLUGINS.registered_paths
-        PLUGINS.find_and_register_plugins(*_paths)
+        _path = Path(unittest_objects.__file__).parent
+        if _path not in PLUGINS.registered_paths:
+            PLUGINS.find_and_register_plugins(_path)
         global SCAN, TREE, EXP, RES
         RES._TREE = TREE
         RES.SCAN = SCAN
@@ -76,8 +76,7 @@ class TestWorkflowResults(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        PLUGINS.unregister_all_paths(True)
-        PLUGINS.find_and_register_plugins(*PLUGINS.registered_paths)
+        PLUGINS.unregister_plugin_path(Path(unittest_objects.__file__).parent)
 
     def setUp(self):
         self.set_up_scan()
@@ -244,7 +243,7 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertIn("node_01.h5", _files)
         self.assertIn("node_02.h5", _files)
 
-    def test_prepare_files_for_saving__w_nonexisting_dir(self):
+    def test_prepare_files_for_saving__w_non_existing_dir(self):
         RES.update_shapes_from_scan_and_workflow()
         self.create_composites()
         shutil.rmtree(self._tmpdir)

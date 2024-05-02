@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,6 +31,7 @@ import tempfile
 import threading
 import time
 import unittest
+from pathlib import Path
 
 import numpy as np
 from qtpy import QtWidgets
@@ -51,7 +52,6 @@ SCAN = ScanContext()
 RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
 COLL = PluginCollection()
-_PLUGIN_PATHS = COLL.registered_paths
 
 
 class TestLock(threading.Thread):
@@ -81,6 +81,13 @@ class TestLock(threading.Thread):
         self._mem["flag"].release()
 
 
+def generate_tree():
+    TREE.clear()
+    TREE.create_and_add_node(unittest_objects.DummyLoader())
+    TREE.create_and_add_node(unittest_objects.DummyProc())
+    TREE.create_and_add_node(unittest_objects.DummyProc(), parent=TREE.root)
+
+
 class TestExecuteWorkflowApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -94,8 +101,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         cls.q_settings = PydidasQsettings()
         cls._buf_size = cls.q_settings.value("global/shared_buffer_size", float)
         cls._n_workers = cls.q_settings.value("global/mp_n_workers", int)
-        _path = os.path.dirname(unittest_objects.__file__)
-        if _path not in _PLUGIN_PATHS:
+        cls.__original_plugin_paths = COLL.registered_paths[:]
+        _path = Path(unittest_objects.__file__).parent
+        if _path not in COLL.registered_paths:
             COLL.find_and_register_plugins(_path)
 
     @classmethod
@@ -103,22 +111,15 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         shutil.rmtree(cls._path)
         cls.q_settings.set_value("global/shared_buffer_size", cls._buf_size)
         cls.q_settings.set_value("global/mp_n_workers", cls._n_workers)
-        COLL.clear_collection(True)
-        COLL.find_and_register_plugins(*_PLUGIN_PATHS)
+        COLL.unregister_plugin_path(Path(unittest_objects.__file__).parent)
 
     def setUp(self):
         RESULT_SAVER.set_active_savers_and_title([])
-        self.generate_tree()
+        generate_tree()
         self.reset_scan_params()
 
     def tearDown(self):
         ExecuteWorkflowApp.parse_func = execute_workflow_app_parser
-
-    def generate_tree(self):
-        TREE.clear()
-        TREE.create_and_add_node(unittest_objects.DummyLoader())
-        TREE.create_and_add_node(unittest_objects.DummyProc())
-        TREE.create_and_add_node(unittest_objects.DummyProc(), parent=TREE.root)
 
     def generate_scan(self):
         SCAN.restore_all_defaults(True)
@@ -182,7 +183,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.multiprocessing_pre_cycle(_index)
         self.assertEqual(_index, app._index)
 
-    def test_multiprocesssing_post_run(self):
+    def test_multiprocessing_post_run(self):
         app = ExecuteWorkflowApp()
         app.multiprocessing_post_run()
         # assert does not raise an Exception
@@ -283,7 +284,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app._redefine_multiprocessing_carryon()
         app._index = utils.get_random_string(8)
         self.assertEqual(app.multiprocessing_carryon(), app._index)
-        self.generate_tree()
+        generate_tree()
 
     def test_multiprocessing_get_tasks__normal(self):
         app = ExecuteWorkflowApp()

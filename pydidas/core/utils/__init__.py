@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ which are used throughout the package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -41,7 +41,6 @@ from .math_utils import *
 from .no_print import *
 from .qt_utilities import *
 from .rebin_ import *
-from .set_default_plugin_dir_ import *
 from .show_busy_mouse import *
 from .sphinx_html import *
 from .str_utils import *
@@ -113,11 +112,6 @@ from . import rebin_
 
 __all__.extend(rebin_.__all__)
 del rebin_
-
-from . import set_default_plugin_dir_
-
-__all__.extend(set_default_plugin_dir_.__all__)
-del set_default_plugin_dir_
 
 from . import show_busy_mouse
 

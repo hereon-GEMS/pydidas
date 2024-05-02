@@ -29,7 +29,6 @@ __all__ = ["UserConfigWindow"]
 
 
 from functools import partial
-from pathlib import Path
 from typing import Literal, Union
 
 from numpy import ceil, floor
@@ -38,7 +37,7 @@ from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
 from pydidas_qtcore import PydidasQApplication
 
-from ...core import SingletonFactory, UserConfigError, get_generic_param_collection
+from ...core import SingletonFactory, get_generic_param_collection
 from ...core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_PARAM_EDIT_WIDTH,
@@ -49,7 +48,8 @@ from ...core.constants import (
     QT_REG_EXP_RGB_VALIDATOR,
 )
 from ...core.generic_params.generic_params_settings import GENERIC_PARAMS_SETTINGS
-from ...plugins import PluginCollection, get_generic_plugin_path
+from ...core.utils import update_palette
+from ...plugins import GENERIC_PLUGIN_PATH, PluginCollection
 from ..dialogues import PydidasExceptionMessageBox, QuestionBox
 from ..factory import SquareButton
 from ..framework import PydidasWindow
@@ -181,9 +181,7 @@ class _UserConfigWindow(PydidasWindow):
             width_io=0.25,
             width_text=0.7,
         )
-
         self.create_spacer(None, parent_widget="config_canvas")
-
         self.create_label(
             "section_mosaic", "Composite creator settings", **_section_options
         )
@@ -200,7 +198,6 @@ class _UserConfigWindow(PydidasWindow):
             width_text=0.7,
         )
         self.create_spacer("spacer_3", parent_widget="config_canvas")
-
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
             self.get_param("histogram_outlier_fraction_low"),
@@ -269,25 +266,36 @@ class _UserConfigWindow(PydidasWindow):
         )
 
         self.create_spacer("spacer_4", parent_widget="config_canvas")
-
         self.create_label("section_plugins", "Plugins", **_section_options)
+        self.create_label(
+            "label_default_plugin_title",
+            "Generic plugin location (not editable):",
+            parent_widget="config_canvas",
+        )
+        self.create_empty_widget(
+            "generic_plugin_box",
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            layout_column_stretches={0: 10, 1: 90},
+            parent_widget="config_canvas",
+        )
+        self.create_lineedit(
+            "label_default_plugin",
+            readOnly=True,
+            gridPos=(0, 1, 1, 1),
+            parent_widget="generic_plugin_box",
+            text=str(GENERIC_PLUGIN_PATH).replace("\\", "/"),
+        )
+        update_palette(self._widgets["label_default_plugin"], base="#F0F0F0")
         self.create_param_widget(
             self.get_param("plugin_path"), linebreak=True, parent_widget="config_canvas"
         )
         self.param_widgets["plugin_path"].update_size_hint(
             QtCore.QSize(2 * GENERIC_STANDARD_WIDGET_WIDTH, 5)
         )
-
         self.create_button(
             "but_plugins",
             "Update plugin collection",
             icon="qt-std::SP_BrowserReload",
-            parent_widget="config_canvas",
-        )
-        self.create_button(
-            "but_reset_plugins",
-            "Restore default plugin collection paths",
-            icon="qt-std::SP_DialogOkButton",
             parent_widget="config_canvas",
         )
 
@@ -301,18 +309,17 @@ class _UserConfigWindow(PydidasWindow):
             self.param_widgets[_param_key].io_edited.connect(
                 partial(self.update_qsetting, _param_key)
             )
-        self._widgets["but_reset"].clicked.connect(self.__reset)
         self._widgets["but_plugins"].clicked.connect(self.update_plugin_collection)
-        self._widgets["but_reset_plugins"].clicked.connect(self.reset_plugins)
+        self._widgets["but_reset"].clicked.connect(self.__reset)
         self._widgets["cmap_combobox"].currentTextChanged.connect(self.update_cmap)
         self._widgets["edit_fontsize"].editingFinished.connect(
             self.process_new_fontsize_setting
         )
         self._widgets["but_fontsize_reduce"].clicked.connect(
-            partial(self.change_fontsize, "decrease")
+            partial(self.change_fontsize, -1)
         )
         self._widgets["but_fontsize_increase"].clicked.connect(
-            partial(self.change_fontsize, "increase")
+            partial(self.change_fontsize, 1)
         )
         self._widgets["font_family_box"].currentFontChanged.connect(
             self.new_font_family_selected
@@ -340,7 +347,7 @@ class _UserConfigWindow(PydidasWindow):
             self._widgets["cmap_combobox"].setCurrentText(_default_cmap)
 
     @QtCore.Slot(object)
-    def update_qsetting(self, param_key, value):
+    def update_qsetting(self, param_key: str, value: object):
         """
         Update a QSettings value
 
@@ -410,36 +417,19 @@ class _UserConfigWindow(PydidasWindow):
         Update the plugin collection from the updated QSetting values for the
         plugin directories.
         """
-        _paths = PLUGINS.get_q_settings_plugin_paths()
-        if _paths == [Path()]:
-            self.set_param_value_and_widget(
-                "plugin_path", str(get_generic_plugin_path()[0])
-            )
-            raise UserConfigError(
-                "Warning! No plugin paths have been selected. Resetting paths to the "
-                "default path value."
-            )
-        PLUGINS.clear_collection(True)
-        PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
-
-    @QtCore.Slot()
-    def reset_plugins(self):
-        """
-        Reset the plugin paths to the default.
-        """
         _reply = QuestionBox(
-            "Reset PluginCollection paths",
-            "Do you want to reset the PluginCollection paths and lose all changes?",
+            "Update plugin paths",
+            (
+                "Do you want to update the custom plugin paths? This will clear the "
+                "current workflow tree and all un-saved changed will be lost."
+            ),
         ).exec_()
         if _reply:
-            _path = str(get_generic_plugin_path()[0])
-            self.set_param_value_and_widget("plugin_path", _path)
-            self.update_qsetting("plugin_path", _path)
             PLUGINS.clear_collection(True)
             PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 
     @QtCore.Slot(str)
-    def update_cmap(self, cmap_name):
+    def update_cmap(self, cmap_name: str):
         """
         Update the default colormap.
 
@@ -451,7 +441,7 @@ class _UserConfigWindow(PydidasWindow):
         self.update_qsetting("cmap_name", cmap_name)
 
     @QtCore.Slot()
-    def change_fontsize(self, change: Literal["increase", "decrease"]):
+    def change_fontsize(self, change: int):
         """
         Process the button clicks to change the fontsize.
 
@@ -460,9 +450,9 @@ class _UserConfigWindow(PydidasWindow):
         change : Literal["increase", "decrease"]
             The change direction.
         """
-        if change == "increase":
+        if change == 1:
             _new_fontsize = min(ceil(self.__qtapp.font_size) + 1, 20)
-        elif change == "decrease":
+        elif change == -1:
             _new_fontsize = max(floor(self.__qtapp.font_size) - 1, 5)
         self._widgets["edit_fontsize"].setText(str(_new_fontsize))
         self.process_new_fontsize_setting()
@@ -493,7 +483,7 @@ class _UserConfigWindow(PydidasWindow):
         self.process_new_fontsize_setting()
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Update the frame.
 
@@ -542,7 +532,7 @@ class _UserConfigWindow(PydidasWindow):
             )
 
     @QtCore.Slot(str, object)
-    def external_update(self, param_key, value):
+    def external_update(self, param_key: str, value: object):
         """
         Perform an update after a Parameter has changed externally.
 

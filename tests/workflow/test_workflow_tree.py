@@ -25,7 +25,6 @@ __status__ = "Production"
 
 
 import copy
-import os
 import pickle
 import shutil
 import tempfile
@@ -46,9 +45,10 @@ _PLUGIN_PATHS = COLL.registered_paths
 
 class TestWorkflowTree(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        _path = os.path.dirname(unittest_objects.__file__)
-        if _path not in _PLUGIN_PATHS:
+    def setUpClass(cls):
+        cls.__original_plugin_paths = COLL.registered_paths[:]
+        _path = Path(unittest_objects.__file__).parent
+        if _path not in COLL.registered_paths:
             COLL.find_and_register_plugins(_path)
 
     def setUp(self):
@@ -58,12 +58,10 @@ class TestWorkflowTree(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
-        # PluginCollection._reset_instance()
 
     @classmethod
     def tearDownClass(cls):
-        COLL.clear_collection(True)
-        COLL.find_and_register_plugins(*_PLUGIN_PATHS)
+        COLL.unregister_plugin_path(Path(unittest_objects.__file__).parent)
 
     def create_node_tree(self, depth=3, width=3):
         obj00 = WorkflowNode(node_id=0, plugin=unittest_objects.DummyLoader())

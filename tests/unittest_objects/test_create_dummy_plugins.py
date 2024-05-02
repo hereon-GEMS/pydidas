@@ -34,7 +34,7 @@ from pydidas.unittest_objects.create_dummy_plugins import (
 )
 
 
-class TestDummyPluginCollection(unittest.TestCase):
+class TestCreateDummyPlugins(unittest.TestCase):
     def setUp(self): ...
 
     def tearDown(self): ...

@@ -13,6 +13,8 @@ Improvements
   class initialization.
 - Added a setting to change the default NaN color which is used to mark
   invalid or missing data.
+- Separated the path for generic plugins from user-defined custom plugin paths
+  for greater clarity.
 
 
 Bugfixes
@@ -24,6 +26,8 @@ Bugfixes
   DiffractionExperimentContext on the command line with wrong data types.
 - Fixed an issue with convenience type conversions in the Parameter class.
 - Fixed an issue with possibly joining queues twice on exit of WorkerController.
+- Fixed an issue with the `unregister_all_paths` method of the PluginRegistry
+  which did not permanently remove the paths.
 
 
 v24.03.25

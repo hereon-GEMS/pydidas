@@ -39,12 +39,12 @@ from ...version import VERSION
 from .processing_tree_io_base import ProcessingTreeIoBase
 
 
-WorkflowTree = NewType("WWorkflowTree", type)
+ProcessingTree = NewType("ProcessingTree", type)
 
 
 class ProcessingTreeIoYaml(ProcessingTreeIoBase):
     """
-    Base class for WorkflowTree exporters.
+    Base class for ProcessingTree exporters.
     """
 
     extensions = YAML_EXTENSIONS
@@ -52,7 +52,7 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
 
     @classmethod
     def export_to_file(
-        cls, filename: Union[Path, str], tree: WorkflowTree, **kwargs: dict
+        cls, filename: Union[Path, str], tree: ProcessingTree, **kwargs: dict
     ):
         """
         Write the content to a file.
@@ -63,7 +63,7 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
         ----------
         filename : str
             The filename of the file to be written.
-        tree : WorkflowTree
+        tree : ProcessingTree
             The workflow tree instance.
         """
         cls.check_for_existing_file(filename, **kwargs)
@@ -75,7 +75,7 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
             yaml.safe_dump(_dump, _file)
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str]) -> WorkflowTree:
+    def import_from_file(cls, filename: Union[Path, str]) -> ProcessingTree:
         """
         Restore the content from a file.
 
@@ -88,8 +88,8 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
 
         Returns
         -------
-        pydidas.workflow.WorkflowTree
-            The restored WorkflowTree.
+        pydidas.workflow.ProcessingTree
+            The restored ProcessingTree.
         """
         from ..processing_tree import ProcessingTree
 
@@ -107,13 +107,14 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
         except (KeyError, TypeError, UserConfigError, ValueError, NameError):
             if _version < VERSION:
                 raise UserConfigError(
-                    "Import of WorkflowTree was not successful. The WorkflowTree was "
-                    f"created with version {_version} and could not be imported in "
-                    f"the current version ({VERSION})."
+                    "Import of ProcessingTree was not successful. \n\n"
+                    "The selected file does not include a workflow tree configuration "
+                    f"or the ProcessingTree was created with version {_version} and "
+                    f"could not be imported in the current version ({VERSION})."
                 )
             raise UserConfigError(
                 "Could not import the Workflow from the given file:"
                 f"\n    {filename}\nPlease check that the content of the file "
-                "is a Pydidas WorkflowTree."
+                "is a Pydidas ProcessingTree."
             )
         return _tree

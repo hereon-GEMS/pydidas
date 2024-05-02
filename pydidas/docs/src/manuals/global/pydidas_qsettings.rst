@@ -66,10 +66,13 @@ whereas the user settings handle convenience user configurations.
     - Default colormap (key: user/cmap_name, type: str, default: Gray)
         The name of the default colormap to use. The name must be a valid
         matplotlib colormap name.
+    - Default color for invalid data (key: user/cmap_nan_color, type: str, default: #9AFEFF)
+        The RGB color code to use for invalid / missing data to distinguish it from the
+        generic colormap and its data points.
 - Plugins
-    - Plugin paths (key: user/plugin_path, type: str, default: n/a)
-        The names of the paths where pydidas will look for plugins.
-        The default is normally per-determined by pydidas and should not be 
-        changed except for expert users. Additional paths can be added by 
-        appending them with a double semicolon ";;" as separator.
+    - Custom plugin paths (key: user/plugin_path, type: str, default: "")
+        The names of custom paths where pydidas will look for plugins. Generic plugins
+        and the generic plugin path is handled independently for greater clarity.
+        Multiple paths can be added by appending them with a double semicolon ";;"
+        as separator.
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ and allows to get the importers/exporters based on the file extension.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -151,13 +151,18 @@ class IoMaster(type):
         cls, extension: str, mode: Literal["import", "export"] = "import"
     ):
         """
-        Check if the extension of filename corresponds to a registered
-        class.
+        Check if the extension of filename corresponds to a registered class.
+
+        The extension is stored without the leading dot. If the given extension
+        includes a leading dot, it is stripped before checking the extension.
+        This behaviour allows to use pathlib.Path instances' suffix property to
+        be used directly.
 
         Parameters
         ----------
         extension : str
-            The extension to be checked.
+            The extension to be checked. If the extension includes a leading
+            dot, it is stripped.
         mode : Literal["import", "export"]
             The mode to use: Choose between import and export. The default is
             import.
@@ -166,6 +171,8 @@ class IoMaster(type):
         bool
             Flag whether the extension is registered or not.
         """
+        if extension.startswith("."):
+            extension = extension[1:]
         if extension in cls._get_registry(mode):
             return True
         return False

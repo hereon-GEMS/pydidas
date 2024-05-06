@@ -30,6 +30,8 @@ Bugfixes
 - Fixed an issue with possibly joining queues twice on exit of WorkerController.
 - Fixed an issue with the `unregister_all_paths` method of the PluginRegistry
   which did not permanently remove the paths.
+- Fixed an issue in the ImageSeriesOperationsWindow where the correctness of 
+  the output filename was not checked until after the operation.
 
 
 v24.03.25

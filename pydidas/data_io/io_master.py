@@ -303,4 +303,12 @@ class IoMaster(type):
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension, mode="import", filename=filename)
         _io_class = cls.registry_import[_extension]
-        return _io_class.import_from_file(filename, **kwargs)
+        _data = _io_class.import_from_file(filename, **kwargs)
+        _forced_dim = kwargs.get("forced_dimension", None)
+        if _forced_dim is not None and _forced_dim != _data.ndim:
+            raise UserConfigError(
+                f"The imported data has {_data.ndim} dimensions, but an input of "
+                f"dimensionality {kwargs.get('forced_dimension')} is required. Please "
+                "control the given input and configuration."
+            )
+        return _data

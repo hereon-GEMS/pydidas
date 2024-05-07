@@ -18,6 +18,8 @@ Improvements
 - Programmatic improvements:
     - Changed the default behaviour of the hdf5 file loader to import the full
       dataset instead of only a single frame.
+    - Allowed to use `None` for hdf5 dataset slicing to load the full dataset.
+- Added an option to specify a required dimensionality when importing data.
 
 Bugfixes
 --------

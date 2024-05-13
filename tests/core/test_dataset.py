@@ -206,10 +206,14 @@ class TestDataset(unittest.TestCase):
         obj.flatten_dims(*_dims)
         self.assertEqual(obj.ndim, len(self._dset["shape"]) - 1)
         for key, preset in zip(
-            ["axis_labels", "axis_units", "axis_ranges"],
-            ["Flattened", "", None],
+            ["axis_labels", "axis_units"],
+            [
+                "Flattened",
+                "",
+            ],
         ):
             self.assertEqual(getattr(obj, key)[_dims[0]], preset)
+        self.assertTrue(np.allclose(obj.axis_ranges[_dims[0]], np.arange(obj.shape[1])))
 
     def test_flatten_dims__1dim_only(self):
         obj = self.create_large_dataset()
@@ -455,13 +459,10 @@ class TestDataset(unittest.TestCase):
             axis_ranges=[np.arange(6), [2], 20 - np.arange(7), [6], None],
         )
         _new = obj.squeeze()
-        for _i1, _i2 in [[0, 0], [2, 1]]:
+        for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
             self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
             self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertEqual(obj.axis_labels[4], _new.axis_labels[2])
-        self.assertEqual(obj.axis_units[4], _new.axis_units[2])
-        self.assertIsNone(_new.axis_ranges[2])
         self.assertTrue(np.allclose(obj[0, 0, 0, 0], _new[0, 0]))
 
     def test_squeeze__no_dim(self):
@@ -604,7 +605,10 @@ class TestDataset(unittest.TestCase):
         for _dim in range(2):
             self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
             self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
-            self.assertEqual(obj.axis_ranges[_dim], _new.axis_ranges[_dim])
+            __slice = slice(1, 4) if _dim == 1 else slice(None, None)
+            self.assertTrue(
+                np.allclose(obj.axis_ranges[_dim][__slice], _new.axis_ranges[_dim])
+            )
 
     def test_take__with_single_iterable_value(self):
         obj = Dataset(
@@ -720,6 +724,10 @@ class TestDataset(unittest.TestCase):
         _newkeys = [123, 456]
         obj.axis_ranges = _newkeys
         self.assertEqual(obj.axis_ranges, dict(enumerate(_newkeys)))
+
+    def test_set_axis_ranges_property__w_none(self):
+        obj = Dataset(np.random.random((20, 20)), axis_ranges=[None, np.arange(20)])
+        self.assertFalse(None in obj.axis_ranges)
 
     def test_set_axis_ranges_property__ndarrays_of_correct_len(self):
         obj = self.create_simple_dataset()

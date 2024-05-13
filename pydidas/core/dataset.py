@@ -32,7 +32,7 @@ import warnings
 from collections.abc import Iterable
 from copy import deepcopy
 from numbers import Integral
-from typing import Literal, Self, Union
+from typing import Literal, Optional, Self, Union
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -53,27 +53,36 @@ class Dataset(np.ndarray):
     """
     Dataset class, a subclass of a numpy.ndarray with metadata.
 
+    The metadata is accessible and modifiable through the respective properties:
+    - axis_units : The units of the axis ranges (in str format).
+    - axis_labels : The descriptive labels for all array axes (in str format).
+    - axis_ranges : The data values corresponding to the respective axes indices,
+      given in form of 1-d arrays.
+    - data_unit : The unit for the data values (in str format).
+    - data_label : The label for the data values (in str format).
+
     Parameters
     ----------
     array : np.ndarray
         The data array.
     **kwargs : dict
-        Optional keyword arguments.
-    **axis_labels : Union[dict, list, tuple], optional
-        The labels for the axes. The length must correspond to the array
-        dimensions. The default is None.
-    **axis_ranges : Union[dict, list, tuple], optional
-        The ranges for the axes. The length must correspond to the array
-        dimensions. The default is None.
-    **axis_units : Union[dict, list, tuple], optional
-        The units for the axes. The length must correspond to the array
-        dimensions. The default is None.
-    **metadata : Union[dict, None], optional
-        A dictionary with metadata. The default is None.
-    **data_unit : str, optional
-        The description of the data unit. The default is an empty string.
-    **data_label : str, optional
-        The description of the data. The default is an empty string.
+        Optional keyword arguments. Supported keywords are:
+
+        axis_labels : Union[dict, list, tuple], optional
+            The labels for the axes. The length must correspond to the array
+            dimensions. The default is None.
+        axis_ranges : Union[dict, list, tuple], optional
+            The ranges for the axes. The length must correspond to the array
+            dimensions. The default is None.
+        axis_units : Union[dict, list, tuple], optional
+            The units for the axes. The length must correspond to the array
+            dimensions. The default is None.
+        metadata : Union[dict, None], optional
+            A dictionary with metadata. The default is None.
+        data_unit : str, optional
+            The description of the data unit. The default is an empty string.
+        data_label : str, optional
+            The description of the data. The default is an empty string.
     """
 
     def __new__(cls, array: np.ndarray, **kwargs: dict) -> Self:
@@ -445,7 +454,7 @@ class Dataset(np.ndarray):
 
         Parameters
         ----------
-        labels : Union[Iterable, dict]
+        units : Union[Iterable, dict]
             The new axis units. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
@@ -529,6 +538,9 @@ class Dataset(np.ndarray):
         """
         _wrong_dims = []
         for _dim, _range in ranges.items():
+            if _range is None:
+                ranges[_dim] = np.arange(self.shape[_dim])
+                continue
             if item_is_iterable_but_not_array(_range):
                 _range = np.asarray(_range)
                 ranges[_dim] = _range
@@ -590,7 +602,7 @@ class Dataset(np.ndarray):
             raise ValueError(f"The index *{index}* is out of bounds (0..{self.ndim}).")
         if not isinstance(item, str):
             raise ValueError(
-                f"The item *{item}* is not a string. Cannot update the axis label."
+                f"The item `{item}` is not a string. Cannot update the axis label."
             )
         self._meta["axis_labels"][index] = item
 
@@ -682,9 +694,9 @@ class Dataset(np.ndarray):
             _str = _str + "; " + _s if len(_str) > 0 else _s
         return _str
 
-    # ############################################
-    # Reimplementations of generic ndarray methods
-    # ############################################
+    # ###########################################
+    # Reimplementation of generic ndarray methods
+    # ###########################################
 
     def transpose(self, *axes: tuple) -> Self:
         """
@@ -736,7 +748,7 @@ class Dataset(np.ndarray):
         """
         Update the keys in flattened arrays i.e. if the new dimension is one.
 
-        Note that the metadara keys are updated in place.
+        Note that the metadata keys are updated in place.
         """
         if self.ndim == 1 and (
             len(self._meta["axis_ranges"]) > 1
@@ -796,7 +808,7 @@ class Dataset(np.ndarray):
         Parameters
         ----------
         indices : Union[int, ArrayLike]
-            The indicies of the values to extract.
+            The indices of the values to extract.
         axis : Union[None, int], optional
             The axis to take the data from. If None, data will be taken from the
             flattened array. The default is None.
@@ -866,9 +878,9 @@ class Dataset(np.ndarray):
         str
             The representation of the Dataset class.
         """
-        _thresh = np.get_printoptions()["threshold"]
+        _print_options = np.get_printoptions()
         _edgeitems = 2 if self.ndim > 1 else 3
-        np.set_printoptions(threshold=20, edgeitems=_edgeitems)
+        np.set_printoptions(threshold=20, edgeitems=_edgeitems, precision=6)
         _meta_repr = "\n".join(
             get_axis_item_representation("metadata", self._meta["metadata"])
         )
@@ -887,7 +899,7 @@ class Dataset(np.ndarray):
             + ",\n".join(_str for _str in _info.values())
             + "\n)"
         )
-        np.set_printoptions(threshold=_thresh, edgeitems=3)
+        np.set_printoptions(**_print_options)
         return _repr
 
     def __get_axis_item_repr(
@@ -940,7 +952,7 @@ class Dataset(np.ndarray):
         -------
         tuple
             The arguments required for pickling. Please refer to
-            https://docs.python.org/2/library/pickle.html#object.__reduce__
+            https://docs.python.org/3/library/pickle.html#object.__reduce__
             for the full documentation. The class' state is appended with
             the class' __dict__
         """
@@ -959,14 +971,12 @@ class Dataset(np.ndarray):
         Parameters
         ----------
         state : tuple
-            The pickled objcts state.
+            The pickled object state.
         """
         self.__dict__ = state[-1]
         np.ndarray.__setstate__(self, state[0:-1])
 
-    def __array_wrap__(
-        self, obj: np.ndarray, context: Union[None, object] = None
-    ) -> Self:
+    def __array_wrap__(self, obj: np.ndarray, context: Optional[object] = None) -> Self:
         """
         Return 0-d results from ufuncs as single values.
 
@@ -982,7 +992,7 @@ class Dataset(np.ndarray):
 
         Returns
         -------
-        Union[pydidas.core.Dataset, type]
+        Union[pydidas.core.Dataset, object]
             The output will be a new Dataset if the output has a dimension
             greater zero or of the basic datatype for 0-d return values.
         """

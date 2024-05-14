@@ -35,6 +35,7 @@ Bugfixes
 - Fixed an issue in the ImageSeriesOperationsWindow where the correctness of 
   the output filename was not checked until after the operation.
 - Fixed an issue where Dataset axis ranges could be None.
+- Fixed an issue where Dataset axis labels / units could be None.
 
 
 v24.03.25

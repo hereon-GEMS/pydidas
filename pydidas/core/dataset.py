@@ -45,6 +45,7 @@ from .utils.dataset_utils import (
     get_axis_item_representation,
     get_number_of_entries,
     item_is_iterable_but_not_array,
+    replace_none_entries,
     update_dataset_properties_from_kwargs,
 )
 
@@ -458,7 +459,9 @@ class Dataset(np.ndarray):
             The new axis units. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
-        self._meta["axis_units"] = convert_data_to_dict(units, self.shape, "axis_units")
+        self._meta["axis_units"] = replace_none_entries(
+            convert_data_to_dict(units, self.shape, "axis_units")
+        )
 
     @property
     def axis_labels(self) -> dict:
@@ -484,8 +487,8 @@ class Dataset(np.ndarray):
             The new axis labels. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
-        self._meta["axis_labels"] = convert_data_to_dict(
-            labels, self.shape, "axis_labels"
+        self._meta["axis_labels"] = replace_none_entries(
+            convert_data_to_dict(labels, self.shape, "axis_labels")
         )
 
     @property

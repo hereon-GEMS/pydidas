@@ -812,6 +812,11 @@ class TestDataset(unittest.TestCase):
         obj.update_axis_label(1, _val)
         self.assertEqual(obj.axis_labels[1], _val)
 
+    def test_update_axis_label__w_none(self):
+        obj = self.create_large_dataset()
+        with self.assertRaises(ValueError):
+            obj.update_axis_label(1, None)
+
     def test_update_axis_unit__wrong_index(self):
         obj = self.create_large_dataset()
         with self.assertRaises(ValueError):

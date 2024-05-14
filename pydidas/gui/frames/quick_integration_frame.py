@@ -71,6 +71,7 @@ class QuickIntegrationFrame(BaseFrame):
         "filename",
         "hdf5_key",
         "hdf5_frame",
+        "hdf5_slicing_axis",
         "overlay_color",
         "integration_direction",
         "azi_npoint",
@@ -182,8 +183,27 @@ class QuickIntegrationFrame(BaseFrame):
             self._new_mask_file_selection
         )
 
-    @QtCore.Slot(str, object)
-    def open_image(self, filename: Union[str, Path], kwargs: dict):
+    def finalize_ui(self):
+        """
+        Finalizes the UI and restore the SelectImageFrameWidgets params.
+        """
+        self._widgets["file_selector"].restore_param_widgets()
+
+    def restore_state(self, state: dict):
+        """
+        Restore the GUI state.
+
+        Parameters
+        ----------
+        state : dict
+            The frame's state dictionary.
+        """
+        BaseFrame.restore_state(self, state)
+        if self._config["built"]:
+            self._widgets["file_selector"].restore_param_widgets()
+
+    @QtCore.Slot(str, dict)
+    def open_image(self, filename: Union[str, Path], open_image_kwargs: dict):
         """
         Open an image with the given filename and display it in the plot.
 
@@ -192,10 +212,10 @@ class QuickIntegrationFrame(BaseFrame):
         filename : Union[str, Path]
             The filename and path. The QSignal only takes strings but if the method
             is called directly, Paths are also an acceptable input.
-        kwargs : dict
+        open_image_kwargs : dict
             Additional parameters to open a specific frame in a file.
         """
-        self._image = import_data(filename, **kwargs)
+        self._image = import_data(filename, **open_image_kwargs)
         self._EXP.set_param_value("detector_npixx", self._image.shape[1])
         self._EXP.set_param_value("detector_npixy", self._image.shape[0])
         self._widgets["input_plot"].plot_pydidas_dataset(self._image)
@@ -239,7 +259,7 @@ class QuickIntegrationFrame(BaseFrame):
         self.param_widgets["detector_model"].update_choices(
             _det_models + ["Custom detector"]
         )
-        self._change_detector_model(_model)
+        self._change_detector_model()
 
     def set_param_value_and_widget(self, key, value):
         """
@@ -315,15 +335,10 @@ class QuickIntegrationFrame(BaseFrame):
         self._update_beamcenter(None)
         self._config["previous_det_pxsize"] = _pxsize
 
-    @QtCore.Slot(str)
-    def _change_detector_model(self, model: str):
+    @QtCore.Slot()
+    def _change_detector_model(self):
         """
         Process a manual change of the detector model.
-
-        Parameters
-        ----------
-        model : str
-            The name of the new detector model.
         """
         _det_model = self.get_param_value("detector_model")
         if _det_model == "Custom detector":
@@ -344,7 +359,7 @@ class QuickIntegrationFrame(BaseFrame):
     @QtCore.Slot(str)
     def _new_mask_file_selection(self, mask_filename: str):
         """
-        Propagate the new mask to the beamcente controller.
+        Propagate the new mask to the beamcenter controller.
 
         Parameters
         ----------
@@ -439,7 +454,7 @@ class QuickIntegrationFrame(BaseFrame):
 
     def _copy_diffraction_exp(self):
         """
-        Copy the DiffracctionExperiment configuration from the Workflow context.
+        Copy the DiffractionExperiment configuration from the Workflow context.
         """
         for _key, _param in EXP.params.items():
             self._EXP.set_param_value(_key, _param.value)

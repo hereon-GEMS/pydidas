@@ -88,7 +88,7 @@ class SubtractBackgroundImage(ProcPlugin):
             _bg_fname,
             dataset=self.get_param_value("bg_hdf5_key"),
             frame=self.get_param_value("bg_hdf5_frame"),
-            slicing_axes=[0],
+            indices=[0],
         )
         if self.get_param_value("multiplicator") != 1.0:
             self._bg_image *= self.get_param_value("multiplicator")

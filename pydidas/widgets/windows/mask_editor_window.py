@@ -28,16 +28,15 @@ __status__ = "Production"
 __all__ = ["MaskEditorWindow"]
 
 
-import os
-
 from qtpy import QtCore, QtWidgets
 
-from ...core import UserConfigError, get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
-from ...core.utils import get_extension, update_size_policy
+from ...core import get_generic_param_collection
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from ...core.utils import update_size_policy
 from ...data_io import import_data
-from .. import dialogues, parameter_config, silx_plot
+from .. import parameter_config, silx_plot
 from ..framework import PydidasWindow
+from ..misc import SelectImageFrameWidget
 
 
 class MaskEditorWindow(PydidasWindow):
@@ -47,9 +46,7 @@ class MaskEditorWindow(PydidasWindow):
 
     show_frame = False
     default_params = get_generic_param_collection(
-        "filename",
-        "hdf5_key",
-        "hdf5_frame",
+        "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis"
     )
 
     def __init__(self, **kwargs: dict):
@@ -74,27 +71,11 @@ class MaskEditorWindow(PydidasWindow):
             bold=True,
             parent_widget=self._widgets["param_frame"],
         )
-        self.create_param_widget(
-            self.params["filename"],
+        self.add_any_widget(
+            "file_selector",
+            SelectImageFrameWidget(*self.params.values()),
+            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["param_frame"],
-            linebreak=True,
-        )
-        self.create_param_widget(
-            self.params["hdf5_key"],
-            parent_widget=self._widgets["param_frame"],
-            visible=False,
-            linebreak=True,
-        )
-        self.create_param_widget(
-            self.params["hdf5_frame"],
-            parent_widget=self._widgets["param_frame"],
-            visible=False,
-        )
-        self.create_button(
-            "button_open_file",
-            "Open selected image file",
-            parent_widget=self._widgets["param_frame"],
-            enabled=False,
         )
         self.create_spacer(None, parent_widget=self._widgets["param_frame"])
         self.create_label(
@@ -122,47 +103,21 @@ class MaskEditorWindow(PydidasWindow):
         """
         Build the frame and create all widgets.
         """
-        self._widgets["button_open_file"].clicked.connect(self._open_new_file)
-        self.param_widgets["filename"].io_edited.connect(self.__selected_filename)
+        self._widgets["file_selector"].sig_new_file_selection.connect(
+            self._open_new_file
+        )
 
-    @QtCore.Slot(str)
-    def __selected_filename(self, fname):
+    @QtCore.Slot(str, dict)
+    def _open_new_file(self, fname: str, input_options: dict):
         """
-        Perform required actions after selecting the image filename.
-
-        This method checks whether a hdf5 file has been selected and shows/
-        hides the required fields for selecting the dataset or the last file
-        in case of a file series.
-        If a hdf5 image file has been selected, this method also opens a
-        pop-up for dataset selection.
+        Open a new file in the plot window.
 
         Parameters
         ----------
         fname : str
-            The filename of the first image file.
+            The filename of the image file.
+        input_options : dict
+            Any additional input options.
         """
-        if not os.path.isfile(fname):
-            return
-        self._widgets["button_open_file"].setEnabled(True)
-        hdf5_flag = get_extension(self.get_param_value("filename")) in HDF5_EXTENSIONS
-        for _key in ["hdf5_key", "hdf5_frame"]:
-            self.toggle_param_widget_visibility(_key, hdf5_flag)
-            self.param_widgets[_key].set_value(self.params[_key].default)
-        if not hdf5_flag:
-            return
-        dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
-        if dset is not None:
-            self.set_param_value_and_widget("hdf5_key", dset)
-
-    @QtCore.Slot()
-    def _open_new_file(self):
-        """
-        Open a new file in the plot window.
-        """
-        _fname = self.get_param_value("filename")
-        if not os.path.isfile(_fname):
-            raise UserConfigError("The selected file cannot be found.")
-        _dset = self.get_param_value("hdf5_key")
-        _frame = self.get_param_value("hdf5_frame")
-        _data = import_data(_fname, dataset=_dset, frame=_frame)
+        _data = import_data(fname, **input_options)
         self._widgets["plot_2d"].addImage(_data)

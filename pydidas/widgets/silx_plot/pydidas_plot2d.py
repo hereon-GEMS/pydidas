@@ -31,6 +31,7 @@ __all__ = ["PydidasPlot2D"]
 import inspect
 from functools import partial
 
+import numpy as np
 from qtpy import QtCore
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
@@ -38,7 +39,7 @@ from silx.gui.plot import Plot2D
 from pydidas_qtcore import PydidasQApplication
 
 from ...contexts import DiffractionExperimentContext
-from ...core import Dataset, PydidasQsettingsMixin
+from ...core import Dataset, PydidasQsettingsMixin, UserConfigError
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .silx_actions import (
@@ -250,6 +251,29 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             return
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
+    def addImage(self, data: np.ndarray, **kwargs: dict):
+        """
+        Add an image to the plot.
+
+        This method implements an additional dimensionality check before passing
+        the image to the Plot2d.addImage method.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data to be displayed.
+
+        **kwargs : dict
+            Any supported Plot2d.addImage keyword arguments.
+        """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition:\n The input data has {data.ndim} "
+                "dimensions."
+            )
+        Plot2D.addImage(self, data, **kwargs)
+
     def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
         """
         Plot a pydidas dataset.
@@ -261,6 +285,11 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Additional keyword arguments to be passed to the silx plot method.
         """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition. (input data has {data.ndim} dimensions)"
+            )
         _has_detector_image_shape = data.shape == (
             self._config["diffraction_exp"].get_param_value("detector_npixy"),
             self._config["diffraction_exp"].get_param_value("detector_npixx"),

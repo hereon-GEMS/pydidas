@@ -56,9 +56,13 @@ _DEFAULTS = ParameterCollection(
         "filename",
         "hdf5_key",
         "hdf5_frame",
+        "hdf5_slicing_axis",
         "current_filename",
     ),
 )
+
+
+_OPS = {"+": np.add, "-": np.subtract, "/": np.divide, "x": np.multiply}
 
 
 class ImageMathFrame(BaseFrame):
@@ -132,8 +136,27 @@ class ImageMathFrame(BaseFrame):
         )
         self._widgets["but_export"].clicked.connect(self._export_image)
 
-    @QtCore.Slot(str, object)
-    def open_image(self, filename: str, kwargs: dict):
+    def finalize_ui(self):
+        """
+        Finalizes the UI and restore the SelectImageFrameWidgets params.
+        """
+        self._widgets["file_selector"].restore_param_widgets()
+
+    def restore_state(self, state: dict):
+        """
+        Restore the GUI state.
+
+        Parameters
+        ----------
+        state : dict
+            The frame's state dictionary.
+        """
+        BaseFrame.restore_state(self, state)
+        if self._config["built"]:
+            self._widgets["file_selector"].restore_param_widgets()
+
+    @QtCore.Slot(str, dict)
+    def open_image(self, filename: str, open_kwargs: dict):
         """
         Open an image with the given filename and display it in the plot.
 
@@ -141,7 +164,7 @@ class ImageMathFrame(BaseFrame):
         ----------
         filename : Union[str, Path]
             The filename and path.
-        kwargs : dict
+        open_kwargs : dict
             Additional parameters to open a specific frame in a file.
         """
         _fname = Path(filename).name
@@ -150,7 +173,7 @@ class ImageMathFrame(BaseFrame):
                 f"::{self.get_param_value('hdf5_key', dtype=str)}"
                 f"::{self.get_param_value('hdf5_frame')}"
             )
-        self._input["data"] = import_data(filename, **kwargs).astype(np.float32)
+        self._input["data"] = import_data(filename, **open_kwargs).astype(np.float32)
         self._input["name"] = _fname
         self._input["path"] = filename
         self._plot_image(input_data=True)
@@ -256,26 +279,19 @@ class ImageMathFrame(BaseFrame):
         _index_out = int(
             self._widgets["ops_arithmetic_target"].currentText().split("#")[1]
         )
-        _ops = self._widgets["combo_ops_arithmetic_operation"].currentText()
+        _ops_key = self._widgets["combo_ops_arithmetic_operation"].currentText()
         _number = self._widgets["io_ops_arithmetic_input"].text()
         try:
             _number = float(_number)
         except ValueError as _err:
             raise UserConfigError(
-                f"Cannot convert the input '{_number}' to a number. Please check the "
-                "given input"
+                f"Cannot convert the input `{_number}` to a number. Please check the "
+                "given input."
             ) from _err
         _input = self.get_input_image(
             self._widgets["combo_ops_arithmetic_input"].currentText()
         )
-        if _ops == "+":
-            self._image_buffer[_index_out] = _input + _number
-        elif _ops == "-":
-            self._image_buffer[_index_out] = _input - _number
-        if _ops == "/":
-            self._image_buffer[_index_out] = _input / _number
-        elif _ops == "x":
-            self._image_buffer[_index_out] = _input * _number
+        self._image_buffer[_index_out] = _OPS[_ops_key](_input, _number)
         self.new_buffer_selection(f"Image #{_index_out}")
 
     def get_input_image(self, label: str) -> np.ndarray:
@@ -308,7 +324,7 @@ class ImageMathFrame(BaseFrame):
             _image = self._image_buffer[_num]
         if _image is None:
             raise UserConfigError(
-                f"The selected input image '{label}' is not a valid image. Please "
+                f"The selected input image `{label}` is not a valid image. Please "
                 "check the input settings."
             )
         return _image
@@ -360,7 +376,7 @@ class ImageMathFrame(BaseFrame):
         _index_out = int(
             self._widgets["ops_image_arithmetic_target"].currentText().split("#")[1]
         )
-        _ops = self._widgets["combo_ops_image_arithmetic_operation"].currentText()
+        _ops_key = self._widgets["combo_ops_image_arithmetic_operation"].currentText()
         _input1 = self.get_input_image(
             self._widgets["combo_ops_image_arithmetic_input_1"].currentText()
         )
@@ -372,14 +388,7 @@ class ImageMathFrame(BaseFrame):
                 "The selected images have different shapes and cannot be processed. "
                 "Please select two images with the same shape."
             )
-        if _ops == "+":
-            self._image_buffer[_index_out] = _input1 + _input2
-        elif _ops == "-":
-            self._image_buffer[_index_out] = _input1 - _input2
-        if _ops == "/":
-            self._image_buffer[_index_out] = _input1 / _input2
-        elif _ops == "x":
-            self._image_buffer[_index_out] = _input1 * _input2
+        self._image_buffer[_index_out] = _OPS[_ops_key](_input1, _input2)
         self.new_buffer_selection(f"Image #{_index_out}")
 
     @QtCore.Slot()

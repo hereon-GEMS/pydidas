@@ -58,8 +58,7 @@ class TestInputPlugin(InputPlugin):
         _frame = index * SCAN.get_param_value(
             "scan_index_stepping"
         ) + SCAN.get_param_value("scan_start_index")
-        kwargs["frame"] = _frame
-        kwargs["slicing_axes"] = [0]
+        kwargs["indices"] = (_frame,)
         return import_data(self.filename_string, **kwargs), kwargs
 
     def update_filename_string(self):

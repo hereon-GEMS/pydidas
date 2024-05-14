@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the InputPlugin base class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -77,12 +77,12 @@ class InputPlugin(BasePlugin):
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
-        self.__setup_image_magedata_manager()
+        self.__setup_image_metadata_manager()
         self._original_input_shape = None
 
-    def __setup_image_magedata_manager(self):
+    def __setup_image_metadata_manager(self):
         """
-        Setup the ImageMetadataManager to determine the shape of the final
+        Set up the ImageMetadataManager to determine the shape of the final
         image.
 
         The shape of the final image is required to determine the shape of

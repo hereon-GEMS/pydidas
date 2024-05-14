@@ -45,9 +45,9 @@ class TestDirectorySpyApp(unittest.TestCase):
     def setUp(self):
         self._path = tempfile.mkdtemp()
         self._pname = "test_12345_#####_suffix.npy"
-        self._ppath = os.path.join(self._path, self._pname)
+        _full_path = os.path.join(self._path, self._pname)
         self._glob_str = self._pname.replace("#####", "*")
-        self._full_glob_str = self._ppath.replace("#####", "*")
+        self._full_glob_str = _full_path.replace("#####", "*")
         self._shape = (20, 20)
         self._mask = np.asarray(
             [
@@ -72,7 +72,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         pattern = pattern.replace("#" * _len_pattern, "{:0" + str(_len_pattern) + "d}")
         _names = []
         for _index in range(n):
-            _data = np.random.random((self._shape))
+            _data = np.random.random(self._shape)
             _fpath = os.path.join(self._path, pattern.format(_index))
             np.save(_fpath, _data)
             _names.append(_fpath)
@@ -89,7 +89,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value("directory_path", self._path)
         app.set_param_value("filename_pattern", "names_with_###_patterns.tif")
         app.prepare_run()
-        app._det_mask = np.zeros((self._shape))
+        app._det_mask = np.zeros(self._shape)
         return app
 
     def create_hdf5_image(self):
@@ -139,8 +139,8 @@ class TestDirectorySpyApp(unittest.TestCase):
         _image = self.get_test_image()
         app = DirectorySpyApp(_param)
         app._det_mask = None
-        _newimage = app._apply_mask(_image)
-        self.assertTrue(np.allclose(_image, _newimage))
+        _new_image = app._apply_mask(_image)
+        self.assertTrue(np.allclose(_image, _new_image))
 
     def test_apply_mask__with_mask(self):
         _val = 42
@@ -148,8 +148,8 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._det_mask = self._mask
         app.set_param_value("detector_mask_val", _val)
         _image = self.get_test_image()
-        _newimage = app._apply_mask(_image)
-        self.assertTrue(np.allclose(_newimage[self._mask], _val))
+        _new_image = app._apply_mask(_image)
+        self.assertTrue(np.allclose(_new_image[self._mask], _val))
 
     def test_get_detector_mask__no_mask(self):
         _param = get_generic_parameter("use_detector_mask")
@@ -370,7 +370,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._load_bg_file()
         self.assertTrue((_data == app._bg_image).all())
 
-    def test_load_bg_file__nosuchfile(self):
+    def test_load_bg_file__no_such_file(self):
         _fname = self.create_pattern_files(n=1)[0]
         os.remove(_fname)
         app = DirectorySpyApp()
@@ -391,7 +391,15 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._load_bg_file()
         self.assertTrue((_data == app._bg_image).all())
 
-    def test_define_path_and_name__with_scanforall(self):
+    def test_load_bg_file__wrong_shape(self):
+        _fname = self.create_pattern_files(n=1)[0]
+        np.save(_fname, np.zeros((10, 10, 10)))
+        app = DirectorySpyApp()
+        app.set_param_value("bg_file", _fname)
+        with self.assertRaises(UserConfigError):
+            app._load_bg_file()
+
+    def test_define_path_and_name__with_scan_for_all(self):
         app = DirectorySpyApp()
         app.set_param_value("scan_for_all", True)
         app.set_param_value("directory_path", self._path)
@@ -478,7 +486,29 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value("hdf5_key", _dset)
         app._DirectorySpyApp__update_hdf5_metadata(_fname)
         _meta = app._DirectorySpyApp__read_image_meta
-        self.assertEqual(_meta["frame"], _shape[0] - 1)
+        self.assertEqual(_meta["indices"], (_shape[0] - 1,))
+        self.assertEqual(_meta["dataset"], _dset)
+
+    def test_update_hdf5_metadata__w_slice_ax(self):
+        _fname, _dset, _shape = self.create_hdf5_image()
+        app = self.create_default_app()
+        for _ax in [1, 2]:
+            with self.subTest(axis=_ax):
+                app.set_param_value("hdf5_key", _dset)
+                app.set_param_value("hdf5_slicing_axis", _ax)
+                app._DirectorySpyApp__update_hdf5_metadata(_fname)
+                _meta = app._DirectorySpyApp__read_image_meta
+                self.assertEqual(_meta["indices"], (None,) * _ax + (_shape[1] - 1,))
+                self.assertEqual(_meta["dataset"], _dset)
+
+    def test_update_hdf5_metadata__no_slice_ax(self):
+        _fname, _dset, _shape = self.create_hdf5_image()
+        app = self.create_default_app()
+        app.set_param_value("hdf5_key", _dset)
+        app.set_param_value("hdf5_slicing_axis", None)
+        app._DirectorySpyApp__update_hdf5_metadata(_fname)
+        _meta = app._DirectorySpyApp__read_image_meta
+        self.assertEqual(_meta["indices"], None)
         self.assertEqual(_meta["dataset"], _dset)
 
     def test_get_image__simple_image(self):
@@ -487,6 +517,13 @@ class TestDirectorySpyApp(unittest.TestCase):
         _data = np.load(_fname)
         _image = app.get_image(_fname)
         self.assertTrue((_data == _image).all())
+
+    def test_get_image__high_dim_image(self):
+        app = self.create_default_app()
+        _fname = self.create_pattern_files(n=1)[0]
+        np.save(_fname, np.zeros((10, 10, 10)))
+        with self.assertRaises(UserConfigError):
+            app.get_image(_fname)
 
     def test_get_image__hdf5_image(self):
         _fname, _dset, _shape = self.create_hdf5_image()

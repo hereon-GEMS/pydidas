@@ -35,13 +35,9 @@ import h5py
 import numpy as np
 
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
-from pydidas.core import Dataset
-from pydidas.core.utils import (
-    create_hdf5_dataset,
-    get_random_string,
-    read_and_decode_hdf5_dataset,
-)
-from pydidas.unittest_objects import create_hdf5_io_file
+from pydidas.core import Dataset, UserConfigError
+from pydidas.core.utils import get_random_string, read_and_decode_hdf5_dataset
+from pydidas.unittest_objects import create_hdf5_results_file
 from pydidas.workflow import WorkflowResults, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.result_io.workflow_result_io_hdf5 import WorkflowResultIoHdf5
@@ -98,7 +94,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
         )
         cls._io_node_label = get_random_string(9)
         cls._import_plugin_name = get_random_string(8)
-        create_hdf5_io_file(
+        create_hdf5_results_file(
             cls._import_test_filename,
             cls._data,
             SCAN.get_param_values_as_dict(filter_types_for_export=True),
@@ -307,7 +303,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             self._import_test_filename
         )
         self.assertEqual(_node_info["node_label"], self._io_node_label)
-        self.assertEqual(_node_info["data_label"], self._data.data_label)
+        self.assertEqual(_data.data_label, self._data.data_label)
         for _ax in range(_data.ndim):
             self.assertEqual(self._data.axis_labels[_ax], _data.axis_labels[_ax])
             self.assertEqual(self._data.axis_units[_ax], _data.axis_units[_ax])
@@ -322,23 +318,17 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
         for _key, _param in SCAN.params.items():
             self.assertEqual(_param.value, _scan.get_param_value(_key))
 
-    def test_import_results_from_file__with_None(self):
+    def test_import_results_from_file__with_missing_data(self):
         _new_name = os.path.join(self._dir, "import_test_with_None.h5")
         shutil.copy(self._import_test_filename, _new_name)
         with h5py.File(_new_name, "r+") as _file:
-            del _file["entry/scan/dim_0/range"]
-            create_hdf5_dataset(_file, "entry/scan/dim_0", "range", data=None)
-            del _file["entry/scan/dim_0/unit"]
-            create_hdf5_dataset(_file, "entry/scan/dim_0", "unit", data=None)
-            del _file["entry/scan/dim_0/label"]
-            create_hdf5_dataset(_file, "entry/scan/dim_0", "label", data=None)
-        _data, _node_info, _scan, _exp, _tree = H5SAVER.import_results_from_file(
-            _new_name
-        )
-        for _key, _param in EXP.params.items():
-            self.assertEqual(_param.value, _exp.get_param_value(_key))
-        for _key, _param in SCAN.params.items():
-            self.assertEqual(_param.value, _scan.get_param_value(_key))
+            del _file["entry/pydidas_config/scan/scan_dim0_n_points"]
+            del _file["entry/pydidas_config/scan/scan_dim0_unit"]
+            del _file["entry/pydidas_config/scan/scan_dim0_label"]
+        with self.assertRaises(UserConfigError):
+            _data, _node_info, _scan, _exp, _tree = H5SAVER.import_results_from_file(
+                _new_name
+            )
 
 
 if __name__ == "__main__":

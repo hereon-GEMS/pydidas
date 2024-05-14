@@ -54,6 +54,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         "filename",
         "hdf5_key",
         "hdf5_frame",
+        "hdf5_slicing_axis",
         "beamcenter_x",
         "beamcenter_y",
         "overlay_color",
@@ -124,7 +125,9 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.add_any_widget(
             "image_selection",
             SelectImageFrameWidget(
-                *self.get_params("filename", "hdf5_key", "hdf5_frame"),
+                *self.get_params(
+                    "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis"
+                ),
                 import_reference="SelectPointsForBeamcenterWindow__import",
             ),
             parent_widget="left_container",

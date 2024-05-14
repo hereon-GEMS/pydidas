@@ -20,6 +20,8 @@ Improvements
       dataset instead of only a single frame.
     - Allowed to use `None` for hdf5 dataset slicing to load the full dataset.
 - Added an option to specify a required dimensionality when importing data.
+- The import_data and export_data functions now read/write the pydidas Dataset 
+  metadata to/from the file.
 
 Bugfixes
 --------

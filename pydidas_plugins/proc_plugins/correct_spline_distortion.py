@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ images with a spline-based distortion field.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -80,7 +80,10 @@ _SPLINE_PARAMS = ParameterCollection(
 
 class CorrectSplineDistortion(ProcPlugin):
     """
-    Apply a Fit2D spline correction to the input data.
+    Apply a Fit2D spline correction to the input data acquired with a FReLoN detector.
+
+    The spline file format is used as exported from Fit2D and the spline is
+    flipped up/down to have the correct orientation with respect to pyFAI.
     """
 
     plugin_name = "Correct spline distortion"

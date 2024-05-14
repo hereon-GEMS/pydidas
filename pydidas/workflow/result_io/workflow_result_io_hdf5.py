@@ -39,9 +39,10 @@ from ... import VERSION
 from ...contexts import DiffractionExperimentContext, ScanContext
 from ...contexts.diff_exp import DiffractionExperiment
 from ...contexts.scan import Scan
-from ...core import Dataset
+from ...core import Dataset, UserConfigError
 from ...core.constants import HDF5_EXTENSIONS
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
+from ...data_io import import_data
 from ..processing_tree import ProcessingTree
 from ..workflow_tree import WorkflowTree
 from .workflow_result_io_base import WorkflowResultIoBase
@@ -390,30 +391,33 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _tree = ProcessingTree()
         _scan = Scan()
         _exp = DiffractionExperiment()
+        _data = import_data(filename)
         with h5py.File(filename, "r") as _file:
-            for _key, _param in _exp.params.items():
-                _exp.set_param_value(
-                    _key,
-                    read_and_decode_hdf5_dataset(
-                        _file[f"entry/pydidas_config/diffraction_exp/{_key}"]
-                    ),
+            try:
+                for _key, _param in _exp.params.items():
+                    _exp.set_param_value(
+                        _key,
+                        read_and_decode_hdf5_dataset(
+                            _file[f"entry/pydidas_config/diffraction_exp/{_key}"]
+                        ),
+                    )
+                for _key, _param in _scan.params.items():
+                    _scan.set_param_value(
+                        _key,
+                        read_and_decode_hdf5_dataset(
+                            _file[f"entry/pydidas_config/scan/{_key}"]
+                        ),
+                    )
+                _tree.restore_from_string(
+                    read_and_decode_hdf5_dataset(_file["entry/pydidas_config/workflow"])
                 )
-            for _key, _param in _scan.params.items():
-                _scan.set_param_value(
-                    _key,
-                    read_and_decode_hdf5_dataset(
-                        _file[f"entry/pydidas_config/scan/{_key}"]
-                    ),
+            except KeyError:
+                raise UserConfigError(
+                    "The given file does not conform to the pydidas results data "
+                    "standard and cannot be imported. Please check the input file."
                 )
-            _tree.restore_from_string(
-                read_and_decode_hdf5_dataset(_file["entry/pydidas_config/workflow"])
-            )
-
-            _data = Dataset(_file["entry/data/data"][()])
             _info = {
                 "node_label": read_and_decode_hdf5_dataset(_file["entry/node_label"]),
-                "data_label": read_and_decode_hdf5_dataset(_file["entry/data_label"]),
-                "data_unit": read_and_decode_hdf5_dataset(_file["entry/data_unit"]),
                 "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),
                 "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),
             }
@@ -422,28 +426,6 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 if len(_info["node_label"]) > 0
                 else f"[{_info['plugin_name']}] (node #{_info['node_id']:03d})"
             )
-            _axlabels = []
-            _axunits = []
-            _axranges = []
-            for _dim in range(_data.ndim):
-                _rangeentry = read_and_decode_hdf5_dataset(
-                    _file[f"entry/data/axis_{_dim}/range"], return_dataset=False
-                )
-                _axranges.append(
-                    None
-                    if (isinstance(_rangeentry, bytes) and _rangeentry == b"::None::")
-                    else _rangeentry
-                )
-                _axunits.append(
-                    read_and_decode_hdf5_dataset(_file[f"entry/data/axis_{_dim}/unit"])
-                )
-                _axlabels.append(
-                    read_and_decode_hdf5_dataset(_file[f"entry/data/axis_{_dim}/label"])
-                )
-        _data.axis_units = _axunits
-        _data.axis_labels = _axlabels
-        _data.axis_ranges = _axranges
-        _data.data_label = _info["data_label"]
-        _data.data_unit = _info["data_unit"]
+
         _info["shape"] = _data.shape
         return _data, _info, _scan, _exp, _tree

@@ -172,7 +172,7 @@ def _hdf5_filename_check(item: Union[Path, str]):
     FileNotFoundError
         If the file does not exist.
     """
-    if not get_extension(item) in HDF5_EXTENSIONS:
+    if get_extension(item) not in HDF5_EXTENSIONS:
         raise TypeError(
             "The file does not have any extension registered for hdf5 files."
         )

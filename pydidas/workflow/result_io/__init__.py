@@ -56,7 +56,7 @@ _io_classes = set(
     for item in os.listdir(_dir)
     if (
         item.startswith("workflow_result_io")
-        and not item[-7:] in ["base.py", "meta.py"]
+        and item[-7:] not in ["base.py", "meta.py"]
     )
 )
 

@@ -132,7 +132,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         self._toggle_file_selected(True)
         if is_hdf5_filename(filename):
             _dsets = get_hdf5_populated_dataset_keys(filename, min_dim=2)
-            if not self.get_param_value("hdf5_key", dtype=str) in _dsets:
+            if self.get_param_value("hdf5_key", dtype=str) not in _dsets:
                 _dset = Hdf5DatasetSelectionPopup(self, filename).get_dset()
                 if _dset is not None:
                     self.set_param_value_and_widget("hdf5_key", _dset)

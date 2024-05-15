@@ -49,7 +49,6 @@ from pydidas.unittest_objects import create_plugin_class
 
 
 class TestPluginRegistry(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._dummy_path = Path(tempfile.mkdtemp())

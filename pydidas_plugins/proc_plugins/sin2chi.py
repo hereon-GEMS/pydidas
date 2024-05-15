@@ -25,3 +25,20 @@ __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm, Gudrun Lotze"
 __status__ = "Development"
+
+import os
+import h5py as h5
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.colors import LogNorm
+import matplotlib.cm as cm
+from scipy.optimize import curve_fit
+from pydidas.core import Dataset
+from pydidas.data_io import import_data
+%matplotlib inline
+
+
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import connected_components
+
+

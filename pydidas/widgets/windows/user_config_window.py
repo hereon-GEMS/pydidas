@@ -29,7 +29,7 @@ __all__ = ["UserConfigWindow"]
 
 
 from functools import partial
-from typing import Literal, Union
+from typing import Union
 
 from numpy import ceil, floor
 from qtpy import QtCore, QtGui, QtWidgets

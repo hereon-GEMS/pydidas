@@ -44,6 +44,7 @@ class Tester:
     @classmethod
     def import_from_file(cls, filename, **kwargs):
         cls._imported = [filename, kwargs]
+        return np.zeros((10, 10))
 
 
 class TestIoMaster(unittest.TestCase):
@@ -172,6 +173,12 @@ class TestIoMaster(unittest.TestCase):
         IoMaster.import_from_file(_fname, **_kws)
         self.assertEqual(Tester._imported[0], _fname)
         self.assertEqual(Tester._imported[1], _kws)
+
+    def test_import_from_file__w_forced_dim(self):
+        _fname = utils.get_random_string(24) + ".test"
+        IoMaster.register_class(Tester)
+        with self.assertRaises(UserConfigError):
+            IoMaster.import_from_file(_fname, forced_dimension=5)
 
 
 if __name__ == "__main__":

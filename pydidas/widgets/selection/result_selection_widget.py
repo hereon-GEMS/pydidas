@@ -682,6 +682,8 @@ class ResultSelectionWidget(
             )
         _loader_plugin = self._RESULTS.frozen_tree.root.plugin.copy()
         _loader_plugin._SCAN = self._RESULTS.frozen_scan
+        if _loader_plugin.filename_string == "":
+            _loader_plugin.pre_execute()
         _timeline = self.get_param_value("use_scan_timeline")
         _node_metadata = self._RESULTS.get_result_metadata(
             self._config["selected_node"], _timeline

@@ -143,7 +143,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
         parent : Union[None, QObject], optional
             The parent QObject. The default is None.
         forced_image_legend : Union[None, str], optional
-            A fixed image legend to use for enfocing the rescaling, if multiple
+            A fixed image legend to use for enforcing the rescaling, if multiple
             image items are in a plot. None defaults to the active image.
             The default is None.
     """
@@ -200,7 +200,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         parent : Union[None, QObject], optional
             The parent QObject. The default is None.
         forced_image_legend : Union[None, str], optional
-            A fixed image legend to use for enfocing the rescaling, if multiple
+            A fixed image legend to use for enforcing the rescaling, if multiple
             image items are in a plot. None defaults to the active image.
             The default is None.
     """
@@ -313,6 +313,10 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         )
         if _filename is not None:
             _image = import_data(_filename).array
+            if _image.ndim == 3:
+                _image = _image.mean(axis=0)
+            if _image.ndim != 2:
+                raise UserConfigError("The input data is not a 2D image.")
             self.parent()._setValue(filename=_filename, data=_image)
 
 

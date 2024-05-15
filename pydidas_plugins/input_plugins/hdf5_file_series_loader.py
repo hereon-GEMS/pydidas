@@ -44,7 +44,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
     start index.
 
     The final filename is
-    <SCAN base directory>/<SCAN name pattern with index subsituted for hashes>.
+    <SCAN base directory>/<SCAN name pattern with index substituted for hashes>.
 
     The dataset in the Hdf5 file is defined by the hdf5_key Parameter.
 
@@ -67,11 +67,16 @@ class Hdf5fileSeriesLoader(InputPlugin):
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection(
-        "hdf5_key", "images_per_file", "file_stepping", "_counted_images_per_file"
+        "hdf5_key",
+        "hdf5_slicing_axis",
+        "images_per_file",
+        "file_stepping",
+        "_counted_images_per_file",
     )
     input_data_dim = None
     output_data_dim = 2
     advanced_parameters = InputPlugin.advanced_parameters.copy() + [
+        "hdf5_slicing_axis",
         "images_per_file",
         "file_stepping",
     ]
@@ -82,13 +87,23 @@ class Hdf5fileSeriesLoader(InputPlugin):
         """
         InputPlugin.pre_execute(self)
         _i_per_file = self.get_param_value("images_per_file")
+        _slice_ax = self.get_param_value("hdf5_slicing_axis")
         if _i_per_file == -1:
-            _n_per_file = get_hdf5_metadata(
-                self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
-            )[0]
-            self.set_param_value("_counted_images_per_file", _n_per_file)
-        else:
-            self.set_param_value("_counted_images_per_file", _i_per_file)
+            _i_per_file = (
+                1
+                if _slice_ax is None
+                else get_hdf5_metadata(
+                    self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
+                )[_slice_ax]
+            )
+        self.set_param_value("_counted_images_per_file", _i_per_file)
+        self._standard_kwargs = {
+            "dataset": self.get_param_value("hdf5_key"),
+            "binning": self.get_param_value("binning"),
+        }
+        self._index_func = lambda i: (
+            None if _slice_ax is None else ((None,) * _slice_ax + (i,))
+        )
 
     def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -111,10 +126,11 @@ class Hdf5fileSeriesLoader(InputPlugin):
         """
         _fname = self.get_filename(frame_index)
         _hdf_index = frame_index % self.get_param_value("_counted_images_per_file")
-        kwargs["dataset"] = self.get_param_value("hdf5_key")
-        kwargs["frame"] = _hdf_index
-        kwargs["binning"] = self.get_param_value("binning")
-        _data = import_data(_fname, **kwargs)
+        kwargs = kwargs | self._standard_kwargs
+        kwargs["indices"] = self._index_func(_hdf_index)
+        _data = import_data(
+            _fname, forced_dimension=2, import_pydidas_metadata=False, **kwargs
+        )
         _data.axis_units = ["pixel", "pixel"]
         _data.axis_labels = ["detector y", "detector x"]
         return _data, kwargs
@@ -130,11 +146,12 @@ class Hdf5fileSeriesLoader(InputPlugin):
         """
         if self.filename_string == "":
             raise UserConfigError(
-                "pre_execute has not been called for Hdf5FileSeriesLoader and no "
-                "filename generator has been created."
+                "`pre_execute` has not been called for the Hdf5FileSeriesLoader plugin "
+                "and no filename generator has been created."
             )
-        _images_per_file = self.get_param_value("_counted_images_per_file")
-        _i_file = (frame_index // _images_per_file) * self.get_param_value(
-            "file_stepping"
-        ) + self._SCAN.get_param_value("scan_start_index")
+        _i_file = (
+            frame_index // self.get_param_value("_counted_images_per_file")
+        ) * self.get_param_value("file_stepping") + self._SCAN.get_param_value(
+            "scan_start_index"
+        )
         return self.filename_string.format(index=_i_file)

@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ImageSeriesOperationsWindow"]
 
-
 import numbers
 import os
 
@@ -37,7 +36,7 @@ from qtpy import QtCore, QtWidgets
 from ...core import Parameter, UserConfigError, get_generic_param_collection
 from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
 from ...core.utils import ShowBusyMouse, get_extension, get_hdf5_metadata
-from ...data_io import export_data, import_data
+from ...data_io import IoMaster, export_data, import_data
 from ...managers import FilelistManager
 from .. import dialogues
 from ..framework import PydidasWindow
@@ -52,6 +51,13 @@ _operation = Parameter(
     tooltip=("The mathematical operation to be applied to the image series."),
 )
 
+_HDF5_PARAM_KEYS = [
+    "hdf5_key",
+    "hdf5_slicing_axis",
+    "hdf5_first_image_num",
+    "hdf5_last_image_num",
+]
+
 
 class ImageSeriesOperationsWindow(PydidasWindow):
     """
@@ -63,9 +69,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
     default_params = get_generic_param_collection(
         "first_file",
         "last_file",
-        "hdf5_key",
-        "hdf5_first_image_num",
-        "hdf5_last_image_num",
+        *_HDF5_PARAM_KEYS,
         "output_fname",
     )
     default_params.add_param(_operation)
@@ -127,13 +131,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         )
         self.create_spacer(None, parent_widget="config_canvas")
         self.create_label("label_input", "Input selection", **_sub_section_config)
-        for _key in [
-            "first_file",
-            "last_file",
-            "hdf5_key",
-            "hdf5_first_image_num",
-            "hdf5_last_image_num",
-        ]:
+        for _key in ["first_file", "last_file", *_HDF5_PARAM_KEYS]:
             self.create_param_widget(self.params[_key], **get_config(_key))
 
         self.create_spacer(None)
@@ -185,9 +183,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         fname : str
             The filename of the first image file.
         """
-        self.__clear_entries(
-            ["last_file", "hdf5_key", "hdf5_first_image_num", "hdf5_last_image_num"]
-        )
+        self.__clear_entries(["last_file", *_HDF5_PARAM_KEYS])
         if not os.path.isfile(fname):
             return
         self.__update_widgets_after_selecting_first_file()
@@ -211,12 +207,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             param = self.params[_key]
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
-        for _key in [
-            "hdf5_key",
-            "hdf5_first_image_num",
-            "hdf5_last_image_num",
-            "last_file",
-        ]:
+        for _key in ["last_file", *_HDF5_PARAM_KEYS]:
             if _key in keys:
                 self.toggle_param_widget_visibility(_key, not hide)
 
@@ -226,7 +217,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         file format (hdf5 or not).
         """
         hdf5_flag = get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS
-        for _key in ["hdf5_key", "hdf5_first_image_num", "hdf5_last_image_num"]:
+        for _key in _HDF5_PARAM_KEYS:
             self.toggle_param_widget_visibility(_key, hdf5_flag)
         self.toggle_param_widget_visibility("last_file", True)
 
@@ -258,17 +249,27 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         Process the file series.
         """
+        if not IoMaster.is_extension_registered(
+            self.get_param_value("output_fname").suffix
+        ):
+            raise UserConfigError(
+                "The output filename does not have a valid extension. Please choose "
+                "a valid filename."
+            )
         self._filelist.update()
         if get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS:
             self._calculate_hdf5_frame_limits()
         _n_frames = self._filelist.n_files * self._config["num_frames_per_file"]
         _hdf5_dset = self.get_param_value("hdf5_key")
+        _base_indices = (None,) * self.get_param_value("hdf5_slicing_axis")
         self._data = None
         self._dtype = None
         with ShowBusyMouse():
             for _index in range(0, _n_frames):
-                _fname, _frame_number = self._get_fname_and_frame_number(_index)
-                _frame = import_data(_fname, dataset=_hdf5_dset, frame=_frame_number)
+                _fname, _i_frame = self._get_fname_and_frame_number(_index)
+                _frame = import_data(
+                    _fname, dataset=_hdf5_dset, indices=_base_indices + (_i_frame,)
+                )
                 if self._data is None:
                     self._data = _frame.astype(np.uint64)
                     self._dtype = _frame.dtype.type
@@ -291,7 +292,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         _key = self.get_param_value("hdf5_key")
         if _max_index == 0:
             _fname = self._filelist.get_filename(0)
-            _max_index = get_hdf5_metadata(_fname, ["shape"], dset=_key)[0]
+            _max_index = get_hdf5_metadata(_fname, ["shape"], dset=_key)[
+                self.get_param_value("hdf5_slicing_axis")
+            ]
         self._config["hdf5_frames"] = [_start_index, _max_index]
         self._config["num_frames_per_file"] = _max_index - _start_index
 

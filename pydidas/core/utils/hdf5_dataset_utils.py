@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a list of all dataset keys which fulfill certain filter criteria.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -131,7 +131,7 @@ def get_hdf5_populated_dataset_keys(
                 _datasets += [f"{item.name}/{key}"]
             if isinstance(_item, (h5py.File, h5py.Group)):
                 raise KeyError(
-                    "Detected an external link to an hdf5.Group which cannot "
+                    "Detected an external link to a hdf5.Group which cannot "
                     f"be followed: {item.name}/{key}."
                 )
     if _close_on_exit:
@@ -141,7 +141,7 @@ def get_hdf5_populated_dataset_keys(
 
 def is_hdf5_filename(filename: Union[Path, str]) -> bool:
     """
-    Check whether the given filename has an hdf5 extension.
+    Check whether the given filename has a hdf5 extension.
 
     Parameters
     ----------
@@ -172,7 +172,7 @@ def _hdf5_filename_check(item: Union[Path, str]):
     FileNotFoundError
         If the file does not exist.
     """
-    if not get_extension(item) in HDF5_EXTENSIONS:
+    if get_extension(item) not in HDF5_EXTENSIONS:
         raise TypeError(
             "The file does not have any extension registered for hdf5 files."
         )
@@ -192,7 +192,7 @@ def hdf5_dataset_check(
 
     This function checks if an item is an instance of :py:class:`h5py.Dataset`
     and if it fulfills the defined filtering criteria for minimum data size,
-    minimum data dimensionality and and filtered keys.
+    minimum data dimensionality and filtered keys.
 
     Parameters
     ----------
@@ -231,7 +231,7 @@ def _get_hdf5_file_and_dataset_names(
     fname: Union[Path, str], dset: Union[str, None] = None
 ) -> Tuple[str]:
     """
-    Get the name of the file and an hdf5 dataset.
+    Get the name of the file and a hdf5 dataset.
 
     This function will return the file name and dataset name. Input can be
     given either with file name and dataset parameters or using the hdf5
@@ -275,9 +275,9 @@ def get_hdf5_metadata(
     dset: Union[str, None] = None,
 ) -> Union[dict, object]:
     """
-    Get metadata about an hdf5 dataset.
+    Get metadata about a hdf5 dataset.
 
-    This function will return the requested metadata of an hdf5 dataset.
+    This function will return the requested metadata of a hdf5 dataset.
     Input can be given either with file name and dataset parameters or using
     the hdf5 nomenclature with <filename>://</dataset> (note the total of
     3 slashes). Dataset metadata include the following: dtype, shape, size,
@@ -330,7 +330,7 @@ def create_hdf5_dataset(
     **dset_kws: dict,
 ):
     """
-    Create an hdf5 dataset at the specified location.
+    Create a hdf5 dataset at the specified location.
 
     If the specified group does not exist, this function will create the
     necessary group for the dataset.
@@ -393,7 +393,7 @@ def read_and_decode_hdf5_dataset(
     This function reads the data from a hdf5 dataset and converts the data type,
     if necessary.
     The direct link to the dataset can be given in the h5object variable or the group
-    and dataset can be specificed separately. Note that group and dataset will only be
+    and dataset can be specified separately. Note that group and dataset will only be
     used if both group and dataset are specified.
 
     Parameters
@@ -414,10 +414,11 @@ def read_and_decode_hdf5_dataset(
     _data : object
         The data stored in the hdf5 dataset.
     """
-    if group is not None and dataset is not None:
-        _data = h5object[group][dataset][()]
-    else:
-        _data = h5object[()]
+    _data = (
+        h5object[group][dataset][()]
+        if group is not None and dataset is not None
+        else h5object[()]
+    )
     if isinstance(_data, bytes):
         _data = _data.decode("UTF-8")
         if _data == "::None::":

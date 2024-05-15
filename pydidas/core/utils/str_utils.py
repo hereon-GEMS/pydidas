@@ -309,8 +309,8 @@ def convert_special_chars_to_unicode(obj: Union[str, list]) -> Union[str, list]:
                 _parts[_index] = GREEK_ASCII_TO_UNI[_part]
         obj = " ".join(_parts)
         # insert Angstrom sign (in context of ^-1):
-        obj = obj.replace("A^-1", "\u212b\u207b\u00B9")
-        obj = obj.replace("^-1", "\u207b\u00B9")
+        obj = obj.replace("A^-1", "\u212b\u207b\u00b9")
+        obj = obj.replace("^-1", "\u207b\u00b9")
         return obj
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
@@ -342,7 +342,7 @@ def convert_unicode_to_ascii(obj: Union[str, list]) -> Union[str, list]:
                 _parts[_index] = GREEK_UNI_TO_ASCII[_part]
         obj = " ".join(_parts)
         obj = obj.replace("\u212b", "A")
-        obj = obj.replace("\u207b\u00B9", "^-1")
+        obj = obj.replace("\u207b\u00b9", "^-1")
         return obj
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 

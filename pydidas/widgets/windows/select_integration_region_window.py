@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,11 @@ integration region for a plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SelectIntegrationRegionWindow"]
-
 
 from pathlib import Path
 
@@ -51,7 +50,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     """
 
     default_params = get_generic_param_collection(
-        "filename", "hdf5_key", "hdf5_frame", "overlay_color"
+        "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis", "overlay_color"
     )
     sig_roi_changed = QtCore.Signal()
     sig_about_to_close = QtCore.Signal()
@@ -233,13 +232,13 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.sig_roi_changed.emit()
         self.close()
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtCore.QEvent):
         """
         Handle the Qt close event and add a question if closing without saving results.
 
         Parameters
         ----------
-        event : Qore.QEvent
+        event : QtCore.QEvent
             The closing event.
         """
         if self._config["closing_confirmed"]:

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ and access files based on their index.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -257,7 +257,7 @@ class FilelistManager(ObjectWithParameterCollection):
         _i1 = _list.index(_file1)
         _i2 = _list.index(_file2)
         _list = _list[_i1 : _i2 + 1 : self.get_param_value("file_stepping")]
-        if not _file1.suffix[1:] in HDF5_EXTENSIONS:
+        if _file1.suffix[1:] not in HDF5_EXTENSIONS:
             verify_files_of_range_are_same_size(_list)
         self._config["file_list"] = _list
         self._config["n_files"] = len(_list)

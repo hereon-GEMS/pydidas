@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ integration plugins using pyFAI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -308,7 +308,7 @@ class pyFAIintegrationBase(ProcPlugin):
         _intervals = (
             f"[-{PI_STR}, {PI_STR}] or [0, 2*{PI_STR}]"
             if "rad" in self.get_param_value("azi_unit")
-            else "[-180\u00B0, 180\u00B0] or [0\u00B0, 360\u00B0]"
+            else "[-180\u00b0, 180\u00b0] or [0\u00b0, 360\u00b0]"
         )
         low = np.round(low, 5)
         high = np.round(high, 5)

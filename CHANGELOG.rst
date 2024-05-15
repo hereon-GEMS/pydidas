@@ -15,7 +15,13 @@ Improvements
   invalid or missing data.
 - Separated the path for generic plugins from user-defined custom plugin paths
   for greater clarity.
-
+- Programmatic improvements:
+    - Changed the default behaviour of the hdf5 file loader to import the full
+      dataset instead of only a single frame.
+    - Allowed to use `None` for hdf5 dataset slicing to load the full dataset.
+- Added an option to specify a required dimensionality when importing data.
+- The import_data and export_data functions now read/write the pydidas Dataset 
+  metadata to/from the file.
 
 Bugfixes
 --------
@@ -28,6 +34,10 @@ Bugfixes
 - Fixed an issue with possibly joining queues twice on exit of WorkerController.
 - Fixed an issue with the `unregister_all_paths` method of the PluginRegistry
   which did not permanently remove the paths.
+- Fixed an issue in the ImageSeriesOperationsWindow where the correctness of 
+  the output filename was not checked until after the operation.
+- Fixed an issue where Dataset axis ranges could be None.
+- Fixed an issue where Dataset axis labels / units could be None.
 
 
 v24.03.25

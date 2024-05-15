@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,6 @@ import unittest
 
 import h5py
 import numpy as np
-from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError
@@ -82,8 +81,6 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._path)
-        qs = QtCore.QSettings("Hereon", "pydidas")
-        qs.remove("unittesting")
 
     def setUp(self):
         SCAN.restore_all_defaults(True)
@@ -139,8 +136,28 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         plugin.pre_execute()
         _data, kwargs = plugin.execute(_index)
         self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs["frame"], self.get_index_in_file(_index))
-        self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
+        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
+        self.assertEqual(
+            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
+        )
+
+    def test_execute__slicing_ax_1(self):
+        plugin = self.create_standard_plugin()
+        plugin.set_param_value("hdf5_slicing_axis", 1)
+        _index = 0
+        plugin.pre_execute()
+        _data, kwargs = plugin.execute(_index)
+        self.assertTrue(np.allclose(_data, self._data[: self._n_per_file, _index]))
+        self.assertEqual(
+            kwargs["indices"],
+            (
+                None,
+                self.get_index_in_file(_index),
+            ),
+        )
+        self.assertEqual(
+            _data.metadata["indices"], f"[:, {self.get_index_in_file(_index)}]"
+        )
 
     def test_execute__with_roi(self):
         plugin = self.create_standard_plugin()
@@ -150,8 +167,10 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         plugin.pre_execute()
         _data, kwargs = plugin.execute(_index)
         self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs["frame"], self.get_index_in_file(_index))
-        self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
+        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
+        self.assertEqual(
+            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
+        )
         self.assertEqual(
             _data.shape, (plugin.get_param_value("roi_yhigh"), self._img_shape[1])
         )
@@ -162,12 +181,14 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         for _index in range(self._n):
             _data, kwargs = plugin.execute(_index)
             self.assertTrue((_data == _index).all())
-            self.assertEqual(kwargs["frame"], self.get_index_in_file(_index))
-            self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
+            self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
+            self.assertEqual(
+                _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
+            )
 
     def test_pickle(self):
         plugin = self.create_standard_plugin()
-        _new_params = {get_random_string(6): get_random_string(12) for i in range(7)}
+        _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
         for _key, _val in _new_params.items():
             plugin.add_param(Parameter(_key, str, _val))
         plugin2 = pickle.loads(pickle.dumps(plugin))
@@ -176,12 +197,12 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
                 plugin.get_param_value(_key), plugin2.get_param_value(_key)
             )
 
-    def test_get_frame__no_preexec(self):
+    def test_get_frame__no_pre_exec(self):
         plugin = self.create_standard_plugin()
         with self.assertRaises(UserConfigError):
             plugin.get_frame(0)
 
-    def test_get_frame__w_preexec(self):
+    def test_get_frame__w_pre_exec(self):
         plugin = self.create_standard_plugin()
         plugin.pre_execute()
         _data, kwargs = plugin.get_frame(0)

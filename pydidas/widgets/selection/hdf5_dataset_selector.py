@@ -210,8 +210,8 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         )
         _combo = self._widgets["select_dataset"]
         with QtCore.QSignalBlocker(self._widgets["select_dataset"]):
-            self._widgets["select_dataset"].clear()
-            self._widgets["select_dataset"].addItems(_datasets)
+            _combo.clear()
+            _combo.addItems(_datasets)
         if len(_datasets) > 0:
             _items = [_combo.itemText(i) for i in range(_combo.count())]
             _combo.view().setMinimumWidth(get_max_pixel_width_of_entries(_items) + 50)
@@ -272,6 +272,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         _dset = self._widgets["select_dataset"].currentText()
         if _dset == "":
             self._frame = None
+            return
         with h5py.File(self._config["current_filename"], "r") as _file:
             _dset = _file[_dset]
             _ndim = len(_dset.shape)

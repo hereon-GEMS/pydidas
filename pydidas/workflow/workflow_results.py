@@ -748,10 +748,10 @@ class WorkflowResults(QtCore.QObject):
                     _id: _item["node_label"] for _id, _item in _node_info.items()
                 },
                 "data_labels": {
-                    _id: _item["data_label"] for _id, _item in _node_info.items()
+                    _id: _dataset.data_label for _id, _dataset in _data.items()
                 },
                 "data_units": {
-                    _id: _item["data_unit"] for _id, _item in _node_info.items()
+                    _id: _dataset.data_unit for _id, _dataset in _data.items()
                 },
                 "plugin_names": {
                     _id: _item["plugin_name"] for _id, _item in _node_info.items()

@@ -250,6 +250,3 @@ urllib3==2.2.1
     #   requests
 wheel==0.43.0
     # via pydidas (pyproject.toml)
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

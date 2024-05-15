@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -41,7 +41,7 @@ class TestImageMetadataManager(unittest.TestCase):
     def setUp(self):
         self._dsize = 40
         self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:03d}.npy"))
+        self._fname = lambda _i: Path(os.path.join(self._path, f"test_{_i:03d}.npy"))
         self._img_shape = (32, 35)
         self._data = np.random.random((self._dsize,) + self._img_shape)
         for i in range(self._dsize):
@@ -293,6 +293,16 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm._config["raw_img_shape_y"], self._img_shape[0])
         self.assertEqual(imm._config["numbers"], range(self._dsize))
         self.assertEqual(imm._config["images_per_file"], self._dsize)
+
+    def test_store_image_data_from_hdf5__slice_ax_1(self):
+        imm = ImageMetadataManager(hdf5_slicing_axis=1)
+        imm.filename = self._hdf5_fname
+        imm._store_image_data_from_hdf5_file()
+        self.assertEqual(imm._config["datatype"], self._data.dtype)
+        self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
+        self.assertEqual(imm._config["raw_img_shape_y"], self._dsize)
+        self.assertEqual(imm._config["numbers"], range(self._img_shape[0]))
+        self.assertEqual(imm._config["images_per_file"], self._img_shape[0])
 
     def test_store_image_data_from_hdf5__wrong_key(self):
         imm = ImageMetadataManager()

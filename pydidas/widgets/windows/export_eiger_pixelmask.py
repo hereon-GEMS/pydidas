@@ -96,9 +96,8 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
             linebreak=True,
             parent_widget="config_canvas",
         )
-        self.param_widgets["output_filename"]._file_selection = (
-            IoMaster.get_string_of_formats("export")
-        )
+        _supported_formats = IoMaster.get_string_of_formats("export")
+        self.param_widgets["output_filename"]._file_selection = _supported_formats
 
         self.create_button(
             "but_exec", "Export pixelmask", parent_widget="config_canvas"

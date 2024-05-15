@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ images from single Hdf5 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,14 +30,12 @@ __all__ = ["EigerScanSeriesLoader"]
 
 import os
 
-from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
+from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core.utils import copy_docstring, get_hdf5_metadata
-from pydidas.data_io import import_data
-from pydidas.plugins import InputPlugin
+from pydidas_plugins.input_plugins.hdf5_file_series_loader import Hdf5fileSeriesLoader
 
 
-class EigerScanSeriesLoader(InputPlugin):
+class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
     """
     Load data frames from an Eiger scan series with files in different directories.
 
@@ -68,40 +66,19 @@ class EigerScanSeriesLoader(InputPlugin):
         of images per file based on the first file. The default is -1.
     live_processing : bool, optional
         Flag to toggle file system checks. In live_processing mode, checks
-        for the size and existance of files are disabled. The default is False.
+        for the size and existence of files are disabled. The default is False.
     """
 
     plugin_name = "Eiger scan series loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
-    default_params = get_generic_param_collection(
-        "eiger_dir",
-        "eiger_filename_suffix",
-        "hdf5_key",
+    default_params = get_generic_param_collection("eiger_dir", "eiger_filename_suffix")
+    default_params.add_params(Hdf5fileSeriesLoader.default_params.copy())
+
+    advanced_parameters = Hdf5fileSeriesLoader.advanced_parameters.copy() + [
+        "hdf5_slicing_axis",
         "images_per_file",
-        "_counted_images_per_file",
-    )
-    input_data_dim = None
-    output_data_dim = 2
-    advanced_parameters = InputPlugin.advanced_parameters.copy() + ["images_per_file"]
-
-    def __init__(self, *args: tuple, **kwargs: dict):
-        super().__init__(*args, **kwargs)
-        self.filename_string = ""
-
-    def pre_execute(self):
-        """
-        Prepare loading images from a file series.
-        """
-        InputPlugin.pre_execute(self)
-        _i_per_file = self.get_param_value("images_per_file")
-        if _i_per_file == -1:
-            _n_per_file = get_hdf5_metadata(
-                self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
-            )[0]
-            self.set_param_value("_counted_images_per_file", _n_per_file)
-        else:
-            self.set_param_value("_counted_images_per_file", _i_per_file)
+    ]
 
     def update_filename_string(self):
         """
@@ -120,49 +97,3 @@ class EigerScanSeriesLoader(InputPlugin):
         self.filename_string = _name.replace(
             "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
         )
-
-    def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
-        """
-        Load a frame and pass it on.
-
-        Parameters
-        ----------
-        frame_index : int
-            The frame index.
-        **kwargs : dict
-            Any calling keyword arguments. Can be used to apply a ROI or
-            binning to the raw image.
-
-        Returns
-        -------
-        data : pydidas.core.Dataset
-            The image data.
-        kwargs : dict
-            The updated keyword arguments used for loading the frame.
-        """
-        _fname = self.get_filename(frame_index)
-        _hdf_index = frame_index % self.get_param_value("_counted_images_per_file")
-        kwargs["dataset"] = self.get_param_value("hdf5_key")
-        kwargs["frame"] = _hdf_index
-        kwargs["binning"] = self.get_param_value("binning")
-        _data = import_data(_fname, **kwargs)
-        _data.axis_units = ["pixel", "pixel"]
-        _data.axis_labels = ["detector y", "detector x"]
-        return _data, kwargs
-
-    @copy_docstring(InputPlugin)
-    def get_filename(self, frame_index: int) -> str:
-        """
-        For the full docstring, please refer to the
-        :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
-        <InputPlugin>` class.
-        """
-        if self.filename_string == "":
-            raise UserConfigError(
-                "pre_execute has not been called for EigerScanSeriesLoader and no "
-                "filename generator has been created."
-            )
-        _i_file = frame_index // self.get_param_value(
-            "_counted_images_per_file"
-        ) + self._SCAN.get_param_value("scan_start_index")
-        return self.filename_string.format(index=_i_file)

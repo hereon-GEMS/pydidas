@@ -83,7 +83,6 @@ class ViewResultsFrameBuilder:
             select_results_param=frame.get_param("selected_results"),
             workflow_results=frame._RESULTS,
         )
-        # frame.create_line("line_export", parent_widget="config")
         frame.create_param_widget(
             frame.get_param("saving_format"),
             parent_widget="config",

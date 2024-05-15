@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DirectorySpyApp"]
 
-
 import glob
 import multiprocessing as mp
 import os
@@ -73,7 +72,7 @@ class DirectorySpyApp(BaseApp):
 
     scan_for_all : bool, optional
         Flag to toggle scanning for all new files or only for files matching
-        the input pattern (defined with the Paramteter `filename_pattern`).
+        the input pattern (defined with the Parameter `filename_pattern`).
         The default is False.
     filename_pattern : pathlib.Path, optional
         The pattern of the filename. Use hashes "#" for wildcards which will
@@ -81,7 +80,7 @@ class DirectorySpyApp(BaseApp):
         is False. The default is an empty Path().
     directory_path : pathlib.Path, optional
         The absolute path of the directory to be used. This Parameter is only
-        used when `scan_for_all` is True but it is mandatory then. The default
+        used when `scan_for_all` is True, but it is mandatory then. The default
         is an empty Path().
     hdf5_key : Hdf5key, optional
         Used only for hdf5 files: The dataset key. The default is
@@ -122,6 +121,7 @@ class DirectorySpyApp(BaseApp):
         "filename_pattern",
         "directory_path",
         "hdf5_key",
+        "hdf5_slicing_axis",
         "use_detector_mask",
         "detector_mask_file",
         "detector_mask_val",
@@ -261,11 +261,23 @@ class DirectorySpyApp(BaseApp):
         _params = {}
         if get_extension(_bg_file) in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
+            _slice_ax = self.get_param_value("hdf5_slicing_axis")
             _params = {
                 "dataset": self.get_param_value("bg_hdf5_key"),
-                "frame": self.get_param_value("bg_hdf5_frame"),
+                "indices": (
+                    None
+                    if _slice_ax is None
+                    else (
+                        (None,) * _slice_ax + (self.get_param_value("bg_hdf5_frame"),)
+                    )
+                ),
             }
         _bg_image = import_data(_bg_file, **_params)
+        if _bg_image.ndim != 2:
+            raise UserConfigError(
+                "The background image is not an image with 2 dimensions. Please check "
+                "the configuration."
+            )
         self._bg_image = self._apply_mask(_bg_image)
 
     def _apply_mask(self, image: np.ndarray) -> np.ndarray:
@@ -406,7 +418,7 @@ class DirectorySpyApp(BaseApp):
 
     def multiprocessing_post_run(self):
         """
-        Perform operatinos after running main parallel processing function.
+        Perform operations after running main parallel processing function.
         """
 
     def multiprocessing_get_tasks(self):
@@ -423,7 +435,7 @@ class DirectorySpyApp(BaseApp):
         Parameters
         ----------
         index : int
-            The image iamge.
+            The image index.
         """
         return
 
@@ -482,7 +494,8 @@ class DirectorySpyApp(BaseApp):
             fname = str(fname)
         if get_extension(fname) in HDF5_EXTENSIONS:
             self.__update_hdf5_metadata(fname)
-        return import_data(fname, **self.__read_image_meta)
+        _data = import_data(fname, forced_dimension=2, **self.__read_image_meta)
+        return _data
 
     def __update_hdf5_metadata(self, fname: str):
         """
@@ -500,7 +513,16 @@ class DirectorySpyApp(BaseApp):
         """
         _dataset = self.get_param_value("hdf5_key")
         _shape = get_hdf5_metadata(fname, meta="shape", dset=_dataset)
-        self.__read_image_meta = {"frame": _shape[0] - 1, "dataset": _dataset}
+        _slice_ax = self.get_param_value("hdf5_slicing_axis")
+        self.__read_image_meta = {
+            "indices": (
+                None
+                if _slice_ax is None
+                else ((None,) * _slice_ax + (_shape[_slice_ax] - 1,))
+            ),
+            "dataset": _dataset,
+            "import_pydidas_metadata": False,
+        }
 
     def __store_image_in_shared_memory(self, image: np.ndarray):
         """
@@ -533,7 +555,7 @@ class DirectorySpyApp(BaseApp):
         if len(self.__read_image_meta) == 0:
             return ""
         return (
-            f' (frame: {self.__read_image_meta["frame"]}, '
+            f' (frame: {self.__read_image_meta["indices"]}, '
             f'dataset: {self.__read_image_meta["dataset"]})'
         )
 
@@ -575,7 +597,7 @@ class DirectorySpyApp(BaseApp):
     @property
     def filename(self) -> str:
         """
-        Get the curently stored filename.
+        Get the currently stored filename.
 
         Returns
         -------

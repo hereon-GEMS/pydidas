@@ -34,6 +34,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal, Optional
 
+import git
+
 
 HELP_TEXT = """
 Formatting checks for pydidas
@@ -78,6 +80,16 @@ MODULE_ARGS = {
     "flake8": [],
     "reuse": ["--root", ".", "lint"],
 }
+_DIRS_TO_SKIP = [
+    ".git",
+    "__pycache__",
+    ".ruff_cache",
+    ".idea",
+    "pydidas.egg-info",
+    "dist",
+    "sphinx",
+]
+_FILES_TO_SKIP = [".coverage"]
 
 
 def _timed_print(input_str: str, new_lines: int = 0, verbose: bool = True):
@@ -199,10 +211,12 @@ class CopyrightYearUpdater:
     _regex_full = re.compile("Copyright 20[0-9][0-9] ?- ?20[0-9][0-9],")
     _regex_short = re.compile("Copyright 20[0-9][0-9],")
 
-    @staticmethod
-    def _check_git_commit_year(fname: str) -> tuple[str, int]:
+    def _check_git_commit_year(self, fname: str) -> tuple[str, int]:
         """
         Check the commit year of a file in git.
+
+        If there is not `git diff` to the current file, this method returns the commit
+        year. If there is a difference, this method returns the current year.
 
         Parameters
         ----------
@@ -214,14 +228,16 @@ class CopyrightYearUpdater:
         str
             The input filename.
         int
-            The epoch timestamp of the commit.
+            The timestamp (in years) of the last change
+            (either commit or file difference).
         """
         try:
-            _output = subprocess.check_output(
-                ["git", "--no-pager", "log", "-1", "--format=%at", fname]
-            )
-            _epoch = int(_output)
-            return fname, datetime.fromtimestamp(_epoch).year
+            _commit_epoch = self.__repo.git.log("-1", "--format=%at", fname)
+            _commit_year = datetime.fromtimestamp(int(_commit_epoch)).year
+            _diff = self.__repo.git.diff(fname)
+            if _diff == "":
+                return fname, _commit_year
+            return fname, self.THIS_YEAR
         except (subprocess.CalledProcessError, ValueError):
             return fname, -1
 
@@ -238,6 +254,7 @@ class CopyrightYearUpdater:
         self._directory = (
             Path(__file__).parent if directory is None else Path(directory)
         )
+        self.__repo = git.Repo(self._directory)
         self._timestamps = {}
         os.chdir(self._directory)
         if self._flags["autorun"]:
@@ -266,9 +283,9 @@ class CopyrightYearUpdater:
         )
         self._timestamps = self._get_all_file_timestamps()
         _outdated_files = self._check_and_update_file_copyrights()
+        _timed_print("Copyright check finished.", verbose=self._flags["verbose"])
         if self._flags["check"] and len(_outdated_files) > 0:
             sys.exit(1)
-        _timed_print("Copyright check finished.", verbose=self._flags["verbose"])
 
     def _get_all_file_timestamps(self) -> dict:
         """
@@ -308,7 +325,6 @@ class CopyrightYearUpdater:
                     self._check_git_commit_year, _git_files
                 )
             }
-
         return _timestamps
 
     def _get_unversioned_timestamps(self, git_files: Optional[dict] = None) -> dict:
@@ -332,19 +348,16 @@ class CopyrightYearUpdater:
         git_files = git_files if git_files is not None else dict()
         _unversioned_files = []
         for _base, _dirs, _files in os.walk(self._directory):
-            if ".git" in _dirs:
-                _dirs.remove(".git")
+            for _dirname in _DIRS_TO_SKIP:
+                if _dirname in _dirs:
+                    _dirs.remove(_dirname)
             for _item in _files:
                 _fname = Path(_base).joinpath(_item)
                 if (
                     _fname.is_file()
                     and _fname.suffix.lower() in self.SUFFIX_WHITELIST
-                    and (
-                        _fname in git_files
-                        and datetime.fromtimestamp(os.path.getmtime(_fname)).year
-                        == self.THIS_YEAR
-                        and git_files.get(_fname, 0) < self.THIS_YEAR
-                    )
+                    and _fname.name not in _FILES_TO_SKIP
+                    and _fname not in git_files
                 ):
                     _unversioned_files.append(_fname)
         return {
@@ -362,6 +375,7 @@ class CopyrightYearUpdater:
             A list of files which are outdated.
         """
         _outdated = []
+        _hint = "Updated" if self._flags["update"] else "Outdated"
         for _fname, _timestamp in self._timestamps.items():
             if _timestamp < self.THIS_YEAR:
                 continue
@@ -381,9 +395,7 @@ class CopyrightYearUpdater:
             if self._flags["update"]:
                 with open(_fname, "w", encoding="utf-8") as f:
                     f.write(_contents)
-                self._print(f"Updated copyright on file {_fname}")
-            else:
-                self._print(f"Outdated copyright on file {_fname}")
+            self._print(f"{_hint} copyright on file {_fname}")
         return _outdated
 
     def _update_short_regex(self, match: re.Match) -> str:

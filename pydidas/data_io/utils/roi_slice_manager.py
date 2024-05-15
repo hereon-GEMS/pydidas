@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ objects for ROI cropping.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -308,7 +308,7 @@ class RoiSliceManager:
         # strip trailing chars:
         while True:
             if _tmpstr[-1] in _valid_chars or (
-                (_tmpstr[-1] == ")" and _tmpstr.count(")") == _tmpstr.count("slice("))
+                _tmpstr[-1] == ")" and _tmpstr.count(")") == _tmpstr.count("slice(")
             ):
                 break
             _tmpstr = _tmpstr[:-1]

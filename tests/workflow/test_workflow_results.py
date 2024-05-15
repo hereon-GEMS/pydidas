@@ -45,7 +45,7 @@ from pydidas.unittest_objects import (
     DummyLoader,
     DummyProc,
     DummyProcNewDataset,
-    create_hdf5_io_file,
+    create_hdf5_results_file,
 )
 from pydidas.workflow import WorkflowResults, WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
@@ -147,7 +147,7 @@ class TestWorkflowResults(unittest.TestCase):
         )
         _node_label = get_random_string(9)
         _plugin_name = get_random_string(7)
-        create_hdf5_io_file(
+        create_hdf5_results_file(
             filename,
             _data,
             _RESULTS._SCAN.get_param_values_as_dict(filter_types_for_export=True),

@@ -68,7 +68,7 @@ _dir = __os.path.dirname(__file__)
 _io_classes = set(
     item.strip(".py")
     for item in __os.listdir(_dir)
-    if (item.startswith("diff_exp_io") and not item[-7:] in ["base.py", "meta.py"])
+    if (item.startswith("diff_exp_io") and item[-7:] not in ["base.py", "meta.py"])
 )
 
 for _module in _io_classes:

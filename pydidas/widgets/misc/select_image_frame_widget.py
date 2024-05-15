@@ -60,7 +60,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
             If None, only the
     """
 
-    sig_new_file_selection = QtCore.Signal(str, object)
+    sig_new_file_selection = QtCore.Signal(str, dict)
     sig_file_valid = QtCore.Signal(bool)
 
     def __init__(self, *input_params: tuple[Parameter, ...], **kwargs: dict):
@@ -85,6 +85,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
             visible=False,
         )
         self.create_param_widget(self.get_param("hdf5_frame"), visible=False)
+        self.create_param_widget(self.get_param("hdf5_slicing_axis"), visible=False)
         self.create_button(
             "but_confirm_file",
             "Confirm input selection",
@@ -96,6 +97,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         self.param_widgets["filename"].io_edited.connect(
             self.process_new_filename_input
         )
+        self.restore_param_widgets()
 
     @QtCore.Slot()
     def open_image_dialog(self):
@@ -130,7 +132,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         self._toggle_file_selected(True)
         if is_hdf5_filename(filename):
             _dsets = get_hdf5_populated_dataset_keys(filename, min_dim=2)
-            if not self.get_param_value("hdf5_key", dtype=str) in _dsets:
+            if self.get_param_value("hdf5_key", dtype=str) not in _dsets:
                 _dset = Hdf5DatasetSelectionPopup(self, filename).get_dset()
                 if _dset is not None:
                     self.set_param_value_and_widget("hdf5_key", _dset)
@@ -149,7 +151,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         _is_hdf5 = is_hdf5_filename(self.get_param_value("filename"))
         for _name in ["but_confirm_file"]:
             self._widgets[_name].setVisible(is_selected and _is_hdf5)
-        for _name in ["hdf5_key", "hdf5_frame"]:
+        for _name in ["hdf5_key", "hdf5_frame", "hdf5_slicing_axis"]:
             self.param_composite_widgets[_name].setVisible(is_selected and _is_hdf5)
         self.sig_file_valid.emit(is_selected)
 
@@ -159,8 +161,22 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         Open a new file / frame based on the input Parameters.
         """
         _fname = self.get_param_value("filename", dtype=str)
+        _slice_ax = self.get_param_value("hdf5_slicing_axis")
         _options = {
             "dataset": self.get_param_value("hdf5_key", dtype=str),
-            "frame": self.get_param_value("hdf5_frame"),
+            "indices": (
+                None
+                if _slice_ax is None
+                else ((None,) * _slice_ax + (self.get_param_value("hdf5_frame"),))
+            ),
         }
         self.sig_new_file_selection.emit(_fname, _options)
+
+    def restore_param_widgets(self):
+        """
+        Restore the hdf5 parameter keys from the Parameters.
+        """
+        for _key in ["filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis"]:
+            self.update_widget_value(_key, self.get_param_value(_key))
+        with QtCore.QSignalBlocker(self):
+            self._toggle_file_selected(self.get_param_value("filename").is_file())

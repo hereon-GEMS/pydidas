@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ populate the CompositeCreatorFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -174,6 +174,7 @@ class CompositeCreatorFrameBuilder:
             frame.param_widgets[_key].setEnabled(False)
         for _key in [
             "hdf5_key",
+            "hdf5_slicing_axis",
             "hdf5_first_image_num",
             "hdf5_last_image_num",
             "last_file",

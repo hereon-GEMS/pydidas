@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,12 +20,11 @@ Module with the CompositeCreatorApp class which allows to combine images to mosa
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["CompositeCreatorApp"]
-
 
 import os
 import time
@@ -54,6 +53,7 @@ COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(
     "last_file",
     "file_stepping",
     "hdf5_key",
+    "hdf5_slicing_axis",
     "hdf5_first_image_num",
     "hdf5_last_image_num",
     "hdf5_stepping",
@@ -144,6 +144,7 @@ class CompositeCreatorApp(BaseApp):
                 "hdf5_first_image_num",
                 "hdf5_last_image_num",
                 "hdf5_stepping",
+                "hdf5_slicing_axis",
                 "binning",
                 "use_roi",
                 "roi_xlow",
@@ -178,7 +179,7 @@ class CompositeCreatorApp(BaseApp):
               exists.
             - If first file is hdf5 file: Check that the selected image
               numbers are included in the dataset dimensions.
-            - If first file is not an hdf5 file: Verify that first and last
+            - If first file is not a hdf5 file: Verify that first and last
               file are in the same directory and that all selected images
               have the same file size. The file size instead of the actual
               file content is checked to speed up the process.
@@ -281,7 +282,9 @@ class CompositeCreatorApp(BaseApp):
         if get_extension(_bg_file) in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
             _params["dataset"] = self.get_param_value("bg_hdf5_key")
-            _params["frame"] = self.get_param_value("bg_hdf5_frame")
+            _params["indices"] = (None,) * self.get_param_value("hdf5_slicing_axis") + (
+                self.get_param_value("bg_hdf5_frame"),
+            )
         _bg_image = import_data(_bg_file, **_params)
         if _bg_image.shape != self._image_metadata.final_shape:
             raise UserConfigError(
@@ -346,16 +349,17 @@ class CompositeCreatorApp(BaseApp):
         _i_file = index // _images_per_file
         _fname = self._filelist.get_filename(_i_file)
         _params = dict(
-            binning=self.get_param_value("binning"), roi=self._image_metadata.roi
+            binning=self.get_param_value("binning"),
+            roi=self._image_metadata.roi,
         )
         if get_extension(_fname) in HDF5_EXTENSIONS:
+            _slice_ax = self.get_param_value("hdf5_slicing_axis")
             _hdf_index = index % _images_per_file
             _i_hdf = self.get_param_value(
                 "hdf5_first_image_num"
             ) + _hdf_index * self.get_param_value("hdf5_stepping")
-            _params = _params | dict(
-                dataset=self.get_param_value("hdf5_key"), frame=_i_hdf
-            )
+            _params["dataset"] = self.get_param_value("hdf5_key")
+            _params["indices"] = (None,) * _slice_ax + (_i_hdf,)
         self._config["current_fname"] = _fname
         self._config["current_kwargs"] = _params
 
@@ -392,14 +396,16 @@ class CompositeCreatorApp(BaseApp):
         Returns
         -------
         bool
-            Flag if the image exists and has the same size as the refernce
+            Flag if the image exists and has the same size as the reference
             file.
         """
         _target_size = self._filelist.filesize
+        if _target_size is None:
+            return False
         _starttime = time.time()
         if not os.path.exists(fname):
             return False
-        while os.stat(fname).st_size != _target_size:
+        while abs(os.stat(fname).st_size - _target_size) > 0.05 * _target_size:
             time.sleep(0.1)
             if time.time() - _starttime > timeout > 0:
                 return False
@@ -506,8 +512,11 @@ class CompositeCreatorApp(BaseApp):
         ----------
         output_fname : str
             The full file system path and filename for the output image file.
-        data_range : tuple, optional
-            A tuple with lower and upper bounds for the data export.
+        **kwargs : dict
+            Additional keyword arguments. Supported arguments are:
+
+            data_range : tuple, optional
+                A tuple with lower and upper bounds for the data export.
         """
         self._composite.export(output_fname, **kwargs)
 

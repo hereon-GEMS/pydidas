@@ -32,6 +32,7 @@ __all__ = [
     "get_number_of_entries",
     "get_axis_item_representation",
     "convert_data_to_dict",
+    "replace_none_entries",
     "item_is_iterable_but_not_array",
 ]
 
@@ -224,7 +225,7 @@ def convert_data_to_dict(
     Parameters
     ----------
     data : Union[dict, Iterable[float, ...]]
-        The keys for the axis meta data.
+        The keys for the axis metadata.
     target_shape: Tuple[int]
         The shape of the target Dataset. This number is needed to sanity-check that
         the input has the correct length.
@@ -269,6 +270,24 @@ def convert_data_to_dict(
         f"Input {data} cannot be converted to dictionary for property"
         f" {calling_method_name}"
     )
+
+
+def replace_none_entries(metadict: dict) -> dict:
+    """
+    Replace all None-type entries in the given metadata dictionary.
+
+    Parameters
+    ----------
+    metadict : dict
+        The input metadata.
+
+    Returns
+    -------
+    The sanitized metadata dictionary.
+    """
+    return {
+        _key: (_val if _val is not None else "None") for _key, _val in metadict.items()
+    }
 
 
 def item_is_iterable_but_not_array(item: object) -> bool:

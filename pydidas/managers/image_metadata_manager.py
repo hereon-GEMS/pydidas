@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ image metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -58,6 +58,9 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         case of hdf5 file input.
     hdf5_key : Hdf5key, optional
         Used only for hdf5 files: The dataset key.
+    hdf5_slicing_axis : int, optional
+        The slicing axis for hdf5 files, i.e. the axis used for iterating over
+        the images. The default is 0.
     hdf5_first_image_num : int, optional
         The first image in the hdf5-dataset to be used. The default is 0.
     hdf5_last_image_num : int, optional
@@ -80,6 +83,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
     default_params = get_generic_param_collection(
         "hdf5_key",
+        "hdf5_slicing_axis",
         "hdf5_first_image_num",
         "hdf5_last_image_num",
         "hdf5_stepping",
@@ -280,19 +284,22 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         _filename = self._config["filename"]
         _key = self.get_param_value("hdf5_key")
+        _slice_ax = self.get_param_value("hdf5_slicing_axis")
         check_hdf5_key_exists_in_file(_filename, _key)
         _meta = get_hdf5_metadata(_filename, ["shape", "dtype"], _key)
-        self.__verify_selection_range(_meta["shape"][0])
+        self.__verify_selection_range(_meta["shape"][_slice_ax])
 
         _n0 = self.get_param_value("hdf5_first_image_num")
         _n1 = self._get_param_value_with_modulo(
-            "hdf5_last_image_num", _meta["shape"][0]
+            "hdf5_last_image_num", _meta["shape"][_slice_ax]
         )
         _step = self.get_param_value("hdf5_stepping")
         _n_per_file = (_n1 - _n0 - 1) // _step + 1
         self._config["numbers"] = range(_n0, _n1, _step)
         self._config["hdf5_dset_shape"] = _meta["shape"]
-        self.store_image_data(_meta["shape"][1:3], _meta["dtype"], _n_per_file)
+        _img_shape = list(_meta["shape"][:])
+        _img_shape.pop(_slice_ax)
+        self.store_image_data(_img_shape, _meta["dtype"], _n_per_file)
 
     def __verify_selection_range(self, dset_length: int):
         """
@@ -312,8 +319,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _n1 = self._get_param_value_with_modulo("hdf5_last_image_num", dset_length)
         if not _n0 < _n1:
             raise UserConfigError(
-                f"The image numbers for the hdf5 file, [{_n0}, {_n1}] do"
-                " not describe a correct range."
+                f"The image numbers for the hdf5 file, [{_n0}, {_n1}] do "
+                "not describe a correct range."
             )
 
     def _store_image_data_from_single_image(self):

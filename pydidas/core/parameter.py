@@ -130,6 +130,7 @@ class Parameter:
         this entry will be ignored. The default is None.
     **kwargs : dict
         Additional keyword arguments. Supported argument
+
         name : str, optional
             The name of the parameter. The default is None.
         subtype : Optional[type]

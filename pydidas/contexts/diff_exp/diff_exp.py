@@ -149,15 +149,15 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     @property
     def detector_is_valid(self) -> bool:
         """
-         Check if the detector definition is valid.
+        Check if the detector definition is valid.
 
         This is determined by checking that the detector pixel sizes and numbers of
-         pixel are positive.
+        pixel are positive.
 
-         Returns
-         -------
-         bool
-             Flag whether the detector definition is valid.
+        Returns
+        -------
+        bool
+            Flag whether the detector definition is valid.
         """
         return (
             self.get_param_value("detector_pxsizex") > 0

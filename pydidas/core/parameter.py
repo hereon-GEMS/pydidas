@@ -28,11 +28,14 @@ __status__ = "Production"
 __all__ = ["Parameter"]
 
 
+import copy
 import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
 from typing import Any, Self, Type, Union
+
+from numpy import asarray, ndarray
 
 from .hdf5_key import Hdf5key
 
@@ -308,6 +311,8 @@ class Parameter:
             and not isinstance(value, str)
         ):
             return self.__type(value)
+        if isinstance(value, Iterable) and self.__type == ndarray:
+            return asarray(value)
         return value
 
     @property
@@ -597,7 +602,7 @@ class Parameter:
             (value, unit, tooltip, refkey, default, choices)
         """
         _meta = self.__meta.copy()
-        _meta.update({"value": self.__value})
+        _meta.update({"value": copy.copy(self.__value)})
         del _meta["default"]
         _default = self.__meta["default"]
         if self.choices is not None and self.__meta["default"] not in self.choices:
@@ -655,15 +660,18 @@ class Parameter:
         """
         _type = f"{self.__type.__name__}" if self.__type is not None else "None"
         _unit = (
-            f'{self.__meta["unit"]} '
+            f"{self.__meta['unit']} "
             if self.__meta["unit"] != ""
             else self.__meta["unit"]
         )
-        _val = f"{self.value}" if self.value != "" else '""'
+        _val = f"{self.value}"
+        if len(_val) == 0:
+            _val = '""'
+        __def_val = self.__meta["default"]
         _def = (
-            f'{self.__meta["default"]}'
-            if self.__meta["default"] not in (None, "")
-            else "None"
+            "None"
+            if (__def_val is None or isinstance(__def_val, str) and __def_val == "")
+            else f"{self.__meta['default']}"
         )
         _s = f"Parameter <{self.__refkey} (type: {_type}"
         if self.__meta["optional"]:

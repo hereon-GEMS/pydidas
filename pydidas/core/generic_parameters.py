@@ -77,7 +77,7 @@ def get_generic_parameter(refkey: str) -> Parameter:
 
 
 def get_generic_param_collection(
-    *param_keys: Iterable[str, ...]
+    *param_keys: Iterable[str, ...],
 ) -> ParameterCollection:
     """
     Get an initialized ParameterCollection from a number of generic Parameter keys.

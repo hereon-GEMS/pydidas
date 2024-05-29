@@ -564,6 +564,11 @@ class TestParameter(unittest.TestCase):
         self.assertIsInstance(_exported_val, list)
         self.assertEqual(_exported_val, list(_param.value))
 
+    def test_with_ndarray__deepcopy(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _h = hash(_param)
+        self.assertIsInstance(_h, int)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -733,7 +733,10 @@ class Parameter:
             _choices,
         ]:
             try:
-                _val = hash(_item)
+                if isinstance(_item, ndarray):
+                    _val = hash(_item.tobytes())
+                else:
+                    _val = hash(_item)
                 _hash_vals.append(_val)
             except TypeError:
                 warnings.warn(

@@ -535,7 +535,14 @@ class TestParameter(unittest.TestCase):
 
     def test_with_ndarray__repr(self):
         _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _param.value = np.asarray([1, 42, 5, 7])
         _repr = _param.__repr__()
+        self.assertIsInstance(_repr, str)
+
+    def test_with_ndarray__str(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _param.value = np.asarray([1, 42, 5, 7])
+        _repr = _param.__str__()
         self.assertIsInstance(_repr, str)
 
     def test_with_ndarray__pickle(self):
@@ -550,6 +557,12 @@ class TestParameter(unittest.TestCase):
         _list = [1, 42, 5, 7]
         _param.value = _list
         self.assertTrue(np.allclose(_param.value, np.array(_list)))
+
+    def test_with_ndarray__value_for_export(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _exported_val = _param.value_for_export
+        self.assertIsInstance(_exported_val, list)
+        self.assertEqual(_exported_val, list(_param.value))
 
 
 if __name__ == "__main__":

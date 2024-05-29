@@ -543,6 +543,8 @@ class Parameter:
             return float(self.value)
         if self.__type in (tuple, list, dict):
             return self.value
+        if self.__type == ndarray:
+            return self.value.tolist()
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
     def update_value_and_choices(self, value: object, choices: Iterable[object, ...]):
@@ -627,27 +629,14 @@ class Parameter:
 
         This method will return a short description of the Parameter in the
         format
-        <Name> - type: <type>, default: <default> <unit>.
+        <Name>: <value> (type: <type>, default: <default> <unit>).
 
         Returns
         -------
         str
             The string of the short description.
         """
-
-        _type = f"{self.__type.__name__}" if self.__type is not None else "None"
-        if self.__meta["allow_None"]:
-            _type += "/None"
-        _def = (
-            f'{self.__meta["default"]}'
-            if self.__meta["default"] not in (None, "")
-            else "None"
-        )
-        _unit = f" {self.unit}" if self.unit else ""
-        return (
-            f"{self.refkey}: {self.value}{_unit} (type: {_type}, "
-            f'default: {_def} {self.__meta["unit"]})'
-        )
+        return self.__get_string_repr()
 
     def __repr__(self) -> str:
         """
@@ -658,26 +647,36 @@ class Parameter:
         str
             The representation.
         """
+        _repr = self.__get_string_repr(check_optional=True)
+        return f"Parameter <{_repr}>"
+
+    def __get_string_repr(self, check_optional: bool = False) -> str:
+        """
+        Get a short string representation of the Parameter.
+
+        Parameters
+        ----------
+        check_optional : bool, optional
+            A flag to print whether the Parameter is optional. The default is False.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
         _type = f"{self.__type.__name__}" if self.__type is not None else "None"
-        _unit = (
-            f"{self.__meta['unit']} "
-            if self.__meta["unit"] != ""
-            else self.__meta["unit"]
-        )
-        _val = f"{self.value}"
+        _unit = "" if self.__meta["unit"] == "" else f" {self.__meta['unit']}"
+        _val = str(self.value)
         if len(_val) == 0:
             _val = '""'
-        __def_val = self.__meta["default"]
-        _def = (
-            "None"
-            if (__def_val is None or isinstance(__def_val, str) and __def_val == "")
-            else f"{self.__meta['default']}"
-        )
-        _s = f"Parameter <{self.__refkey} (type: {_type}"
-        if self.__meta["optional"]:
-            _s += ", optional"
-        _s += f"): {_val} {_unit}(default: {_def})>"
-        return _s
+        _default_val = str(self.__meta["default"])
+        if len(_default_val) == 0:
+            _default_val = '""'
+        _repr = f"{self.__refkey}: {_val}{_unit} (type: {_type}, "
+        if check_optional and self.__meta["optional"]:
+            _repr += "optional, "
+        _repr += f"default: {_default_val}{_unit})"
+        return _repr
 
     def __copy__(self) -> Self:
         """

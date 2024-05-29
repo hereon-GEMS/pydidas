@@ -22,6 +22,8 @@ Improvements
 - Added an option to specify a required dimensionality when importing data.
 - The import_data and export_data functions now read/write the pydidas Dataset 
   metadata to/from the file.
+- Added a flag to toggle plugin detailed_results generation to minimize 
+  overhead in full processing.
 
 Bugfixes
 --------

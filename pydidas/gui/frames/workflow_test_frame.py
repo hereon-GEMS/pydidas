@@ -292,6 +292,7 @@ class WorkflowTestFrame(BaseFrame):
                 _index,
                 force_store_results=True,
                 store_input_data=True,
+                store_details=True,
                 test=True,
             )
             self.__store_tree_results()

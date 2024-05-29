@@ -212,13 +212,11 @@ class WorkflowNode(GenericNode):
             or kwargs.get("force_store_results", False)
         ) and self.plugin.output_data_dim is not None:
             self.results = deepcopy(res)
-            self.result_kws = reskws
+            self.result_kws = self._get_deep_copy_of_kwargs(reskws)
         self.runtime = _runtime()
         for _child in self._children:
             if len(self._children) > 1:
-                _child.execute_plugin_chain(
-                    deepcopy(res), **self._get_deep_copy_of_kwargs(reskws)
-                )
+                _child.execute_plugin_chain(deepcopy(res), **reskws)
             else:
                 _child.execute_plugin_chain(
                     res, **self._get_deep_copy_of_kwargs(reskws)

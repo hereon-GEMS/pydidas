@@ -40,6 +40,8 @@ Bugfixes
   the output filename was not checked until after the operation.
 - Fixed an issue where Dataset axis ranges could be None.
 - Fixed an issue where Dataset axis labels / units could be None.
+- Fixed an issue in the ParamIoWidgetLineEdit where setting the value would 
+  compare the new str with a generic typed item.
 
 
 v24.03.25

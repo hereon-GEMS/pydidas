@@ -43,7 +43,8 @@ Bugfixes
 - Fixed an issue where Dataset axis labels / units could be None.
 - Fixed an issue in the ParamIoWidgetLineEdit where setting the value would 
   compare the new str with a generic typed item.
-
+- Fixed an issue where a selection of a ´wrong´ mask by a user would raise
+  a pyFAI assertion error without a human-readable error message.
 
 v24.03.25
 =========

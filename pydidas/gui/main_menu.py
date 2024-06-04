@@ -99,7 +99,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._menus = {}
         self.__window_counter = 0
 
-        self._setup_mainwindow_widget(geometry)
+        self._setup_main_window_widget(geometry)
         self._add_config_windows()
         self._io_dialog = PydidasFileDialog()
         self._create_menu()
@@ -111,9 +111,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _app.aboutToQuit.connect(self.centralWidget().reset)
         self.sig_close_main_window.connect(_app.send_gui_close_signal)
 
-    def _setup_mainwindow_widget(self, geometry):
+    def _setup_main_window_widget(self, geometry):
         """
-        Setup the user interface.
+        Set up the user interface.
 
         Parameters
         ----------
@@ -203,7 +203,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._actions["open_user_config"] = QtWidgets.QAction("&User config", self)
 
         self._actions["tools_export_eiger_pixel_mask"] = QtWidgets.QAction(
-            "&Export Eiger Pixelmask", self
+            "&Export Eiger pixel mask", self
         )
         self._actions["tools_image_series_ops"] = QtWidgets.QAction(
             "&Image series processing", self
@@ -385,7 +385,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
     @QtCore.Slot()
     def check_for_updates(self, force_check: bool = False, auto_check: bool = False):
         """
-        Check if the pydidas version is up to date and show a dialog if not.
+        Check if the pydidas version is up-to-date and show a dialog if not.
 
         Parameters
         ----------
@@ -540,10 +540,10 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         for _key, _window in self._child_windows.items():
             if _key != "tmp":
                 _window_states[_key] = _window.export_window_state()
-        _window_states["main"] = self.export_mainwindow_state()
+        _window_states["main"] = self.export_main_window_state()
         return _window_states
 
-    def export_mainwindow_state(self):
+    def export_main_window_state(self):
         """
         Export the main window's state.
 
@@ -591,19 +591,26 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         if _state is None:
             return
-        if _state.get("pydidas_version", "0.0.0") != VERSION:
+        try:
+            self._restore_global_objects(_state)
+            self._restore_frame_states(_state)
+            self._restore_window_states(_state)
+        except Exception as exc:
+            if _state.get("pydidas_version", "0.0.0") != VERSION:
+                raise UserConfigError(
+                    "Error during GUI state import.\n"
+                    "The saved state was not created with the current pydidas version "
+                    "and cannot be imported."
+                )
             raise UserConfigError(
-                "The saved state was not created with the current pydidas version and "
-                "cannot be imported."
+                "Error during GUI state import.\n"
+                f"The following error occurred: {exc}\n"
             )
-        self._restore_global_objects(_state)
-        self._restore_frame_states(_state)
-        self._restore_window_states(_state)
 
     @staticmethod
     def _restore_global_objects(state):
         """
-        Get the states of pydidas' global objects (ScanContext,
+        Get the states of pydidas's global objects (ScanContext,
         DiffractionExperimentContext, WorkflowTree)
 
         Parameters
@@ -633,9 +640,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         for _key, _window in self._child_windows.items():
             if not _key.startswith("temp_window"):
                 _window.restore_window_state(state[_key])
-        self.restore_mainwindow_state(state["main"])
+        self.restore_main_window_state(state["main"])
 
-    def restore_mainwindow_state(self, state):
+    def restore_main_window_state(self, state):
         """
         Restore the main window's state from saved information.
 
@@ -676,13 +683,13 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         """
         Open the help in a browser.
 
-        This slot will check whether a helpfile exists for the current frame and open
-        the respective helpfile if it exits or the main documentation if it does not.
+        This slot will check whether a help file exists for the current frame and open
+        the respective help file if it exits or the main documentation if it does not.
         """
         _frame_class = self.centralWidget().currentWidget().__class__.__name__
-        _docfile = doc_filename_for_frame_manual(_frame_class)
+        _doc_file = doc_filename_for_frame_manual(_frame_class)
 
-        if os.path.exists(_docfile):
+        if os.path.exists(_doc_file):
             _url = doc_qurl_for_frame_manual(_frame_class)
         else:
             _url = DOC_HOME_QURL

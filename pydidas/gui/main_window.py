@@ -29,12 +29,11 @@ __all__ = ["MainWindow"]
 
 
 import os
-import warnings
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ..core import PydidasGuiError
+from ..core import PydidasGuiError, UserConfigError
 from ..widgets.framework import FontScalingToolbar, PydidasStatusWidget
 from . import utils
 from .frames import DefineDiffractionExpFrame, DefineScanFrame, WorkflowEditFrame
@@ -159,7 +158,7 @@ class MainWindow(MainMenu):
 
     def _create_toolbar_actions(self):
         """
-        Create the toolbar actions to swtich between frames.
+        Create the toolbar actions to switch between frames.
         """
         for _entry in self.__configuration["menu_entries"]:
             _metadata = self._toolbar_metadata[_entry]
@@ -167,8 +166,8 @@ class MainWindow(MainMenu):
             _action.setCheckable(True)
             _action.triggered.connect(partial(self.select_item, _entry))
             self._toolbar_actions[_entry] = _action
-            itembase = os.path.dirname(_entry)
-            self._toolbars[itembase].addAction(_action)
+            _item_base = os.path.dirname(_entry)
+            self._toolbars[_item_base].addAction(_action)
 
     def _update_toolbar_visibility(self):
         """
@@ -226,9 +225,9 @@ class MainWindow(MainMenu):
         PydidasFrameStack.
 
         This method takes a :py:class:`BaseFrame <pydidas.widgets.framework.BaseFrame>`
-        and creates an instance which is registeres with the
+        and creates an instance which is registers with the
         PydidasFrameStack. It also stores the required metadata to create
-        a actionbar link to open the frame.
+        an actionbar link to open the frame.
 
         Parameters
         ----------
@@ -298,14 +297,14 @@ class MainWindow(MainMenu):
         try:
             MainMenu.restore_gui_state(self, state, filename)
         except Exception as exc:
-            warnings.warn(
-                "Error during GUI state restoration:\n"
+            raise UserConfigError(
+                "Error during GUI state restoration.\n\n"
                 + str(exc)
-                + "\nSkipping restoration..."
+                + "\n\nSkipping restoration..."
             )
         self.select_item(self.centralWidget().currentWidget().menu_entry)
 
-    def export_mainwindow_state(self):
+    def export_main_window_state(self):
         """
         Export the main window's state.
 
@@ -314,11 +313,11 @@ class MainWindow(MainMenu):
         dict
             The state of the main window required to restore the look.
         """
-        return MainMenu.export_mainwindow_state(self) | {
+        return MainMenu.export_main_window_state(self) | {
             "toolbar_visibility": self.__configuration["toolbar_visibility"],
         }
 
-    def restore_mainwindow_state(self, state):
+    def restore_main_window_state(self, state):
         """
         Restore the main window's state from saved information.
 
@@ -329,7 +328,7 @@ class MainWindow(MainMenu):
         """
         self.__configuration["toolbar_visibility"] = state["toolbar_visibility"]
         self._update_toolbar_visibility()
-        MainMenu.restore_mainwindow_state(self, state)
+        MainMenu.restore_main_window_state(self, state)
 
     @QtCore.Slot(str)
     def update_status(self, text):

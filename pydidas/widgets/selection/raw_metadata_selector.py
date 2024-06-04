@@ -34,7 +34,7 @@ from qtpy import QtCore, QtWidgets
 
 from ...core import PydidasGuiError, get_generic_param_collection
 from ...core.constants.file_extensions import BINARY_EXTENSIONS
-from ...core.constants.numpy_names import NUMPY_DATATYPES
+from ...core.constants.numpy_names import NUMPY_HUMAN_READABLE_DATATYPES
 from ...core.utils import get_extension
 from ...data_io import import_data
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
@@ -127,7 +127,7 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         """
         if not isinstance(self._widgets["plot"], QtWidgets.QWidget):
             raise PydidasGuiError("No plot widget has been registered.")
-        _datatype = NUMPY_DATATYPES[self.get_param_value("raw_datatype")]
+        _datatype = NUMPY_HUMAN_READABLE_DATATYPES[self.get_param_value("raw_datatype")]
         _offset = self.get_param_value("raw_header")
         _shape = (
             self.get_param_value("raw_shape_y"),

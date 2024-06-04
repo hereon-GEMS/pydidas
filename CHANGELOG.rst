@@ -45,6 +45,9 @@ Bugfixes
   compare the new str with a generic typed item.
 - Fixed an issue where a selection of a ´wrong´ mask by a user would raise
   a pyFAI assertion error without a human-readable error message.
+- Fixed a bug which would display wrong numbers for allowed scan points in the 
+  WorkflowTestFrame.
+  
 
 v24.03.25
 =========

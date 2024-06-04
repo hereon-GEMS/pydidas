@@ -39,7 +39,7 @@ from qtpy import QtWidgets
 from silx.opencl.common import OpenCL
 
 from ..contexts import DiffractionExperimentContext
-from ..core import Dataset, UserConfigError, get_generic_param_collection
+from ..core import UserConfigError, get_generic_param_collection
 from ..core.constants import (
     GREEK_ASCII_TO_UNI,
     PROC_PLUGIN,

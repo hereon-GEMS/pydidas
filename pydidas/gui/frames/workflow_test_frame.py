@@ -360,9 +360,13 @@ class WorkflowTestFrame(BaseFrame):
         """
         _index = self.get_param_value("frame_index", dtype=int)
         if not 0 <= _index < SCAN.n_points:
+            if SCAN.n_points < 3:
+                _text = "[" + ", ".join(str(_i) for _i in range(SCAN.n_points)) + "]."
+            else:
+                _text = f"[0, 1, ..., {SCAN.n_points - 1}]."
             raise UserConfigError(
                 f"The selected number {_index} is outside the scope of the number "
-                f"of images in the scan (0...{SCAN.n_points - 1})"
+                f"of images in the scan {_text}"
             )
         return _index
 
@@ -395,14 +399,24 @@ class WorkflowTestFrame(BaseFrame):
         int
             The global index.
         """
-        _start = SCAN.get_param_value("scan_start_index")
+        _i0 = SCAN.get_param_value("scan_start_index")
         _delta = SCAN.get_param_value("scan_index_stepping")
         _num = self.get_param_value("detector_image_index")
-        _index = (_num - _start) // _delta
+        _index = (_num - _i0) // _delta
         if not 0 <= _index < SCAN.n_points:
+            if SCAN.n_points <= 3:
+                _text = (
+                    "["
+                    + ", ".join(str(_i0 + _delta * _i) for _i in range(SCAN.n_points))
+                    + "]."
+                )
+            else:
+                _text = (
+                    f"[{_i0}, {_i0 + _delta}, ..., {_i0 + (SCAN.n_points - 1)*_delta}]."
+                )
             raise UserConfigError(
                 f"The selected number {_num} is not included in the images of the scan "
-                f"[{_start}, {_start + _delta}, ..., {(SCAN.n_points - 1)*_delta}]."
+                + _text
             )
         return _index
 

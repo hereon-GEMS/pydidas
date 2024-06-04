@@ -42,9 +42,8 @@ Formatting checks for pydidas
 =============================
 
 Supported python modules are:
-1. black for automatic code re-formatting.
-2. isort for import re-organisation.
-3. flake8 for style guide checks.
+1. ruff `format` for automatic code re-formatting.
+2. ruff `check` for style guide checks.
 4. reuse for copyright information checking.
 
 In addition, a function to update the copyright in changed files to be consistent
@@ -69,15 +68,16 @@ Examples
     python formatting_checks.py --black
 """
 MODULE_TASK = {
-    "black": "re-formatting",
-    "isort": "import re-organization",
-    "flake8": "code style checks",
+    "ruff-format": "re-formatting",
+    "ruff-check": "style guide checks",
     "reuse": "licensing check",
 }
 MODULE_ARGS = {
     "black": ["."],
     "isort": ["."],
     "flake8": [],
+    "ruff-check": [],
+    "ruff-format": [],
     "reuse": ["--root", ".", "lint"],
 }
 _DIRS_TO_SKIP = [
@@ -126,16 +126,34 @@ def run_module(module_name: Literal["black", "flake8", "isort", "reuse"]):
     module_name : Literal["black", "flake8", "isort", "reuse"]
         The name of the module to be run.
     """
-    if module_name not in ["black", "flake8", "isort", "reuse"]:
+    if module_name not in [
+        "black",
+        "flake8",
+        "isort",
+        "reuse",
+        "ruff-check",
+        "ruff-format",
+    ]:
         raise ValueError(f"Module '{module_name}' not supported.")
-    _check = "--check" in sys.argv and module_name in ["black", "isort"]
-    _check_arg = ["--check"] if _check else []
+    _check = "--check" in sys.argv and module_name in ["ruff-format", "black", "isort"]
+    _check_arg = (
+        ["--check"]
+        if _check
+        else (
+            ["--fix"]
+            if ("--check" not in sys.argv and module_name == "ruff-check")
+            else []
+        )
+    )
     _job_label = (
         f"{MODULE_TASK[module_name]} "
         + ("check " if _check else "")
         + f"with {module_name}"
     )
-    _cmd = ["python", "-m", module_name] + MODULE_ARGS[module_name] + _check_arg
+    _cmd_module = (
+        module_name.split("-") if module_name.startswith("ruff") else [module_name]
+    )
+    _cmd = ["python", "-m"] + _cmd_module + MODULE_ARGS[module_name] + _check_arg
     try:
         _timed_print(f"Starting {_job_label}...", new_lines=1)
         subprocess.run(_cmd, check=True)
@@ -440,14 +458,12 @@ if __name__ == "__main__":
     if "--help" in sys.argv or len(sys.argv) < 2:
         print(HELP_TEXT)
         sys.exit()
-    if "--black" in sys.argv or "--all" in sys.argv:
-        run_module("black")
-    if "--isort" in sys.argv or "--all" in sys.argv:
-        run_module("isort")
-    if "--flake8" in sys.argv or "--all" in sys.argv:
-        run_module("flake8")
-    if "--reuse" in sys.argv or "--all" in sys.argv:
-        run_module("reuse")
+    for _module in ["black", "isort", "flake8"]:
+        if f"--{_module}" in sys.argv:
+            run_module(_module)
+    for _module in ["ruff-check", "ruff-format", "reuse"]:
+        if f"--{_module}" in sys.argv or "--all" in sys.argv:
+            run_module(_module)
     if "--copyright" in sys.argv or "--all" in sys.argv:
         CopyrightYearUpdater()
     if "--version" in sys.argv or "--all" in sys.argv:

@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v24.xx.yy
+v24.06.05
 =========
 
 Improvements

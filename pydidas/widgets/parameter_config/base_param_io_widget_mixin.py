@@ -31,7 +31,7 @@ __all__ = ["BaseParamIoWidgetMixIn"]
 import numbers
 import pathlib
 
-from numpy import nan
+from numpy import nan, ndarray
 from qtpy import QtCore, QtGui
 
 from ...core import Hdf5key, Parameter, UserConfigError
@@ -40,6 +40,7 @@ from ...core.constants import (
     QT_REG_EXP_FLOAT_VALIDATOR,
     QT_REG_EXP_INT_VALIDATOR,
 )
+from ...core.utils import NumpyParser
 
 
 LOCAL_SETTINGS = QtCore.QLocale(QtCore.QLocale.C)
@@ -48,6 +49,21 @@ LOCAL_SETTINGS.setNumberOptions(QtCore.QLocale.RejectGroupSeparator)
 FLOAT_VALIDATOR = QtGui.QDoubleValidator()
 FLOAT_VALIDATOR.setNotation(QtGui.QDoubleValidator.ScientificNotation)
 FLOAT_VALIDATOR.setLocale(LOCAL_SETTINGS)
+
+
+_TYPE_STRINGS = {
+    "true": True,
+    "false": False,
+    "nan": nan,
+    "none": None,
+}
+_TYPE_CONVERTERS = {
+    numbers.Integral: int,
+    numbers.Real: float,
+    pathlib.Path: pathlib.Path,
+    Hdf5key: Hdf5key,
+    ndarray: NumpyParser,
+}
 
 
 class BaseParamIoWidgetMixIn:
@@ -118,14 +134,8 @@ class BaseParamIoWidgetMixIn:
         """
         # need to process True and False explicitly because bool is a subtype
         # of int but the strings 'True' and 'False' cannot be converted to int
-        if text.upper() == "TRUE":
-            return True
-        if text.upper() == "FALSE":
-            return False
-        if text.upper() == "NAN":
-            return nan
-        if text.upper() == "NONE":
-            return None
+        if text.lower() in _TYPE_STRINGS:
+            return _TYPE_STRINGS[text.lower()]
         try:
             if (
                 text == ""
@@ -133,14 +143,8 @@ class BaseParamIoWidgetMixIn:
                 and self._ptype in [numbers.Integral, numbers.Real]
             ):
                 return None
-            if self._ptype == numbers.Integral:
-                return int(text)
-            if self._ptype == numbers.Real:
-                return float(text)
-            if self._ptype == pathlib.Path:
-                return pathlib.Path(text)
-            if self._ptype == Hdf5key:
-                return Hdf5key(text)
+            if self._ptype in _TYPE_CONVERTERS:
+                return _TYPE_CONVERTERS[self._ptype](text)
         except ValueError as _error:
             _msg = str(_error)
             _msg = _msg[0].upper() + _msg[1:]

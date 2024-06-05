@@ -67,7 +67,7 @@ IMAGE_SELECTION_PARAM = Parameter(
         "Use detector image number",
     ],
     tooltip=(
-        "Choose between selecing frames using either the global index for the "
+        "Choose between selecting frames using either the global index for the "
         "flattened image / frame index (the 'timeline'), the multi-dimensional "
         "position in the scan or the detector image number."
     ),

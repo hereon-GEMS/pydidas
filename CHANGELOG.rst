@@ -25,6 +25,7 @@ Improvements
 - Added a flag to toggle plugin detailed_results generation to minimize 
   overhead in full processing.
 - Added support for np.ndarray as Parameter values.
+- Added documentation for Plugin development.
 
 Bugfixes
 --------

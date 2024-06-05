@@ -16,7 +16,7 @@
 .. |plugin_collection| replace:: :py:class:`PluginCollection <pydidas.plugins.plugin_registry.PluginRegistry>`
 .. |base_plugin| replace:: :py:class:`BasePlugin <pydidas.plugins.BasePlugin>`
 .. |process_multi_dim| replace:: :py:func:`process_1d_with_multi_input_dims <pydidas.core.utils.process_1d_with_multi_input_dims>`
-
+.. |workflow_tree| replace:: :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`
 
 .. _developer_guide_to_plugins:
 
@@ -205,8 +205,15 @@ Generic methods
 The following generic methods are defined and used by all plugins. The default behaviour
 is described as well to know when to overload these methods.
 
- - |pre_execute|: Please see the description above.
- - |execute|: Please see the description above.
+ - |pre_execute|:
+    The |pre_execute| method is called once at the start of the
+    processing. This method can be used to perform computationally expensive tasks
+    which need to be performed once. It does not accept any arguments.
+ - |execute|:
+    The |execute| method is called repeatedly with the processing data.
+    Required arguments are exactly one input |dataset| and the :py:data:`kwargs` input
+    keyword arguments. It must also return exactly one |dataset| and the
+    :py:data:`kwargs`, possibly modified by the plugin.
  - :py:meth:`get_parameter_config_widget <pydidas.plugins.BasePlugin.get_parameter_config_widget>`:
     This method returns a widget instance for the plugin's parameter configuration.
     The default implementation raises a :py:data:`NotImplementedError`. This method is
@@ -268,8 +275,8 @@ an integrated azimuthal line profile, but should also work with a series of line
 profiles which are generated from a two-dimensional integration.
 
 Pydidas provides a mechanism to handle this situation by using the |process_multi_dim|
-decorator on the |execute| method. This decorator will requires the :py:data:`process_data_dim`
-|parameter| which is defined in the generic parameters.
+decorator on the |execute| method. This decorator will requires the
+:py:data:`process_data_dim` |parameter| which is defined in the generic parameters.
 
 The |process_multi_dim| decorator will automatically handle all necessary steps and the
 |execute| method must be written as if it handled 1-dimensional data only.
@@ -278,9 +285,73 @@ Please see the :ref:`examples_handle_dynamic_data_dimensionality` for further de
 
 :ref:`(go back to top of the page) <developer_guide_to_plugins>`
 
+.. _intermediate_results:
+
 Intermediate and detailed results
 ---------------------------------
 
+For some applications, it is useful for the user to have access to intermediate results
+of the processing, for example for fitting or automatic classifications. The
+intermediate results are used for automatic visualization and therefore require a
+specific form.
+Pydidas provides an automatic mechanism to access intermediate results. The plugin's
+:py:data:`_details` attribute is used to store the intermediate results as a
+:py:data:`dict` with a :py:data:`None` key and a :py:data:`dict` value. The
+:py:data:`detailed_results_dict` details will be laid out below.
+
+A :py:data:`detailed_results` property must also be defined to access the detailed
+results.
+
+.. code-block::
+
+        def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+            # Do some processing
+            if kwargs.get("store_details", False):
+                self._details = {None: detailed_results_dict}
+            return data, kwargs
+
+        @property
+        def detailed_results(self) -> dict:
+            return self._details
+
+The rationale behind this is that detailed results must also be available for plugins
+which allow dynamic data dimensionality. In this case, the |process_multi_dim|
+decorator stores the detailed results with the correct keys and :py:data:`None` was
+selected as generic key because no data will use the :py:data`None` key.
+
+The :py:data:`detailed_results_dict` also has a defined structure. The following
+keys are required:
+
+    - :py:data:`n_plots` (type: :py:data:`int`):
+        The number of plots used by this Plugin.
+    - :py:data:`plot_titles` (type: :py:data:`dict`):
+        A dictionary with the plot titles. The keys are the plot indices and the values
+        are the plot titles. Example ``"plot_titles" : {0: "Title A", 1: "Title B"}``.
+    - :py:data:`metadata` (type: :py:data:`str`):
+        Additional metadata to be given to the user. The metadata must be in string
+        format and if a specific formatting is required for readability, the plugin
+        must provide this formatting.
+    - :py:data:`items` (type: :py:data:`list[dict]`):
+        A list with the individual items to be plotted. Each item must be a dictionary
+        with the following keys:
+
+            - :py:data:`plot` (type: :py:data:`int`):
+                The index of the plot to which the item belongs.
+            - :py:data:`label` (type: :py:data:`str`):
+                The label of the plot item for the legend.
+            - :py:data:`data` (type: |dataset|):
+                The data to be plotted.
+
+For an example, please see the :ref:`examples_intermediate_results`.
+
+.. note::
+
+    Detailed results are only available if the user has selected to store them.
+    This can be by using the ``store_details=True`` keyword argument in the
+    |execute| method. Because :py:data:`kwargs` are passed down through the
+    |workflow_tree| to all the plugins,
+    the ``store_details=True`` can be called in the :py:meth:`execute_process
+    <pydidas.workflow.ProcessingTree.execute_process>` method of the |workflow_tree|.
 
 Examples
 --------
@@ -299,6 +370,7 @@ four generic |parameter| objects.
 .. code-block::
 
     from pydidas.core.generic_params import get_generic_param_collection
+    from pydidas.plugins import BasePlugin
 
     class MyPlugin(BasePlugin):
 
@@ -326,6 +398,7 @@ of generic and custom |parameter| objects.
 
     from pydidas.core import Parameter
     from pydidas.core.generic_params import get_generic_param_collection
+    from pydidas.plugins import BasePlugin
 
     offset_param = Parameter(
         "offset",
@@ -363,6 +436,7 @@ the plugin.
 
     from pydidas.core import Parameter, ParameterCollection
     from pydidas.core.generic_params import get_generic_parameter
+    from pydidas.plugins import BasePlugin
 
     class MyPlugin(BasePlugin):
 
@@ -396,11 +470,123 @@ the plugin.
 .. _examples_handle_dynamic_data_dimensionality:
 
 Handling dynamic data dimensionality example
---------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This example shows a fully functional plugin which can handle multi-dimensional input.
-The plugin
+The plugin adds a one-dimensional :py:class:`np.ndarray` to the input data.
 
+.. code-block::
+
+    import numpy as np
+
+    from pydidas.core import (
+        Dataset, Parameter, ParameterCollection, UserConfigError, get_generic_parameter
+    )
+    from pydidas.core.utils import process_1d_with_multi_input_dims
+    from pydidas.core.constants import PROC_PLUGIN
+    from pydidas.plugins import ProcPlugin
+
+
+    class AddOneDimensionalData(ProcPlugin):
+
+        default_params = ParameterCollection(
+            get_generic_parameter("process_data_dim"),
+            Parameter(
+                "offset_array",
+                np.ndarray,
+                np.zeros((5)),
+                name="1D offset array",
+                tooltip="The offset array to be added to the 1d input data",
+            ),
+        )
+        plugin_name = "Add one-dimensional data"
+        plugin_type = PROC_PLUGIN
+        basic_plugin = False
+        input_data_dim = -1
+        output_data_dim = -1
+
+        @process_1d_with_multi_input_dims
+        def execute(self, data: Dataset, **kwargs: dict) -> Dataset:
+            _arr = self.get_param_value("offset_array")
+            if data.shape != _arr.shape:
+                raise UserConfigError(
+                    "The offset array must have the same shape as the input data."
+                )
+            data += _arr
+            return data, kwargs
+
+Now, when testing the plugin with 1-dimensional data, the plugin will simple process
+the input data:
+
+.. code-block::
+
+    >>> p = AddOneDimensionalData()
+    >>> p.set_param_value("offset_array", np.arange(5))
+    >>> data_1d = Dataset(np.zeros((5)
+    ...     axis_ranges=[5 * np.arange(5)],
+    ...     axis_labels=["x"],
+    ...     axis_units=["px"],
+    ...     data_label="Test data",
+    ...     data_unit="a.u.",
+    ...     )
+    >>> new_data, _ = p.execute(data_1d)
+    >>> print(new_data)
+    Dataset(
+    axis_labels: {
+        0: 'x'},
+    axis_ranges: {
+        0: array([ 0,  5, 10, 15, 20])},
+    axis_units: {
+        0: 'px'},
+    metadata: {},
+    data_unit: a.u.,
+    data_label: Test data,
+    array([0., 1., 2., 3., 4.])
+    )
+
+When testing the plugin with multi-dimensional data, the plugin will automatically
+apply the algorithm in the decorated |execute| method to one-dimensional slices of the
+input data. By default, the processed dimension is the last dimension (see first part
+of the example below) . When the :py:data:`process_data_dim` |parameter| is set to 0,
+the first dimension will be processed (compare second part of the example).
+
+.. code-block::
+
+    >>> p = AddOneDimensionalData()
+    >>> p.set_param_value("offset_array", np.arange(5))
+    >>> data_2d = Dataset(
+    ...     np.zeros((5, 5)),
+    ...     axis_ranges=[5 * np.arange(5), 12 - np.arange(5)],
+    ...     axis_labels=["x", "y"],
+    ...     axis_units=["px", "px"],
+    ...     data_label="Test data",
+    ...     data_unit="a.u.",
+    ... )
+    >>> new_data, _ = p.execute(data_2d.copy())
+    # Note: For brevity, only the numerical data of the output Dataset is printed.
+    >>> print(new_data.array)
+    [[0. 1. 2. 3. 4.]
+     [0. 1. 2. 3. 4.]
+     [0. 1. 2. 3. 4.]
+     [0. 1. 2. 3. 4.]
+     [0. 1. 2. 3. 4.]]
+    # Now, we change the processing dimension:
+    >>> p.set_param_value("process_data_dim", 0)
+    >>> new_data, _ = p.execute(data_2d)
+    >>> print(new_data.array)
+    [[0. 0. 0. 0. 0.]
+     [2. 2. 2. 2. 2.]
+     [1. 1. 1. 1. 1.]
+     [3. 3. 3. 3. 3.]
+     [4. 4. 4. 4. 4.]]
+
+.. note::
+
+    The plugin modifies the input |dataset| in place. Therefore, the input dataset
+    will also be changed. Copying of the data in the input is only necessary in
+    this example. In a proper pydidas Workflow, the framework will automatically
+    pass a copy of the input data to the plugin if the input data is passed to more
+    than one plugin.
 
 .. raw:: html
 
@@ -408,3 +594,109 @@ The plugin
     <a href="#handle-dynamic-data-dimensionality">Back to "Handling dynamic data dimensionality" section</a>
     <a href="#developer-guide-to-plugins">(go back to top of the page)</a>
     </p><br><br>
+
+
+.. _examples_intermediate_results:
+
+Intermediate and detailed results example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This example uses the :py:data:`AddOneDimensionalData` plugin from the previous example
+(see :ref:`examples_handle_dynamic_data_dimensionality`) and adds functionality to
+handle intermediate results.
+
+.. code-block::
+
+    class AddOneDimensionalDataWithDetails(AddOneDimensionalData):
+        plugin_name = "Add one-dimensional data with details"
+
+        def __init__(self):
+            super().__init__()
+            self._details = {}
+
+        @property
+        def detailed_results(self) -> dict:
+            return self._details
+
+        @process_1d_with_multi_input_dims
+        def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+            self.store_input_data_copy(data)
+            new_data, kwargs = AddOneDimensionalData.execute(self, data, **kwargs)
+            if kwargs.get("store_details", False):
+                self._details = {None: self._create_detailed_results(data, new_data)}
+            return new_data, kwargs
+
+        def _create_detailed_results(self, output: Dataset) -> dict:
+            return {
+                "n_plots": 2,
+                "plot_titles": {0: "Input and Output", 1: "Offset array"},
+                "plot_ylabels": {
+                    0: "intensity / a.u.",
+                    1: "intensity / a.u.",
+                },
+                "metadata": "",
+                "items": [
+                    {"plot": 0, "label": "input data", "data": self.input_data},
+                    {"plot": 0, "label": "output data", "data": output},
+                    {
+                        "plot": 1,
+                        "label": "offset",
+                        "data": Dataset(self.get_param_value("offset_array"))
+                    },
+                ],
+            }
+
+Now, when testing the plugin, the detailed results can be accessed through the
+:py:data:`detailed_results` property or automatically in the :ref:`workflow_test_frame`
+when using the GUI.
+
+As example, the following code snippet shows how to access the detailed results, first
+for a one-dimensional input |dataset|, then for a two-dimensional input |dataset|.
+
+.. code-block::
+
+    >>> p = AddOneDimensionalDataWithDetails()
+    >>> p.set_param_value("offset_array", np.array((4, 2, 0, 1, 3)))
+    >>> data_1d = Dataset(np.array((1, 1, 0, 0, 0)), axis_labels=["x"])
+    >>> data_2d = Dataset(
+    ...     np.tile(np.array((1, 1, 0, 0, 0)), (5, 1)),
+    ...     axis_labels=["x", "y"],
+    ... )
+
+    # First, we test the plugin with a one-dimensional input Dataset:
+    >>> new_data_1d, _ = p.execute(data_1d.copy(), store_details=True)
+    >>> (new_data_1d - data_1d).array
+    array([4, 2, 0, 1, 3])
+    # Detailed results will now be stored using the generic key `None`:
+    >>> p.detailed_results.keys()
+    dict_keys([None])
+    >>> p.detailed_results[None].keys()
+    dict_keys(['n_plots', 'plot_titles', 'plot_ylabels', 'metadata', 'items'])
+
+    # Now, we test the plugin with a two-dimensional input Dataset:
+    >>> new_data, _ = p.execute(data_2d.copy(), store_details=True)
+    >>> (new_data - data_2d).array
+    array([[4., 2., 0., 1., 3.],
+           [4., 2., 0., 1., 3.],
+           [4., 2., 0., 1., 3.],
+           [4., 2., 0., 1., 3.],
+           [4., 2., 0., 1., 3.]])
+    >>> p.detailed_results.keys()
+    dict_keys(['x: 0.0000 ', 'x: 1.0000 ', 'x: 2.0000 ', 'x: 3.0000 ', 'x: 4.0000 '])
+
+The representation in the GUI looks like the following:
+
+.. image::
+    images/plugin_detailed_results.png
+    :width: 800 px
+    :align: center
+
+|
+
+.. raw:: html
+
+    <p class="align-references">
+    <a href="#intermediate-results">Back to "Intermediate and detailed results" section</a>
+    <a href="#developer-guide-to-plugins">(go back to top of the page)</a>
+    </p><br><br>
+

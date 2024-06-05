@@ -4,6 +4,9 @@
     Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
+.. role:: raw-html(raw)
+   :format: html
+
 .. _user_config_window:
 
 The User config window

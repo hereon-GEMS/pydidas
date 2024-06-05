@@ -114,4 +114,20 @@ NUMPY_ARGPARSE_ARGS = {
         "--mmap_mode": {"type": str, "help": "mmap_mode", "default": None},
         "--encoding": {"type": str, "help": "encoding", "default": "ASCII"},
     },
+    "ones": {
+        "shape": {"type": str, "help": "shape"},
+        "--dtype": {"type": str, "help": "dtype", "default": None},
+        "--order": {"type": str, "help": "order", "default": "C"},
+    },
+    "zeros": {
+        "shape": {"type": str, "help": "shape"},
+        "--dtype": {"type": str, "help": "dtype", "default": "float"},
+        "--order": {"type": str, "help": "order", "default": "C"},
+    },
+    "full": {
+        "shape": {"type": str, "help": "shape"},
+        "fill_value": {"type": float, "help": "fill_value"},
+        "--dtype": {"type": str, "help": "dtype", "default": None},
+        "--order": {"type": str, "help": "order", "default": "C"},
+    },
 }

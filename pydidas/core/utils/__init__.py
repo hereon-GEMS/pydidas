@@ -38,6 +38,7 @@ from .get_documentation_targets import *
 from .hdf5_dataset_utils import *
 from .logger import *
 from .math_utils import *
+from .numpy_parser import *
 from .no_print import *
 from .qt_utilities import *
 from .rebin_ import *
@@ -97,6 +98,11 @@ from . import math_utils
 
 __all__.extend(math_utils.__all__)
 del math_utils
+
+from . import numpy_parser
+
+__all__.extend(numpy_parser.__all__)
+del numpy_parser
 
 from . import no_print
 

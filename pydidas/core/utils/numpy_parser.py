@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The str_utils module includes convenience functions for string formatting.
+The NumpyParser class is used to create numpy arrays from strings.
 """
 
 __author__ = "Malte Storm"
@@ -39,32 +39,7 @@ from ..exceptions import UserConfigError
 
 _NUM_NUMERIC_CHARS_TRANSLATE = str.maketrans("", "", "01234567890. ")
 
-
 BRACKETED_KEY = "$$$BRACKETED$$$"
-
-
-def _argparse_string_to_bool(input_str: str) -> bool:
-    """
-    Get the boolean value of a string.
-
-    Parameters
-    ----------
-    input_str : str
-        The input string.
-
-    Returns
-    -------
-    bool :
-        The corresponding boolean value.
-    """
-    if isinstance(input_str, bool):
-        return input_str
-    input_str = input_str.strip()
-    if input_str.lower() in ("yes", "true", "t", "y", "1"):
-        return True
-    if input_str.lower() in ("no", "false", "f", "n", "0"):
-        return False
-    raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
 class _NumpyParser:
@@ -237,9 +212,9 @@ class _NumpyParser:
         if input_str[0] in ["(", "["] and input_str[-1] in [")", "]"]:
             input_str = input_str[1:-1]
         _non_numeric_chars = set(input_str.translate(_NUM_NUMERIC_CHARS_TRANSLATE))
-        if _non_numeric_chars == set("-"):
+        if _non_numeric_chars in [set("-"), set()]:
             return np.fromstring(input_str, sep=" ")
-        if _non_numeric_chars == set(",-"):
+        if _non_numeric_chars in [set(",-"), set(",")]:
             return np.fromstring(input_str, sep=",")
         raise UserConfigError("Could not parse the given string.")
 
@@ -274,7 +249,7 @@ class _NumpyParser:
             if len(_args) > 0:
                 _tmp_arg = _args.pop(0)
                 if _type == bool:
-                    _tmp_arg = _argparse_string_to_bool(_tmp_arg)
+                    _tmp_arg = _tmp_arg.lower() in ("true", "1")
                 _kwargs[_key] = _type(_tmp_arg)
         # print("arange kwargs", _kwargs)
         if _kwargs["dtype"] not in NUMPY_DTYPES:
@@ -311,7 +286,7 @@ class _NumpyParser:
             if len(_args) > 0:
                 _tmp_arg = _args.pop(0)
                 _kwargs[_key] = (
-                    _argparse_string_to_bool(_tmp_arg)
+                    _tmp_arg.lower() in ("true", "1")
                     if _type == bool
                     else _type(_tmp_arg)
                 )
@@ -368,6 +343,44 @@ class _NumpyParser:
             None if _kwargs["mmap_mode"] == "None" else _kwargs["mmap_mode"]
         )
         return np.load(_fname, **_kwargs)
+
+    def __parse_for_func(
+        self, input_str: str, np_func=None, np_func_name=""
+    ) -> np.ndarray:
+        """
+        Parse the arguments given for creating an array of ones or zeros.
+
+        Parameters
+        ----------
+        input_str : str
+            The input string.
+        np_func : callable, optional
+            The numpy function to be used.
+        np_func_name : str, optional
+            The function name as string.
+
+        Returns
+        -------
+        np.ndarray :
+            The output ndarray.
+        """
+        _kwargs, _other = self._parse_known_args(input_str, np_func_name)
+        _shape = _kwargs.pop("shape").strip("()").split(",")
+        if len(_shape) == 1 or (len(_shape) == 2 and _shape[1] == ""):
+            _shape = int(_shape[0])
+        else:
+            _shape = tuple(int(dim) for dim in _shape)
+        _kwargs["dtype"] = NUMPY_DTYPES[_kwargs["dtype"]]
+        if "fill_value" in _kwargs:
+            _fill_value = float(_kwargs.pop("fill_value"))
+            return np_func(_shape, _fill_value, **_kwargs)
+        return np_func(_shape, **_kwargs)
+
+    _parse_ones = partialmethod(__parse_for_func, np_func=np.ones, np_func_name="ones")
+    _parse_zeros = partialmethod(
+        __parse_for_func, np_func=np.zeros, np_func_name="zeros"
+    )
+    _parse_full = partialmethod(__parse_for_func, np_func=np.full, np_func_name="full")
 
 
 NumpyParser = _NumpyParser()

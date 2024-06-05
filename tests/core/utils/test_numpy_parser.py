@@ -40,6 +40,7 @@ _LINSPACE_EXAMPLES = [
     ["numpy.linspace(2, 10)", np.linspace(2, 10)],
     ["linspace(2, 10, 50)", np.linspace(2, 10, 50)],
     ["np.linspace(2, 10, num=10)", np.linspace(2, 10, num=10)],
+    ["np.linspace(-2, 37, num=44)", np.linspace(-2, 37, num=44)],
     ["np.linspace(2, 10, num= 12)", np.linspace(2, 10, num=12)],
     [
         "numpy.linspace(2, 10, endpoint=False)",
@@ -61,6 +62,7 @@ _LINSPACE_EXAMPLES = [
 _ARANGE_EXAMPLES = [
     ["np.arange(5)", np.arange(5)],
     ["numpy.arange(2, 10)", np.arange(2, 10)],
+    ["numpy.arange(-124, 17, 23)", np.arange(-124, 17, 23)],
     ["arange(2, 10, 2)", np.arange(2, 10, 2)],
     ["np.arange(2, 10, 2.5)", np.arange(2, 10, 2.5)],
     ["numpy.arange(10, 2, -1)", np.arange(10, 2, -1)],
@@ -111,6 +113,11 @@ class Test_numpy_utils(unittest.TestCase):
             with self.subTest(input=_input):
                 _new = NumpyParser(_input)
                 self.assertTrue(np.allclose(_new, np.array((1, 2, -3, 0.4, 5))))
+        for _input in _SIMPLE_CASES:
+            _input = _input.replace("-", "")
+            with self.subTest(input=_input):
+                _new = NumpyParser(_input)
+                self.assertTrue(np.allclose(_new, np.array((1, 2, 3, 0.4, 5))))
 
     def test_parse_string_to_ndarray__arange(self):
         for _input, _arr in _ARANGE_EXAMPLES:
@@ -186,6 +193,40 @@ class Test_numpy_utils(unittest.TestCase):
                 _ref = np.load(_fname, **_kwargs)
                 _new = NumpyParser(f"np.load({_fname}{_kwargs_str})")
                 self.assertTrue(np.allclose(_new, _ref))
+
+    def __test_parse_string_to_ndarray(self, func: callable, func_name: str):
+        for _shape, _value, _kwargs in [
+            [5, 12, {}],
+            [(5,), 4.3, {}],
+            [(5, 2), -4.44e5, {}],
+            [(5, 2), 12.4, {"dtype": np.float32}],
+            [(5, 2), 44, {"dtype": np.int64}],
+            [(5, 2), 1.234e-4, {"dtype": np.float64, "order": "F"}],
+            [(5, 2), -5.432e-2, {"dtype": np.float32, "order": "C"}],
+            [(5, 2, 7), 6789, {"dtype": np.int64}],
+        ]:
+            with self.subTest(shape=_shape, kwargs=_kwargs):
+                _kwargs_str = (", " if len(_kwargs) > 0 else "") + ", ".join(
+                    f"{k}=" + (f"'{v}'" if isinstance(v, str) else f"np.{v.__name__}")
+                    for k, v in _kwargs.items()
+                )
+                if func_name == "full":
+                    _ref = func(_shape, _value, **_kwargs)
+                    _parse_str = f"np.{func_name}({_shape}, {_value}{_kwargs_str})"
+                else:
+                    _ref = func(_shape, **_kwargs)
+                    _parse_str = f"np.{func_name}({_shape}{_kwargs_str})"
+                _new = NumpyParser(_parse_str)
+                self.assertTrue(np.allclose(_new, _ref))
+
+    def test_parse_string_to_ndarray__zeros(self):
+        self.__test_parse_string_to_ndarray(np.zeros, "zeros")
+
+    def test_parse_string_to_ndarray__ones(self):
+        self.__test_parse_string_to_ndarray(np.ones, "ones")
+
+    def test_parse_string_to_ndarray__full(self):
+        self.__test_parse_string_to_ndarray(np.full, "full")
 
 
 if __name__ == "__main__":

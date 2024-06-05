@@ -104,5 +104,5 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         """
         if self._ptype == Real and value is not None and np.isfinite(value):
             value = np.round(value, decimals=FLOAT_DISPLAY_ACCURACY)
-        self._old_value = value
+        self._old_value = str(value)
         self.setText(f"{value}")

@@ -4,3 +4,10 @@
   overflow-y : hidden;
 }
 
+.align-references a:first-child {
+  float: left;
+}
+
+.align-references a:last-child {
+  float: right;
+}

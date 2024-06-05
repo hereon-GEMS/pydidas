@@ -80,8 +80,9 @@ class ResultSelectionWidget(
     -----
     The ResultSelectionWidget offers the following signal which can be used:
 
-        sig_new_selection : QtCore.Signal(
+    .. code-block::
 
+        .sig_new_selection : QtCore.Signal(
             use_timeline : int,
             active_dims : list,
             active_node : int,
@@ -89,10 +90,10 @@ class ResultSelectionWidget(
             plot_type : str
         )
 
-            The signal signature is: flag to use timeline or scan shape,
-            active scan dimensions, node ID of the active node,
-            the selection in form of a tuple with entries for every dimension
-            (in form of a numpy array), the type of plot in form of a string.
+    The signal signature is: flag to use timeline or scan shape,
+    active scan dimensions, node ID of the active node,
+    the selection in form of a tuple with entries for every dimension
+    (in form of a numpy array), the type of plot in form of a string.
 
     Parameters
     ----------

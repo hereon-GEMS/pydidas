@@ -332,7 +332,7 @@ class TestFitTriplePeak(unittest.TestCase):
     def test_detailed_results(self):
         plugin = self.create_generic_plugin()
         plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
+        _data, _kwargs = plugin.execute(self._data, store_details=True)
         _details = plugin.detailed_results
         self.assertEqual(set(_details.keys()), {None})
 
@@ -347,7 +347,7 @@ class TestFitTriplePeak(unittest.TestCase):
         _data.axis_units = ("u0", "u1", "u2")
         plugin = self.create_generic_plugin()
         plugin.pre_execute()
-        _new_data, _kwargs = plugin.execute(_data)
+        _new_data, _kwargs = plugin.execute(_data, store_details=True)
         _details = plugin.detailed_results
         for _indices in itertools.product(np.arange(3), np.arange(3)):
             self.assertIn(

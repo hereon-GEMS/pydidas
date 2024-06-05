@@ -65,7 +65,6 @@ class BaseFitPlugin(ProcPlugin):
     )
     input_data_dim = -1
     output_data_dim = 0
-    param_labels = []
     new_dataset = True
     advanced_parameters = ["fit_sigma_threshold", "fit_min_peak_height"]
     has_unique_parameter_config_widget = True
@@ -75,7 +74,7 @@ class BaseFitPlugin(ProcPlugin):
         self._fitter = None
         self._data = None
         self._data_x = None
-        self._details = None
+        self._details = {}
         self._fit_params = {}
         self._fit_presets = {}
         self._config = self._config | {
@@ -178,12 +177,13 @@ class BaseFitPlugin(ProcPlugin):
         )
         _res_c = self._fitter.sort_fitted_peaks_by_position(_res.x)
         self._fit_params = dict(zip(self._config["param_labels"], _res_c))
-        _results = self.create_result_dataset()
         kwargs = kwargs | {
             "fit_params": self._fit_params,
             "fit_func": self._fitter.name,
         }
-        self._details = {None: self.create_detailed_results(_results, _startguess)}
+        _results = self.create_result_dataset()
+        if kwargs.get("store_details", False):
+            self._details = {None: self.create_detailed_results(_results, _startguess)}
         return _results, kwargs
 
     def create_result_dataset(self, valid: bool = True):

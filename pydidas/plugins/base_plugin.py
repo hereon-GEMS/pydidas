@@ -92,18 +92,18 @@ class BasePlugin(ObjectWithParameterCollection):
         A key to discriminate between the different types of plugins
         (input, processing, output)
     plugin_name : str
-        The plugin name key in hunman-readable form for referencing the plugin.
+        The plugin name key in human-readable form for referencing the plugin.
     default_params : ParameterCollection, optional
         A ParameterCollection with the class parameters which are required to use the
         plugin. The default is an empty ParameterCollection.
-    generic_params : ParameterCollection, optinoal
+    generic_params : ParameterCollection, optional
         A ParameterCollection with the generic parameters for all plugins of a specific
         type. The default are the Parameters "keep_results" and "label" for all plugins.
     input_data_dim : int, optional
-        The dimensionality of the input data. Use -1 for arbitraty dimensionality or
+        The dimensionality of the input data. Use -1 for arbitrary dimensionality or
         None if the plugin does not accept any input data. The default is -1.
     output_data_dim : int, optional
-        The dimensionality of the output data. Use -1 for arbitraty dimensionality or
+        The dimensionality of the output data. Use -1 for arbitrary dimensionality or
         None if the plugin does not create any output data. The default is -1.
     output_data_label : str, optional
         The label for the output Dataset. The default is an empty string.
@@ -183,7 +183,7 @@ class BasePlugin(ObjectWithParameterCollection):
         Returns
         -------
         dict
-            The descripion of the plugin.
+            The description of the plugin.
         """
         _doc = (
             cls.__doc__.strip() if cls.__doc__ is not None else "No docstring available"
@@ -336,7 +336,7 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         from .plugin_getter_ import plugin_getter
 
-        return (plugin_getter, (self.__class__.__name__,), self.__getstate__())
+        return plugin_getter, (self.__class__.__name__,), self.__getstate__()
 
     def copy(self) -> Self:
         """
@@ -345,7 +345,7 @@ class BasePlugin(ObjectWithParameterCollection):
         Returns
         -------
         BasePlugin :
-            The plugins's copy.
+            The plugin's copy.
         """
         return copy.copy(self)
 
@@ -488,7 +488,7 @@ class BasePlugin(ObjectWithParameterCollection):
                 "due to an incorrect and inconsistent workflow tree. Please check the "
                 "full workflow."
             )
-        if self.input_data_dim > 0 and len(new_shape) != self.input_data_dim:
+        if 0 < self.input_data_dim != len(new_shape):
             raise UserConfigError(
                 f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
                 f"\nThe new shape must be a tuple of length {self.input_data_dim} but "
@@ -614,7 +614,7 @@ class BasePlugin(ObjectWithParameterCollection):
         Get the parameters for a single ROI and binning operation.
 
         This method combines all legacy operations on the data into one set of
-        operations to be applied..
+        operations to be applied.
 
         Returns
         -------

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The decorator module has useful decorators to facilitate coding.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -108,6 +108,9 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
         if data.ndim == 1:
             return method(self, data, **kwargs)
         _results = None
+        _process_details = kwargs.get("store_details", False) and hasattr(
+            self, "_details"
+        )
         _details = {}
         _dim_to_process = np.mod(self.get_param_value("process_data_dim"), data.ndim)
         _results_shape = remove_item_at_index_from_iterable(data.shape, _dim_to_process)
@@ -121,9 +124,8 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
 
             _point = insert_item_in_tuple(_params, _dim_to_process, None)
             _detail_identifier = data.get_description_of_point(_point)
-            if hasattr(self, "_details"):
-                _details[_detail_identifier] = self._details[None].copy()
-                del self._details[None]
+            if _process_details:
+                _details[_detail_identifier] = self._details.pop(None)
 
             _output_slices = insert_item_in_tuple(
                 _params, _dim_to_process, slice(0, _single_result.size)
@@ -147,7 +149,7 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
             _results[_output_slices] = _single_result
         if _results.shape[_dim_to_process] == 1:
             _results = _results.squeeze(_dim_to_process)
-        if hasattr(self, "_details"):
+        if _process_details:
             self._details = _details
         return _results, _new_kws
 

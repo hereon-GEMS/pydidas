@@ -31,7 +31,7 @@ __all__ = ["WorkflowResults", "WorkflowResultsContext"]
 import os
 import re
 from pathlib import Path
-from typing import Self, Union
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore
@@ -41,7 +41,7 @@ from ..contexts.diff_exp import DiffractionExperiment
 from ..contexts.scan import Scan
 from ..core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
 from .processing_tree import ProcessingTree
-from .result_io import WorkflowResultIoMeta as RESULT_SAVER
+from .result_io import WorkflowResultIoMeta as ResultSaver
 from .workflow_tree import WorkflowTree
 
 
@@ -76,7 +76,7 @@ class WorkflowResults(QtCore.QObject):
         diffraction_exp_context: Union[None, DiffractionExperiment] = None,
         scan_context: Union[None, Scan] = None,
         workflow_tree: Union[None, ProcessingTree] = None,
-    ) -> Self:
+    ):
         super().__init__()
         self._SCAN = ScanContext() if scan_context is None else scan_context
         self._EXP = (
@@ -127,7 +127,7 @@ class WorkflowResults(QtCore.QObject):
 
     def clear_all_results(self):
         """
-        Clear all interally stored results and reset the instance attributes.
+        Clear all internally stored results and reset the instance attributes.
         """
         self.__composites = {}
         self.__source_hash = -1
@@ -365,7 +365,7 @@ class WorkflowResults(QtCore.QObject):
         Parameters
         ----------
         node_id : int
-            The node ID for which results should be retured.
+            The node ID for which results should be returned.
 
         Returns
         -------
@@ -384,7 +384,7 @@ class WorkflowResults(QtCore.QObject):
         Parameters
         ----------
         node_id : int
-            The node ID for which results should be retured.
+            The node ID for which results should be returned.
         squeeze : bool, optional
             Keyword to toggle squeezing of data dimensions of the final dataset. If
             True, all dimensions with a length of 1 will be removed. The default is
@@ -418,9 +418,9 @@ class WorkflowResults(QtCore.QObject):
         Parameters
         ----------
         node_id : int
-            The node ID for which results should be retured.
+            The node ID for which results should be returned.
         slices : tuple
-            The tuple used for slicing/indexing the np.ndaray.
+            The tuple used for slicing/indexing the np.ndarray.
         flattened_scan_dim : bool, optional
             Keyword to process flattened Scan dimensions. If True, the Scan
             is assumed to be 1-d only and the first slice item will be used
@@ -558,7 +558,7 @@ class WorkflowResults(QtCore.QObject):
             _res = self.__composites
         else:
             _res = {node_id: self.__composites[node_id]}
-        RESULT_SAVER.export_full_data_to_active_savers(
+        ResultSaver.export_full_data_to_active_savers(
             _res, scan_context=self._config["frozen_SCAN"]
         )
 
@@ -597,7 +597,7 @@ class WorkflowResults(QtCore.QObject):
         """
         save_formats = [s.strip() for s in re.split("&|/|,", save_formats)]
         _name = self._config["scan_title"]
-        RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
+        ResultSaver.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
             _keys = list(self.shapes.keys())
         else:
@@ -613,18 +613,18 @@ class WorkflowResults(QtCore.QObject):
             for _id in _keys
         }
         _labels = {_id: _node_info[_id]["node_label"] for _id in _node_info}
-        _names = RESULT_SAVER.get_filenames_from_active_savers(_labels)
-        _existcheck = [
+        _names = ResultSaver.get_filenames_from_active_savers(_labels)
+        _exist_check = [
             os.path.exists(os.path.join(save_dir, _name)) for _name in _names
         ]
-        if True in _existcheck and not overwrite:
+        if True in _exist_check and not overwrite:
             raise UserConfigError(
                 f'The specified directory "{save_dir}" exists and is not empty. Please '
                 "select a different directory."
             )
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        RESULT_SAVER.prepare_active_savers(
+        ResultSaver.prepare_active_savers(
             save_dir,
             _node_info,
             scan_context=self._config["frozen_SCAN"],
@@ -738,7 +738,7 @@ class WorkflowResults(QtCore.QObject):
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()
-        _data, _node_info, _scan, _exp, _tree = RESULT_SAVER.import_data_from_directory(
+        _data, _node_info, _scan, _exp, _tree = ResultSaver.import_data_from_directory(
             directory
         )
         self._config.update(

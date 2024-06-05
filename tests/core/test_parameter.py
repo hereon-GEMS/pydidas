@@ -25,6 +25,7 @@ __status__ = "Production"
 
 
 import copy
+import pickle
 import unittest
 import warnings
 from numbers import Integral, Real
@@ -516,6 +517,57 @@ class TestParameter(unittest.TestCase):
         _param3 = Parameter("Test", None, [0, 1], name="Other name", unit="m")
         self.assertEqual(hash(_param), hash(_param2))
         self.assertNotEqual(hash(_param), hash(_param3))
+
+    def test_with_ndarray__value_property(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        self.assertIsInstance(_param.value, np.ndarray)
+
+    def test_with_ndarray__copy(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _param2 = _param.copy()
+        self.assertIsInstance(_param2.value, np.ndarray)
+        self.assertNotEqual(id(_param.value), id(_param2.value))
+
+    def test_with_ndarray__hash(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _param2 = Parameter("Test", np.ndarray, np.zeros(3))
+        self.assertEqual(hash(_param), hash(_param2))
+
+    def test_with_ndarray__repr(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _param.value = np.asarray([1, 42, 5, 7])
+        _repr = _param.__repr__()
+        self.assertIsInstance(_repr, str)
+
+    def test_with_ndarray__str(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _param.value = np.asarray([1, 42, 5, 7])
+        _repr = _param.__str__()
+        self.assertIsInstance(_repr, str)
+
+    def test_with_ndarray__pickle(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _dump = pickle.dumps(_param)
+        _param2 = pickle.loads(_dump)
+        self.assertTrue(np.allclose(_param.value, _param2.value))
+        self.assertEqual(_param.refkey, _param2.refkey)
+
+    def test_with_ndarray__value_as_list(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _list = [1, 42, 5, 7]
+        _param.value = _list
+        self.assertTrue(np.allclose(_param.value, np.array(_list)))
+
+    def test_with_ndarray__value_for_export(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _exported_val = _param.value_for_export
+        self.assertIsInstance(_exported_val, list)
+        self.assertEqual(_exported_val, list(_param.value))
+
+    def test_with_ndarray__deepcopy(self):
+        _param = Parameter("Test", np.ndarray, np.zeros(3))
+        _h = hash(_param)
+        self.assertIsInstance(_h, int)
 
 
 if __name__ == "__main__":

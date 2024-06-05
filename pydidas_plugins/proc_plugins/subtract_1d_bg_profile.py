@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -76,7 +76,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
 
     def pre_execute(self):
         """
-        Set-up the fit and store required values.
+        Set up the fit and store required values.
         """
         self._thresh = self.get_param_value("threshold_low")
         if self._thresh is not None and not np.isfinite(self._thresh):
@@ -107,9 +107,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         data = data - self._profile
-
         if self._thresh is not None:
             _indices = np.where(data < self._thresh)[0]
             data[_indices] = self._thresh
-
         return data, kwargs

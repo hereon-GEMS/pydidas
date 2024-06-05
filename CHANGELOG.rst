@@ -22,6 +22,10 @@ Improvements
 - Added an option to specify a required dimensionality when importing data.
 - The import_data and export_data functions now read/write the pydidas Dataset 
   metadata to/from the file.
+- Added a flag to toggle plugin detailed_results generation to minimize 
+  overhead in full processing.
+- Added support for np.ndarray as Parameter values.
+- Added documentation for Plugin development.
 
 Bugfixes
 --------
@@ -38,7 +42,13 @@ Bugfixes
   the output filename was not checked until after the operation.
 - Fixed an issue where Dataset axis ranges could be None.
 - Fixed an issue where Dataset axis labels / units could be None.
-
+- Fixed an issue in the ParamIoWidgetLineEdit where setting the value would 
+  compare the new str with a generic typed item.
+- Fixed an issue where a selection of a ´wrong´ mask by a user would raise
+  a pyFAI assertion error without a human-readable error message.
+- Fixed a bug which would display wrong numbers for allowed scan points in the 
+  WorkflowTestFrame.
+  
 
 v24.03.25
 =========

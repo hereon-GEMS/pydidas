@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -92,9 +92,11 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         plugin = pyFAIintegrationBase(**kwargs)
         return plugin
 
-    def create_mask(self):
+    def create_mask(self, shape=None):
         rng = np.random.default_rng(12345)
-        _mask = rng.integers(low=0, high=2, size=self._shape)
+        _mask = rng.integers(
+            low=0, high=2, size=shape if shape is not None else self._shape
+        )
         _maskfilename = os.path.join(self._temppath, "mask.npy")
         np.save(_maskfilename, _mask)
         return _maskfilename, _mask
@@ -546,6 +548,14 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         plugin.load_and_set_mask()
         self.assertTrue((plugin._mask == _mask).all())
 
+    def test_load_and_set_mask__wrong_size(self):
+        _maskfilename, _mask = self.create_mask()
+        plugin = pyFAIintegrationBase()
+        EXP.set_param_value("detector_mask_file", _maskfilename)
+        EXP.set_detector_params_from_name("Eiger2 9M")
+        with self.assertRaises(UserConfigError):
+            plugin.pre_execute()
+
     def test_load_and_set_mask__wrong_local_mask_and_q_settings(self):
         _maskfilename, _mask = self.create_mask()
         plugin = pyFAIintegrationBase()
@@ -561,6 +571,25 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         plugin._original_input_shape = (123, 45)
         plugin.pre_execute()
         self.assertIsInstance(plugin._ai, pyFAI.azimuthalIntegrator.AzimuthalIntegrator)
+
+    def test_check_mask_shape__okay(self):
+        _maskfilename, _mask = self.create_mask(shape=(3262, 3108))
+        _data = np.zeros((3262, 3108))
+        plugin = pyFAIintegrationBase()
+        EXP.set_param_value("detector_mask_file", _maskfilename)
+        EXP.set_detector_params_from_name("Eiger2 9M")
+        plugin.pre_execute()
+        plugin._check_mask_shape(_data)
+
+    def test_check_mask_shape__wrong_size(self):
+        _maskfilename, _mask = self.create_mask(shape=(3262, 3108))
+        _data = np.zeros((100, 100))
+        plugin = pyFAIintegrationBase()
+        EXP.set_param_value("detector_mask_file", _maskfilename)
+        EXP.set_detector_params_from_name("Eiger2 9M")
+        plugin.pre_execute()
+        with self.assertRaises(UserConfigError):
+            plugin._check_mask_shape(_data)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -317,7 +317,7 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_detailed_results(self):
         plugin = self.create_generic_plugin()
         plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
+        _data, _kwargs = plugin.execute(self._data, store_details=True)
         _details = plugin.detailed_results
         self.assertEqual(set(_details.keys()), {None})
 
@@ -332,7 +332,7 @@ class TestFitSinglePeak(unittest.TestCase):
         _data.axis_units = ("u0", "u1", "u2")
         plugin = self.create_generic_plugin()
         plugin.pre_execute()
-        _new_data, _kwargs = plugin.execute(_data)
+        _new_data, _kwargs = plugin.execute(_data, store_details=True)
         _details = plugin.detailed_results
         for _indices in itertools.product(np.arange(3), np.arange(3)):
             self.assertIn(

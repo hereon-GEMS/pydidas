@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to input data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -71,7 +71,7 @@ class RollingAverage1d(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._data = None
-        self._details = None
+        self._details = {}
 
     @property
     def detailed_results(self) -> dict:
@@ -122,7 +122,8 @@ class RollingAverage1d(ProcPlugin):
         _new_data[:_offset] = data[:_offset]
         _new_data[-_offset:] = data[-_offset:]
         self._results = _new_data
-        self._details = {None: self._create_detailed_results()}
+        if kwargs.get("store_details", False):
+            self._details = {None: self._create_detailed_results()}
         return _new_data, kwargs
 
     def _create_detailed_results(self):

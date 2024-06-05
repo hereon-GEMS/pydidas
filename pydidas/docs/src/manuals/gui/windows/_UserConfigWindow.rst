@@ -9,8 +9,11 @@
 The User config window
 ======================
 
-The *User config window* allows the user to customize the bahaviour of their
-pydidas copy. The individual Parameters are described below.
+The *User config window* allows the user to customize the behaviour of their
+pydidas copy. The *User config window* can either be accessed through the GUI menu
+(Options :raw-html:`&rarr;` User config) or through the :ref:`utilities_frame`.
+
+The individual Parameters are described below.
 
 .. image:: images/user_config_overview.png
     :align: center

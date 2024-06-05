@@ -30,7 +30,7 @@ __all__ = []
 from . import diff_exp
 from . import scan
 
-__all__.extend(["diff_exp", "scan"])
+__all__.extend(["diff_exp", "scan", "GLOBAL_CONTEXTS"])
 
 
 # import __all__ items from modules:

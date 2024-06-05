@@ -102,11 +102,12 @@ max-complexity = 12
 # E402 module level import not at top of file
 # E501 line too long
 # W605 invalid escape sequence
-"__init__.py" = ["F401", "F403", "F405", "E402"]
+"__init__.py" = ["F401", "F403", "F405", "E402", "I"]
 "pydidas/__init__.py" = ["F401", "F403", "F405", "E402", "I"]
 "generic_base_plugins.py" = ["F401"]
 "qt_presets.py" = ["W605"]
 "file_extensions.py" = ["W605"]
+"numpy_parser.py" = ["W605"]
 # For reading Eiger data, the hdf5plugin must be imported to allow
 # decompressing the data, but it is not actually used.
 "dectris_utils.py" = ["F401"]

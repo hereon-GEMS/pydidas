@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -122,7 +122,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         self._local_minina_threshold = 1.2
         self.__input_data = None
         self.__results = None
-        self._details = None
+        self._details = {}
         self.__kwargs = {}
 
     @property
@@ -229,7 +229,8 @@ class Remove1dPolynomialBackground(ProcPlugin):
         )
 
         self.__results = data
-        self._details = {None: self._create_detailed_results()}
+        if kwargs.get("store_details", False):
+            self._details = {None: self._create_detailed_results()}
         return data, kwargs
 
     @staticmethod

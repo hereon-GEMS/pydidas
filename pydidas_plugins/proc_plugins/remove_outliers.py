@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a defined width.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -81,7 +81,7 @@ class RemoveOutliers(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._data = None
-        self._details = None
+        self._details = {}
 
     @property
     def detailed_results(self) -> dict:
@@ -132,7 +132,8 @@ class RemoveOutliers(ProcPlugin):
         data[_outliers_index_data] = self._config["ref_outer"][_outliers_index_cropped]
 
         self._results = data
-        self._details = {None: self._create_detailed_results()}
+        if kwargs.get("store_details", False):
+            self._details = {None: self._create_detailed_results()}
         return data, kwargs
 
     def _create_derived_data(self):
@@ -244,10 +245,10 @@ class RemoveOutliers(ProcPlugin):
         This method will return detailed information to display for the user. The return
         format is a dictionary with four keys:
         First, "n_plots" which determines the number of plots. Second, "plot_titles"
-        gives a title for each subplot. Third, "plot_ylabels" gives a y axis label for
+        gives a title for each subplot. Third, "plot_ylabels" gives a y-axis label for
         each subplot. Fourth, "items" provides  a list with the different items to be
         plotted. Each list entry must be a dictionary with the following keys: "plot"
-        [to detemine the plot number], "label" [for the legend label] and "data" with
+        [to determine the plot number], "label" [for the legend label] and "data" with
         the actual data.
 
         Returns

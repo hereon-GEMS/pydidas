@@ -31,7 +31,7 @@ __all__ = ["pyFAIintegrationBase"]
 import multiprocessing as mp
 import os
 import pathlib
-from typing import Literal, Union
+from typing import Literal, Optional, Union
 
 import numpy as np
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
@@ -105,7 +105,6 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Check and load the mask and set up the AzimuthalIntegrator.
         """
-        self.load_and_set_mask()
         if self._exp_hash != hash(self._EXP):
             _lambda_in_A = self._EXP.get_param_value("xray_wavelength")
             self._ai = AzimuthalIntegrator(
@@ -119,6 +118,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 wavelength=1e-10 * _lambda_in_A,
             )
             self._exp_hash = hash(self._EXP)
+        self.load_and_set_mask()
         if self._mask is not None:
             self._ai.set_mask(self._mask)
         self._adjust_integration_discontinuity()
@@ -142,6 +142,7 @@ class pyFAIintegrationBase(ProcPlugin):
                     f"Cannot load detector mask: No file with the name \n{_mask_file}"
                     "\nexists."
                 )
+            self._check_mask_shape()
         if self._mask is not None and len(self._legacy_image_ops) > 0:
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
@@ -385,6 +386,25 @@ class pyFAIintegrationBase(ProcPlugin):
         if hasattr(self, "_ais"):
             for _ai in self._ais:
                 _ai.set_mask(_mask)
+
+    def _check_mask_shape(self, mask: Optional[np.ndarray] = None):
+        """
+        Compare the shape of the mask and the AzimuthalIntegrator's detector.
+
+        Parameters
+        ----------
+        mask : ndarray, optional
+            The custom mask to be checked. If None, the stored default mask is used.
+        """
+        if self._ai is None:
+            return
+        _mask_shape = mask.shape if mask is not None else self._mask.shape
+        if _mask_shape != self._ai.detector.max_shape:
+            raise UserConfigError(
+                "The shape of the mask does not match the shape of the data.\n"
+                f"Experimental geometry shape: {self._ai.detector.max_shape}\n"
+                f"Mask shape: {_mask_shape}."
+            )
 
     def execute(self, data: np.ndarray, **kwargs: dict):
         """

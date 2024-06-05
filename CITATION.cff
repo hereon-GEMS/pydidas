@@ -20,5 +20,5 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-date-released: 2024-03-25
-version: 24.03.25
+date-released: 2024-06-05
+version: 24.06.05

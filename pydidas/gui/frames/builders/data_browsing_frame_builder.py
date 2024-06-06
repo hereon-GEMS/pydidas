@@ -30,6 +30,7 @@ __all__ = ["DataBrowsingFrameBuilder"]
 
 import qtawesome as qta
 from qtpy import QtWidgets
+from silx.gui.data.DataViewerFrame import DataViewerFrame
 
 from ....core.constants import POLICY_EXP_EXP
 from ....widgets.factory import SquareButton
@@ -39,7 +40,6 @@ from ....widgets.selection import (
     Hdf5DatasetSelector,
     RawMetadataSelector,
 )
-from ....widgets.silx_plot import PydidasImageView
 
 
 class DataBrowsingFrameBuilder:
@@ -89,8 +89,29 @@ class DataBrowsingFrameBuilder:
             icon=qta.icon("fa.chevron-right"),
             parent_widget="browser",
         )
-
-        frame._widgets["viewer"] = PydidasImageView()
+        frame.create_empty_widget(
+            "viewer_and_filename", parent_widget=None, sizePolicy=POLICY_EXP_EXP
+        )
+        frame.create_label(
+            "filename_label",
+            "Filename:",
+            parent_widget="viewer_and_filename",
+            gridPos=(0, 0, 1, 1),
+            font_metric_width_factor=12,
+        )
+        frame.create_lineedit(
+            "filename",
+            parent_widget="viewer_and_filename",
+            gridPos=(0, 1, 1, 1),
+            readOnly=True,
+            sizePolicy=POLICY_EXP_EXP,
+        )
+        frame.add_any_widget(
+            "viewer",
+            DataViewerFrame(),
+            parent_widget="viewer_and_filename",
+            gridPos=(1, 0, 1, 2),
+        )
 
         frame._widgets["splitter"] = QtWidgets.QSplitter()
         frame._widgets["splitter"].setSizePolicy(
@@ -99,5 +120,5 @@ class DataBrowsingFrameBuilder:
         frame._widgets["splitter"].setStretchFactor(0, 10)
         frame._widgets["splitter"].setStretchFactor(1, 20)
         frame._widgets["splitter"].addWidget(frame._widgets["browser"])
-        frame._widgets["splitter"].addWidget(frame._widgets["viewer"])
+        frame._widgets["splitter"].addWidget(frame._widgets["viewer_and_filename"])
         frame.layout().addWidget(frame._widgets["splitter"])

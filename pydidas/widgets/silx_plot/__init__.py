@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = []
 
 # import __all__ items from modules:
-from .pydidas_data_viewer_frame import *
 from .pydidas_imageview import *
 from .pydidas_masktools_widget import *
 from .pydidas_plot1d import *
@@ -39,11 +38,6 @@ from .utilities import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import pydidas_data_viewer_frame
-
-__all__.extend(pydidas_data_viewer_frame.__all__)
-del pydidas_data_viewer_frame
-
 from . import pydidas_imageview
 
 __all__.extend(pydidas_imageview.__all__)

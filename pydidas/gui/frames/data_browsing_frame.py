@@ -199,7 +199,6 @@ class DataBrowsingFrame(BaseFrame):
         kwargs : dict
             The kwargs required for decoding the raw data.
         """
-        print(self.__current_filename, kwargs)
         _data = import_data(self.__current_filename, **kwargs)
         self.__display_dataset(_data)
         self._widgets["filename"].setText(self.__current_filename)

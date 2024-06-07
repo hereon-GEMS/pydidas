@@ -81,7 +81,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
         self._config = {
             "activeDsetFilters": [],
-            "currentDset": None,
+            "current_dataset": "",
             "current_filename": "",
             "dsetFilters": (
                 dataset_key_filters
@@ -193,9 +193,9 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         accepted frame range for the sliders.
         """
         _dset = self._widgets["select_dataset"].currentText()
-        if _dset == self._config["currentDset"]:
+        if _dset == self._config["current_dataset"]:
             return
-        self._config["currentDset"] = _dset
+        self._config["current_dataset"] = _dset
         self.sig_new_dataset_selected.emit(_dset)
 
     def _toggle_filter_key(self, widget: QtWidgets.QWidget, key: str):
@@ -236,7 +236,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             The full file system path to the new file.
         """
         _filename = Path(name)
-        if (not _filename.is_file()) or _filename == self._config["current_filename"]:
+        if (not _filename.is_file()) or name == self._config["current_filename"]:
             return
         _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
@@ -245,5 +245,6 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             self.__populate_dataset_list()
         else:
             self._config["current_filename"] = ""
+            self._config["current_dataset"] = ""
             with QtCore.QSignalBlocker(self._widgets["select_dataset"]):
                 self._widgets["select_dataset"].clear()

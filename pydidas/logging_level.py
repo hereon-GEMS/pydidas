@@ -52,3 +52,5 @@ if any(
 
 
 LOGGING_LEVEL = __log_level
+
+logging.basicConfig(level=LOGGING_LEVEL)

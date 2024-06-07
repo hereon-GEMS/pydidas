@@ -30,7 +30,6 @@ __all__ = ["DataBrowsingFrameBuilder"]
 
 import qtawesome as qta
 from qtpy import QtWidgets
-from silx.gui.data.DataViewerFrame import DataViewerFrame
 
 from ....core.constants import POLICY_EXP_EXP
 from ....widgets.factory import SquareButton
@@ -40,6 +39,7 @@ from ....widgets.selection import (
     Hdf5DatasetSelector,
     RawMetadataSelector,
 )
+from ....widgets.silx_plot import PydidasDataViewerFrame
 
 
 class DataBrowsingFrameBuilder:
@@ -108,7 +108,7 @@ class DataBrowsingFrameBuilder:
         )
         frame.add_any_widget(
             "viewer",
-            DataViewerFrame(),
+            PydidasDataViewerFrame(),
             parent_widget="viewer_and_filename",
             gridPos=(1, 0, 1, 2),
         )

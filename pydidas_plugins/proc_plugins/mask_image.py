@@ -58,8 +58,6 @@ class MaskImage(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._mask = None
-        
-        
         self._maskval = None
 
     def pre_execute(self):

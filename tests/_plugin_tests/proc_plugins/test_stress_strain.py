@@ -33,7 +33,7 @@ from typing import Callable
 from numbers import Real, Integral 
 import numpy as np
 import pytest
-from pydidas_plugins.proc_plugins.stress-strain import chi_pos_verification, ds_slicing, extract_d_spacing, idx_s2c_grouping, group_d_spacing_by_chi
+from pydidas_plugins.proc_plugins.stress_strain import chi_pos_verification, ds_slicing, extract_d_spacing, idx_s2c_grouping, group_d_spacing_by_chi, combine_sort_d_spacing_pos_neg
 
 
 def chi_gen(chi_start, chi_stop, delta_chi):

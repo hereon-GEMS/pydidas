@@ -202,21 +202,7 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
                                  axis_ranges={0: np.arange(2), 1:  s2c_axis_pos_sorted}, 
                                  axis_labels={0: ['d-', 'd+'], 1: 'sin2chi'})
     
-    print(d_spacing_combined.shape)
-    print(d_spacing_combined.axis_ranges)
-    
-    fig, ax =plt.subplots()
-    ax.plot(d_spacing_combined.axis_ranges[1], d_spacing_combined.array[0,:], label='d-', linestyle='None', marker='s')
-    ax.plot(d_spacing_combined.axis_ranges[1], d_spacing_combined.array[1,:], label='d+',linestyle='None',  marker='o')
-    ax.plot(d_spacing_combined.axis_ranges[1], np.nanmean(d_spacing_combined.array[:,:], axis=0), label ="'d+'+'d-'/2", linestyle='None',  marker='x')
-    ax.set_ylabel('d [nm]')
-    ax.set_xlabel('sin^2(chi)')
-    ax.set_title('sin^2(chi) vs d_spacing')
-    fig.legend()
-    ax.grid()
-    fig.show()
-    # (d+ +d-)/2 in general np.mean(d+,d-)
-    # d(+) - d(-) vs sin(2*chi)  #different graph, linear fit, force through 0
+  
     return d_spacing_combined
 
 

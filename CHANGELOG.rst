@@ -2,6 +2,15 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v24.XX.YY
+=========
+
+Bugfixes
+--------
+- Fixed an issue where a exception message would be copied to the clipboard
+  without clicking the corresponding button.
+
+
 v24.06.05
 =========
 

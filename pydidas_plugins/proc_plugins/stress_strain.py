@@ -37,6 +37,7 @@ from pydidas.data_io import import_data
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
+
 def chi_pos_verification(ds):
     '''
     Verification if dataset ds contains 'chi' and 'position' for d-spacing.
@@ -86,14 +87,6 @@ def chi_pos_verification(ds):
 
     return (chi_key, position_key)
 
-
-                break
-
-    # Check if 'position' is found
-    if position_key is None:
-        raise ValueError('Key containing "position" is missing. Check your dataset.')
-
-    return (chi_key, position_key)
 
 
 def extract_d_spacing(ds1, pos_key, pos_idx):

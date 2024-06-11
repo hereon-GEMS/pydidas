@@ -31,6 +31,9 @@ from pydidas.core import Dataset
 from dataclasses import dataclass
 from typing import Callable
 from numbers import Real, Integral 
+import numpy as np
+import pytest
+from pydidas_plugins.proc_plugins.stress-strain import chi_pos_verification, ds_slicing, extract_d_spacing, idx_s2c_grouping, group_d_spacing_by_chi
 
 
 def chi_gen(chi_start, chi_stop, delta_chi):
@@ -87,9 +90,6 @@ def generate_spatial_fit_res(y_range, x_range=None, chi_start=-175, chi_stop=180
 
             fit_results = np.array(fit_results)
             # Adjust how results are stored based on the presence of x_range
-            # Debug print statements
-            #print(f"fit_results.T.shape: {fit_results.T.shape}, j: {j}, i: {i}")
-            #print('x_range:', x_range)
             if x is not None:
                 result_array[j, i, :, :] = fit_results.T
             else:

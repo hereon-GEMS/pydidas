@@ -31,8 +31,12 @@ from functools import partial
 from typing import Union
 
 import h5py
+import numpy as np
 from qtpy import QtCore
 from silx.gui.data.DataViews import IMAGE_MODE, PLOT1D_MODE, RAW_MODE
+from silx.gui.hdf5 import H5Node
+from silx.gui.hdf5.Hdf5Item import Hdf5Item
+from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
 from pydidas_qtcore import PydidasQApplication
 
@@ -63,6 +67,7 @@ class DataBrowsingFrame(BaseFrame):
         self.__supported_extensions = set(IoMaster.registry_import.keys())
         self.__current_filename = None
         self.__open_file = None
+        self.__hdf5node = Hdf5Node()
 
     def connect_signals(self):
         """
@@ -88,31 +93,12 @@ class DataBrowsingFrame(BaseFrame):
         self._widgets["raw_metadata_selector"].sig_decode_params.connect(
             self.__display_raw_data
         )
-        # self.sig_this_frame_activated.connect(
-        #     self._widgets["viewer"].update_from_diffraction_exp
-        # )
-        # self.sig_this_frame_activated.connect(
-        #     partial(
-        #         self._widgets["viewer"].cs_transform_button.check_detector_is_set, True
-        #     )
-        # )
 
     def build_frame(self):
         """
         Build the frame and populate it with widgets.
         """
         DataBrowsingFrameBuilder.build_frame(self)
-
-    def finalize_ui(self):
-        """
-        Finalize UI creation.
-        """
-        # self._widgets["hdf5_dataset_selector"].register_plot_widget(
-        #     self._widgets["viewer"]
-        # )
-        # self._widgets["raw_metadata_selector"].register_plot_widget(
-        #     self._widgets["viewer"]
-        # )
 
     @QtCore.Slot(bool)
     def change_splitter_pos(self, enlarge_dir: bool = True):
@@ -143,12 +129,15 @@ class DataBrowsingFrame(BaseFrame):
         filename : str
             The full file name (including directory) of the selected file.
         """
+        if self.__current_filename == filename:
+            return
         _extension = get_extension(filename)
         if _extension not in self.__supported_extensions:
             return
         self.set_status(f"Selected file: {filename}")
         self.__current_filename = filename
         if self.__open_file is not None:
+            self._widgets["viewer"].setData(None)
             self.__open_file.close()
             self.__open_file = None
         if _extension in HDF5_EXTENSIONS:
@@ -160,7 +149,7 @@ class DataBrowsingFrame(BaseFrame):
         self.__display_dataset(_data)
         self._widgets["filename"].setText(self.__current_filename)
 
-    def __display_dataset(self, data: Union[Dataset, h5py.Dataset]):
+    def __display_dataset(self, data: Union[Dataset, H5Node]):
         """
         Display the data in the viewer widget.
 
@@ -170,11 +159,18 @@ class DataBrowsingFrame(BaseFrame):
             The data to display.
         """
         self._widgets["viewer"].setData(data)
-        self._widgets["viewer"].setDisplayMode(
+        if isinstance(data, (np.ndarray, H5Node, h5py.Dataset)):
+            _shape = data.shape
+        else:
+            raise TypeError("Data type not supported.")
+        _target_mode = (
             PLOT1D_MODE
-            if data.ndim == 1
-            else (IMAGE_MODE if data.ndim >= 2 else RAW_MODE)
+            if len(_shape) == 1
+            else (IMAGE_MODE if len(_shape) >= 2 else RAW_MODE)
         )
+        _current_mode = self._widgets["viewer"].displayMode()
+        if _target_mode != _current_mode:
+            self._widgets["viewer"].setDisplayMode(_target_mode)
 
     @QtCore.Slot(str)
     def __display_hdf5_dataset(self, dataset: str):
@@ -186,7 +182,14 @@ class DataBrowsingFrame(BaseFrame):
         dataset : str
             The key of the dataset to display.
         """
-        self.__display_dataset(self.__open_file[dataset])
+        _item = Hdf5Item(
+            text=dataset,
+            obj=self.__open_file[dataset],
+            parent=self.__hdf5node,
+            openedPath=self.__current_filename,
+        )
+        _data = H5Node(_item)
+        self.__display_dataset(_data)
         self._widgets["filename"].setText(f"{self.__current_filename}::{dataset}")
 
     @QtCore.Slot(object)

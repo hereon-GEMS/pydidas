@@ -28,11 +28,11 @@ __all__ = ["SilxDataViewer"]
 
 
 from silx.gui.data.DataViewerFrame import DataViewerFrame
-from silx.gui.data.DataViews import (
-    _ImageView,
-)
+from silx.gui.data.DataViews import PLOT2D_MODE, _ImageView
 
-from ._data_views import PydidasImageDataView
+from pydidas_qtcore import PydidasQApplication
+
+from ._data_views import _PydidasPlot2dView
 
 
 class SilxDataViewer(DataViewerFrame):
@@ -41,8 +41,13 @@ class SilxDataViewer(DataViewerFrame):
     """
 
     def __init__(self, parent=None):
+        self.__qtapp = PydidasQApplication.instance()
         super(SilxDataViewer, self).__init__(parent=parent)
 
         for _view in [_v for _v in self.availableViews() if isinstance(_v, _ImageView)]:
-            self.removeView(_view)
-        self.addView(PydidasImageDataView(self))
+            _success = _view.replaceView(PLOT2D_MODE, _PydidasPlot2dView(self))
+            if not _success:
+                raise TypeError(
+                    "Could not replace the default view in SilxDataViewer with the "
+                    "custom pydidas view."
+                )

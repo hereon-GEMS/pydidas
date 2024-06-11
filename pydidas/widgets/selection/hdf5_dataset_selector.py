@@ -128,7 +128,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             "min_datasize",
             gridPos=(_row_offset, 1, 1, 1),
             range=(0, int(1e9)),
-            value=50,
+            value=10,
             minimumWidth=60,
         )
         self.create_spin_box(
@@ -174,6 +174,9 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             min_dim=_dset_filter_min_dim,
             ignore_keys=self._config["activeDsetFilters"],
         )
+        if "/entry/data/data" in _datasets:
+            _datasets.remove("/entry/data/data")
+            _datasets.insert(0, "/entry/data/data")
         _combo = self._widgets["select_dataset"]
         with QtCore.QSignalBlocker(self._widgets["select_dataset"]):
             _combo.clear()
@@ -240,11 +243,10 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             return
         _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
+        self._config["current_filename"] = name if _is_hdf5 else ""
+        self._config["current_dataset"] = ""
         if _is_hdf5:
-            self._config["current_filename"] = name
             self.__populate_dataset_list()
         else:
-            self._config["current_filename"] = ""
-            self._config["current_dataset"] = ""
             with QtCore.QSignalBlocker(self._widgets["select_dataset"]):
                 self._widgets["select_dataset"].clear()

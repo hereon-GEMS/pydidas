@@ -5,6 +5,11 @@
 v24.XX.YY
 =========
 
+Improvements
+------------
+- Replaced the data viewer in the DataBrowsingFrame with a modern silx 
+  DataViewerFrame.
+
 Bugfixes
 --------
 - Fixed an issue where a exception message would be copied to the clipboard

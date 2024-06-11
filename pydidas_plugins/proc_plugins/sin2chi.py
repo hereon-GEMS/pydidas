@@ -23,7 +23,7 @@ embedded metadata.
 __author__ = "Gudrun Lotze"
 __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
-__maintainer__ = "Malte Storm, Gudrun Lotze"
+__maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
 import os

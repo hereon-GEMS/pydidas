@@ -144,3 +144,378 @@ def d_spacing_simu_noise(chi):
     d_spacing_noise = np.random.default_rng(seed=10).laplace(mean_value, scale, size=d_spacing.shape)
     return d_spacing + d_spacing_noise
 
+@dataclass
+class S2cTestConfig:
+    delta_chi: Real
+    chi_start: Real
+    chi_stop: Real
+    d_spacing_func: Callable
+    d_mean_pos: np.ndarray
+    d_mean_neg: np.ndarray
+    s2c_range: np.ndarray
+    description: str = ""
+    
+case1=S2cTestConfig(
+    delta_chi = 22.5,
+    chi_start= -180,
+    chi_stop= 180,
+    d_spacing_func = d_spacing_simple,
+    d_mean_pos =  np.array([4,5,6,7,8]),
+    d_mean_neg = np.array([8,11,10,9,8]),
+    s2c_range = np.array([0. , 0.14645 ,0.5   ,  0.85355 ,1   ])    
+)
+
+case2=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= 0,
+    chi_stop= 45,
+    d_spacing_func = d_spacing_simple,
+    d_mean_pos =  np.array([0. ,1., 2., 3., 4.]),
+    d_mean_neg = np.array([np.nan, np.nan ,np.nan, np.nan ,np.nan]),
+    s2c_range = np.array([0.  ,    0.03015, 0.11698,0.25   , 0.41318]),
+    description = "Few chi values"
+)
+
+case3=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= -180,
+    chi_stop= 181,
+    d_spacing_func = d_spacing_simple_nan,
+    d_mean_pos = np.array([ 9., np.nan, 11. ,np.nan ,13., np.nan ,15., np.nan ,17., np.nan]),
+    d_mean_neg = np.array([27., np.nan ,25. ,np.nan, 23., np.nan ,21. ,np.nan, 19., np.nan]),
+    s2c_range = np.array([0., 0.03015 ,0.11698 ,0.25  ,  0.41318 ,0.58682 ,0.75   , 0.88302, 0.96985, 1.  ]),
+    description = "Some nan values"
+)
+
+case4=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= -90,
+    chi_stop= 11,
+    d_spacing_func = d_spacing_simple,
+    d_mean_pos= np.array([np.nan,  np.nan ,np.nan ,np.nan, np.nan, np.nan, np.nan ,np.nan ,10.,  9.]),
+    d_mean_neg = np.array([0. ,1., 2., 3., 4. ,5., 6. ,7., 8., 9.]),
+    s2c_range = np.array([1.    ,  0.96985, 0.88302 ,0.75  ,  0.58682,0.41318 ,0.25 ,   0.11698, 0.03015, 0.     ]),
+    description = "Few values in positive slope"
+)
+
+case5=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= -10,
+    chi_stop= 91,
+    d_spacing_func = d_spacing_simple,
+    d_mean_pos= np.array([ 2.,  1,  3.  ,4. , 5. , 6. , 7.,  8.,  9.,10.]),
+    d_mean_neg = np.array([ 0. , 1, np.nan, np.nan, np.nan ,np.nan, np.nan, np.nan, np.nan, np.nan]),
+    s2c_range = np.array([0.03015 ,0.   ,   0.11698 ,0.25  ,  0.41318, 0.58682,0.75  ,  0.88302, 0.96985, 1.     ]),
+    description = "Few values in negative slope"
+)
+
+case6=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= -30,
+    chi_stop= 181,
+    d_spacing_func = d_spacing_simple,
+    d_mean_pos= np.array([ 6.,  5.,  4.,  3.,  7. , 8.,  9., 10., 11., 12.]),
+    d_mean_neg = np.array([ 9., 10., 11. ,12.,17. ,16. ,15., 14. ,13., 12.]),
+    s2c_range = np.array( [0.25  ,  0.11698, 0.03015 ,0.   ,   0.41318, 0.58682, 0.75  ,  0.88302, 0.96985, 1.     ]),
+    description = "Less values in negative slope"
+)   
+
+case7=S2cTestConfig(
+    delta_chi = 22.5,
+    chi_start= -180,
+    chi_stop= 180,
+    d_spacing_func = d_spacing_simple,
+    d_mean_pos = np.array([4,5,6,7,8]),
+    d_mean_neg = np.array([8,11,10,9,8]),
+    s2c_range = np.array([0. , 0.14645 ,0.5   ,  0.85355 ,1   ]),
+    description = "Simple case"
+)
+
+case8=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= -180,
+    chi_stop= 181,
+    d_spacing_func = d_spacing_simu,
+    d_mean_pos = np.array([25.25007189, 25.27466048 ,25.2832 ,    25.27466048, 25.25007189, 25.2124, 25.16618858 ,25.11701142 ,25.0708    , 25.03312811]),
+    d_mean_neg = np.array([25.25007189, 25.2124  ,   25.16618858 ,25.11701142 ,25.0708   ,  25.03312811 ,25.00853952, 25.    ,     25.00853952 ,25.03312811]),
+    s2c_range = np.array([0.   ,   0.03015, 0.11698, 0.25  ,  0.41318 ,0.58682, 0.75 ,  0.88302, 0.96985 , 1.     ]),
+    description = "A more realistic case"
+)
+
+case9=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= 0,
+    chi_stop= 361,
+    d_spacing_func = d_spacing_simu,
+    d_mean_pos = np.array([25.25007 ,25.27466, 25.2832 , 25.27466 ,25.25007, 25.2124 , 25.16619,25.11701 ,25.0708,  25.03313]),
+    d_mean_neg = np.array([25.25007, 25.2124 , 25.16619 ,25.11701, 25.0708 , 25.03313 ,25.00854 ,25.   ,   25.00854 ,25.03313]),
+    s2c_range = np.array([0.   ,   0.03015, 0.11698,0.25  ,  0.41318, 0.58682, 0.75 ,  0.88302 ,0.96985, 1.     ]),
+    description = "A more realistic case with chi ranging from 0 to 360"
+)
+
+case10=S2cTestConfig(
+    delta_chi = 10,
+    chi_start= 0,
+    chi_stop= 361,
+    d_spacing_func = d_spacing_simu_noise,
+    d_mean_pos = np.array([26.267365 ,26.286636, 26.287342, 26.274916, 26.243111 ,26.234978 ,26.173857 ,26.127689 ,26.059813, 26.073472]),
+    d_mean_neg=np.array([26.211465, 26.204416 ,26.137925, 26.15062 , 26.106923, 26.033314, 25.993381 ,26.000767 ,26.018253, 26.073472]),
+    s2c_range = np.array([0.    ,   0.030154 ,0.116978 ,0.25 ,   0.413176, 0.586824, 0.75     ,0.883022, 0.969846,1.      ]),
+    description = "A more realistic case with chi ranging from 0 to 360 and noise added"
+)
+    
+    
+
+test_cases = [case1, case2, case3, case4, case5, case6, case7, case8, case9, case10]
+@pytest.mark.parametrize("case", test_cases)        
+def test_group_d_spacing_by_chi_result(case):
+    chi=chi_gen(case.chi_start, case.chi_stop, case.delta_chi)
+    d_spacing = Dataset(case.d_spacing_func(chi), axis_ranges = {0 : np.arange(0, len(chi))}, axis_labels={0 : 'd_spacing'} )
+    
+    (d_spacing_pos, d_spacing_neg) = group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4) 
+    
+    assert nan_allclose(d_spacing_pos.array, case.d_mean_pos, atol=1e-8)
+    assert nan_allclose(d_spacing_neg.array, case.d_mean_neg, atol=1e-8)
+    assert nan_allclose(d_spacing_pos.axis_ranges[0],case.s2c_range, atol=1e-5)
+    assert nan_allclose(d_spacing_neg.axis_ranges[0],case.s2c_range, atol=1e-5)
+    assert d_spacing_pos.array.size == case.d_mean_pos.size
+    assert d_spacing_neg.array.size == case.d_mean_neg.size
+    assert np.sum(np.isnan(d_spacing_pos.array)) == np.sum(np.isnan(case.d_mean_pos)), f"Expected {np.sum(np.isnan(case.d_mean_pos))} NaN values, but got {np.sum(np.isnan(d_spacing_pos.array))}"
+    assert np.sum(np.isnan(d_spacing_neg.array)) == np.sum(np.isnan(case.d_mean_neg)), f"Expected {np.sum(np.isnan(case.d_mean_neg))} NaN values, but got {np.sum(np.isnan(d_spacing_neg.array))}"
+    assert d_spacing_pos.array.shape == case.d_mean_pos.shape, \
+        f"Expected shapes to match: {d_spacing_pos.array.shape} != {case.d_mean_pos.shape}"
+    assert d_spacing_neg.array.shape == case.d_mean_neg.shape, \
+        f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
+
+   
+def test_chi_pos_verification_success():
+    
+    fit_labels= '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    
+    result_array_spatial = generate_result_array_spatial()
+    
+    axis_labels=['y', 'x', 'chi', fit_labels]
+    
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+    chi_pos_verification(ds)
+        
+def test_chi_pos_verification_missing_chi():
+
+    fit_labels= '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+
+    result_array_spatial = generate_result_array_spatial()
+    
+    axis_labels=['y', 'x', 'omega', fit_labels]
+    
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+       
+    with pytest.raises(ValueError) as excinfo:
+        chi_pos_verification(ds)
+    assert 'chi is missing' in str(excinfo.value)   
+       
+def test_chi_pos_verification_missing_position():
+    
+    fit_labels= '0: energy; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    
+    result_array_spatial = generate_result_array_spatial(fit_labels=fit_labels)
+
+    axis_labels=['y', 'x', 'chi', fit_labels]
+
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+    with pytest.raises(ValueError) as excinfo:
+        chi_pos_verification(ds)
+    assert 'Key containing "position" is missing' in str(excinfo.value)  
+
+def test_chi_pos_verification_wrong_input_type():
+    
+    with pytest.raises(TypeError) as excinfo:
+        chi_pos_verification([])  # Pass a list instead of a Dataset
+    assert 'Input has to be of type Dataset.' in str(excinfo.value), "Error message should indicate wrong type for Dataset."
+
+    
+def test_chi_pos_verification_all_labels_missing():
+   
+    result_array_spatial = generate_result_array_spatial()
+    
+    #labels are missing while creating a Dataset
+    ds = Dataset(result_array_spatial)
+    with pytest.raises(ValueError) as excinfo:
+        chi_pos_verification(ds)
+    assert 'chi is missing' in str(excinfo.value)
+    
+def test_multiple_chis_in_labels():
+
+    fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    result_array_spatial = generate_result_array_spatial()
+    axis_labels = {0: 'y', 1: 'chi', 2: 'chi', 3: fit_labels}  # 'chi' appears twice, simulated by the same value at different keys
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+
+    with pytest.raises(KeyError) as excinfo:
+        chi_pos_verification(ds)
+    
+    assert "Multiple \"chi\" found" in str(excinfo.value), "Error message should indicate multiple 'chi' were found"
+
+
+def test_position_not_at_zero():
+    
+    fit_labels = '1: area; 2: position; 3: FWHM; 4: background at peak; 0: total count intensity'
+    
+    result_array_spatial = generate_result_array_spatial(fit_labels=fit_labels)
+    axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+   
+    _, position_key = chi_pos_verification(ds)
+    assert position_key == (3, 2), "Expected position key to be (3, 2)"
+    
+    
+def test_position_not_at_zero_3d():
+    fit_labels = '1: area; 2: position; 3: FWHM; 4: background at peak; 0: total count intensity'
+    results_array_spatial_3d= generate_result_array_spatial(None, fit_labels=fit_labels)
+    axis_labels = {0: 'y', 1: 'chi', 2: fit_labels}
+    ds=Dataset(results_array_spatial_3d,  axis_labels=axis_labels)
+    _, position_key = chi_pos_verification(ds)
+    assert position_key == (2, 2), "Expected position key to be (2, 2)"
+
+    
+def test_ds_slicing_type_error():
+    with pytest.raises(TypeError) as excinfo: 
+        ds_slicing([])  # Pass an empty list instead of a Dataset
+    assert 'Input has to be of type Dataset.' in str(excinfo.value), "Error message should indicate wrong type for Dataset."
+        
+def test_ds_slicing_valid():
+    fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    result_array_spatial = generate_result_array_spatial()
+    axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+    ds = ds[0,0]
+    chi, d_spacing = ds_slicing(ds)
+    
+    assert isinstance(chi, np.ndarray) and isinstance(d_spacing, Dataset)
+    
+def test_ds_slicing_beyond_bounds():
+    fit_labels = '5: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    result_array_spatial = generate_result_array_spatial(fit_labels=fit_labels)
+    # position 5 is out of bounds 
+    axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels) 
+       
+    with pytest.raises(ValueError) as excinfo:
+        ds_slicing(ds)
+    assert 'Array is empty' in str(excinfo.value), "Error message should indicate that slicing beyond bounds."
+    
+def test_ds_slicing_dimension_mismatch():
+    
+    fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    result_array_spatial = generate_result_array_spatial()
+    axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels) 
+    
+    with pytest.raises(ValueError) as excinfo:
+        test=ds_slicing(ds)
+    assert 'Dimension mismatch' in str(excinfo.value), "Error message should indicate that d_spacing has a larger dimension."
+    
+def test_ds_slicing_dimension_mismatch_3d():
+    fit_labels = '0: position'
+    results_array_spatial_3d= generate_result_array_spatial(None, fit_labels=fit_labels)
+    axis_labels = {0: 'y', 1: 'chi', 2: fit_labels}
+    ds_3d=Dataset(results_array_spatial_3d,  axis_labels=axis_labels)
+    with pytest.raises(ValueError) as excinfo:
+        ds_slicing(ds_3d)
+    assert 'Dimension mismatch' in str(excinfo.value), "Error message should indicate that d_spacing has a larger dimension."
+    
+
+
+def test_extract_d_spacing_valid():
+
+    fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    result_array_spatial = generate_result_array_spatial()
+    axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels) 
+    pos_key_exp=3
+    pos_idx_exp=0
+    ds_expected=ds[:, :,:, pos_idx_exp:pos_idx_exp+1].squeeze()
+    assert np.array_equal(extract_d_spacing(ds, pos_key_exp, pos_idx_exp), ds_expected)
+    
+def test_idx_s2c_grouping_basic():
+    chi=np.arange(-175, 185, 10)
+    n_components, s2c_labels = idx_s2c_grouping(chi, tolerance=1e-3)
+    assert n_components > 0
+    assert len(s2c_labels) == len(chi)
+    
+def test_idx_s2c_grouping_tolerance_effectiveness():
+    chi = np.array([0, 0.001, 0.002, 0.003])
+    n_components, labels = idx_s2c_grouping(chi, tolerance=0.00001)
+    assert n_components == 1  # All should be in one group due to small variation and tight tolerance
+
+def test_idx_s2c_grouping_type_error():
+    with pytest.raises(TypeError):
+        idx_s2c_grouping([0, 30, 60])  # Passing a list instead of np.ndarray
+        
+def test_idx_s2c_grouping_empty_array():
+    chi = np.array([])
+    n_components, labels = idx_s2c_grouping(chi)
+    assert n_components == 0  # No components should be found
+    assert len(labels) == 0  # No labels should be assigned
+    
+def test_idx_s2c_grouping_extreme_values():
+    chi = np.array([-360, 360])
+    n_components, labels = idx_s2c_grouping(chi)
+    assert n_components == 1  # Extreme but equivalent values should be grouped together
+
+def test_idx_s2c_grouping_very_small_array():
+    chi = np.array([0])
+    n_components, labels = idx_s2c_grouping(chi)
+    assert n_components == 1  # Single value should form one group
+    assert len(labels) == 1  # One label for the one value 
+    
+def test_group_d_spacing_by_chi_basic():
+    chi = np.arange(-175, 185, 10)
+    d_spacing = Dataset(np.arange(0, len(chi)), axis_ranges={0: chi}, axis_labels={0: 'chi'})
+    d_spacing_pos, d_spacing_neg = group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-3)
+    assert d_spacing_pos.size == d_spacing_neg.size
+    assert d_spacing_pos.size > 0
+    assert d_spacing_neg.size > 0
+    
+def test_group_d_spacing_by_chi_type_error():
+    chi = np.arange(-175, 185, 10)
+    d_spacing = Dataset(np.arange(0, len(chi)), axis_ranges={0: chi}, axis_labels={0: 'chi'})
+    with pytest.raises(TypeError) as excinfo:
+        group_d_spacing_by_chi(d_spacing, [], tolerance=1e-4)
+    assert 'Chi has to be of type np.ndarray' in str(excinfo.value)
+    
+    with pytest.raises(TypeError) as excinfo:
+        group_d_spacing_by_chi([],chi, tolerance=1e-4)
+    assert 'd_spacing has to be of type Pydidas Dataset' in str(excinfo.value)
+    
+   
+    
+def test_group_d_spacing_by_chi_len_unique_groups():
+    delta_chi = 10
+    chi_start= -180
+    chi_stop= 181
+    chi=chi_gen(chi_start, chi_stop, delta_chi)
+    d_spacing = Dataset(np.arange(0, len(chi), dtype=float), axis_ranges = {0 : np.arange(0, len(chi))}, axis_labels={0 : 'd_spacing'} )
+    
+    #unique groups: 
+    #dependent only on chi
+    #idx_s2c_grouping is tested separately
+    _, s2c_labels = idx_s2c_grouping(chi, tolerance=1e-4)
+    s2c_unique_labels = np.unique(s2c_labels)
+    
+    
+    (d_spacing_pos, d_spacing_neg) = group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4) 
+    
+     # Check the lengths of the output arrays
+    assert len(s2c_unique_labels) == d_spacing_pos.size, \
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.size}"
+    assert len(s2c_unique_labels) == d_spacing_pos.axis_ranges[0].size, \
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.axis_ranges[0].size}"
+    assert len(s2c_unique_labels) == d_spacing_neg.size, \
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.size}"
+    assert len(s2c_unique_labels) == d_spacing_neg.axis_ranges[0].size, \
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.axis_ranges[0].size}"
+    
+    
+    
+    
+    

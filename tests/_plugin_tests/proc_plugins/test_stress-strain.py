@@ -516,6 +516,262 @@ def test_group_d_spacing_by_chi_len_unique_groups():
         f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.axis_ranges[0].size}"
     
     
+test_cases = [case9]
+@pytest.mark.parametrize("case", test_cases)           
+def test_group_d_spacing_by_chi_second_validation_method(case):
+    """
+    A test function to validate the `group_d_spacing_by_chi` function via the via a different approach.
     
+    This test performs the following steps:
+    1. Initializes chi values and a Dataset instance for d_spacing using the provided case configuration.
+    2. Uses the second validation method to calculate mean d_spacing values for positive and negative slopes.
+    3. Uses the original `group_d_spacing_by_chi` function to calculate mean d_spacing values for positive and negative slopes.
+    4. Compares the results from both methods with each other and with the expected mean values provided in the case configuration.
+    5. Asserts that all elements in the comparisons are close within the specified tolerances.
+
+    Parameters
+    ----------
+    case : S2cTestConfig
+        The test configuration containing the parameters and expected values for the test case.
+
+    Raises
+    ------
+    AssertionError
+        If any of the comparisons fail, indicating that the methods do not produce close results.
+
+    """
+
+    def group_d_spacing_by_chi_second_validation(d_spacing, chi, tolerance=1e-4):
+        """
+        Group d_spacing values by chi using a secondary validation method.
+
+        Parameters
+        ----------
+        d_spacing : Dataset
+            The dataset containing d_spacing values.
+        chi : np.ndarray
+            The array of chi values.
+        tolerance : float, optional
+            The tolerance value for grouping by chi, by default 1e-4.
+
+        Returns
+        -------
+        tuple
+            A tuple containing two arrays: mean d_spacing values for positive slopes and negative slopes.
+
+        Raises
+        ------
+        TypeError
+            If chi is not an np.ndarray or d_spacing is not a Pydidas Dataset.
+        """
+        
+        if not isinstance(chi, np.ndarray):
+            raise TypeError('Chi has to be of type np.ndarray')
     
+        if not isinstance(d_spacing, Dataset):
+            raise TypeError('d_spacing has to be of type Pydidas Dataset.')
+        
+        n_components, s2c_labels = idx_s2c_grouping(chi, tolerance=tolerance)
+        s2c=np.sin(np.deg2rad(chi))**2
+        s2c_unique_labels = np.unique(s2c_labels)
+        unique_groups = np.unique(s2c_labels)
+        
+        # Calculate first derivative
+        first_derivative = np.gradient(s2c, edge_order=2)
+        
+        # Define the threshold for being "close to zero", i.e. where is the slope=0
+        zero_threshold = 1e-4     
+        # Categorize the values of the first_derivative
+        # 1 is close to zero
+        # 2 is positive
+        # 0 is negative
+        categories = np.zeros_like(first_derivative, dtype=int)
+        categories[first_derivative > zero_threshold] = 2
+        categories[first_derivative < -zero_threshold] = 0
+        categories[(first_derivative >= -zero_threshold) & (first_derivative <= zero_threshold)] = 1
+        
+    
+        #Dynamic length of matrices
+        max_len = 0
+        for group in unique_groups:
+            mask_pos = (s2c_labels == group) & ((categories == 2) | (categories == 1 ))
+            mask_neg = (s2c_labels == group) & ((categories == 0) | (categories == 1 ))
+            
+            d_pos = d_spacing[mask_pos]
+            d_neg = d_spacing[mask_neg]
+            
+            len_d_pos = len(d_pos)  
+            len_d_neg = len(d_neg)  
+            
+            current_max = max(len_d_pos, len_d_neg)
+            
+            if current_max > max_len:
+                max_len = current_max
+
+        #array creation with initialization           
+        data_pos = np.full((n_components, max_len +2), np.nan) #group, max value for d_spacing for pos slope, average = max_len+2 
+        data_neg = np.full((n_components, max_len +2), np.nan)
+        data = np.full((n_components, 2*max_len+1), np.nan)
+        
+        #Chi indices
+        idx_chi= np.arange(0,len(chi),1)  
+        
+        for group in unique_groups:
+            
+            mask_pos = (s2c_labels == group) & ((categories == 2) | (categories == 1 ))
+            mask_neg = (s2c_labels == group) & ((categories == 0) | (categories == 1 ))
+            
+            chi_combi_pos = chi[mask_pos]
+            chi_combi_neg = chi[mask_neg]
+            
+            d_pos = d_spacing[mask_pos]
+            d_neg = d_spacing[mask_neg]
+           
+            data_pos[group,0] = group
+            data_neg[group,0] = group
+            data[group,0] = group
+
+            # Check the length of d_pos to see if it should be assigned
+            if len(d_pos) > 0:
+                data_pos[group, 1:len(d_pos)+1] = d_pos
+                #print(d_pos.array, np.nanmean(data_pos[group, 1:len(d_pos)+1]))
+                data_pos[group, -1] = np.nanmean(data_pos[group, 1:len(d_pos)+1])       
+                data[group, 1:len(d_pos)+1] = d_pos
+
+
+            # Check the length of d_neg to see if it should be assigned
+            if len(d_neg) > 0:
+                data_neg[group, 1:len(d_neg)+1] = d_neg
+                data_neg[group, -1] = np.nanmean(data_neg[group, 1:len(d_neg)+1])
+                data[group, -len(d_neg):] = d_neg
+    
+        return (data_pos[:,-1].T, data_neg[:,-1].T )
+    
+    #Initialisation
+    chi=chi_gen(case.chi_start, case.chi_stop, case.delta_chi)
+    d_spacing = Dataset(case.d_spacing_func(chi), axis_ranges = {0 : np.arange(0, len(chi))}, axis_labels={0 : 'd_spacing'} )
+        
+    #Calculate the expected values 
+    (data_pos_mean, data_neg_mean)=group_d_spacing_by_chi_second_validation(d_spacing, chi, tolerance=1e-4)
+    (d_spacing_pos, d_spacing_neg) = group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4) 
+    
+    #Comparison of both calculation methods and, finally, with the expected values
+    res_pos_1 = np.isclose(data_pos_mean, d_spacing_pos.array, equal_nan=True, atol=1e-8, rtol=1e-5)
+    res_pos_2 = np.isclose(d_spacing_pos.array, case.d_mean_pos, equal_nan=True, atol=1e-8, rtol=1e-5)
+    res_pos_combined = np.logical_and(res_pos_1, res_pos_2)
+     
+    # Assertions to ensure all elements are close
+    assert np.all(res_pos_1), f"data_pos_mean and d_spacing_pos are not close: {res_pos_1}"
+    assert np.all(res_pos_2), f"d_spacing_pos and case.d_mean_pos are not close: {res_pos_2}"
+    # Assertions to ensure all elements are close
+    assert np.all(res_pos_combined), f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not close: {res_pos_combined}"
+
+    #Same for negative slopes
+    res_neg_1 = np.isclose(data_neg_mean, d_spacing_neg.array, equal_nan=True, atol=1e-8, rtol=1e-5)
+    res_neg_2 = np.isclose(d_spacing_neg.array, case.d_mean_neg, equal_nan=True, atol=1e-8, rtol=1e-5)
+    res_neg_combined = np.logical_and(res_neg_1, res_neg_2)
+    
+    assert np.all(res_neg_1), f"data_neg_mean and d_spacing_neg are not close: {res_neg_1}"
+    assert np.all(res_neg_2), f"d_spacing_neg and case.d_mean_neg are not close: {res_neg_2}"
+    assert np.all(res_neg_combined), f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not close: {res_neg_combined}"
+    
+
+        
+@dataclass
+class DSpacingTestConfig:
+    d_spacing_pos: Dataset
+    d_spacing_neg: Dataset
+    ds_expected: Dataset
+
+ds_case1=DSpacingTestConfig(
+        d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'}),
+        d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'}),
+        ds_expected = Dataset(np.vstack((np.array([1.0, 2.0, 3.0]), np.array([3.0, 2.0, 1.0]))),
+                                        axis_ranges={0: np.arange(2), 1: np.array([0.1, 0.2, 0.3])}, axis_labels={0: ['d-', 'd+'], 1: 'sin2chi'})
+        )  
+    
+@pytest.mark.parametrize("d_spacing_pos, d_spacing_neg, expect_error", [
+    (np.arange(0, 10), np.arange(0, 10)[::-1], True),  # Both inputs are non-Dataset
+    (ds_case1.d_spacing_pos, np.arange(0, 10), True),  # One input is non-Dataset
+    (ds_case1.d_spacing_pos, ds_case1.d_spacing_neg, False),  # Both inputs are Dataset
+    (ds_case1.d_spacing_pos , [], True),  # One input is empty list
+    ([] , ds_case1.d_spacing_pos, True),  # One input is empty list
+])
+def test_combine_sort_d_spacing_pos_neg_type_error(d_spacing_pos, d_spacing_neg, expect_error):
+    if expect_error:
+        with pytest.raises(TypeError):
+            combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    else:
+        result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+        assert isinstance(result, Dataset), "Expected Dataset object as output"
+
+    
+def test_combine_sort_d_spacing_pos_neg_axis_labels_mismatch():
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'})
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'different_label'})
+    
+    with pytest.raises(ValueError, match="Axis labels do not match."):
+        combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+
+def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch():
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'})
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.4])}, axis_labels= {0: 'sin2chi'})
+    
+    with pytest.raises(ValueError, match="Axis ranges do not match."):
+        combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+            
+def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape():
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'})
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0,0.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3,0.4])}, axis_labels= {0: 'sin2chi'})
+      
+    with pytest.raises(ValueError, match="Axis ranges do not have the same length."):
+        combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+
+def test_combine_sort_d_spacing_pos_neg_valid():
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin2chi'})
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin2chi'})
+    
+    result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    assert np.array_equal(result.array, np.array([[3.0, 2.0, 1.0], [1.0, 2.0, 3.0]]))
+    assert np.array_equal(result.axis_ranges[1], np.array([0.1, 0.2, 0.3]))
+    assert result.axis_labels == {0: ['d-', 'd+'], 1: 'sin2chi'}
+    
+def test_combine_sort_d_spacing_pos_neg_mergesort():
+    # Create datasets with the same sin2chi values but in different unsorted order
+    sin2chi_values = np.array([0.3, 0.1, 0.2])
+    
+    d_spacing_pos = Dataset(np.array([3.0, 1.0, 2.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
+    d_spacing_neg = Dataset(np.array([2.0, 3.0, 1.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
+    
+    result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    
+    # Check that the sin2chi axis has been sorted
+    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.3])
+    np.testing.assert_array_equal(result.axis_ranges[1], expected_sin2chi_sorted, 
+                                  err_msg="sin2chi values are not correctly sorted in ascending order.")
+    
+    # Check that the d_spacing values have been sorted according to the sorted sin2chi values
+    expected_d_spacing_combined = np.array([[3.0, 1.0, 2.0], [1.0, 2.0, 3.0]])
+    np.testing.assert_array_equal(result.array, expected_d_spacing_combined, 
+                                  err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values.")
+
+def test_combine_sort_d_spacing_pos_neg_with_nan():
+    # Create datasets with the same sin2chi values but with NaN values in d_spacing
+    sin2chi_values = np.array([0.3, 0.1, 0.2])
+    
+    d_spacing_pos = Dataset(np.array([3.0, np.nan, 2.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
+    d_spacing_neg = Dataset(np.array([2.0, 3.0, np.nan]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
+    
+    result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    
+    # Check that the sin2chi axis has been sorted
+    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.3])
+    np.testing.assert_array_equal(result.axis_ranges[1], expected_sin2chi_sorted, 
+                                  err_msg="sin2chi values are not correctly sorted in ascending order.")
+    
+    # Check that the d_spacing values have been sorted according to the sorted sin2chi values
+    expected_d_spacing_combined = np.array([[3.0, np.nan, 2.0], [np.nan, 2.0, 3.0]])
+    np.testing.assert_array_equal(result.array, expected_d_spacing_combined, 
+                                  err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values, especially with NaN values.")
+
     

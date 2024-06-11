@@ -28,7 +28,6 @@ __status__ = "Development"
 
 import os
 import h5py as h5
-import matplotlib.pyplot as plt
 import numpy as np
 
 from pydidas.core import Dataset

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ be opened by the main GUI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,6 +32,7 @@ from .about_window import *
 from .convert_fit2d_geometry import *
 from .export_eiger_pixelmask import *
 from .feedback_window import *
+from .hdf5_browser import *
 from .image_series_operations_window import *
 from .global_settings_window import *
 from .manually_set_beamcenter_window import *
@@ -46,6 +47,12 @@ from .user_config_window import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import hdf5_browser
+
+__all__.extend(hdf5_browser.__all__)
+del hdf5_browser
+
+
 from . import about_window
 
 __all__.extend(about_window.__all__)

@@ -45,6 +45,7 @@ from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
 from ...core.utils import get_extension
 from ...data_io import IoMaster, import_data
 from ...widgets.framework import BaseFrame
+from ...widgets.windows import Hdf5Browser
 from .builders import DataBrowsingFrameBuilder
 
 
@@ -68,6 +69,7 @@ class DataBrowsingFrame(BaseFrame):
         self.__current_filename = None
         self.__open_file = None
         self.__hdf5node = Hdf5Node()
+        self.__browser_window = None
 
     def connect_signals(self):
         """
@@ -93,12 +95,34 @@ class DataBrowsingFrame(BaseFrame):
         self._widgets["raw_metadata_selector"].sig_decode_params.connect(
             self.__display_raw_data
         )
+        self._widgets["hdf5_dataset_selector"].sig_request_hdf5_browser.connect(
+            self.__inspect_hdf5_tree
+        )
 
     def build_frame(self):
         """
         Build the frame and populate it with widgets.
         """
         DataBrowsingFrameBuilder.build_frame(self)
+
+    @QtCore.Slot(int)
+    def frame_activated(self, index: int):
+        """
+        Received signal that frame has been activated.
+
+        This method is called when this frame becomes activated by the
+        central widget. By default, this method will perform no actions.
+        If specific frames require any actions, they will need to overwrite
+        this method.
+
+        Parameters
+        ----------
+        index : int
+            The index of the activated frame.
+        """
+        BaseFrame.frame_activated(self, index)
+        if index != self.frame_index and self.__browser_window is not None:
+            self.__browser_window.hide()
 
     @QtCore.Slot(bool)
     def change_splitter_pos(self, enlarge_dir: bool = True):
@@ -141,7 +165,7 @@ class DataBrowsingFrame(BaseFrame):
             self.__open_file.close()
             self.__open_file = None
         if _extension in HDF5_EXTENSIONS:
-            self.__open_file = h5py.File(filename, "r")
+            self.__open_file = h5py.File(filename, "r", locking=False)
             return
         if _extension in BINARY_EXTENSIONS:
             return
@@ -205,3 +229,14 @@ class DataBrowsingFrame(BaseFrame):
         _data = import_data(self.__current_filename, **kwargs)
         self.__display_dataset(_data)
         self._widgets["filename"].setText(self.__current_filename)
+
+    @QtCore.Slot()
+    def __inspect_hdf5_tree(self):
+        """
+        Inspect the hdf5 tree structure of the current file.
+
+        This method will open
+        """
+        if self.__browser_window is None:
+            self.__browser_window = Hdf5Browser()
+        self.__browser_window.open_file(self.__current_filename)

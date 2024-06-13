@@ -73,6 +73,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     """
 
     sig_new_dataset_selected = QtCore.Signal(str)
+    sig_request_hdf5_browser = QtCore.Signal()
 
     def __init__(self, dataset_key_filters=None, **kwargs):
         QtWidgets.QWidget.__init__(self, kwargs.pop("parent", None))
@@ -144,6 +145,12 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             minimumContentsLength=25,
             sizeAdjustPolicy=QT_COMBO_BOX_SIZE_POLICY,
         )
+        self.create_button(
+            "button_inspect",
+            "Inspect hdf5 tree structure",
+            gridPos=(2 + _row_offset, 1, 1, 4),
+            icon="qt-std::SP_MessageBoxInformation",
+        )
         self.setVisible(False)
 
     def __connect_slots(self):
@@ -157,6 +164,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self._widgets["select_dataset"].currentTextChanged.connect(
             self.__select_dataset
         )
+        self._widgets["button_inspect"].clicked.connect(self.sig_request_hdf5_browser)
 
     def __populate_dataset_list(self):
         """

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with utility functions asociated with Dectris detectors.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -43,7 +43,7 @@ def store_eiger_pixel_mask_from_master_file(master_filename: str, new_filename: 
         The filename for the output file.
     """
     _key = "/entry/instrument/detector/detectorSpecific/pixel_mask"
-    with h5py.File(master_filename, "r") as _file:
+    with h5py.File(master_filename, "r", locking=False) as _file:
         _pixel_mask = _file[_key][()]
     _pixel_mask = _pixel_mask.astype(np.int8)
     np.save(new_filename, _pixel_mask)
@@ -61,6 +61,6 @@ def store_eiger_flat_field_from_master_file(master_filename: str, new_filename: 
         The filename for the output file.
     """
     _key = "/entry/instrument/detector/detectorSpecific/flatfield"
-    with h5py.File(master_filename, "r") as _file:
+    with h5py.File(master_filename, "r", locking=False) as _file:
         _flat_field = _file[_key][()]
     np.save(new_filename, _flat_field)

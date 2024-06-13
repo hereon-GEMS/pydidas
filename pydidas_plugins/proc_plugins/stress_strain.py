@@ -178,7 +178,7 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     if not comparison:
         raise ValueError('Axis ranges do not match.')
 
-    
+    #TODO: Is this really necessary?! Probably not.
     # Make copies of the arrays
     s2c_axis_pos_copy = np.copy(s2c_axis_pos)
     d_spacing_pos_copy = np.copy(d_spacing_pos)
@@ -200,7 +200,7 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
       
     d_spacing_combined = Dataset(d_spacing_combi_arr , 
                                  axis_ranges={0: np.arange(2), 1:  s2c_axis_pos_sorted}, 
-                                 axis_labels={0: '0: d-, 1: d+', 1: 'sin2chi'},
+                                 axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'}, #TODO: previous: sin2chi
                                  data_label='d_spacing')
     
   

@@ -44,7 +44,7 @@ from qtpy.QtWidgets import QWidget
 
 def _get_args_as_list(args: Iterable):
     """
-    Format the input arguments to an interable list to be passed as *args.
+    Format the input arguments to an iterable list to be passed as *args.
 
     This is used to convert strings (which are Iterable) to a list entry to
     prevent iterating over each string character.
@@ -57,7 +57,7 @@ def _get_args_as_list(args: Iterable):
     Returns
     -------
     args : Union[tuple, list, set]
-        The input arguments formatted to a iterable list.
+        The input arguments formatted to an iterable list.
     """
     if not isinstance(args, (tuple, list, set)):
         args = [args]
@@ -66,15 +66,15 @@ def _get_args_as_list(args: Iterable):
 
 def update_child_qobject(obj: QObject, attr: str, **kwargs: dict):
     """
-    Update the objects given atttribute in place.
+    Update the objects given attribute in place.
 
     This function allows to update a QObjects attribute, which is a QObject itself,
     in place and update the original object after the update.
 
-    This function takes a dictionary (ie. keyword arguments) and iterates
+    This function takes a dictionary (i.e. keyword arguments) and iterates
     through all keys. Keys will be interpreted in Qt style: A "property: 12"
     entry in the dictionary will verify that the widget has a "setProperty"
-    method and will then call "obj.setProperty(12)". The verificiation that
+    method and will then call "obj.setProperty(12)". The verification that
     the methods exist allows this function to take the full kwargs of any
     object without the need to filter out non-related keys.
 
@@ -113,10 +113,10 @@ def apply_qt_properties(obj: QObject, **kwargs: dict):
     """
     Set Qt widget properties from a supplied dict.
 
-    This function takes a dictionary (ie. keyword arguments) and iterates
+    This function takes a dictionary (i.e. keyword arguments) and iterates
     through all keys. Keys will be interpreted in Qt style: A "property: 12"
     entry in the dictionary will verify that the widget has a "setProperty"
-    method and will then call "obj.setProperty(12)". The verificiation that
+    method and will then call "obj.setProperty(12)". The verification that
     the methods exist allows this function to take the full kwargs of any
     object without the need to filter out non-related keys.
 
@@ -186,11 +186,11 @@ def apply_font_properties(fontobj: QFont, **kwargs: dict):
     """
     Set font properties from a supplied dict.
 
-    This function takes a dictionary (ie. keyword arguments) and iterates
+    This function takes a dictionary (i.e. keyword arguments) and iterates
     through all keys. Keys will be interpreted in Qt style: A "property: 12"
     entry in the dictionary will verify that the font object has a
     "setProperty" method and will then call "fontobj.setProperty(12)". The
-    verificiation that methods exist allows this function to take the full
+    verification that methods exist allows this function to take the full
     kwargs of any object without the need to filter out non-related keys.
 
     Note that the object is modified in place and no explicit return is given.

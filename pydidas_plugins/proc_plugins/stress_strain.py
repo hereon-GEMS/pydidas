@@ -200,7 +200,7 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
       
     d_spacing_combined = Dataset(d_spacing_combi_arr , 
                                  axis_ranges={0: np.arange(2), 1:  s2c_axis_pos_sorted}, 
-                                 axis_labels={0: ['d-', 'd+'], 1: 'sin2chi'})
+                                 axis_labels={0: '0: d-, 1: d+', 1: 'sin2chi'})
     
   
     return d_spacing_combined

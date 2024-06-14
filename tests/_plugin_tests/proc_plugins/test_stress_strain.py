@@ -33,7 +33,7 @@ from typing import Callable
 from numbers import Real, Integral 
 import numpy as np
 import pytest
-from pydidas_plugins.proc_plugins.stress_strain import chi_pos_verification, ds_slicing, extract_d_spacing, idx_s2c_grouping, group_d_spacing_by_chi, combine_sort_d_spacing_pos_neg
+from pydidas_plugins.proc_plugins.stress_strain import chi_pos_verification, ds_slicing, extract_d_spacing, idx_s2c_grouping, group_d_spacing_by_chi, combine_sort_d_spacing_pos_neg, pre_regression_calculation
 
 
 def chi_gen(chi_start, chi_stop, delta_chi):
@@ -684,10 +684,10 @@ class DSpacingTestConfig:
     ds_expected: Dataset
 
 ds_case1=DSpacingTestConfig(
-        d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'}),
-        d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'}),
+        d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin^2(chi)'}),
+        d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin^2(chi)'}),
         ds_expected = Dataset(np.vstack((np.array([1.0, 2.0, 3.0]), np.array([3.0, 2.0, 1.0]))),
-                                        axis_ranges={0: np.arange(2), 1: np.array([0.1, 0.2, 0.3])}, axis_labels={0: ['d-', 'd+'], 1: 'sin2chi'})
+                                        axis_ranges={0: np.arange(2), 1: np.array([0.1, 0.2, 0.3])}, axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'})
         )  
     
 @pytest.mark.parametrize("d_spacing_pos, d_spacing_neg, expect_error", [
@@ -707,15 +707,15 @@ def test_combine_sort_d_spacing_pos_neg_type_error(d_spacing_pos, d_spacing_neg,
 
     
 def test_combine_sort_d_spacing_pos_neg_axis_labels_mismatch():
-    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'})
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin^2(chi)'})
     d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'different_label'})
     
     with pytest.raises(ValueError, match="Axis labels do not match."):
         combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
 
 def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch():
-    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'})
-    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.4])}, axis_labels= {0: 'sin2chi'})
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin^2(chi)'})
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.4])}, axis_labels= {0: 'sin^2(chi)'})
     
     with pytest.raises(ValueError, match="Axis ranges do not match."):
         combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
@@ -728,20 +728,20 @@ def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape():
         combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
 
 def test_combine_sort_d_spacing_pos_neg_valid():
-    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin2chi'})
-    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin2chi'})
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
     
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     assert np.array_equal(result.array, np.array([[3.0, 2.0, 1.0], [1.0, 2.0, 3.0]]))
     assert np.array_equal(result.axis_ranges[1], np.array([0.1, 0.2, 0.3]))
-    assert result.axis_labels == {0: ['d-', 'd+'], 1: 'sin2chi'}
+    assert result.axis_labels == {0: '0: d-, 1: d+', 1: 'sin^2(chi)'}
     
 def test_combine_sort_d_spacing_pos_neg_mergesort():
     # Create datasets with the same sin2chi values but in different unsorted order
     sin2chi_values = np.array([0.3, 0.1, 0.2])
     
-    d_spacing_pos = Dataset(np.array([3.0, 1.0, 2.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
-    d_spacing_neg = Dataset(np.array([2.0, 3.0, 1.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
+    d_spacing_pos = Dataset(np.array([3.0, 1.0, 2.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin^2(chi)'})
+    d_spacing_neg = Dataset(np.array([2.0, 3.0, 1.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin^2(chi)'})
     
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     
@@ -774,4 +774,14 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
     np.testing.assert_array_equal(result.array, expected_d_spacing_combined, 
                                   err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values, especially with NaN values.")
 
-    
+
+# Parameterized test for TypeError with list and 2D numpy array inputs
+@pytest.mark.parametrize("invalid_input", [
+    [1.0, 2.0],                 # List input
+    np.array([[1.0, 2.0]])      # 2D numpy array input
+])
+def test_pre_regression_calculation_type_error(invalid_input):
+    with pytest.raises(TypeError, match="Input d_spacing_combined must be an instance of Dataset."):
+        pre_regression_calculation(invalid_input)
+        
+        

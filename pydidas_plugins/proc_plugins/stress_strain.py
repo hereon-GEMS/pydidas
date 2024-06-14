@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The dataset module includes the Dataset subclasses of numpy.ndarray with additional
-embedded metadata.
+Module for stress-strain analysis.
 """
 
 __author__ = "Gudrun Lotze"
@@ -36,6 +35,7 @@ from pydidas.data_io import import_data
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
+#TODO: d_spacing is d_spacing. Or do we ant to have q in nm^-1?
 
 def chi_pos_verification(ds):
     '''

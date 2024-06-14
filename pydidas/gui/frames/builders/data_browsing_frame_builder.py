@@ -28,12 +28,10 @@ __status__ = "Production"
 __all__ = ["DataBrowsingFrameBuilder"]
 
 
-import qtawesome as qta
-from qtpy import QtWidgets
+from qtpy import QtGui, QtWidgets
 
 # from ....widgets.silx_plot import PydidasDataViewerFrame
 from ....core.constants import POLICY_EXP_EXP
-from ....widgets.factory import SquareButton
 from ....widgets.framework import BaseFrame
 from ....widgets.selection import (
     DirectoryExplorer,
@@ -59,59 +57,57 @@ class DataBrowsingFrameBuilder:
         frame.create_any_widget(
             "explorer",
             DirectoryExplorer,
-            gridPos=(0, 0, 3, 1),
+            gridPos=(0, 0, 1, 1),
             parent_widget="browser",
         )
-        frame.create_any_widget(
-            "hdf5_dataset_selector",
-            Hdf5DatasetSelector,
-            gridPos=(3, 0, 1, 1),
+        frame.create_spacer(
+            "explorer_spacer",
+            gridPos=(0, -1, 1, 1),
             parent_widget="browser",
-            visible=False,
-        )
-        frame.create_any_widget(
-            "raw_metadata_selector",
-            RawMetadataSelector,
-            gridPos=(4, 0, 1, 1),
-            parent_widget="browser",
-            visible=False,
-        )
-        frame.create_any_widget(
-            "but_minimize",
-            SquareButton,
-            gridPos=(0, 1, 1, 1),
-            icon=qta.icon("fa.chevron-left"),
-            parent_widget="browser",
-        )
-        frame.create_any_widget(
-            "but_maximize",
-            SquareButton,
-            gridPos=(2, 1, 1, 1),
-            icon=qta.icon("fa.chevron-right"),
-            parent_widget="browser",
+            fixedWidth=5,
         )
         frame.create_empty_widget(
             "viewer_and_filename", parent_widget=None, sizePolicy=POLICY_EXP_EXP
+        )
+        frame.create_spacer(
+            "spacer",
+            gridPos=(0, 0, 1, 1),
+            parent_widget="viewer_and_filename",
+            fixedWidth=5,
         )
         frame.create_label(
             "filename_label",
             "Filename:",
             parent_widget="viewer_and_filename",
-            gridPos=(0, 0, 1, 1),
+            gridPos=(0, 1, 1, 1),
             font_metric_width_factor=12,
         )
         frame.create_lineedit(
             "filename",
+            gridPos=(0, 2, 1, 1),
             parent_widget="viewer_and_filename",
-            gridPos=(0, 1, 1, 1),
             readOnly=True,
             sizePolicy=POLICY_EXP_EXP,
+        )
+        frame.create_any_widget(
+            "hdf5_dataset_selector",
+            Hdf5DatasetSelector,
+            gridPos=(-1, 1, 1, 2),
+            parent_widget="viewer_and_filename",
+            visible=False,
+        )
+        frame.create_any_widget(
+            "raw_metadata_selector",
+            RawMetadataSelector,
+            gridPos=(-1, 1, 1, 2),
+            parent_widget="viewer_and_filename",
+            visible=False,
         )
         frame.add_any_widget(
             "viewer",
             SilxDataViewer(),
+            gridPos=(-1, 1, 1, 2),
             parent_widget="viewer_and_filename",
-            gridPos=(1, 0, 1, 2),
         )
 
         frame._widgets["splitter"] = QtWidgets.QSplitter()
@@ -119,7 +115,12 @@ class DataBrowsingFrameBuilder:
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
         frame._widgets["splitter"].setStretchFactor(0, 10)
-        frame._widgets["splitter"].setStretchFactor(1, 20)
+        frame._widgets["splitter"].setStretchFactor(1, 50)
         frame._widgets["splitter"].addWidget(frame._widgets["browser"])
         frame._widgets["splitter"].addWidget(frame._widgets["viewer_and_filename"])
         frame.layout().addWidget(frame._widgets["splitter"])
+
+        for handle in frame.findChildren(QtWidgets.QSplitterHandle):
+            palette = handle.palette()
+            palette.setColor(QtGui.QPalette.ColorRole.Window, QtGui.QColor("#797979"))
+            handle.setPalette(palette)

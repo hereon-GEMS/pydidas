@@ -85,7 +85,7 @@ extend-exclude = ["docs/source/conf.py"]
 show-fixes = true
 
 [tool.ruff.lint]
-extend-select = ["I", "C90"]
+extend-select = ["I", "C90", "F401"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
@@ -114,7 +114,6 @@ max-complexity = 12
 "hdf5_dataset_utils.py" = ["F401"]
 "read_hdf5_slice.py" = ["F401"]
 "read_hdf5_dataset_.py" = ["F401"]
-"hdf5_dataset_selector.py" = ["F401", "E501"]
 "hdf5_io.py" = ["F401"]
 "base_app.py" = ["E731"]
 "pydidas_plot2d_with_integration_regions.py" = ["C901"]

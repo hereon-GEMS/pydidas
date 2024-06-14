@@ -269,12 +269,24 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Any supported Plot2d.addImage keyword arguments.
         """
-        if not data.ndim == 2:
-            raise UserConfigError(
-                "The given dataset does not have exactly 2 dimensions. Please check "
-                f"the input data definition:\n The input data has {data.ndim} "
-                "dimensions."
-            )
+        if isinstance(data, Dataset):
+            self.plot_pydidas_dataset(data, **kwargs)
+        else:
+            self._check_data_dim(data)
+            self._plot2d_add_image(data, **kwargs)
+
+    def _plot2d_add_image(self, data: np.ndarray, **kwargs: dict):
+        """
+        Call the original Plot2D.addImage method.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data to be displayed.
+
+        **kwargs : dict
+            Any supported Plot2d.addImage keyword arguments.
+        """
         kwargs.update({"legend": "pydidas image", "replace": True})
         Plot2D.addImage(self, data, **kwargs)
         self.enable_cs_transform()
@@ -292,11 +304,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Additional keyword arguments to be passed to the silx plot method.
         """
-        if not data.ndim == 2:
-            raise UserConfigError(
-                "The given dataset does not have exactly 2 dimensions. Please check "
-                f"the input data definition. (input data has {data.ndim} dimensions)"
-            )
+        self._check_data_dim(data)
         if data.axis_units[0] != "" and data.axis_units[1] != "":
             self.update_cs_units(data.axis_units[1], data.axis_units[0])
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
@@ -318,7 +326,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         }
         self.setGraphYLabel(self._plot_config["ax_labels"][0])
         self.setGraphXLabel(self._plot_config["ax_labels"][1])
-        self.addImage(data, **self._plot_config["kwargs"])
+        self._plot2d_add_image(data, **self._plot_config["kwargs"])
         self._plot_config["cbar_legend"] = ""
         if len(data.data_label) > 0:
             self._plot_config["cbar_legend"] += data.data_label
@@ -326,6 +334,22 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self._plot_config["cbar_legend"] += f" / {data.data_unit}"
         if len(self._plot_config["cbar_legend"]) > 0:
             self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
+
+    def _check_data_dim(self, data: np.ndarray):
+        """
+        Check the data dimensionality.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data to be checked.
+        """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition:\n The input data has {data.ndim} "
+                "dimensions."
+            )
 
     def clear_plot(self):
         """

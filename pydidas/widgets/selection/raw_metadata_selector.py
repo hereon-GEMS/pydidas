@@ -30,7 +30,7 @@ __all__ = ["RawMetadataSelector"]
 
 from pathlib import Path
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...core import get_generic_param_collection
 from ...core.constants.file_extensions import BINARY_EXTENSIONS
@@ -81,6 +81,12 @@ class RawMetadataSelector(WidgetWithParameterCollection):
             clicked=self._emit_decoder_settings,
             gridPos=(_row, 2, 1, 1),
             font_metric_width_factor=30,
+        )
+        self.create_spacer(
+            "spacer",
+            gridPos=(_row, 4, 1, 1),
+            policy=QtWidgets.QSizePolicy.Expanding,
+            vertical_policy=QtWidgets.QSizePolicy.Fixed,
         )
         self.setVisible(False)
 

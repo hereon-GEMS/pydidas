@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DataBrowsingFrame"]
 
-from functools import partial
 from typing import Union
 
 import h5py
@@ -83,12 +82,6 @@ class DataBrowsingFrame(BaseFrame):
         self._widgets["explorer"].sig_new_file_selected.connect(
             self._widgets["hdf5_dataset_selector"].new_filename
         )
-        self._widgets["but_minimize"].clicked.connect(
-            partial(self.change_splitter_pos, False)
-        )
-        self._widgets["but_maximize"].clicked.connect(
-            partial(self.change_splitter_pos, True)
-        )
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
         )
@@ -124,25 +117,6 @@ class DataBrowsingFrame(BaseFrame):
         if index != self.frame_index and self.__browser_window is not None:
             self.__browser_window.hide()
 
-    @QtCore.Slot(bool)
-    def change_splitter_pos(self, enlarge_dir: bool = True):
-        """
-        Change the position of the window splitter to one of two predefined
-        positions.
-
-        The positions toggled using the enlarge_dir keyword.
-
-        Parameters
-        ----------
-        enlarge_dir : bool, optional
-            Keyword to enlarge the directory view. If False, the plot window
-            is enlarged instead of the directory viewer. The default is True.
-        """
-        if enlarge_dir:
-            self._widgets["splitter"].moveSplitter(self.__qtapp.font_height * 50, 1)
-        else:
-            self._widgets["splitter"].moveSplitter(self.__qtapp.font_height * 20, 1)
-
     @QtCore.Slot(str)
     def __file_selected(self, filename: str):
         """
@@ -158,8 +132,10 @@ class DataBrowsingFrame(BaseFrame):
         _extension = get_extension(filename)
         if _extension not in self.__supported_extensions:
             return
-        self.set_status(f"Selected file: {filename}")
+        if self.__browser_window is not None:
+            self.__browser_window.hide()
         self.__current_filename = filename
+        self._widgets["filename"].setText(self.__current_filename)
         if self.__open_file is not None:
             self._widgets["viewer"].setData(None)
             self.__open_file.close()
@@ -171,7 +147,6 @@ class DataBrowsingFrame(BaseFrame):
             return
         _data = import_data(filename)
         self.__display_dataset(_data)
-        self._widgets["filename"].setText(self.__current_filename)
 
     def __display_dataset(self, data: Union[Dataset, H5Node]):
         """
@@ -206,6 +181,9 @@ class DataBrowsingFrame(BaseFrame):
         dataset : str
             The key of the dataset to display.
         """
+        if dataset == "":
+            self._widgets["viewer"].setData(None)
+            return
         _item = Hdf5Item(
             text=dataset,
             obj=self.__open_file[dataset],
@@ -214,7 +192,6 @@ class DataBrowsingFrame(BaseFrame):
         )
         _data = H5Node(_item)
         self.__display_dataset(_data)
-        self._widgets["filename"].setText(f"{self.__current_filename}::{dataset}")
 
     @QtCore.Slot(object)
     def __display_raw_data(self, kwargs: dict):
@@ -228,7 +205,6 @@ class DataBrowsingFrame(BaseFrame):
         """
         _data = import_data(self.__current_filename, **kwargs)
         self.__display_dataset(_data)
-        self._widgets["filename"].setText(self.__current_filename)
 
     @QtCore.Slot()
     def __inspect_hdf5_tree(self):

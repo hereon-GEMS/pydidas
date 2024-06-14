@@ -9,6 +9,8 @@ Improvements
 ------------
 - Replaced the data viewer in the DataBrowsingFrame with a modern silx 
   DataViewerFrame.
+- Improved the design of the DataBrowsingFrame and selectors for raw or hdf5 
+  data are now located directly above the plots.
 
 Bugfixes
 --------

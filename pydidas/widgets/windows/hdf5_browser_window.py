@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["Hdf5Browser"]
+__all__ = ["Hdf5BrowserWindow"]
 
 
 from functools import partial
@@ -40,7 +40,7 @@ from pydidas_qtcore import PydidasQApplication
 from ..framework import PydidasWindow
 
 
-class Hdf5Browser(PydidasWindow):
+class Hdf5BrowserWindow(PydidasWindow):
     """
     A class to browse and display the tree structure of hdf5 files.
 

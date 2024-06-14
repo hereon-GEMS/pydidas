@@ -44,7 +44,7 @@ from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
 from ...core.utils import get_extension
 from ...data_io import IoMaster, import_data
 from ...widgets.framework import BaseFrame
-from ...widgets.windows import Hdf5Browser
+from ...widgets.windows import Hdf5BrowserWindow
 from .builders import DataBrowsingFrameBuilder
 
 
@@ -214,5 +214,5 @@ class DataBrowsingFrame(BaseFrame):
         This method will open
         """
         if self.__browser_window is None:
-            self.__browser_window = Hdf5Browser()
+            self.__browser_window = Hdf5BrowserWindow()
         self.__browser_window.open_file(self.__current_filename)

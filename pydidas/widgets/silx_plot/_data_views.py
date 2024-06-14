@@ -77,15 +77,15 @@ class _PydidasPlot2dView(_Plot2dView):
         return widget
 
     def axesNames(self, data, info):
-        return ["use as image x-axis", "use as image y-axis"]
+        return ["use as image y-axis", "use as image x-axis"]
 
 
 DATA_VIEW_AXES_NAMES = {
     "_Plot1dView": ["use as curve y"],
     "_Plot3dView": ["use as z", "use as y", "use as x"],
-    "_ComplexImageView": ["use as image y", "use as image x"],
+    "_ComplexImageView": ["use as image y-axis", "use as image x-axis"],
     "_ArrayView": ["use as column", "use as row"],
-    "_StackView": ["depth", "use as image y", "use as image x"],
+    "_StackView": ["depth", "use as image y-axis", "use as image x-axis"],
     "_NXdataScalarView": ["use as column", "use as row"],
 }
 

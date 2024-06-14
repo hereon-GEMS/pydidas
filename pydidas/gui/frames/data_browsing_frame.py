@@ -211,7 +211,7 @@ class DataBrowsingFrame(BaseFrame):
         """
         Inspect the hdf5 tree structure of the current file.
 
-        This method will open
+        This method will open a new window with the hdf5 tree structure to display.
         """
         if self.__browser_window is None:
             self.__browser_window = Hdf5BrowserWindow()

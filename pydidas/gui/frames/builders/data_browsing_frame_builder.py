@@ -118,6 +118,9 @@ class DataBrowsingFrameBuilder:
         frame._widgets["splitter"].setStretchFactor(1, 50)
         frame._widgets["splitter"].addWidget(frame._widgets["browser"])
         frame._widgets["splitter"].addWidget(frame._widgets["viewer_and_filename"])
+        frame._widgets["splitter"].setSizes(
+            [int(0.4 * frame.width()), int(0.6 * frame.width())]
+        )
         frame.layout().addWidget(frame._widgets["splitter"])
 
         for handle in frame.findChildren(QtWidgets.QSplitterHandle):

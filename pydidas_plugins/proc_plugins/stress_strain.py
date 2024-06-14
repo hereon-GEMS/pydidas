@@ -356,8 +356,8 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     
     #create Datasets for output
     #TODO: if wished later to be changed to s2c[s2c_unique_labels] for s2c_mean
-    d_spacing_pos=Dataset(d_spacing_mean_pos, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin2chi'} )   
-    d_spacing_neg=Dataset(d_spacing_mean_neg, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin2chi'} ) 
+    d_spacing_pos=Dataset(d_spacing_mean_pos, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_pos' )   
+    d_spacing_neg=Dataset(d_spacing_mean_neg, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_neg' ) 
     
     return (d_spacing_pos, d_spacing_neg)
 

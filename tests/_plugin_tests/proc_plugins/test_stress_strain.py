@@ -494,7 +494,7 @@ def test_group_d_spacing_by_chi_len_unique_groups():
     chi_start= -180
     chi_stop= 181
     chi=chi_gen(chi_start, chi_stop, delta_chi)
-    d_spacing = Dataset(np.arange(0, len(chi), dtype=float), axis_ranges = {0 : np.arange(0, len(chi))}, axis_labels={0 : 'd_spacing'} )
+    d_spacing = Dataset(np.arange(0, len(chi), dtype=float), axis_ranges = {0 : np.arange(0, len(chi))}, axis_labels={0 : 'chi'}, data_label='d_spacing' )
     
     #unique groups: 
     #dependent only on chi

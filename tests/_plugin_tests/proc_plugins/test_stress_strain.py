@@ -687,7 +687,7 @@ ds_case1=DSpacingTestConfig(
         d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin^2(chi)'}),
         d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin^2(chi)'}),
         ds_expected = Dataset(np.vstack((np.array([1.0, 2.0, 3.0]), np.array([3.0, 2.0, 1.0]))),
-                                        axis_ranges={0: np.arange(2), 1: np.array([0.1, 0.2, 0.3])}, axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'})
+                                        axis_ranges={0: np.arange(2), 1: np.array([0.1, 0.2, 0.3])}, axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'}, data_label='d_spacing')
         )  
     
 @pytest.mark.parametrize("d_spacing_pos, d_spacing_neg, expect_error", [

@@ -475,6 +475,9 @@ def test_group_d_spacing_by_chi_basic():
     assert d_spacing_pos.size == d_spacing_neg.size
     assert d_spacing_pos.size > 0
     assert d_spacing_neg.size > 0
+    assert d_spacing_pos.axis_ranges[0].size == d_spacing_neg.axis_ranges[0].size
+    assert d_spacing_pos.data_label == 'd_spacing_pos'
+    assert d_spacing_neg.data_label == 'd_spacing_neg'
     
 def test_group_d_spacing_by_chi_type_error():
     chi = np.arange(-175, 185, 10)

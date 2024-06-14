@@ -760,8 +760,8 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
     # Create datasets with the same sin2chi values but with NaN values in d_spacing
     sin2chi_values = np.array([0.3, 0.1, 0.2])
     
-    d_spacing_pos = Dataset(np.array([3.0, np.nan, 2.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
-    d_spacing_neg = Dataset(np.array([2.0, 3.0, np.nan]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin2chi'})
+    d_spacing_pos = Dataset(np.array([3.0, np.nan, 2.0]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin^2(chi)'})
+    d_spacing_neg = Dataset(np.array([2.0, 3.0, np.nan]), axis_ranges={0: sin2chi_values}, axis_labels={0: 'sin^2(chi)'})
     
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     

@@ -721,8 +721,8 @@ def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch():
         combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
             
 def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape():
-    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin2chi'})
-    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0,0.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3,0.4])}, axis_labels= {0: 'sin2chi'})
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels= {0: 'sin^2(chi)'})
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0,0.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3,0.4])}, axis_labels= {0: 'sin^2(chi)'})
       
     with pytest.raises(ValueError, match="Axis ranges do not have the same length."):
         combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
@@ -735,6 +735,7 @@ def test_combine_sort_d_spacing_pos_neg_valid():
     assert np.array_equal(result.array, np.array([[3.0, 2.0, 1.0], [1.0, 2.0, 3.0]]))
     assert np.array_equal(result.axis_ranges[1], np.array([0.1, 0.2, 0.3]))
     assert result.axis_labels == {0: '0: d-, 1: d+', 1: 'sin^2(chi)'}
+    assert result.data_label == 'd_spacing'
     
 def test_combine_sort_d_spacing_pos_neg_mergesort():
     # Create datasets with the same sin2chi values but in different unsorted order

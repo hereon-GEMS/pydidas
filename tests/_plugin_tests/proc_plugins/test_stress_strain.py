@@ -422,11 +422,8 @@ def test_ds_slicing_dimension_mismatch_3d():
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds_3d)
     assert 'Dimension mismatch' in str(excinfo.value), "Error message should indicate that d_spacing has a larger dimension."
-    
-
 
 def test_extract_d_spacing_valid():
-
     fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
@@ -478,6 +475,8 @@ def test_group_d_spacing_by_chi_basic():
     assert d_spacing_pos.axis_ranges[0].size == d_spacing_neg.axis_ranges[0].size
     assert d_spacing_pos.data_label == 'd_spacing_pos'
     assert d_spacing_neg.data_label == 'd_spacing_neg'
+    assert d_spacing_pos.axis_labels[0] == 'sin^2(chi)'
+    assert d_spacing_neg.axis_labels[0] == 'sin^2(chi)'
     
 def test_group_d_spacing_by_chi_type_error():
     chi = np.arange(-175, 185, 10)

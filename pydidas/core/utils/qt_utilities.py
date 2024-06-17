@@ -91,7 +91,7 @@ def update_child_qobject(obj: QObject, attr: str, **kwargs: dict):
     """
     _child_obj = getattr(obj, attr)()
     apply_qt_properties(_child_obj, **kwargs)
-    _child_setter = getattr(obj, "set" + attr.capitalize())
+    _child_setter = getattr(obj, "set" + attr[0].upper() + attr[1:])
     _child_setter(_child_obj)
 
 

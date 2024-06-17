@@ -61,7 +61,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     are added to the toolbar.
     """
 
-    setData = Plot2D.addImage
     sig_get_more_info_for_data = QtCore.Signal(float, float)
     init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
     user_config_update = user_config_update_func
@@ -219,20 +218,24 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _exp = self._config["diffraction_exp"]
         self._config["cs_transform_valid"] = _exp.detector_is_valid
 
-    def enable_cs_transform(self, enable: bool):
+    def enable_cs_transform(self):
         """
         Enable or disable the coordinate system transformations.
 
-        Parameters
-        ----------
-        enable : bool
-            Flag to enable the coordinate system transformations.
+        The CS transform is enabled if the image has the same shape as the detector
+        configured in the DiffractionExperimentContext.
         """
-        if not self._config["cs_transform"]:
+        _data = self.getImage()
+        if _data is None or not self._config["cs_transform"]:
             return
-        if not enable:
+        _data = _data.getData()
+        _enable = _data.shape == (
+            self._config["diffraction_exp"].get_param_value("detector_npixy"),
+            self._config["diffraction_exp"].get_param_value("detector_npixx"),
+        )
+        if not _enable:
             self.cs_transform.set_coordinates("cartesian")
-        self.cs_transform.setEnabled(enable and self._config["cs_transform_valid"])
+        self.cs_transform.setEnabled(_enable and self._config["cs_transform_valid"])
 
     def update_cs_units(self, x_unit: str, y_unit: str):
         """
@@ -266,17 +269,33 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Any supported Plot2d.addImage keyword arguments.
         """
-        if not data.ndim == 2:
-            raise UserConfigError(
-                "The given dataset does not have exactly 2 dimensions. Please check "
-                f"the input data definition:\n The input data has {data.ndim} "
-                "dimensions."
-            )
+        if isinstance(data, Dataset):
+            self.plot_pydidas_dataset(data, **kwargs)
+        else:
+            self._check_data_dim(data)
+            self._plot2d_add_image(data, **kwargs)
+
+    def _plot2d_add_image(self, data: np.ndarray, **kwargs: dict):
+        """
+        Call the original Plot2D.addImage method.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data to be displayed.
+
+        **kwargs : dict
+            Any supported Plot2d.addImage keyword arguments.
+        """
+        kwargs.update({"legend": "pydidas image", "replace": True})
         Plot2D.addImage(self, data, **kwargs)
+        self.enable_cs_transform()
+        if self.cs_transform.isEnabled():
+            self.changeCanvasToDataAction._actionTriggered()
 
     def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
         """
-        Plot a pydidas dataset.
+        Plot a pydidas Dataset.
 
         Parameters
         ----------
@@ -285,26 +304,13 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Additional keyword arguments to be passed to the silx plot method.
         """
-        if not data.ndim == 2:
-            raise UserConfigError(
-                "The given dataset does not have exactly 2 dimensions. Please check "
-                f"the input data definition. (input data has {data.ndim} dimensions)"
-            )
-        _has_detector_image_shape = data.shape == (
-            self._config["diffraction_exp"].get_param_value("detector_npixy"),
-            self._config["diffraction_exp"].get_param_value("detector_npixx"),
-        )
-        self.enable_cs_transform(_has_detector_image_shape)
+        self._check_data_dim(data)
         if data.axis_units[0] != "" and data.axis_units[1] != "":
             self.update_cs_units(data.axis_units[1], data.axis_units[0])
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
         _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
         self._plot_config = {
-            "ax_labels": [
-                data.axis_labels[i]
-                + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
-                for i in [0, 1]
-            ],
+            "ax_labels": [data.get_axis_description(i) for i in [0, 1]],
             "kwargs": {
                 "replace": kwargs.pop("replace", True),
                 "copy": kwargs.pop("copy", False),
@@ -320,7 +326,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         }
         self.setGraphYLabel(self._plot_config["ax_labels"][0])
         self.setGraphXLabel(self._plot_config["ax_labels"][1])
-        self.addImage(data, **self._plot_config["kwargs"])
+        self._plot2d_add_image(data, **self._plot_config["kwargs"])
         self._plot_config["cbar_legend"] = ""
         if len(data.data_label) > 0:
             self._plot_config["cbar_legend"] += data.data_label
@@ -329,8 +335,21 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if len(self._plot_config["cbar_legend"]) > 0:
             self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
 
-        if _has_detector_image_shape:
-            self.changeCanvasToDataAction._actionTriggered()
+    def _check_data_dim(self, data: np.ndarray):
+        """
+        Check the data dimensionality.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data to be checked.
+        """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition:\n The input data has {data.ndim} "
+                "dimensions."
+            )
 
     def clear_plot(self):
         """

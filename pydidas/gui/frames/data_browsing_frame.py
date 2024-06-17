@@ -27,16 +27,24 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DataBrowsingFrame"]
 
-from functools import partial
+from typing import Union
 
+import h5py
+import numpy as np
 from qtpy import QtCore
+from silx.gui.data.DataViews import IMAGE_MODE, PLOT1D_MODE, RAW_MODE
+from silx.gui.hdf5 import H5Node
+from silx.gui.hdf5.Hdf5Item import Hdf5Item
+from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
 from pydidas_qtcore import PydidasQApplication
 
+from ...core import Dataset
 from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
 from ...core.utils import get_extension
 from ...data_io import IoMaster, import_data
 from ...widgets.framework import BaseFrame
+from ...widgets.windows import Hdf5BrowserWindow
 from .builders import DataBrowsingFrameBuilder
 
 
@@ -57,6 +65,10 @@ class DataBrowsingFrame(BaseFrame):
         BaseFrame.__init__(self, **kwargs)
         self.__qtapp = PydidasQApplication.instance()
         self.__supported_extensions = set(IoMaster.registry_import.keys())
+        self.__current_filename = None
+        self.__open_file = None
+        self.__hdf5node = Hdf5Node()
+        self.__browser_window = None
 
     def connect_signals(self):
         """
@@ -70,19 +82,14 @@ class DataBrowsingFrame(BaseFrame):
         self._widgets["explorer"].sig_new_file_selected.connect(
             self._widgets["hdf5_dataset_selector"].new_filename
         )
-        self._widgets["but_minimize"].clicked.connect(
-            partial(self.change_splitter_pos, False)
+        self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
+            self.__display_hdf5_dataset
         )
-        self._widgets["but_maximize"].clicked.connect(
-            partial(self.change_splitter_pos, True)
+        self._widgets["raw_metadata_selector"].sig_decode_params.connect(
+            self.__display_raw_data
         )
-        self.sig_this_frame_activated.connect(
-            self._widgets["viewer"].update_from_diffraction_exp
-        )
-        self.sig_this_frame_activated.connect(
-            partial(
-                self._widgets["viewer"].cs_transform_button.check_detector_is_set, True
-            )
+        self._widgets["hdf5_dataset_selector"].sig_request_hdf5_browser.connect(
+            self.__inspect_hdf5_tree
         )
 
     def build_frame(self):
@@ -91,35 +98,24 @@ class DataBrowsingFrame(BaseFrame):
         """
         DataBrowsingFrameBuilder.build_frame(self)
 
-    def finalize_ui(self):
+    @QtCore.Slot(int)
+    def frame_activated(self, index: int):
         """
-        Finalize UI creation.
-        """
-        self._widgets["hdf5_dataset_selector"].register_plot_widget(
-            self._widgets["viewer"]
-        )
-        self._widgets["raw_metadata_selector"].register_plot_widget(
-            self._widgets["viewer"]
-        )
+        Received signal that frame has been activated.
 
-    @QtCore.Slot(bool)
-    def change_splitter_pos(self, enlarge_dir: bool = True):
-        """
-        Change the position of the window splitter to one of two predefined
-        positions.
-
-        The positions toggled using the enlarge_dir keyword.
+        This method is called when this frame becomes activated by the
+        central widget. By default, this method will perform no actions.
+        If specific frames require any actions, they will need to overwrite
+        this method.
 
         Parameters
         ----------
-        enlarge_dir : bool, optional
-            Keyword to enlarge the directory view. If False, the plot window
-            is enlarged instead of the directory viewer. The default is True.
+        index : int
+            The index of the activated frame.
         """
-        if enlarge_dir:
-            self._widgets["splitter"].moveSplitter(self.__qtapp.font_height * 50, 1)
-        else:
-            self._widgets["splitter"].moveSplitter(self.__qtapp.font_height * 20, 1)
+        BaseFrame.frame_activated(self, index)
+        if index != self.frame_index and self.__browser_window is not None:
+            self.__browser_window.hide()
 
     @QtCore.Slot(str)
     def __file_selected(self, filename: str):
@@ -131,12 +127,92 @@ class DataBrowsingFrame(BaseFrame):
         filename : str
             The full file name (including directory) of the selected file.
         """
+        if self.__current_filename == filename:
+            return
         _extension = get_extension(filename)
         if _extension not in self.__supported_extensions:
             return
-        self.set_status(f"Selected file: {filename}")
-        if _extension in HDF5_EXTENSIONS + BINARY_EXTENSIONS:
+        if self.__browser_window is not None:
+            self.__browser_window.hide()
+        self.__current_filename = filename
+        self._widgets["filename"].setText(self.__current_filename)
+        if self.__open_file is not None:
+            self._widgets["viewer"].setData(None)
+            self.__open_file.close()
+            self.__open_file = None
+        if _extension in HDF5_EXTENSIONS:
+            self.__open_file = h5py.File(filename, "r", locking=False)
             return
+        if _extension in BINARY_EXTENSIONS:
+            return
+        _data = import_data(filename)
+        self.__display_dataset(_data)
+
+    def __display_dataset(self, data: Union[Dataset, H5Node]):
+        """
+        Display the data in the viewer widget.
+
+        Parameters
+        ----------
+        data : Union[Dataset, h5py.Dataset]
+            The data to display.
+        """
+        self._widgets["viewer"].setData(data)
+        if isinstance(data, (np.ndarray, H5Node, h5py.Dataset)):
+            _shape = data.shape
         else:
-            _data = import_data(filename)
-            self._widgets["viewer"].display_image(_data)
+            raise TypeError("Data type not supported.")
+        _target_mode = (
+            PLOT1D_MODE
+            if len(_shape) == 1
+            else (IMAGE_MODE if len(_shape) >= 2 else RAW_MODE)
+        )
+        _current_mode = self._widgets["viewer"].displayMode()
+        if _target_mode != _current_mode:
+            self._widgets["viewer"].setDisplayMode(_target_mode)
+
+    @QtCore.Slot(str)
+    def __display_hdf5_dataset(self, dataset: str):
+        """
+        Display the selected dataset in the viewer widget.
+
+        Parameters
+        ----------
+        dataset : str
+            The key of the dataset to display.
+        """
+        if dataset == "":
+            self._widgets["viewer"].setData(None)
+            return
+        _item = Hdf5Item(
+            text=dataset,
+            obj=self.__open_file[dataset],
+            parent=self.__hdf5node,
+            openedPath=self.__current_filename,
+        )
+        _data = H5Node(_item)
+        self.__display_dataset(_data)
+
+    @QtCore.Slot(object)
+    def __display_raw_data(self, kwargs: dict):
+        """
+        Display the raw data in the viewer widget.
+
+        Parameters
+        ----------
+        kwargs : dict
+            The kwargs required for decoding the raw data.
+        """
+        _data = import_data(self.__current_filename, **kwargs)
+        self.__display_dataset(_data)
+
+    @QtCore.Slot()
+    def __inspect_hdf5_tree(self):
+        """
+        Inspect the hdf5 tree structure of the current file.
+
+        This method will open a new window with the hdf5 tree structure to display.
+        """
+        if self.__browser_window is None:
+            self.__browser_window = Hdf5BrowserWindow()
+        self.__browser_window.open_file(self.__current_filename)

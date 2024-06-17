@@ -87,13 +87,13 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
 
     def tearDown(self): ...
 
-    def test_get_hdf5_file_and_dataset_names_wrong_type(self):
+    def test_get_hdf5_file_and_dataset_names__wrong_type(self):
         _name = 123
         _dset = "/test/dset"
         with self.assertRaises(TypeError):
             _get_hdf5_file_and_dataset_names(_name, _dset)
 
-    def test_get_hdf5_file_and_dataset_names_Path_type(self):
+    def test_get_hdf5_file_and_dataset_names__Path_type(self):
         _name = Path("c:/test/path/testfile.h5")
         _dset = "/test/dset"
         _newname, _newdset = _get_hdf5_file_and_dataset_names(_name, _dset)
@@ -107,7 +107,7 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         self.assertEqual(_name, _newname)
         self.assertEqual(_dset, _newdset)
 
-    def test_get_hdf5_file_and_dataset_names_joint(self):
+    def test_get_hdf5_file_and_dataset_names__joint_file_and_dset(self):
         _name = "c:/test/path/testfile.h5"
         _dset = "/test/dset"
         _option = f"{_name}://{_dset}"
@@ -115,69 +115,69 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         self.assertEqual(_name, _newname)
         self.assertEqual(_dset, _newdset)
 
-    def test_get_hdf5_file_and_dataset_names_only_fname(self):
+    def test_get_hdf5_file_and_dataset_names__only_fname(self):
         _name = "c:/test/path/testfile.h5"
         with self.assertRaises(KeyError):
             _get_hdf5_file_and_dataset_names(_name)
 
-    def test_get_hdf5_metadata_meta_wrong_type(self):
+    def test_get_hdf5_metadata_meta__wrong_type(self):
         with self.assertRaises(TypeError):
             get_hdf5_metadata(self._ref, 123)
 
-    def test_get_hdf5_metadata_meta_str(self):
+    def test_get_hdf5_metadata_meta__str(self):
         _res = get_hdf5_metadata(self._ref, "nokey")
         self.assertEqual(_res, dict())
 
-    def test_get_hdf5_metadata_meta_shape(self):
+    def test_get_hdf5_metadata_meta__shape(self):
         _shape = get_hdf5_metadata(self._ref, "shape")
         self.assertEqual(_shape, self._data.shape)
 
-    def test_get_hdf5_metadata_meta_dtype(self):
+    def test_get_hdf5_metadata_meta__dtype(self):
         dtype = get_hdf5_metadata(self._ref, "dtype")
         self.assertEqual(dtype, self._data.dtype)
 
-    def test_get_hdf5_metadata_meta_size(self):
+    def test_get_hdf5_metadata_meta__size(self):
         size = get_hdf5_metadata(self._ref, "size")
         self.assertEqual(size, self._data.size)
 
-    def test_get_hdf5_metadata_meta_ndim(self):
+    def test_get_hdf5_metadata_meta__ndim(self):
         ndim = get_hdf5_metadata(self._ref, "ndim")
         self.assertEqual(ndim, self._data.ndim)
 
-    def test_get_hdf5_metadata_meta_nbytes(self):
+    def test_get_hdf5_metadata_meta__nbytes(self):
         nbytes = get_hdf5_metadata(self._ref, "nbytes")
         self.assertEqual(nbytes, self._data.nbytes)
 
-    def test_get_hdf5_metadata_meta_wrong_key(self):
+    def test_get_hdf5_metadata_meta__wrong_key(self):
         with self.assertRaises(KeyError):
             get_hdf5_metadata(self._ref + "/more", "dtype")
 
-    def test_get_hdf5_metadata_meta_multiples(self):
+    def test_get_hdf5_metadata_meta__multiples(self):
         _res = get_hdf5_metadata(self._ref, ("ndim", "size"))
         self.assertEqual(_res, dict(ndim=self._data.ndim, size=self._data.size))
 
-    def test_hdf5_dataset_check_no_dset(self):
+    def test_hdf5_dataset_check__no_dset(self):
         self.assertFalse(hdf5_dataset_check("something"))
 
-    def test_hdf5_dataset_check_simple(self):
+    def test_hdf5_dataset_check__simple(self):
         with h5py.File(self._fname(2), "w") as _file:
             _file.create_group("test")
             _file["test"].create_dataset("data", data=self._data)
             self.assertTrue(hdf5_dataset_check(_file["test/data"]))
 
-    def test_hdf5_dataset_check_dim(self):
+    def test_hdf5_dataset_check__dim(self):
         with h5py.File(self._fname(2), "w") as _file:
             _file.create_group("test")
             _file["test"].create_dataset("data", data=self._data)
             self.assertFalse(hdf5_dataset_check(_file["test/data"], min_dim=5))
 
-    def test_hdf5_dataset_check_size(self):
+    def test_hdf5_dataset_check__size(self):
         with h5py.File(self._fname(2), "w") as _file:
             _file.create_group("test")
             _file["test"].create_dataset("data", data=self._data)
             self.assertFalse(hdf5_dataset_check(_file["test/data"], min_size=50000))
 
-    def test_hdf5_dataset_check_to_ignore(self):
+    def test_hdf5_dataset_check__to_ignore(self):
         with h5py.File(self._fname(2), "w") as _file:
             _file.create_group("test")
             _file["test"].create_dataset("data", data=self._data)
@@ -193,23 +193,27 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         _res = get_hdf5_populated_dataset_keys([1, 2, 3])
         self.assertEqual(_res, [])
 
-    def test_get_hdf5_populated_dataset_keys_str(self):
+    def test_get_hdf5_populated_dataset_keys__w_str(self):
         _res = get_hdf5_populated_dataset_keys(self._fname(1))
-        self.assertEqual(set(_res), set(self._fulldsets))
+        self.assertEqual(set(_res), set(self._fulldsets + self._2ddsets))
 
-    def test_get_hdf5_populated_dataset_keys_path(self):
+    def test_get_hdf5_populated_dataset_keys__w_Path(self):
         _res = get_hdf5_populated_dataset_keys(Path(self._fname(1)))
+        self.assertEqual(set(_res), set(self._fulldsets + self._2ddsets))
+
+    def test_get_hdf5_populated_dataset_keys__min_dim(self):
+        _res = get_hdf5_populated_dataset_keys(Path(self._fname(1)), min_dim=3)
         self.assertEqual(set(_res), set(self._fulldsets))
 
-    def test_get_hdf5_populated_dataset_keys_h5py_file(self):
+    def test_get_hdf5_populated_dataset_keys__w_h5py_file(self):
         with h5py.File(self._fname(1), "r") as _file:
             _res = get_hdf5_populated_dataset_keys(_file)
-        self.assertEqual(set(_res), set(self._fulldsets))
+        self.assertEqual(set(_res), set(self._fulldsets + self._2ddsets))
 
-    def test_get_hdf5_populated_dataset_keys_h5py_dset(self):
+    def test_get_hdf5_populated_dataset_keys__w_h5py_dset(self):
         with h5py.File(self._fname(1), "r") as _file:
             _res = get_hdf5_populated_dataset_keys(_file["test"])
-        self.assertEqual(set(_res), set(self._fulldsets))
+        self.assertEqual(set(_res), set(self._fulldsets + self._2ddsets))
 
     def test_get_hdf5_populated_dataset_keys_smaller_dim(self):
         _res = get_hdf5_populated_dataset_keys(self._fname(1), min_dim=1)
@@ -221,7 +225,7 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         )
         self.assertEqual(set(_res), set())
 
-    def test_get_hdf5_populated_dataset_keys_medium_size(self):
+    def test_get_hdf5_populated_dataset_keys__medium_size(self):
         _res = get_hdf5_populated_dataset_keys(self._fname(1), min_dim=1, min_size=1000)
         self.assertEqual(set(_res), set(self._fulldsets))
 

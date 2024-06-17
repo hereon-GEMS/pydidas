@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The PydidasCheckBox is a QCheckBox with font formatting and sizeHint adjustment.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,6 +38,6 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
     """
 
     def __init__(self, *args: tuple, **kwargs: dict):
-        kwargs["font_metric_height_factor"] = 1
+        kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 1)
         QtWidgets.QCheckBox.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)

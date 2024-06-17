@@ -31,28 +31,48 @@ __all__ = ["Hdf5DatasetSelector"]
 from functools import partial
 from pathlib import Path
 
-import h5py
-from qtpy import QtCore, QtWidgets
-from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
+from qtpy import QtCore
 
-from ...core import PydidasGuiError
-from ...core.constants import ALIGN_TOP_RIGHT, HDF5_EXTENSIONS, QT_COMBO_BOX_SIZE_POLICY
+from ...core import Parameter
+from ...core.constants import HDF5_EXTENSIONS
 from ...core.utils import (
-    apply_qt_properties,
     get_extension,
     get_hdf5_populated_dataset_keys,
+    update_child_qobject,
 )
-from ..factory import CreateWidgetsMixIn
-from ..utilities import get_max_pixel_width_of_entries
-from .common_selection import register_plot_widget_method
+from ..utilities import get_max_pixel_width_of_entries, get_pyqt_icon_from_str
+from ..widget_with_parameter_collection import WidgetWithParameterCollection
 
 
 DEFAULT_FILTERS = {
-    "/entry/instrument/detector/detectorSpecific/": '"detectorSpecific"\nkeys (Eiger detector)'
+    "/entry/instrument/detector/detectorSpecific/": (
+        '"detectorSpecific"\nkeys (Eiger detector)'
+    ),
+}
+DATA_DIMENSION_PARAM = Parameter(
+    "min_datadim",
+    str,
+    ">= 1",
+    choices=["any", ">= 1", ">= 2", ">= 3", ">= 4"],
+    name="Filter for dataset dimensions",
+    tooltip="Minimum number of dimensions for a dataset to be displayed.",
+)
+DATASET_PARAM = Parameter(
+    "dataset",
+    str,
+    "",
+    choices=[""],
+    name="Selected dataset",
+    tooltip="The selected dataset to be displayed.",
+)
+EMPTY_WIDGET_COLS = {
+    0: [],
+    1: [1, 2],
+    2: [2],
 }
 
 
-class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
+class Hdf5DatasetSelector(WidgetWithParameterCollection):
     """
     A compound widget to select datasets in Hdf5 files.
 
@@ -63,9 +83,6 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
     Parameters
     ----------
-    plot_widget : Union[QWidget, None], optional
-        A widget for a full view. It can also be registered later using
-        the  *register_plot_widget* method. The default is None.
     dataset_key_filters : Union[dict, None], optional
         A dictionary with dataset keys to be filtered from the list
         of displayed datasets. Entries must be in the format
@@ -79,101 +96,77 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         ``fixedWidth``, ``fixedHeight``.
     """
 
-    new_frame_signal = QtCore.Signal(object)
-    register_plot_widget = register_plot_widget_method
+    sig_new_dataset_selected = QtCore.Signal(str)
+    sig_request_hdf5_browser = QtCore.Signal()
 
-    def __init__(self, plot_widget=None, dataset_key_filters=None, **kwargs):
-        QtWidgets.QWidget.__init__(self, kwargs.pop("parent", None))
-        CreateWidgetsMixIn.__init__(self)
-        apply_qt_properties(self, **kwargs)
+    def __init__(self, dataset_key_filters=None, **kwargs):
+        WidgetWithParameterCollection.__init__(self, **kwargs)
+        self.add_params(DATA_DIMENSION_PARAM.copy(), DATASET_PARAM.copy())
 
         self._config = {
             "activeDsetFilters": [],
-            "currentDset": None,
-            "current_filename": None,
-            "currentIndex": None,
+            "current_dataset": "",
+            "current_filename": "",
+            "min_datadim": 1,
+            "display_details": True,
             "dsetFilters": (
                 dataset_key_filters
                 if dataset_key_filters is not None
                 else DEFAULT_FILTERS
             ),
         }
-        self.flags = {"slotActive": False, "autoUpdate": True}
-        self.show_image_method = None
-        if plot_widget is not None:
-            self.register_plot_widget(plot_widget)
-        self._frame = None
-        self.__create_widgets_and_layout()
+        self.__create_widgets()
         self.__connect_slots()
+        self._toggle_details()
 
-    def __create_widgets_and_layout(self):
+    def __create_widgets(self):
         """
-        Create all required widgets and the layout.
-
-        This private method will create all the required and widgets and
-        the layout.
+        Create all required widgets.
         """
-        _layout = QtWidgets.QGridLayout()
-        _layout.setHorizontalSpacing(15)
-        self.setLayout(_layout)
+        update_child_qobject(self, "layout", horizontalSpacing=2)
+        self.create_button(
+            "button_inspect",
+            "Inspect hdf5 tree structure",
+            gridPos=(0, 2, 1, 1),
+            icon="qt-std::SP_MessageBoxInformation",
+        )
+        for _index, (_key, _text) in enumerate(self._config["dsetFilters"].items()):
+            self.create_check_box(
+                f"check_filter_{_key}",
+                f"Hide {_text}",
+                checked=False,
+                font_metric_height_factor=2,
+                gridPos=(1 + _index // 3, _index % 3, 1, 1),
+            )
+            self._widgets[f"check_filter_{_key}"].stateChanged.connect(
+                partial(self._toggle_filter_key, _key)
+            )
+        for _col in range(3):
+            update_child_qobject(self, "layout", columnStretch=(_col, 10))
+            if _col in EMPTY_WIDGET_COLS[len(self._config["dsetFilters"]) % 3]:
+                self.create_empty_widget(
+                    f"empty_{_index}",
+                    gridPos=(1 + _index // 3, _col, 1, 1),
+                    fixedHeight=5,
+                )
 
-        # create checkboxes and links for all filter keys:
-        _w_filter_keys = []
-        for key, text in self._config["dsetFilters"].items():
-            _widget = QtWidgets.QCheckBox(f"Ignore {text}")
-            _widget.setChecked(False)
-            _widget.stateChanged.connect(partial(self._toggle_filter_key, _widget, key))
-            _w_filter_keys.append(_widget)
-        for i, widget in enumerate(_w_filter_keys):
-            _layout.addWidget(widget, i // 2, i % 2, 1, 2)
+        _row_offset = len(self._config["dsetFilters"]) // 2 + 2
 
-        # Determine the layout row offset for the other widgets based on
-        # the number of filter key checkboxes:
-        _row_offset = len(_w_filter_keys) // 2 + len(_w_filter_keys) % 2
-
-        self.create_label(None, "Min. dataset\nsize: ", gridPos=(_row_offset, 0, 1, 1))
-        self.create_label(
-            None, "Min. dataset\ndimensions: ", gridPos=(_row_offset, 3, 1, 1)
+        self.create_param_widget(
+            self.get_param("min_datadim"), gridPos=(_row_offset, 0, 1, 1)
         )
-        self.create_label(
-            None, "Filtered datasets: ", gridPos=(1 + _row_offset, 0, 1, 1)
-        )
-        self.create_spin_box(
-            "min_datasize",
-            gridPos=(_row_offset, 1, 1, 1),
-            range=(0, int(1e9)),
-            value=50,
-        )
-        self.create_spin_box(
-            "min_datadim",
-            gridPos=(_row_offset, 4, 1, 1),
-            range=(0, 3),
-            value=2,
-        )
-        self.create_combo_box(
-            "select_dataset",
-            gridPos=(1 + _row_offset, 1, 1, 4),
-            minimumContentsLength=25,
-            sizeAdjustPolicy=QT_COMBO_BOX_SIZE_POLICY,
-        )
-        self.add_any_widget(
-            "frame_browser",
-            HorizontalSliderWithBrowser(),
-            gridPos=(2 + _row_offset, 0, 1, 5),
+        self.create_param_widget(
+            self.get_param("dataset"),
+            gridPos=(_row_offset + 1, 0, 1, 2),
+            width_text=0.275,
+            width_io=0.725,
         )
         self.create_button(
-            "but_view",
-            "Show full frame",
-            alignment=ALIGN_TOP_RIGHT,
-            gridPos=(3 + _row_offset, 3, 1, 2),
-            font_metric_width_factor=30,
-        )
-        self.create_check_box(
-            "auto_update",
-            "Auto update",
-            checked=True,
-            gridPos=(3 + _row_offset, 0, 1, 2),
-            font_metric_width_factor=30,
+            "button_toggle_details",
+            "Show detailed dataset selection options",
+            clicked=self._toggle_details,
+            icon="qt-std::SP_TitleBarUnshadeButton",
+            gridPos=(_row_offset + 1, 2, 1, 1),
         )
         self.setVisible(False)
 
@@ -183,14 +176,22 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
         Filter keys are set up dynamically along with their checkbox widgets.
         """
-        self._widgets["min_datasize"].valueChanged.connect(self.__populate_dataset_list)
-        self._widgets["min_datadim"].valueChanged.connect(self.__populate_dataset_list)
-        self._widgets["select_dataset"].currentTextChanged.connect(
-            self.__select_dataset
-        )
-        self._widgets["frame_browser"].valueChanged.connect(self._index_changed)
-        self._widgets["but_view"].clicked.connect(self.click_view_button)
-        self._widgets["auto_update"].clicked.connect(self._toggle_auto_update)
+        self.param_widgets["min_datadim"].io_edited.connect(self.__process_min_datadim)
+        self.param_widgets["dataset"].io_edited.connect(self.__select_dataset)
+        self._widgets["button_inspect"].clicked.connect(self.sig_request_hdf5_browser)
+
+    @QtCore.Slot(str)
+    def __process_min_datadim(self, value: str):
+        """
+        Process the minimum dataset dimension parameter.
+
+        Parameters
+        ----------
+        value : str
+            The new value of the minimum dataset dimension parameter.
+        """
+        self._config["min_datadim"] = 0 if value == "any" else int(value.split("=")[1])
+        self.__populate_dataset_list()
 
     def __populate_dataset_list(self):
         """
@@ -200,24 +201,23 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         list of datasets according to the selected criteria. The filtered list
         is used to populate the selection drop-down menu.
         """
-        _dset_filter_min_size = self._widgets["min_datasize"].value()
-        _dset_filter_min_dim = self._widgets["min_datadim"].value()
         _datasets = get_hdf5_populated_dataset_keys(
             self._config["current_filename"],
-            min_size=_dset_filter_min_size,
-            min_dim=_dset_filter_min_dim,
+            min_dim=self._config["min_datadim"],
             ignore_keys=self._config["activeDsetFilters"],
         )
-        _combo = self._widgets["select_dataset"]
-        with QtCore.QSignalBlocker(self._widgets["select_dataset"]):
-            _combo.clear()
-            _combo.addItems(_datasets)
-        if len(_datasets) > 0:
-            _items = [_combo.itemText(i) for i in range(_combo.count())]
-            _combo.view().setMinimumWidth(get_max_pixel_width_of_entries(_items) + 50)
-            self.__select_dataset()
-        else:
-            self._widgets["but_view"].setEnabled(False)
+        if "/entry/data/data" in _datasets:
+            _datasets.remove("/entry/data/data")
+            _datasets.insert(0, "/entry/data/data")
+        if len(_datasets) == 0:
+            _datasets = [""]
+        _param_widget = self.param_widgets["dataset"]
+        self.params["dataset"].update_value_and_choices(_datasets[0], _datasets)
+        _param_widget.update_choices(_datasets)
+        _param_widget.view().setMinimumWidth(
+            get_max_pixel_width_of_entries(_datasets) + 50
+        )
+        self.__select_dataset()
 
     def __select_dataset(self):
         """
@@ -228,60 +228,13 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         a different dataset to be visualized. This method also updates the
         accepted frame range for the sliders.
         """
-        _dset = self._widgets["select_dataset"].currentText()
-        with h5py.File(self._config["current_filename"], "r") as _file:
-            _shape = _file[_dset].shape
-        n_frames = _shape[0] if len(_shape) >= 3 else 1
-        self._widgets["frame_browser"].setRange(0, n_frames - 1)
-        self._config["currentIndex"] = 0
-        self._widgets["but_view"].setEnabled(True)
-        self.__update()
-
-    def __update(self, new_frame: bool = False):
-        """
-        Propagate an update to any consumers.
-
-        This method will read a new frame from the file if any consumers
-        demand it (consumers must activate the signal slot or the automatic
-        update). The new frame will be passed to any active view/preview
-        widgets and a signal emitted if the slot is active.
-
-        Parameters
-        ----------
-        new_frame : bool
-            A flag to tell this method to process a new frame, e.g. after changing
-            the dataset.
-        """
-        if self.flags["autoUpdate"] or self.flags["slotActive"] or new_frame:
-            self.__get_frame()
-            if self._frame is None:
-                return
-        if self.flags["slotActive"]:
-            self.new_frame_signal.emit(self._frame)
-        if self.flags["autoUpdate"] and self._widgets["plot"] is not None:
-            self.show_image_method(self._frame, legend="pydidas image")
-
-    def __get_frame(self):
-        """
-        Get and store a frame.
-
-        This internal method reads an image frame from the hdf5 dataset and
-        stores it internally for further processing (passing to other widgets
-        / signals)
-        """
-        _dset = self._widgets["select_dataset"].currentText()
-        if _dset == "":
-            self._frame = None
+        _dset = self.get_param_value("dataset")
+        if _dset == self._config["current_dataset"]:
             return
-        with h5py.File(self._config["current_filename"], "r") as _file:
-            _dset = _file[_dset]
-            _ndim = len(_dset.shape)
-            if _ndim >= 3:
-                self._frame = _dset[self._config["currentIndex"]]
-            elif _ndim == 2:
-                self._frame = _dset[...]
+        self._config["current_dataset"] = _dset
+        self.sig_new_dataset_selected.emit(_dset)
 
-    def _toggle_filter_key(self, widget: QtWidgets.QWidget, key: str):
+    def _toggle_filter_key(self, key: str):
         """
         Add or remove the filter key from the active dataset key filters.
 
@@ -293,40 +246,18 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
         Parameters
         ----------
-        widget : QWidget
-            The checkbox widget which is associated with enabling/disabling
-            the filter key.
         key : str
             The dataset filter string.
         """
-        if widget.isChecked() and key not in self._config["activeDsetFilters"]:
+        _widget = self._widgets[f"check_filter_{key}"]
+        if _widget.isChecked() and key not in self._config["activeDsetFilters"]:
             self._config["activeDsetFilters"].append(key)
-        if not widget.isChecked() and key in self._config["activeDsetFilters"]:
+        if not _widget.isChecked() and key in self._config["activeDsetFilters"]:
             self._config["activeDsetFilters"].remove(key)
         self.__populate_dataset_list()
 
-    def _toggle_auto_update(self):
-        """
-        Toggle automatic updates based on the state of the checkbox widget.
-        """
-        self.flags["autoUpdate"] = self._widgets["auto_update"].isChecked()
-
-    def enable_signal_slot(self, enable: bool):
-        """
-        Toggle the signal slot to emit the selected frame as signal for other
-        widgets.
-
-        Parameters
-        ----------
-        enable : bool
-            Flag to enable the signal slot. If True, a signal is emitted every
-            time a new frame is selected. If False, the signal slot is not
-            used.
-        """
-        self.flags["slotActive"] = enable
-
     @QtCore.Slot(str)
-    def new_filename(self, name: str):
+    def new_filename(self, filename: str):
         """
         Process the new filename.
 
@@ -335,42 +266,36 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
         Parameters
         ----------
-        name : str
+        filename : str
             The full file system path to the new file.
         """
-        _filename = Path(name)
-        if not _filename.is_file():
+        _filename = Path(filename)
+        if (not _filename.is_file()) or filename == self._config["current_filename"]:
             return
-        _is_hdf5 = get_extension(_filename) in HDF5_EXTENSIONS
+        _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
+        self._config["current_filename"] = filename if _is_hdf5 else ""
+        self._config["current_dataset"] = ""
         if _is_hdf5:
-            self._config["current_filename"] = name
             self.__populate_dataset_list()
-            self.__update(True)
 
-    def _index_changed(self, index: int):
+    def _toggle_details(self):
         """
-        Store the new index from the frame selector.
-
-        This method is connected to the frame selector (slider/field) and
-        calls for an update of the frame if the index has changed.
-
-        Parameters
-        ----------
-        index : int
-            The index in the image dataset.
+        Toggle the visibility of the detailed dataset selection options.
         """
-        self._config["currentIndex"] = index
-        self.__update(True)
-
-    def click_view_button(self):
-        """
-        Process clicking the view button.
-
-        This method is connected to the clicked event of the View button.
-        """
-        if self._frame is None or not self.flags["autoUpdate"]:
-            self.__get_frame()
-        if not isinstance(self._widgets["plot"], QtWidgets.QWidget):
-            raise PydidasGuiError("The reference is not a widget")
-        self.show_image_method(self._frame, legend="pydidas_image")
+        _show = not self._config["display_details"]
+        for _key in self._widgets:
+            if _key.startswith("check_filter_") or _key.startswith("empty_"):
+                self._widgets[_key].setVisible(_show)
+        self.param_composite_widgets["min_datadim"].setVisible(_show)
+        self._config["display_details"] = _show
+        self._widgets["button_toggle_details"].setText(
+            "Hide detailed dataset selection options"
+            if _show
+            else "Show detailed dataset selection options"
+        )
+        self._widgets["button_toggle_details"].setIcon(
+            get_pyqt_icon_from_str("qt-std::SP_TitleBarShadeButton")
+            if _show
+            else get_pyqt_icon_from_str("qt-std::SP_TitleBarUnshadeButton")
+        )

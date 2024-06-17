@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ of the hdf5 file reader with support for indexing and chunking.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -70,7 +70,7 @@ def read_hdf5_dataset(filename, dataset="entry/data/data", axes=None):
         The dataset as a numpy array.
     """
     axes = axes if axes is not None else []
-    with h5py.File(filename, "r") as _file:
+    with h5py.File(filename, "r", locking=False) as _file:
         _ds = _file[dataset]
 
         limits = np.r_[[(0, _shape) for _shape in _ds.shape]]

@@ -32,13 +32,12 @@ from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import PydidasGuiError, get_generic_param_collection
+from ...core import get_generic_param_collection
 from ...core.constants.file_extensions import BINARY_EXTENSIONS
 from ...core.constants.numpy_names import NUMPY_HUMAN_READABLE_DATATYPES
 from ...core.utils import get_extension
-from ...data_io import import_data
+from ..utilities import get_pyqt_icon_from_str
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
-from .common_selection import register_plot_widget_method
 
 
 class RawMetadataSelector(WidgetWithParameterCollection):
@@ -50,26 +49,21 @@ class RawMetadataSelector(WidgetWithParameterCollection):
     **kwargs : dict
         Any additional keyword arguments. In addition to all QAttributes supported
         by QWidget, see below for supported arguments:
-
-        plot_widget : Union[QWidget, None], optional
-            A widget for plotting the data. It can also be registered later using
-            the  *register_plot_widget* method. The default is None.
     """
 
     default_params = get_generic_param_collection(
         "raw_datatype", "raw_shape_y", "raw_shape_x", "raw_header"
     )
-    sig_decode_params = QtCore.Signal(object, int, int)
-    register_plot_widget = register_plot_widget_method
+    sig_decode_params = QtCore.Signal(object)
 
     def __init__(self, **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(self.default_params.copy())
-        self._config = {"filename": None}
-        self.show_image_method = None
-        self._widgets["plot"] = kwargs.get("plot_widget", None)
-        if self._widgets["plot"] is not None:
-            self.register_plot_widget(self._widgets["plot"])
+        self._config = {
+            "filename": Path(),
+            "decode_kwargs": {},
+            "display_details": True,
+        }
         self.__create_widgets()
 
     def __create_widgets(self):
@@ -89,10 +83,24 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         self.create_button(
             "confirm",
             "Decode raw data file",
-            clicked=self._decode_file,
+            clicked=self._emit_decoder_settings,
             gridPos=(_row, 2, 1, 1),
             font_metric_width_factor=30,
         )
+        self.create_spacer(
+            "spacer",
+            gridPos=(0, 4, 1, 1),
+            policy=QtWidgets.QSizePolicy.Expanding,
+            vertical_policy=QtWidgets.QSizePolicy.Fixed,
+        )
+        self.create_button(
+            "button_toggle_details",
+            "Hide detailed options",
+            clicked=self._toggle_details,
+            icon="qt-std::SP_TitleBarShadeButton",
+            gridPos=(_row, 4, 1, 1),
+        )
+
         self.setVisible(False)
 
     @QtCore.Slot(str)
@@ -111,29 +119,43 @@ class RawMetadataSelector(WidgetWithParameterCollection):
         self._config["filename"] = Path(name)
         if not self._config["filename"].is_file():
             return
-        _is_raw = (
-            get_extension(self._config["filename"], lowercase=True) in BINARY_EXTENSIONS
-        )
+        _is_raw = get_extension(Path(name), lowercase=True) in BINARY_EXTENSIONS
         self.setVisible(_is_raw)
         if not _is_raw:
             return
         if self._widgets["auto_load"].isChecked():
-            self._decode_file()
+            self.sig_decode_params.emit(self._config["decode_kwargs"])
 
     @QtCore.Slot()
-    def _decode_file(self):
+    def _emit_decoder_settings(self):
         """
-        Confirm the params and send them to the calling frame.
+        Confirm the decoder settings and emit the signal.
         """
-        if not isinstance(self._widgets["plot"], QtWidgets.QWidget):
-            raise PydidasGuiError("No plot widget has been registered.")
-        _datatype = NUMPY_HUMAN_READABLE_DATATYPES[self.get_param_value("raw_datatype")]
-        _offset = self.get_param_value("raw_header")
+        _dtype = NUMPY_HUMAN_READABLE_DATATYPES[self.get_param_value("raw_datatype")]
         _shape = (
             self.get_param_value("raw_shape_y"),
             self.get_param_value("raw_shape_x"),
         )
-        _data = import_data(
-            self._config["filename"], datatype=_datatype, offset=_offset, shape=_shape
+        self._config["decode_kwargs"] = {
+            "datatype": _dtype,
+            "offset": self.get_param_value("raw_header"),
+            "shape": _shape,
+        }
+        self.sig_decode_params.emit(self._config["decode_kwargs"])
+
+    def _toggle_details(self):
+        """
+        Toggle the visibility of the detailed dataset selection options.
+        """
+        _show = not self._config["display_details"]
+        for _widget in self.param_composite_widgets.values():
+            _widget.setVisible(_show)
+        self._config["display_details"] = _show
+        self._widgets["button_toggle_details"].setText(
+            "Hide detailed options" if _show else "Show detailed options"
         )
-        self.show_image_method(_data, legend="pydidas image")
+        self._widgets["button_toggle_details"].setIcon(
+            get_pyqt_icon_from_str("qt-std::SP_TitleBarShadeButton")
+            if _show
+            else get_pyqt_icon_from_str("qt-std::SP_TitleBarUnshadeButton")
+        )

@@ -71,6 +71,8 @@ MODULE_TASK = {
     "ruff-format": "re-formatting",
     "ruff-check": "style guide checks",
     "reuse": "licensing check",
+    "flake8": "style guide checks",
+    "black": "re-formatting",
 }
 MODULE_ARGS = {
     "black": ["."],

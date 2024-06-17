@@ -51,8 +51,8 @@ from .file_utils import get_extension
 
 def get_hdf5_populated_dataset_keys(
     item: Union[str, Path, h5py.File, h5py.Group, h5py.Dataset],
-    min_size: int = 50,
-    min_dim: int = 3,
+    min_size: int = 0,
+    min_dim: int = 2,
     max_dim: Union[int, None] = None,
     file_ref: Union[h5py.File, None] = None,
     ignore_keys: Union[list, None] = None,
@@ -74,7 +74,7 @@ def get_hdf5_populated_dataset_keys(
         filepath to the Hdf5 file.
     min_size : int, optional
         A minimum size which datasets need to have. Any integer between 0
-        and 1,000,000,000 are acceptable. The default is 50.
+        and 1,000,000,000 are acceptable. The default is 0.
     min_dim : int, optional
         The minimum dimensionality of the dataset. Allowed entries are
         between 0 and 3. The default is 3.
@@ -112,7 +112,7 @@ def get_hdf5_populated_dataset_keys(
 
     if isinstance(item, (str, Path)):
         _hdf5_filename_check(item)
-        item = h5py.File(item, "r")
+        item = h5py.File(item, "r", locking=False)
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
     _datasets = []
@@ -182,7 +182,7 @@ def _hdf5_filename_check(item: Union[Path, str]):
 
 def hdf5_dataset_check(
     item: object,
-    min_size: int = 50,
+    min_size: int = 0,
     min_dim: int = 3,
     max_dim: Union[int, None] = None,
     to_ignore: tuple = (),
@@ -201,7 +201,7 @@ def hdf5_dataset_check(
         :py:class:`h5py.Dataset`.
     min_size : int, optional
         The minimum data size of the item. This is the total size of the
-        dataset, not the size along any one dimension. The default is 50.
+        dataset, not the size along any one dimension. The default is 0.
     min_dim : int, optional
         The minimum dimensionality of the item. The default is 3.
     max_dim : Union[list, None], optional
@@ -307,7 +307,7 @@ def get_hdf5_metadata(
     if not isinstance(meta, (set, list, tuple)):
         raise TypeError("meta parameter must be of type str, set, list, tuple.")
     _results = {}
-    with h5py.File(_fname, "r") as _file:
+    with h5py.File(_fname, "r", locking=False) as _file:
         if "dtype" in meta:
             _results["dtype"] = _file[_dset].dtype
         if "shape" in meta:

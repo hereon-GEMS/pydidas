@@ -121,6 +121,7 @@ Detailed information about the individual windows is given here.
     windows/ManuallySetBeamcenterWindow
     windows/SelectIntegrationRegionWindow
     frames/CompositeCreatorFrame
+    windows/Hdf5BrowserWindow
 
 .. _gui_recipes:
 

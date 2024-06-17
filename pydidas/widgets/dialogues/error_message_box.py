@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with ErrorMessageBox class for exception output.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -154,7 +154,6 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             + "Exception trace:\n\n"
         )
         self._text = text
-        copy_text_to_system_clipbord(self._text)
         self._widgets["label"].setText(_note + text)
         _lines = (_note + text).split("\n")
         _max_len = max(len(_line) for _line in _lines)

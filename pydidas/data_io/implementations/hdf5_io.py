@@ -174,7 +174,10 @@ class Hdf5Io(IoBase):
         dataset = kwargs.get("dataset", "entry/data/data")
         auto_squeeze = kwargs.get("auto_squeeze", True)
 
-        with CatchFileErrors(filename), h5py.File(filename, "r") as _h5file:
+        with (
+            CatchFileErrors(filename),
+            h5py.File(filename, "r", locking=False) as _h5file,
+        ):
             _raw_data = _h5file[dataset][_indices]
             _human_readable_indices = _get_slice_repr(_indices)
             if 0 in _raw_data.shape:

@@ -152,7 +152,7 @@ def extract_units(ds):
     except KeyError:
         raise ValueError("Unit not found for chi.")
     
-
+    return result
 
 def extract_d_spacing(ds1, pos_key, pos_idx):
     '''

@@ -86,6 +86,72 @@ def chi_pos_verification(ds):
 
     return (chi_key, position_key)
 
+def extract_units(ds):
+    """
+    Extract units from data_label in a Pydidas.Dataset, corresponding to parameters in fit_labels.
+
+    Parameters:
+    ds (pydidas.Dataset): The dataset containing fit_labels and data_label.
+
+    Returns:
+    dict: A dictionary mapping fit_labels to their corresponding units.
+
+    Raises:
+    TypeError: If ds is not an instance of pydidas.Dataset.
+    ValueError: If a unit for any fit label is not found.
+    """
+        
+    # Ensure ds is an instance of Dataset
+    if not isinstance(ds, Dataset):
+        raise TypeError("Input must be an instance of pydidas.Dataset")
+       
+    
+    chi_key, (pos_key, _) = chi_pos_verification(ds)
+    print(ds.axis_units[chi_key])
+        
+    data_label=ds.data_label
+    fit_labels=ds.axis_labels[pos_key]
+    
+    # Step 1: Extract parameter names from fit_labels using dictionary comprehension
+    fit_labels_dict = {int(item.split(":")[0].strip()): item.split(":")[1].strip() for item in fit_labels.split(";")}
+
+    # Step 2: Extract units from data_label
+    data_label_dict = {}
+    data_label_parts = data_label.split(';')
+    for part in data_label_parts:
+        if '/' in part:
+            name, unit = part.split('/')
+            name = name.split(':')[-1].strip()
+            unit = unit.strip()
+            data_label_dict[name] = unit
+    
+    # Alternative approach using dictionary comprehension        
+    ## Step 2: Extract units from data_label using dictionary comprehension
+    #data_label_dict = {
+    #    part.split(':')[-1].split('/')[0].strip(): part.split('/')[-1].strip()
+    #    for part in data_label.split(';') if '/' in part
+    #}
+
+    # Step 3: Create a mapping of fit_labels to their corresponding units
+    #result = {param: data_label_dict.get(param, 'Unit not found') for #param in fit_labels_dict.values()}
+    result = {}
+    for param in fit_labels_dict.values():
+        print(param, unit)
+        try:
+            unit = data_label_dict[param]
+        except KeyError:
+            raise ValueError(f"Unit not found for parameter: {param}")
+        result[param] = unit
+          
+    # Append the unit for chi
+    try:
+        chi_unit = ds.axis_units[chi_key]
+        if not chi_unit:
+            raise ValueError("Unit for chi is empty.")
+        result['chi'] = chi_unit
+    except KeyError:
+        raise ValueError("Unit not found for chi.")
+    
 
 
 def extract_d_spacing(ds1, pos_key, pos_idx):
@@ -132,6 +198,9 @@ def ds_slicing(ds1):
         raise TypeError('Input has to be of type Dataset.')
       
     chi_key, (pos_key, pos_idx) = chi_pos_verification(ds1)
+    
+    
+    
     
     #select the chi values
     chi=ds1.axis_ranges[chi_key]

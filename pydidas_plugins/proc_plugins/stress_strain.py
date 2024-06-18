@@ -234,13 +234,12 @@ def ds_slicing(ds1):
 
     if not isinstance(ds1, Dataset):
         raise TypeError('Input has to be of type Dataset.')
-      
-      
+        
     chi_key, (pos_key, pos_idx) = chi_pos_verification(ds1)
     
     #Verification of units for chi and position
     try:
-        chi_pos_unit_verification(d1)
+        chi_pos_unit_verification(ds1)
     except (TypeError, ValueError) as e:
         # Handle the error or raise it further if needed
         raise e

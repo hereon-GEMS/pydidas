@@ -154,6 +154,45 @@ def extract_units(ds):
     
     return result
 
+def chi_pos_unit_verification(ds):
+    """
+    Verification of units for chi and position are correct.
+    
+    Parameters:
+    ds (Dataset): A Pydidas Dataset with fitting results. Position contains d_spacing values
+    
+    Returns:
+    bool: True if the units are correct, False otherwise.
+
+    Raises:
+    TypeError:  If ds is not an instance of pydidas.Dataset.
+    ValueError: If the units for chi or position are not allowed.
+  
+    """
+    if not isinstance(ds, Dataset):
+        raise TypeError("Input must be an instance of pydidas.Dataset")
+    
+    ds_units = extract_units(ds)
+    
+    #position/pos contains the unit for d_spacing
+    pos_units_allowed = ['nm', 'A']
+    chi_units_allowed = ['deg', 'rad']
+    
+    units_to_check = ['position', 'chi']
+    
+    for item, val in ds_units.items():
+        if item in units_to_check:
+            if item == 'position':
+                if val not in pos_units_allowed:
+                    raise ValueError(f"Unit {val} not allowed for {item}.")
+            if item == 'chi':
+                if val not in chi_units_allowed:
+                    raise ValueError(f"Unit {val} not allowed for {item}.")
+    
+    return True
+
+
+
 def extract_d_spacing(ds1, pos_key, pos_idx):
     '''
     Extracts d-spacing

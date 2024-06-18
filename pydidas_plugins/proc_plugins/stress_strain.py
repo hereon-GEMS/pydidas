@@ -178,7 +178,7 @@ def chi_pos_unit_verification(ds):
     pos_units_allowed = ['nm', 'A']
     chi_units_allowed = ['deg', 'rad']
     
-    units_to_check = ['position', 'chi']
+    params_to_check = ['position', 'chi']
     
     for item, val in ds_units.items():
         if item in units_to_check:

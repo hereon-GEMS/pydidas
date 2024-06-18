@@ -181,7 +181,7 @@ def chi_pos_unit_verification(ds):
     params_to_check = ['position', 'chi']
     
     for item, val in ds_units.items():
-        if item in units_to_check:
+        if item in params_to_check:
             if item == 'position':
                 if val not in pos_units_allowed:
                     raise ValueError(f"Unit {val} not allowed for {item}.")
@@ -190,7 +190,6 @@ def chi_pos_unit_verification(ds):
                     raise ValueError(f"Unit {val} not allowed for {item}.")
     
     return True
-
 
 
 def extract_d_spacing(ds1, pos_key, pos_idx):
@@ -236,10 +235,16 @@ def ds_slicing(ds1):
     if not isinstance(ds1, Dataset):
         raise TypeError('Input has to be of type Dataset.')
       
+      
     chi_key, (pos_key, pos_idx) = chi_pos_verification(ds1)
     
-    
-    
+    #Verification of units for chi and position
+    try:
+        chi_pos_unit_verification(d1)
+    except (TypeError, ValueError) as e:
+        # Handle the error or raise it further if needed
+        raise e
+  
     
     #select the chi values
     chi=ds1.axis_ranges[chi_key]

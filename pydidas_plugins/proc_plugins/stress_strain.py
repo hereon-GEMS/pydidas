@@ -247,17 +247,10 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
     d_spacing = ds1[*_slices]
     d_spacing = d_spacing.squeeze()
     
-    #TODO: Slicing does not slice the data_label
+    #TODO: Slicing does not work on the data_label
     d_spacing.data_label = key_at_pos_idx
     d_spacing.data_unit = unit_at_pos_idx
-    
-    
-    
-    print(40*"\N{palm tree}")
-    print(d_spacing)
-    print(40*"\N{palm tree}")
-    
-    
+       
         
     return d_spacing
 
@@ -307,63 +300,7 @@ def ds_slicing(ds1):
                        
     return chi, d_spacing
 
-def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
-    '''
-    Combines the positive and negative slopes of d_spacing and sorts them in ascending order of sin2chi.
-    Parameters:
-    - d_spacing_pos (Dataset): Dataset of d_spacing values for positive slopes.
-    - d_spacing_neg (Dataset): Dataset of d_spacing values for negative slopes.
-    Returns:
-    - d_spacing_combined (Dataset): Dataset of combined d_spacing values.
-    '''
-    # Check if the input is of type Dataset
-    if not isinstance(d_spacing_pos, Dataset) or not isinstance(d_spacing_neg, Dataset):
-        raise TypeError('Input has to be of type Dataset.')
-    
-    # Check if the axis labels are the same
-    if d_spacing_pos.axis_labels != d_spacing_neg.axis_labels:
-        raise ValueError('Axis labels do not match.')
-    
-    
-    # Check if the axis ranges are the same, 
-    # Create a mask for non-nan values in both arrays
-    s2c_axis_pos = d_spacing_pos.axis_ranges[0]
-    s2c_axis_neg = d_spacing_neg.axis_ranges[0]
-    
-    if s2c_axis_pos.shape != s2c_axis_neg.shape:
-        raise ValueError("Axis ranges do not have the same length.")
-       
-    comparison = np.allclose(s2c_axis_pos, s2c_axis_neg, atol=1e-15)   
-    if not comparison:
-        raise ValueError('Axis ranges do not match.')
 
-    #TODO: Is this really necessary?! Probably not.
-    # Make copies of the arrays
-    s2c_axis_pos_copy = np.copy(s2c_axis_pos)
-    d_spacing_pos_copy = np.copy(d_spacing_pos)
-    s2c_axis_neg_copy = np.copy(s2c_axis_neg)
-    d_spacing_neg_copy = np.copy(d_spacing_neg)
-    
-    # Get the indices that would sort s2c_mean_pos_copy in ascending order
-    sorted_idx_pos = np.argsort(s2c_axis_pos_copy, kind='mergesort')
-    sorted_idx_neg = np.argsort(s2c_axis_neg_copy, kind='mergesort')
-    
-    # Sorting the arrays
-    s2c_axis_pos_sorted = s2c_axis_pos_copy[sorted_idx_pos]
-    d_spacing_pos_sorted = d_spacing_pos_copy[sorted_idx_pos]
-    s2c_axis_neg_sorted = s2c_axis_neg_copy[sorted_idx_neg]
-    d_spacing_neg_sorted = d_spacing_neg_copy[sorted_idx_neg]
-     
-    d_spacing_combi_arr = np.vstack((d_spacing_neg_sorted, d_spacing_pos_sorted))
-       
-      
-    d_spacing_combined = Dataset(d_spacing_combi_arr , 
-                                 axis_ranges={0: np.arange(2), 1:  s2c_axis_pos_sorted}, 
-                                 axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'}, #TODO: previous: sin2chi
-                                 data_label='d_spacing')
-    
-  
-    return d_spacing_combined
 
 
 def idx_s2c_grouping(chi, tolerance=1e-4):
@@ -515,10 +452,71 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     
     #create Datasets for output
     #TODO: if wished later to be changed to s2c[s2c_unique_labels] for s2c_mean
-    d_spacing_pos=Dataset(d_spacing_mean_pos, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_pos')   
-    d_spacing_neg=Dataset(d_spacing_mean_neg, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_neg') 
+    d_spacing_pos=Dataset(d_spacing_mean_pos, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label=f'{d_spacing.data_label}_pos', data_unit=d_spacing.data_unit)   
+    d_spacing_neg=Dataset(d_spacing_mean_neg, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label=f'{d_spacing.data_label}_neg', data_unit=d_spacing.data_unit) 
     
     return (d_spacing_pos, d_spacing_neg)
+
+def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
+    '''
+    Combines the positive and negative slopes of d_spacing and sorts them in ascending order of sin2chi.
+    Parameters:
+    - d_spacing_pos (Dataset): Dataset of d_spacing values for positive slopes.
+    - d_spacing_neg (Dataset): Dataset of d_spacing values for negative slopes.
+    Returns:
+    - d_spacing_combined (Dataset): Dataset of combined d_spacing values.
+    '''
+    # Check if the input is of type Dataset
+    if not isinstance(d_spacing_pos, Dataset) or not isinstance(d_spacing_neg, Dataset):
+        raise TypeError('Input has to be of type Dataset.')
+    
+    # Check if the axis labels are the same
+    if d_spacing_pos.axis_labels != d_spacing_neg.axis_labels:
+        raise ValueError('Axis labels do not match.')
+    
+    
+    # Check if the axis ranges are the same, 
+    # Create a mask for non-nan values in both arrays
+    s2c_axis_pos = d_spacing_pos.axis_ranges[0]
+    s2c_axis_neg = d_spacing_neg.axis_ranges[0]
+    
+    if s2c_axis_pos.shape != s2c_axis_neg.shape:
+        raise ValueError("Axis ranges do not have the same length.")
+       
+    comparison = np.allclose(s2c_axis_pos, s2c_axis_neg, atol=1e-15)   
+    if not comparison:
+        raise ValueError('Axis ranges do not match.')
+
+    #TODO: Is this really necessary?! Probably not.
+    # Make copies of the arrays
+    s2c_axis_pos_copy = np.copy(s2c_axis_pos)
+    d_spacing_pos_copy = np.copy(d_spacing_pos)
+    s2c_axis_neg_copy = np.copy(s2c_axis_neg)
+    d_spacing_neg_copy = np.copy(d_spacing_neg)
+    
+    # Get the indices that would sort s2c_mean_pos_copy in ascending order
+    sorted_idx_pos = np.argsort(s2c_axis_pos_copy, kind='mergesort')
+    sorted_idx_neg = np.argsort(s2c_axis_neg_copy, kind='mergesort')
+    
+    # Sorting the arrays
+    s2c_axis_pos_sorted = s2c_axis_pos_copy[sorted_idx_pos]
+    d_spacing_pos_sorted = d_spacing_pos_copy[sorted_idx_pos]
+    s2c_axis_neg_sorted = s2c_axis_neg_copy[sorted_idx_neg]
+    d_spacing_neg_sorted = d_spacing_neg_copy[sorted_idx_neg]
+     
+    d_spacing_combi_arr = np.vstack((d_spacing_neg_sorted, d_spacing_pos_sorted))
+       
+    #TODO: Is the data_label how we want them to be?
+    d_spacing_combined = Dataset(d_spacing_combi_arr , 
+                                 axis_ranges={0: np.arange(2), 1:  s2c_axis_pos_sorted}, 
+                                 axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'}, #TODO: previous: sin2chi
+                                 data_label=f'0: {d_spacing_neg.data_label}, 1: {d_spacing_pos.data_label}',
+                                 data_unit=d_spacing_pos.data_unit)
+
+
+    return d_spacing_combined
+
+
 
 
 def pre_regression_calculation(d_spacing_combined):
@@ -554,14 +552,16 @@ def pre_regression_calculation(d_spacing_combined):
         d_spacing_avg= np.mean(d_spacing_combined, axis=0)
         d_spacing_avg.axis_ranges={0: d_spacing_combined.axis_ranges[1]}
         d_spacing_avg.axis_labels={0: 'sin^2(chi)'}
-        d_spacing_avg.data_label='d_spacing_mean'
+        d_spacing_avg.data_label='position mean'
+        d_spacing_avg.data_unit=d_spacing_combined.data_unit
         
         
         #d-, d+
         #d[1,1]-d[0,1]
         #vs sin(2*chi)
         d_spacing_diff= np.diff(d_spacing_combined, axis=0).squeeze()
-        d_spacing_diff.data_label='d_spacing_diff'
+        d_spacing_diff.data_unit=d_spacing_combined.data_unit
+        d_spacing_diff.data_label='position diff'
         d_spacing_diff.axis_labels={0: 'sin(2*chi)'} #or #TODO 'sin(2chi)' or 'sin_2chi'
         #calculation of sin(2*chi) from sin^2(chi)
         d_spacing_diff.axis_ranges ={0: np.sin(2*np.arcsin(np.sqrt(d_spacing_combined.axis_ranges[1])))}

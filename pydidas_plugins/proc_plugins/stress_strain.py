@@ -192,6 +192,36 @@ def chi_pos_unit_verification(ds):
     return True
 
 
+def get_param_unit_at_index(ds_units, pos_idx):
+    """
+    Retrieve the key-value pair from the dictionary `ds_units` at a specified index `pos_idx`.
+    Verify that 'position' is the key at the specified pos_idx.
+
+    Parameters:
+    ds_units (dict): The dictionary containing key-value pairs.
+    pos_idx (int): The index of the key-value pair to retrieve.
+
+    Returns:
+    tuple: A tuple containing the key and its corresponding value.
+
+    Raises:
+    IndexError: If pos_idx is out of range for the dictionary keys.
+    ValueError: If 'position' is not the key at the specified pos_idx.
+    """
+    keys_list = list(ds_units.keys())  # Convert keys to a list to access by index
+
+    if pos_idx < 0 or pos_idx >= len(keys_list):
+        raise IndexError(f"pos_idx {pos_idx} is out of range for the dictionary keys")
+
+    key_at_pos_idx = keys_list[pos_idx]
+    unit_at_pos_idx = ds_units[key_at_pos_idx]
+
+    if key_at_pos_idx != 'position':
+        raise ValueError(f"The key at pos_idx {pos_idx} is not 'position'")
+
+    return key_at_pos_idx, unit_at_pos_idx
+
+
 def extract_d_spacing(ds1, pos_key, pos_idx):
     '''
     Extracts d-spacing
@@ -202,6 +232,10 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
     - pos_idx (int): Index containing 'position' information in substring 
     
     '''    
+       
+    ds_units = extract_units(ds1)
+    key_at_pos_idx, unit_at_pos_idx = get_param_unit_at_index(ds_units, pos_idx)
+    
     _slices = []
     for _dim in range(ds1.ndim):
         if _dim != pos_key:
@@ -212,6 +246,18 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
         
     d_spacing = ds1[*_slices]
     d_spacing = d_spacing.squeeze()
+    
+    #TODO: Slicing does not slice the data_label
+    d_spacing.data_label = key_at_pos_idx
+    d_spacing.data_unit = unit_at_pos_idx
+    
+    
+    
+    print(40*"\N{palm tree}")
+    print(d_spacing)
+    print(40*"\N{palm tree}")
+    
+    
         
     return d_spacing
 
@@ -250,6 +296,7 @@ def ds_slicing(ds1):
     
     # Extract d-spacing values
     d_spacing = extract_d_spacing(ds1, pos_key, pos_idx)
+        
     
     if d_spacing.size == 0: 
         #Should check for empty arrays in case of slicing beyond bounds
@@ -464,12 +511,12 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     #print('s2c_mean', s2c_mean) 
     #print( 's2c_mean_pos', s2c_mean_pos)
     #print('s2c_mean_neg', s2c_mean_neg)
-    
+
     
     #create Datasets for output
     #TODO: if wished later to be changed to s2c[s2c_unique_labels] for s2c_mean
-    d_spacing_pos=Dataset(d_spacing_mean_pos, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_pos' )   
-    d_spacing_neg=Dataset(d_spacing_mean_neg, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_neg' ) 
+    d_spacing_pos=Dataset(d_spacing_mean_pos, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_pos')   
+    d_spacing_neg=Dataset(d_spacing_mean_neg, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label='d_spacing_neg') 
     
     return (d_spacing_pos, d_spacing_neg)
 

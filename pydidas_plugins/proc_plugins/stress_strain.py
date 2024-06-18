@@ -136,7 +136,6 @@ def extract_units(ds):
     #result = {param: data_label_dict.get(param, 'Unit not found') for #param in fit_labels_dict.values()}
     result = {}
     for param in fit_labels_dict.values():
-        print(param, unit)
         try:
             unit = data_label_dict[param]
         except KeyError:

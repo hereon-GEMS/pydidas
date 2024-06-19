@@ -94,8 +94,9 @@ def extract_units(ds):
     ds (pydidas.Dataset): The dataset containing fit_labels and data_label.
 
     Returns:
-    dict: A dictionary mapping fit_labels to their corresponding units.
-
+    dict: A dictionary where each key is the index of a fit label, and the value is a list 
+          containing the fit label and its corresponding unit. 
+          
     Raises:
     TypeError: If ds is not an instance of pydidas.Dataset.
     ValueError: If a unit for any fit label is not found.
@@ -108,12 +109,12 @@ def extract_units(ds):
     
     chi_key, (pos_key, _) = chi_pos_verification(ds)
             
-    data_label=ds.data_label
-    fit_labels=ds.axis_labels[pos_key]
+    data_label = ds.data_label
+    fit_labels = ds.axis_labels[pos_key]
     
     # Step 1: Extract parameter names from fit_labels using dictionary comprehension
     fit_labels_dict = {int(item.split(":")[0].strip()): item.split(":")[1].strip() for item in fit_labels.split(";")}
-
+   
     # Step 2: Extract units from data_label
     data_label_dict = {}
     data_label_parts = data_label.split(';')
@@ -124,29 +125,16 @@ def extract_units(ds):
             unit = unit.strip()
             data_label_dict[name] = unit
     
-    # Alternative approach using dictionary comprehension        
-    ## Step 2: Extract units from data_label using dictionary comprehension
-    #data_label_dict = {
-    #    part.split(':')[-1].split('/')[0].strip(): part.split('/')[-1].strip()
-    #    for part in data_label.split(';') if '/' in part
-    #}
-
-    # Step 3: Create a mapping of fit_labels to their corresponding units
-    #result = {param: data_label_dict.get(param, 'Unit not found') for #param in fit_labels_dict.values()}
-    print(40*"\N{hot beverage}")
-    print('fit_labels_dict' ,fit_labels_dict)
-    print('data_label_dict', data_label_dict)
-    print(40*"\N{hot beverage}")
-    
+    # Step 3: Create a mapping of fit_labels (with their indices) to their corresponding units
     result = {}
-    for param in fit_labels_dict.values():
+    for index, param in fit_labels_dict.items():
         try:
             unit = data_label_dict[param]
         except KeyError:
             raise ValueError(f"Unit not found for parameter: {param}")
-        result[param] = unit
-          
-       
+        result[f'{index}'] = [param, unit]
+
+    
     return result
 
 def chi_pos_unit_verification(ds):

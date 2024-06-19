@@ -132,8 +132,7 @@ def extract_units(ds):
             unit = data_label_dict[param]
         except KeyError:
             raise ValueError(f"Unit not found for parameter: {param}")
-        result[f'{index}'] = [param, unit]
-
+        result[index] = [param, unit]
     
     return result
 
@@ -178,41 +177,30 @@ def chi_pos_unit_verification(ds):
 
 def get_param_unit_at_index(ds_units, pos_idx):
     """
-    Retrieve the key-value pair from the dictionary `ds_units` at a specified index `pos_idx`.
-    Verify that 'position' is the key at the specified pos_idx.
+    Retrieve the parameter name and unit from the dictionary `ds_units` at a specified index `pos_idx`.
+    Verify that 'position' is the parameter name at the specified pos_idx.
 
     Parameters:
-    ds_units (dict): The dictionary containing key-value pairs.
-    pos_idx (int): The index of the key-value pair to retrieve.
+    ds_units (dict): The dictionary containing parameter name and unit pairs.
+    pos_idx (int): The index of the parameter to retrieve.
 
     Returns:
-    tuple: A tuple containing the key and its corresponding value.
+    tuple: A tuple containing the parameter name and its corresponding unit.
 
     Raises:
     IndexError: If pos_idx is out of range for the dictionary keys.
-    ValueError: If 'position' is not the key at the specified pos_idx.
+    ValueError: If 'position' is not the parameter name at the specified pos_idx.
     """
-    keys_list = list(ds_units.keys())  # Convert keys to a list to access by index
-    
-    print(50*"\N{hot pepper}")
-    print('key list', keys_list)
-    print(50*"\N{hot pepper}")
-
-    if pos_idx < 0 or pos_idx >= len(keys_list):
+    if pos_idx not in ds_units:
         raise IndexError(f"pos_idx {pos_idx} is out of range for the dictionary keys")
 
-    key_at_pos_idx = keys_list[pos_idx]
-    unit_at_pos_idx = ds_units[key_at_pos_idx]
+    param_info = ds_units[pos_idx]
+    param_name, unit = param_info
 
-    print(50*" \N{hot pepper} ")
-    print(pos_idx, key_at_pos_idx, unit_at_pos_idx)
-    print(50*" \N{hot pepper} ")
+    if param_name != 'position':
+        raise ValueError(f"The parameter name at pos_idx {pos_idx} is not 'position'")
 
-    if key_at_pos_idx != 'position':
-        raise ValueError(f"The key at pos_idx {pos_idx} is not 'position'")
-
-    return key_at_pos_idx, unit_at_pos_idx
-
+    return param_name, unit
 
 def extract_d_spacing(ds1, pos_key, pos_idx):
     '''
@@ -285,8 +273,7 @@ def ds_slicing(ds1):
     
     # Extract d-spacing values
     d_spacing = extract_d_spacing(ds1, pos_key, pos_idx)
-    print('d_spacing after extraction', d_spacing.shape, d_spacing.size, d_spacing[0,0,0])
-        
+           
     
     if d_spacing.size == 0: 
         #Should check for empty arrays in case of slicing beyond bounds

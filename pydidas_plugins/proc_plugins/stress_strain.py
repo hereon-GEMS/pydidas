@@ -107,8 +107,7 @@ def extract_units(ds):
        
     
     chi_key, (pos_key, _) = chi_pos_verification(ds)
-    print(ds.axis_units[chi_key])
-        
+            
     data_label=ds.data_label
     fit_labels=ds.axis_labels[pos_key]
     
@@ -134,6 +133,11 @@ def extract_units(ds):
 
     # Step 3: Create a mapping of fit_labels to their corresponding units
     #result = {param: data_label_dict.get(param, 'Unit not found') for #param in fit_labels_dict.values()}
+    print(40*"\N{hot beverage}")
+    print('fit_labels_dict' ,fit_labels_dict)
+    print('data_label_dict', data_label_dict)
+    print(40*"\N{hot beverage}")
+    
     result = {}
     for param in fit_labels_dict.values():
         try:
@@ -142,15 +146,7 @@ def extract_units(ds):
             raise ValueError(f"Unit not found for parameter: {param}")
         result[param] = unit
           
-    # Append the unit for chi
-    try:
-        chi_unit = ds.axis_units[chi_key]
-        if not chi_unit:
-            raise ValueError("Unit for chi is empty.")
-        result['chi'] = chi_unit
-    except KeyError:
-        raise ValueError("Unit not found for chi.")
-    
+       
     return result
 
 def chi_pos_unit_verification(ds):
@@ -175,7 +171,8 @@ def chi_pos_unit_verification(ds):
     
     #position/pos contains the unit for d_spacing
     pos_units_allowed = ['nm', 'A']
-    chi_units_allowed = ['deg', 'rad']
+    #TODO: Currently only chi in degree is allowed. If chi [rad] has to be allowed, adjust the calculation of sin^2(chi).
+    chi_units_allowed = ['deg']
     
     params_to_check = ['position', 'chi']
     
@@ -208,12 +205,20 @@ def get_param_unit_at_index(ds_units, pos_idx):
     ValueError: If 'position' is not the key at the specified pos_idx.
     """
     keys_list = list(ds_units.keys())  # Convert keys to a list to access by index
+    
+    print(50*"\N{hot pepper}")
+    print('key list', keys_list)
+    print(50*"\N{hot pepper}")
 
     if pos_idx < 0 or pos_idx >= len(keys_list):
         raise IndexError(f"pos_idx {pos_idx} is out of range for the dictionary keys")
 
     key_at_pos_idx = keys_list[pos_idx]
     unit_at_pos_idx = ds_units[key_at_pos_idx]
+
+    print(50*" \N{hot pepper} ")
+    print(pos_idx, key_at_pos_idx, unit_at_pos_idx)
+    print(50*" \N{hot pepper} ")
 
     if key_at_pos_idx != 'position':
         raise ValueError(f"The key at pos_idx {pos_idx} is not 'position'")
@@ -242,6 +247,10 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
         elif _dim == pos_key:
             _slices.append(slice(pos_idx, pos_idx + 1))
         #print(f"Dimension {_dim}, Slices: {_slices}")
+     
+    print('shape of ds', ds1.shape)    
+    print('slices', _slices)    
+    print('pos_key', pos_key, 'pos_idx', pos_idx)
         
     d_spacing = ds1[*_slices]
     d_spacing = d_spacing.squeeze()
@@ -288,6 +297,7 @@ def ds_slicing(ds1):
     
     # Extract d-spacing values
     d_spacing = extract_d_spacing(ds1, pos_key, pos_idx)
+    print('d_spacing after extraction', d_spacing.shape, d_spacing.size, d_spacing[0,0,0])
         
     
     if d_spacing.size == 0: 
@@ -453,9 +463,10 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     #TODO: if wished later to be changed to s2c[s2c_unique_labels] for s2c_mean
     d_spacing_pos=Dataset(d_spacing_mean_pos, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label=f'{d_spacing.data_label}_pos', data_unit=d_spacing.data_unit)   
     d_spacing_neg=Dataset(d_spacing_mean_neg, axis_ranges = {0 : s2c_mean}, axis_labels={0 : 'sin^2(chi)'}, data_label=f'{d_spacing.data_label}_neg', data_unit=d_spacing.data_unit) 
-    
+        
     return (d_spacing_pos, d_spacing_neg)
 
+#TODO: Fix this function, no copying
 def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     '''
     Combines the positive and negative slopes of d_spacing and sorts them in ascending order of sin2chi.

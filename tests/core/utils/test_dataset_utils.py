@@ -32,8 +32,8 @@ import numpy as np
 from pydidas.core import PydidasConfigError
 from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
-    dataset_ax_str_default,
-    dataset_property_default_val,
+    _dataset_ax_str_default,
+    dataset_default_attribute,
     get_input_as_dict,
     get_number_of_entries,
     item_is_iterable_but_not_array,
@@ -49,7 +49,12 @@ class Test_dataset_utils(unittest.TestCase):
     def test_update_dataset_properties_from_kwargs__no_input(self):
         obj = Dataset(np.random.random((10, 10)))
         update_dataset_properties_from_kwargs(obj, {})
-        self.assertEqual(obj._meta["getitem_key"], ())
+        self.assertEqual(obj._meta["_get_item_key"], ())
+
+    def test_update_dataset_properties_from_kwargs__wrong_input(self):
+        obj = Dataset(np.random.random((10, 10)))
+        with self.assertWarns(UserWarning):
+            update_dataset_properties_from_kwargs(obj, {"wrong_key": 12})
 
     def test_update_dataset_properties_from_kwargs__axis_units(self):
         _units = {0: "a", 1: "b"}
@@ -81,17 +86,17 @@ class Test_dataset_utils(unittest.TestCase):
         update_dataset_properties_from_kwargs(obj, {"data_unit": _unit})
         self.assertEqual(obj.data_unit, _unit)
 
-    def test_dataset_property_default_val__metadata(self):
-        self.assertEqual(dataset_property_default_val("metadata"), {})
+    def dataset_default_attribute__metadata(self):
+        self.assertEqual(dataset_default_attribute("metadata", (1,)), {})
 
-    def test_dataset_property_default_val__data_unit(self):
-        self.assertEqual(dataset_property_default_val("data_unit"), "")
+    def dataset_default_attribute__data_unit(self):
+        self.assertEqual(dataset_default_attribute("data_unit", (1,)), "")
 
-    def test_dataset_property_default_val__getitem_key(self):
-        self.assertEqual(dataset_property_default_val("getitem_key"), tuple())
+    def dataset_default_attribute___get_item_key(self):
+        self.assertEqual(dataset_default_attribute("_get_item_key", (1,)), tuple())
 
     def test_dataset_ax_str_default(self):
-        _range = dataset_ax_str_default(5)
+        _range = _dataset_ax_str_default(5)
         self.assertEqual(set(np.arange(5)), set(_range.keys()))
         self.assertEqual(set([""]), set(_range.values()))
 

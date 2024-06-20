@@ -39,10 +39,9 @@ from numpy.typing import ArrayLike
 
 from .utils.dataset_utils import (
     FLATTEN_DIM_DEFAULTS,
+    METADATA_KEYS,
     convert_ranges_and_check_length,
-    dataset_ax_default_ranges,
-    dataset_ax_str_default,
-    dataset_property_default_val,
+    dataset_default_attribute,
     get_axis_item_representation,
     get_dict_with_string_entries,
     get_input_as_dict,
@@ -124,10 +123,10 @@ class Dataset(np.ndarray):
         pydidas.core.Dataset
             The sliced new dataset.
         """
-        self._meta["getitem_key"] = key if isinstance(key, tuple) else (key,)
+        self._meta["_get_item_key"] = key if isinstance(key, tuple) else (key,)
         _item = np.ndarray.__getitem__(self, key)
         if not isinstance(_item, np.ndarray):
-            self._meta["getitem_key"] = ()
+            self._meta["_get_item_key"] = ()
         return _item
 
     def __array_finalize__(self, obj: Self):
@@ -142,8 +141,8 @@ class Dataset(np.ndarray):
             return
         self.__update_keys_from_object(obj)
         if hasattr(obj, "_meta"):
-            obj._meta["getitem_key"] = ()
-        self._meta["getitem_key"] = ()
+            obj._meta["_get_item_key"] = ()
+        self._meta["_get_item_key"] = ()
 
     def __update_keys_from_object(self, obj: object):
         """
@@ -156,18 +155,10 @@ class Dataset(np.ndarray):
             acceptable object to create a ndarray, e.g. tuple, list.
         """
         self._meta = {
-            _key: deepcopy(getattr(obj, _key, _default))
-            for _key, _default in [
-                ["axis_labels", dataset_ax_str_default(self.ndim)],
-                ["axis_units", dataset_ax_str_default(self.ndim)],
-                ["axis_ranges", dataset_ax_default_ranges(self.shape)],
-                ["metadata", dataset_property_default_val("metadata")],
-                ["data_unit", dataset_property_default_val("data_unit")],
-                ["data_label", dataset_property_default_val("data_label")],
-            ]
+            _key: getattr(obj, _key, dataset_default_attribute(_key, self.shape))
+            for _key in METADATA_KEYS
         }
-        self._meta["getitem_key"] = getattr(obj, "_meta", {}).get("getitem_key", ())
-        for _dim, _slicer in enumerate(self._meta["getitem_key"]):
+        for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
             if isinstance(_slicer, np.ndarray) and _slicer.size == obj.size:
                 # in the case of a masked array, keep all axis keys.
                 break
@@ -177,10 +168,9 @@ class Dataset(np.ndarray):
             elif isinstance(_slicer, (slice, Iterable, np.ndarray)):
                 if isinstance(_slicer, tuple):
                     _slicer = list(_slicer)
-                if self._meta["axis_ranges"][_dim] is not None:
-                    self._meta["axis_ranges"][_dim] = self._meta["axis_ranges"][_dim][
-                        _slicer
-                    ]
+                self._meta["axis_ranges"][_dim] = self._meta["axis_ranges"][_dim][
+                    _slicer
+                ]
             elif _slicer is None:
                 self.__insert_axis_keys(_dim)
         # finally, shift all keys to have a consistent numbering:
@@ -414,6 +404,20 @@ class Dataset(np.ndarray):
             The array data.
         """
         return self.__array__()
+
+    @property
+    def _get_item_key(self) -> tuple:
+        """
+        Return the getitem key.
+
+        Note
+
+        Returns
+        -------
+        tuple
+            The getitem key.
+        """
+        return deepcopy(self._meta["_get_item_key"])
 
     @property
     def axis_units(self) -> dict:
@@ -808,7 +812,7 @@ class Dataset(np.ndarray):
             for _key in ["axis_labels", "axis_units", "axis_ranges"]
         } | {
             _key: self._meta[_key]
-            for _key in ["data_unit", "data_label", "getitem_key"]
+            for _key in ["data_unit", "data_label", "_get_item_key"]
         }
         _new._meta["metadata"] = {}
         for _key, _val in self._meta["metadata"].items():

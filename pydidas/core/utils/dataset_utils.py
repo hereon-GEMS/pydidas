@@ -26,10 +26,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "FLATTEN_DIM_DEFAULTS",
+    "METADATA_KEYS",
+    "dataset_default_attribute",
     "update_dataset_properties_from_kwargs",
-    "dataset_property_default_val",
-    "dataset_ax_str_default",
-    "dataset_ax_default_ranges",
     "get_number_of_entries",
     "get_axis_item_representation",
     "get_dict_with_string_entries",
@@ -58,6 +57,16 @@ FLATTEN_DIM_DEFAULTS = {
     "new_dim_range": None,
 }
 
+METADATA_KEYS = [
+    "data_unit",
+    "data_label",
+    "metadata",
+    "_get_item_key",
+    "axis_units",
+    "axis_labels",
+    "axis_ranges",
+]
+
 
 def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset:
     """
@@ -75,42 +84,46 @@ def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset
     obj : pydidas.core.Dataset
         The updated Dataset.
     """
-    obj._meta = {"getitem_key": ()}
-    obj.axis_units = kwargs.get("axis_units", dataset_ax_str_default(obj.ndim))
-    obj.axis_labels = kwargs.get("axis_labels", dataset_ax_str_default(obj.ndim))
-    obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default_ranges(obj.shape))
-    obj.metadata = kwargs.get("metadata", {})
-    obj.data_unit = kwargs.get("data_unit", "")
-    obj.data_label = kwargs.get("data_label", "")
+    obj._meta = {"_get_item_key": ()}
+    for _key in METADATA_KEYS:
+        if _key.startswith("_"):
+            continue
+        setattr(obj, _key, kwargs.get(_key, dataset_default_attribute(_key, obj.shape)))
+    if not set(kwargs.keys()).issubset(set(METADATA_KEYS)):
+        warnings.warn("Unknown keys in the input dictionary. Please check the inputs.")
     return obj
 
 
-def dataset_property_default_val(entry: str) -> Union[dict, str, tuple]:
+def dataset_default_attribute(key: str, shape: tuple[int]) -> Union[str, dict]:
     """
-    Generate default values for the properties in a Dataset.
+    Get the default value for a Dataset attribute.
 
     Parameters
     ----------
-    entry : str
-        The entry to be processed. This must be a defined string to get the default
-        keys for these entries.
+    key : str
+        The key to be processed.
+    shape : tuple[int]
+        The shape of the Dataset.
 
     Returns
     -------
     Union[str, dict]
-        The default entries for different properties. This is an empty string for the
-        data unit, an empty dictionary for the metadata.
+        The default value for the given key.
     """
-    if entry == "metadata":
-        return {}
-    if entry in ["data_unit", "data_label"]:
+    if key in ["data_unit", "data_label"]:
         return ""
-    if entry == "getitem_key":
+    if key == "_get_item_key":
         return tuple()
-    raise ValueError(f"No default available for '{entry}'.")
+    if key == "metadata":
+        return {}
+    if key in ["axis_units", "axis_labels"]:
+        return _dataset_ax_str_default(len(shape))
+    if key == "axis_ranges":
+        return _dataset_ax_default_ranges(shape)
+    raise ValueError(f"No default available for `{key}`.")
 
 
-def dataset_ax_str_default(ndim: int) -> dict:
+def _dataset_ax_str_default(ndim: int) -> dict:
     """
     Generate default values for the string-based axis properties in a Dataset.
 
@@ -128,7 +141,7 @@ def dataset_ax_str_default(ndim: int) -> dict:
     return {i: "" for i in range(ndim)}
 
 
-def dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
+def _dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
     """
     Generate default values for the axis ranges in a Dataset.
 
@@ -317,9 +330,9 @@ def get_input_as_dict(
             "`{calling_method_name}`)."
         )
         _default_data = (
-            dataset_ax_str_default(target_length)
+            _dataset_ax_str_default(target_length)
             if entry_type == "str"
-            else dataset_ax_default_ranges(target_shape)
+            else _dataset_ax_default_ranges(target_shape)
         )
         _default_data.update({k: v for k, v in data.items() if k in _target_keys})
         return _default_data

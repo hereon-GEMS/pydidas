@@ -257,7 +257,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _ = obj[0, 0]
         _ = obj[0]
-        self.assertEqual(obj._meta["getitem_key"], ())
+        self.assertEqual(obj._meta["_get_item_key"], ())
 
     def test_array_finalize__multiple_slicing(self):
         obj = self.create_large_dataset()
@@ -286,7 +286,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_simple_dataset()[0]
         _val = obj[0]
         self.assertIsInstance(_val, Real)
-        self.assertEqual(obj._meta["getitem_key"], ())
+        self.assertEqual(obj._meta["_get_item_key"], ())
 
     def test__with_rebin2d(self):
         obj = Dataset(np.random.random((11, 11)), axis_labels=["0", "1"])

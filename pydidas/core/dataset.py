@@ -38,14 +38,14 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from .utils.dataset_utils import (
-    convert_data_to_dict,
+    convert_ranges_and_check_length,
     dataset_ax_default_ranges,
     dataset_ax_str_default,
     dataset_property_default_val,
     get_axis_item_representation,
+    get_dict_with_string_entries,
+    get_input_as_dict,
     get_number_of_entries,
-    item_is_iterable_but_not_array,
-    replace_none_entries,
     update_dataset_properties_from_kwargs,
 )
 
@@ -460,8 +460,8 @@ class Dataset(np.ndarray):
             The new axis units. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
-        self._meta["axis_units"] = replace_none_entries(
-            convert_data_to_dict(units, self.shape, "axis_units")
+        self._meta["axis_units"] = get_dict_with_string_entries(
+            units, self.shape, "axis_units"
         )
 
     @property
@@ -488,8 +488,8 @@ class Dataset(np.ndarray):
             The new axis labels. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
-        self._meta["axis_labels"] = replace_none_entries(
-            convert_data_to_dict(labels, self.shape, "axis_labels")
+        self._meta["axis_labels"] = get_dict_with_string_entries(
+            labels, self.shape, "axis_labels"
         )
 
     @property
@@ -519,46 +519,8 @@ class Dataset(np.ndarray):
             The new axis ranges. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
-        _ranges = convert_data_to_dict(ranges, self.shape, "axis_ranges")
-        self._convert_ranges_and_verify_length_okay(_ranges)
-        self._meta["axis_ranges"] = _ranges
-
-    def _convert_ranges_and_verify_length_okay(self, ranges: dict):
-        """
-        Convert ranges to ndarray.
-
-        Verify that all given true ranges (i.e. with more than one item) are of type
-        np.ndarray and that the length of all given ranges matches the data shape.
-
-        Parameters
-        ----------
-        ranges : dict
-            The dictionary with the loaded ranges.
-
-        Raises
-        ------
-        ValueError
-            If the given lengths do not match the data length.
-        """
-        _wrong_dims = []
-        for _dim, _range in ranges.items():
-            if _range is None:
-                ranges[_dim] = np.arange(self.shape[_dim])
-                continue
-            if item_is_iterable_but_not_array(_range):
-                _range = np.asarray(_range)
-                ranges[_dim] = _range
-            if isinstance(_range, np.ndarray) and _range.size != self.shape[_dim]:
-                _wrong_dims.append([_dim, _range.size, self.shape[_dim]])
-        if len(_wrong_dims) > 0:
-            _error = (
-                "The length of the given ranges does not match the size of the data."
-            )
-            for _dim, _len, _ndata in _wrong_dims:
-                _error += (
-                    f"\nDimension {_dim}: Given range: {_len}; target length: {_ndata}."
-                )
-            raise ValueError(_error)
+        _ranges = get_input_as_dict(ranges, self.shape, "axis_ranges")
+        self._meta["axis_ranges"] = convert_ranges_and_check_length(_ranges, self.shape)
 
     # ######################################
     # Update methods for the axis properties
@@ -582,8 +544,8 @@ class Dataset(np.ndarray):
         """
         if not 0 <= index < self.ndim:
             raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
-        self._convert_ranges_and_verify_length_okay({index: item})
-        self._meta["axis_ranges"][index] = item
+        _new = convert_ranges_and_check_length({index: item}, self.shape)
+        self._meta["axis_ranges"][index] = _new[index]
 
     def update_axis_label(self, index: int, item: str):
         """

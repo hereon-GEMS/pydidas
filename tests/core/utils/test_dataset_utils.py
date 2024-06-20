@@ -32,9 +32,9 @@ import numpy as np
 from pydidas.core import PydidasConfigError
 from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
-    convert_data_to_dict,
     dataset_ax_str_default,
     dataset_property_default_val,
+    get_input_as_dict,
     get_number_of_entries,
     item_is_iterable_but_not_array,
     update_dataset_properties_from_kwargs,
@@ -120,34 +120,32 @@ class Test_dataset_utils(unittest.TestCase):
         with self.assertRaises(TypeError):
             get_number_of_entries(_obj)
 
-    def test_convert_data_to_dict__correct_dict(self):
+    def test_get_input_as_dict__correct_dict(self):
         _obj = {0: 5, 1: 4, 2: 42}
-        _new = convert_data_to_dict(_obj, (1, 2, 3))
+        _new = get_input_as_dict(_obj, (1, 2, 3))
         self.assertEqual(_obj, _new)
 
-    def test_convert_data_to_dict__incorrect_dict(self):
+    def test_get_input_as_dict__incorrect_dict(self):
         _obj = {0: 5, 3: 4, 6: 42}
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            _new = convert_data_to_dict(_obj, (1, 2, 3))
-            self.assertEqual(_new, dict(enumerate(_obj.values())))
+            _new = get_input_as_dict(_obj, (1, 2, 3))
+        self.assertEqual(_new, {0: 5, 1: "", 2: ""})
 
-    def test_convert_data_to_dict__correct_iterable(self):
+    def test_get_input_as_dict__correct_iterable(self):
         _obj = [5, 4, 3]
-        _new = convert_data_to_dict(_obj, (1, 2, 3))
+        _new = get_input_as_dict(_obj, (1, 2, 3))
         self.assertEqual(_new, dict(enumerate(_obj)))
 
-    def test_convert_data_to_dict__incorrect_iterable(self):
+    def test_get_input_as_dict__incorrect_iterable(self):
         _obj = [4, 2, 7, 4]
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            _new = convert_data_to_dict(_obj, (1, 2, 3))
-            self.assertEqual(_new, dataset_ax_str_default(3))
+        with self.assertRaises(PydidasConfigError):
+            get_input_as_dict(_obj, (1, 2, 3))
 
-    def test_convert_data_to_dict__incorrect_type(self):
+    def test_get_input_as_dict__incorrect_type(self):
         _obj = "a string"
         with self.assertRaises(PydidasConfigError):
-            convert_data_to_dict(_obj, 3)
+            get_input_as_dict(_obj, (3,))
 
     def test_item_is_iterable_but_not_array__string(self):
         _flag = item_is_iterable_but_not_array("a string")

@@ -234,7 +234,6 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
     #TODO: Slicing does not work on the data_label
     d_spacing.data_label = key_at_pos_idx
     d_spacing.data_unit = unit_at_pos_idx
-       
         
     return d_spacing
 

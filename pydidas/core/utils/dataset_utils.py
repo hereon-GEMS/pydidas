@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "FLATTEN_DIM_DEFAULTS",
     "update_dataset_properties_from_kwargs",
     "dataset_property_default_val",
     "dataset_ax_str_default",
@@ -50,6 +51,12 @@ from ..exceptions import PydidasConfigError, UserConfigError
 
 
 Dataset = NewType("Dataset", np.ndarray)
+
+FLATTEN_DIM_DEFAULTS = {
+    "new_dim_label": "Flattened",
+    "new_dim_unit": "",
+    "new_dim_range": None,
+}
 
 
 def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset:

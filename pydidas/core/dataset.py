@@ -38,6 +38,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from .utils.dataset_utils import (
+    FLATTEN_DIM_DEFAULTS,
     convert_ranges_and_check_length,
     dataset_ax_default_ranges,
     dataset_ax_str_default,
@@ -199,27 +200,16 @@ class Dataset(np.ndarray):
             The dimension in front of which the new key shall be inserted.
         """
         for _item in ["axis_labels", "axis_units", "axis_ranges"]:
-            _new_entry = np.arange(self.shape[dim]) if _item == "axis_ranges" else ""
-            _copy = {}
             _dict = self._meta[_item]
-            for _key in sorted(_dict):
-                if _key < dim:
-                    _copy[_key] = _dict[_key]
-                elif _key == dim:
-                    _copy[dim] = _new_entry
-                    _copy[_key + 1] = _dict[_key]
-                else:
-                    _copy[_key + 1] = _dict[_key]
-            if dim not in _copy:
-                _copy[dim] = _new_entry
-            self._meta[_item] = _copy
+            _new_entry = np.arange(self.shape[dim]) if _item == "axis_ranges" else ""
+            _vals = [_dict[_key] for _key in sorted(_dict)]
+            _vals.insert(dim, _new_entry)
+            self._meta[_item] = {_i: _val for _i, _val in enumerate(_vals)}
 
     def flatten_dims(
         self,
         *args: tuple,
-        new_dim_label: str = "Flattened",
-        new_dim_unit: str = "",
-        new_dim_range: Union[None, np.ndarray, Iterable] = None,
+        **kwargs: dict,
     ):
         """
         Flatten the specified dimensions in place in the Dataset.
@@ -235,40 +225,41 @@ class Dataset(np.ndarray):
         *args : tuple
             The tuple of the dimensions to be flattened. Each dimension must
             be an integer entry.
-        new_dim_label : str, optional
-            The label for the new, flattened dimension. The default is
-            'Flattened'.
-        new_dim_unit : str, optional
-            The unit for the new, flattened dimension. The default is ''.
-        new_dim_range : Union[None, np.ndarray, Iterable], optional
-            The new range for the flattened dimension. If None, a simple The
-            default is None.
+        **kwargs: dict
+            Additional keyword arguments. Supported keywords are:
+
+            new_dim_label : str, optional
+                The label for the new, flattened dimension. The default is
+                'Flattened'.
+            new_dim_unit : str, optional
+                The unit for the new, flattened dimension. The default is ''.
+            new_dim_range : Union[None, np.ndarray, Iterable], optional
+                The new range for the flattened dimension. If None, a simple The
+                default is None.
         """
         if len(args) < 2:
             return
         if set(np.diff(args)) != {1}:
             raise ValueError("The dimensions to flatten must be adjacent.")
-        _axis_labels = []
-        _axis_units = []
-        _axis_ranges = []
+        _new = {"axis_labels": [], "axis_units": [], "axis_ranges": []}
         _new_shape = []
         for _dim in range(self.ndim):
             if _dim not in args:
-                _axis_labels.append(self._meta["axis_labels"][_dim])
-                _axis_units.append(self._meta["axis_units"][_dim])
-                _axis_ranges.append(self._meta["axis_ranges"][_dim])
                 _new_shape.append(self.shape[_dim])
+                for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+                    _new[_key].append(self._meta[_key][_dim])
             elif _dim == args[0]:
-                _axis_labels.append(new_dim_label)
-                _axis_units.append(new_dim_unit)
-                _axis_ranges.append(new_dim_range)
                 _new_shape.append(np.prod([self.shape[_arg] for _arg in args]))
+                for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+                    _kwarg_key = _key[:-1].replace("axis", "new_dim")
+                    _new[_key].append(
+                        kwargs.get(_kwarg_key, FLATTEN_DIM_DEFAULTS[_kwarg_key])
+                    )
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.shape = _new_shape
-        self.axis_labels = _axis_labels
-        self.axis_units = _axis_units
-        self.axis_ranges = _axis_ranges
+        for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+            setattr(self, _key, _new[_key])
 
     def get_rebinned_copy(self, binning: int) -> Self:
         """
@@ -287,31 +278,19 @@ class Dataset(np.ndarray):
         pydidas.core.Dataset
             The binned Dataset.
         """
+        from .utils.rebin_ import get_cropping_slices, rebin
+
         if binning == 1:
             return self.copy()
-        _shape = np.asarray(self.shape)
-        _lowlim = (_shape % binning) // 2
-        _highlim = _shape - (_shape % binning) + _lowlim
-        _highlim[_highlim == _lowlim] += 1
-        _slices = tuple(slice(low, high) for low, high in zip(_lowlim, _highlim))
-        _copy = self[_slices]
-        _newshape = tuple()
-        for _s in self.shape:
-            _addon = (1, 1) if _s == 1 else (_s // binning, binning)
-            _newshape = _newshape + _addon
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            _copy.shape = _newshape
-            _copy = np.mean(_copy, axis=tuple(np.arange(1, _copy.ndim, 2)))
-        _copy.axis_labels = self.axis_labels.copy()
-        _copy.axis_units = self.axis_units.copy()
-        _axis_ranges = self.axis_ranges.copy()
-        for _dim, _range in _axis_ranges.items():
+        _kwargs = self.property_dict
+        _kwargs.pop("axis_ranges")
+        _copy = self.__new__(self.__class__, rebin(self.array, binning), **_kwargs)
+        _slices = get_cropping_slices(self.shape, binning)
+        for _dim, _range in self.axis_ranges.items():
             if isinstance(_range, np.ndarray):
                 _new = _range[_slices[_dim]]
                 _new = _new.reshape(_new.size // binning, binning).mean(-1)
-                _axis_ranges[_dim] = _new
-        _copy.axis_ranges = _axis_ranges
+                _copy.update_axis_range(_dim, _new)
         return _copy
 
     # ##########
@@ -596,6 +575,10 @@ class Dataset(np.ndarray):
                 f"The item *{item}* is not a string. Cannot update the axis label."
             )
         self._meta["axis_units"][index] = item
+
+    # ################################
+    # Metadata and description methods
+    # ################################
 
     def get_axis_description(self, index: int) -> str:
         """

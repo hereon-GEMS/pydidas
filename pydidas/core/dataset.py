@@ -31,8 +31,9 @@ __all__ = ["Dataset"]
 import warnings
 from collections.abc import Iterable
 from copy import deepcopy
+from functools import partialmethod
 from numbers import Integral
-from typing import Literal, Optional, Self, Union
+from typing import Callable, Literal, Optional, Self, Union
 
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike
@@ -792,8 +793,10 @@ class Dataset(np.ndarray):
                 )
         return _new
 
-    def mean(
+    def __reimplement_numpy_method(
         self,
+        numpy_method: Callable,
+        has_dtype_arg: bool = True,
         axis: Optional[Union[int, tuple[int]]] = None,
         dtype: DTypeLike = None,
         out: Optional[ArrayLike] = None,
@@ -835,26 +838,30 @@ class Dataset(np.ndarray):
         ndarray
             The mean of the array elements.
         """
-        if not set(kwargs).issubset({"keepdims", "where"}):
-            raise TypeError("Invalid keyword argument(s) in mean.")
-        _mean = np.ndarray.mean(self, axis, dtype, out, **kwargs)
-        if axis is None or (not isinstance(_mean, np.ndarray)):
-            return _mean
+        if has_dtype_arg:
+            kwargs["dtype"] = dtype
+        _result = numpy_method(self, axis=axis, out=out, **kwargs)
+        if axis is None or (not isinstance(_result, np.ndarray)):
+            return _result
         if out is not None and not isinstance(out, Dataset):
-            return _mean
-        _mean.data_label = "Mean of " + self.data_label
-        _mean.data_unit = self.data_unit
+            return _result
+        _result.data_label = (
+            f"{numpy_method.__name__.capitalize()} of " + self.data_label
+        )
+        _result.data_unit = self.data_unit
         if not kwargs.get("keepdims", False):
             axis = (axis,) if isinstance(axis, int) else axis
             for _key in ["axis_labels", "axis_units", "axis_ranges"]:
                 _items = [
                     _val for _i, _val in self._meta[_key].items() if _i not in axis
                 ]
-                setattr(_mean, _key, _items)
-        return _mean
+                setattr(_result, _key, _items)
+        return _result
 
-    def diff(self):
-        pass
+    mean = partialmethod(__reimplement_numpy_method, np.ndarray.mean)
+    sum = partialmethod(__reimplement_numpy_method, np.ndarray.sum)
+    max = partialmethod(__reimplement_numpy_method, np.ndarray.max, has_dtype_arg=False)
+    min = partialmethod(__reimplement_numpy_method, np.ndarray.min, has_dtype_arg=False)
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """

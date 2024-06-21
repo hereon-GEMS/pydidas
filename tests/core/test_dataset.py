@@ -37,6 +37,10 @@ from pydidas.core.utils import rebin2d
 _np_random_generator = np.random.default_rng()
 
 _AXIS_SLICES = [0, 1, 3, (0,), (2,), (0, 1), (1, 3), (2, 0), (1, 2, 3), (0, 2, 3)]
+_IMPLEMENTED_METHODS = ["mean", "sum", "max", "min"]
+_METHOD_TAKES_INT_ONLY = ["cumsum"]
+_METHOD_REQUIRES_INITIAL = ["max", "min"]
+_METHOD_TAKES_NO_DTYPE = ["max", "min"]
 
 
 class TestDataset(unittest.TestCase):
@@ -857,25 +861,40 @@ class TestDataset(unittest.TestCase):
                     _ax_str, f"{self._axis_labels[index]} / {self._axis_units[index]}"
                 )
 
-    def test_mean__invalid_kwargs(self):
-        obj = self.create_large_dataset()
-        with self.assertRaises(TypeError):
-            obj.mean(wrong_key=True)
+    def test_np_reimplementation__invalid_kwargs(self):
+        for _method_name in _IMPLEMENTED_METHODS:
+            with self.subTest(method=_method_name):
+                obj = self.create_large_dataset()
+                _method = getattr(obj, _method_name)
+                with self.assertRaises(TypeError):
+                    _method(wrong_key=True)
 
-    def test_mean__full_mean(self):
-        obj = self.create_large_dataset()
-        _mean = obj.mean()
-        self.assertEqual(_mean, obj.array.mean())
+    def test_np_reimplementation__full(self):
+        for _method_name in _IMPLEMENTED_METHODS:
+            with self.subTest(method=_method_name):
+                obj = self.create_large_dataset()
+                _method = getattr(obj, _method_name)
+                _val = _method()
+                _ref = getattr(obj.array, _method_name)()
+                self.assertEqual(_val, _ref)
 
-    def test_mean__none_axis(self):
-        obj = self.create_large_dataset()
-        _mean = obj.mean(axis=None)
-        self.assertEqual(_mean, obj.array.mean())
+    def test_np_reimplementation__none_axis(self):
+        for _method_name in _IMPLEMENTED_METHODS:
+            with self.subTest(method=_method_name):
+                obj = self.create_large_dataset()
+                _method = getattr(obj, _method_name)
+                _val = _method(axis=None)
+                _ref = getattr(obj.array, _method_name)(axis=None)
+                self.assertEqual(_val, _ref)
 
-    def test_mean__all_axes(self):
-        obj = self.create_large_dataset()
-        _mean = obj.mean(axis=(0, 1, 2, 3))
-        self.assertEqual(_mean, obj.array.mean())
+    def test_np_reimplementation__all_axes(self):
+        for _method_name in _IMPLEMENTED_METHODS:
+            with self.subTest(method=_method_name):
+                obj = self.create_large_dataset()
+                _method = getattr(obj, _method_name)
+                _val = _method(axis=(0, 1, 2, 3))
+                _ref = getattr(obj.array, _method_name)(axis=(0, 1, 2, 3))
+                self.assertEqual(_val, _ref)
 
     def test_mean__simple(self):
         obj = self.create_large_dataset()
@@ -888,80 +907,132 @@ class TestDataset(unittest.TestCase):
                     if isinstance(_ax, int):
                         _ax = (_ax,)
                     self.assertTrue(np.allclose(_mean, obj.array.mean(axis=_ax)))
-                    self.__assert_mean_metadata_correct(_mean, _ax)
+                    self.__assert_new_metadata_correct(_mean, _ax, "mean")
 
-    def test_mean__w_out_ndarray(self):
+    def test_sum__simple(self):
         obj = self.create_large_dataset()
         for _ax in _AXIS_SLICES:
-            if isinstance(_ax, int):
-                continue
-            _new_shape = tuple(n for i, n in enumerate(obj.shape) if i not in _ax)
-            _out = np.zeros(_new_shape)
-            _ = obj.mean(axis=_ax, out=_out)
-            self.assertTrue(np.allclose(_out, obj.array.mean(axis=_ax)))
+            for _method, _sum in [
+                ("Dataset.sum", obj.sum(axis=_ax)),
+                ("np.sum(Dataset)", np.sum(obj, axis=_ax)),
+            ]:
+                with self.subTest(axis=_ax, method=_method):
+                    if isinstance(_ax, int):
+                        _ax = (_ax,)
+                    self.assertTrue(np.allclose(_sum, obj.array.sum(axis=_ax)))
+                    self.__assert_new_metadata_correct(_sum, _ax, "sum")
 
-    def test_mean__w_out_dataset(self):
+    def test_np_reimplementation__w_out_ndarray(self):
         obj = self.create_large_dataset()
-        for _ax in _AXIS_SLICES:
-            if isinstance(_ax, int):
-                continue
-            _new_shape = tuple(n for i, n in enumerate(obj.shape) if i not in _ax)
-            _out = Dataset(np.zeros(_new_shape))
-            _ = obj.mean(axis=_ax, out=_out)
-            self.assertTrue(np.allclose(_out, obj.array.mean(axis=_ax)))
-            self.__assert_mean_metadata_correct(_out, _ax)
-
-    def test_mean__all_w_dtype(self):
-        obj = self.create_large_dataset()
-        _dtype = np.float32
-        _mean = obj.mean(dtype=_dtype)
-        self.assertEqual(_mean.dtype, _dtype)
-
-    def test_mean__w_axis_w_dtype(self):
-        obj = self.create_large_dataset()
-        _dtype = np.float32
-        for _ax in _AXIS_SLICES:
-            with self.subTest(axis=_ax):
+        for _method_name in ["max", "mean", "sum"]:
+            for _ax in _AXIS_SLICES:
                 if isinstance(_ax, int):
                     _ax = (_ax,)
-                _mean = obj.mean(axis=_ax, dtype=_dtype)
-                self.assertEqual(_mean.dtype, _dtype)
+                _new_shape = tuple(n for i, n in enumerate(obj.shape) if i not in _ax)
+                _out = np.zeros(_new_shape)
+                with self.subTest(method=_method_name):
+                    _method = getattr(obj, _method_name)
+                    _ = _method(axis=_ax, out=_out)
+                    _ref = getattr(obj.array, _method_name)(axis=_ax)
+                    self.assertTrue(np.allclose(_out, _ref))
 
-    def test_mean__w_keepdims(self):
+    # TODO: tests below
+    def test_np_reimplementation__w_out_dataset(self):
+        obj = self.create_large_dataset()
+        for _method_name in _IMPLEMENTED_METHODS:
+            for _ax in _AXIS_SLICES:
+                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
+                    continue
+                _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+                _new_shape = tuple(
+                    n for i, n in enumerate(obj.shape) if i not in _ax_tuple
+                )
+                with self.subTest(method=_method_name, axis=_ax):
+                    _out = Dataset(np.zeros(_new_shape))
+                    _method = getattr(obj, _method_name)
+                    _ = _method(axis=_ax, out=_out)
+                    _ref = getattr(obj.array, _method_name)(axis=_ax)
+                    self.assertTrue(np.allclose(_out, _ref))
+                    self.__assert_new_metadata_correct(_out, _ax_tuple, _method_name)
+
+    def test_np_reimplementation__all_w_dtype(self):
+        obj = self.create_large_dataset()
+        for _method_name in _IMPLEMENTED_METHODS:
+            if _method_name in _METHOD_TAKES_NO_DTYPE:
+                continue
+            with self.subTest(method=_method_name):
+                _method = getattr(obj, _method_name)
+                _result = _method(dtype=np.float32)
+                _ref = getattr(obj.array, _method_name)(dtype=np.float32)
+                self.assertEqual(_result, _ref)
+                self.assertEqual(_result.dtype, np.float32)
+
+    def test_np_reimplementation__w_axis_w_dtype(self):
+        obj = self.create_large_dataset()
+        for _method_name in _IMPLEMENTED_METHODS:
+            if _method_name in _METHOD_TAKES_NO_DTYPE:
+                continue
+            for _ax in _AXIS_SLICES:
+                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
+                    continue
+                _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+                with self.subTest(method=_method_name, axis=_ax):
+                    _method = getattr(obj, _method_name)
+                    _result = _method(axis=_ax, dtype=np.float32)
+                    _ref = getattr(obj.array, _method_name)(axis=_ax, dtype=np.float32)
+                    self.assertTrue(np.allclose(_result, _ref))
+                    self.__assert_new_metadata_correct(_result, _ax_tuple, _method_name)
+                    self.assertEqual(_result.dtype, np.float32)
+
+    def test_np_reimplementation__w_keepdims(self):
         obj = self.create_large_dataset()
         for _ax in _AXIS_SLICES:
-            with self.subTest(axis=_ax):
-                if isinstance(_ax, int):
-                    _ax = (_ax,)
-                _mean = obj.mean(axis=_ax, keepdims=True)
-                self.assertEqual(
-                    _mean.shape,
-                    tuple(1 if i in _ax else n for i, n in enumerate(obj.shape)),
-                )
-                self.assertTrue(
-                    np.allclose(_mean, obj.array.mean(axis=_ax, keepdims=True))
-                )
-                self.__assert_mean_metadata_correct(_mean, [])
+            _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+            for _method_name in _IMPLEMENTED_METHODS:
+                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
+                    continue
+                with self.subTest(method=_method_name, axis=_ax):
+                    _method = getattr(obj, _method_name)
+                    _result = _method(axis=_ax, keepdims=True)
+                    _ref = getattr(obj.array, _method_name)(axis=_ax, keepdims=True)
+                    self.assertEqual(
+                        list(_result.shape),
+                        [1 if i in _ax_tuple else n for i, n in enumerate(obj.shape)],
+                    )
+                    self.assertTrue(np.allclose(_result, _ref))
+                    self.__assert_new_metadata_correct(_result, [], _method_name)
 
-    def test_mean__w_where(self):
+    def test_np_reimplementation__w_where(self):
         obj = self.create_large_dataset()
         _mask = np.ones(obj.shape, dtype=bool)
         _mask[obj.shape[0] // 2 :] = False
         for _ax in _AXIS_SLICES:
-            with self.subTest(axis=_ax):
-                if isinstance(_ax, int):
-                    _ax = (_ax,)
-                _mean = obj.mean(axis=_ax, where=_mask)
-                self.assertTrue(
-                    np.allclose(
-                        _mean[~np.isnan(_mean)],
-                        obj.array.mean(axis=_ax, where=_mask)[~np.isnan(_mean)],
+            _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+            for _method_name in _IMPLEMENTED_METHODS:
+                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
+                    continue
+                with self.subTest(method=_method_name, axis=_ax):
+                    _method = getattr(obj, _method_name)
+                    if _method_name in _METHOD_REQUIRES_INITIAL:
+                        _result = _method(axis=_ax, where=_mask, initial=0)
+                        _ref = getattr(obj.array, _method_name)(
+                            axis=_ax, where=_mask, initial=0
+                        )
+                    else:
+                        _result = _method(axis=_ax, where=_mask)
+                        _ref = getattr(obj.array, _method_name)(axis=_ax, where=_mask)
+                    self.assertTrue(
+                        np.allclose(
+                            _result[~np.isnan(_result)], _ref[~np.isnan(_result)]
+                        )
                     )
-                )
-                self.__assert_mean_metadata_correct(_mean, _ax)
+                    self.__assert_new_metadata_correct(_result, _ax_tuple, _method_name)
 
-    def __assert_mean_metadata_correct(self, new_array, slicing_axes):
-        self.assertEqual(new_array.data_label, "Mean of " + self._dset["data_label"])
+    def __assert_new_metadata_correct(self, new_array, slicing_axes, function_name):
+        self.assertEqual(
+            new_array.data_label,
+            f"{function_name.capitalize()} of " + self._dset["data_label"],
+        )
         self.assertEqual(new_array.data_unit, self._dset["data_unit"])
         for _key in ["axis_labels", "axis_units"]:
             _ref = [
@@ -978,6 +1049,15 @@ class TestDataset(unittest.TestCase):
         _new_ranges = list(new_array.axis_ranges.values())
         for _ref, _new in zip(_ref_ranges, _new_ranges):
             self.assertTrue(np.allclose(_ref, _new))
+
+    def test__nanmean(self):
+        obj = self.create_large_dataset()
+        obj[0, 0, :, 0] = np.nan
+        for _ax in _AXIS_SLICES:
+            _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+            with self.subTest(axis=_ax):
+                _result = np.nanmean(obj, axis=_ax)
+                self.__assert_new_metadata_correct(_result, _ax_tuple, "sum")
 
 
 if __name__ == "__main__":

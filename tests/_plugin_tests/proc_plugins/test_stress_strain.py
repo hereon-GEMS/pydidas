@@ -414,10 +414,10 @@ def test_ds_slicing_beyond_bounds():
     ds=Dataset(result_array_spatial,  axis_labels=axis_labels, data_label=data_labels, axis_units=axis_units) 
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds)
-    assert 'Array is empty' in str(excinfo.value), "Error message should indicate that slicing beyond bounds."
+    assert 'Array is empty, slicing out of bounds.' in str(excinfo.value), "Error message should indicate that slicing beyond bounds."
     
 def test_ds_slicing_beyond_bounds_v2():
-    """fit_label is 5: position. Shape of Dataset is 5 in the last dimension. Expected error: "Array is empty" because 5 is out of range.
+    """fit_label is 5: position. Shape of Dataset is 5 in the last dimension. Expected error: "Array is empty, slicing out of bounds." because 5 is out of range.
     Slice: slices [slice(None, None, None), slice(None, None, None), slice(None, None, None), slice(5, 6, None)]
     Allowed incides in last dimension range from 0 to 4.
     """
@@ -438,7 +438,7 @@ def test_ds_slicing_beyond_bounds_v2():
     assert pos_idx == 5
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds2)
-    assert 'Array is empty' in str(excinfo.value), "Error message should indicate that slicing beyond bounds."
+    assert 'Array is empty, slicing out of bounds.' in str(excinfo.value), "Error message should indicate that slicing beyond bounds."
    
     
 def test_ds_slicing_dimension_mismatch():

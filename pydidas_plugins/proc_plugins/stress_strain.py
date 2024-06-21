@@ -276,7 +276,7 @@ def ds_slicing(ds1):
     # Check for empty array
     if d_spacing.size == 0: 
         #Should check for empty arrays in case of slicing beyond bounds
-        raise ValueError('Array is empty.')
+        raise ValueError('Array is empty, slicing out of bounds.')
     
     if not d_spacing.ndim == 1: 
         print('d_spacing.ndim',d_spacing.ndim)

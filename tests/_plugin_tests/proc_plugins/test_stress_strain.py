@@ -348,7 +348,10 @@ def test_multiple_chis_in_labels():
     fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: 'y', 1: 'chi', 2: 'chi', 3: fit_labels}  # 'chi' appears twice, simulated by the same value at different keys
-    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+    data_labels='position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts'
+
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels, data_label=data_labels)
+    
 
     with pytest.raises(KeyError) as excinfo:
         chi_pos_verification(ds)
@@ -359,10 +362,12 @@ def test_multiple_chis_in_labels():
 def test_position_not_at_zero():
     
     fit_labels = '1: area; 2: position; 3: FWHM; 4: background at peak; 0: total count intensity'
+    data_labels='area / (cts * nm-1); position / nm; FWHM / nm; background at peak / cts; total count intensity / cts'
+
     
     result_array_spatial = generate_result_array_spatial(fit_labels=fit_labels)
     axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
-    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels, data_label=data_labels)
    
     _, position_key = chi_pos_verification(ds)
     assert position_key == (3, 2), "Expected position key to be (3, 2)"
@@ -370,9 +375,11 @@ def test_position_not_at_zero():
     
 def test_position_not_at_zero_3d():
     fit_labels = '1: area; 2: position; 3: FWHM; 4: background at peak; 0: total count intensity'
+    data_labels='area / (cts * nm-1); position / nm; FWHM / nm; background at peak / cts; total count intensity / cts'
+
     results_array_spatial_3d= generate_result_array_spatial(None, fit_labels=fit_labels)
     axis_labels = {0: 'y', 1: 'chi', 2: fit_labels}
-    ds=Dataset(results_array_spatial_3d,  axis_labels=axis_labels)
+    ds=Dataset(results_array_spatial_3d,  axis_labels=axis_labels, data_label=data_labels)
     _, position_key = chi_pos_verification(ds)
     assert position_key == (2, 2), "Expected position key to be (2, 2)"
 
@@ -384,9 +391,13 @@ def test_ds_slicing_type_error():
         
 def test_ds_slicing_valid():
     fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    data_labels='position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts'
+
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
-    ds=Dataset(result_array_spatial,  axis_labels=axis_labels)
+    axis_units= ['um', 'um', 'deg', '']
+    
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels, data_label=data_labels, axis_units=axis_units)
     ds = ds[0,0]
     chi, d_spacing = ds_slicing(ds)
     
@@ -394,40 +405,73 @@ def test_ds_slicing_valid():
     
 def test_ds_slicing_beyond_bounds():
     fit_labels = '5: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    data_labels='area / (cts * nm-1);FWHM / nm;background at peak / cts;total count intensity / cts ; position / nm'
+    
     result_array_spatial = generate_result_array_spatial(fit_labels=fit_labels)
     # position 5 is out of bounds 
     axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
-    ds=Dataset(result_array_spatial,  axis_labels=axis_labels) 
-       
+    axis_units= ['um', 'um', 'deg', ''] 
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels, data_label=data_labels, axis_units=axis_units) 
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds)
     assert 'Array is empty' in str(excinfo.value), "Error message should indicate that slicing beyond bounds."
     
+def test_ds_slicing_beyond_bounds_v2():
+    """fit_label is 5: position. Shape of Dataset is 5 in the last dimension. Expected error: "Array is empty" because 5 is out of range.
+    Slice: slices [slice(None, None, None), slice(None, None, None), slice(None, None, None), slice(5, 6, None)]
+    Allowed incides in last dimension range from 0 to 4.
+    """
+    ones_array = np.ones((3, 2, 1, 5))
+    # Create the arange array and reshape it to (1, 1, 1, 5)
+    arange_array = np.arange(5).reshape(1, 1, 1, 5)
+    # Multiply using broadcasting
+    result_array = ones_array * arange_array
+    axis_units=['um', 'um', 'deg', '']
+    data_label='area / (cts * nm); FWHM / nm; background at peak / cts; total count intensity / cts; position / nm' 
+    axis_labels= ['y', 'x', 'chi', 'fit_labels']
+    fit_labels= '1: area; 2: FWHM; 3: background at peak; 4: total count intensity; 5: position'
+    ds2=Dataset(result_array, axis_labels=axis_labels,data_label=data_label, axis_units=axis_units)
+    ds2.update_axis_label(3,fit_labels)   
+    
+    chi_key, (pos_key, pos_idx) = chi_pos_verification(ds2)
+    # Position has a key of 5
+    assert pos_idx == 5
+    with pytest.raises(ValueError) as excinfo:
+        ds_slicing(ds2)
+    assert 'Array is empty' in str(excinfo.value), "Error message should indicate that slicing beyond bounds."
+   
+    
 def test_ds_slicing_dimension_mismatch():
     
     fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    data_labels='position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts'
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
-    ds=Dataset(result_array_spatial,  axis_labels=axis_labels) 
-    
+    axis_units= ['um', 'um', 'deg', '']    
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels, data_label=data_labels, axis_units=axis_units) 
+        
     with pytest.raises(ValueError) as excinfo:
         test=ds_slicing(ds)
     assert 'Dimension mismatch' in str(excinfo.value), "Error message should indicate that d_spacing has a larger dimension."
     
 def test_ds_slicing_dimension_mismatch_3d():
     fit_labels = '0: position'
+    data_labels='position / nm'
     results_array_spatial_3d= generate_result_array_spatial(None, fit_labels=fit_labels)
     axis_labels = {0: 'y', 1: 'chi', 2: fit_labels}
-    ds_3d=Dataset(results_array_spatial_3d,  axis_labels=axis_labels)
+    axis_units= ['um', 'deg', '']  
+    ds_3d=Dataset(results_array_spatial_3d,  axis_labels=axis_labels, data_label=data_labels, axis_units=axis_units)
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds_3d)
     assert 'Dimension mismatch' in str(excinfo.value), "Error message should indicate that d_spacing has a larger dimension."
 
 def test_extract_d_spacing_valid():
     fit_labels = '0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'
+    data_labels='position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts'
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: 'y', 1: 'x', 2: 'chi', 3: fit_labels}
-    ds=Dataset(result_array_spatial,  axis_labels=axis_labels) 
+    axis_units= ['um', 'um', 'deg', '']
+    ds=Dataset(result_array_spatial,  axis_labels=axis_labels, data_label=data_labels, axis_units=axis_units) 
     pos_key_exp=3
     pos_idx_exp=0
     ds_expected=ds[:, :,:, pos_idx_exp:pos_idx_exp+1].squeeze()
@@ -467,14 +511,14 @@ def test_idx_s2c_grouping_very_small_array():
     
 def test_group_d_spacing_by_chi_basic():
     chi = np.arange(-175, 185, 10)
-    d_spacing = Dataset(np.arange(0, len(chi)), axis_ranges={0: chi}, axis_labels={0: 'chi'})
+    d_spacing = Dataset(np.arange(0, len(chi)), axis_ranges={0: chi}, axis_labels={0: 'chi'}, data_label='position' ) 
     d_spacing_pos, d_spacing_neg = group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-3)
     assert d_spacing_pos.size == d_spacing_neg.size
     assert d_spacing_pos.size > 0
     assert d_spacing_neg.size > 0
     assert d_spacing_pos.axis_ranges[0].size == d_spacing_neg.axis_ranges[0].size
-    assert d_spacing_pos.data_label == 'd_spacing_pos'
-    assert d_spacing_neg.data_label == 'd_spacing_neg'
+    assert d_spacing_pos.data_label == f'{ d_spacing.data_label}_pos'
+    assert d_spacing_neg.data_label == f'{ d_spacing.data_label}_neg'
     assert d_spacing_pos.axis_labels[0] == 'sin^2(chi)'
     assert d_spacing_neg.axis_labels[0] == 'sin^2(chi)'
     
@@ -730,14 +774,14 @@ def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape():
         combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
 
 def test_combine_sort_d_spacing_pos_neg_valid():
-    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
-    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
+    d_spacing_pos = Dataset(np.array([1.0, 2.0, 3.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'}, data_label='position_pos')
+    d_spacing_neg = Dataset(np.array([3.0, 2.0, 1.0]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'},data_label='position_neg')
     
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     assert np.array_equal(result.array, np.array([[3.0, 2.0, 1.0], [1.0, 2.0, 3.0]]))
     assert np.array_equal(result.axis_ranges[1], np.array([0.1, 0.2, 0.3]))
     assert result.axis_labels == {0: '0: d-, 1: d+', 1: 'sin^2(chi)'}
-    assert result.data_label == 'd_spacing'
+    assert result.data_label == '0: position_neg, 1: position_pos'
     
 def test_combine_sort_d_spacing_pos_neg_mergesort():
     # Create datasets with the same sin2chi values but in different unsorted order

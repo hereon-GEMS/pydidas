@@ -35,7 +35,7 @@ from pydidas.data_io import import_data
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
-#TODO: d_spacing is d_spacing. Or do we ant to have q in nm^-1?
+#TODO: d_spacing is d-spacing. Or do we want to have q in nm^-1?
 
 def chi_pos_verification(ds):
     '''
@@ -216,13 +216,14 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
     ds_units = extract_units(ds1)
     key_at_pos_idx, unit_at_pos_idx = get_param_unit_at_index(ds_units, pos_idx)
     
+    #slice(None, None, None) is equivalent to "":"" in one dimension of the array. Explicit representation of the slice object shows all three parameters, even if the step parameter is not explicitly provided.
     _slices = []
     for _dim in range(ds1.ndim):
         if _dim != pos_key:
             _slices.append(slice(None, None))
         elif _dim == pos_key:
             _slices.append(slice(pos_idx, pos_idx + 1))
-        #print(f"Dimension {_dim}, Slices: {_slices}")
+        print(f"Dimension {_dim}, Slices: {_slices}")
      
     print('shape of ds', ds1.shape)    
     print('slices', _slices)    
@@ -280,6 +281,8 @@ def ds_slicing(ds1):
         raise ValueError('Array is empty.')
     
     if not d_spacing.ndim == 1: 
+        print('d_spacing.ndim',d_spacing.ndim)
+        print(d_spacing)
         raise ValueError('Dimension mismatch.')
                        
     return chi, d_spacing

@@ -225,9 +225,6 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
             _slices.append(slice(pos_idx, pos_idx + 1))
         print(f"Dimension {_dim}, Slices: {_slices}")
      
-    print('shape of ds', ds1.shape)    
-    print('slices', _slices)    
-    print('pos_key', pos_key, 'pos_idx', pos_idx)
         
     d_spacing = ds1[*_slices]
     d_spacing = d_spacing.squeeze()
@@ -275,7 +272,8 @@ def ds_slicing(ds1):
     # Extract d-spacing values
     d_spacing = extract_d_spacing(ds1, pos_key, pos_idx)
            
-    
+    # Slicing out of indeces/bounds returns an empty array
+    # Check for empty array
     if d_spacing.size == 0: 
         #Should check for empty arrays in case of slicing beyond bounds
         raise ValueError('Array is empty.')

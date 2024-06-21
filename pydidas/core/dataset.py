@@ -35,7 +35,7 @@ from numbers import Integral
 from typing import Literal, Optional, Self, Union
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, DTypeLike
 
 from .utils.dataset_utils import (
     FLATTEN_DIM_DEFAULTS,
@@ -791,6 +791,70 @@ class Dataset(np.ndarray):
                     self.axis_ranges[axis], indices
                 )
         return _new
+
+    def mean(
+        self,
+        axis: Optional[Union[int, tuple[int]]] = None,
+        dtype: DTypeLike = None,
+        out: Optional[ArrayLike] = None,
+        **kwargs: dict,
+    ) -> np.ndarray:
+        """
+        Compute the mean of the array elements over a given axis.
+
+        Parameters
+        ----------
+        axis : Union[int, tuple[int], None], optional
+            Axis or axes along which the means are computed. None corresponds to the
+            mean over the full array. The default is None.
+        dtype : DTypeLike, optional
+            The type of the returned array and of the accumulator in which the elements
+            are summed. The default is None.
+        out : ndarray, optional
+            Alternative output array in which to place the result. It must have the
+            same shape as the expected output but the type will be cast if necessary.
+            The default is None.
+        **kwargs : dict
+            Additional keyword arguments which are only passed when specified.
+            Supported keywords are:
+
+            keepdims : bool, optional
+                If this is set to True, the axes which are reduced are left in the
+                result as dimensions with size one. With this option, the result will
+                broadcast correctly against the original array. The default is False.
+            where : array_like, optional
+                This condition is broadcast over the input. At locations where the
+                condition is True, the out array will be set to the ufunc result.
+                Elsewhere, the out array will retain its original value. Note that
+                if an uninitialized out array is created via the default out=None,
+                locations within it where the condition is False will remain
+                uninitialized. The default is None.
+
+        Returns
+        -------
+        ndarray
+            The mean of the array elements.
+        """
+        if not set(kwargs).issubset({"keepdims", "where"}):
+            raise TypeError("Invalid keyword argument(s) in mean.")
+        _mean = np.ndarray.mean(self, axis, dtype, out, **kwargs)
+        if axis is None or (not isinstance(_mean, np.ndarray)):
+            return _mean
+        if out is not None and not isinstance(out, Dataset):
+            return _mean
+        _mean.data_label = "Mean of " + self.data_label
+        _mean.data_unit = self.data_unit
+        if not kwargs.get("keepdims", False):
+            axis = (axis,) if isinstance(axis, int) else axis
+            for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+                _items = [
+                    _val for _i, _val in self._meta[_key].items() if _i not in axis
+                ]
+                setattr(_mean, _key, _items)
+        return _mean
+
+    def diff(self):
+        pass
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """

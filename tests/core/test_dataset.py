@@ -36,6 +36,8 @@ from pydidas.core.utils import rebin2d
 
 _np_random_generator = np.random.default_rng()
 
+_AXIS_SLICES = [0, 1, 3, (0,), (2,), (0, 1), (1, 3), (2, 0), (1, 2, 3), (0, 2, 3)]
+
 
 class TestDataset(unittest.TestCase):
     def setUp(self):
@@ -61,12 +63,16 @@ class TestDataset(unittest.TestCase):
             "labels": ["a", "b", "c", "d"],
             "ranges": [np.arange(10), np.arange(12), np.arange(14), np.arange(16)],
             "units": ["ua", "ub", "uc", "ud"],
+            "data_label": "data label",
+            "data_unit": "data unit",
         }
         obj = Dataset(
             np.random.random(self._dset["shape"]),
             axis_labels=self._dset["labels"],
             axis_ranges=self._dset["ranges"],
             axis_units=self._dset["units"],
+            data_label=self._dset["data_label"],
+            data_unit=self._dset["data_unit"],
             metadata={},
         )
         return obj
@@ -850,6 +856,128 @@ class TestDataset(unittest.TestCase):
                 self.assertEqual(
                     _ax_str, f"{self._axis_labels[index]} / {self._axis_units[index]}"
                 )
+
+    def test_mean__invalid_kwargs(self):
+        obj = self.create_large_dataset()
+        with self.assertRaises(TypeError):
+            obj.mean(wrong_key=True)
+
+    def test_mean__full_mean(self):
+        obj = self.create_large_dataset()
+        _mean = obj.mean()
+        self.assertEqual(_mean, obj.array.mean())
+
+    def test_mean__none_axis(self):
+        obj = self.create_large_dataset()
+        _mean = obj.mean(axis=None)
+        self.assertEqual(_mean, obj.array.mean())
+
+    def test_mean__all_axes(self):
+        obj = self.create_large_dataset()
+        _mean = obj.mean(axis=(0, 1, 2, 3))
+        self.assertEqual(_mean, obj.array.mean())
+
+    def test_mean__simple(self):
+        obj = self.create_large_dataset()
+        for _ax in _AXIS_SLICES:
+            for _method, _mean in [
+                ("Dataset.mean", obj.mean(axis=_ax)),
+                ("np.mean(Dataset)", np.mean(obj, axis=_ax)),
+            ]:
+                with self.subTest(axis=_ax, method=_method):
+                    if isinstance(_ax, int):
+                        _ax = (_ax,)
+                    self.assertTrue(np.allclose(_mean, obj.array.mean(axis=_ax)))
+                    self.__assert_mean_metadata_correct(_mean, _ax)
+
+    def test_mean__w_out_ndarray(self):
+        obj = self.create_large_dataset()
+        for _ax in _AXIS_SLICES:
+            if isinstance(_ax, int):
+                continue
+            _new_shape = tuple(n for i, n in enumerate(obj.shape) if i not in _ax)
+            _out = np.zeros(_new_shape)
+            _ = obj.mean(axis=_ax, out=_out)
+            self.assertTrue(np.allclose(_out, obj.array.mean(axis=_ax)))
+
+    def test_mean__w_out_dataset(self):
+        obj = self.create_large_dataset()
+        for _ax in _AXIS_SLICES:
+            if isinstance(_ax, int):
+                continue
+            _new_shape = tuple(n for i, n in enumerate(obj.shape) if i not in _ax)
+            _out = Dataset(np.zeros(_new_shape))
+            _ = obj.mean(axis=_ax, out=_out)
+            self.assertTrue(np.allclose(_out, obj.array.mean(axis=_ax)))
+            self.__assert_mean_metadata_correct(_out, _ax)
+
+    def test_mean__all_w_dtype(self):
+        obj = self.create_large_dataset()
+        _dtype = np.float32
+        _mean = obj.mean(dtype=_dtype)
+        self.assertEqual(_mean.dtype, _dtype)
+
+    def test_mean__w_axis_w_dtype(self):
+        obj = self.create_large_dataset()
+        _dtype = np.float32
+        for _ax in _AXIS_SLICES:
+            with self.subTest(axis=_ax):
+                if isinstance(_ax, int):
+                    _ax = (_ax,)
+                _mean = obj.mean(axis=_ax, dtype=_dtype)
+                self.assertEqual(_mean.dtype, _dtype)
+
+    def test_mean__w_keepdims(self):
+        obj = self.create_large_dataset()
+        for _ax in _AXIS_SLICES:
+            with self.subTest(axis=_ax):
+                if isinstance(_ax, int):
+                    _ax = (_ax,)
+                _mean = obj.mean(axis=_ax, keepdims=True)
+                self.assertEqual(
+                    _mean.shape,
+                    tuple(1 if i in _ax else n for i, n in enumerate(obj.shape)),
+                )
+                self.assertTrue(
+                    np.allclose(_mean, obj.array.mean(axis=_ax, keepdims=True))
+                )
+                self.__assert_mean_metadata_correct(_mean, [])
+
+    def test_mean__w_where(self):
+        obj = self.create_large_dataset()
+        _mask = np.ones(obj.shape, dtype=bool)
+        _mask[obj.shape[0] // 2 :] = False
+        for _ax in _AXIS_SLICES:
+            with self.subTest(axis=_ax):
+                if isinstance(_ax, int):
+                    _ax = (_ax,)
+                _mean = obj.mean(axis=_ax, where=_mask)
+                self.assertTrue(
+                    np.allclose(
+                        _mean[~np.isnan(_mean)],
+                        obj.array.mean(axis=_ax, where=_mask)[~np.isnan(_mean)],
+                    )
+                )
+                self.__assert_mean_metadata_correct(_mean, _ax)
+
+    def __assert_mean_metadata_correct(self, new_array, slicing_axes):
+        self.assertEqual(new_array.data_label, "Mean of " + self._dset["data_label"])
+        self.assertEqual(new_array.data_unit, self._dset["data_unit"])
+        for _key in ["axis_labels", "axis_units"]:
+            _ref = [
+                _item
+                for _i, _item in enumerate(self._dset[_key[5:]])
+                if _i not in slicing_axes
+            ]
+            self.assertEqual(_ref, list(getattr(new_array, _key).values()))
+        _ref_ranges = [
+            _range
+            for _i, _range in enumerate(self._dset["ranges"])
+            if _i not in slicing_axes
+        ]
+        _new_ranges = list(new_array.axis_ranges.values())
+        for _ref, _new in zip(_ref_ranges, _new_ranges):
+            self.assertTrue(np.allclose(_ref, _new))
 
 
 if __name__ == "__main__":

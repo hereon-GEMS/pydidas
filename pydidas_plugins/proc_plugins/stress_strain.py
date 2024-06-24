@@ -535,11 +535,14 @@ def pre_regression_calculation(d_spacing_combined):
         
         #d_spacing_combined[0,5] = np.nan
         # This is the case where one part of the d_spacing pair is missing and not taken into account for the average
-        d_spacing_avg= np.mean(d_spacing_combined, axis=0)
-        d_spacing_avg.axis_ranges={0: d_spacing_combined.axis_ranges[1]}
-        d_spacing_avg.axis_labels={0: 'sin^2(chi)'}
-        d_spacing_avg.data_label='position mean'
+        #d_spacing_avg= np.mean(d_spacing_combined, axis=0)
+        d_spacing_avg= d_spacing_combined.mean(axis=0)
         d_spacing_avg.data_unit=d_spacing_combined.data_unit
+        print(d_spacing_avg)
+        #d_spacing_avg.axis_ranges={0: d_spacing_combined.axis_ranges[1]}
+        #d_spacing_avg.axis_labels={0: 'sin^2(chi)'}
+        #d_spacing_avg.data_label='position mean'
+        
         
         
         #d-, d+

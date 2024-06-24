@@ -503,8 +503,6 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     return d_spacing_combined
 
 
-
-
 def pre_regression_calculation(d_spacing_combined):
         ''' 
 
@@ -538,12 +536,14 @@ def pre_regression_calculation(d_spacing_combined):
         #d_spacing_avg= np.mean(d_spacing_combined, axis=0)
         d_spacing_avg= d_spacing_combined.mean(axis=0)
         d_spacing_avg.data_unit=d_spacing_combined.data_unit
-        print(d_spacing_avg)
+        print(50*"\N{fire}")
+        print('d_spacing_avg\n\n', d_spacing_avg)
+        print(50*"\N{fire}")
+        print('d_spacing_combined.axis_ranges[1]', d_spacing_combined.axis_ranges[1])
         #d_spacing_avg.axis_ranges={0: d_spacing_combined.axis_ranges[1]}
         #d_spacing_avg.axis_labels={0: 'sin^2(chi)'}
         #d_spacing_avg.data_label='position mean'
-        
-        
+                
         
         #d-, d+
         #d[1,1]-d[0,1]

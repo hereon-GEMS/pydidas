@@ -18,6 +18,8 @@ Bugfixes
 --------
 - Fixed an issue where a exception message would be copied to the clipboard
   without clicking the corresponding button.
+- Fixed an issue with using ROI in plugins in a WorkflowTree
+
 
 
 v24.06.05

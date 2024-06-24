@@ -149,6 +149,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
     def test_execute__with_roi(self):
         plugin = self.create_plugin()
         plugin.set_param_value("use_roi", True)
+        plugin.set_param_value("roi_ylow", 0)
         plugin.set_param_value("roi_yhigh", 5)
         _index = 0
         plugin.pre_execute()
@@ -161,6 +162,25 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         self.assertEqual(
             _data.shape, (plugin.get_param_value("roi_yhigh"), self._img_shape[1])
         )
+
+    def test_execute__w_full_roi(self):
+        plugin = self.create_plugin()
+        plugin.set_param_value("use_roi", True)
+        plugin.set_param_value("roi_ylow", 1)
+        plugin.set_param_value("roi_yhigh", 5)
+        plugin.set_param_value("roi_xlow", 1)
+        plugin.set_param_value("roi_xhigh", 5)
+        _index = 0
+        plugin.pre_execute()
+        _roi = plugin._get_own_roi()
+        _data, kwargs = plugin.execute(_index)
+        self.assertTrue((_data == _index).all())
+        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
+        self.assertEqual(
+            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
+        )
+        self.assertEqual(_data.shape, (4, 4))
+        self.assertEqual(_roi, (slice(1, 5), slice(1, 5)))
 
     def test_get_frame__wrong_dim(self):
         plugin = self.create_plugin()

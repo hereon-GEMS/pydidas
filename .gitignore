@@ -23,3 +23,7 @@ htmlcov
 
 # logging
 *.log
+
+### macOS ###
+# General
+.DS_Store

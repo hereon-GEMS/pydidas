@@ -19,7 +19,8 @@ Bugfixes
 - Fixed an issue where a exception message would be copied to the clipboard
   without clicking the corresponding button.
 - Fixed an issue with using ROI in plugins in a WorkflowTree
-
+- Fixed an issue when using slicing on importing Hdf5 files with pydidas 
+  metadata.
 
 
 v24.06.05

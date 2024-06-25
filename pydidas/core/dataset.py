@@ -36,6 +36,7 @@ from numbers import Integral
 from typing import Callable, Literal, Optional, Self, Union
 
 import numpy as np
+from numpy import ndarray
 from numpy.typing import ArrayLike, DTypeLike
 
 from .utils.dataset_utils import (
@@ -44,6 +45,7 @@ from .utils.dataset_utils import (
     convert_ranges_and_check_length,
     dataset_default_attribute,
     get_axis_item_representation,
+    get_corresponding_dims,
     get_dict_with_string_entries,
     get_input_as_dict,
     get_number_of_entries,
@@ -51,7 +53,7 @@ from .utils.dataset_utils import (
 )
 
 
-class Dataset(np.ndarray):
+class Dataset(ndarray):
     """
     Dataset class, a subclass of a numpy.ndarray with metadata.
 
@@ -66,7 +68,7 @@ class Dataset(np.ndarray):
 
     Parameters
     ----------
-    array : np.ndarray
+    array : ndarray
         The data array.
     **kwargs : dict
         Optional keyword arguments. Supported keywords are:
@@ -88,13 +90,13 @@ class Dataset(np.ndarray):
             The description of the data. The default is an empty string.
     """
 
-    def __new__(cls, array: np.ndarray, **kwargs: dict) -> Self:
+    def __new__(cls, array: ndarray, **kwargs: dict) -> Self:
         """
         Create a new Dataset.
 
         Parameters
         ----------
-        array : np.ndarray
+        array : ndarray
             The data array.
         **kwargs : type
             Accepted keywords are axis_labels, axis_ranges, axis_units,
@@ -125,8 +127,8 @@ class Dataset(np.ndarray):
             The sliced new dataset.
         """
         self._meta["_get_item_key"] = key if isinstance(key, tuple) else (key,)
-        _item = np.ndarray.__getitem__(self, key)
-        if not isinstance(_item, np.ndarray):
+        _item = ndarray.__getitem__(self, key)
+        if not isinstance(_item, ndarray):
             self._meta["_get_item_key"] = ()
         return _item
 
@@ -160,13 +162,13 @@ class Dataset(np.ndarray):
             for _key in METADATA_KEYS
         }
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
-            if isinstance(_slicer, np.ndarray) and _slicer.size == obj.size:
+            if isinstance(_slicer, ndarray) and _slicer.size == obj.size:
                 # in the case of a masked array, keep all axis keys.
                 break
             if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
                     del self._meta[_item][_dim]
-            elif isinstance(_slicer, (slice, Iterable, np.ndarray)):
+            elif isinstance(_slicer, (slice, Iterable, ndarray)):
                 if isinstance(_slicer, tuple):
                     _slicer = list(_slicer)
                 self._meta["axis_ranges"][_dim] = self._meta["axis_ranges"][_dim][
@@ -224,7 +226,7 @@ class Dataset(np.ndarray):
                 'Flattened'.
             new_dim_unit : str, optional
                 The unit for the new, flattened dimension. The default is ''.
-            new_dim_range : Union[None, np.ndarray, Iterable], optional
+            new_dim_range : Union[None, ndarray, Iterable], optional
                 The new range for the flattened dimension. If None, a simple The
                 default is None.
         """
@@ -278,7 +280,7 @@ class Dataset(np.ndarray):
         _copy = self.__new__(self.__class__, rebin(self.array, binning), **_kwargs)
         _slices = get_cropping_slices(self.shape, binning)
         for _dim, _range in self.axis_ranges.items():
-            if isinstance(_range, np.ndarray):
+            if isinstance(_range, ndarray):
                 _new = _range[_slices[_dim]]
                 _new = _new.reshape(_new.size // binning, binning).mean(-1)
                 _copy.update_axis_range(_dim, _new)
@@ -395,13 +397,13 @@ class Dataset(np.ndarray):
         self._meta["metadata"] = metadata
 
     @property
-    def array(self) -> np.ndarray:
+    def array(self) -> ndarray:
         """
         Get the raw array data of the dataset.
 
         Returns
         -------
-        np.ndarray
+        ndarray
             The array data.
         """
         return self.__array__()
@@ -510,7 +512,7 @@ class Dataset(np.ndarray):
     # Update methods for the axis properties
     # ######################################
 
-    def update_axis_range(self, index: int, item: Union[np.ndarray, Iterable]):
+    def update_axis_range(self, index: int, item: Union[ndarray, Iterable]):
         """
         Update a single axis range value.
 
@@ -518,7 +520,7 @@ class Dataset(np.ndarray):
         ----------
         index : int
             The dimension to be updated.
-        item : Union[np.ndarray, Iterable]
+        item : Union[ndarray, Iterable]
             The new item for the range of the selected dimension.
 
         Raises
@@ -671,7 +673,7 @@ class Dataset(np.ndarray):
         """
         if axes is tuple():
             axes = tuple(np.arange(self.ndim)[::-1])
-        _new = np.ndarray.transpose(deepcopy(self), axes)
+        _new = ndarray.transpose(deepcopy(self), axes)
         _new.axis_labels = [self.axis_labels[_index] for _index in axes]
         _new.axis_units = [self.axis_units[_index] for _index in axes]
         _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
@@ -694,9 +696,72 @@ class Dataset(np.ndarray):
         self._meta["axis_labels"] = {0: "Flattened"}
         self._meta["axis_ranges"] = {0: np.arange(self.size)}
         self._meta["axis_units"] = {0: ""}
-        _new = np.ndarray.flatten(self, order)
+        _new = ndarray.flatten(self, order)
         _new._update_keys_in_flattened_array()
         return _new
+
+    def reshape(self, *new_shape: Union[int, tuple[int]], order="C"):
+        """
+        Overload the generic reshape method to update the metadata.
+
+        Parameters
+        ----------
+        new_shape : Union[int, tuple[int]]
+            The new shape of the array.
+        order : {'C', 'F', 'A', 'K'}, optional
+            The order of the reshaping. The default is 'C'.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The reshaped Dataset.
+        """
+        if len(new_shape) == 1:
+            if isinstance(new_shape[0], list):
+                new_shape = tuple(new_shape[0])
+            elif isinstance(new_shape[0], tuple):
+                new_shape = new_shape[0]
+        _new = ndarray.reshape(self, new_shape, order=order)
+        _dim_matches = get_corresponding_dims(self.shape, _new.shape)
+        for _key in ["axis_labels", "axis_units"]:
+            _values = [
+                self._meta[_key][_dim_matches[_dim]] if _dim in _dim_matches else ""
+                for _dim in range(_new.ndim)
+            ]
+            setattr(_new, _key, _values)
+        _new.axis_ranges = [
+            self._meta["axis_ranges"][_dim_matches[_dim]]
+            if _dim in _dim_matches
+            else np.arange(_len)
+            for _dim, _len in enumerate(_new.shape)
+        ]
+        return _new
+
+    @property
+    def shape(self) -> tuple:
+        """
+        Get the shape of the array.
+
+        Returns
+        -------
+        tuple
+            The shape of the array.
+        """
+        return self.array.shape
+
+    @shape.setter
+    def shape(self, shape: tuple):
+        """
+        Set the shape of the array.
+
+        Parameters
+        ----------
+        shape : tuple
+            The new shape of the array.
+        """
+        _reshaped = self.reshape(shape)
+        self._meta = _reshaped._meta
+        ndarray.shape.__set__(self, shape)
 
     def _update_keys_in_flattened_array(self):
         """
@@ -740,7 +805,7 @@ class Dataset(np.ndarray):
                 data_label=self.data_label,
             )
         else:
-            _new = np.ndarray.squeeze(self, axis)
+            _new = ndarray.squeeze(self, axis)
             for _key in ["axis_labels", "axis_ranges", "axis_units"]:
                 _entry = [_v for _k, _v in getattr(self, _key).items() if _k in _axes]
                 setattr(_new, _key, _entry)
@@ -750,7 +815,7 @@ class Dataset(np.ndarray):
         self,
         indices: Union[int, ArrayLike],
         axis: Union[int, None] = None,
-        out: Union[None, np.ndarray] = None,
+        out: Union[None, ndarray] = None,
         mode: Literal["raise", "wrap", "clip"] = "raise",
     ) -> Self:
         """
@@ -766,7 +831,7 @@ class Dataset(np.ndarray):
         axis : Union[None, int], optional
             The axis to take the data from. If None, data will be taken from the
             flattened array. The default is None.
-        out : Union[np.ndarray, None], optional
+        out : Union[ndarray, None], optional
             An optional output array. If None, a new array is created. The default is
             None.
         mode : str, optional
@@ -777,7 +842,7 @@ class Dataset(np.ndarray):
         new : pydidas.core.Dataset
             The new dataset.
         """
-        _new = np.ndarray.take(self, indices, axis, out, mode)
+        _new = ndarray.take(self, indices, axis, out, mode)
         if not isinstance(_new, Dataset) or axis is None:
             return _new
         _nindices = get_number_of_entries(indices)
@@ -787,7 +852,7 @@ class Dataset(np.ndarray):
                 _item.pop(axis)
                 setattr(_new, _key, _item.values())
         else:
-            if isinstance(_new._meta["axis_ranges"][axis], np.ndarray):
+            if isinstance(_new._meta["axis_ranges"][axis], ndarray):
                 _new._meta["axis_ranges"][axis] = np.take(
                     self.axis_ranges[axis], indices
                 )
@@ -801,7 +866,7 @@ class Dataset(np.ndarray):
         dtype: DTypeLike = None,
         out: Optional[ArrayLike] = None,
         **kwargs: dict,
-    ) -> np.ndarray:
+    ) -> ndarray:
         """
         Compute the mean of the array elements over a given axis.
 
@@ -841,7 +906,7 @@ class Dataset(np.ndarray):
         if has_dtype_arg:
             kwargs["dtype"] = dtype
         _result = numpy_method(self, axis=axis, out=out, **kwargs)
-        if axis is None or (not isinstance(_result, np.ndarray)):
+        if axis is None or (not isinstance(_result, ndarray)):
             return _result
         if out is not None and not isinstance(out, Dataset):
             return _result
@@ -858,10 +923,10 @@ class Dataset(np.ndarray):
                 setattr(_result, _key, _items)
         return _result
 
-    mean = partialmethod(__reimplement_numpy_method, np.ndarray.mean)
-    sum = partialmethod(__reimplement_numpy_method, np.ndarray.sum)
-    max = partialmethod(__reimplement_numpy_method, np.ndarray.max, has_dtype_arg=False)
-    min = partialmethod(__reimplement_numpy_method, np.ndarray.min, has_dtype_arg=False)
+    mean = partialmethod(__reimplement_numpy_method, ndarray.mean)
+    sum = partialmethod(__reimplement_numpy_method, ndarray.sum)
+    max = partialmethod(__reimplement_numpy_method, ndarray.max, has_dtype_arg=False)
+    min = partialmethod(__reimplement_numpy_method, ndarray.min, has_dtype_arg=False)
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
@@ -877,7 +942,7 @@ class Dataset(np.ndarray):
         Dataset
             The copied dataset.
         """
-        _new = np.ndarray.copy(self, order)
+        _new = ndarray.copy(self, order)
         _new._meta = {
             _key: self._meta[_key].copy()
             for _key in ["axis_labels", "axis_units", "axis_ranges"]
@@ -980,7 +1045,7 @@ class Dataset(np.ndarray):
             for the full documentation. The class' state is appended with
             the class' __dict__
         """
-        _ndarray_reduced = np.ndarray.__reduce__(self)
+        _ndarray_reduced = ndarray.__reduce__(self)
         _dataset_state = _ndarray_reduced[2] + (self.__dict__,)
         return _ndarray_reduced[0], _ndarray_reduced[1], _dataset_state
 
@@ -998,9 +1063,9 @@ class Dataset(np.ndarray):
             The pickled object state.
         """
         self.__dict__ = state[-1]
-        np.ndarray.__setstate__(self, state[0:-1])
+        ndarray.__setstate__(self, state[0:-1])
 
-    def __array_wrap__(self, obj: np.ndarray, context: Optional[object] = None) -> Self:
+    def __array_wrap__(self, obj: ndarray, context: Optional[object] = None) -> Self:
         """
         Return 0-d results from ufuncs as single values.
 
@@ -1009,7 +1074,7 @@ class Dataset(np.ndarray):
 
         Parameters
         ----------
-        obj : Union[np.ndarray, pydidas.core.Dataset]
+        obj : Union[ndarray, pydidas.core.Dataset]
             The output array from the ufunc call.
         context : Union[None, object], optional
             The calling context. The default is None.
@@ -1022,7 +1087,7 @@ class Dataset(np.ndarray):
         """
         if obj.shape == ():
             return np.atleast_1d(obj)[0]
-        return np.ndarray.__array_wrap__(self, obj, context)
+        return ndarray.__array_wrap__(self, obj, context)
 
     def __hash__(self) -> int:
         """

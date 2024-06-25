@@ -36,6 +36,7 @@ __all__ = [
     "replace_none_entries",
     "item_is_iterable_but_not_array",
     "convert_ranges_and_check_length",
+    "get_corresponding_dims",
 ]
 
 import textwrap
@@ -117,28 +118,10 @@ def dataset_default_attribute(key: str, shape: tuple[int]) -> Union[str, dict]:
     if key == "metadata":
         return {}
     if key in ["axis_units", "axis_labels"]:
-        return _dataset_ax_str_default(len(shape))
+        return {i: "" for i in range(len(shape))}
     if key == "axis_ranges":
         return _dataset_ax_default_ranges(shape)
     raise ValueError(f"No default available for `{key}`.")
-
-
-def _dataset_ax_str_default(ndim: int) -> dict:
-    """
-    Generate default values for the string-based axis properties in a Dataset.
-
-    Parameters
-    ----------
-
-    ndim : int
-        The number of dimensions in the Dataset.
-
-    Returns
-    -------
-    dict
-        The default entries: a dictionary with None entries for each dimension.
-    """
-    return {i: "" for i in range(ndim)}
 
 
 def _dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
@@ -271,9 +254,7 @@ def get_dict_with_string_entries(
     dict
         A dictionary with string entries.
     """
-    entries = replace_none_entries(
-        get_input_as_dict(entries, shape, "str", name_reference)
-    )
+    entries = replace_none_entries(get_input_as_dict(entries, shape, name_reference))
     if not all(isinstance(_val, str) for _val in entries.values()):
         print(entries)
         raise UserConfigError(
@@ -285,8 +266,7 @@ def get_dict_with_string_entries(
 def get_input_as_dict(
     data: Union[dict, Iterable[float, ...]],
     target_shape: Tuple[int],
-    entry_type: Literal["str", "array"] = "str",
-    calling_method_name: str = "undefined method",
+    calling_method_name: str = "axis_labels",
 ) -> dict:
     """
     Get an ordered dictionary with the axis keys for the input data.
@@ -329,11 +309,7 @@ def get_input_as_dict(
             "missing keys with default values. (Error encountered in "
             "`{calling_method_name}`)."
         )
-        _default_data = (
-            _dataset_ax_str_default(target_length)
-            if entry_type == "str"
-            else _dataset_ax_default_ranges(target_shape)
-        )
+        _default_data = dataset_default_attribute(calling_method_name, target_shape)
         _default_data.update({k: v for k, v in data.items() if k in _target_keys})
         return _default_data
     if isinstance(data, Iterable) and not isinstance(data, str):
@@ -430,7 +406,56 @@ def convert_ranges_and_check_length(ranges: dict, shape: tuple[int]) -> dict:
         for _dim, _len, _ndata in _wrong_dims:
             _error += (
                 f"\nDimension {_dim}: Given range length: `{_len}`; "
-                "target length: `{_ndata}`."
+                f"target length: `{_ndata}`."
             )
         raise ValueError(_error)
     return ranges
+
+
+def get_corresponding_dims(ref_shape: tuple[int], new_shape: tuple[int]) -> dict:
+    """
+    Get the corresponding dimensions for two shapes.
+
+    Parameters
+    ----------
+    ref_shape : tuple[int]
+        The old shape.
+    new_shape : tuple[int]
+        The new shape.
+
+    Returns
+    -------
+    dict
+        The corresponding dimensions. This dictionary will have the new dimensions
+        as keys and the corresponding old dimensions as values.
+    """
+    _index_ref = 0
+    _index_new_offset = 0
+    _ref_shape = list(ref_shape)
+    _new_shape = list(new_shape)
+    _ref_cumprod = list(np.cumprod(_ref_shape))
+    _new_cumprod = list(np.cumprod(_new_shape))
+    _current_ref = _ref_cumprod.pop(0)
+    _current_new = _new_cumprod.pop(0)
+    _key_indices = {}
+    _factorized = False
+    while True:
+        if _current_new == _current_ref and not _factorized:
+            _key_indices[_index_ref + _index_new_offset] = _index_ref
+        if len(_ref_cumprod) == 0 or len(_new_cumprod) == 0:
+            break
+        if _current_ref == _current_new:
+            _factorized = False
+            _current_ref = _ref_cumprod.pop(0)
+            _current_new = _new_cumprod.pop(0)
+            _index_ref += 1
+        while _current_ref < _current_new and len(_ref_cumprod) > 0:
+            _factorized = True
+            _current_ref = _ref_cumprod.pop(0)
+            _index_ref += 1
+            _index_new_offset -= 1
+        while _current_ref > _current_new and len(_new_cumprod) > 0:
+            _factorized = True
+            _current_new = _new_cumprod.pop(0)
+            _index_new_offset += 1
+    return _key_indices

@@ -32,6 +32,7 @@ import numpy as np
 
 from pydidas.core import Dataset, PydidasConfigError
 from pydidas.core.utils import rebin2d
+from pydidas.core.utils.dataset_utils import get_corresponding_dims
 
 
 _np_random_generator = np.random.default_rng()
@@ -936,7 +937,6 @@ class TestDataset(unittest.TestCase):
                     _ref = getattr(obj.array, _method_name)(axis=_ax)
                     self.assertTrue(np.allclose(_out, _ref))
 
-    # TODO: tests below
     def test_np_reimplementation__w_out_dataset(self):
         obj = self.create_large_dataset()
         for _method_name in _IMPLEMENTED_METHODS:
@@ -1050,7 +1050,7 @@ class TestDataset(unittest.TestCase):
         for _ref, _new in zip(_ref_ranges, _new_ranges):
             self.assertTrue(np.allclose(_ref, _new))
 
-    def test__nanmean(self):
+    def test_nanmean(self):
         obj = self.create_large_dataset()
         obj[0, 0, :, 0] = np.nan
         for _ax in _AXIS_SLICES:
@@ -1058,6 +1058,83 @@ class TestDataset(unittest.TestCase):
             with self.subTest(axis=_ax):
                 _result = np.nanmean(obj, axis=_ax)
                 self.__assert_new_metadata_correct(_result, _ax_tuple, "sum")
+
+    def test_reshape__syntax(self):
+        obj = self.create_large_dataset()
+        _shape = (5, 2, 6, 2, 14, 16)
+        for _type in ("tuple", "ints"):
+            with self.subTest(type=_type):
+                if _type == "ints":
+                    new = obj.reshape(*_shape)
+                elif _type == "tuple":
+                    new = obj.reshape(_shape)
+                self.assertEqual(new.shape, _shape)
+
+    def test_shape__setter(self):
+        obj = self.create_large_dataset()
+        _shape = (5, 2, 6, 2, 14, 16)
+        obj.shape = _shape
+        self.assertEqual(obj.shape, _shape)
+
+    def test_reshape__syntax_flat(self):
+        obj = self.create_large_dataset()
+        new = obj.reshape(obj.size)
+        self.assertEqual(new.shape, (obj.size,))
+
+    def test_reshape__simple(self):
+        for i0, i1 in [(0, 1), (1, 2), (2, 3)]:
+            with self.subTest(axes=(i0, i1)):
+                obj = self.create_large_dataset()
+                _new_shape = tuple(
+                    (n if i not in [i0, i1] else n * obj.shape[i1])
+                    for i, n in enumerate(obj.shape)
+                    if i != i1
+                )
+                obj.shape = _new_shape
+                self.assertEqual(obj.shape, _new_shape)
+                self.__check_reshape_metadata(obj)
+
+    def test_reshape__shape_inversion(self):
+        obj = self.create_large_dataset()
+        _new_shape = obj.shape[::-1]
+        obj.shape = _new_shape
+        self.assertEqual(obj.shape, _new_shape)
+        self.__check_reshape_metadata(obj)
+
+    def test_reshape__complex(self):
+        for _new_shape in [
+            (5, 2, 6, 2, 14, 16),
+            (5, 2, 6, 2, 14, 16),
+            (2, 5, 6, 2, 7, 2, 4, 4),
+            (10, 7, 12, 2, 16),
+            (10, 12, 7, 16, 2),
+        ]:
+            with self.subTest(shape=_new_shape):
+                obj = self.create_large_dataset()
+                obj.shape = _new_shape
+                self.assertEqual(obj.shape, _new_shape)
+                self.__check_reshape_metadata(obj)
+
+    def __check_reshape_metadata(self, obj):
+        _dim_matches = get_corresponding_dims(self._dset["shape"], obj.shape)
+        for _index, _len in enumerate(obj.shape):
+            if _index in _dim_matches:
+                _original_index = _dim_matches[_index]
+                self.assertEqual(
+                    obj.axis_labels[_index], self._dset["labels"][_original_index]
+                )
+                self.assertEqual(
+                    obj.axis_units[_index], self._dset["units"][_original_index]
+                )
+                self.assertTrue(
+                    np.allclose(
+                        obj.axis_ranges[_index], self._dset["ranges"][_original_index]
+                    )
+                )
+            else:
+                self.assertEqual(obj.axis_labels[_index], "")
+                self.assertEqual(obj.axis_units[_index], "")
+                self.assertTrue(np.allclose(obj.axis_ranges[_index], np.arange(_len)))
 
 
 if __name__ == "__main__":

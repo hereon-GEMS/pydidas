@@ -32,8 +32,8 @@ import numpy as np
 from pydidas.core import PydidasConfigError
 from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
-    _dataset_ax_str_default,
     dataset_default_attribute,
+    get_corresponding_dims,
     get_input_as_dict,
     get_number_of_entries,
     item_is_iterable_but_not_array,
@@ -94,11 +94,6 @@ class Test_dataset_utils(unittest.TestCase):
 
     def dataset_default_attribute___get_item_key(self):
         self.assertEqual(dataset_default_attribute("_get_item_key", (1,)), tuple())
-
-    def test_dataset_ax_str_default(self):
-        _range = _dataset_ax_str_default(5)
-        self.assertEqual(set(np.arange(5)), set(_range.keys()))
-        self.assertEqual(set([""]), set(_range.values()))
 
     def test_get_number_of_entries__ndarray(self):
         _arr = np.arange(27)
@@ -179,6 +174,31 @@ class Test_dataset_utils(unittest.TestCase):
     def test_item_is_iterable_but_not_array__set(self):
         _flag = item_is_iterable_but_not_array({1, 2, 3})
         self.assertTrue(_flag)
+
+    def test_get_corresponding_dims__identity(self):
+        _old = (10, 11, 12, 15)
+        _dims = get_corresponding_dims(_old, _old)
+        self.assertEqual(list(_dims.keys()), list(_dims.values()))
+
+    def test_get_corresponding_dims__inverted(self):
+        _old = (10, 11, 12, 15)
+        _dims = get_corresponding_dims(_old, _old[::-1])
+        self.assertEqual(_dims, {})
+
+    def test_get_corresponding_dims(self):
+        for _old, _new, _matches in [
+            [(14, 14, 14), (14, 7, 2, 14), {0: 0, 3: 2}],
+            [(14, 7, 14, 2), (14, 14, 14), {0: 0}],
+            [(16, 16, 16), (16, 4, 2, 2, 16), {0: 0, 4: 2}],
+            [(14, 14, 2, 7), (14, 14, 14), {0: 0, 1: 1}],
+            [(16, 16, 16), (16, 4, 16, 2, 2), {0: 0}],
+            [(16, 16, 16), (2, 16, 4, 16, 2), {}],
+            [(16, 16, 16), (4, 4, 16, 2, 2, 4), {2: 1}],
+            [(16, 16, 16), (4, 2, 2, 8, 2, 16), {5: 2}],
+        ]:
+            with self.subTest(old_shape=_old, new_shape=_new):
+                _dim_matches = get_corresponding_dims(_old, _new)
+                self.assertEqual(_dim_matches, _matches)
 
 
 if __name__ == "__main__":

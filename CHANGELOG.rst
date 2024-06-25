@@ -13,6 +13,7 @@ Improvements
   data are now located directly above the plots.
 - Added type-checking for Datasets axis_ranges and axis_units.  
 - Added mean, sum, min, max methods to Dataset to keep metadata consistent.
+- Added reshape metadata handling to Dataset.
 
 Bugfixes
 --------

@@ -166,8 +166,8 @@ class Hdf5Io(IoBase):
         """
         _input_indices = kwargs.get("indices", slice(None))
         _indices = (
-            slice(None)
-            if _input_indices is None
+            (slice(None),)
+            if _input_indices in [None, slice(None)]
             else (
                 (_input_indices,)
                 if isinstance(_input_indices, Integral)

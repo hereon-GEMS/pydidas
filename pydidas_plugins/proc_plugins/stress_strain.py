@@ -530,20 +530,16 @@ def pre_regression_calculation(d_spacing_combined):
         if not isinstance(d_spacing_combined, Dataset):
             raise TypeError("Input d_spacing_combined must be an instance of Dataset.")
 
-        
-        #d_spacing_combined[0,5] = np.nan
+    
         # This is the case where one part of the d_spacing pair is missing and not taken into account for the average
         #d_spacing_avg= np.mean(d_spacing_combined, axis=0)
+        #TODO: Now with Dataset.mean axis_ranges: 7.498799e-33, before: 7.49879891e-33. Precision??
         d_spacing_avg= d_spacing_combined.mean(axis=0)
         d_spacing_avg.data_unit=d_spacing_combined.data_unit
-        print(50*"\N{fire}")
-        print('d_spacing_avg\n\n', d_spacing_avg)
-        print(50*"\N{fire}")
-        print('d_spacing_combined.axis_ranges[1]', d_spacing_combined.axis_ranges[1])
+        #print('d_spacing_combined.axis_ranges[1]', d_spacing_combined.axis_ranges[1])
         #d_spacing_avg.axis_ranges={0: d_spacing_combined.axis_ranges[1]}
-        #d_spacing_avg.axis_labels={0: 'sin^2(chi)'}
-        #d_spacing_avg.data_label='position mean'
-                
+    
+            
         
         #d-, d+
         #d[1,1]-d[0,1]

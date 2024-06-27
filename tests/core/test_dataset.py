@@ -134,6 +134,11 @@ class TestDataset(unittest.TestCase):
         _new = obj[None, :]
         self.assertEqual(list(_new.axis_labels.values()), [""] + self._dset["labels"])
         self.assertEqual(list(_new.axis_units.values()), [""] + self._dset["units"])
+        for _dim, _new_range in enumerate(_new.axis_ranges.values()):
+            if _dim == 0:
+                self.assertTrue(np.allclose(_new_range, np.arange(_new.shape[0])))
+            else:
+                self.assertTrue(np.allclose(_new_range, self._dset["ranges"][_dim - 1]))
 
     def test_array_finalize__add_dimension_in_middle(self):
         obj = self.create_large_dataset()
@@ -184,9 +189,9 @@ class TestDataset(unittest.TestCase):
     def test_flatten(self):
         obj = self.create_large_dataset()
         _new = obj.flatten()
-        self.assertEqual(_new.size, obj.size)
-        self.assertEqual(_new.axis_labels[0], "Flattened")
-        self.assertEqual(_new.axis_units[0], "")
+        self.assertEqual(_new.shape, (obj.size,))
+        self.assertEqual(_new.axis_labels, {0: "Flattened"})
+        self.assertEqual(_new.axis_units, {0: ""})
         self.assertTrue(np.equal(_new.axis_ranges[0], np.arange(_new.size)).all())
 
     def test_flatten_dims__simple(self):
@@ -1101,6 +1106,11 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(obj.shape, _new_shape)
         self.__check_reshape_metadata(obj)
 
+    def test_reshape_0d(self):
+        obj = Dataset(0)
+        new = obj.reshape(1)
+        self.assertEqual(new.shape, (1,))
+
     def test_reshape__complex(self):
         for _new_shape in [
             (5, 2, 6, 2, 14, 16),
@@ -1114,6 +1124,40 @@ class TestDataset(unittest.TestCase):
                 obj.shape = _new_shape
                 self.assertEqual(obj.shape, _new_shape)
                 self.__check_reshape_metadata(obj)
+
+    def test_reshape_w_neg_index(self):
+        obj = self.create_large_dataset()
+        for _dim in range(len(obj.shape)):
+            _new_shape = list(obj.shape)
+            _new_shape[_dim] = -1
+            obj.shape = _new_shape
+            self.assertEqual(obj.shape, self._dset["shape"])
+            self.__check_reshape_metadata(obj)
+
+    def test_reshape_w_neg_index__and_reshape(self):
+        for _new_shape in [
+            (5, 2, 6, 2, 14, -1),
+            (5, 2, 6, -1, 14, 16),
+            (2, 5, 6, 2, -1, 2, 4, 4),
+            (10, 7, -1, 2, 16),
+            (-1, 12, 7, 16, 2),
+        ]:
+            with self.subTest(shape=_new_shape):
+                obj = self.create_large_dataset()
+                obj.shape = _new_shape
+                _new_dim = obj.size // np.cumprod([n for n in obj.shape if n != -1])
+                _new_final_shape = tuple(
+                    (n if n != -1 else _new_dim) for n in obj.shape
+                )
+                self.assertEqual(obj.shape, _new_final_shape)
+                self.__check_reshape_metadata(obj)
+
+    def test_reshape__insert_dim(self):
+        obj = self.create_large_dataset()
+        _new_shape = (obj.shape[0], 1, 1, *obj.shape[1:])
+        obj.shape = _new_shape
+        self.assertEqual(obj.shape, _new_shape)
+        self.__check_reshape_metadata(obj)
 
     def __check_reshape_metadata(self, obj):
         _dim_matches = get_corresponding_dims(self._dset["shape"], obj.shape)
@@ -1135,6 +1179,57 @@ class TestDataset(unittest.TestCase):
                 self.assertEqual(obj.axis_labels[_index], "")
                 self.assertEqual(obj.axis_units[_index], "")
                 self.assertTrue(np.allclose(obj.axis_ranges[_index], np.arange(_len)))
+
+    def test_reshape__1d_insert_dim(self):
+        obj = self.get_random_dataset(1)
+        _new = obj.reshape(-1, obj.size)
+        self.assertEqual(_new.shape, (1, obj.size))
+
+    def test_reshape_1d(self):
+        obj = self.get_random_dataset(1)
+        obj.update_axis_range(0, 0.5 * np.arange(obj.shape[0]))
+        _new_shape = (1, obj.size)
+        obj.shape = _new_shape
+        self.assertEqual(obj.shape, _new_shape)
+        self.assertEqual(obj.axis_labels, {0: "", 1: ""})
+        self.assertEqual(obj.axis_units, {0: "", 1: ""})
+        for _i, _len in enumerate(obj.shape):
+            self.assertTrue(np.allclose(obj.axis_ranges[_i], np.arange(_len)))
+
+    def test_repeat(self):
+        obj = self.get_random_dataset(4)
+        for _ax in range(obj.ndim):
+            with self.subTest(axis=_ax):
+                _new = obj.repeat(repeats=3, axis=_ax)
+                for _dim in range(obj.ndim):
+                    if _dim == _ax:
+                        self.assertEqual(_new.shape[_dim], obj.shape[_dim] * 3)
+                    else:
+                        self.assertEqual(_new.shape[_dim], obj.shape[_dim])
+                self.assertEqual(_new.axis_labels, obj.axis_labels)
+                self.assertEqual(_new.axis_units, obj.axis_units)
+
+    def test_np_array__simple(self):
+        obj = self.get_random_dataset(1)
+        _new = np.array(obj)
+        self.assertTrue(np.allclose(obj, _new))
+        self.assertIsInstance(_new, np.ndarray)
+
+    def test_np_array__w_subok(self):
+        obj = self.get_random_dataset(3)
+        _new = np.array(obj, subok=True)
+        self.assertTrue(np.allclose(obj, _new))
+        self.assertIsInstance(_new, Dataset)
+
+    def test_np_array__w_subok_ndmin(self):
+        obj = self.get_random_dataset(1)
+        _new = np.array(obj, subok=True, ndmin=4)
+        self.assertTrue(np.allclose(obj, _new))
+        self.assertIsInstance(_new, Dataset)
+
+    def test_np_tile(self):
+        obj = self.get_random_dataset(2)
+        _new = np.tile(obj, (1, 2, 3))
 
 
 if __name__ == "__main__":

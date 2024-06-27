@@ -318,7 +318,7 @@ def get_input_as_dict(
         raise PydidasConfigError(
             "The number of given keys does not match the number of array dimensions. "
             "Resetting keys to defaults. (Error encountered in "
-            "`{calling_method_name}`)."
+            f"`{calling_method_name}`)."
         )
     raise PydidasConfigError(
         f"Input `{data}` cannot be converted to dictionary for property "
@@ -431,31 +431,36 @@ def get_corresponding_dims(ref_shape: tuple[int], new_shape: tuple[int]) -> dict
     """
     _index_ref = 0
     _index_new_offset = 0
-    _ref_shape = list(ref_shape)
-    _new_shape = list(new_shape)
-    _ref_cumprod = list(np.cumprod(_ref_shape))
-    _new_cumprod = list(np.cumprod(_new_shape))
-    _current_ref = _ref_cumprod.pop(0)
-    _current_new = _new_cumprod.pop(0)
+    _ref = [[_shape, _cp] for _shape, _cp in zip(ref_shape, np.cumprod(ref_shape))]
+    _new = [[_shape, _cp] for _shape, _cp in zip(new_shape, np.cumprod(new_shape))]
+    _current_ref = _ref.pop(0)
+    _current_new = _new.pop(0)
     _key_indices = {}
     _factorized = False
     while True:
         if _current_new == _current_ref and not _factorized:
             _key_indices[_index_ref + _index_new_offset] = _index_ref
-        if len(_ref_cumprod) == 0 or len(_new_cumprod) == 0:
+        if len(_ref) == 0 or len(_new) == 0:
             break
-        if _current_ref == _current_new:
+        if _current_ref[1] == _current_new[1]:
             _factorized = False
-            _current_ref = _ref_cumprod.pop(0)
-            _current_new = _new_cumprod.pop(0)
+            _current_ref = _ref.pop(0)
+            _current_new = _new.pop(0)
             _index_ref += 1
-        while _current_ref < _current_new and len(_ref_cumprod) > 0:
-            _factorized = True
-            _current_ref = _ref_cumprod.pop(0)
+        while _current_ref[0] == 1 and len(_ref) > 0 and _current_new[0] > 1:
+            _current_ref = _ref.pop(0)
             _index_ref += 1
             _index_new_offset -= 1
-        while _current_ref > _current_new and len(_new_cumprod) > 0:
+        while _current_new[0] == 1 and len(_new) > 0 and _current_ref[0] > 1:
+            _current_new = _new.pop(0)
+            _index_new_offset += 1
+        while _current_ref[1] < _current_new[1] and len(_ref) > 0:
             _factorized = True
-            _current_new = _new_cumprod.pop(0)
+            _current_ref = _ref.pop(0)
+            _index_ref += 1
+            _index_new_offset -= 1
+        while _current_ref[1] > _current_new[1] and len(_new) > 0:
+            _factorized = True
+            _current_new = _new.pop(0)
             _index_new_offset += 1
     return _key_indices

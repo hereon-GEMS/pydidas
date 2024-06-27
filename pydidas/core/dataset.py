@@ -205,7 +205,7 @@ class Dataset(ndarray):
         **kwargs: dict,
     ):
         """
-        Flatten the specified dimensions in place in the Dataset.
+        Flatten the specified dimensions **in place** in the Dataset.
 
         This method will reduce the dimensionality of the Dataset by len(args).
 
@@ -406,7 +406,7 @@ class Dataset(ndarray):
         ndarray
             The array data.
         """
-        return self.__array__()
+        return self.view(ndarray)
 
     @property
     def _get_item_key(self) -> tuple:
@@ -433,6 +433,7 @@ class Dataset(ndarray):
             The axis units: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
+        self.__check_property_length("axis_units")
         return self._meta["axis_units"].copy()
 
     @axis_units.setter
@@ -461,6 +462,7 @@ class Dataset(ndarray):
             The axis labels: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
+        self.__check_property_length("axis_labels")
         return self._meta["axis_labels"].copy()
 
     @axis_labels.setter
@@ -492,6 +494,7 @@ class Dataset(ndarray):
             The axis ranges: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
+        self.__check_property_length("axis_ranges")
         return self._meta["axis_ranges"].copy()
 
     @axis_ranges.setter
@@ -507,6 +510,26 @@ class Dataset(ndarray):
         """
         _ranges = get_input_as_dict(ranges, self.shape, "axis_ranges")
         self._meta["axis_ranges"] = convert_ranges_and_check_length(_ranges, self.shape)
+
+    def __check_property_length(self, key: str):
+        """
+        Check the length of the axis properties.
+
+        Parameters
+        ----------
+        key : str
+            The name of the property to be checked.
+        """
+        if len(self._meta[key]) != self.ndim:
+            warnings.warn(
+                f"The number of {key.replace('_', ' ')} entries "
+                f"does not match the number of  dimensions of the Dataset. "
+                f"Resetting the{key}."
+            )
+            self._meta[key] = {
+                i: (np.arange(_length) if key == "axis_ranges" else "invalid")
+                for i, _length in enumerate(self.shape)
+            }
 
     # ######################################
     # Update methods for the axis properties
@@ -693,9 +716,6 @@ class Dataset(ndarray):
             'K' means to flatten `a` in the order the elements occur in memory.
             The default is 'C'.
         """
-        self._meta["axis_labels"] = {0: "Flattened"}
-        self._meta["axis_ranges"] = {0: np.arange(self.size)}
-        self._meta["axis_units"] = {0: ""}
         _new = ndarray.flatten(self, order)
         _new._update_keys_in_flattened_array()
         return _new
@@ -722,7 +742,10 @@ class Dataset(ndarray):
             elif isinstance(new_shape[0], tuple):
                 new_shape = new_shape[0]
         _new = ndarray.reshape(self, new_shape, order=order)
-        _dim_matches = get_corresponding_dims(self.shape, _new.shape)
+        _dim_matches = (
+            {} if self.shape == () else get_corresponding_dims(self.shape, _new.shape)
+        )
+
         for _key in ["axis_labels", "axis_units"]:
             _values = [
                 self._meta[_key][_dim_matches[_dim]] if _dim in _dim_matches else ""
@@ -730,11 +753,37 @@ class Dataset(ndarray):
             ]
             setattr(_new, _key, _values)
         _new.axis_ranges = [
-            self._meta["axis_ranges"][_dim_matches[_dim]]
-            if _dim in _dim_matches
-            else np.arange(_len)
+            (
+                self._meta["axis_ranges"][_dim_matches[_dim]]
+                if _dim in _dim_matches
+                else np.arange(_len)
+            )
             for _dim, _len in enumerate(_new.shape)
         ]
+        return _new
+
+    def repeat(self, repeats, axis: Optional[int] = None):
+        """
+        Overload the generic repeat method to update the metadata.
+
+        Parameters
+        ----------
+        repeats : int
+            The number of repetitions.
+        axis : int, optional
+            The axis along which to repeat. If None, the flattened array is returned.
+            The default is None.
+
+        Returns
+        -------
+        ndarray
+            The repeated array.
+        """
+        _new = ndarray.repeat(self, repeats, axis)
+        if axis is None:
+            _new._update_keys_in_flattened_array()
+        else:
+            _new._meta["axis_ranges"][axis] = np.repeat(self.axis_ranges[axis], repeats)
         return _new
 
     @property
@@ -747,7 +796,7 @@ class Dataset(ndarray):
         tuple
             The shape of the array.
         """
-        return self.array.shape
+        return ndarray.shape.__get__(self)
 
     @shape.setter
     def shape(self, shape: tuple):
@@ -760,8 +809,8 @@ class Dataset(ndarray):
             The new shape of the array.
         """
         _reshaped = self.reshape(shape)
-        self._meta = _reshaped._meta
         ndarray.shape.__set__(self, shape)
+        self._meta = _reshaped._meta
 
     def _update_keys_in_flattened_array(self):
         """
@@ -814,8 +863,8 @@ class Dataset(ndarray):
     def take(
         self,
         indices: Union[int, ArrayLike],
-        axis: Union[int, None] = None,
-        out: Union[None, ndarray] = None,
+        axis: Optional[int] = None,
+        out: Optional[ndarray] = None,
         mode: Literal["raise", "wrap", "clip"] = "raise",
     ) -> Self:
         """
@@ -828,10 +877,10 @@ class Dataset(ndarray):
         ----------
         indices : Union[int, ArrayLike]
             The indices of the values to extract.
-        axis : Union[None, int], optional
+        axis : int, optional
             The axis to take the data from. If None, data will be taken from the
             flattened array. The default is None.
-        out : Union[ndarray, None], optional
+        out : ndarray, optional
             An optional output array. If None, a new array is created. The default is
             None.
         mode : str, optional
@@ -848,7 +897,7 @@ class Dataset(ndarray):
         _nindices = get_number_of_entries(indices)
         if _nindices == 1 and not isinstance(indices, Iterable):
             for _key in ["axis_labels", "axis_units", "axis_ranges"]:
-                _item = getattr(_new, _key)
+                _item = _new._meta[_key]
                 _item.pop(axis)
                 setattr(_new, _key, _item.values())
         else:
@@ -980,7 +1029,7 @@ class Dataset(ndarray):
             "metadata": _meta_repr,
             "data_unit": "data_unit: " + self.data_unit,
             "data_label": "data_label: " + self.data_label,
-            "array": self.__array__().__repr__(),
+            "array": self.view(ndarray).__repr__(),
         }
         _repr = (
             self.__class__.__name__

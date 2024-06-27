@@ -24,6 +24,7 @@ Bugfixes
   metadata.
 - Fixed an issue in Dataset's flatten implementation.
 - Fixed an issue with restoring the UI after the number of screens was reduced.  
+- Fixed an issue in Dataset's reshape after using np.array with ndmin parameter.
 
 
 v24.06.05

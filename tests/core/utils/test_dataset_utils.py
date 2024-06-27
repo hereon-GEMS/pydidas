@@ -186,7 +186,7 @@ class Test_dataset_utils(unittest.TestCase):
         self.assertEqual(_dims, {})
 
     def test_get_corresponding_dims(self):
-        for _old, _new, _matches in [
+        for _shape1, _shape2, _matches in [
             [(14, 14, 14), (14, 7, 2, 14), {0: 0, 3: 2}],
             [(14, 7, 14, 2), (14, 14, 14), {0: 0}],
             [(16, 16, 16), (16, 4, 2, 2, 16), {0: 0, 4: 2}],
@@ -194,10 +194,17 @@ class Test_dataset_utils(unittest.TestCase):
             [(16, 16, 16), (16, 4, 16, 2, 2), {0: 0}],
             [(16, 16, 16), (2, 16, 4, 16, 2), {}],
             [(16, 16, 16), (4, 4, 16, 2, 2, 4), {2: 1}],
+            [(1, 16, 1, 16, 16), (1, 4, 4, 1, 16, 2, 2, 4), {0: 0, 3: 2, 4: 3}],
+            [(1, 16, 1, 16, 16), (1, 4, 4, 16, 1, 2, 2, 4), {0: 0, 3: 3}],
             [(16, 16, 16), (4, 2, 2, 8, 2, 16), {5: 2}],
+            [(16, 16, 16), (1, 1, 4, 2, 2, 1, 8, 2, 16), {8: 2}],
+            [(14, 14, 14), (14, 1, 1, 14, 1, 14), {0: 0, 3: 1, 5: 2}],
+            [(1, 14, 14, 14), (1, 1, 1, 14, 1, 1, 14, 1, 14), {0: 0, 3: 1, 6: 2, 8: 3}],
+            [(1, 1, 14, 14, 14, 1), (14, 14, 14), {0: 2, 1: 3, 2: 4}],
+            [(14, 1, 1, 14, 14), (14, 14, 1, 14), {0: 0, 1: 3, 3: 4}],
         ]:
-            with self.subTest(old_shape=_old, new_shape=_new):
-                _dim_matches = get_corresponding_dims(_old, _new)
+            with self.subTest(old_shape=_shape1, new_shape=_shape2):
+                _dim_matches = get_corresponding_dims(_shape1, _shape2)
                 self.assertEqual(_dim_matches, _matches)
 
 

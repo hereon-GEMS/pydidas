@@ -22,6 +22,8 @@ Bugfixes
 - Fixed an issue with using ROI in plugins in a WorkflowTree
 - Fixed an issue when using slicing on importing Hdf5 files with pydidas 
   metadata.
+- Fixed an issue in Dataset's flatten implementation.
+- Fixed an issue with restoring the UI after the number of screens was reduced.  
 
 
 v24.06.05

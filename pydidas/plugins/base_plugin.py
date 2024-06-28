@@ -587,13 +587,13 @@ class BasePlugin(ObjectWithParameterCollection):
         Union[tuple[slice. slice], None]
             The tuple with two slice objects which define the image ROI.
         """
-        if self.input_data_dim == 1:
+        if self.output_data_dim == 1:
             _roi_bounds = (
                 self.get_param_value("roi_xlow"),
                 self.get_param_value("roi_xhigh"),
             )
             _dim = 1
-        elif self.input_data_dim in (2, -1):
+        elif self.output_data_dim == 2:
             _roi_bounds = (
                 self.get_param_value("roi_ylow"),
                 self.get_param_value("roi_yhigh"),

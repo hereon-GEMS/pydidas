@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The rebin_ module includes functions to rebin 2d and n-dimensional data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -91,17 +91,40 @@ def rebin(data: np.ndarray, binning: int) -> np.ndarray:
         return data
     if isinstance(data, Dataset):
         return data.get_rebinned_copy(binning)
-    _shape = np.asarray(data.shape)
-    _lowlim = (_shape % binning) // 2
-    _highlim = _shape - (_shape % binning) + _lowlim
-    _highlim[_highlim == _lowlim] += 1
-    _slices = tuple(slice(low, high) for low, high in zip(_lowlim, _highlim))
-    data = data[_slices]
+    data = data[get_cropping_slices(data.shape, binning)]
     _newshape = tuple()
     for _s in data.shape:
         _addon = (1, 1) if _s == 1 else (_s // binning, binning)
         _newshape = _newshape + _addon
+    if 0 in _newshape:
+        raise ValueError(
+            "Binning factor too large for the dataset. The resulting shape "
+            "contains a dimension of size 0."
+        )
     data.shape = _newshape
-    _flataxes = tuple(np.arange(1, data.ndim, 2))
-    data = np.mean(data, axis=_flataxes)
-    return data
+    return np.mean(data, axis=tuple(np.arange(1, data.ndim, 2)))
+
+
+def get_cropping_slices(shape: tuple[int], binning: int) -> tuple[slice]:
+    """
+    Get the slices for cropping an array to be re-binned.
+
+    This function will calculate the slices to crop an array to a shape which allows
+    reshaping it in preparation for re-binning.
+
+    Parameters
+    ----------
+    shape : tuple[int]
+        The shape of the array to be re-binned.
+    binning : int
+        The re-binning factor.
+
+    Returns
+    -------
+    tuple[slice]
+        The slices to crop the array.
+    """
+    _shape = np.asarray(shape)
+    _low_crop = (_shape % binning) // 2
+    _upper_crop = np.maximum(_shape - (_shape % binning) + _low_crop, _low_crop + 1)
+    return tuple(slice(low, high) for low, high in zip(_low_crop, _upper_crop))

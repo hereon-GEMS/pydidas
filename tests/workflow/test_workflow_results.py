@@ -325,8 +325,8 @@ class TestWorkflowResults(unittest.TestCase):
         _tmpres = np.random.random((50, 50))
         RES._WorkflowResults__composites[0] = Dataset(
             _tmpres,
-            axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
-            axis_units=[["unit_" + chr(_i + 97)] for _i in range(_tmpres.ndim)],
+            axis_labels=[chr(_i + 97) for _i in range(_tmpres.ndim)],
+            axis_units=["unit_" + chr(_i + 97) for _i in range(_tmpres.ndim)],
         )
         _res = RES.get_result_metadata(0)
         self.assertIsInstance(_res, dict)
@@ -340,8 +340,8 @@ class TestWorkflowResults(unittest.TestCase):
         RES.update_shapes_from_scan_and_workflow()
         RES._WorkflowResults__composites[0] = Dataset(
             _tmpres,
-            axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
-            axis_units=[["unit_" + chr(_i + 97)] for _i in range(_tmpres.ndim)],
+            axis_labels=[chr(_i + 97) for _i in range(_tmpres.ndim)],
+            axis_units=["unit_" + chr(_i + 97) for _i in range(_tmpres.ndim)],
         )
         _res = RES.get_result_metadata(0, use_scan_timeline=True)
         self.assertIsInstance(_res, dict)

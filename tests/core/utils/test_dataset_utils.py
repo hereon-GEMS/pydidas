@@ -32,9 +32,9 @@ import numpy as np
 from pydidas.core import PydidasConfigError
 from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
-    convert_data_to_dict,
-    dataset_ax_str_default,
-    dataset_property_default_val,
+    dataset_default_attribute,
+    get_corresponding_dims,
+    get_input_as_dict,
     get_number_of_entries,
     item_is_iterable_but_not_array,
     update_dataset_properties_from_kwargs,
@@ -49,7 +49,12 @@ class Test_dataset_utils(unittest.TestCase):
     def test_update_dataset_properties_from_kwargs__no_input(self):
         obj = Dataset(np.random.random((10, 10)))
         update_dataset_properties_from_kwargs(obj, {})
-        self.assertEqual(obj._meta["getitem_key"], ())
+        self.assertEqual(obj._meta["_get_item_key"], ())
+
+    def test_update_dataset_properties_from_kwargs__wrong_input(self):
+        obj = Dataset(np.random.random((10, 10)))
+        with self.assertWarns(UserWarning):
+            update_dataset_properties_from_kwargs(obj, {"wrong_key": 12})
 
     def test_update_dataset_properties_from_kwargs__axis_units(self):
         _units = {0: "a", 1: "b"}
@@ -81,19 +86,14 @@ class Test_dataset_utils(unittest.TestCase):
         update_dataset_properties_from_kwargs(obj, {"data_unit": _unit})
         self.assertEqual(obj.data_unit, _unit)
 
-    def test_dataset_property_default_val__metadata(self):
-        self.assertEqual(dataset_property_default_val("metadata"), {})
+    def dataset_default_attribute__metadata(self):
+        self.assertEqual(dataset_default_attribute("metadata", (1,)), {})
 
-    def test_dataset_property_default_val__data_unit(self):
-        self.assertEqual(dataset_property_default_val("data_unit"), "")
+    def dataset_default_attribute__data_unit(self):
+        self.assertEqual(dataset_default_attribute("data_unit", (1,)), "")
 
-    def test_dataset_property_default_val__getitem_key(self):
-        self.assertEqual(dataset_property_default_val("getitem_key"), tuple())
-
-    def test_dataset_ax_str_default(self):
-        _range = dataset_ax_str_default(5)
-        self.assertEqual(set(np.arange(5)), set(_range.keys()))
-        self.assertEqual(set([""]), set(_range.values()))
+    def dataset_default_attribute___get_item_key(self):
+        self.assertEqual(dataset_default_attribute("_get_item_key", (1,)), tuple())
 
     def test_get_number_of_entries__ndarray(self):
         _arr = np.arange(27)
@@ -120,34 +120,32 @@ class Test_dataset_utils(unittest.TestCase):
         with self.assertRaises(TypeError):
             get_number_of_entries(_obj)
 
-    def test_convert_data_to_dict__correct_dict(self):
+    def test_get_input_as_dict__correct_dict(self):
         _obj = {0: 5, 1: 4, 2: 42}
-        _new = convert_data_to_dict(_obj, (1, 2, 3))
+        _new = get_input_as_dict(_obj, (1, 2, 3))
         self.assertEqual(_obj, _new)
 
-    def test_convert_data_to_dict__incorrect_dict(self):
+    def test_get_input_as_dict__incorrect_dict(self):
         _obj = {0: 5, 3: 4, 6: 42}
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            _new = convert_data_to_dict(_obj, (1, 2, 3))
-            self.assertEqual(_new, dict(enumerate(_obj.values())))
+            _new = get_input_as_dict(_obj, (1, 2, 3))
+        self.assertEqual(_new, {0: 5, 1: "", 2: ""})
 
-    def test_convert_data_to_dict__correct_iterable(self):
+    def test_get_input_as_dict__correct_iterable(self):
         _obj = [5, 4, 3]
-        _new = convert_data_to_dict(_obj, (1, 2, 3))
+        _new = get_input_as_dict(_obj, (1, 2, 3))
         self.assertEqual(_new, dict(enumerate(_obj)))
 
-    def test_convert_data_to_dict__incorrect_iterable(self):
+    def test_get_input_as_dict__incorrect_iterable(self):
         _obj = [4, 2, 7, 4]
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            _new = convert_data_to_dict(_obj, (1, 2, 3))
-            self.assertEqual(_new, dataset_ax_str_default(3))
+        with self.assertRaises(PydidasConfigError):
+            get_input_as_dict(_obj, (1, 2, 3))
 
-    def test_convert_data_to_dict__incorrect_type(self):
+    def test_get_input_as_dict__incorrect_type(self):
         _obj = "a string"
         with self.assertRaises(PydidasConfigError):
-            convert_data_to_dict(_obj, 3)
+            get_input_as_dict(_obj, (3,))
 
     def test_item_is_iterable_but_not_array__string(self):
         _flag = item_is_iterable_but_not_array("a string")
@@ -176,6 +174,38 @@ class Test_dataset_utils(unittest.TestCase):
     def test_item_is_iterable_but_not_array__set(self):
         _flag = item_is_iterable_but_not_array({1, 2, 3})
         self.assertTrue(_flag)
+
+    def test_get_corresponding_dims__identity(self):
+        _old = (10, 11, 12, 15)
+        _dims = get_corresponding_dims(_old, _old)
+        self.assertEqual(list(_dims.keys()), list(_dims.values()))
+
+    def test_get_corresponding_dims__inverted(self):
+        _old = (10, 11, 12, 15)
+        _dims = get_corresponding_dims(_old, _old[::-1])
+        self.assertEqual(_dims, {})
+
+    def test_get_corresponding_dims(self):
+        for _shape1, _shape2, _matches in [
+            [(14, 14, 14), (14, 7, 2, 14), {0: 0, 3: 2}],
+            [(14, 7, 14, 2), (14, 14, 14), {0: 0}],
+            [(16, 16, 16), (16, 4, 2, 2, 16), {0: 0, 4: 2}],
+            [(14, 14, 2, 7), (14, 14, 14), {0: 0, 1: 1}],
+            [(16, 16, 16), (16, 4, 16, 2, 2), {0: 0}],
+            [(16, 16, 16), (2, 16, 4, 16, 2), {}],
+            [(16, 16, 16), (4, 4, 16, 2, 2, 4), {2: 1}],
+            [(1, 16, 1, 16, 16), (1, 4, 4, 1, 16, 2, 2, 4), {0: 0, 3: 2, 4: 3}],
+            [(1, 16, 1, 16, 16), (1, 4, 4, 16, 1, 2, 2, 4), {0: 0, 3: 3}],
+            [(16, 16, 16), (4, 2, 2, 8, 2, 16), {5: 2}],
+            [(16, 16, 16), (1, 1, 4, 2, 2, 1, 8, 2, 16), {8: 2}],
+            [(14, 14, 14), (14, 1, 1, 14, 1, 14), {0: 0, 3: 1, 5: 2}],
+            [(1, 14, 14, 14), (1, 1, 1, 14, 1, 1, 14, 1, 14), {0: 0, 3: 1, 6: 2, 8: 3}],
+            [(1, 1, 14, 14, 14, 1), (14, 14, 14), {0: 2, 1: 3, 2: 4}],
+            [(14, 1, 1, 14, 14), (14, 14, 1, 14), {0: 0, 1: 3, 3: 4}],
+        ]:
+            with self.subTest(old_shape=_shape1, new_shape=_shape2):
+                _dim_matches = get_corresponding_dims(_shape1, _shape2)
+                self.assertEqual(_dim_matches, _matches)
 
 
 if __name__ == "__main__":

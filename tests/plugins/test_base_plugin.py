@@ -215,6 +215,7 @@ class TestBasePlugin(unittest.TestCase):
     def test_get_own_roi(self):
         _this_roi = (3, 436, 17, 357)
         plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.output_data_dim = 2
         for _name in ["use_roi", "roi_ylow", "roi_yhigh", "roi_xlow", "roi_xhigh"]:
             plugin.add_param(get_generic_parameter(_name))
         plugin.set_param_value("use_roi", True)
@@ -236,6 +237,7 @@ class TestBasePlugin(unittest.TestCase):
         _this_bin = 4
         _shape = (1257, 1235)
         plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.output_data_dim = 2
         plugin.input_shape = _shape
         for _name in [
             "binning",

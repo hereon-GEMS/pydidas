@@ -164,11 +164,15 @@ class Hdf5Io(IoBase):
         data : pydidas.core.Dataset
             The data in form of a pydidas Dataset (with embedded metadata)
         """
-        _input_indices = kwargs.get("indices", ())
+        _input_indices = kwargs.get("indices", slice(None))
         _indices = (
-            ()
-            if _input_indices is None
-            else tuple(_create_slice_object(_item) for _item in _input_indices)
+            (slice(None),)
+            if _input_indices in [None, slice(None)]
+            else (
+                (_input_indices,)
+                if isinstance(_input_indices, Integral)
+                else tuple(_create_slice_object(_item) for _item in _input_indices)
+            )
         )
 
         dataset = kwargs.get("dataset", "entry/data/data")
@@ -192,14 +196,16 @@ class Hdf5Io(IoBase):
                 metadata={"indices": _human_readable_indices, "dataset": dataset},
             )
             if kwargs.get("import_pydidas_metadata", True):
-                cls._update_dataset_metadata(_data, _h5file, dataset)
+                cls._update_dataset_metadata(_data, _h5file, dataset, _indices)
             if auto_squeeze:
                 _data = squeeze(_data)
             cls._data = _data
         return cls.return_data(**kwargs)
 
     @staticmethod
-    def _update_dataset_metadata(data: Dataset, h5file: h5py.File, dataset: str):
+    def _update_dataset_metadata(
+        data: Dataset, h5file: h5py.File, dataset: str, slicing_indices: tuple[slice]
+    ):
         """
         Check the hdf5 file for Dataset metadata and update the data's properties.
 
@@ -211,9 +217,12 @@ class Hdf5Io(IoBase):
             The open h5py file object.
         dataset : str
             The dataset location. This is required to find the metadata.
+        slicing_indices : tuple[slice]
+            The slicing indices used on the loaded data.
         """
         _data_group_name = os.path.dirname(dataset)
         _root = os.path.dirname(_data_group_name)
+        _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
         if _root == "":
             return
         _items = {_key: _item for _key, _item in h5file[_data_group_name].items()}
@@ -229,7 +238,7 @@ class Hdf5Io(IoBase):
                 if _key not in _ax_items:
                     continue
                 _val = (
-                    _ax_items[_key][()]
+                    _ax_items[_key][_slicers.get(_ax, slice(None))]
                     if _key == "range"
                     else _ax_items[_key][()].decode()
                 )

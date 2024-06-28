@@ -11,11 +11,20 @@ Improvements
   DataViewerFrame.
 - Improved the design of the DataBrowsingFrame and selectors for raw or hdf5 
   data are now located directly above the plots.
+- Added type-checking for Datasets axis_ranges and axis_units.  
+- Added mean, sum, min, max methods to Dataset to keep metadata consistent.
+- Added reshape metadata handling to Dataset.
 
 Bugfixes
 --------
 - Fixed an issue where a exception message would be copied to the clipboard
   without clicking the corresponding button.
+- Fixed an issue with using ROI in plugins in a WorkflowTree
+- Fixed an issue when using slicing on importing Hdf5 files with pydidas 
+  metadata.
+- Fixed an issue in Dataset's flatten implementation.
+- Fixed an issue with restoring the UI after the number of screens was reduced.  
+- Fixed an issue in Dataset's reshape after using np.array with ndmin parameter.
 
 
 v24.06.05

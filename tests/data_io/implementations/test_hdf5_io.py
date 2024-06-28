@@ -188,6 +188,15 @@ class TestHdf5Io(unittest.TestCase):
         )
         self.assertTrue(np.allclose(_data, self._data))
 
+    def test_import_from_file__w_dataset_and_indices(self):
+        _data = Hdf5Io.import_from_file(
+            self._fname,
+            dataset="test/path/data",
+            import_pydidas_metadata=True,
+            indices=(1, 4),
+        )
+        self.assertTrue(np.allclose(_data, self._data[1, 4]))
+
     def test_import_from_file__metadata_was_copied(self):
         _data = Hdf5Io.import_from_file(self._fname, import_pydidas_metadata=False)
         self.assertIn("indices", _data.metadata)

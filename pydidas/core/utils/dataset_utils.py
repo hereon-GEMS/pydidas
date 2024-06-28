@@ -25,15 +25,18 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "FLATTEN_DIM_DEFAULTS",
+    "METADATA_KEYS",
+    "dataset_default_attribute",
     "update_dataset_properties_from_kwargs",
-    "dataset_property_default_val",
-    "dataset_ax_str_default",
-    "dataset_ax_default_ranges",
     "get_number_of_entries",
     "get_axis_item_representation",
-    "convert_data_to_dict",
+    "get_dict_with_string_entries",
+    "get_input_as_dict",
     "replace_none_entries",
     "item_is_iterable_but_not_array",
+    "convert_ranges_and_check_length",
+    "get_corresponding_dims",
 ]
 
 import textwrap
@@ -44,10 +47,26 @@ from typing import List, Literal, NewType, Tuple, Union
 
 import numpy as np
 
-from ..exceptions import PydidasConfigError
+from ..exceptions import PydidasConfigError, UserConfigError
 
 
 Dataset = NewType("Dataset", np.ndarray)
+
+FLATTEN_DIM_DEFAULTS = {
+    "new_dim_label": "Flattened",
+    "new_dim_unit": "",
+    "new_dim_range": None,
+}
+
+METADATA_KEYS = [
+    "data_unit",
+    "data_label",
+    "metadata",
+    "_get_item_key",
+    "axis_units",
+    "axis_labels",
+    "axis_ranges",
+]
 
 
 def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset:
@@ -66,60 +85,46 @@ def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset
     obj : pydidas.core.Dataset
         The updated Dataset.
     """
-    obj._meta = {"getitem_key": ()}
-    obj.axis_units = kwargs.get("axis_units", dataset_ax_str_default(obj.ndim))
-    obj.axis_labels = kwargs.get("axis_labels", dataset_ax_str_default(obj.ndim))
-    obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default_ranges(obj.shape))
-    obj.metadata = kwargs.get("metadata", {})
-    obj.data_unit = kwargs.get("data_unit", "")
-    obj.data_label = kwargs.get("data_label", "")
+    obj._meta = {"_get_item_key": ()}
+    for _key in METADATA_KEYS:
+        if _key.startswith("_"):
+            continue
+        setattr(obj, _key, kwargs.get(_key, dataset_default_attribute(_key, obj.shape)))
+    if not set(kwargs.keys()).issubset(set(METADATA_KEYS)):
+        warnings.warn("Unknown keys in the input dictionary. Please check the inputs.")
     return obj
 
 
-def dataset_property_default_val(entry: str) -> Union[dict, str, tuple]:
+def dataset_default_attribute(key: str, shape: tuple[int]) -> Union[str, dict]:
     """
-    Generate default values for the properties in a Dataset.
+    Get the default value for a Dataset attribute.
 
     Parameters
     ----------
-    entry : str
-        The entry to be processed. This must be a defined string to get the default
-        keys for these entries.
+    key : str
+        The key to be processed.
+    shape : tuple[int]
+        The shape of the Dataset.
 
     Returns
     -------
     Union[str, dict]
-        The default entries for different properties. This is an empty string for the
-        data unit, an empty dictionary for the metadata.
+        The default value for the given key.
     """
-    if entry == "metadata":
-        return {}
-    if entry in ["data_unit", "data_label"]:
+    if key in ["data_unit", "data_label"]:
         return ""
-    if entry == "getitem_key":
+    if key == "_get_item_key":
         return tuple()
-    raise ValueError(f"No default available for '{entry}'.")
+    if key == "metadata":
+        return {}
+    if key in ["axis_units", "axis_labels"]:
+        return {i: "" for i in range(len(shape))}
+    if key == "axis_ranges":
+        return _dataset_ax_default_ranges(shape)
+    raise ValueError(f"No default available for `{key}`.")
 
 
-def dataset_ax_str_default(ndim: int) -> dict:
-    """
-    Generate default values for the string-based axis properties in a Dataset.
-
-    Parameters
-    ----------
-
-    ndim : int
-        The number of dimensions in the Dataset.
-
-    Returns
-    -------
-    dict
-        The default entries: a dictionary with None entries for each dimension.
-    """
-    return {i: "" for i in range(ndim)}
-
-
-def dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
+def _dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
     """
     Generate default values for the axis ranges in a Dataset.
 
@@ -128,8 +133,6 @@ def dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
 
     shape : tuple
         The shape of the Dataset.
-    get_string : bool
-        Keyword to return an empty string instead of "None".
 
     Returns
     -------
@@ -209,11 +212,61 @@ def get_axis_item_representation(
     return _lines
 
 
-def convert_data_to_dict(
+def get_dict_with_array_entries(
+    entries: Union[Iterable, dict], shape: Tuple[int], name_reference: str
+) -> dict:
+    """
+    Get a dictionary with array entries.
+
+    Parameters
+    ----------
+    entries : Union[Iterable, dict]
+        The entries to be processed.
+    shape : Tuple[int]
+        The shape of the calling Dataset.
+    name_reference : str
+        The reference name from the calling method for a possible error message.
+
+    Returns
+    -------
+    dict
+        A dictionary with array entries.
+    """
+
+
+def get_dict_with_string_entries(
+    entries: Union[Iterable, dict], shape: Tuple[int], name_reference: str
+) -> dict:
+    """
+    Get a dictionary with string entries.
+
+    Parameters
+    ----------
+    entries : Union[Iterable, dict]
+        The entries to be processed.
+    shape : int
+        The shape of the calling Dataset.
+    name_reference : str
+        The reference name from the calling method for a possible error message.
+
+    Returns
+    -------
+    dict
+        A dictionary with string entries.
+    """
+    entries = replace_none_entries(get_input_as_dict(entries, shape, name_reference))
+    if not all(isinstance(_val, str) for _val in entries.values()):
+        print(entries)
+        raise UserConfigError(
+            f"Invalid entries for `{name_reference}`. All entries must be strings."
+        )
+    return entries
+
+
+def get_input_as_dict(
     data: Union[dict, Iterable[float, ...]],
     target_shape: Tuple[int],
-    entry_type: Literal["str", "array"] = "str",
-    calling_method_name: str = "undefined method",
+    calling_method_name: str = "axis_labels",
 ) -> dict:
     """
     Get an ordered dictionary with the axis keys for the input data.
@@ -237,38 +290,39 @@ def convert_data_to_dict(
     Raises
     ------
     PydidasConfigError
-        If a dictionary is passed as data and the keys do not correspond
-        to the set(0, 1, ..., ndim - 1) or if a tuple or list is passed and the length
-        of entries is not equal to ndim.
+        If the entries is not Iterable or the  length of the keys does not match the
+        number of dimensions.
 
     Returns
     -------
     dict
         A dictionary with keys [0, 1, ..., ndim - 1] and the corresponding
-        values from the input _data.
+        values from the input data.
     """
+    target_length = len(target_shape)
     if isinstance(data, dict):
-        if set(data.keys()) != set(np.arange(len(target_shape))):
-            warnings.warn(
-                "The key numbers do not match the number of array dimensions. Changing "
-                f"keys to defaults. (Error encountered in {calling_method_name})."
-            )
-            return dict(enumerate(data.values()))
-        return data
+        _target_keys = set(np.arange(target_length))
+        if set(data.keys()) == _target_keys:
+            return data
+        warnings.warn(
+            "The key numbers do not match the number of array dimensions. Updating "
+            "missing keys with default values. (Error encountered in "
+            "`{calling_method_name}`)."
+        )
+        _default_data = dataset_default_attribute(calling_method_name, target_shape)
+        _default_data.update({k: v for k, v in data.items() if k in _target_keys})
+        return _default_data
     if isinstance(data, Iterable) and not isinstance(data, str):
-        if len(data) != len(target_shape):
-            warnings.warn(
-                "The number of given keys does not match the number of array "
-                "dimensions. Resettings keys to defaults. (Error encountered in "
-                f"{calling_method_name})."
-            )
-            if entry_type == "array":
-                return dataset_ax_default_ranges(target_shape)
-            return dataset_ax_str_default(len(target_shape))
-        return dict(enumerate(data))
+        if len(data) == target_length:
+            return dict(enumerate(data))
+        raise PydidasConfigError(
+            "The number of given keys does not match the number of array dimensions. "
+            "Resetting keys to defaults. (Error encountered in "
+            f"`{calling_method_name}`)."
+        )
     raise PydidasConfigError(
-        f"Input {data} cannot be converted to dictionary for property"
-        f" {calling_method_name}"
+        f"Input `{data}` cannot be converted to dictionary for property "
+        f"`{calling_method_name}`."
     )
 
 
@@ -309,3 +363,104 @@ def item_is_iterable_but_not_array(item: object) -> bool:
         and not isinstance(item, str)
         and not isinstance(item, np.ndarray)
     )
+
+
+def convert_ranges_and_check_length(ranges: dict, shape: tuple[int]) -> dict:
+    """
+    Convert ranges to ndarrays and check their length with respect to the shape.
+
+    Verify that all given true ranges (i.e. with more than one item) are of type
+    np.ndarray and that the length of all given ranges matches the data shape.
+
+    Warning: This function modifies the input dictionary in place!
+
+    Parameters
+    ----------
+    ranges : dict
+        The dictionary with the loaded ranges.
+    shape : tuple[int]
+        The shape of the Dataset.
+
+    Raises
+    ------
+    ValueError
+        If the given lengths do not match the data length.
+
+    Returns
+    -------
+    dict
+        The modified ranges dictionary.
+    """
+    _wrong_dims = []
+    for _dim, _range in ranges.items():
+        if _range is None:
+            ranges[_dim] = np.arange(shape[_dim])
+            continue
+        if item_is_iterable_but_not_array(_range):
+            _range = np.asarray(_range)
+            ranges[_dim] = _range
+        if isinstance(_range, np.ndarray) and _range.size != shape[_dim]:
+            _wrong_dims.append([_dim, _range.size, shape[_dim]])
+    if len(_wrong_dims) > 0:
+        _error = "The length of the given ranges does not match the size of the data."
+        for _dim, _len, _ndata in _wrong_dims:
+            _error += (
+                f"\nDimension {_dim}: Given range length: `{_len}`; "
+                f"target length: `{_ndata}`."
+            )
+        raise ValueError(_error)
+    return ranges
+
+
+def get_corresponding_dims(ref_shape: tuple[int], new_shape: tuple[int]) -> dict:
+    """
+    Get the corresponding dimensions for two shapes.
+
+    Parameters
+    ----------
+    ref_shape : tuple[int]
+        The old shape.
+    new_shape : tuple[int]
+        The new shape.
+
+    Returns
+    -------
+    dict
+        The corresponding dimensions. This dictionary will have the new dimensions
+        as keys and the corresponding old dimensions as values.
+    """
+    _index_ref = 0
+    _index_new_offset = 0
+    _ref = [[_shape, _cp] for _shape, _cp in zip(ref_shape, np.cumprod(ref_shape))]
+    _new = [[_shape, _cp] for _shape, _cp in zip(new_shape, np.cumprod(new_shape))]
+    _current_ref = _ref.pop(0)
+    _current_new = _new.pop(0)
+    _key_indices = {}
+    _factorized = False
+    while True:
+        if _current_new == _current_ref and not _factorized:
+            _key_indices[_index_ref + _index_new_offset] = _index_ref
+        if len(_ref) == 0 or len(_new) == 0:
+            break
+        if _current_ref[1] == _current_new[1]:
+            _factorized = False
+            _current_ref = _ref.pop(0)
+            _current_new = _new.pop(0)
+            _index_ref += 1
+        while _current_ref[0] == 1 and len(_ref) > 0 and _current_new[0] > 1:
+            _current_ref = _ref.pop(0)
+            _index_ref += 1
+            _index_new_offset -= 1
+        while _current_new[0] == 1 and len(_new) > 0 and _current_ref[0] > 1:
+            _current_new = _new.pop(0)
+            _index_new_offset += 1
+        while _current_ref[1] < _current_new[1] and len(_ref) > 0:
+            _factorized = True
+            _current_ref = _ref.pop(0)
+            _index_ref += 1
+            _index_new_offset -= 1
+        while _current_ref[1] > _current_new[1] and len(_new) > 0:
+            _factorized = True
+            _current_new = _new.pop(0)
+            _index_new_offset += 1
+    return _key_indices

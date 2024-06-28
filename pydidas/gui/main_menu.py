@@ -552,8 +552,10 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         dict
             The state of the main window required to restore the look.
         """
+        _app = QtWidgets.QApplication.instance()
         return {
             "geometry": self.geometry().getRect(),
+            "screen": _app.screens().index(self.window().windowHandle().screen()),
             "frame_index": self.centralWidget().currentIndex(),
         }
 
@@ -651,10 +653,19 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         state : dict
             The stored state of the main window.
         """
+        _app = QtWidgets.QApplication.instance()
+        _screens = _app.screens()
+        _screen_no = state.get("screen", 0)
+        if _screen_no > len(_screens):
+            _screen_no = 0
+        _target_screen = _screens[_screen_no]
+        if _target_screen.availableGeometry().width() >= state["geometry"][0] - 50:
+            state["geometry"][0] = 40
         self.setGeometry(*state["geometry"])
         _frame_index = state["frame_index"]
         if _frame_index >= 0:
             self.centralWidget().setCurrentIndex(_frame_index)
+        self.setScreen(_target_screen)
 
     def _restore_frame_states(self, state):
         """

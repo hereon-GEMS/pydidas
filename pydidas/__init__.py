@@ -69,6 +69,7 @@ from . import gui
 
 IS_QT6 = __qtpy.QT_VERSION[0] == "6"
 
+__version__ = VERSION
 __all__.extend(
     [
         "core",

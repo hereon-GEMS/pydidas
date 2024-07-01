@@ -127,7 +127,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         by the name. An optional title can be used as name for the plugin
         widget but the title will be determined automatically from the plugin
         name if not selected.
-        New plugins will always be created as children of the active plugin
+        New plugins will always be created as children of the active plugin,
         and it is the users responsibility to select the correct parent
         prior to calling this method or to use the parent_node_id keyword.
 
@@ -138,7 +138,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         title : str, optional
             The title of the plugin widget. If no title is given, this will default
             to the widget name. The default is an empty string.
-        parent_node : Union[int, None], optional
+        parent_node_id : Union[int, None], optional
             The id of the parent node, if given. If None, this will default to the
             WorkflowTree's active node.
 
@@ -393,7 +393,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         new workflow.
         """
         _all_ids = list(self._node_widgets.keys())
-        self.__delete_nodes_and_widgets(*_all_ids, delete_widgets=_all_ids)
+        self.__delete_nodes_and_widgets(*_all_ids)
 
     @QtCore.Slot(int)
     def delete_branch(self, node_id: int):
@@ -413,7 +413,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         _branch_ids = [_id for _id in _ids if _id != node_id]
         TREE.delete_node_by_id(node_id)
         self._nodes[node_id].delete_node_references()
-        self.__delete_nodes_and_widgets(*_ids, delete_widgets=_branch_ids)
+        self.__delete_nodes_and_widgets(*_ids)
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
@@ -442,7 +442,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._nodes[node_id].connect_parent_to_children()
         self.__delete_nodes_and_widgets(node_id)
         TREE.delete_node_by_id(node_id, keep_children=True, recursive=False)
-
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
@@ -450,9 +449,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.sig_plugin_selected.emit(-1)
         self._check_consistency()
 
-    def __delete_nodes_and_widgets(
-        self, *ids: Iterable[int], delete_widgets: Iterable[int] = ()
-    ):
+    def __delete_nodes_and_widgets(self, *ids: Iterable[int]):
         """
         Delete all nodes and widgets with corresponding IDs from the manager.
 
@@ -460,10 +457,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         ----------
         *ids : Iterable[int]
             All integer widget/node IDs in any Iterable datatype.
-        delete_widgets : Iterable[int], optional
-            The integer widget IDs of the widgets to be deleted.
         """
-        for _id in delete_widgets:
+        for _id in ids:
             self.sig_consistent_plugins.disconnect(
                 self._node_widgets[_id].receive_consistent_signal
             )
@@ -471,7 +466,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
                 self._node_widgets[_id].receive_inconsistent_signal
             )
             self._node_widgets[_id].deleteLater()
-        for _id in ids:
             del self._nodes[_id]
             del self._node_widgets[_id]
             del self._node_positions[_id]

@@ -25,7 +25,7 @@ Bugfixes
 - Fixed an issue in Dataset's flatten implementation.
 - Fixed an issue with restoring the UI after the number of screens was reduced.  
 - Fixed an issue in Dataset's reshape after using np.array with ndmin parameter.
-
+- Fixed an issue when deleting the root WorkflowNode with multiple children.
 
 v24.06.05
 =========

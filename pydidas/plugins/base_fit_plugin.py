@@ -352,7 +352,9 @@ class BaseFitPlugin(ProcPlugin):
         _output = _output.replace("area", f"area / (cts * {self._data.axis_units[0]})")
         _output = _output.replace("FWHM", f"FWHM / {self._data.axis_units[0]}")
         _output = _output.replace("background at peak", "background at peak / cts")
-        _output = _output.replace("total count intensity", "total intensity / cts")
+        _output = _output.replace(
+            "total count intensity", "total count intensity / cts"
+        )
         self.output_data_label = _output
 
     def _update_peak_bounds_from_data(self):

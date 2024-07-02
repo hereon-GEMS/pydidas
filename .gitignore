@@ -20,6 +20,7 @@ build/*
 *egg*
 .coverage
 htmlcov
+.ruff_cache/*
 
 # logging
 *.log

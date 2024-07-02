@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 name = "pydidas"
 authors = [{name = "Malte Storm"}]
 description = "pydidas - the PYthon DIffraction Data Analysis Suite"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "GNU General Public License v3"}
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
@@ -50,7 +50,7 @@ pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
 
 [tool.pip-compile]
 dependencies = [
-    "pyFAI==2024.2.0",
+    "pyFAI==2024.5.0",
     "scikit-image>=0.22.0",
     "qtawesome>=1.3",
     "sphinx>=7.2.0",
@@ -63,7 +63,7 @@ dependencies = [
     "requests>=2.31.0",
     "PyQt5==5.15.10",
     "build>=1.0.3",
-    "setuptools>69.0.0"
+    "setuptools>69.0.0",
 ]
 
 [tools.coverage.report]

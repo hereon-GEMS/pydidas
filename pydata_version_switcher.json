@@ -2,7 +2,8 @@
     {
         "name": "v2024.06.05 (stable)",
         "version": "2024.06.05",
-        "url": "https://hereon-gems.github.io/pydidas/"
+        "url": "https://hereon-gems.github.io/pydidas/",
+        "preferred": True
     },
     {
         "name": "latest (unreleased)",

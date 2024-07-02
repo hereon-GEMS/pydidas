@@ -1,0 +1,57 @@
+# This file is part of pydidas.
+#
+# Copyright 2024, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# This workflow will create the github pages documentation for pydidas
+# which is accessible at https://hereon-gems.github.io/pydidas/
+
+name: Release and Documentation
+
+on:
+  push:
+    branches: [ "release_branch_for_documentation" ]
+    tags:
+      - '*'
+
+jobs:
+  create_release_and_docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install sphinx sphinx_rtd_theme myst_parser
+        python -m pip install .
+    - name: Build Sphinx documentation
+      run: |
+        export QT_QPA_PLATFORM=offscreen
+        sphinx-build pydidas/docs/src _site
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./_site
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        publish_branch: gh-pages-test
+        cname: stable

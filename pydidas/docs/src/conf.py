@@ -18,11 +18,40 @@
 
 import os
 import sys
+import requests
 from pathlib import Path
 
 
 sys.path.insert(0, os.path.abspath("./../../.."))
 sys.path.insert(0, os.path.abspath("./../.."))
+
+
+def is_on_github_actions():
+    """
+    Check if the current build is running on GitHub Actions.
+
+    The code is adapted  from the discussion at:
+    https://github.com/orgs/community/discussions/49224
+
+    Returns
+    -------
+    bool
+        True if the build is running on GitHub Actions, False otherwise.
+    """
+    if (
+        "CI" not in os.environ
+        or not os.environ["CI"]
+        or "GITHUB_RUN_ID" not in os.environ
+    ):
+        return False
+
+    headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
+    url = (
+        "https://api.github.com/repos/"
+        f"{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+    )
+    response = requests.get(url, headers=headers)
+    return response.status_code == 200 and "workflow_runs" in response.json()
 
 
 # -- Project information -----------------------------------------------------
@@ -56,6 +85,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx_rtd_theme",
     "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -72,34 +102,31 @@ tls_verify = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# nature scheme options
-# html_theme_options = {'sidebarwidth': '350px',
-#                       "body_min_width": 800,
-#                      }
 html_theme_options = {
-    "analytics_id": "G-XXXXXXXXXX",  # Provided by Google in your dashboard
-    "analytics_anonymize_ip": False,
-    "logo_only": False,
-    "display_version": True,
-    "prev_next_buttons_location": "bottom",
-    "style_external_links": False,
-    "vcs_pageview_mode": "",
-    "style_nav_header_background": "#4444AA",
     # Toc options
     "collapse_navigation": True,
-    "sticky_navigation": True,
     "navigation_depth": 5,
-    "includehidden": True,
-    "titles_only": False,
     # manual options
     "body_min_width": 800,
+    # pydata scheme options:
+    "show_version_warning_banner": True,
+    "logo": {
+        "text": " pydidas - documentation Home",
+        "link": "./images/logo/pydidas_snakes_circ_bg.png",
+        "alt_text": "pydidas documentation - Home",
+    },
 }
+# if is_on_github_actions():
+#     html_theme_options["switcher"] = {
+#         "version_match": pydidas_version,
+#     }
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".

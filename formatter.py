@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+import json
 import math
 import multiprocessing as mp
 import os
@@ -35,6 +36,7 @@ from pathlib import Path
 from typing import Literal, Optional
 
 import git
+import requests
 
 
 HELP_TEXT = """
@@ -192,9 +194,36 @@ def check_version_tags(directory: Optional[Path] = None):
     _citation_okay = f"version: {_version}" in _lines
     if not _citation_okay:
         _timed_print("The CITATION.cff does not include the latest version tag.")
-    if not (_citation_okay and _changelog_okay):
+    _gh_pages_okay = __check_gh_pages_release_versions(_version)
+    if not _gh_pages_okay:
+        _timed_print(
+            "The current version is not included in the pydata version scheme for the "
+            "github pages."
+        )
+    if not (_citation_okay and _changelog_okay and _gh_pages_okay):
         sys.exit(1)
     _timed_print("Version tag check sucessfully concluded.")
+
+
+def __check_gh_pages_release_versions(version: str):
+    """
+    Check that the current release is included in the  pydata scheme version.
+
+    Returns
+    -------
+    bool
+        True if the version is included in the pydata version scheme.
+    """
+    _config = json.loads(
+        requests.get(
+            "https://raw.githubusercontent.com/hereon-GEMS/pydidas/"
+            "_gh_pages_release_versions/pydata_version_switcher.json"
+        ).content
+    )
+    for _item in _config:
+        if version in _item["version"]:
+            return True
+    return False
 
 
 class CopyrightYearUpdater:

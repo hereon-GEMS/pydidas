@@ -18,8 +18,9 @@
 
 import os
 import sys
-import requests
 from pathlib import Path
+
+import requests
 
 
 sys.path.insert(0, os.path.abspath("./../../.."))
@@ -116,16 +117,22 @@ html_theme_options = {
     "body_min_width": 800,
     # pydata scheme options:
     "show_version_warning_banner": True,
+    "github_url": "https://github.com/hereon-GEMS/pydidas",
     "logo": {
-        "text": " pydidas - documentation Home",
-        "link": "./images/logo/pydidas_snakes_circ_bg.png",
-        "alt_text": "pydidas documentation - Home",
+        "text": " pydidas",
+        "alt_text": "pydidas",
     },
 }
-# if is_on_github_actions():
-#     html_theme_options["switcher"] = {
-#         "version_match": pydidas_version,
-#     }
+if is_on_github_actions():
+    html_theme_options["switcher"] = {
+        "version_match": pydidas_version.strip("\"'"),
+        "json_url": (
+            "https://raw.githubusercontent.com/hereon-GEMS/pydidas/"
+            "_gh_pages_release_versions/pydata_version_switcher.json"
+        ),
+    }
+    html_theme_options["navbar_end"] = ["version-switcher", "navbar-icon-links"]
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

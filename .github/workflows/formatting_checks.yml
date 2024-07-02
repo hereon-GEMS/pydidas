@@ -75,7 +75,7 @@ jobs:
         python-version: "3.11"
     - name: Install dependencies
       run: |
-        python -m pip install GitPython
+        python -m pip install GitPython requests
     - name: Check copyrights
       run: |
         python formatter.py --copyright --check --git-only

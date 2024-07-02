@@ -35,8 +35,8 @@ jobs:
       run: |
         echo ::set-output name=VERSION::$(python -c "from pydidas import __version__; print(__version__)")
     - name: Display version
-        run: |
-          echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
+      run: |
+        echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
 #    - name: Build Sphinx documentation
 #      run: |
 #        export QT_QPA_PLATFORM=offscreen

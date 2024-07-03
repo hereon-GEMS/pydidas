@@ -24,6 +24,7 @@ classifiers = [
 ]
 dynamic = ["version", "dependencies"]
 
+
 [project.urls]
 homepage = "https://pydidas.hereon.de/"
 documentation = "https://hereon-gems.github.io/pydidas"
@@ -48,26 +49,14 @@ remove-pydidas = "pydidas_scripts.remove_pydidas_from_system:remove_pydidas_from
 [project.gui-scripts]
 pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
 
-[tool.pip-compile]
-dependencies = [
-    "pyFAI==2024.5.0",
-    "scikit-image>=0.22.0",
-    "qtawesome>=1.3",
-    "sphinx>=7.2.0",
-    "pydata_sphinx_theme>=0.15.4",
-    "sphinx-copybutton>=0.5.2",
-    "pyopencl>=2024.1",
-    "qtpy>=2.4.0",
-    "hdf5plugin>=4.4.0",
-    "pyyaml>=6.0",
-    "requests>=2.31.0",
-    "PyQt5==5.15.10",
-    "build>=1.0.3",
-    "setuptools>69.0.0",
-]
+[tool.coverage.run]
+branch = true
 
-[tools.coverage.report]
+[tool.coverage.report]
 omit = ['*/tests/*']
+
+[tool.coverage.html]
+directory = "coverage_html_report"
 
 [tool.isort]
 profile = 'black'
@@ -90,7 +79,6 @@ extend-select = ["I", "C90", "F401"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
-
 
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 12.

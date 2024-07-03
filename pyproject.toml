@@ -53,7 +53,7 @@ pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
 branch = true
 
 [tool.coverage.report]
-omit = ['*/tests/*']
+omit = ["tests/*", "pydidas/gui/*", "pydidas/widgets/*"]
 
 [tool.coverage.html]
 directory = "coverage_html_report"

@@ -84,7 +84,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.coverage",
-    "sphinx_rtd_theme",
     "sphinx.ext.intersphinx",
     "sphinx_copybutton",
 ]

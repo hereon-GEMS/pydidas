@@ -36,8 +36,8 @@ jobs:
         python -m venv .venv
         source .venv/bin/activate
         python -m pip install -r requirements.txt
-        echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
-        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+        echo "$VIRTUAL_ENV/bin" >> "$GITHUB_PATH"
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> "$GITHUB_ENV"
 #
 #        python -m pip install --upgrade pip
 #        python -m pip install sphinx pydata-sphinx-theme myst_parser requests
@@ -47,10 +47,16 @@ jobs:
       id: extract_version
       run: |
         export QT_QPA_PLATFORM=offscreen
-        echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')") >> "$GITHUB_OUTPUT"
+        echo "DUMMY=123" > "$GITHUB_OUTPUT"
+#        {
+#          echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')")
+#          >> "$GITHUB_OUTPUT"
+#        }
+        echo "{Extracted version from pydidas.}" >> $GITHUB_STEP_SUMMARY
     - name: Display version
       run: |
-        echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
+        echo "Dummy: ${{ steps.extract_version.outputs.DUMMY }}"
+        #echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
 #    - name: Build Sphinx documentation
 #      run: |
 #        export QT_QPA_PLATFORM=offscreen

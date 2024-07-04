@@ -43,11 +43,10 @@ jobs:
       id: extract_version
       run: |
         export QT_QPA_PLATFORM=offscreen
-        echo "DUMMY=123" >> $GITHUB_OUTPUT
-        echo "Extracted version from pydidas." >> $GITHUB_STEP_SUMMARY
         {
           echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
         } >> $GITHUB_OUTPUT
+        echo "Extracted version from pydidas: ${{ steps.extract_version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
     - name: Display version
       run: |
         echo "Dummy variable: ${{ steps.extract_version.outputs.DUMMY }}"

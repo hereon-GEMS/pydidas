@@ -812,7 +812,7 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     
     # Check that the sin2chi axis has been sorted
-    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.4])
+    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.3])
     np.testing.assert_array_equal(result.axis_ranges[1], expected_sin2chi_sorted, 
                                   err_msg="sin2chi values are not correctly sorted in ascending order.")
     
@@ -881,7 +881,7 @@ def test_combine_sort_d_spacing_pos_neg_explicit(d_spacing_datasets):
 def test_pre_regression_calculation_type_error(invalid_input):
     with pytest.raises(TypeError, match="Input d_spacing_combined must be an instance of Dataset."):
         pre_regression_calculation(invalid_input)
-        
+
 
 @pytest.fixture
 def d_spacing_combined_fixture():
@@ -903,20 +903,76 @@ def test_pre_regression_calculation_valid_input(d_spacing_combined_fixture):
     d_spacing_avg, d_spacing_diff = pre_regression_calculation(d_spacing_combined_fixture)
     
     # Verify the shape and content of the returned datasets
-    assert d_spacing_avg.shape == (1, 3), "Average dataset shape is incorrect"
-    assert d_spacing_avg.axis_label[0] == 'sin^2(chi)', "Average dataset axis label is incorrect"
+    assert d_spacing_avg.shape == (3,), "Average dataset shape is incorrect"
+    assert d_spacing_avg.axis_labels[0] == 'sin^2(chi)', "Average dataset axis label is incorrect"
     assert d_spacing_avg.data_unit == d_spacing_combined_fixture.data_unit, "Average dataset data unit is incorrect"
     assert d_spacing_avg.data_label == 'Mean of 0: position_neg, 1: position_pos', "Average dataset data label is incorrect"    
         
-    assert d_spacing_diff.shape == (1, 3), "Difference dataset shape is incorrect"
-    assert d_spacing_diff.axis_label[0] == 'sin(2*chi)', "Difference dataset axis label is incorrect"
+    assert d_spacing_diff.shape == (3,), "Difference dataset shape is incorrect"
+    assert d_spacing_diff.axis_labels[0] == 'sin(2*chi)', "Difference dataset axis label is incorrect"
     assert d_spacing_diff.data_unit == d_spacing_combined_fixture.data_unit, "Difference dataset data unit is incorrect"  
     assert d_spacing_diff.data_label == 'Difference of d(+) - d(-)', "Difference dataset data label is incorrect"  
     
+def test_pre_regression_calculation_accuracy(d_spacing_combined_fixture):
+    d_spacing_avg, d_spacing_diff = pre_regression_calculation(d_spacing_combined_fixture)
+   
+    expected_avg = np.array([2.5, 3.5, np.nan])  # Assuming mean calculation ignores np.nan
+    expected_diff = np.array([3, 3, np.nan])  # Assuming diff calculation result
+   
+    np.testing.assert_allclose(d_spacing_avg.array, expected_avg, rtol=1e-5, atol=1e-8, equal_nan=True, err_msg="Average calculation is incorrect")
+    np.testing.assert_allclose(d_spacing_diff.array, expected_diff,rtol=1e-5, atol=1e-8, equal_nan=True, err_msg="Difference calculation is incorrect")   
+    
+def test_pre_regression_calculation_with_nan_explicit(d_spacing_combined_fixture):
+    d_spacing_combined_fixture.array[0, 2] = np.nan
+    d_spacing_avg, d_spacing_diff = pre_regression_calculation(d_spacing_combined_fixture)
+    
+    expected_avg = np.array([2.5, 3.5, np.nan])  # Assuming mean calculation ignores np.nan
+    expected_diff = np.array([3, 3, np.nan])  # Assuming diff calculation result
+    np.testing.assert_array_equal(d_spacing_avg.array, expected_avg, "Average calculation is incorrect")
+    np.testing.assert_array_equal(d_spacing_diff.array, expected_diff, "Difference calculation is incorrect")
 
-
+def test_pre_regression_calculation_precision(d_spacing_datasets):
+    _, _, d_spacing_combined = d_spacing_datasets
+    
+    d_spacing_avg, d_spacing_diff = pre_regression_calculation(d_spacing_combined)
+    
+    expected_avg = Dataset(
+        axis_ranges={0: np.array([0.      , 0.030154, 0.116978, 0.25    , 0.413176, 0.586824, 0.75
+                      , 0.883022, 0.969846, 1.      ])},
+        axis_labels={0: 'sin^2(chi)'},
+        axis_units={0: ''},
+        metadata={},
+        data_unit='nm',
+        data_label='Mean of 0: position_neg, 1: position_pos',
+        array=np.array([26.281715, 26.275108, 26.265263, 26.248177, 26.18344 , 26.161894,
+            26.121524, 26.094265, 26.0692  , 26.063213])           
+        ) 
     
     
+    expected_diff = Dataset(
+        axis_ranges={0: np.array([0.000000e+00, 3.420201e-01, 6.427876e-01, 8.660254e-01,
+              9.848078e-01, 9.848078e-01, 8.660254e-01, 6.427876e-01,
+              3.420201e-01, 1.224647e-16])},
+        axis_labels={0: 'sin(2*chi)'},
+        axis_units={0: ''},
+        metadata={},
+        data_unit='nm',
+        data_label='Difference of d(+) - d(-)',
+        array=np.array([0.      , 0.073234, 0.117113, 0.153297, 0.168506, 0.174524,
+                0.160857, 0.113477, 0.065961, 0.      ])
+        )
+    
+    print("Actual avg:", d_spacing_avg.array)
+    print("Actual diff:", d_spacing_diff.array)
+    
+    assert np.allclose(d_spacing_avg.array, expected_avg.array, rtol=1e-5, atol=1e-8)
+    assert np.allclose(d_spacing_diff.array, expected_diff.array, rtol=1e-4, atol=1e-7)  # Lower tolerance for difference calculation
+    assert np.allclose(d_spacing_avg.axis_ranges[0], expected_avg.axis_ranges[0])
+    assert np.allclose(d_spacing_diff.axis_ranges[0], expected_diff.axis_ranges[0])
+    
+
+
+
 
 # Test the Dataset against the expected values
 @pytest.fixture

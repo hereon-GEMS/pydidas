@@ -93,7 +93,7 @@ __all__.extend(
 
 # Check whether the sphinx documentation has been built and build it if it
 # has not:
-if not core.utils.check_sphinx_html_docs():
+if not core.utils.check_sphinx_html_docs() and "--no-sphinx" not in __sys.argv:
     core.utils.run_sphinx_html_build()
 
 # Disable the pyFAI logging to console

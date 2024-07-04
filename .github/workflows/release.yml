@@ -19,7 +19,7 @@ jobs:
 
     strategy:
         matrix:
-            tag: [ "24.06.05", "v24.03.05" ]
+            tag: [ "24.06.05", "v24.03.25" ]
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

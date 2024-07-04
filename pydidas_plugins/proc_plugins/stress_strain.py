@@ -488,6 +488,8 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
        
     #TODO: Is the data_label how we want them to be?
     #TODO: Is the axis_label for idx 0 correct and a good axis label?
+    #TODO: I set the axis_ranges[1] explicitly to s2c_axis_pos_sorted. This why I did not detect in the corresponding test
+    # the problem with the .sort method on the Dataset. 
     d_spacing_combined = Dataset(d_spacing_combi_arr, 
                                  axis_ranges={0: np.arange(2), 1:  s2c_axis_pos_sorted}, 
                                  axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'},
@@ -499,7 +501,7 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
 
 
 def pre_regression_calculation(d_spacing_combined):
-        ''' 
+    ''' 
 
     Prepares data for regression analysis based on d-spacing values.
 
@@ -541,6 +543,7 @@ def pre_regression_calculation(d_spacing_combined):
     d_spacing_diff.axis_labels={0: 'sin(2*chi)'} #or #TODO 'sin(2chi)' or 'sin_2chi'
     #calculation of sin(2*chi) from sin^2(chi)
     d_spacing_diff.axis_ranges ={0: np.sin(2*np.arcsin(np.sqrt(d_spacing_combined.axis_ranges[1])))}
+    
     return d_spacing_avg, d_spacing_diff
 
 

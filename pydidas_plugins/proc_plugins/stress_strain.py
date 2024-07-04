@@ -488,18 +488,6 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     if not np.allclose(s2c_axis_pos_sorted, s2c_axis_neg_sorted, atol=1e-15):
         raise ValueError('Axis ranges do not match after sorting.')
     
-    #print(40*"\N{Cactus}")
-    #$print('s2c_axis_pos_sorted', s2c_axis_pos_sorted)
-    #print('s2c_axis_neg_sorted', s2c_axis_neg_sorted)
-    #print(40*"\N{Cactus}")
-        
-    #print(40*"\N{Strawberry}")
-    #print('d_spacing_pos\n', d_spacing_pos)
-    #print('d_spacing_pos_sorted\n', d_spacing_pos_sorted)
-    #print(40*"\N{Strawberry}")
-    #print('d_spacing_neg\n', d_spacing_neg)
-    #print('d_spacing_neg_sorted\n', d_spacing_neg_sorted) #TODO: It looks like the array is sorted but not the axis values
-    #print(40*"\N{Carrot}")
      
     d_spacing_combi_arr = np.vstack((d_spacing_neg_sorted, d_spacing_pos_sorted))
        

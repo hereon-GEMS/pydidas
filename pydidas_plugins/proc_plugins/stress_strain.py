@@ -36,6 +36,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
 #TODO: d_spacing is d-spacing. Or do we want to have q in nm^-1?
+#TODO: Write   
 
 def chi_pos_verification(ds):
     '''
@@ -473,16 +474,10 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     if not comparison:
         raise ValueError('Axis ranges do not match.')
 
-    #TODO: Is this really necessary?! Probably not.
-    # Make copies of the arrays
-    #s2c_axis_pos_copy = np.copy(s2c_axis_pos)
-    #d_spacing_pos_copy = np.copy(d_spacing_pos)
-    #s2c_axis_neg_copy = np.copy(s2c_axis_neg)
-    #d_spacing_neg_copy = np.copy(d_spacing_neg)
     
     # Get the indices that would sort s2c_mean_pos_copy in ascending order
-    sorted_idx_pos = np.argsort(s2c_axis_pos, kind='mergesort')
-    sorted_idx_neg = np.argsort(s2c_axis_neg, kind='mergesort')
+    sorted_idx_pos = np.argsort(s2c_axis_pos, kind='stable')
+    sorted_idx_neg = np.argsort(s2c_axis_neg, kind='stable')
     
     print(40*"\N{Peach}")
     print('s2c_axis_pos', s2c_axis_pos)
@@ -498,13 +493,19 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     s2c_axis_neg_sorted = s2c_axis_neg[sorted_idx_neg]
     d_spacing_neg_sorted = d_spacing_neg[sorted_idx_neg]
     
-    print(40*"\N{Strawberry}")
-    print('d_spacing_pos\n', d_spacing_pos)
-    print('d_spacing_pos_sorted\n', d_spacing_pos_sorted)
-    print(40*"\N{Strawberry}")
-    print('d_spacing_neg\n', d_spacing_neg)
-    print('d_spacing_neg_sorted\n', d_spacing_neg_sorted) #TODO: It looks like the array is sorted but not the axis values
-    print(40*"\N{Carrot}")
+    print(40*"\N{Cactus}")
+    print('s2c_axis_pos_sorted', s2c_axis_pos_sorted)
+    print('s2c_axis_neg_sorted', s2c_axis_neg_sorted)
+    print(40*"\N{Cactus}")
+    
+    
+    #print(40*"\N{Strawberry}")
+    #print('d_spacing_pos\n', d_spacing_pos)
+    #print('d_spacing_pos_sorted\n', d_spacing_pos_sorted)
+    #print(40*"\N{Strawberry}")
+    #print('d_spacing_neg\n', d_spacing_neg)
+    #print('d_spacing_neg_sorted\n', d_spacing_neg_sorted) #TODO: It looks like the array is sorted but not the axis values
+    #print(40*"\N{Carrot}")
      
     d_spacing_combi_arr = np.vstack((d_spacing_neg_sorted, d_spacing_pos_sorted))
        

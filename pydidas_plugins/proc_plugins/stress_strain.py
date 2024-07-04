@@ -528,7 +528,6 @@ def pre_regression_calculation(d_spacing_combined):
     
         # This is the case where one part of the d_spacing pair is missing and not taken into account for the average
         #d_spacing_avg= np.mean(d_spacing_combined, axis=0)
-        #TODO: Now with Dataset.mean axis_ranges: 7.498799e-33, before: 7.49879891e-33. Precision??
         d_spacing_avg= d_spacing_combined.mean(axis=0)
         print(40*"\N{cactus}")
         print('d_spacing_avg', d_spacing_avg)     
@@ -539,9 +538,11 @@ def pre_regression_calculation(d_spacing_combined):
         #d-, d+
         #d[1,1]-d[0,1]
         #vs sin(2*chi)
+        #TODO: np.diff is not yet implemented as method of Dataset
+        #overriding the existing d_spacing_combined Dataset is faster than creating a new one. 
         d_spacing_diff= np.diff(d_spacing_combined, axis=0).squeeze()
-        d_spacing_diff.data_unit=d_spacing_combined.data_unit
-        d_spacing_diff.data_label='position diff'
+        #correcting the metadata
+        d_spacing_diff.data_label='Difference of d(+) - d(-)' #TODO: Is this there a better label? But this clear.
         d_spacing_diff.axis_labels={0: 'sin(2*chi)'} #or #TODO 'sin(2chi)' or 'sin_2chi'
         #calculation of sin(2*chi) from sin^2(chi)
         d_spacing_diff.axis_ranges ={0: np.sin(2*np.arcsin(np.sqrt(d_spacing_combined.axis_ranges[1])))}

@@ -783,7 +783,7 @@ def test_combine_sort_d_spacing_pos_neg_valid():
     assert result.axis_labels == {0: '0: d-, 1: d+', 1: 'sin^2(chi)'}
     assert result.data_label == '0: position_neg, 1: position_pos'
     
-def test_combine_sort_d_spacing_pos_neg_mergesort():
+def test_combine_sort_d_spacing_pos_neg_stablesort():
     # Create datasets with the same sin2chi values but in different unsorted order
     sin2chi_values = np.array([0.3, 0.1, 0.2])
     
@@ -822,6 +822,57 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
                                   err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values, especially with NaN values.")
 
 
+@pytest.fixture
+def d_spacing_datasets():
+    d_spacing_pos=Dataset(
+        axis_labels={0: 'sin^2(chi)'},
+        axis_ranges={0: np.array([0.75    , 0.883022, 0.969846, 1.      , 0.586824, 0.413176, 0.25
+                      , 0.116978, 0.030154, 0.      ])},
+        axis_units={0: ''},
+        metadata={},
+        data_unit= 'nm',
+        data_label = 'position_pos',
+        array=np.array([26.201953, 26.151003, 26.102181, 26.063213, 26.249156, 26.267693,
+                        26.324825, 26.323819, 26.311725, 26.281715])
+        )
+    d_spacing_neg=Dataset(
+        axis_labels={0: 'sin^2(chi)'},
+        axis_ranges={0: np.array([0.75    , 0.883022, 0.969846, 1.      , 0.586824, 0.413176, 0.25
+                      , 0.116978, 0.030154, 0.      ])},
+        axis_units={0: ''},
+        metadata={},
+        data_unit= 'nm',
+        data_label = 'position_neg',
+        array=np.array([26.041096, 26.037526, 26.036219, 26.063213, 26.074632, 26.099187,
+                        26.171528, 26.206706, 26.238491, 26.281715])
+        )
+        
+    d_spacing_combined=Dataset(
+        axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'},
+        axis_ranges={0: np.array([0, 1]), 1: np.array([0.      , 0.030154, 0.116978, 0.25    , 0.413176, 0.586824, 0.75
+                      , 0.883022, 0.969846, 1.      ])},
+        axis_units={0: '', 1: ''},
+        metadata={},
+        data_unit='nm',
+        data_label='0: position_neg, 1: position_pos',
+        array= np.array([[26.281715, 26.238491, 26.206706, 26.171528, 26.099187, 26.074632,
+        26.041096, 26.037526, 26.036219, 26.063213],
+       [26.281715, 26.311725, 26.323819, 26.324825, 26.267693, 26.249156,
+        26.201953, 26.151003, 26.102181, 26.063213]])
+        )
+    return d_spacing_pos, d_spacing_neg, d_spacing_combined
+    
+
+def test_combine_sort_d_spacing_pos_neg_explicit():
+    d_spacing_pos, d_spacing_neg, d_spacing_combined = d_spacing_datasets
+    d_spacing_combined_cal =combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    
+    assert np.allclose(d_spacing_combined_cal.array, d_spacing_combined.array)
+    assert np.allclose(d_spacing_combined_cal.axis_ranges[1], d_spacing_combined.axis_ranges[1]) 
+    assert d_spacing_combined_cal.data_label == d_spacing_combined.data_label
+    assert d_spacing_combined_cal.data_unit == d_spacing_combined.data_unit
+    
+
 # Parameterized test for TypeError with list and 2D numpy array inputs
 @pytest.mark.parametrize("invalid_input", [
     [1.0, 2.0],                 # List input
@@ -832,9 +883,39 @@ def test_pre_regression_calculation_type_error(invalid_input):
         pre_regression_calculation(invalid_input)
         
 
-def test_pre_regression_calculation_valid():
+@pytest.fixture
+def d_spacing_combined_fixture():
+    # Mocking a Dataset instance with sample data
+    data = np.array([[1, 2, np.nan], [4, 5, 6]])  # Example data
+    d_spacing_combined = Dataset(
+        axis_ranges={1: np.array([0.1, 0.2, 0.3])},  # Example sin^2(chi) values
+        axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'},
+        axis_units={0: '', 1: ''},
+        data_unit='nm',
+        data_label='0: position_neg, 1: position_pos',
+        array=data
+    )
+    return d_spacing_combined
     
-    ds_array=Dataset(np.array([[1,2,3], [5,6,7]]), )
+def test_pre_regression_calculation_valid_input(d_spacing_combined_fixture):
+    
+    # Calculation
+    d_spacing_avg, d_spacing_diff = pre_regression_calculation(d_spacing_combined_fixture)
+    
+    # Verify the shape and content of the returned datasets
+    assert d_spacing_avg.shape == (1, 3), "Average dataset shape is incorrect"
+    assert d_spacing_avg.axis_label[0] == 'sin^2(chi)', "Average dataset axis label is incorrect"
+    assert d_spacing_avg.data_unit == d_spacing_combined_fixture.data_unit, "Average dataset data unit is incorrect"
+    assert d_spacing_avg.data_label == 'Mean of 0: position_neg, 1: position_pos', "Average dataset data label is incorrect"    
+        
+    assert d_spacing_diff.shape == (1, 3), "Difference dataset shape is incorrect"
+    assert d_spacing_diff.axis_label[0] == 'sin(2*chi)', "Difference dataset axis label is incorrect"
+    assert d_spacing_diff.data_unit == d_spacing_combined_fixture.data_unit, "Difference dataset data unit is incorrect"  
+    assert d_spacing_diff.data_label == 'Difference of d(+) - d(-)', "Difference dataset data label is incorrect"  
+    
+
+
+    
     
 
 # Test the Dataset against the expected values

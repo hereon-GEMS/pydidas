@@ -19,7 +19,7 @@ jobs:
 
     strategy:
         matrix:
-            tag: [ "24.06.05", "v24.03.05", "24.01.18" ]
+            tag: [ "24.06.05", "v24.03.05" ]
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v4.1.1
         with:
             ref: ${{ matrix.tag }}
+            fetch-tags: true
       - name: Set up Python
         uses: actions/setup-python@v3
         with:

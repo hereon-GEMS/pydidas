@@ -483,12 +483,7 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     d_spacing_pos_sorted = d_spacing_pos[sorted_idx_pos]
     s2c_axis_neg_sorted = s2c_axis_neg[sorted_idx_neg]
     d_spacing_neg_sorted = d_spacing_neg[sorted_idx_neg]
-    
-    #technically not necassary, but for quality assurance
-    if not np.allclose(s2c_axis_pos_sorted, s2c_axis_neg_sorted, atol=1e-15):
-        raise ValueError('Axis ranges do not match after sorting.')
-    
-     
+       
     d_spacing_combi_arr = np.vstack((d_spacing_neg_sorted, d_spacing_pos_sorted))
        
     #TODO: Is the data_label how we want them to be?

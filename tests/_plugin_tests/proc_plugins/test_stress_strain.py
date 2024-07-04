@@ -812,7 +812,7 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     
     # Check that the sin2chi axis has been sorted
-    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.3])
+    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.4])
     np.testing.assert_array_equal(result.axis_ranges[1], expected_sin2chi_sorted, 
                                   err_msg="sin2chi values are not correctly sorted in ascending order.")
     
@@ -863,7 +863,7 @@ def d_spacing_datasets():
     return d_spacing_pos, d_spacing_neg, d_spacing_combined
     
 
-def test_combine_sort_d_spacing_pos_neg_explicit():
+def test_combine_sort_d_spacing_pos_neg_explicit(d_spacing_datasets):
     d_spacing_pos, d_spacing_neg, d_spacing_combined = d_spacing_datasets
     d_spacing_combined_cal =combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     

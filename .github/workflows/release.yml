@@ -43,7 +43,7 @@ jobs:
       id: extract_version
       run: |
         export QT_QPA_PLATFORM=offscreen
-        echo "DUMMY=123" > "$GITHUB_OUTPUT"
+        echo "DUMMY=123" >> "$GITHUB_OUTPUT"
 #       {
 #         echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')")
 #       } >> "$GITHUB_OUTPUT"

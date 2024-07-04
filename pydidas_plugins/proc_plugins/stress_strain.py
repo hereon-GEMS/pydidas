@@ -529,12 +529,7 @@ def pre_regression_calculation(d_spacing_combined):
     # This is the case where one part of the d_spacing pair is missing and not taken into account for the average
     #d_spacing_avg= np.mean(d_spacing_combined, axis=0)
     d_spacing_avg= d_spacing_combined.mean(axis=0)
-    print(40*"\N{cactus}")
-    print('d_spacing_avg', d_spacing_avg)     
-    
-    print(40*"\N{cactus}")
-        
-    
+          
     #d-, d+
     #d[1,1]-d[0,1]
     #vs sin(2*chi)

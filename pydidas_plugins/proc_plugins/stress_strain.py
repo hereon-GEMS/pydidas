@@ -477,27 +477,22 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     # Get the indices that would sort s2c_mean_pos_copy in ascending order
     sorted_idx_pos = np.argsort(s2c_axis_pos, kind='stable')
     sorted_idx_neg = np.argsort(s2c_axis_neg, kind='stable')
-    
-    #print(40*"\N{Peach}")
-    #print('s2c_axis_pos', s2c_axis_pos)
-    #print('sorted_idx_ps', sorted_idx_pos)
-    #print(40*"\N{Peach}")
-    #print('s2c_axis_neg', s2c_axis_neg)
-    #print('sorted_idx_neg', sorted_idx_neg)
-    #print(40*"\N{Peach}")
-    
+     
     # Sorting the arrays
     s2c_axis_pos_sorted = s2c_axis_pos[sorted_idx_pos]
     d_spacing_pos_sorted = d_spacing_pos[sorted_idx_pos]
     s2c_axis_neg_sorted = s2c_axis_neg[sorted_idx_neg]
     d_spacing_neg_sorted = d_spacing_neg[sorted_idx_neg]
     
-    print(40*"\N{Cactus}")
-    print('s2c_axis_pos_sorted', s2c_axis_pos_sorted)
-    print('s2c_axis_neg_sorted', s2c_axis_neg_sorted)
-    print(40*"\N{Cactus}")
+    #technically not necassary, but for quality assurance
+    if not np.allclose(s2c_axis_pos_sorted, s2c_axis_neg_sorted, atol=1e-15):
+        raise ValueError('Axis ranges do not match after sorting.')
     
-    
+    #print(40*"\N{Cactus}")
+    #$print('s2c_axis_pos_sorted', s2c_axis_pos_sorted)
+    #print('s2c_axis_neg_sorted', s2c_axis_neg_sorted)
+    #print(40*"\N{Cactus}")
+        
     #print(40*"\N{Strawberry}")
     #print('d_spacing_pos\n', d_spacing_pos)
     #print('d_spacing_pos_sorted\n', d_spacing_pos_sorted)

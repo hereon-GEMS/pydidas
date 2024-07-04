@@ -845,6 +845,37 @@ def data_values():
     ds=Dataset(data_val.copy(), axis_units={0: 'um'}, data_label='position', data_unit='nm', axis_labels={0: 'x'}, axis_ranges={0: axis_val.copy()})
     return data_val, axis_val, ds
 
+def test_unsorted(data_values):
+    data_val, axis_val, ds = data_values
+    assert np.array_equal(axis_val,  ds.axis_ranges[0])
+    assert np.array_equal(data_val, ds.array)
+
+def test_sort(data_values):
+    data_val, axis_val, ds = data_values
+    #inplace sorting
+    ds.sort(axis=0) #sorts only the values in the array, but not the metadata (axis values). Metadata not aligned with sorted array
+      
+    sorted_arr_idx = np.argsort(data_val)
+    
+    print('comparison', ds.array, np.sort(data_val))
+    assert np.allclose(ds.array, np.sort(data_val))
+    assert np.allclose(ds.axis_ranges[0], axis_val[sorted_arr_idx])
+    
+def test_sort_explicit():
+    ds = Dataset(
+        np.array([3, 2, 1, 5, 4]), 
+        axis_units={0: 'um'}, 
+        data_label='position', 
+        data_unit='nm', 
+        axis_labels={0: 'x'}, 
+        axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])})
+    
+    assert np.allclose(ds.array, np.array([3, 2, 1, 5, 4]))
+    assert np.allclose(ds.axis_ranges[0], np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
+    ds.sort(axis=0) #in place sorting does not work on metadata
+    assert np.allclose(ds.array, np.array([1, 2, 3, 4, 5]))
+    assert np.allclose(ds.axis_ranges[0], [0.3, 0.4, 0.5, 0.1, 0.2])
+
 def test_argsort(data_values):
     data_val, axis_val, ds = data_values
     sorted_arr_idx = ds.argsort(axis=0)

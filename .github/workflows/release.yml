@@ -37,12 +37,12 @@ jobs:
         source .venv/bin/activate
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
-        export QT_QPA_PLATFORM=offscreen
         echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
     - name: Extract version
       id: extract_version
       run: |
+        export QT_QPA_PLATFORM=offscreen
         {
           echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
         } >> $GITHUB_OUTPUT
@@ -51,6 +51,7 @@ jobs:
         echo "Extracted version from pydidas: ${{ steps.extract_version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
     - name: Build Sphinx documentation
       run: |
+        export QT_QPA_PLATFORM=offscreen
         sphinx-build pydidas/docs/src _site
 
 #    - name: Create Release

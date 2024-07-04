@@ -501,52 +501,52 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
 def pre_regression_calculation(d_spacing_combined):
         ''' 
 
-        Prepares data for regression analysis based on d-spacing values.
+    Prepares data for regression analysis based on d-spacing values.
 
-        Parameters:
-        d_spacing_combined (Dataset): Pydidas Dataset with d-spacing values vs sin^2(chi) values.
-            - Shape (2, N) where d_spacing_combined[0, :] represents d(-) values and
-            d_spacing_combined[1, :] represents d(+) values.
-            - If a value in either d(+) or d(-) is missing (np.nan), it is not taken into account for the calculations.
+    Parameters:
+    d_spacing_combined (Dataset): Pydidas Dataset with d-spacing values vs sin^2(chi) values.
+        - Shape (2, N) where d_spacing_combined[0, :] represents d(-) values and
+        d_spacing_combined[1, :] represents d(+) values.
+        - If a value in either d(+) or d(-) is missing (np.nan), it is not taken into account for the calculations.
 
-        Returns:
-        d_spacing_avg (Dataset): Pydidas Dataset containing the average of (d(+) + d(-))/2 vs sin^2(chi).
-            - axis_ranges[0] corresponds to sin^2(chi).
-            - axis_labels[0] is 'sin^2(chi)'.
-            - data_label is 'd_spacing_mean'.
+    Returns:
+    d_spacing_avg (Dataset): Pydidas Dataset containing the average of (d(+) + d(-))/2 vs sin^2(chi).
+        - axis_ranges[0] corresponds to sin^2(chi).
+        - axis_labels[0] is 'sin^2(chi)'.
+        - data_label is 'd_spacing_mean'.
 
-        d_spacing_diff (Dataset): Pydidas Dataset containing the difference of d(+) - d(-) vs sin(2*chi).
-            - axis_ranges[0] corresponds to sin(2*chi).
-            - axis_labels[0] is 'sin(2*chi)'.
-            - data_label is 'd_spacing_diff'.
-     
-        '''
-        # Check if d_spacing_combined is an instance of Dataset
-        if not isinstance(d_spacing_combined, Dataset):
-            raise TypeError("Input d_spacing_combined must be an instance of Dataset.")
-
+    d_spacing_diff (Dataset): Pydidas Dataset containing the difference of d(+) - d(-) vs sin(2*chi).
+        - axis_ranges[0] corresponds to sin(2*chi).
+        - axis_labels[0] is 'sin(2*chi)'.
+        - data_label is 'd_spacing_diff'.
     
-        # This is the case where one part of the d_spacing pair is missing and not taken into account for the average
-        #d_spacing_avg= np.mean(d_spacing_combined, axis=0)
-        d_spacing_avg= d_spacing_combined.mean(axis=0)
-        print(40*"\N{cactus}")
-        print('d_spacing_avg', d_spacing_avg)     
-      
-        print(40*"\N{cactus}")
-            
+    '''
+    # Check if d_spacing_combined is an instance of Dataset
+    if not isinstance(d_spacing_combined, Dataset):
+        raise TypeError("Input d_spacing_combined must be an instance of Dataset.")
+
+
+    # This is the case where one part of the d_spacing pair is missing and not taken into account for the average
+    #d_spacing_avg= np.mean(d_spacing_combined, axis=0)
+    d_spacing_avg= d_spacing_combined.mean(axis=0)
+    print(40*"\N{cactus}")
+    print('d_spacing_avg', d_spacing_avg)     
+    
+    print(40*"\N{cactus}")
         
-        #d-, d+
-        #d[1,1]-d[0,1]
-        #vs sin(2*chi)
-        #TODO: np.diff is not yet implemented as method of Dataset
-        #overriding the existing d_spacing_combined Dataset is faster than creating a new one. 
-        d_spacing_diff= np.diff(d_spacing_combined, axis=0).squeeze()
-        #correcting the metadata
-        d_spacing_diff.data_label='Difference of d(+) - d(-)' #TODO: Is this there a better label? But this clear.
-        d_spacing_diff.axis_labels={0: 'sin(2*chi)'} #or #TODO 'sin(2chi)' or 'sin_2chi'
-        #calculation of sin(2*chi) from sin^2(chi)
-        d_spacing_diff.axis_ranges ={0: np.sin(2*np.arcsin(np.sqrt(d_spacing_combined.axis_ranges[1])))}
-        return d_spacing_avg, d_spacing_diff
+    
+    #d-, d+
+    #d[1,1]-d[0,1]
+    #vs sin(2*chi)
+    #TODO: np.diff is not yet implemented as method of Dataset
+    #overriding the existing d_spacing_combined Dataset is faster than creating a new one. 
+    d_spacing_diff= np.diff(d_spacing_combined, axis=0).squeeze()
+    #correcting the metadata
+    d_spacing_diff.data_label='Difference of d(+) - d(-)' #TODO: Is this there a better label? But this clear.
+    d_spacing_diff.axis_labels={0: 'sin(2*chi)'} #or #TODO 'sin(2chi)' or 'sin_2chi'
+    #calculation of sin(2*chi) from sin^2(chi)
+    d_spacing_diff.axis_ranges ={0: np.sin(2*np.arcsin(np.sqrt(d_spacing_combined.axis_ranges[1])))}
+    return d_spacing_avg, d_spacing_diff
 
 
 

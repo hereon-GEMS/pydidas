@@ -47,7 +47,7 @@ jobs:
       id: extract_version
       run: |
         export QT_QPA_PLATFORM=offscreen
-        echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')") >> $GITHUB_OUTPUT
+        echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')") >> "$GITHUB_OUTPUT"
     - name: Display version
       run: |
         echo "Version: ${{ steps.extract_version.outputs.VERSION }}"

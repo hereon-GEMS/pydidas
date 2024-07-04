@@ -831,4 +831,67 @@ def test_pre_regression_calculation_type_error(invalid_input):
     with pytest.raises(TypeError, match="Input d_spacing_combined must be an instance of Dataset."):
         pre_regression_calculation(invalid_input)
         
-        
+
+def test_pre_regression_calculation_valid():
+    
+    ds_array=Dataset(np.array([[1,2,3], [5,6,7]]), )
+    
+
+# Test the Dataset against the expected values
+@pytest.fixture
+def data_values():
+    data_val = np.array([3, 2, 1, 5, 4])
+    axis_val = np.array([5, 4, 3, 2, 1]) / 10
+    ds=Dataset(data_val.copy(), axis_units={0: 'um'}, data_label='position', data_unit='nm', axis_labels={0: 'x'}, axis_ranges={0: axis_val.copy()})
+    return data_val, axis_val, ds
+
+def test_argsort(data_values):
+    data_val, axis_val, ds = data_values
+    sorted_arr_idx = ds.argsort(axis=0)
+    
+    ds_sorted=ds[sorted_arr_idx]
+    
+    assert np.allclose(ds_sorted.array, data_val[sorted_arr_idx])
+    assert np.allclose(ds_sorted.axis_ranges[0], axis_val[sorted_arr_idx])
+
+def test_argsort_axis(data_values):
+    data_val, axis_val, ds = data_values
+    sorted_axis_idx=np.argsort(ds.axis_ranges[0], axis=0)
+    ds_sorted=ds[sorted_axis_idx]
+    
+    assert np.allclose(ds_sorted.array, data_val[sorted_axis_idx])
+    assert np.allclose(ds_sorted.axis_ranges[0], axis_val[sorted_axis_idx])
+
+def test_numpy_indexing_with_list(): 
+    ds = Dataset(
+        np.array([3, 2, 1, 5, 4]), 
+        axis_units={0: 'um'}, 
+        data_label='position', 
+        data_unit='nm', 
+        axis_labels={0: 'x'}, 
+        axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])})
+    
+    assert np.allclose(ds.array, np.array([3, 2, 1, 5, 4]))
+    assert np.allclose(ds.axis_ranges[0], np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
+    
+    ds_sorted=ds[ [2, 3, 4, 0, 1] ] 
+    
+    assert np.allclose(ds_sorted.array, np.array([1, 5, 4, 3 ,2]))
+    assert np.allclose(ds_sorted.axis_ranges[0], [0.3, 0.2, 0.1, 0.5, 0.4]) 
+    
+def test_numpy_indexing_with_ndarray(): 
+    ds = Dataset(
+        np.array([3, 2, 1, 5, 4]), 
+        axis_units={0: 'um'}, 
+        data_label='position', 
+        data_unit='nm', 
+        axis_labels={0: 'x'}, 
+        axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])})
+    
+    assert np.allclose(ds.array, np.array([3, 2, 1, 5, 4]))
+    assert np.allclose(ds.axis_ranges[0], np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
+    
+    ds_sorted=ds[np.array([2, 3, 4, 0, 1])] 
+    
+    assert np.allclose(ds_sorted.array, np.array([1, 5, 4, 3 ,2]))
+    assert np.allclose(ds_sorted.axis_ranges[0], [0.3, 0.2, 0.1, 0.5, 0.4]) 

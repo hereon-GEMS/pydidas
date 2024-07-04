@@ -45,13 +45,13 @@ jobs:
         export QT_QPA_PLATFORM=offscreen
         echo "DUMMY=123" >> $GITHUB_OUTPUT
         echo "Extracted version from pydidas." >> $GITHUB_STEP_SUMMARY
-#       {
-#         echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')")
-#       } >> "$GITHUB_OUTPUT"
+        {
+          echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')")
+        } >> "$GITHUB_OUTPUT"
     - name: Display version
       run: |
         echo "Dummy variable: ${{ steps.extract_version.outputs.DUMMY }}"
-#        echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
+        echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
 #    - name: Build Sphinx documentation
 #      run: |
 #        export QT_QPA_PLATFORM=offscreen

@@ -51,7 +51,7 @@ jobs:
     - name: Display version
       run: |
         echo "Dummy: ${{ steps.extract_version.outputs.DUMMY }}"
-        #echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
+#        echo "Version: ${{ steps.extract_version.outputs.VERSION }}"
 #    - name: Build Sphinx documentation
 #      run: |
 #        export QT_QPA_PLATFORM=offscreen

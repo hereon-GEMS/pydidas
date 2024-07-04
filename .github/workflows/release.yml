@@ -19,7 +19,7 @@ jobs:
 
     strategy:
         matrix:
-            tag: [ "24.06.05", "v24.03.25" ]
+            tag: [ "24.06.05"]#, "v24.03.25" ]
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,7 +40,7 @@ jobs:
 #          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
 #          path: .venv
       - name: Install dependencies
-        run: |
+        run: |          
           # python -m venv .venv
           # source .venv/bin/activate
           python -m pip install --upgrade pip
@@ -57,36 +57,36 @@ jobs:
       - name: Display version
         run: |
           echo "Extracted version from pydidas: ${{ steps.extract_version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
-      - name: Build Sphinx documentation
-        run: |
-          export QT_QPA_PLATFORM=offscreen
-          sphinx-build pydidas/docs/src _site
+#      - name: Build Sphinx documentation
+#        run: |
+#          export QT_QPA_PLATFORM=offscreen
+#          sphinx-build pydidas/docs/src _site
 
-  #    - name: Create Release
-  #      id: create_release
-  #      uses: actions/create-release@v1
-  #      env:
-  #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #      with:
-  #        tag_name: ${{ github.ref }}
-  #        release_name: Release ${{ github.ref }}
-  #        draft: false
-  #        prerelease: false
-  #
-      - name: Deploy to GitHub Pages version subdirectory
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          destination_dir: ${{ steps.extract_version.outputs.VERSION }}
-
-      - name: Deploy to GitHub Pages main
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          keep_files: true
+#    - name: Create Release
+#      id: create_release
+#      uses: actions/create-release@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        tag_name: ${{ github.ref }}
+#        release_name: Release ${{ github.ref }}
+#        draft: false
+#        prerelease: false
+#
+#      - name: Deploy to GitHub Pages version subdirectory
+#        uses: peaceiris/actions-gh-pages@v3
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          publish_dir: ./_site
+#          user_name: 'github-actions[bot]'
+#          user_email: 'github-actions[bot]@users.noreply.github.com'
+#          destination_dir: ${{ steps.extract_version.outputs.VERSION }}
+#
+#      - name: Deploy to GitHub Pages main
+#        uses: peaceiris/actions-gh-pages@v3
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          publish_dir: ./_site
+#          user_name: 'github-actions[bot]'
+#          user_email: 'github-actions[bot]@users.noreply.github.com'
+#          keep_files: true

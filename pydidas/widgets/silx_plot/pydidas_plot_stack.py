@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
-
 from qtpy import QtCore, QtWidgets
 
 from ...core import Dataset
@@ -90,6 +89,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         _dim = data.ndim
         self._create_widget_if_required(_dim)
         self.setCurrentIndex(_dim - 1)
+        if _dim > 2:
+            return
         _plot = getattr(self, f"_{_dim}dplot")
         _title = kwargs.pop("title", None)
         if _title is not None:
@@ -114,6 +115,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         dim : int
             The data dimension
         """
+        if dim > 2:
+            return
         _plot = getattr(self, f"_{dim}dplot")
         if _plot is None:
             _plot = PydidasPlot1D() if dim == 1 else PydidasPlot2D(**self._config)

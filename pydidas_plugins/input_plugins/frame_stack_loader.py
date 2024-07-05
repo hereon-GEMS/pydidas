@@ -62,7 +62,7 @@ class FrameStackLoader(InputPlugin):
         Parameter(
             "frame_count",
             int,
-            3,
+            1,
             name="Frame count",
             tooltip="How many frames should be included in the stack.",
         )

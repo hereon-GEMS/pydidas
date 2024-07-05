@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial for the DirectorySpyApp &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Graphical user interface" href="../gui/graphical_user_interface.html" />
+    <link rel="prev" title="Tutorial for the ExecuteWorkflowApp" href="cmd_execute_workflow_app.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../commandline.html">Command line manuals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_global.html">pydidas general command line tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_diffraction_exp_context.html">The DiffractionExperimentContext class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_scan_context.html">The ScanContext class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_workflow_tree.html">The WorkflowTree class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_workflow_results.html">The WorkflowResults class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_running_workflows.html">Running pydidas workflows from the command line</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="cmd_apps.html">Command line applications</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cmd_running_apps.html">Running pydidas applications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmd_composite_creator_app.html">Tutorial for the CompositeCreatorApp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmd_execute_workflow_app.html">Tutorial for the ExecuteWorkflowApp</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Tutorial for the DirectorySpyApp</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#motivation">Motivation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#setup-of-the-directoryspyapp">Setup of the DirectorySpyApp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#detector-mask-and-background-image">Detector mask and background image</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#running-the-directoryspyapp">Running the DirectorySpyApp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#accessing-results">Accessing results</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#directoryspyapp-parameters">DirectorySpyApp Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/graphical_user_interface.html">Graphical user interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../commandline.html">Command line manuals</a></li>
+          <li class="breadcrumb-item"><a href="cmd_apps.html">Command line applications</a></li>
+      <li class="breadcrumb-item active">Tutorial for the DirectorySpyApp</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/cmdline_apps/cmd_directory_spy_app.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tutorial-for-the-directoryspyapp">
+<h1>Tutorial for the DirectorySpyApp<a class="headerlink" href="#tutorial-for-the-directoryspyapp" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#motivation" id="id1">Motivation</a></p></li>
+<li><p><a class="reference internal" href="#setup-of-the-directoryspyapp" id="id2">Setup of the DirectorySpyApp</a></p>
+<ul>
+<li><p><a class="reference internal" href="#selection-of-input-data" id="id3">Selection of input data</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#detector-mask-and-background-image" id="id4">Detector mask and background image</a></p>
+<ul>
+<li><p><a class="reference internal" href="#using-a-mask-file" id="id5">Using a mask file</a></p></li>
+<li><p><a class="reference internal" href="#using-a-background-file" id="id6">Using a background file</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#running-the-directoryspyapp" id="id7">Running the DirectorySpyApp</a></p></li>
+<li><p><a class="reference internal" href="#accessing-results" id="id8">Accessing results</a></p>
+<ul>
+<li><p><a class="reference internal" href="#accessing-results-within-python" id="id9">Accessing results within Python</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#directoryspyapp-parameters" id="id10">DirectorySpyApp Parameters</a></p></li>
+</ul>
+</nav>
+<section id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a> is
+designed to keep track of the files in a directory and notify the user if a new
+file (with a specific filename pattern) has been created or changed.
+If configured to do so, it will also supply the image data of the latest image
+as well as the filename.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While the use of different Parameters is handled in different sections of
+this manual, they must all be combined to use all capabilities of the
+<a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a>.</p>
+</div>
+</section>
+<section id="setup-of-the-directoryspyapp">
+<h2>Setup of the DirectorySpyApp<a class="headerlink" href="#setup-of-the-directoryspyapp" title="Link to this heading"></a></h2>
+<p>This section describes the different input Parameters that can be used and gives
+an overview of the <a class="reference internal" href="#directory-spy-app-params"><span class="std std-ref">DirectorySpyApp Parameters</span></a> at the end of the
+section.</p>
+<section id="selection-of-input-data">
+<h3>Selection of input data<a class="headerlink" href="#selection-of-input-data" title="Link to this heading"></a></h3>
+<p>First of all, the user must specify the <code class="xref py py-data docutils literal notranslate"><span class="pre">directory_path</span></code> Parameter to
+define the working directory. In addition, the user must decide whether the app
+will scan for all new files the selected directory or only for files matching
+a specific filename pattern. In the latter case, the <code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code>
+Parameter is used and must include the filename pattern with hashes “#” for
+the counting variable.</p>
+<p>The file finding behaviour is controlled through the <code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all</span></code>
+Parameter. If set to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>, the app will look for all files in a
+directory. If <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code>, it will only look for incremental counts
+according to the filename pattern and the current index.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using the <code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all=True</span></code> setting will be slow in directories
+with many files and it is not recommended.</p>
+</div>
+<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code> Parameter only includes the filename with
+hash characters as wildcards. The number of wildcard characters must correspond
+to the length of the numbers to be replaced and it will be filled with leading
+zeros.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only a single set of wildcars is accepted. Please leave all other numbers
+in place.</p>
+</div>
+<p>If HDF5 files are used, the dataset to use must be specified with the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key</span></code>. The frame cannot be selected as the DirectorySpyApp will
+always show the latest frame.</p>
+<p>See <a class="reference internal" href="cmd_composite_creator_app.html#composite-creator-app-params"><span class="std std-ref">Complete list of CompositeCreatorApp Parameters</span></a> for the detailed list of all Parameters.</p>
+<section id="example-1-scanning-for-all-files">
+<h4>Example 1: Scanning for all files<a class="headerlink" href="#example-1-scanning-for-all-files" title="Link to this heading"></a></h4>
+<p>For the first example, we want to scan for all new files in the
+<em>/scratch/scan_42/</em> directory. We expect Hdf5 files with the data in the
+<em>entry/other_data/data/</em> dataset.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_for-all&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;directory_path&#39;</span><span class="p">,</span> <span class="s1">&#39;/scratch/scan_42/&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;hdf5_key&#39;</span><span class="p">,</span> <span class="s1">&#39;/entry/other_data/data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="example-2-scanning-for-new-tiff-files">
+<h4>Example 2: Scanning for new tiff files<a class="headerlink" href="#example-2-scanning-for-new-tiff-files" title="Link to this heading"></a></h4>
+<p>For this example, we want to load Tiff files from the <em>/scratch/test_scan/</em>
+directory. The files are named <em>test_scan_01_0001.tiff</em>,
+<em>test_scan_01_0002.tiff</em> etc.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
+<span class="go"># scan_for_all is False by default, no need to set it.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;directory_path&#39;</span><span class="p">,</span> <span class="s1">&#39;/scratch/test_scan&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;filename_pattern&#39;</span><span class="p">,</span> <span class="s1">&#39;test_scan_01_####.tiff&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="detector-mask-and-background-image">
+<h2>Detector mask and background image<a class="headerlink" href="#detector-mask-and-background-image" title="Link to this heading"></a></h2>
+<section id="using-a-mask-file">
+<h3>Using a mask file<a class="headerlink" href="#using-a-mask-file" title="Link to this heading"></a></h3>
+<p>A mask file can be used by activating the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_det_mask</span></code>
+Parameter. This will instruct the app to apply the detector mask to the data
+frame.</p>
+<p>To modify the detector mask used by the DirectorySpyApp, set the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_file</span></code> Parameter to point to the mask file. The value
+taken for masked pixels is controlled by the <code class="xref py py-data docutils literal notranslate"><span class="pre">det_mask_val</span></code> Parameter.
+The default value is 0.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s2">&quot;use_detector_mask&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s2">&quot;detector_mask_file&quot;</span><span class="p">,</span> <span class="s1">&#39;/home/user/data/detector_mask.npy&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="using-a-background-file">
+<h3>Using a background file<a class="headerlink" href="#using-a-background-file" title="Link to this heading"></a></h3>
+<p>Usage of a background file (which will be subtracted from all frames) can be
+activated by setting the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_bg_file</span></code> Parameter to True.</p>
+<p>The background file itself can be selected by specifying the <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_file</span></code>
+Parameter. If a hdf5 file is selected, the dataset and frame can be given by
+the <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_key</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_frame</span></code> Parameters. These
+values default to <em>entry/data/data</em> and 0, respectively.</p>
+<p>As example, let us use the first frame (i.e. zero) from the
+<em>/scratch/scan_42/test.h5df5</em> file and the <em>entry/detector/data</em> dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;use_bg_file&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;bg_file&#39;</span><span class="p">,</span> <span class="s1">&#39;/scratch/scan_42/test.h5df5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;bg_hdf5_key&#39;</span><span class="p">,</span> <span class="s1">&#39;entry/detector/data&#39;</span><span class="p">)</span>
+<span class="go"># Because the bg_hdf5_frame defaults to 0, this Parameter does not need to</span>
+<span class="go"># be modified:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;bg_hdf5_frame&#39;</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="running-the-directoryspyapp">
+<h2>Running the DirectorySpyApp<a class="headerlink" href="#running-the-directoryspyapp" title="Link to this heading"></a></h2>
+<p>Once configured, the <a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a>
+is run like any pydidas app, as described in detail in
+<a class="reference internal" href="cmd_running_apps.html#running-pydidas-applications"><span class="std std-ref">Running pydidas applications</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Because the DirectorySpyApp does not use tasks and is running indefinitely
+until stopped, it <strong>cannot</strong> be run serially.</p>
+</div>
+<p>To run it utilizing parallelization, set up an
+<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use the
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">start</span></code> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-results">
+<h2>Accessing results<a class="headerlink" href="#accessing-results" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a> results can
+be only be accessed indirectly within Python.</p>
+<section id="accessing-results-within-python">
+<h3>Accessing results within Python<a class="headerlink" href="#accessing-results-within-python" title="Link to this heading"></a></h3>
+<p>The results can be accessed through the <code class="xref py py-data docutils literal notranslate"><span class="pre">image</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code>
+and <code class="xref py py-data docutils literal notranslate"><span class="pre">image_metadata</span></code> properties. Note that this requires to connect
+the AppRunner <code class="xref py py-data docutils literal notranslate"><span class="pre">sig_results</span></code> with the local app’s
+<a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp.multiprocessing_store_results" title="pydidas.apps.DirectorySpyApp.multiprocessing_store_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">multiprocessing_store_results</span></code></a> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span><span class="o">.</span><span class="n">sig_results</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">multiprocessing_store_results</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">image</span>
+<span class="go">array([[0.98215663, 0.30682687, 0.21160315, ..., 0.2604671 , 0.59461537,</span>
+<span class="go">    0.09863754],</span>
+<span class="go">   [0.51141869, 0.32276036, 0.43406916, ..., 0.02741798, 0.91533116,</span>
+<span class="go">    0.79145334],</span>
+<span class="go">   [0.1881628 , 0.4708237 , 0.14207525, ..., 0.26664729, 0.68337244,</span>
+<span class="go">    0.83566994],</span>
+<span class="go">   ...,</span>
+<span class="go">   [0.6985084 , 0.58230171, 0.11641333, ..., 0.3299515 , 0.29834082,</span>
+<span class="go">    0.19949315],</span>
+<span class="go">   [0.54581434, 0.96941275, 0.21216339, ..., 0.26659825, 0.13700608,</span>
+<span class="go">    0.01721194],</span>
+<span class="go">   [0.74946649, 0.24262777, 0.94001868, ..., 0.29572706, 0.68824381,</span>
+<span class="go">    0.61529555]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">filename</span>
+<span class="go">/scratch/test_scan/test_scan_01_0004.tiff</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="directoryspyapp-parameters">
+<span id="directory-spy-app-params"></span><h2>DirectorySpyApp Parameters<a class="headerlink" href="#directoryspyapp-parameters" title="Link to this heading"></a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>scan_for_all (type: bool, default: False)</dt><dd><p>Flag to toggle scanning for all new files or only for files matching
+the input pattern (defined with the Parameter
+<code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code>).</p>
+</dd>
+<dt>filename_pattern (type: pathlib.Path, default: &lt;empty Path&gt;)</dt><dd><p>The pattern of the filename. Use hashes “#” for wildcards which will
+be filled in with numbers. This Parameter must be set if
+<code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all</span></code> is <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt>directory_path (type: pathlib.Path, default: &lt;empty Path&gt;)</dt><dd><p>The absolute path of the directory to be used.</p>
+</dd>
+<dt>hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Used only for hdf5 files: The dataset key.</p>
+</dd>
+<dt>use_global_det_mask (type: bool, default: True)</dt><dd><p>Keyword to enable or disable using the global detector mask as
+defined by the global mask file and mask value.</p>
+</dd>
+<dt>use_bg_file (type: bool, default: False)</dt><dd><p>Keyword to toggle usage of background subtraction.</p>
+</dd>
+<dt>bg_file (type: pathlib.Path, default: &lt;empty Path&gt;)</dt><dd><p>The name of the file used for background correction.</p>
+</dd>
+<dt>bg_hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Required for hdf5 background image files: The dataset key with the
+image for the background file.</p>
+</dd>
+<dt>bg_hdf5_frame (type: int, default: 0)</dt><dd><p>Required for hdf5 background image files: The image number of the
+background image in the dataset.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_execute_workflow_app.html" class="btn btn-neutral float-left" title="Tutorial for the ExecuteWorkflowApp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../gui/graphical_user_interface.html" class="btn btn-neutral float-right" title="Graphical user interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

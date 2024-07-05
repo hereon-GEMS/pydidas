@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code documentation &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Key concepts" href="concepts.html" />
+    <link rel="prev" title="Using the pydidas processing pipeline" href="../manuals/gui/recipes/pydidas_processing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydidas
+              <img src="../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#further-code-documentation">Further code documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="concepts.html">Key concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="package_structure.html">Package structure</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-documentation">API documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Code documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/code/code_documentation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="code-documentation">
+<h1>Code documentation<a class="headerlink" href="#code-documentation" title="Link to this heading"></a></h1>
+<p>This section documents the code and is intended as reference for developers.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#introduction" id="id1">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#architecture" id="id3">Architecture</a></p></li>
+<li><p><a class="reference internal" href="#further-code-documentation" id="id4">Further code documentation</a></p></li>
+<li><p><a class="reference internal" href="#api-documentation" id="id5">API documentation</a></p></li>
+</ul>
+</nav>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>A fundamental consideration is the separation of GUI and functionality. All computational
+functionality is designed to be accessible from the command line / scripts. (Although the
+GUI does provide some additional convenience methods.)
+Some funcionality like file browsing and result visualization requires a GUI and is not
+available from the command line.</p>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>Much of pydidas’ functionality is based on Qt (PyQt5) and its QObjects with the inherent
+signal/slot system. For more information about Qt, please visit the Qt documentation.
+Qt is also used for storing persistent information about global settings in the registry.</p>
+<p>The computational part requires the pyFAI, numpy and scipy packages.</p>
+<p>Additionally, the GUI uses widgets from pyFAI and silx and requires both packages.</p>
+</section>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<p>pydidas is designed to be versatile and expandable. The processing is completely separated
+from the GUI and can be used from command line scripts as well.</p>
+<p>Generic functionality is grouped in basic sub-modules (for a full description please refer
+to the <a class="reference external" href="package_structure.html">Package Structure</a>). Specific use cases are defined as
+stand-alone applications and are agnostic to the way they are called (serial or parallel).
+Parallelization of apps is provided by the multiprocessing sub-package and works with all
+generic apps.</p>
+<p>Widgets and the GUI are not referenced by other components and are independant of the rest of the
+pydidas package.</p>
+</section>
+<section id="further-code-documentation">
+<h2>Further code documentation<a class="headerlink" href="#further-code-documentation" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Key concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package_structure.html">Package structure</a></li>
+</ul>
+</div>
+</section>
+<section id="api-documentation">
+<h2>API documentation<a class="headerlink" href="#api-documentation" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/core.html">The core submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/managers.html">The managers sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/apps.html">The apps sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/gui.html">The gui submodule</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../manuals/gui/recipes/pydidas_processing.html" class="btn btn-neutral float-left" title="Using the pydidas processing pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="concepts.html" class="btn btn-neutral float-right" title="Key concepts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

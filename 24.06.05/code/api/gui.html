@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The gui submodule &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="MainWindow" href="gui/main_window.html" />
+    <link rel="prev" title="GlobalSettingsWindow" href="widgets/windows/global_settings_window.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The gui submodule</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#global-gui-classes">Global GUI classes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="gui/main_window.html">MainWindow</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#frames">Frames</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/data_browsing_frame.html">DataBrowsingFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/pyfai_calib_frame.html">PyfaiCalibFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/composite_creator_frame.html">CompositeCreatorFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/define_diffraction_exp_frame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/define_scan_frame.html">DefineScanFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/workflow_edit_frame.html">WorkflowEditFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/workflow_test_frame.html">WorkflowTestFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/workflow_run_frame.html">WorkflowRunFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/view_results_frame.html">ViewResultsFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="gui/frames/builders.html">Builder classes</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#windows">Windows</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="widgets/windows/global_settings_window.html">GlobalSettingsWindow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../code_documentation.html">Code documentation</a></li>
+      <li class="breadcrumb-item active">The gui submodule</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/code/api/gui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-gui-submodule">
+<h1>The gui submodule<a class="headerlink" href="#the-gui-submodule" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#global-gui-classes" id="id1">Global GUI classes</a></p></li>
+<li><p><a class="reference internal" href="#frames" id="id2">Frames</a></p></li>
+<li><p><a class="reference internal" href="#windows" id="id3">Windows</a></p></li>
+</ul>
+</nav>
+<p>The gui submodule for the graphical user interface is the equivalent to <em>apps</em>
+submodule for processing as it exposes functionality to the user.</p>
+<p>The main graphical interface is handled by the <a class="reference internal" href="gui/main_window.html#pydidas.gui.MainWindow" title="pydidas.gui.MainWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">MainWindow</span></code></a> class. It handles the individual frames and persistent
+state storage.</p>
+<p>Functionality is organized in individual <code class="xref py py-class docutils literal notranslate"><span class="pre">Frames</span></code> which allow storage of state and which are shown
+in the central widget and independent <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindows</span></code> which are not persistent and are used for
+individual and independent tasks.</p>
+<section id="global-gui-classes">
+<h2>Global GUI classes<a class="headerlink" href="#global-gui-classes" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gui/main_window.html">MainWindow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/main_window.html#class-name-with-own-methods-only">MainWindow with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/main_window.html#pydidas.gui.MainWindow"><code class="docutils literal notranslate"><span class="pre">MainWindow</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/main_window.html#class-name-with-inherited-methods-too">MainWindow with inherited methods too</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="frames">
+<h2>Frames<a class="headerlink" href="#frames" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/data_browsing_frame.html">DataBrowsingFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/data_browsing_frame.html#class-name-with-own-methods-only">DataBrowsingFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/data_browsing_frame.html#pydidas.gui.frames.DataBrowsingFrame"><code class="docutils literal notranslate"><span class="pre">DataBrowsingFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/data_browsing_frame.html#class-name-with-inherited-methods-too">DataBrowsingFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/pyfai_calib_frame.html">PyfaiCalibFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/pyfai_calib_frame.html#class-name-with-own-methods-only">PyfaiCalibFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/pyfai_calib_frame.html#pydidas.gui.frames.PyfaiCalibFrame"><code class="docutils literal notranslate"><span class="pre">PyfaiCalibFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/pyfai_calib_frame.html#class-name-with-inherited-methods-too">PyfaiCalibFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/composite_creator_frame.html">CompositeCreatorFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/composite_creator_frame.html#class-name-with-own-methods-only">CompositeCreatorFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/composite_creator_frame.html#pydidas.gui.frames.CompositeCreatorFrame"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/composite_creator_frame.html#class-name-with-inherited-methods-too">CompositeCreatorFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/define_diffraction_exp_frame.html">DefineDiffractionExpFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/define_diffraction_exp_frame.html#class-name-with-own-methods-only">DefineDiffractionExpFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/define_diffraction_exp_frame.html#pydidas.gui.frames.DefineDiffractionExpFrame"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/define_diffraction_exp_frame.html#class-name-with-inherited-methods-too">DefineDiffractionExpFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/define_scan_frame.html">DefineScanFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/define_scan_frame.html#class-name-with-own-methods-only">DefineScanFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/define_scan_frame.html#pydidas.gui.frames.DefineScanFrame"><code class="docutils literal notranslate"><span class="pre">DefineScanFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/define_scan_frame.html#class-name-with-inherited-methods-too">DefineScanFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/workflow_edit_frame.html">WorkflowEditFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/workflow_edit_frame.html#class-name-with-own-methods-only">WorkflowEditFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/workflow_edit_frame.html#pydidas.gui.frames.WorkflowEditFrame"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/workflow_edit_frame.html#class-name-with-inherited-methods-too">WorkflowEditFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/workflow_test_frame.html">WorkflowTestFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/workflow_test_frame.html#class-name-with-own-methods-only">WorkflowTestFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/workflow_test_frame.html#pydidas.gui.frames.WorkflowTestFrame"><code class="docutils literal notranslate"><span class="pre">WorkflowTestFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/workflow_test_frame.html#class-name-with-inherited-methods-too">WorkflowTestFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/workflow_run_frame.html">WorkflowRunFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/workflow_run_frame.html#class-name-with-own-methods-only">WorkflowRunFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/workflow_run_frame.html#pydidas.gui.frames.WorkflowRunFrame"><code class="docutils literal notranslate"><span class="pre">WorkflowRunFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/workflow_run_frame.html#class-name-with-inherited-methods-too">WorkflowRunFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/view_results_frame.html">ViewResultsFrame</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/view_results_frame.html#class-name-with-own-methods-only">ViewResultsFrame with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/view_results_frame.html#pydidas.gui.frames.ViewResultsFrame"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/view_results_frame.html#class-name-with-inherited-methods-too">ViewResultsFrame with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui/frames/builders.html">Builder classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorFrameBuilder.build_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DataBrowsingFrameBuilder"><code class="docutils literal notranslate"><span class="pre">DataBrowsingFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DataBrowsingFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">DataBrowsingFrameBuilder.build_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder.build_frame()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_detector_header"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder.create_detector_header()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_geometry_header"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder.create_geometry_header()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DefineScanFrameBuilder"><code class="docutils literal notranslate"><span class="pre">DefineScanFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DefineScanFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">DefineScanFrameBuilder.build_frame()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.DefineScanFrameBuilder.width_factor"><code class="docutils literal notranslate"><span class="pre">DefineScanFrameBuilder.width_factor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.ImageMathFrameBuilder"><code class="docutils literal notranslate"><span class="pre">ImageMathFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.ImageMathFrameBuilder.create_combo_button_row"><code class="docutils literal notranslate"><span class="pre">ImageMathFrameBuilder.create_combo_button_row()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.ImageMathFrameBuilder.populate_frame"><code class="docutils literal notranslate"><span class="pre">ImageMathFrameBuilder.populate_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder"><code class="docutils literal notranslate"><span class="pre">QuickIntegrationFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder.populate_frame"><code class="docutils literal notranslate"><span class="pre">QuickIntegrationFrameBuilder.populate_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.UtilitiesFrameBuilder"><code class="docutils literal notranslate"><span class="pre">UtilitiesFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.UtilitiesFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">UtilitiesFrameBuilder.build_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.WorkflowEditFrameBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.WorkflowEditFrameBuilder.populate_frame"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrameBuilder.populate_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.WorkflowRunFrameBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowRunFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.WorkflowRunFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">WorkflowRunFrameBuilder.build_frame()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.WorkflowTestFrameBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowTestFrameBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gui/frames/builders.html#pydidas.gui.frames.builders.WorkflowTestFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">WorkflowTestFrameBuilder.build_frame()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="windows">
+<h2>Windows<a class="headerlink" href="#windows" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="widgets/windows/global_settings_window.html">GlobalSettingsWindow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="widgets/windows/global_settings_window.html#class-name-with-own-methods-only">GlobalSettingsWindow with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="widgets/windows/global_settings_window.html#pydidas.widgets.windows.global_settings_window._GlobalSettingsWindow"><code class="docutils literal notranslate"><span class="pre">_GlobalSettingsWindow</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/windows/global_settings_window.html#class-name-with-inherited-methods-too">GlobalSettingsWindow with inherited methods too</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="widgets/windows/global_settings_window.html" class="btn btn-neutral float-left" title="GlobalSettingsWindow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gui/main_window.html" class="btn btn-neutral float-right" title="MainWindow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

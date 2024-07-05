@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphical user interface &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The menu" href="menu.html" />
+    <link rel="prev" title="Tutorial for the DirectorySpyApp" href="../cmdline_apps/cmd_directory_spy_app.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../commandline.html">Command line manuals</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Graphical user interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-ui-state">The UI state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generic-gui-information">Generic GUI information</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="menu.html">The menu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="editing_parameters.html">Editing Parameters in the GUI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="silx/plots.html">Plots</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#frames">Frames</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="frames/DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/DefineDiffractionExpFrame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/DefineScanFrame.html">Define scan frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#windows">Windows</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="windows/ImageSeriesOperationsWindow.html">Image series operations window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/MaskEditorWindow.html">Mask editor window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/ExportEigerPixelmaskWindow.html">Export Eiger pixel mask window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/_UserConfigWindow.html">The User config window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/_GlobalSettingsWindow.html">The Global settings window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/TweakPluginParameterWindow.html">Tweak Plugin Parameters window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/ShowDetailedPluginResultsWindow.html">Show Detailed Plugin Results window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/ManuallySetBeamcenterWindow.html">Manually Set Beamcenter Window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows/SelectIntegrationRegionWindow.html">Select integration region window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="frames/CompositeCreatorFrame.html">Composite image creator frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#recipes">Recipes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="recipes/pydidas_processing.html">Using the pydidas processing pipeline</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../manuals.html">Manuals</a></li>
+      <li class="breadcrumb-item active">Graphical user interface</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/gui/graphical_user_interface.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="graphical-user-interface">
+<h1>Graphical user interface<a class="headerlink" href="#graphical-user-interface" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#overview" id="id1">Overview</a></p></li>
+<li><p><a class="reference internal" href="#the-ui-state" id="id2">The UI state</a></p></li>
+<li><p><a class="reference internal" href="#generic-gui-information" id="id3">Generic GUI information</a></p></li>
+<li><p><a class="reference internal" href="#frames" id="id4">Frames</a></p></li>
+<li><p><a class="reference internal" href="#windows" id="id5">Windows</a></p></li>
+<li><p><a class="reference internal" href="#recipes" id="id6">Recipes</a></p></li>
+</ul>
+</nav>
+<p>The graphical user interface is organized in <em>Frames</em> which are independent of
+each other and which each hold persistent information during each session.</p>
+<p>The individual <a class="reference internal" href="#gui-frames"><span class="std std-ref">Frames</span></a> and <a class="reference internal" href="#gui-windows"><span class="std std-ref">Windows</span></a> are presented below before
+<a class="reference internal" href="#gui-recipes"><span class="std std-ref">Recipes</span></a> are described which give a detailed guide on individual use
+cases.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The general pydidas GUI layout is shown below:</p>
+<a class="reference internal image-reference" href="../../_images/gui_generic_layout.png"><img alt="../../_images/gui_generic_layout.png" class="align-center" src="../../_images/gui_generic_layout.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to global functionality like state import and
+export, global and user settings as well as help and bug reporting. The
+details are described in the <a class="reference internal" href="menu.html#gui-menu"><span class="std std-ref">Menu manual</span></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The status &amp; logging area</dt><dd><p>This dockable area is used by all frames to send status updates and to
+display them globally.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The Frame selection toolbar</dt><dd><p>This toolbar is used to select which frame to display in the central widget
+of the GUI. Some entries can open a submenu with additional choices.
+Clicking on the icon will open the frame. Frames are persistent within a
+session and information is stored when switching between different frames.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The central frame</dt><dd><p>This widget displays the active frame and the main interaction with the user
+happens here.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>After starting the GUI, the home frame gives links to the documentation and a
+very brief reminder how to user the pydidas GUI.</p>
+</section>
+<section id="the-ui-state">
+<h2>The UI state<a class="headerlink" href="#the-ui-state" title="Link to this heading"></a></h2>
+<p>The state of the interface, including all configurations of frames and apps, can
+be stored and restored by the user. This is handled in the <strong>File &gt; GUI state</strong>
+menu and details are explained in detail <a class="reference internal" href="menu.html#gui-menu"><span class="std std-ref">Menu manual</span></a>.</p>
+<p>This function allows to either store the state in a automatically controlled
+file in the OS-specific user’s application config directory or in a file
+specified by the user itself. For restoring, similar options exist.
+In addition, pydidas stores the GUI’s state when closing the GUI properly (i.e.
+a regular exit), allowing the user to pick up where they left.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The automatically-controlled files are user-specific and if users log in
+on the same machine using a different user account, the file will not be
+accessible.</p>
+</div>
+</section>
+<section id="generic-gui-information">
+<h2>Generic GUI information<a class="headerlink" href="#generic-gui-information" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="menu.html">The menu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="editing_parameters.html">Editing Parameters in the GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="silx/plots.html">Plots</a></li>
+</ul>
+</div>
+</section>
+<section id="frames">
+<span id="gui-frames"></span><h2>Frames<a class="headerlink" href="#frames" title="Link to this heading"></a></h2>
+<p>Detailed descriptions of the individual frames are given here.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="frames/DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/DefineDiffractionExpFrame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/DefineScanFrame.html">Define scan frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</div>
+</section>
+<section id="windows">
+<span id="gui-windows"></span><h2>Windows<a class="headerlink" href="#windows" title="Link to this heading"></a></h2>
+<p>Detailed information about the individual windows is given here.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="windows/ImageSeriesOperationsWindow.html">Image series operations window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/MaskEditorWindow.html">Mask editor window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/ExportEigerPixelmaskWindow.html">Export Eiger pixel mask window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/_UserConfigWindow.html">The User config window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/_GlobalSettingsWindow.html">The Global settings window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/TweakPluginParameterWindow.html">Tweak Plugin Parameters window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/ShowDetailedPluginResultsWindow.html">Show Detailed Plugin Results window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/ManuallySetBeamcenterWindow.html">Manually Set Beamcenter Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows/SelectIntegrationRegionWindow.html">Select integration region window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frames/CompositeCreatorFrame.html">Composite image creator frame</a></li>
+</ul>
+</div>
+</section>
+<section id="recipes">
+<span id="gui-recipes"></span><h2>Recipes<a class="headerlink" href="#recipes" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="recipes/pydidas_processing.html">Using the pydidas processing pipeline</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../cmdline_apps/cmd_directory_spy_app.html" class="btn btn-neutral float-left" title="Tutorial for the DirectorySpyApp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="menu.html" class="btn btn-neutral float-right" title="The menu" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

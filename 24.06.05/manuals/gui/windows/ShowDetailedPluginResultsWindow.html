@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Show Detailed Plugin Results window &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Manually Set Beamcenter Window" href="ManuallySetBeamcenterWindow.html" />
+    <link rel="prev" title="Tweak Plugin Parameters window" href="TweakPluginParameterWindow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../commandline.html">Command line manuals</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#the-ui-state">The UI state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#generic-gui-information">Generic GUI information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#frames">Frames</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../graphical_user_interface.html#windows">Windows</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="ImageSeriesOperationsWindow.html">Image series operations window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="MaskEditorWindow.html">Mask editor window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ExportEigerPixelmaskWindow.html">Export Eiger pixel mask window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_UserConfigWindow.html">The User config window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_GlobalSettingsWindow.html">The Global settings window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="TweakPluginParameterWindow.html">Tweak Plugin Parameters window</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Show Detailed Plugin Results window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ManuallySetBeamcenterWindow.html">Manually Set Beamcenter Window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="SelectIntegrationRegionWindow.html">Select integration region window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../frames/CompositeCreatorFrame.html">Composite image creator frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#recipes">Recipes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../graphical_user_interface.html">Graphical user interface</a></li>
+      <li class="breadcrumb-item active">Show Detailed Plugin Results window</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/manuals/gui/windows/ShowDetailedPluginResultsWindow.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="show-detailed-plugin-results-window">
+<span id="id1"></span><h1>Show Detailed Plugin Results window<a class="headerlink" href="#show-detailed-plugin-results-window" title="Link to this heading"></a></h1>
+<p>The <em>Show detailed Plugin results window</em> will have a different layout for
+each plugin, depending on the detailed information.</p>
+<a class="reference internal image-reference" href="../../../_images/detailed_results.png"><img alt="../../../_images/detailed_results.png" class="align-center" src="../../../_images/detailed_results.png" style="width: 640px;" /></a>
+<p>Generally, on the left will be a text box with metadata and a number of plots
+will be shown on the right side.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="TweakPluginParameterWindow.html" class="btn btn-neutral float-left" title="Tweak Plugin Parameters window" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ManuallySetBeamcenterWindow.html" class="btn btn-neutral float-right" title="Manually Set Beamcenter Window" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

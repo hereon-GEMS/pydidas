@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The widgets.framework sub-package &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The widgets.misc sub-package" href="misc.html" />
+    <link rel="prev" title="The widgets.factory sub-package" href="factory.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">The widgets.framework sub-package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame"><code class="docutils literal notranslate"><span class="pre">BaseFrame</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.framework.BaseFrameWithApp"><code class="docutils literal notranslate"><span class="pre">BaseFrameWithApp</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.framework.FontScalingToolbar"><code class="docutils literal notranslate"><span class="pre">FontScalingToolbar</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.framework.PydidasWindow"><code class="docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../code_documentation.html">Code documentation</a></li>
+          <li class="breadcrumb-item"><a href="../widgets.html">The widgets sub-package</a></li>
+      <li class="breadcrumb-item active">The widgets.framework sub-package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/code/api/widgets/framework.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pydidas.widgets.framework">
+<span id="the-widgets-framework-sub-package"></span><h1>The widgets.framework sub-package<a class="headerlink" href="#module-pydidas.widgets.framework" title="Link to this heading"></a></h1>
+<p>Package with modified widgets required for creating the pydidas graphical user
+interface.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">BaseFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code>, <a class="reference internal" href="../core/others.html#pydidas.core.ParameterCollectionMixIn" title="pydidas.core.parameter_collection_mixin.ParameterCollectionMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollectionMixIn</span></code></a>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a>, <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <a class="reference internal" href="parameter_config.html#pydidas.widgets.parameter_config.ParameterWidgetsMixIn" title="pydidas.widgets.parameter_config.parameter_widgets_mixin.ParameterWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a></p>
+<p>The BaseFrame is a subclassed QWidget and the base class for all Frames in pydidas.</p>
+<p>By default, a QGridLayout is applied with an alignment of left/top.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments which might be used by
+subclasses.</p></li>
+<li><p><strong>**init_layout</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to initialize the frame layout with a QtWidgets.QGridLayout
+and left / top alignment. If False, no layout will be initialized
+and the subclass is responsible for setting up the layout. The
+default is True.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Build all widgets of the frame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.closeEvent" title="Link to this definition"></a></dt>
+<dd><p>Reimplement the closeEvent to emit a signal about the closing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The event which triggered the closeEvent.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.connect_signals" title="Link to this definition"></a></dt>
+<dd><p>Connect all the required signals for the frame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.export_state" title="Link to this definition"></a></dt>
+<dd><p>Export the state of the Frame for saving.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>frame_index</strong> (<em>int</em>) – The frame index which can be used as key for referencing the state.</p></li>
+<li><p><strong>information</strong> (<em>dict</em>) – A dictionary with all the information required to export the
+frame’s state.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.finalize_ui">
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.finalize_ui" title="Link to this definition"></a></dt>
+<dd><p>finalize the UI initialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.frame_activated">
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.frame_activated" title="Link to this definition"></a></dt>
+<dd><p>Received signal that frame has been activated.</p>
+<p>This method is called when this frame becomes activated by the
+central widget. By default, this method will perform no actions.
+If specific frames require any actions, they will need to overwrite
+this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the activated frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.restore_state">
+<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.restore_state" title="Link to this definition"></a></dt>
+<dd><p>Restore the frame’s state from stored information.</p>
+<p>The default implementation in the BaseFrame will update all Parameters
+(and associated widgets) and restore the visibility of all widgets. If the
+frame has not yet been built, the state information is only stored internally
+and not yet applied. It will be applied at the next frame activation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – A dictionary with ‘params’ and ‘visibility’ keys and the respective
+information for both.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrame.set_status">
+<span class="sig-name descname"><span class="pre">set_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrame.set_status" title="Link to this definition"></a></dt>
+<dd><p>Emit a status message to the main window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – The status message to be emitted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrameWithApp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">BaseFrameWithApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrameWithApp" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a></p>
+<p>The BaseFrameWithApp is a subclassed BaseFrame with an associated pydidas App.</p>
+<p>It should be used as the base class for all Frames with an associated
+Application in the pydidas suite.</p>
+<p>It adds (internal) methods required for running a pydidas app to the
+BaseFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>Union</em><em>[</em><em>QWidget</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The parent widget. The default is None.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments.</p></li>
+<li><p><strong>**init_layout</strong> (<em>bool</em>) – Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
+If False, no layout will be initialized and the subclass is
+responsible for setting up the layout. The default is True.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrameWithApp.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrameWithApp.export_state" title="Link to this definition"></a></dt>
+<dd><p>Export the state of the Frame for saving.</p>
+<p>This method adds an export for the frame’s app.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>frame_index</strong> (<em>int</em>) – The frame index which can be used as key for referencing the state.</p></li>
+<li><p><strong>information</strong> (<em>dict</em>) – A dictionary with all the information required to export the
+frame’s state.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.BaseFrameWithApp.restore_state">
+<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.BaseFrameWithApp.restore_state" title="Link to this definition"></a></dt>
+<dd><p>Restore the frame’s state from stored information.</p>
+<p>The BaseFrameWithApp implementation will update the associated App
+and then call the BaseFrame’s method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – A dictionary with ‘params’, ‘app’ and ‘visibility’ keys and the
+respective information for all.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.FontScalingToolbar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">FontScalingToolbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.FontScalingToolbar" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QToolBar</span></code></p>
+<p>A subclassed toolbar with automatic scaling based on the font metrics.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.FontScalingToolbar.process_new_font_family">
+<span class="sig-name descname"><span class="pre">process_new_font_family</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.FontScalingToolbar.process_new_font_family" title="Link to this definition"></a></dt>
+<dd><p>Redraw the toolbar with the new font family.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.FontScalingToolbar.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.FontScalingToolbar.process_new_font_metrics" title="Link to this definition"></a></dt>
+<dd><p>Process the new font height and adjust the ToolBar accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>font_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">PydidasWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindowMixIn</span></code></p>
+<p>The PydidasWindow is a standalone BaseFrame with a persistent geometry.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow.open_help">
+<span class="sig-name descname"><span class="pre">open_help</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow.open_help" title="Link to this definition"></a></dt>
+<dd><p>Open the help in a browser.</p>
+<p>This slot will check whether a helpfile exists for the current frame and open
+the respective helpfile if it exits or the main documentation if it does not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow.show" title="Link to this definition"></a></dt>
+<dd><p>Overload the generic show method.</p>
+<p>This makes sure that any show calls will have a fully built window.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="factory.html" class="btn btn-neutral float-left" title="The widgets.factory sub-package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="misc.html" class="btn btn-neutral float-right" title="The widgets.misc sub-package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

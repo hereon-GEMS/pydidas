@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pydidas quick-start guide &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=853907ea"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Manuals" href="manuals.html" />
+    <link rel="prev" title="pydidas" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pydidas
+              <img src="_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pydidas quick-start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#entry-points">Entry points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scripts">Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line">Command line</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="manuals.html">Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Pydidas quick-start guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pydidas-quick-start-guide">
+<span id="quickstart"></span><h1>Pydidas quick-start guide<a class="headerlink" href="#pydidas-quick-start-guide" title="Link to this heading"></a></h1>
+<p>Pydidas is usable both through its graphical user interface as well as through the
+command line / notebooks.</p>
+<p>To quickly start using pydidas, there are multiple options:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Entry points (if pydidas was installed using pip)</p></li>
+<li><p>Scripts in the <code class="docutils literal notranslate"><span class="pre">pydidas_scripts</span></code> folder.</p></li>
+<li><p>Using the <code class="docutils literal notranslate"><span class="pre">pydidas</span></code> module in the python shell.</p></li>
+</ul>
+</div></blockquote>
+<section id="entry-points">
+<h2>Entry points<a class="headerlink" href="#entry-points" title="Link to this heading"></a></h2>
+<p>If installed as wheel, pydidas offers the following entry points:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-gui</span></code> to start the graphical user interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-documentation</span></code> to open the pydidas documentation in the default system
+web browser. <strong>Note:</strong> The pydidas module must have been run at least once
+(either through opening the GUI or imported in a python shell) for the
+documentation to have been created.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-clear-settings</span></code> Remove the stored registry keys for pydidas.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-updater</span></code> Start a script which automatically updates pydidas to the latest
+version available on GitHub.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-remove-local-files</span></code> This script removes all local log files and stored
+configuration files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run-pydidas-workflow</span></code> Script to run a defined workflow in the console. This script
+also requires configuration files for the scan and diffraction experiment. Please
+refer to the full documentation for more details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remove-pydidas</span></code> Remove all local config files and registry settings from the
+system. Please note that this script will not remove the python code itself, but
+only cleans up the system.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="scripts">
+<h2>Scripts<a class="headerlink" href="#scripts" title="Link to this heading"></a></h2>
+<p>Pydidas includes multiple scripts which are located in the <code class="docutils literal notranslate"><span class="pre">pydidas_scripts</span></code> folder,
+which is located in the same folder as <code class="docutils literal notranslate"><span class="pre">pydidas</span></code>.
+These can be called directly by python from the command line and they are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas_gui.py</span></code> to start the GUI.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas_documentation.py</span></code> to open the html documentation in a browser.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_pydidas_workflow.py</span></code> to run a processing workflow on the command line.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas_updater_script.py</span></code> to update pydidas to the latest release published on
+GitHub.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clear_local_settings.py</span></code> to remove all registry settings written by pydidas.</p></li>
+</ul>
+</div></blockquote>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h3>
+<p>If pydidas, was installed in <cite>/user/myname/code/python/my_packages/pydidas</cite>,
+the <code class="docutils literal notranslate"><span class="pre">pydidas_scripts</span></code> will be located in</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/user/myname/code/python/my_packages/pydidas_scripts
+$<span class="w"> </span>python<span class="w"> </span>pydidas_gui.py
+</pre></div>
+</div>
+</section>
+</section>
+<section id="command-line">
+<h2>Command line<a class="headerlink" href="#command-line" title="Link to this heading"></a></h2>
+<p>Much of pydidas’ functionality is also available from the command line or notebooks.
+Pydidas can be imported and used as any other python module. Please refer to the
+documentation, in particular to the <a class="reference internal" href="manuals/commandline.html#command-line-manual"><span class="std std-ref">Command line manuals</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="pydidas" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manuals.html" class="btn btn-neutral float-right" title="Manuals" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

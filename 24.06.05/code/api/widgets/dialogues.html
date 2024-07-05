@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The widgets.dialogues sub-package &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The widgets.factory sub-package" href="factory.html" />
+    <link rel="prev" title="The widgets.controllers sub-package" href="controllers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">The widgets.dialogues sub-package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.dialogues.AcknowledgeBox"><code class="docutils literal notranslate"><span class="pre">AcknowledgeBox</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.dialogues.ErrorMessageBox"><code class="docutils literal notranslate"><span class="pre">ErrorMessageBox</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelectionPopup</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.dialogues.PydidasExceptionMessageBox"><code class="docutils literal notranslate"><span class="pre">PydidasExceptionMessageBox</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.dialogues.QuestionBox"><code class="docutils literal notranslate"><span class="pre">QuestionBox</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.dialogues.WarningBox"><code class="docutils literal notranslate"><span class="pre">WarningBox</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.dialogues.critical_warning"><code class="docutils literal notranslate"><span class="pre">critical_warning()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../code_documentation.html">Code documentation</a></li>
+          <li class="breadcrumb-item"><a href="../widgets.html">The widgets sub-package</a></li>
+      <li class="breadcrumb-item active">The widgets.dialogues sub-package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/code/api/widgets/dialogues.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pydidas.widgets.dialogues">
+<span id="the-widgets-dialogues-sub-package"></span><h1>The widgets.dialogues sub-package<a class="headerlink" href="#module-pydidas.widgets.dialogues" title="Link to this heading"></a></h1>
+<p>Subpackage with PyQt dialogues.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.AcknowledgeBox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.dialogues.</span></span><span class="sig-name descname"><span class="pre">AcknowledgeBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.AcknowledgeBox" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDialog</span></code>, <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a></p>
+<p>Show a dialogue box with information to be acknowledged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>tuple</em>) – Arguments passed to QtWidgets.QDialogue instanciation.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Supported keywords are:</p>
+<dl class="simple">
+<dt>text<span class="classifier">str, optional</span></dt><dd><p>The notice text to be displayed. The text will be formatted to a
+line length of a maximum of 60 characters.</p>
+</dd>
+<dt>text_preformatted<span class="classifier">bool, optional</span></dt><dd><p>Flag to keep the text formatting and not to auto-format the text
+to keep a width of &lt; 60 characters.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>The title of the box. The default is “Notice”</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.AcknowledgeBox.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.AcknowledgeBox.close" title="Link to this definition"></a></dt>
+<dd><p>Close the widget and store the acknowledge state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.AcknowledgeBox.set_text">
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_formatted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.AcknowledgeBox.set_text" title="Link to this definition"></a></dt>
+<dd><p>Set the text in the message box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be displayed.</p></li>
+<li><p><strong>pre_formatted</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to keep the text formatting. The default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.ErrorMessageBox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.dialogues.</span></span><span class="sig-name descname"><span class="pre">ErrorMessageBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.ErrorMessageBox" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDialog</span></code>, <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a></p>
+<p>Show a dialogue box with exception information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>tuple</em>) – Arguments passed to QtWidgets.QDialogue instanciation.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments passed to QtWidgets.QDialogue instanciation.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.ErrorMessageBox.copy_to_clipboard_and_open_webpage">
+<span class="sig-name descname"><span class="pre">copy_to_clipboard_and_open_webpage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.ErrorMessageBox.copy_to_clipboard_and_open_webpage" title="Link to this definition"></a></dt>
+<dd><p>Copy the trace to the clipboard and open the URL for the pydidas
+feedback form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.ErrorMessageBox.set_text">
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.ErrorMessageBox.set_text" title="Link to this definition"></a></dt>
+<dd><p>Set the text in the message box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – The text to be displayed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.dialogues.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelectionPopup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">QWidget</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QInputDialog</span></code></p>
+<p>A dialogue for showing a pop-up dialogue to select a dataset from an hdf5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>QWidget</em><em>]</em>) – The parent widget</p></li>
+<li><p><strong>fname</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The file path to the hdf5 file.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup.get_dset">
+<span class="sig-name descname"><span class="pre">get_dset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/others.html#pydidas.core.Hdf5key" title="pydidas.core.hdf5_key.Hdf5key"><span class="pre">Hdf5key</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup.get_dset" title="Link to this definition"></a></dt>
+<dd><p>Show the QInputDialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If the dialogue is accepted, returns the selected Hdf5key.
+If it is aborted, it will return None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Union[<a class="reference internal" href="../core/others.html#pydidas.core.Hdf5key" title="pydidas.core.Hdf5key">Hdf5key</a>, None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup.set_filename">
+<span class="sig-name descname"><span class="pre">set_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup.set_filename" title="Link to this definition"></a></dt>
+<dd><p>Set the filename for the Hdf5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> (<em>str</em>) – The full path to the Hdf5 file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.PydidasExceptionMessageBox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.dialogues.</span></span><span class="sig-name descname"><span class="pre">PydidasExceptionMessageBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.PydidasExceptionMessageBox" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDialog</span></code>, <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a></p>
+<p>Show a dialogue box with exception information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>tuple</em>) – Arguments passed to QtWidgets.QDialogue instanciation.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Supported keyword arguments are:</p>
+<dl class="simple">
+<dt>text<span class="classifier">str, optional</span></dt><dd><p>The error string. The default is an empty string.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>The window title. The default is “Configuration error”.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.PydidasExceptionMessageBox.set_text">
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.PydidasExceptionMessageBox.set_text" title="Link to this definition"></a></dt>
+<dd><p>Set the text in the message box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – The text to be displayed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.QuestionBox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.dialogues.</span></span><span class="sig-name descname"><span class="pre">QuestionBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">QWidget</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StandardButton</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">65536</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tooltip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.QuestionBox" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QMessageBox</span></code></p>
+<p>Show a dialogue box with a yes/no question.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) – The QuestionBox title.</p></li>
+<li><p><strong>question</strong> (<em>str</em>) – The question text.</p></li>
+<li><p><strong>explanation</strong> (<em>str</em><em>, </em><em>optional</em>) – An explanatory text to amend the question text.</p></li>
+<li><p><strong>parent</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>QtWidgets.QWidget</em><em>]</em><em>, </em><em>optional</em>) – The parent widget. The default is None.</p></li>
+<li><p><strong>default</strong> (<em>QtWidgets.QMessageBox.StandardButton</em><em>, </em><em>optional</em>) – The default pre-selected button. The default is No.</p></li>
+<li><p><strong>tooltip</strong> (<em>str</em><em>, </em><em>optional</em>) – The tooltip text for the dialog. The default is an empty string.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.QuestionBox.exec_">
+<span class="sig-name descname"><span class="pre">exec_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.widgets.dialogues.QuestionBox.exec_" title="Link to this definition"></a></dt>
+<dd><p>Show the box.</p>
+<p>This method will show the QuestionBox</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.WarningBox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.dialogues.</span></span><span class="sig-name descname"><span class="pre">WarningBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.WarningBox" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QMessageBox</span></code></p>
+<p>A QMessageBox with simplified calling syntax to generate a user warning.</p>
+<p>The WarningBox class will set title and message of the QMessageBox
+and call the execute function to display it with a single line of
+code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) – The message box title.</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – The message box text.</p></li>
+<li><p><strong>info</strong> (<em>str</em><em>, </em><em>optional</em>) – Additional informative text. The default is an empty string.</p></li>
+<li><p><strong>details</strong> (<em>str</em><em>, </em><em>optional</em>) – Addition details for the warning. The default is an empty string.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.widgets.dialogues.critical_warning">
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.dialogues.</span></span><span class="sig-name descname"><span class="pre">critical_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.dialogues.critical_warning" title="Link to this definition"></a></dt>
+<dd><p>Create a QMessageBox with a critical warning and show it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) – The warning title.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The warning message text.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="controllers.html" class="btn btn-neutral float-left" title="The widgets.controllers sub-package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="factory.html" class="btn btn-neutral float-right" title="The widgets.factory sub-package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

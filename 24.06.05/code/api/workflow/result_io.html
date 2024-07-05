@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>workflow.result_io &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="workflow.processing_tree_io" href="processing_tree_io.html" />
+    <link rel="prev" title="workflow" href="workflow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../workflow.html">The workflow sub-package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../workflow.html#further-sub-packages">Further sub-packages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../workflow.html#full-code-documentation">Full code documentation</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="workflow.html">workflow</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">workflow.result_io</a></li>
+<li class="toctree-l5"><a class="reference internal" href="processing_tree_io.html">workflow.processing_tree_io</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../code_documentation.html">Code documentation</a></li>
+          <li class="breadcrumb-item"><a href="../workflow.html">The workflow sub-package</a></li>
+      <li class="breadcrumb-item active">workflow.result_io</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/code/api/workflow/result_io.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pydidas.workflow.result_io">
+<span id="workflow-result-io"></span><h1>workflow.result_io<a class="headerlink" href="#module-pydidas.workflow.result_io" title="Link to this heading"></a></h1>
+<p>The pydidas.workflow.result_saver package includes exporters for workflow results
+in different formats as well as a registry metaclass to handle actual
+exports.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.result_io.</span></span><span class="sig-name descname"><span class="pre">WorkflowResultIoBase</span></span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase" title="Link to this definition"></a></dt>
+<dd><p>Base class for WorkflowTree exporters.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.export_frame_to_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_frame_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_result_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.export_frame_to_file" title="Link to this definition"></a></dt>
+<dd><p>Export the results of one frame and store them on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – This method needs to be implemented by each concrete subclass.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The frame index.</p></li>
+<li><p><strong>frame_result_dict</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any kwargs which should be passed to the udnerlying exporter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.export_full_data_to_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_full_data_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.export_full_data_to_file" title="Link to this definition"></a></dt>
+<dd><p>Export all specified datasets to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – This method needs to be implemented by each concrete subclass.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>full_data</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
+<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
+this, if you explicitly require a different context. The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.get_attribute_dict">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_attribute_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.get_attribute_dict" title="Link to this definition"></a></dt>
+<dd><p>Get a dictionary for a single attribute from the combined node informatinon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the attribute to extract.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The dictionary with the node IDs and the single attribute values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.get_filenames_from_labels">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_filenames_from_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.get_filenames_from_labels" title="Link to this definition"></a></dt>
+<dd><p>Get the directory names from labels.</p>
+<p>This method will assemble directory names which include the node ID,
+the Plugin label and the format name. Any spaces or escape characters
+will be converted to underscores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The labels to be used. If labels are not supplied, they will be taken from
+the internally stored node information. The default is None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>names</strong> – The dictionary of possible directory names.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.get_node_attribute">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_node_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.get_node_attribute" title="Link to this definition"></a></dt>
+<dd><p>Get a single node attribute from the stored node information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node_id</strong> (<em>int</em>) – The node number.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The required attribute name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the required attribute</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.import_results_from_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_results_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.import_results_from_file" title="Link to this definition"></a></dt>
+<dd><p>Import results from a file and store them as a Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The full filename of the file to be imported.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – This method needs to be implemented by each concrete subclass.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>pydidas.core.Dataset</em>) – The dataset with the imported data.</p></li>
+<li><p><strong>node_info</strong> (<em>dict</em>) – A dictionary with node_label, data_label, plugin_name keys and the
+respective values.</p></li>
+<li><p><strong>scan</strong> (<em>dict</em>) – The dictionary with meta information about the scan.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.prepare_files_and_directories">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prepare_files_and_directories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_information</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.prepare_files_and_directories" title="Link to this definition"></a></dt>
+<dd><p>Prepare the required files and directories to write the data to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The full path for the data to be saved.</p></li>
+<li><p><strong>node_information</strong> (<em>dict</em>) – A dictionary with nodeID keys and dictionary values. Each value dictionary
+must have the following keys: shape, node_label, data_label, plugin_name
+and the respecive values. The shape (tuple) detemines the shape of the
+Dataset, the node_label is the user’s name for the processing node. The
+data_label gives the description of what the data shows (e.g. intensity)
+and the plugin_name is simply the name of the plugin.</p></li>
+<li><p><strong>**kwargs</strong> – <p>Supported kwargs are:</p>
+<dl class="simple">
+<dt>scan_context<span class="classifier">Union[Scan, None], optional</span></dt><dd><p>The scan context. If None, the generic context will be used.
+Only specify this, if you explicitly require a different context.
+The default is None.</p>
+</dd>
+<dt>diffraction_exp_context<span class="classifier">Union[DiffractionExp, None], optional</span></dt><dd><p>The diffraction experiment context. If None, the generic context
+will be used. Only specify this, if you explicitly require a
+different context. The default is None.</p>
+</dd>
+<dt>workflow_tree<span class="classifier">Union[WorkflowTree, None], optional</span></dt><dd><p>The WorkflowTree. If None, the generic WorkflowTree will be used.
+Only specify this, if you explicitly require a different context.
+The default is None.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoBase.update_frame_metadata">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_frame_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoBase.update_frame_metadata" title="Link to this definition"></a></dt>
+<dd><p>Update the metadata of the individual frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – This method needs to be implemented by each concrete subclass.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – The metadata dictionary with results of one frame for each node.</p></li>
+<li><p><strong>scan</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>pydidas.contexts.scan.Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The Scan instance. If None, this will default to the generic ScanContext.
+The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.result_io.</span></span><span class="sig-name descname"><span class="pre">WorkflowResultIoMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clsname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta" title="Link to this definition"></a></dt>
+<dd><p>Metaclass for WorkflowTree exporters and importers which holds the
+registry with all associated file extensions for exporting WorkflowTrees.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.export_frame_to_active_savers">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_frame_to_active_savers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_result_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.export_frame_to_active_savers" title="Link to this definition"></a></dt>
+<dd><p>Export the results of a frame to all active savers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The frame index.</p></li>
+<li><p><strong>frame_result_dict</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Any kwargs which should be passed to the udnerlying exporter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.export_frame_to_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_frame_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_result_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.export_frame_to_file" title="Link to this definition"></a></dt>
+<dd><p>Call the concrete export_to_file method in the subclass registered
+to the extension of the filename.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The frame index.</p></li>
+<li><p><strong>extension</strong> (<em>str</em>) – The file extension for the saver.</p></li>
+<li><p><strong>frame_result_dict</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Any kwargs which should be passed to the udnerlying exporter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.export_full_data_to_active_savers">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_full_data_to_active_savers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.export_full_data_to_active_savers" title="Link to this definition"></a></dt>
+<dd><p>Export the full data to all active savers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
+<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
+this, if you explicitly require a different context. The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.export_full_data_to_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_full_data_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.export_full_data_to_file" title="Link to this definition"></a></dt>
+<dd><p>Export the full data to all active savers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extension</strong> (<em>str</em>) – The file extension for the saver.</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
+<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
+this, if you explicitly require a different context. The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.get_filenames_from_active_savers">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_filenames_from_active_savers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.get_filenames_from_active_savers" title="Link to this definition"></a></dt>
+<dd><p>Get the filenames from all active savers based on the supplied labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>dict</em>) – The labels of the results in form of a dictionary with nodeID
+keys and label values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list will all filenames for all selected nodes and exporters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.import_data_from_directory">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_data_from_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dirname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.processing_tree.ProcessingTree"><span class="pre">ProcessingTree</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.import_data_from_directory" title="Link to this definition"></a></dt>
+<dd><p>Import data from files in a directory.</p>
+<p>This method imports data, reads the metadata and passes it in a format for
+the WorkflowResults to update itself.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dirname</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The name of the directory from which data shall be imported.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data_dict</strong> (<em>dict</em>) – The dictionary with the data. Keys are the respective node IDs and dict
+values is the imported data.</p></li>
+<li><p><strong>node_info_dict</strong> (<em>dict</em>) – The dictionary with information for all imported nodes.</p></li>
+<li><p><strong>scan</strong> (<em>Scan</em>) – A pydidas Scan instance with the scan’s context</p></li>
+<li><p><strong>exp</strong> (<em>DiffractionExperiment</em>) – A pydidas DiffractionExperiment instance with the experiment’s context</p></li>
+<li><p><strong>tree</strong> (<em>WorkflowTree</em>) – A pydidas WorkflowTree instance with the workflow’s context</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.prepare_active_savers">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prepare_active_savers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_information</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffraction_exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.processing_tree.ProcessingTree"><span class="pre">ProcessingTree</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.prepare_active_savers" title="Link to this definition"></a></dt>
+<dd><p>Prepare the active savers for storing data.</p>
+<p>This method creates the required files and directories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The full path for the data to be saved.</p></li>
+<li><p><strong>node_information</strong> (<em>dict</em>) – A dictionary with nodeID keys and dictionary values. Each value dictionary
+must have the following keys: shape, node_label, data_label, plugin_name
+and the respecive values. The shape (tuple) detemines the shape of the
+Dataset, the node_label is the user’s name for the processing node. The
+data_label gives the description of what the data shows (e.g. intensity)
+and the plugin_name is simply the name of the plugin.</p></li>
+<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
+this, if you explicitly require a different context. The default is None.</p></li>
+<li><p><strong>diffraction_exp</strong> (<em>Union</em><em>[</em><em>DiffractionExp</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The diffraction experiment context. If None, the generic context will be
+used. Only specify this, if you explicitly require a different context. The
+default is None.</p></li>
+<li><p><strong>workflow_tree</strong> (<em>Union</em><em>[</em><em>WorkflowTree</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The WorkflowTree. If None, the generic WorkflowTree will be used. Only
+specify this, if you explicitly require a different context. The default is
+None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.push_frame_metadata_to_active_savers">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">push_frame_metadata_to_active_savers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.push_frame_metadata_to_active_savers" title="Link to this definition"></a></dt>
+<dd><p>Push the frame metadata to all active savers.</p>
+<p>This method is required if the ExecuteWorkflowApp is used with the
+AppRunner because the metadata cannot be transferred through the
+shared numpy.buffers and needs to be forwarded independently of the
+frame data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – The dictionary with the metadata.</p></li>
+<li><p><strong>scan</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The Scan instance. If None, this will default to the generic ScanContext.
+The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.reset">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.reset" title="Link to this definition"></a></dt>
+<dd><p>Reset the Meta registry and clear all entries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.result_io.WorkflowResultIoMeta.set_active_savers_and_title">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_active_savers_and_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">savers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'unknown'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.result_io.WorkflowResultIoMeta.set_active_savers_and_title" title="Link to this definition"></a></dt>
+<dd><p>Set the active savers so they do not need to be specified individually
+later on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>savers</strong> (<em>list</em>) – A list of the names of the savers. “None” is a valid Saver to
+clear the list.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – The title of the scan. If not provided, the title will default to
+“unknown”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="workflow.html" class="btn btn-neutral float-left" title="workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="processing_tree_io.html" class="btn btn-neutral float-right" title="workflow.processing_tree_io" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

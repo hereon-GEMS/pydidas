@@ -20,18 +20,23 @@ Module with the FrameLoader Plugin which can be used to load files with
 single images in each, e.g. tiff files or numpy files.
 """
 
-__author__ = "Malte Storm"
+__author__ = "Nonni Heere"
 __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["FrameStackLoader"]
 
-import logging
 
 import numpy as np
 
-from pydidas.core import (Dataset, FileReadError, Parameter, ParameterCollection, UserConfigError)
+from pydidas.core import (
+    Dataset,
+    FileReadError,
+    Parameter,
+    ParameterCollection,
+    UserConfigError,
+)
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
@@ -69,7 +74,6 @@ class FrameStackLoader(InputPlugin):
         super().__init__(*args, **kwargs)
         self._roi_data_dim = 2
 
-
     def calculate_result_shape(self):
         """
         Calculate the shape of the Plugin's results.
@@ -78,17 +82,16 @@ class FrameStackLoader(InputPlugin):
         self._image_metadata.update(filename=self.get_filename(0))
         self._config["result_shape"] = (
             self.get_param_value("frame_count"),
-            *self._image_metadata.final_shape
+            *self._image_metadata.final_shape,
         )
         self._original_input_shape = (
             self._image_metadata.raw_size_y,
             self._image_metadata.raw_size_x,
         )
 
-
     def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Load a frame and pass it on.
+        Load a frame stack and pass it on.
 
         Parameters
         ----------
@@ -100,8 +103,8 @@ class FrameStackLoader(InputPlugin):
 
         Returns
         -------
-        data : pydidas.core.Dataset
-            The image data.
+        new_data : pydidas.core.Dataset
+            The 3d image data.
         kwargs : dict
             The updated calling keyword arguments.
         """
@@ -133,7 +136,5 @@ class FrameStackLoader(InputPlugin):
             "data_label": _fdata.data_label,
             "data_unit": _fdata.data_unit,
         }
-        new_data = Dataset(
-            _stack, **data_kwargs
-        )
+        new_data = Dataset(_stack, **data_kwargs)
         return new_data, kwargs

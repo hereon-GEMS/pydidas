@@ -19,7 +19,7 @@
 Module with the MaskImage Plugin which can be used to apply a mask to images.
 """
 
-__author__ = "Malte Storm"
+__author__ = "Nonni Heere"
 __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
@@ -34,12 +34,14 @@ import scipy.ndimage
 
 from pydidas.core import (
     Dataset,
+    Parameter,
     ParameterCollection,
     UserConfigError,
-    get_generic_parameter, Parameter,
+    get_generic_parameter,
 )
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.plugins import ProcPlugin
+
 
 class MaskMultipleImages(ProcPlugin):
     """
@@ -62,7 +64,7 @@ class MaskMultipleImages(ProcPlugin):
             np.nan,
             name="Background value",
             tooltip="The value used for pixels that are masked in every image",
-        )
+        ),
     )
     advanced_parameters = ("background_value",)
     input_data_dim = 3
@@ -101,9 +103,11 @@ class MaskMultipleImages(ProcPlugin):
         if _grow > 0:
             self._operation = scipy.ndimage.binary_dilation
 
-    def execute(self, data: Union[Dataset, np.ndarray], **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+    ) -> tuple[Dataset, dict]:
         """
-        Generate and apply dynamic mask for images
+        Generate and apply dynamic mask for images, average the remaining pixels
 
         Parameters
         ----------
@@ -144,9 +148,7 @@ class MaskMultipleImages(ProcPlugin):
                     iterations=self.get_param_value("kernel_iterations"),
                 )
             _mask_data = _mask_data - _image_mask
-            _image_sum = np.where(
-                (_image_mask == 0), _image_sum + image, _image_sum
-            )
+            _image_sum = np.where((_image_mask == 0), _image_sum + image, _image_sum)
         _final_image = np.divide(
             _image_sum,
             _mask_data,
@@ -154,9 +156,11 @@ class MaskMultipleImages(ProcPlugin):
             dtype=np.float64,
         )
 
-        _final_image = np.where(~np.isfinite(_final_image),
-                                self.get_param_value("background_value"),
-                                _final_image)
+        _final_image = np.where(
+            ~np.isfinite(_final_image),
+            self.get_param_value("background_value"),
+            _final_image,
+        )
 
         if isinstance(data, Dataset):
             data_kwargs = {
@@ -167,14 +171,9 @@ class MaskMultipleImages(ProcPlugin):
                 "data_unit": data.data_unit,
             }
         else:
-            data_kwargs = {
-                "axis_labels": ["pixel y", "pixel x"]
-            }
+            data_kwargs = {"axis_labels": ["pixel y", "pixel x"]}
 
-        new_data = Dataset(
-            _final_image,
-            **data_kwargs
-        )
+        new_data = Dataset(_final_image, **data_kwargs)
         return new_data, kwargs
 
     def calculate_result_shape(self):

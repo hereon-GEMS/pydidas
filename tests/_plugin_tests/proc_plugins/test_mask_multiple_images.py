@@ -17,7 +17,7 @@
 
 """Unit tests for pydidas modules."""
 
-__author__ = "Malte Storm"
+__author__ = "Nonni Heere"
 __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
@@ -27,10 +27,10 @@ import random
 import unittest
 
 import numpy as np
-from qtpy import QtCore
 import scipy.ndimage
+from qtpy import QtCore
 
-from pydidas.core import UserConfigError, Dataset
+from pydidas.core import Dataset, UserConfigError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
@@ -130,8 +130,8 @@ class TestMaskMultipleImages(unittest.TestCase):
         _thresh_high = 80
         plugin.set_param_value("mask_threshold_high", _thresh_high)
         plugin.set_param_value("mask_grow", 9)
-#        plugin.input_shape = self._data.shape
-#        plugin.calculate_result_shape()
+        #        plugin.input_shape = self._data.shape
+        #        plugin.calculate_result_shape()
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         _ref = np.full(_data.shape, np.sum(self._data, axis=0) / self._data.shape[0])

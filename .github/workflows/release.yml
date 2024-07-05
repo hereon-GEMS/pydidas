@@ -51,7 +51,7 @@ jobs:
         id: extract_version
         run: |
           export QT_QPA_PLATFORM=offscreen
-          sphinx-build pydidas/docs/src _site
+          echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
           {
             echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
           } >> $GITHUB_OUTPUT

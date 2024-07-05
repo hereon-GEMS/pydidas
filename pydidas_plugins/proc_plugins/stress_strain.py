@@ -39,12 +39,36 @@ from scipy.sparse.csgraph import connected_components
 #TODO: Write   
 
 def chi_pos_verification(ds):
-    '''
-    Verification if dataset ds contains 'chi' and 'position' for d-spacing.
-    Returns:
-        chi_key: The index associated with 'chi'.
-        position_key: A tuple where the first element is the index in axis_labels where 'position' descriptor is found, and the second element is the key in the structured string resembling a dict.    
-    '''
+    """
+    Verify if the dataset `ds` contains 'chi' and 'position' for d-spacing.
+
+    Parameters
+    ----------
+    ds : Dataset
+        The dataset to be verified.
+
+    Returns
+    -------
+    tuple
+        A tuple containing two elements:
+        - chi_key (int): The index associated with 'chi'.
+        - position_key (tuple): A tuple where the first element is the index in `axis_labels` where 'position' descriptor is found, and the second element is the key in the structured string resembling a dict.
+
+    Raises
+    ------
+    TypeError
+        If the input is not of type Dataset.
+    KeyError
+        If multiple 'chi' entries are found in the dataset.
+    ValueError
+        If 'chi' or the key containing 'position' is missing in the dataset.
+
+    Notes
+    -----
+    This function checks the `axis_labels` of the dataset for the presence of 'chi' and 'position'. It ensures that there is exactly one 'chi' and at least one 'position' descriptor. The function raises errors if the conditions are not met, ensuring the dataset's structure is as expected for further processing.
+    """
+    
+
     if not isinstance(ds, Dataset):
         raise TypeError('Input has to be of type Dataset.')
         
@@ -489,7 +513,7 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
     #TODO: Is the data_label how we want them to be?
     #TODO: Is the axis_label for idx 0 correct and a good axis label?
     #TODO: I set the axis_ranges[1] explicitly to s2c_axis_pos_sorted. This why I did not detect in the corresponding test
-    # the problem with the .sort method on the Dataset. 
+    # the problem with the .sort method on the Dataset. This covered the problem with the .sort method on the Dataset.
     d_spacing_combined = Dataset(d_spacing_combi_arr, 
                                  axis_ranges={0: np.arange(2), 1:  s2c_axis_pos_sorted}, 
                                  axis_labels={0: '0: d-, 1: d+', 1: 'sin^2(chi)'},

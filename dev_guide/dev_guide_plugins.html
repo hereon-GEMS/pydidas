@@ -1,414 +1,120 @@
-
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-
-<html lang="en" data-content_root="../" >
-
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>Developers guide to pydidas Plugins &#8212; pydidas</title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developers guide to pydidas Plugins &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/_css/pydidas-custom.css?v=7afb26e6" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/_css/pydidas-custom.css?v=7afb26e6" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
-
-    <script src="../_static/documentation_options.js?v=853907ea"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'dev_guide/dev_guide_plugins';</script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Developers guide to pydidas applications" href="dev_guide_apps.html" />
-    <link rel="prev" title="Developer guide" href="../developer_guide.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+    <link rel="prev" title="Developer guide" href="../developer_guide.html" /> 
+</head>
 
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
 
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
-<form class="bd-search d-flex align-items-center"
-      action="../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         id="search-input"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydidas
+              <img src="../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
-  </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="../index.html">
-  
-  
-  
-  
-  
-    
-    
-      
-    
-    
-    <img src="../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
-    <script>document.write(`<img src="../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
-  
-  
-    <p class="title logo__title"> pydidas</p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
-      
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../manuals.html">
-    Manuals
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../code/code_documentation.html">
-    Code documentation
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../developer_guide.html">
-    Developer guide
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
-          
-
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
-        </div>
-      
-      
-        <div class="navbar-item">
-
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <div class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../manuals.html">
-    Manuals
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../code/code_documentation.html">
-    Code documentation
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../developer_guide.html">
-    Developer guide
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Developers guide to pydidas Plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_guide_apps.html">Developers guide to pydidas applications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_guide_multiprocessing.html">Developers guide to pydidas multiprocessing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_guide_list_of_signals.html">Developers guide to pydidas signals</a></li>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manuals.html">Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../developer_guide.html">Developer guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Developers guide to pydidas Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plugin-structure">Plugin structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plugin-class-attributes">Plugin class attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generic-plugin-attributes-and-methods">Generic plugin attributes and methods</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#generic-attributes">Generic attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#plugin-classmethods">Plugin classmethods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generic-properties">Generic properties</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generic-methods">Generic methods</a></li>
 </ul>
-</div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-  </div>
-  
-  <div id="rtd-footer-container"></div>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#defining-plugin-parameters">Defining plugin Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#handling-dynamic-data-dimensionality">Handling dynamic data dimensionality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intermediate-and-detailed-results">Intermediate and detailed results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#plugin-default-parameter-definition-examples">Plugin default parameter definition examples</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#example-1-a-plugin-with-a-only-generic-parameter-objects">Example 1: A plugin with a only generic <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects">Example 2: A plugin with a mix of generic and custom <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#example-3-a-plugin-with-mostly-custom-parameter-objects">Example 3: A plugin with mostly custom <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#handling-dynamic-data-dimensionality-example">Handling dynamic data dimensionality example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#intermediate-and-detailed-results-example">Intermediate and detailed results example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide_apps.html">Developers guide to pydidas applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide_multiprocessing.html">Developers guide to pydidas multiprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide_list_of_signals.html">Developers guide to pydidas signals</a></li>
+</ul>
+</li>
+</ul>
 
-
+        </div>
       </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
+    </nav>
 
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydidas</a>
+      </nav>
 
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../developer_guide.html" class="nav-link">Developer guide</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">Developers...</li>
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../developer_guide.html">Developer guide</a></li>
+      <li class="breadcrumb-item active">Developers guide to pydidas Plugins</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guide/dev_guide_plugins.rst.txt" rel="nofollow"> View page source</a>
+      </li>
   </ul>
-</nav>
+  <hr/>
 </div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="developers-guide-to-pydidas-plugins">
-<span id="developer-guide-to-plugins"></span><h1>Developers guide to pydidas Plugins<a class="headerlink" href="#developers-guide-to-pydidas-plugins" title="Link to this heading">#</a></h1>
+<span id="developer-guide-to-plugins"></span><h1>Developers guide to pydidas Plugins<a class="headerlink" href="#developers-guide-to-pydidas-plugins" title="Link to this heading"></a></h1>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#plugin-structure" id="id3">Plugin structure</a></p></li>
@@ -454,7 +160,7 @@ manually or use the <a class="reference internal" href="../manuals/gui/windows/_
 <p>Multiple paths need to be separated by a double semicolon “<strong>;;</strong>”.</p>
 </div>
 <section id="plugin-structure">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Plugin structure</a><a class="headerlink" href="#plugin-structure" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Plugin structure</a><a class="headerlink" href="#plugin-structure" title="Link to this heading"></a></h2>
 <p>Plugins include a number of class attributes for permanent configuration (which will be
 discussed in detail later) and uses the <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> class to handle dynamic
 configurations.</p>
@@ -464,20 +170,19 @@ performed once. The <a class="reference internal" href="../code/api/plugins.html
 and ingests one input <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and returns one <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The figure below shows a
 sketch.</p>
 <figure class="align-center" id="id2">
-<a class="reference internal image-reference" href="../_images/plugin_processing_diagram.png"><img alt="../_images/plugin_processing_diagram.png" src="../_images/plugin_processing_diagram.png" style="width: 495px;" />
-</a>
+<a class="reference internal image-reference" href="../_images/plugin_processing_diagram.png"><img alt="../_images/plugin_processing_diagram.png" src="../_images/plugin_processing_diagram.png" style="width: 495px;" /></a>
 <figcaption>
 <p><span class="caption-text">The simplified Plugin processing diagram. The <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> data processing method
 can be called as often as necessary while the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.pre_execute" title="pydidas.plugins.BasePlugin.pre_execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pre_execute</span></code></a> method will be called
-exactly once.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+exactly once.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="plugin-class-attributes">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Plugin class attributes</a><a class="headerlink" href="#plugin-class-attributes" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Plugin class attributes</a><a class="headerlink" href="#plugin-class-attributes" title="Link to this heading"></a></h2>
 <p>The following class attributes are used by pydidas to define the generic behaviour of
 the plugin.</p>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
+<table class="tight-table docutils align-default">
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 10.0%" />
@@ -553,15 +258,14 @@ users with too many options. The default is an empty list [].</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 <p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
 </section>
 <section id="generic-plugin-attributes-and-methods">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Generic plugin attributes and methods</a><a class="headerlink" href="#generic-plugin-attributes-and-methods" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Generic plugin attributes and methods</a><a class="headerlink" href="#generic-plugin-attributes-and-methods" title="Link to this heading"></a></h2>
 <p>This section describes the generic attributes and plugin methods and classmethods
 which all plugins inherit and use.</p>
 <section id="generic-attributes">
-<h3><a class="toc-backref" href="#id6" role="doc-backlink">Generic attributes</a><a class="headerlink" href="#generic-attributes" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Generic attributes</a><a class="headerlink" href="#generic-attributes" title="Link to this heading"></a></h3>
 <p>Plugins have a number of attributes which are used to store and modify the plugin’s
 state. The following attributes are used by all plugins:</p>
 <blockquote>
@@ -591,13 +295,13 @@ plugin’s Parameters.</p>
 <p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
 </section>
 <section id="plugin-classmethods">
-<h3><a class="toc-backref" href="#id7" role="doc-backlink">Plugin classmethods</a><a class="headerlink" href="#plugin-classmethods" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Plugin classmethods</a><a class="headerlink" href="#plugin-classmethods" title="Link to this heading"></a></h3>
 <p>Multiple class methods have been defined for the basic plugin to manage the
 representation of the plugin class in the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_registry.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a>. For details, please
 refer to the API documentation of the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></a>.</p>
 </section>
 <section id="generic-properties">
-<h3><a class="toc-backref" href="#id8" role="doc-backlink">Generic properties</a><a class="headerlink" href="#generic-properties" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Generic properties</a><a class="headerlink" href="#generic-properties" title="Link to this heading"></a></h3>
 <p>The following properties are used to access the plugin’s configuration. <strong>Note that
 there are no setter methods defined for these properties.</strong></p>
 <blockquote>
@@ -641,7 +345,7 @@ method either based on the plugin configuration or on the input data.</p>
 <p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
 </section>
 <section id="generic-methods">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">Generic methods</a><a class="headerlink" href="#generic-methods" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Generic methods</a><a class="headerlink" href="#generic-methods" title="Link to this heading"></a></h3>
 <p>The following generic methods are defined and used by all plugins. The default behaviour
 is described as well to know when to overload these methods.</p>
 <blockquote>
@@ -701,7 +405,7 @@ explicitly.</p>
 </section>
 </section>
 <section id="defining-plugin-parameters">
-<span id="id1"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">Defining plugin Parameters</a><a class="headerlink" href="#defining-plugin-parameters" title="Link to this heading">#</a></h2>
+<span id="id1"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">Defining plugin Parameters</a><a class="headerlink" href="#defining-plugin-parameters" title="Link to this heading"></a></h2>
 <p>The plugin’s <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a> with access to all <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects is defined in
 the <code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code> class attribute. The type of the <code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code>
 attribute is a <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>.
@@ -720,7 +424,7 @@ look at the <a class="reference internal" href="#plugin-default-params-examples"
 <p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
 </section>
 <section id="handling-dynamic-data-dimensionality">
-<span id="handle-dynamic-data-dimensionality"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">Handling dynamic data dimensionality</a><a class="headerlink" href="#handling-dynamic-data-dimensionality" title="Link to this heading">#</a></h2>
+<span id="handle-dynamic-data-dimensionality"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">Handling dynamic data dimensionality</a><a class="headerlink" href="#handling-dynamic-data-dimensionality" title="Link to this heading"></a></h2>
 <p>Some plugins should always handle 1-dimensional data but can be supplied
 with multi-dimensional input data. For example, a plugin can be designed to work with
 an integrated azimuthal line profile, but should also work with a series of line
@@ -734,7 +438,7 @@ decorator on the <a class="reference internal" href="../code/api/plugins.html#py
 <p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
 </section>
 <section id="intermediate-and-detailed-results">
-<span id="intermediate-results"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">Intermediate and detailed results</a><a class="headerlink" href="#intermediate-and-detailed-results" title="Link to this heading">#</a></h2>
+<span id="intermediate-results"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">Intermediate and detailed results</a><a class="headerlink" href="#intermediate-and-detailed-results" title="Link to this heading"></a></h2>
 <p>For some applications, it is useful for the user to have access to intermediate results
 of the processing, for example for fitting or automatic classifications. The
 intermediate results are used for automatic visualization and therefore require a
@@ -820,11 +524,11 @@ the <code class="docutils literal notranslate"><span class="pre">store_details=T
 </div>
 </section>
 <section id="examples">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <section id="plugin-default-parameter-definition-examples">
-<span id="plugin-default-params-examples"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">Plugin default parameter definition examples</a><a class="headerlink" href="#plugin-default-parameter-definition-examples" title="Link to this heading">#</a></h3>
+<span id="plugin-default-params-examples"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">Plugin default parameter definition examples</a><a class="headerlink" href="#plugin-default-parameter-definition-examples" title="Link to this heading"></a></h3>
 <section id="example-1-a-plugin-with-a-only-generic-parameter-objects">
-<h4>Example 1: A plugin with a only generic <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-1-a-plugin-with-a-only-generic-parameter-objects" title="Link to this heading">#</a></h4>
+<h4>Example 1: A plugin with a only generic <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-1-a-plugin-with-a-only-generic-parameter-objects" title="Link to this heading"></a></h4>
 <p>The following example shows an incomplete class definition of a plugin with only
 four generic <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydidas.core.generic_params</span> <span class="kn">import</span> <span class="n">get_generic_param_collection</span>
@@ -845,7 +549,7 @@ four generic <a class="reference internal" href="../code/api/core/parameter.html
 <a href="#developer-guide-to-plugins">(go back to top of the page)</a>
 </p><br><br></section>
 <section id="example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects">
-<h4>Example 2: A plugin with a mix of generic and custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects" title="Link to this heading">#</a></h4>
+<h4>Example 2: A plugin with a mix of generic and custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects" title="Link to this heading"></a></h4>
 <p>The following example shows an incomplete class definition of a plugin with a mix
 of generic and custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydidas.core</span> <span class="kn">import</span> <span class="n">Parameter</span>
@@ -876,7 +580,7 @@ of generic and custom <a class="reference internal" href="../code/api/core/param
 <a href="#developer-guide-to-plugins">(go back to top of the page)</a>
 </p><br><br></section>
 <section id="example-3-a-plugin-with-mostly-custom-parameter-objects">
-<h4>Example 3: A plugin with mostly custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-3-a-plugin-with-mostly-custom-parameter-objects" title="Link to this heading">#</a></h4>
+<h4>Example 3: A plugin with mostly custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-3-a-plugin-with-mostly-custom-parameter-objects" title="Link to this heading"></a></h4>
 <p>The following example shows an incomplete class definition of a plugin with
 <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a> including generic and custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects defined outside
 the plugin.</p>
@@ -911,7 +615,7 @@ the plugin.</p>
 </p><br><br></section>
 </section>
 <section id="handling-dynamic-data-dimensionality-example">
-<span id="examples-handle-dynamic-data-dimensionality"></span><h3><a class="toc-backref" href="#id15" role="doc-backlink">Handling dynamic data dimensionality example</a><a class="headerlink" href="#handling-dynamic-data-dimensionality-example" title="Link to this heading">#</a></h3>
+<span id="examples-handle-dynamic-data-dimensionality"></span><h3><a class="toc-backref" href="#id15" role="doc-backlink">Handling dynamic data dimensionality example</a><a class="headerlink" href="#handling-dynamic-data-dimensionality-example" title="Link to this heading"></a></h3>
 <p>This example shows a fully functional plugin which can handle multi-dimensional input.
 The plugin adds a one-dimensional <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code> to the input data.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1027,7 +731,7 @@ than one plugin.</p>
 <a href="#developer-guide-to-plugins">(go back to top of the page)</a>
 </p><br><br></section>
 <section id="intermediate-and-detailed-results-example">
-<span id="examples-intermediate-results"></span><h3><a class="toc-backref" href="#id16" role="doc-backlink">Intermediate and detailed results example</a><a class="headerlink" href="#intermediate-and-detailed-results-example" title="Link to this heading">#</a></h3>
+<span id="examples-intermediate-results"></span><h3><a class="toc-backref" href="#id16" role="doc-backlink">Intermediate and detailed results example</a><a class="headerlink" href="#intermediate-and-detailed-results-example" title="Link to this heading"></a></h3>
 <p>This example uses the <code class="xref py py-data docutils literal notranslate"><span class="pre">AddOneDimensionalData</span></code> plugin from the previous example
 (see <a class="reference internal" href="#examples-handle-dynamic-data-dimensionality"><span class="std std-ref">Handling dynamic data dimensionality example</span></a>) and adds functionality to
 handle intermediate results.</p>
@@ -1107,8 +811,7 @@ for a one-dimensional input <a class="reference internal" href="../code/api/core
 </pre></div>
 </div>
 <p>The representation in the GUI looks like the following:</p>
-<a class="reference internal image-reference" href="../_images/plugin_detailed_results.png"><img alt="../_images/plugin_detailed_results.png" class="align-center" src="../_images/plugin_detailed_results.png" style="width: 800px;" />
-</a>
+<a class="reference internal image-reference" href="../_images/plugin_detailed_results.png"><img alt="../_images/plugin_detailed_results.png" class="align-center" src="../_images/plugin_detailed_results.png" style="width: 800px;" /></a>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -1120,140 +823,45 @@ for a one-dimensional input <a class="reference internal" href="../code/api/core
 </section>
 
 
-                </article>
-              
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="../developer_guide.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Developer guide</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="dev_guide_apps.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Developers guide to pydidas applications</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-</div>
-                </footer>
-              
-            </div>
-            
-            
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-structure">Plugin structure</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-class-attributes">Plugin class attributes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-plugin-attributes-and-methods">Generic plugin attributes and methods</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-attributes">Generic attributes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-classmethods">Plugin classmethods</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-properties">Generic properties</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-methods">Generic methods</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-plugin-parameters">Defining plugin Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-dynamic-data-dimensionality">Handling dynamic data dimensionality</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intermediate-and-detailed-results">Intermediate and detailed results</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-default-parameter-definition-examples">Plugin default parameter definition examples</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-1-a-plugin-with-a-only-generic-parameter-objects">Example 1: A plugin with a only generic <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects">Example 2: A plugin with a mix of generic and custom <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-3-a-plugin-with-mostly-custom-parameter-objects">Example 3: A plugin with mostly custom <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-dynamic-data-dimensionality-example">Handling dynamic data dimensionality example</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intermediate-and-detailed-results-example">Intermediate and detailed results example</a></li>
-</ul>
-</li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../_sources/dev_guide/dev_guide_plugins.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
-
-</div></div>
-              
-            
+           </div>
           </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../developer_guide.html" class="btn btn-neutral float-left" title="Developer guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dev_guide_apps.html" class="btn btn-neutral float-right" title="Developers guide to pydidas applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
   </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
-  <p class="copyright">
-    
-      © Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.
-      <br/>
-    
-  </p>
-</div>
-      
-        <div class="footer-item">
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
-    <br/>
-  </p>
-</div>
-      
-    </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
-</p></div>
-      
-    </div>
-  
-</div>
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
 
-  </footer>
-  </body>
+</body>
 </html>

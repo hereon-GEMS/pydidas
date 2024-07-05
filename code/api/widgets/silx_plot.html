@@ -1,444 +1,142 @@
-
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-
-<html lang="en" data-content_root="../../../" >
-
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>The widgets.silx_plot sub-package &#8212; pydidas</title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The widgets.silx_plot sub-package &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
-
-    <script src="../../../_static/documentation_options.js?v=853907ea"></script>
-    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../../_static/copybutton.js?v=f281be69"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/widgets/silx_plot';</script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="The widgets.workflow_edit sub-package" href="workflow_edit.html" />
-    <link rel="prev" title="The widgets.selection sub-package" href="selection.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+    <link rel="prev" title="The widgets.selection sub-package" href="selection.html" /> 
+</head>
 
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
 
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
-<form class="bd-search d-flex align-items-center"
-      action="../../../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         id="search-input"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
-
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
-  </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="../../../index.html">
-  
-  
-  
-  
-  
-    
-    
-      
-    
-    
-    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
-    <script>document.write(`<img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
-  
-  
-    <p class="title logo__title"> pydidas</p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
-      
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../manuals.html">
-    Manuals
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../../code_documentation.html">
-    Code documentation
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer_guide.html">
-    Developer guide
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
           
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">The widgets.silx_plot sub-package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.AutoscaleToMeanAndThreeSigma"><code class="docutils literal notranslate"><span class="pre">AutoscaleToMeanAndThreeSigma</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.ChangeCanvasToData"><code class="docutils literal notranslate"><span class="pre">ChangeCanvasToData</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.CropHistogramOutliers"><code class="docutils literal notranslate"><span class="pre">CropHistogramOutliers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.ExpandCanvas"><code class="docutils literal notranslate"><span class="pre">ExpandCanvas</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasGetDataInfoAction"><code class="docutils literal notranslate"><span class="pre">PydidasGetDataInfoAction</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasImageView"><code class="docutils literal notranslate"><span class="pre">PydidasImageView</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasLoadImageAction"><code class="docutils literal notranslate"><span class="pre">PydidasLoadImageAction</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasMaskToolsWidget"><code class="docutils literal notranslate"><span class="pre">PydidasMaskToolsWidget</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot1D"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2D"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlotStack"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings"><code class="docutils literal notranslate"><span class="pre">get_2d_silx_plot_ax_settings()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.user_config_update_func"><code class="docutils literal notranslate"><span class="pre">user_config_update_func()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
         </div>
-      
-      
-        <div class="navbar-item">
+      </div>
+    </nav>
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <div class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../manuals.html">
-    Manuals
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../../code_documentation.html">
-    Code documentation
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer_guide.html">
-    Developer guide
-  </a>
-</li>
-
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../code_documentation.html">Code documentation</a></li>
+          <li class="breadcrumb-item"><a href="../widgets.html">The widgets sub-package</a></li>
+      <li class="breadcrumb-item active">The widgets.silx_plot sub-package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/code/api/widgets/silx_plot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
   </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../concepts.html">Key concepts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../package_structure.html">Package structure</a></li>
-</ul>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../core.html">The core submodule</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.silx_plot sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
-</ul>
+  <hr/>
 </div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-  </div>
-  
-  <div id="rtd-footer-container"></div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../../code_documentation.html" class="nav-link">Code documentation</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../widgets.html" class="nav-link">The widgets sub-package</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">The...</li>
-  </ul>
-</nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="module-pydidas.widgets.silx_plot">
-<span id="the-widgets-silx-plot-sub-package"></span><h1>The widgets.silx_plot sub-package<a class="headerlink" href="#module-pydidas.widgets.silx_plot" title="Link to this heading">#</a></h1>
+<span id="the-widgets-silx-plot-sub-package"></span><h1>The widgets.silx_plot sub-package<a class="headerlink" href="#module-pydidas.widgets.silx_plot" title="Link to this heading"></a></h1>
 <p>Package with subclassed silx widgets and actions.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.AutoscaleToMeanAndThreeSigma">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">AutoscaleToMeanAndThreeSigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.AutoscaleToMeanAndThreeSigma" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">AutoscaleToMeanAndThreeSigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.AutoscaleToMeanAndThreeSigma" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PlotAction</span></code></p>
 <p>A new custom PlotAction to set the colormap to autoscale with mean +/- 3 sigma.</p>
 <dl class="field-list simple">
@@ -462,7 +160,7 @@ The default is None.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.ChangeCanvasToData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">ChangeCanvasToData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.ChangeCanvasToData" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">ChangeCanvasToData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.ChangeCanvasToData" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PlotAction</span></code></p>
 <p>A customized silx Action to change the size of the figure canvas to the data
 dimensions.</p>
@@ -470,7 +168,7 @@ dimensions.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.CropHistogramOutliers">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">CropHistogramOutliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.CropHistogramOutliers" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">CropHistogramOutliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.CropHistogramOutliers" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PlotAction</span></code>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a></p>
 <p>A new custom PlotAction to crop outliers from the histogram.</p>
 <p>This action will use the global ‘histogram_outlier_fraction’ QSettings value to
@@ -501,7 +199,7 @@ The default is None.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.ExpandCanvas">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">ExpandCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.ExpandCanvas" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">ExpandCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.ExpandCanvas" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PlotAction</span></code></p>
 <p>A modified silx ResetZoomAction which also resets the figure canvas to the maximum
 size allowed by the widget.</p>
@@ -509,14 +207,78 @@ size allowed by the widget.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasGetDataInfoAction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasGetDataInfoAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasGetDataInfoAction" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasGetDataInfoAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasGetDataInfoAction" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PlotAction</span></code></p>
 <p>Action to select a datapoint and show more information about this datapoint.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasImageView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ImageView</span></code>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a></p>
+<p>A customized silx.gui.plot.ImageView with an additional configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Supported keyword arguments are:</p>
+<dl class="simple">
+<dt>parent<span class="classifier">Union[QWidget, None], optional</span></dt><dd><p>The parent widget or None for no parent. The default is None.</p>
+</dd>
+<dt>backend<span class="classifier">Union[None, silx.gui.plot.backends.BackendBase], optional</span></dt><dd><p>The silx backend to use. If None, this defaults to the standard
+silx settings. The default is None.</p>
+</dd>
+<dt>show_cs_transform<span class="classifier">bool, optional</span></dt><dd><p>Flag whether to show the coordinate transform action. The default
+is True.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.display_image">
+<span class="sig-name descname"><span class="pre">display_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.display_image" title="Link to this definition"></a></dt>
+<dd><p>Set the image data, handle the coordinate system and forward the data to
+plotting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – The image data.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Optional kwargs for the ImageView.setImage method.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.update_from_diffraction_exp">
+<span class="sig-name descname"><span class="pre">update_from_diffraction_exp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.update_from_diffraction_exp" title="Link to this definition"></a></dt>
+<dd><p>Get the detector size from the DiffractionExperimentContext and store it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.update_mpl_fonts">
+<span class="sig-name descname"><span class="pre">update_mpl_fonts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.update_mpl_fonts" title="Link to this definition"></a></dt>
+<dd><p>Update the plot’s fonts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.user_config_update">
+<span class="sig-name descname"><span class="pre">user_config_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.user_config_update" title="Link to this definition"></a></dt>
+<dd><p>Handle a user config update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The name of the updated key.</p></li>
+<li><p><strong>value</strong> – The new value of the updated key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasLoadImageAction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasLoadImageAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Select</span> <span class="pre">image</span> <span class="pre">file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasLoadImageAction" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasLoadImageAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Select</span> <span class="pre">image</span> <span class="pre">file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasLoadImageAction" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QAction</span></code></p>
 <p>Action to load an image using the pydidas file dialog.</p>
 <p>This action is used as additional option in the pyFAI calibration widgets.</p>
@@ -533,19 +295,19 @@ The default is None.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasMaskToolsWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasMaskToolsWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">QWidget</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">QWidget</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasMaskToolsWidget" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasMaskToolsWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">QWidget</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">QWidget</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasMaskToolsWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskToolsWidget</span></code></p>
 <p>A customized silx.gui.plot.MaskToolsWidget with larger buttons.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot1D">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlot1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlot1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Plot1D</span></code></p>
 <p>A customized silx.gui.plot.Plot1D with an additional configuration.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot">
-<span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clear_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clear_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot" title="Link to this definition"></a></dt>
 <dd><p>Clear the plot and remove all items.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -556,7 +318,7 @@ The default is None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot1D.plot_pydidas_dataset">
-<span class="sig-name descname"><span class="pre">plot_pydidas_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_pydidas_dataset" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_pydidas_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_pydidas_dataset" title="Link to this definition"></a></dt>
 <dd><p>Plot a pydidas dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -570,7 +332,7 @@ The default is None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot1D.update_mpl_fonts">
-<span class="sig-name descname"><span class="pre">update_mpl_fonts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.update_mpl_fonts" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_mpl_fonts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.update_mpl_fonts" title="Link to this definition"></a></dt>
 <dd><p>Update the plot’s fonts.</p>
 </dd></dl>
 
@@ -578,14 +340,14 @@ The default is None.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlot2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlot2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Plot2D</span></code>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a></p>
 <p>A customized silx.gui.plot.Plot2D with an additional features.</p>
 <p>Additional features are implemented through additional SilxActions which
 are added to the toolbar.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.addImage">
-<span class="sig-name descname"><span class="pre">addImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">addImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage" title="Link to this definition"></a></dt>
 <dd><p>Add an image to the plot.</p>
 <p>This method implements an additional dimensionality check before passing
 the image to the Plot2d.addImage method.</p>
@@ -601,22 +363,25 @@ the image to the Plot2d.addImage method.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot">
-<span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot" title="Link to this definition"></a></dt>
 <dd><p>Clear the plot and remove all items.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.enable_cs_transform">
-<span class="sig-name descname"><span class="pre">enable_cs_transform</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.enable_cs_transform" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">enable_cs_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.enable_cs_transform" title="Link to this definition"></a></dt>
 <dd><p>Enable or disable the coordinate system transformations.</p>
-<p>The CS transform is enabled if the image has the same shape as the detector
-configured in the DiffractionExperimentContext.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>enable</strong> (<em>bool</em>) – Flag to enable the coordinate system transformations.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.plot_pydidas_dataset">
-<span class="sig-name descname"><span class="pre">plot_pydidas_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_pydidas_dataset" title="Link to this definition">#</a></dt>
-<dd><p>Plot a pydidas Dataset.</p>
+<span class="sig-name descname"><span class="pre">plot_pydidas_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_pydidas_dataset" title="Link to this definition"></a></dt>
+<dd><p>Plot a pydidas dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -628,8 +393,61 @@ configured in the DiffractionExperimentContext.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.setData">
+<span class="sig-name descname"><span class="pre">setData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selectable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draggable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resetzoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.setData" title="Link to this definition"></a></dt>
+<dd><p>Add a 2D dataset or an image to the plot.</p>
+<p>It displays either an array of data using a colormap or a RGB(A) image.</p>
+<p>Images are uniquely identified by their legend.
+To add multiple images, call <a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage" title="pydidas.widgets.silx_plot.PydidasPlot2D.addImage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addImage()</span></code></a> multiple times with
+different legend argument.
+To replace/update an existing image, call <a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage" title="pydidas.widgets.silx_plot.PydidasPlot2D.addImage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addImage()</span></code></a> with the
+existing image legend.</p>
+<p>When image parameters are not provided, if an image with the
+same legend is displayed in the plot, its parameters are used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – (nrows, ncolumns) data or
+(nrows, ncolumns, RGBA) ubyte array
+Note: boolean values are converted to int8.</p></li>
+<li><p><strong>legend</strong> (<em>str</em>) – The legend to be associated to the image (or None)</p></li>
+<li><p><strong>info</strong> – User-defined information associated to the image</p></li>
+<li><p><strong>replace</strong> (<em>bool</em>) – True to delete already existing images (Default: False).</p></li>
+<li><p><strong>z</strong> (<em>int</em>) – Layer on which to draw the image (default: 0)
+This allows to control the overlay.</p></li>
+<li><p><strong>selectable</strong> (<em>bool</em>) – Indicate if the image can be selected.
+(default: False)</p></li>
+<li><p><strong>draggable</strong> (<em>bool</em>) – Indicate if the image can be moved.
+(default: False)</p></li>
+<li><p><strong>colormap</strong> (<em>Union</em><em>[</em><em>Colormap</em><em>, </em><em>dict</em><em>]</em>) – Colormap object to use (or None).
+This is ignored if data is a RGB(A) image.</p></li>
+<li><p><strong>pixmap</strong> (<em>(</em><em>nrows</em><em>, </em><em>ncolumns</em><em>, </em><em>RGBA</em><em>) </em><em>ubyte array</em><em> or </em><em>None</em><em> (</em><em>default</em><em>)</em>) – Pixmap representation of the data (if any)</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – X axis label to show when this curve is active,
+or None to keep default axis label.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – Y axis label to show when this curve is active,
+or None to keep default axis label.</p></li>
+<li><p><strong>origin</strong> (<em>float</em><em> or </em><em>2-tuple</em><em> of </em><em>float</em>) – (origin X, origin Y) of the data.
+It is possible to pass a single float if both
+coordinates are equal.
+Default: (0., 0.)</p></li>
+<li><p><strong>scale</strong> (<em>float</em><em> or </em><em>2-tuple</em><em> of </em><em>float</em>) – (scale X, scale Y) of the data.
+It is possible to pass a single float if both
+coordinates are equal.
+Default: (1., 1.)</p></li>
+<li><p><strong>resetzoom</strong> (<em>bool</em>) – True (the default) to reset the zoom.</p></li>
+<li><p><strong>copy</strong> (<em>bool</em>) – True make a copy of the data (default),
+False to use provided arrays.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The image item</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.update_cs_units">
-<span class="sig-name descname"><span class="pre">update_cs_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_cs_units" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_cs_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_cs_units" title="Link to this definition"></a></dt>
 <dd><p>Update the coordinate system units.</p>
 <p>Note: Any changes to the CS transform will overwrite these settings.</p>
 <dl class="field-list simple">
@@ -644,19 +462,19 @@ configured in the DiffractionExperimentContext.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.update_exp_setup_params">
-<span class="sig-name descname"><span class="pre">update_exp_setup_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_exp_setup_params" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_exp_setup_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_exp_setup_params" title="Link to this definition"></a></dt>
 <dd><p>Check that the detector is valid for a CS transform.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts">
-<span class="sig-name descname"><span class="pre">update_mpl_fonts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_mpl_fonts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts" title="Link to this definition"></a></dt>
 <dd><p>Update the plot’s fonts.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update">
-<span class="sig-name descname"><span class="pre">user_config_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">user_config_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update" title="Link to this definition"></a></dt>
 <dd><p>Handle a user config update.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -672,12 +490,12 @@ configured in the DiffractionExperimentContext.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlot2DwithIntegrationRegions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlot2DwithIntegrationRegions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2D" title="pydidas.widgets.silx_plot.pydidas_plot2d.PydidasPlot2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot2D</span></code></a></p>
 <p>An extended PydidasPlot2D which allows to show integration regions.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_circle">
-<span class="sig-name descname"><span class="pre">draw_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_circle" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">draw_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_circle" title="Link to this definition"></a></dt>
 <dd><p>Draw a circle with the given radius and store it as the given legend.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -693,7 +511,7 @@ DiffractionExperiment beamcenter. The default is None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_integration_region">
-<span class="sig-name descname"><span class="pre">draw_integration_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azimuthal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_integration_region" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">draw_integration_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azimuthal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_integration_region" title="Link to this definition"></a></dt>
 <dd><p>Draw the given integration region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -709,7 +527,7 @@ with (azi_start, azi_end) in radians for a region.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter">
-<span class="sig-name descname"><span class="pre">draw_line_from_beamcenter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">draw_line_from_beamcenter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter" title="Link to this definition"></a></dt>
 <dd><p>Draw a line from the beamcenter in the direction given by the angle chi.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -723,7 +541,7 @@ with (azi_start, azi_end) in radians for a region.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.set_marker_color">
-<span class="sig-name descname"><span class="pre">set_marker_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.set_marker_color" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_marker_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.set_marker_color" title="Link to this definition"></a></dt>
 <dd><p>Set the new marker color.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -736,7 +554,7 @@ with (azi_start, azi_end) in radians for a region.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlotStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlotStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QStackedWidget</span></code></p>
 <p>A stack with two plots for 1d and 2d data which selects the correct to display.</p>
 <dl class="field-list simple">
@@ -760,13 +578,13 @@ DiffractionExperimentContext.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots">
-<span class="sig-name descname"><span class="pre">clear_plots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">clear_plots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots" title="Link to this definition"></a></dt>
 <dd><p>Clear all plots.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack.plot_data">
-<span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data" title="Link to this definition"></a></dt>
 <dd><p>Plot the given data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -782,7 +600,7 @@ DiffractionExperimentContext.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">get_2d_silx_plot_ax_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">get_2d_silx_plot_ax_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings" title="Link to this definition"></a></dt>
 <dd><p>Get the axis settings to have pixels centered at their values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -801,7 +619,7 @@ dimensions for silx ImageView.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.user_config_update_func">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">user_config_update_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.user_config_update_func" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">user_config_update_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.user_config_update_func" title="Link to this definition"></a></dt>
 <dd><p>Handle a user config update.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -816,155 +634,45 @@ dimensions for silx ImageView.</p></li>
 </section>
 
 
-                </article>
-              
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="selection.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The widgets.selection sub-package</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="workflow_edit.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The widgets.workflow_edit sub-package</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-</div>
-                </footer>
-              
-            </div>
-            
-            
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.AutoscaleToMeanAndThreeSigma"><code class="docutils literal notranslate"><span class="pre">AutoscaleToMeanAndThreeSigma</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.ChangeCanvasToData"><code class="docutils literal notranslate"><span class="pre">ChangeCanvasToData</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.CropHistogramOutliers"><code class="docutils literal notranslate"><span class="pre">CropHistogramOutliers</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.ExpandCanvas"><code class="docutils literal notranslate"><span class="pre">ExpandCanvas</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasGetDataInfoAction"><code class="docutils literal notranslate"><span class="pre">PydidasGetDataInfoAction</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasLoadImageAction"><code class="docutils literal notranslate"><span class="pre">PydidasLoadImageAction</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasMaskToolsWidget"><code class="docutils literal notranslate"><span class="pre">PydidasMaskToolsWidget</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.clear_plot()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.plot_pydidas_dataset()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.update_mpl_fonts"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.update_mpl_fonts()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.addImage()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.clear_plot()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.enable_cs_transform"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.enable_cs_transform()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.plot_pydidas_dataset()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_cs_units"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_cs_units()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_exp_setup_params"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_exp_setup_params()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_mpl_fonts()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.user_config_update()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_circle"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_circle()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_integration_region"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_integration_region()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.set_marker_color"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.set_marker_color()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.clear_plots()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.plot_data()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings"><code class="docutils literal notranslate"><span class="pre">get_2d_silx_plot_ax_settings()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.user_config_update_func"><code class="docutils literal notranslate"><span class="pre">user_config_update_func()</span></code></a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../../../_sources/code/api/widgets/silx_plot.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
-
-</div></div>
-              
-            
+           </div>
           </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="selection.html" class="btn btn-neutral float-left" title="The widgets.selection sub-package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="workflow_edit.html" class="btn btn-neutral float-right" title="The widgets.workflow_edit sub-package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
   </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
-  <p class="copyright">
-    
-      © Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.
-      <br/>
-    
-  </p>
-</div>
-      
-        <div class="footer-item">
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
-    <br/>
-  </p>
-</div>
-      
-    </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
-</p></div>
-      
-    </div>
-  
-</div>
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
 
-  </footer>
-  </body>
+</body>
 </html>

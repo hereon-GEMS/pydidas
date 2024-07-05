@@ -1,429 +1,148 @@
-
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-
-<html lang="en" data-content_root="../../" >
-
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>The multiprocessing sub-package &#8212; pydidas</title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The multiprocessing sub-package &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
-
-    <script src="../../_static/documentation_options.js?v=853907ea"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/multiprocessing';</script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="The data_io sub-package" href="data_io.html" />
-    <link rel="prev" title="Other core classes and functions" href="core/others.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+    <link rel="prev" title="Other core classes and functions" href="core/others.html" /> 
+</head>
 
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
 
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
-<form class="bd-search d-flex align-items-center"
-      action="../../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         id="search-input"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
-
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
-  </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="../../index.html">
-  
-  
-  
-  
-  
-    
-    
-      
-    
-    
-    <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
-    <script>document.write(`<img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
-  
-  
-    <p class="title logo__title"> pydidas</p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
-      
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../manuals.html">
-    Manuals
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../code_documentation.html">
-    Code documentation
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../developer_guide.html">
-    Developer guide
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
           
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.06.05"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="core.html">The core submodule</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The multiprocessing sub-package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.multiprocessing.AppRunner"><code class="docutils literal notranslate"><span class="pre">AppRunner</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.AppRunner.call_app_method"><code class="docutils literal notranslate"><span class="pre">AppRunner.call_app_method()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.AppRunner.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_post_run()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.AppRunner.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_pre_run()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.AppRunner.get_app"><code class="docutils literal notranslate"><span class="pre">AppRunner.get_app()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.AppRunner.set_app_param"><code class="docutils literal notranslate"><span class="pre">AppRunner.set_app_param()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController"><code class="docutils literal notranslate"><span class="pre">WorkerController</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.add_task"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_task()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.add_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_tasks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.change_function"><code class="docutils literal notranslate"><span class="pre">WorkerController.change_function()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_post_run()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_pre_run()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.exit"><code class="docutils literal notranslate"><span class="pre">WorkerController.exit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.finalize_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.finalize_tasks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.join_queues"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_queues()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.join_workers"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_workers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.n_workers"><code class="docutils literal notranslate"><span class="pre">WorkerController.n_workers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.progress"><code class="docutils literal notranslate"><span class="pre">WorkerController.progress</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.requestInterruption"><code class="docutils literal notranslate"><span class="pre">WorkerController.requestInterruption()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.reset_task_list"><code class="docutils literal notranslate"><span class="pre">WorkerController.reset_task_list()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.restart"><code class="docutils literal notranslate"><span class="pre">WorkerController.restart()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.run"><code class="docutils literal notranslate"><span class="pre">WorkerController.run()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.send_stop_signal"><code class="docutils literal notranslate"><span class="pre">WorkerController.send_stop_signal()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.stop"><code class="docutils literal notranslate"><span class="pre">WorkerController.stop()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.suspend"><code class="docutils literal notranslate"><span class="pre">WorkerController.suspend()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.multiprocessing.WorkerController.write_lock"><code class="docutils literal notranslate"><span class="pre">WorkerController.write_lock()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.multiprocessing.app_processor"><code class="docutils literal notranslate"><span class="pre">app_processor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.multiprocessing.app_processor_without_tasks"><code class="docutils literal notranslate"><span class="pre">app_processor_without_tasks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.multiprocessing.processor"><code class="docutils literal notranslate"><span class="pre">processor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
         </div>
-      
-      
-        <div class="navbar-item">
+      </div>
+    </nav>
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <div class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../manuals.html">
-    Manuals
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../code_documentation.html">
-    Code documentation
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../developer_guide.html">
-    Developer guide
-  </a>
-</li>
-
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../code_documentation.html">Code documentation</a></li>
+      <li class="breadcrumb-item active">The multiprocessing sub-package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/code/api/multiprocessing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
   </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Key concepts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../package_structure.html">Package structure</a></li>
-</ul>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="core.html">The core submodule</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">The multiprocessing sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_io.html">The data_io sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contexts.html">The contexts sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="managers.html">The managers sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plugins.html">The plugins sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="workflow.html">The workflow sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="apps.html">The apps sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="widgets.html">The widgets sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gui.html">The gui submodule</a></li>
-</ul>
+  <hr/>
 </div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-  </div>
-  
-  <div id="rtd-footer-container"></div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../code_documentation.html" class="nav-link">Code documentation</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">The...</li>
-  </ul>
-</nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="module-pydidas.multiprocessing">
-<span id="the-multiprocessing-sub-package"></span><span id="multiprocessing-package"></span><h1>The multiprocessing sub-package<a class="headerlink" href="#module-pydidas.multiprocessing" title="Link to this heading">#</a></h1>
+<span id="the-multiprocessing-sub-package"></span><span id="multiprocessing-package"></span><h1>The multiprocessing sub-package<a class="headerlink" href="#module-pydidas.multiprocessing" title="Link to this heading"></a></h1>
 <p>The pydidas.multiprocessing module includes functionalities to run scripts and
 applications in parallel procesing.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">AppRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app:</span> <span class="pre">~pydidas.core.base_app.BaseApp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_workers:</span> <span class="pre">None</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor:</span> <span class="pre">type</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">app_processor&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">AppRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app:</span> <span class="pre">~pydidas.core.base_app.BaseApp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_workers:</span> <span class="pre">None</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor:</span> <span class="pre">type</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">app_processor&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner" title="Link to this definition"></a></dt>
 <dd><p>The AppRunner is a subclassed WorkerController for running pydidas applications.</p>
 <p>The App runner requires a BaseApp (or subclass) instance with a
 defined method layout as defined in the BaseApp.</p>
@@ -452,7 +171,7 @@ tasks on the fly. The default is app_processor.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner.call_app_method">
-<span class="sig-name descname"><span class="pre">call_app_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.call_app_method" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">call_app_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.call_app_method" title="Link to this definition"></a></dt>
 <dd><p>Call a method of the app on the AppRunner’s copy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -476,7 +195,7 @@ tasks on the fly. The default is app_processor.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner.cycle_post_run">
-<span class="sig-name descname"><span class="pre">cycle_post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.cycle_post_run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">cycle_post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.cycle_post_run" title="Link to this definition"></a></dt>
 <dd><p>Perform the app’s final operations and shut down the workers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -487,7 +206,7 @@ tasks on the fly. The default is app_processor.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner.cycle_pre_run">
-<span class="sig-name descname"><span class="pre">cycle_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.cycle_pre_run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">cycle_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.cycle_pre_run" title="Link to this definition"></a></dt>
 <dd><p>Perform pre-multiprocessing operations.</p>
 <p>This time slot is used to prepare the App by running the
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">app.multiprocessing_pre_run()</span></code>, settings the tasks and
@@ -496,7 +215,7 @@ starting the workers.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner.get_app">
-<span class="sig-name descname"><span class="pre">get_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.get_app" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.get_app" title="Link to this definition"></a></dt>
 <dd><p>Get the reference to the interally stored app.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -515,7 +234,7 @@ instance for further use.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner.set_app_param">
-<span class="sig-name descname"><span class="pre">set_app_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.set_app_param" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_app_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.set_app_param" title="Link to this definition"></a></dt>
 <dd><p>Set a Parameter of the Application.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -531,7 +250,7 @@ instance for further use.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">WorkerController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">WorkerController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController" title="Link to this definition"></a></dt>
 <dd><p>The WorkerController is a QThread for spawing and controlling workers.</p>
 <p>The WorkerControllers workers are used to perform computations in parallel.</p>
 <p>A function with defined args and kwargs can be called in separate
@@ -551,7 +270,7 @@ be set later for the workers to actually perform tasks.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.add_task">
-<span class="sig-name descname"><span class="pre">add_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.add_task" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.add_task" title="Link to this definition"></a></dt>
 <dd><p>Add a task to the worker pool.</p>
 <p>This will add a task to the worker pool to call the function defined
 in :py:meth`WorkerController.change_function` method. Note that the
@@ -566,7 +285,7 @@ required by the function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.add_tasks">
-<span class="sig-name descname"><span class="pre">add_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">are_stop_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.add_tasks" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">are_stop_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.add_tasks" title="Link to this definition"></a></dt>
 <dd><p>Add tasks to the worker pool.</p>
 <p>This will add tasks to the worker pool to call the function defined in
 :py:meth`WorkerController.change_function` method. Note that the task_arg given
@@ -584,7 +303,7 @@ disable updating the task target number.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.change_function">
-<span class="sig-name descname"><span class="pre">change_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.change_function" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">change_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.change_function" title="Link to this definition"></a></dt>
 <dd><p>Change the function called by the workers.</p>
 <p>This method stops any active processing and resets the queue. Then,
 the function is changed and new workers are spawned. To run the new
@@ -603,7 +322,7 @@ function argument will always the the task.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.cycle_post_run">
-<span class="sig-name descname"><span class="pre">cycle_post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.cycle_post_run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">cycle_post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.cycle_post_run" title="Link to this definition"></a></dt>
 <dd><p>Perform operations after the the main processing loop.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -615,13 +334,13 @@ signal before raising a TimeoutError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.cycle_pre_run">
-<span class="sig-name descname"><span class="pre">cycle_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.cycle_pre_run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">cycle_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.cycle_pre_run" title="Link to this definition"></a></dt>
 <dd><p>Perform operations before entering the main processing loop.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.exit">
-<span class="sig-name descname"><span class="pre">exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.exit" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.exit" title="Link to this definition"></a></dt>
 <dd><p>Call the exit method.</p>
 <p>This exit method adds shutdown calls to the Queue threads.</p>
 <dl class="field-list simple">
@@ -633,7 +352,7 @@ signal before raising a TimeoutError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.finalize_tasks">
-<span class="sig-name descname"><span class="pre">finalize_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.finalize_tasks" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">finalize_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.finalize_tasks" title="Link to this definition"></a></dt>
 <dd><p>Finalize the task list.</p>
 <p>This will add tasks to tell the workers to shut down and set a flag
 to quit the loop once processing is done.</p>
@@ -641,19 +360,19 @@ to quit the loop once processing is done.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.join_queues">
-<span class="sig-name descname"><span class="pre">join_queues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.join_queues" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">join_queues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.join_queues" title="Link to this definition"></a></dt>
 <dd><p>Joining all active queues.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.join_workers">
-<span class="sig-name descname"><span class="pre">join_workers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.join_workers" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">join_workers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.join_workers" title="Link to this definition"></a></dt>
 <dd><p>Join the workers back to the thread and free their resources.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.n_workers">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_workers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.n_workers" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_workers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.n_workers" title="Link to this definition"></a></dt>
 <dd><p>Get the number of worker processes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -667,7 +386,7 @@ to quit the loop once processing is done.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.progress">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">progress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.progress" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">progress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.progress" title="Link to this definition"></a></dt>
 <dd><p>Get the progress level of the current computations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -682,7 +401,7 @@ means that no tasks have been defined.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.requestInterruption">
-<span class="sig-name descname"><span class="pre">requestInterruption</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.requestInterruption" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">requestInterruption</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.requestInterruption" title="Link to this definition"></a></dt>
 <dd><p>Request the interruption of the thread.</p>
 <p>This is a reimplementation of the generic “requestInterruption” method of the
 QThread.</p>
@@ -690,13 +409,13 @@ QThread.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.reset_task_list">
-<span class="sig-name descname"><span class="pre">reset_task_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.reset_task_list" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">reset_task_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.reset_task_list" title="Link to this definition"></a></dt>
 <dd><p>Reset and clear the list of tasks.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.restart">
-<span class="sig-name descname"><span class="pre">restart</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.restart" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">restart</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.restart" title="Link to this definition"></a></dt>
 <dd><p>Restart the event loop.</p>
 <p>This method allow the event loop to run and to submit tasks via the
 queue to the workers.</p>
@@ -704,14 +423,14 @@ queue to the workers.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.run" title="Link to this definition"></a></dt>
 <dd><p>Run the thread event loop.</p>
 <p>This method is automatically called upon starting the thread.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.send_stop_signal">
-<span class="sig-name descname"><span class="pre">send_stop_signal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.send_stop_signal" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">send_stop_signal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.send_stop_signal" title="Link to this definition"></a></dt>
 <dd><p>Send stop signal to workers.</p>
 <p>This method will send stop signals to all workers.
 Note that the runtime of the workers will be determined by the runtime
@@ -721,13 +440,13 @@ signal will be processed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.stop">
-<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.stop" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.stop" title="Link to this definition"></a></dt>
 <dd><p>Stop the thread from running.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.suspend">
-<span class="sig-name descname"><span class="pre">suspend</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.suspend" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">suspend</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.suspend" title="Link to this definition"></a></dt>
 <dd><p>Suspend the event loop.</p>
 <p>This method effectively suspends the event loop and calls for the
 workers to be joined again. New calculations can be performed by
@@ -736,7 +455,7 @@ using the :py:meth`WorkerController.restart` method.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.write_lock">
-<span class="sig-name descname"><span class="pre">write_lock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.write_lock" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">write_lock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.write_lock" title="Link to this definition"></a></dt>
 <dd><p>Set up the write lock for adding tasks to the list.</p>
 </dd></dl>
 
@@ -744,7 +463,7 @@ using the :py:meth`WorkerController.restart` method.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.app_processor">
-<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">app_processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.app_processor" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">app_processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.app_processor" title="Link to this definition"></a></dt>
 <dd><p>Start a loop to process function calls on individual frames.</p>
 <p>This function starts a while loop to call the supplied function with
 indices supplied by the queue. Results will be written to the output
@@ -780,7 +499,7 @@ level.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.app_processor_without_tasks">
-<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">app_processor_without_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.app_processor_without_tasks" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">app_processor_without_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.app_processor_without_tasks" title="Link to this definition"></a></dt>
 <dd><p>Start a loop to process function calls on individual frames.</p>
 <p>This function starts a while loop to call the supplied function without
 actually using the input queue (but the input queue is kept for
@@ -817,7 +536,7 @@ level.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.processor">
-<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.processor" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.processor" title="Link to this definition"></a></dt>
 <dd><p>Start a loop to process function calls on individual frames.</p>
 <p>This function starts a while loop to call the supplied function with
 indices supplied by the queue. Results will be written to the output
@@ -844,150 +563,45 @@ keyword arguments from the calling arguments of processor.</p></li>
 </section>
 
 
-                </article>
-              
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="core/others.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Other core classes and functions</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="data_io.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The data_io sub-package</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-</div>
-                </footer>
-              
-            </div>
-            
-            
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner"><code class="docutils literal notranslate"><span class="pre">AppRunner</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.call_app_method"><code class="docutils literal notranslate"><span class="pre">AppRunner.call_app_method()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_post_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_pre_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.get_app"><code class="docutils literal notranslate"><span class="pre">AppRunner.get_app()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.set_app_param"><code class="docutils literal notranslate"><span class="pre">AppRunner.set_app_param()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController"><code class="docutils literal notranslate"><span class="pre">WorkerController</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.add_task"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_task()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.add_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_tasks()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.change_function"><code class="docutils literal notranslate"><span class="pre">WorkerController.change_function()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_post_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_pre_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.exit"><code class="docutils literal notranslate"><span class="pre">WorkerController.exit()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.finalize_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.finalize_tasks()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.join_queues"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_queues()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.join_workers"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_workers()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.n_workers"><code class="docutils literal notranslate"><span class="pre">WorkerController.n_workers</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.progress"><code class="docutils literal notranslate"><span class="pre">WorkerController.progress</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.requestInterruption"><code class="docutils literal notranslate"><span class="pre">WorkerController.requestInterruption()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.reset_task_list"><code class="docutils literal notranslate"><span class="pre">WorkerController.reset_task_list()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.restart"><code class="docutils literal notranslate"><span class="pre">WorkerController.restart()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.run"><code class="docutils literal notranslate"><span class="pre">WorkerController.run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.send_stop_signal"><code class="docutils literal notranslate"><span class="pre">WorkerController.send_stop_signal()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.stop"><code class="docutils literal notranslate"><span class="pre">WorkerController.stop()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.suspend"><code class="docutils literal notranslate"><span class="pre">WorkerController.suspend()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.write_lock"><code class="docutils literal notranslate"><span class="pre">WorkerController.write_lock()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor"><code class="docutils literal notranslate"><span class="pre">app_processor()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor_without_tasks"><code class="docutils literal notranslate"><span class="pre">app_processor_without_tasks()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.processor"><code class="docutils literal notranslate"><span class="pre">processor()</span></code></a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../../_sources/code/api/multiprocessing.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
-
-</div></div>
-              
-            
+           </div>
           </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="core/others.html" class="btn btn-neutral float-left" title="Other core classes and functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_io.html" class="btn btn-neutral float-right" title="The data_io sub-package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
   </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
-  <p class="copyright">
-    
-      © Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.
-      <br/>
-    
-  </p>
-</div>
-      
-        <div class="footer-item">
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
-    <br/>
-  </p>
-</div>
-      
-    </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
-</p></div>
-      
-    </div>
-  
-</div>
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
 
-  </footer>
-  </body>
+</body>
 </html>

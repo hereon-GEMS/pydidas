@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The ScanContext class &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=9284fa43"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The WorkflowTree class" href="cmd_workflow_tree.html" />
+    <link rel="prev" title="The DiffractionExperimentContext class" href="cmd_diffraction_exp_context.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.01.18"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../commandline.html">Command line manuals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cmd_global.html">pydidas general command line tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_diffraction_exp_context.html">The DiffractionExperimentContext class</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The ScanContext class</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuring-the-scancontext">Configuring the ScanContext</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#global-parameters">Global Parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#parameters-for-each-dimension">Parameters for each dimension</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#import-of-scan-metadata">Import of scan metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#list-of-all-scancontext-parameters">List of all ScanContext Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_workflow_tree.html">The WorkflowTree class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_workflow_results.html">The WorkflowResults class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_running_workflows.html">Running pydidas workflows from the command line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_apps/cmd_apps.html">Command line applications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/graphical_user_interface.html">Graphical user interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../commandline.html">Command line manuals</a></li>
+      <li class="breadcrumb-item active">The ScanContext class</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/cmdline_global/cmd_scan_context.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-scancontext-class">
+<span id="scan-context"></span><h1>The ScanContext class<a class="headerlink" href="#the-scancontext-class" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#introduction" id="id1">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#configuring-the-scancontext" id="id2">Configuring the ScanContext</a></p>
+<ul>
+<li><p><a class="reference internal" href="#global-parameters" id="id3">Global Parameters</a></p></li>
+<li><p><a class="reference internal" href="#parameters-for-each-dimension" id="id4">Parameters for each dimension</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#import-of-scan-metadata" id="id5">Import of scan metadata</a></p></li>
+<li><p><a class="reference internal" href="#list-of-all-scancontext-parameters" id="id6">List of all ScanContext Parameters</a></p></li>
+</ul>
+</nav>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code> is the pydidas Singleton instance of the
+<a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.scan_context.Scan" title="pydidas.contexts.scan_context.Scan"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scan</span></code></a>
+class. It is used for storing and accessing global information about the scan
+layout and generic infomation like title, directory and file naming patterns.</p>
+<p>Stored information include</p>
+<blockquote>
+<div><ul>
+<li><p>Dimensionality (for arranging results)</p></li>
+<li><p>Name (for metadata and titles only)</p></li>
+<li><p>Directory (for data loading)</p></li>
+<li><p>Filename pattern (for data loading)</p></li>
+<li><p>Scan multiplicity (the number of each frames at each scan point).</p></li>
+<li><p>Starting index of files/frames</p></li>
+<li><p>Index stepping</p></li>
+<li><p>Information for each scan dimension</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Name for the scan dimension (for reference, e.g. motor name, time)</p></li>
+<li><p>Number of scan points</p></li>
+<li><p>Step width between two scan points</p></li>
+<li><p>Offset of the first scan points</p></li>
+<li><p>Unit of the scan direction</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p>These information allow to arrange the processed datasets in the correct order
+and to add metadata about the scan to plots and stored datasets.</p>
+<p>All objects are stored as <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> and
+can be accesses as described in the basic tutorial. A full list of Parameters is
+given in <a class="reference internal" href="#scan-context-parameters"><span class="std std-ref">List of all ScanContext Parameters</span></a>.</p>
+<p>Its instance can be obtained by calling the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="configuring-the-scancontext">
+<h2>Configuring the ScanContext<a class="headerlink" href="#configuring-the-scancontext" title="Link to this heading"></a></h2>
+<section id="global-parameters">
+<h3>Global Parameters<a class="headerlink" href="#global-parameters" title="Link to this heading"></a></h3>
+<p>The <a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.scan_context.Scan" title="pydidas.contexts.scan_context.Scan"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code></a>
+has <em>global</em> Parameters for generic information, listed in detail below:</p>
+<table class="tight-table docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ScanContext Parameter name</p></th>
+<th class="head"><p>data type</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>scan_dim</p></td>
+<td><p>int</p></td>
+<td><p>The number of dimensions in the scan.</p></td>
+</tr>
+<tr class="row-odd"><td><p>scan_title</p></td>
+<td><p>str</p></td>
+<td><p>The scan title. This Parameter is only used for plot titles and
+metadata.</p></td>
+</tr>
+<tr class="row-even"><td><p>scan_base_directory</p></td>
+<td><p>pathlib.Path</p></td>
+<td><p>The base directory for finding the files of the scan.</p></td>
+</tr>
+<tr class="row-odd"><td><p>scan_name_pattern</p></td>
+<td><p>str</p></td>
+<td><p>The naming pattern of the scan files. Use hashes ‘#’ for wildcards
+which will be replaced by indices.</p></td>
+</tr>
+<tr class="row-even"><td><p>scan_start_index</p></td>
+<td><p>int</p></td>
+<td><p>The starting index to subsititute the wildcards in the name pattern.</p></td>
+</tr>
+<tr class="row-odd"><td><p>scan_multiplicity</p></td>
+<td><p>int</p></td>
+<td><p>The number of frames acquired at each scan point.
+Note: If you want to handle multiple images individually, add them as
+an additional scan dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p>scan_multi_image_handling</p></td>
+<td><p>str</p></td>
+<td><p>Flag how to handle multiple images. Choices are averaging or summation.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Test_42&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_base_directory&#39;</span><span class="p">,</span> <span class="s1">&#39;/home/user/dir_to_data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The number of dimensions in the scan is limited to 4 which should be
+sufficient for all applications. If you have a specific application which
+required a larger number of dimensions, please get in contact with the
+pydidas development team to discuss your needs.</p>
+</div>
+</section>
+<section id="parameters-for-each-dimension">
+<h3>Parameters for each dimension<a class="headerlink" href="#parameters-for-each-dimension" title="Link to this heading"></a></h3>
+<p>The Parameters for each dimension are distinguished by a dimension index in the
+Parameter names, respectively. In the description, the numbers are substituted
+by an <em>i</em> for generality. It is important to preserve the scan order from the
+experiment to have the results in the correct structure.</p>
+<p>Each dimension is described by a total of five Parameters:</p>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 10.0%" />
+<col style="width: 16.0%" />
+<col style="width: 59.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>default</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>scan_dim{i}_label</p></td>
+<td><p>str</p></td>
+<td><p>[empty str]</p></td>
+<td><p>The axis name for scan direction <em>i</em>. This information will only be used
+for labelling.</p></td>
+</tr>
+<tr class="row-odd"><td><p>scan_dim{i}_n_points</p></td>
+<td><p>int</p></td>
+<td><p>0</p></td>
+<td><p>The number of scan points in scan direction <em>i</em>.</p></td>
+</tr>
+<tr class="row-even"><td><p>scan_dim{i}_delta</p></td>
+<td><p>float</p></td>
+<td><p>2</p></td>
+<td><p>The step width between two scan points in scan direction <em>i</em>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>scan_dim{i}_offset</p></td>
+<td><p>float</p></td>
+<td><p>0</p></td>
+<td><p>The coordinate offset of the movement in scan direction <em>i</em> (i.e. the
+counter / motor position for scan step #0)</p></td>
+</tr>
+<tr class="row-even"><td><p>scan_dim{i}_unit</p></td>
+<td><p>str</p></td>
+<td><p>[empty str]</p></td>
+<td><p>The unit of the movement / steps / offset in scan direction <em>i</em>. This
+value will only be used for labelling these numbers.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The only Parameter that must be set for each dimension is the number of
+points <code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim{i}_n_points</span></code> to allow pydidas to organize results
+in the correct grid.</p>
+</div>
+<p>As example, let us configure a scan with 2 dimensions. The slow motor is the
+x-axis with 25 scan points in the range [-12.0 mm, -11.5 mm, …, 12.0 mm] and
+the fast motor is the z-axis with 100 points in the range [150 nm, 225, nm, …,
+7575 nm]:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim0_label&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim0_n_points&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim0_delta&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim0_offset&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">12.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim0_unit&#39;</span><span class="p">,</span> <span class="s1">&#39;mm&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim1_label&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim1_n_points&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim1_delta&#39;</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim1_offset&#39;</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;scan_dim1_unit&#39;</span><span class="p">,</span> <span class="s1">&#39;nm&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="import-of-scan-metadata">
+<h2>Import of scan metadata<a class="headerlink" href="#import-of-scan-metadata" title="Link to this heading"></a></h2>
+<p>pydidas includes the option to import metadata from beamlines directly. Please
+contact your beamline local contact for details.</p>
+<p>Import functions will be implemented as required and depending on the scan
+metadata available at the beamlines.</p>
+<span class="target" id="scan-context-parameters"></span></section>
+<section id="list-of-all-scancontext-parameters">
+<h2>List of all ScanContext Parameters<a class="headerlink" href="#list-of-all-scancontext-parameters" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_dim (type: int, default: 2, unit: “”)</dt><dd><p>The scan dimensionality. This defines the number of processed dimensions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_title (type: str, default: “”, unit: “”)</dt><dd><p>The scan name or title. This is used exclusively for reference in axis
+labels and result exporters.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_base_directory (type: Path, default: “.”, unit: “”)</dt><dd><p>The base directory in which the raw scan data is stored.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_name_pattern (type: str, default: “”, unit: “”)</dt><dd><p>The name pattern for scan files, subdirectories etc. User hashes (“#”) to
+mark wildcard characters to be filled in with the current index.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_start_index (type: int, default: 0, unit: “”)</dt><dd><p>The starting index for files etc. of the first point in the scan.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_index_stepping (type: int, default: 1, unit: “”)</dt><dd><p>The stepping of the index, i.e. the difference in the index between two
+adjacent scan points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_multiplicity (type: int, default: 1, unit: “”)</dt><dd><p>The image multiplicity: The number of frames acquired at each unique scan
+point. Use this value only if the multiple images should be combined.
+Otherwise, use an additional scan dimension for the multiplicity.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_multi_image_handling (type: str, default: “Average”, unit: “”)</dt><dd><p>The handling instructions for multiple frames at each scan point. Can be
+either “Average” or “Sum”.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The following Parameters exist for each scan dimension, i.e. scan_dim<em>{i}</em>_label stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
+scan_dim3_label. For clarity, only the generic form is described here.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
+for labelling.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
+counter / motor position for scan step #0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_diffraction_exp_context.html" class="btn btn-neutral float-left" title="The DiffractionExperimentContext class" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_workflow_tree.html" class="btn btn-neutral float-right" title="The WorkflowTree class" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

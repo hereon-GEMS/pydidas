@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Builder classes &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=9284fa43"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Developer guide" href="../../../../developer_guide.html" />
+    <link rel="prev" title="ViewResultsFrame" href="view_results_frame.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.01.18"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../gui.html">The gui submodule</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../gui.html#global-gui-classes">Global GUI classes</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../gui.html#frames">Frames</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="data_browsing_frame.html">DataBrowsingFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="pyfai_calib_frame.html">PyfaiCalibFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="composite_creator_frame.html">CompositeCreatorFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="define_diffraction_exp_frame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="define_scan_frame.html">DefineScanFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="workflow_edit_frame.html">WorkflowEditFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="workflow_test_frame.html">WorkflowTestFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="workflow_run_frame.html">WorkflowRunFrame</a></li>
+<li class="toctree-l5"><a class="reference internal" href="view_results_frame.html">ViewResultsFrame</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">Builder classes</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../gui.html#windows">Windows</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../code_documentation.html">Code documentation</a></li>
+          <li class="breadcrumb-item"><a href="../../gui.html">The gui submodule</a></li>
+      <li class="breadcrumb-item active">Builder classes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/code/api/gui/frames/builders.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="builder-classes">
+<h1>Builder classes<a class="headerlink" href="#builder-classes" title="Link to this heading"></a></h1>
+<p>Builder classes manage the creation of widgets and layout for the respective frames.</p>
+<p id="module-pydidas.gui.frames.builders">The gui.frames.builders sub-package includes builders for all GUI frame classes.</p>
+<p>The builders to create and arrange the widgets have been separated simply for
+improved code organisation. They will create the user interface “shells”
+without any connections and functionality.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.CompositeCreatorFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">CompositeCreatorFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Create the layout and add all widgets required for the CompositeCreatorFrame.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.CompositeCreatorFrameBuilder.build_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Create and initialize all widgets for the CompositeCreatorFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The BaseFrame instance in which the widgets shall be added.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DataBrowsingFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">DataBrowsingFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DataBrowsingFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Class to populate the DataBrowsingFrame with widgets.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DataBrowsingFrameBuilder.build_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DataBrowsingFrameBuilder.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Build the frame and create all required widgets.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">DefineDiffractionExpFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Class to populate the DefineDiffractionExpFrame with widgets.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.build_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Populate the input frame with the required widgets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The DefineDiffractionExpFrame instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_detector_header">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_detector_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_detector_header" title="Link to this definition"></a></dt>
+<dd><p>Create header items (label / buttons) for the detector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_geometry_header">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_geometry_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_geometry_header" title="Link to this definition"></a></dt>
+<dd><p>Create header items (label / buttons) for the detector.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineScanFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">DefineScanFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Create all widgets and initialize their state.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineScanFrameBuilder.build_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Create all widgets for the frame and place them in the layout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The DefineScanFrame instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineScanFrameBuilder.width_factor">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">two_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder.width_factor" title="Link to this definition"></a></dt>
+<dd><p>Get the width factor based on the number of visible columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dim_columns</strong> (<em>int</em>) – The number of columns</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting total width factor for font metrics.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.ImageMathFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">ImageMathFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.ImageMathFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Create all widgets and initialize their state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> (<em>pydidas.gui.ImageMathFrame</em>) – The ImageMathFrame instance.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.ImageMathFrameBuilder.create_combo_button_row">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_combo_button_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combo_choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_icon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.ImageMathFrameBuilder.create_combo_button_row" title="Link to this definition"></a></dt>
+<dd><p>Create a combined widget with label, combobox and a button.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference</strong> (<em>str</em>) – The widget reference</p></li>
+<li><p><strong>label_text</strong> (<em>str</em>) – The text for the label.</p></li>
+<li><p><strong>combo_choices</strong> (<em>list</em>) – The choices to be displayed in the QComboBox.</p></li>
+<li><p><strong>button_text</strong> (<em>str</em>) – The button text.</p></li>
+<li><p><strong>button_icon</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>str</em><em>]</em>) – The button icon.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.ImageMathFrameBuilder.populate_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">populate_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.ImageMathFrameBuilder.populate_frame" title="Link to this definition"></a></dt>
+<dd><p>Build the frame by creating all required widgets and placing them in the layout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The frame instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.QuickIntegrationFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">QuickIntegrationFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>The QuickIntegrationFrameBuilder can be used to populate the QuickIntegrationFrame
+with widgets.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.QuickIntegrationFrameBuilder.populate_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">populate_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder.populate_frame" title="Link to this definition"></a></dt>
+<dd><p>Populate the given frame with widgets.</p>
+<p>Note: This method is reliant upon passing the correct type of frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<em>pydidas.gui.frames.QuickIntegrationFrame</em>) – The frame to be populated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.UtilitiesFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">UtilitiesFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Create all widgets and initialize their state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> (<em>pydidas.gui.DefineScanFrame</em>) – The DefineScanFrame instance.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.UtilitiesFrameBuilder.build_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Create all widgets for the frame and place them in the layout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The frame to be populated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.WorkflowEditFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">WorkflowEditFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.WorkflowEditFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Builder for the WorkflowEditFrame.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.WorkflowEditFrameBuilder.populate_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">populate_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.WorkflowEditFrameBuilder.populate_frame" title="Link to this definition"></a></dt>
+<dd><p>Build the frame by creating all required widgets and placing them in the layout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The frame instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.WorkflowRunFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">WorkflowRunFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.WorkflowRunFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Builder class to build the WorkflowRunFrame.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.WorkflowRunFrameBuilder.build_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrameWithApp" title="pydidas.widgets.framework.base_frame_with_app.BaseFrameWithApp"><span class="pre">BaseFrameWithApp</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.WorkflowRunFrameBuilder.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrameWithApp" title="pydidas.widgets.framework.BaseFrameWithApp"><em>BaseFrameWithApp</em></a>) – The WorkflowRunFrame instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.WorkflowTestFrameBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">WorkflowTestFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.WorkflowTestFrameBuilder" title="Link to this definition"></a></dt>
+<dd><p>Class to populate the WorkflowTestFrame with widgets.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.WorkflowTestFrameBuilder.build_frame">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.WorkflowTestFrameBuilder.build_frame" title="Link to this definition"></a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The WorkflowTestFrame instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="view_results_frame.html" class="btn btn-neutral float-left" title="ViewResultsFrame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../../developer_guide.html" class="btn btn-neutral float-right" title="Developer guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

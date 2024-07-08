@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data browsing frame &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9284fa43"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pyFAI calibration frame" href="PyfaiCalibFrame.html" />
+    <link rel="prev" title="Plots" href="../silx/plots.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.01.18"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../commandline.html">Command line manuals</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#the-ui-state">The UI state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#generic-gui-information">Generic GUI information</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../graphical_user_interface.html#frames">Frames</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Data browsing frame</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#controls">Controls</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#directory-explorer">Directory explorer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas-imageview">Pydidas ImageView</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineDiffractionExpFrame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineScanFrame.html">Define scan frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#windows">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#recipes">Recipes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../graphical_user_interface.html">Graphical user interface</a></li>
+      <li class="breadcrumb-item active">Data browsing frame</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/manuals/gui/frames/DataBrowsingFrame.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-browsing-frame">
+<span id="id1"></span><h1>Data browsing frame<a class="headerlink" href="#data-browsing-frame" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#controls" id="id2">Controls</a></p></li>
+<li><p><a class="reference internal" href="#directory-explorer" id="id3">Directory explorer</a></p>
+<ul>
+<li><p><a class="reference internal" href="#the-hdf5-data-selection-widget" id="id4">The hdf5 data selection widget</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#pydidas-imageview" id="id5">Pydidas ImageView</a></p>
+<ul>
+<li><p><a class="reference internal" href="#menu-entries-description" id="id6">menu entries description</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<p>The data browsing frame allows the visualization of two-dimensional data.
+The frame is divided in two main parts: On the left, a directory explorer allows
+to browse the full file system and select files. The right side, a data display
+allows to visualize data.</p>
+<a class="reference internal image-reference" href="../../../_images/data_browsing_overview.png"><img alt="../../../_images/data_browsing_overview.png" class="align-center" src="../../../_images/data_browsing_overview.png" style="width: 600px;" /></a>
+<p>The width of the directory explorer widgets can be adjusted by using the two
+arrow buttons in between the two main widgets, to reduce or to enlarge the
+directory explorer, respectively. Alternatively, the splitter between the two
+frames can be dragged by the mouse to change the relative sizes.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The two main widgets have a defined minimum size. If the user drags the
+splitter further, the respective widget will be hidden. It can be enlarged
+again by capturing and dragging the slider from the edge towards the center.</p>
+</div>
+<section id="controls">
+<h2>Controls<a class="headerlink" href="#controls" title="Link to this heading"></a></h2>
+<p>The controls are located on the left, above the directory explorer.
+Selecting or deselecting an option will directly update the directory explorer.</p>
+<p>The options are:</p>
+<blockquote>
+<div><ul>
+<li><p>Show network drives</p>
+<p>This option allows to show or hide linked network drives in the explorer
+view.</p>
+</li>
+<li><p>Sorting is case sensitive</p>
+<p>This option toggles case sensitive sorting. If enabled, lowercase and
+uppercase names will be sorted and displayed separately.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="directory-explorer">
+<h2>Directory explorer<a class="headerlink" href="#directory-explorer" title="Link to this heading"></a></h2>
+<p>The directory explorer is used to select the data to be displayed. The exact
+look and feel will depend on the used operating system and might be different
+from the screenshots shown here.</p>
+<p>A single click on an item will just highlight the item but will otherwise be
+ignored. Double-clicking on a folder (or the arrow next to a folder) will
+expand or collapse the folder, depending on the folder’s current state.
+Double-clicking on a file will instruct pydidas to open the selected file. If
+the data format is readable and the file contains two-dimensional data, the
+content will be displayed in the ImageView widget. In case of hdf5 files, an
+aditional selection field will be shown to select the data frame.</p>
+<section id="the-hdf5-data-selection-widget">
+<h3>The hdf5 data selection widget<a class="headerlink" href="#the-hdf5-data-selection-widget" title="Link to this heading"></a></h3>
+<p>The hdf5 data selection widget is shown below.</p>
+<img alt="../../../_images/data_browsing_hdf5.png" class="align-center" src="../../../_images/data_browsing_hdf5.png" />
+<p>The first row allows the user to select dataset filters for specific names.
+For example, the Eiger detector master file has a number of datasets for
+detector specific settings like offsets and calibrations for the different
+modules. If the respective box is ticked, these datasets will not be shown in
+the drop-down list. Additional filters for datasets can be set on their minimum
+size (the total number of datapoints, not per axis) and minimum data dimension.
+Any changes to the filters will update the list of filtered datasets
+immediately.</p>
+<p>To select a dataset, simply select the corresponding hdf5 dataset key from the
+list. This will update the selection of the data frame.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For three-dimensional datasets, pydidas will assume that the first dimension
+in the dataset is always the frame number and the second and third
+dimensions correspond to the detector data frame.</p>
+</div>
+<p>The data frame can be selected by dragging the slider, clicking on an arrow or
+by entering a new number. Clicking on “Show full frame” will show the selected
+frame in the ImageView widget.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Changing the selected frame will only trigger an update of the ImageView
+if the “Auto update” checkbox is ticked.</p>
+</div>
+</section>
+</section>
+<section id="pydidas-imageview">
+<h2>Pydidas ImageView<a class="headerlink" href="#pydidas-imageview" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../../code/api/widgets/silx_plot.html#pydidas.widgets.silx_plot.PydidasImageView" title="pydidas.widgets.silx_plot.PydidasImageView"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasImageView</span></code></a> is a
+subclassed <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/imageview.html#silx.gui.plot.ImageView.ImageView">silx ImageView</a>
+with additional features useful in pydidas.</p>
+<p>Its layout is shown below:</p>
+<a class="reference internal image-reference" href="../../../_images/standard_imageview.png"><img alt="../../../_images/standard_imageview.png" class="align-center" src="../../../_images/standard_imageview.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
+functionality. The detailed menu icons and actions are described below
+in the menu entries description.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The image display</dt><dd><p>This plot shows the image data. Depending on the zoom level, this is either
+the full image or a sub-region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The overview &amp; pan area</dt><dd><p>This widget shows the current zoom region with respect to the full image,
+if the user zoomed in on a subregion. In addition, it allows to pan the
+image region by dragging the zoom region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The histograms</dt><dd><p>The vertical and horizontal histograms display the histograms for the
+selected image region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
+the mouse cursor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="menu-entries-description">
+<h3>menu entries description<a class="headerlink" href="#menu-entries-description" title="Link to this heading"></a></h3>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>menu icon</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
+</td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
+of the data to be visualized.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
+</td>
+<td><p>Panning mode: clicking with the mouse and dragging moves the data on the
+canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_unzoom.png" class="align-center" src="../../../_images/menu_unzoom.png" />
+</td>
+<td><p>Unzoom: Reset the display region to the full data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_palette.png" class="align-center" src="../../../_images/menu_palette.png" />
+</td>
+<td><p>Open the colormap editor. This button opens a window with selections
+for the colormap and scaling of the displayed minimum and maximum
+values.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_crop_histogram_outliers.png" class="align-center" src="../../../_images/menu_crop_histogram_outliers.png" />
+</td>
+<td><p>Crop histogram outliers: Calculate the histogram of the image and set
+the colormap to ignore the low <em>x% and the top *y%</em> of the image
+histogram. The levels of <em>x</em> and <em>y</em> can be adjusted in the pydidas
+user settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_cmap_autoscale.png" class="align-center" src="../../../_images/menu_cmap_autoscale.png" />
+</td>
+<td><p>Autoscale the colormap to the image mean value +/- 3 standard
+deviations.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_aspect.png" class="align-center" src="../../../_images/menu_aspect.png" />
+</td>
+<td><p>This action allows to control the aspect of the displayed data and
+allows to stretch the data to fill the available canvas or keep its
+original aspect ratio.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_orientation.png" class="align-center" src="../../../_images/menu_orientation.png" />
+</td>
+<td><p>Control the position of the origin in the image: Select between the top
+left and bottom left corner.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_mask.png" class="align-center" src="../../../_images/menu_mask.png" />
+</td>
+<td><p>Mask tools: This button opens an additional widget at the bottom of the
+canvas with tools for importing or setting a mask to mask certain
+data regions.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_histogram.png" class="align-center" src="../../../_images/menu_histogram.png" />
+</td>
+<td><p>Show/hide the histograms at the side. This will also hide the
+<em>overview &amp; pan</em> widget.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_filter.png" class="align-center" src="../../../_images/menu_filter.png" />
+</td>
+<td><p>Filter tools: This button allows the user to select simple filters to
+apply to the image data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_coordinate_system.png" class="align-center" src="../../../_images/menu_coordinate_system.png" />
+</td>
+<td><p>Set coordinate system: This button will open a submenu which allows to
+select the coordinate system (cartesian or cylindrical). Note that the
+cylindrical coordinate system use the global <a class="reference internal" href="../../../code/api/contexts.html#pydidas.contexts.diffraction_exp_context.DiffractionExperiment" title="pydidas.contexts.diffraction_exp_context.DiffractionExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code></a>
+calibration to determine the beam center. Therefore, looking at data
+with a different calibration will display a wrong center and therefore
+also wrong coordinates.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+</td>
+<td><p>Copy the currently visible figure to the clipboard. This will only copy
+the main figure and not the histograms.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+</td>
+<td><p>Save the currently loaded full data to file, ignoring any zooming. This
+function will open a dialogue to select the file type and filename.
+Depending on the selected file type, the colormap and scaling will be
+retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+</td>
+<td><p>Print the currently visible figure. This will print only the data
+visible on the canvas and it will retain colormap and scaling settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_profile.png" class="align-center" src="../../../_images/menu_profile.png" />
+</td>
+<td><p>Create and delete line profiles. This function allows the selection and
+editing of line profiles. The line profiles are shown in the histograms
+plots for the vertical and horizontal, respectively.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../silx/plots.html" class="btn btn-neutral float-left" title="Plots" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="PyfaiCalibFrame.html" class="btn btn-neutral float-right" title="pyFAI calibration frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The managers sub-package &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=9284fa43"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The plugins sub-package" href="plugins.html" />
+    <link rel="prev" title="The contexts sub-package" href="contexts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.01.18"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The managers sub-package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.managers.CompositeImageManager"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.CompositeImageManager.apply_thresholds"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager.apply_thresholds()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.CompositeImageManager.create_new_image"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager.create_new_image()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.CompositeImageManager.export"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager.export()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.CompositeImageManager.image"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager.image</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.CompositeImageManager.insert_image"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager.insert_image()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.CompositeImageManager.save"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager.save()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.CompositeImageManager.shape"><code class="docutils literal notranslate"><span class="pre">CompositeImageManager.shape</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.managers.FilelistManager"><code class="docutils literal notranslate"><span class="pre">FilelistManager</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.FilelistManager.filesize"><code class="docutils literal notranslate"><span class="pre">FilelistManager.filesize</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.FilelistManager.get_config"><code class="docutils literal notranslate"><span class="pre">FilelistManager.get_config()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.FilelistManager.get_filename"><code class="docutils literal notranslate"><span class="pre">FilelistManager.get_filename()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.FilelistManager.n_files"><code class="docutils literal notranslate"><span class="pre">FilelistManager.n_files</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.FilelistManager.reset"><code class="docutils literal notranslate"><span class="pre">FilelistManager.reset()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.FilelistManager.update"><code class="docutils literal notranslate"><span class="pre">FilelistManager.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.datatype"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.datatype</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.filename"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.filename</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.final_shape"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.final_shape</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.hdf5_dset_shape"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.hdf5_dset_shape</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.images_per_file"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.images_per_file</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.numbers"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.numbers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.raw_size_x"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.raw_size_x</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.raw_size_y"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.raw_size_y</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.roi"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.roi</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.store_image_data"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.store_image_data()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.update"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.update()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.update_final_image"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.update_final_image()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.managers.ImageMetadataManager.update_input_data"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.update_input_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../code_documentation.html">Code documentation</a></li>
+      <li class="breadcrumb-item active">The managers sub-package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/code/api/managers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pydidas.managers">
+<span id="the-managers-sub-package"></span><h1>The managers sub-package<a class="headerlink" href="#module-pydidas.managers" title="Link to this heading"></a></h1>
+<p>The pydidas.managers sub-package includes manager classes which handle certain
+aspects of pydidas.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.managers.</span></span><span class="sig-name descname"><span class="pre">CompositeImageManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.CompositeImageManager" title="Link to this definition"></a></dt>
+<dd><p>A manager to arrrange images in a composite.</p>
+<p>The CompositeImage class holds a numpy array to combine individual images
+to a composite and to provide basic insertion and manipulation routines.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager.apply_thresholds">
+<span class="sig-name descname"><span class="pre">apply_thresholds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.CompositeImageManager.apply_thresholds" title="Link to this definition"></a></dt>
+<dd><p>Apply thresholds to the composite image.</p>
+<p>This method applies thresholds to the composite image. By default, it
+will apply the thresholds defined in the ParameterCollection but these
+can be overwritten with the low and high arguments. Note that these
+values will be used to update the ParameterCollection.
+This method will only apply the thresholds to the image but will not
+return the iamge itself.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>low</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The lower threshold. If not specified, the stored lower threshold
+from the ParameterCollection will be used. A value of np.nan or
+None will be ignored.</p></li>
+<li><p><strong>high</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The upper threshold. If not specified, the stored upper threshold
+from the ParameterCollection will be used. A value of np.nan or
+None will be ignored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager.create_new_image">
+<span class="sig-name descname"><span class="pre">create_new_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.CompositeImageManager.create_new_image" title="Link to this definition"></a></dt>
+<dd><p>Create a new image array with the stored Parameters.</p>
+<p>The new image array is accessible through the .image property.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.CompositeImageManager.export" title="Link to this definition"></a></dt>
+<dd><p>Export the image to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_fname</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The full file system path and filename for the output image file.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Optional keyword arguments to be passed to the exporters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager.image">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#pydidas.managers.CompositeImageManager.image" title="Link to this definition"></a></dt>
+<dd><p>Get the composite image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The composite image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager.insert_image">
+<span class="sig-name descname"><span class="pre">insert_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.CompositeImageManager.insert_image" title="Link to this definition"></a></dt>
+<dd><p>Put the image in the composite image.</p>
+<p>This method will find the correct place for the image in the composite
+and copy the image data there.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image data.</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – The image index. This is needed to find the correct place for
+the image in the composite.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.CompositeImageManager.save" title="Link to this definition"></a></dt>
+<dd><p>Save the image in binary npy format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_fname</strong> (<em>str</em>) – The full filename and path to the output image file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.CompositeImageManager.shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.managers.CompositeImageManager.shape" title="Link to this definition"></a></dt>
+<dd><p>Get the shape of the composite image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The shape of the composite image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.managers.FilelistManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.managers.</span></span><span class="sig-name descname"><span class="pre">FilelistManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.FilelistManager" title="Link to this definition"></a></dt>
+<dd><p>The FilelistManager creates and manages a file list from which to select
+items for processing.</p>
+<p>Any required Parameters can be supplied as arguments or with
+<code class="docutils literal notranslate"><span class="pre">refkey=&lt;ParameterInstance&gt;</span></code> as kwargs. Any Parameter not given will
+default to new instances with the default values.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The FilelistManager uses the following generic Parameters:</p>
+<dl class="simple">
+<dt>live_processing<span class="classifier">bool, optional</span></dt><dd><p>Keyword to toggle live processing which means file existance and size
+checks will be disabled in the setup process and the file processing
+will wait for files to be created (indefinitely). The default is
+False.</p>
+</dd>
+<dt>first_file<span class="classifier">pathlib.Path</span></dt><dd><p>The name of the first file for a file series or of the hdf5 file in
+case of hdf5 file input.</p>
+</dd>
+<dt>last_file<span class="classifier">pathlib.Path, optional</span></dt><dd><p>Used only for file series: The name of the last file to be added to
+the composite image.</p>
+</dd>
+<dt>file_stepping<span class="classifier">int, optional</span></dt><dd><p>The step width (in files). A value n &gt; 1 will only process every n-th
+image for the composite. The default is 1.</p>
+</dd>
+</dl>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>tuple</em>) – Any of the Parameters in use can be given as instances.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Parameters can also be supplied as kwargs, referencey by their refkey.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.FilelistManager.filesize">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filesize</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pydidas.managers.FilelistManager.filesize" title="Link to this definition"></a></dt>
+<dd><p>Get the file size of the processed files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The file size in bytes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.FilelistManager.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.managers.FilelistManager.get_config" title="Link to this definition"></a></dt>
+<dd><p>Get the full _config dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>_config</strong> – The config dictionary with information about the file list, sizes
+and number of files.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.FilelistManager.get_filename">
+<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#pydidas.managers.FilelistManager.get_filename" title="Link to this definition"></a></dt>
+<dd><p>Get the filename of the image file numbered with index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the image file.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If the file list is not correctly initiated or if the index is
+    out of the range of the file list.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The filename (and path) of the image file indexed with index.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.FilelistManager.n_files">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.managers.FilelistManager.n_files" title="Link to this definition"></a></dt>
+<dd><p>Get the number of files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_files</strong> – The number of files in the filelist.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.FilelistManager.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.FilelistManager.reset" title="Link to this definition"></a></dt>
+<dd><p>Reset the filelist to the initial configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.FilelistManager.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live_processing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_stepping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.FilelistManager.update" title="Link to this definition"></a></dt>
+<dd><p>Create a filelist with updated parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>first_file</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>str</em><em>, </em><em>Path</em><em>]</em><em>, </em><em>optional</em>) – The path to the first file. If None, the stored Parameter for
+‘first_file’ will be used. The default is None.</p></li>
+<li><p><strong>last_file</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>str</em><em>, </em><em>Path</em><em>]</em><em>, </em><em>optional</em>) – The path to the last file. If None, the stored Parameter for
+‘last_file’ will be used. The default is None.</p></li>
+<li><p><strong>live_processing</strong> (<em>Union</em><em>[</em><em>None. bool</em><em>]</em><em>, </em><em>optional</em>) – Flag for live processing (i.e. disable file system checks.)
+If None, the stored Parameter ‘live_processing’ will be used.
+The default is None.</p></li>
+<li><p><strong>file_stepping</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – The file stepping number. If None, the stored Parameter
+‘file_stepping’ will be used. The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.managers.</span></span><span class="sig-name descname"><span class="pre">ImageMetadataManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager" title="Link to this definition"></a></dt>
+<dd><p>Class to handle image metadata.</p>
+<p>The ImageMetadataManager is responsible for keeping track of the
+metadata (shape, datatype, imager per file) of image files. All the
+metadata is available for the user through class properties.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The ImageMetadataManager uses the following generic Parameters:</p>
+<dl class="simple">
+<dt>filename<span class="classifier">Path</span></dt><dd><p>The name of the first file for a file series or of the hdf5 file in
+case of hdf5 file input.</p>
+</dd>
+<dt>hdf5_key<span class="classifier">Hdf5key, optional</span></dt><dd><p>Used only for hdf5 files: The dataset key.</p>
+</dd>
+<dt>hdf5_first_image_num<span class="classifier">int, optional</span></dt><dd><p>The first image in the hdf5-dataset to be used. The default is 0.</p>
+</dd>
+<dt>hdf5_last_image_num<span class="classifier">int, optional</span></dt><dd><p>The last image in the hdf5-dataset to be used. The value -1 will
+default to the last image. The default is -1.</p>
+</dd>
+<dt>hdf5_stepping<span class="classifier">int, optional</span></dt><dd><p>The step width (in images) of hdf5 datasets. A value n &gt; 1 will only
+add every n-th image to the composite. The default is 1.</p>
+</dd>
+<dt>binning<span class="classifier">int, optional</span></dt><dd><p>The re-binning factor for the images in the composite. The binning
+will be applied to the cropped images. The default is 1.</p>
+</dd>
+</dl>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>tuple</em>) – Any of the Parameters in use can be given as instances.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Parameters can also be supplied as kwargs, referencey by their refkey.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.datatype">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">datatype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">type</span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.datatype" title="Link to this definition"></a></dt>
+<dd><p>Get the datatype of the raw image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The datatype class.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.filename">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filename</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.filename" title="Link to this definition"></a></dt>
+<dd><p>Get the currently stored reference filename.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The filename.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.final_shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">final_shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.final_shape" title="Link to this definition"></a></dt>
+<dd><p>Get the final shape of the processed image (cropped &amp; binned).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The final shape of the image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.hdf5_dset_shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hdf5_dset_shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.hdf5_dset_shape" title="Link to this definition"></a></dt>
+<dd><p>Get the shape of the hdf5 dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The shape (number of datapoints) of the dataset.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[int, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.images_per_file">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">images_per_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.images_per_file" title="Link to this definition"></a></dt>
+<dd><p>Get the number of images per file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of images per file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.numbers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numbers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.numbers" title="Link to this definition"></a></dt>
+<dd><p>Get the frame numbers pointing to the selected images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The selected frame numbers.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Union[range, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.raw_size_x">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_size_x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.raw_size_x" title="Link to this definition"></a></dt>
+<dd><p>Get the x-size of the raw image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of pixels in x-direction.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.raw_size_y">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_size_y</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.raw_size_y" title="Link to this definition"></a></dt>
+<dd><p>Get the y-size of the raw image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of pixels in y-direction.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.roi">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">roi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">slice</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.roi" title="Link to this definition"></a></dt>
+<dd><p>Get the ROI object required to achieve the final image shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Either None, if no ROI has been defined or a tuple with the slice
+objects for y and x dimensions.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Union[None, tuple[slice, slice]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.store_image_data">
+<span class="sig-name descname"><span class="pre">store_image_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.store_image_data" title="Link to this definition"></a></dt>
+<dd><p>Store the data about the image shape and datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_shape</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – The shape of the image.</p></li>
+<li><p><strong>img_dtype</strong> (<em>type</em>) – The python datatype of the image.</p></li>
+<li><p><strong>n_image</strong> (<em>int</em>) – The number of images per file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update" title="Link to this definition"></a></dt>
+<dd><p>Perform a full update.</p>
+<p>If a new filename is specified, it will be set as first action. Otherwise,
+the metadata will be extracted from the current file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The filename to be updated. If None, the current filename will be used.
+The default is None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.update_final_image">
+<span class="sig-name descname"><span class="pre">update_final_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update_final_image" title="Link to this definition"></a></dt>
+<dd><p>Calculate the dimensions of the final image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.update_input_data">
+<span class="sig-name descname"><span class="pre">update_input_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update_input_data" title="Link to this definition"></a></dt>
+<dd><p>Update the image metadata from new input.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contexts.html" class="btn btn-neutral float-left" title="The contexts sub-package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="plugins.html" class="btn btn-neutral float-right" title="The plugins sub-package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

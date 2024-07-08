@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Package structure &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=9284fa43"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The core submodule" href="api/core.html" />
+    <link rel="prev" title="Key concepts" href="concepts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydidas
+              <img src="../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.01.18"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_documentation.html#further-code-documentation">Further code documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="concepts.html">Key concepts</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Package structure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#index-of-sub-packages">Index of sub-packages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sub-package-descriptions">Sub-package descriptions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#api-documentation">API documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="code_documentation.html">Code documentation</a></li>
+      <li class="breadcrumb-item active">Package structure</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/code/package_structure.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="package-structure">
+<span id="id1"></span><h1>Package structure<a class="headerlink" href="#package-structure" title="Link to this heading"></a></h1>
+<p>The pydidas sub-packages are organized hierachically with only upward
+references to allow a clean architecture. A list of the sub-packages including
+internal references is given below.</p>
+<section id="index-of-sub-packages">
+<h2>Index of sub-packages<a class="headerlink" href="#index-of-sub-packages" title="Link to this heading"></a></h2>
+<p>The list of all pydidas subpackages including their internal requirements is
+given below:</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>sub-package</strong></p></td>
+<td><p><strong>requirements</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>core</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>multiprocessing</p></td>
+<td><p>core</p></td>
+</tr>
+<tr class="row-even"><td><p>data_io</p></td>
+<td><p>core</p></td>
+</tr>
+<tr class="row-odd"><td><p>contexts</p></td>
+<td><p>core</p></td>
+</tr>
+<tr class="row-even"><td><p>managers</p></td>
+<td><p>core, data_io</p></td>
+</tr>
+<tr class="row-odd"><td><p>plugins</p></td>
+<td><p>core, data_io, managers</p></td>
+</tr>
+<tr class="row-even"><td><p>workflow</p></td>
+<td><p>core, contexts, plugins</p></td>
+</tr>
+<tr class="row-odd"><td><p>apps</p></td>
+<td><p>core, data_io, contexts, managers, workflow</p></td>
+</tr>
+<tr class="row-even"><td><p>widgets</p></td>
+<td><p>core, contexts, workflow, apps</p></td>
+</tr>
+<tr class="row-odd"><td><p>unittest_objects</p></td>
+<td><p>core, data_io, plugins, apps</p></td>
+</tr>
+<tr class="row-even"><td><p>gui</p></td>
+<td><p>core, multiprocessing, data_io, contexts,
+workflow, apps, widgets</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sub-package-descriptions">
+<h2>Sub-package descriptions<a class="headerlink" href="#sub-package-descriptions" title="Link to this heading"></a></h2>
+<ul>
+<li><p><strong>pydidas.core</strong></p>
+<blockquote>
+<div><p>The core classes and functions which are used throughout the pydidas
+package. These include data structure, generic objects, and factories.</p>
+</div></blockquote>
+<ul>
+<li><p><em>pydidas.core.constants</em></p>
+<blockquote>
+<div><p>Hardcoded constants (numerical and for GUI behaviour) used by pydidas.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.core.io_registry</em></p>
+<blockquote>
+<div><p>Base classes for a metaclass-based registry to associate specific
+actions with specific file extensions.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.core.utils</em></p>
+<blockquote>
+<div><p>Utility functions for various purposes.</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>pydidas.multiprocessing</strong></p>
+<blockquote>
+<div><p>All the required functionality to run simple functions or apps in
+parallel processes.</p>
+</div></blockquote>
+</li>
+<li><p><strong>pydidas.data_io</strong></p>
+<blockquote>
+<div><p>The pydidas image reader and writer implementation and registry classes
+for the various formats.</p>
+</div></blockquote>
+<ul>
+<li><p><em>pydidas.data_io.implementations</em></p>
+<blockquote>
+<div><p>Specific implementations for various file formats.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.data_io.low_level_readers</em></p>
+<blockquote>
+<div><p>Low-level implementations of file readers used by <em>implementations</em>
+(e.g. reading slices out of hdf5 files).</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>pydidas.contexts</strong></p>
+<blockquote>
+<div><p>Singleton classes which manage global settings for the experimental setup
+and the scan setup. This information can be used by plugins or apps to query
+the global processing parameters.</p>
+</div></blockquote>
+<ul>
+<li><p><em>pydidas.contexts.experiment_context</em></p>
+<blockquote>
+<div><p>Classes for the global experimental settings and import/export.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.contexts.scan_context</em></p>
+<blockquote>
+<div><p>Classes for the global scan settings and import/export.</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>pydidas.managers</strong></p>
+<blockquote>
+<div><p>Classes which manage specific tasks or aspects of processing and which
+can be used by plugins and apps.</p>
+</div></blockquote>
+</li>
+<li><p><strong>pydidas.plugins</strong></p>
+<blockquote>
+<div><p>Base classes for plugins and the plugin collection singleton which handles
+the collection of plugin classes from (possibly) different locations and
+which can return single classes for instantiation in a workflow tree.</p>
+</div></blockquote>
+</li>
+<li><p><strong>pydidas.workflow</strong></p>
+<blockquote>
+<div><p>Classes of nodes and trees to describe the workflow and execute plugins in
+the order defined by the user.</p>
+</div></blockquote>
+<ul>
+<li><p><em>pydidas.workflow.result_io</em></p>
+<blockquote>
+<div><p>Classes to handle writing the results of the workflow execution to
+files.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.workflow.processing_tree_io</em></p>
+<blockquote>
+<div><p>Registry with importers/exporters and the importer/exporter
+implementations.</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>pydidas.apps</strong></p>
+<blockquote>
+<div><p>The pydidas use cases have been defined in apps which can be called from
+the command line or using the GUI. All apps are parallelizable using the
+functionality of the multiprocesing subpackage.</p>
+</div></blockquote>
+</li>
+<li><p><strong>pydidas.widgets</strong></p>
+<blockquote>
+<div><p>pydidas-specific PyQt5 widgets which are used in the graphical user
+interface.</p>
+</div></blockquote>
+<ul>
+<li><p><em>pydidas.widgets.dialogues</em></p>
+<blockquote>
+<div><p>User dialogue widgets which show in their own windows.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.widgets.factory</em></p>
+<blockquote>
+<div><p>Convenience functions to create new widgets and set Qt properties
+defined by the user.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.widgets.parameter_config</em></p>
+<blockquote>
+<div><p>Specific widgets to edit the values of Parameters and functionality to
+create and manage parameter config widgets.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.widgets.selection</em></p>
+<blockquote>
+<div><p>Widgets used to select a specific item.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.widgets.workflow_edit</em></p>
+<blockquote>
+<div><p>Widgets used to show and edit the workflow tree.</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>pydidas.unittest_objects</strong></p>
+<blockquote>
+<div><p>Objects which are not used in the deployed pydidas version but which are
+required to run unittests with simplified objects.</p>
+</div></blockquote>
+</li>
+<li><p><strong>pydidas.gui</strong></p>
+<blockquote>
+<div><p>All the functionality required for building and running the graphical user
+interface. Functionality is organized in “frames” which can all be accessed
+from the main window.</p>
+</div></blockquote>
+<ul>
+<li><p><em>pydidas.gui.frames</em></p>
+<blockquote>
+<div><p>Frames are the top-level widgets used in pydidas to organize and show
+content in the GUI.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.gui.frames.builders</em></p>
+<blockquote>
+<div><p>Mix-in classes for the individual frames which include the layout and
+arrangement of widgets.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.gui.managers</em></p>
+<blockquote>
+<div><p>Manager classes for the GUI.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.gui.mixins</em></p>
+<blockquote>
+<div><p>Mix-in classes for the GUI which add specific functionality to the base
+frame classes.</p>
+</div></blockquote>
+</li>
+<li><p><em>pydidas.gui.windows</em></p>
+<blockquote>
+<div><p>Stand-alone main windows which can be opened from within the pydidas
+main window, for example for the documentation.</p>
+</div></blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="concepts.html" class="btn btn-neutral float-left" title="Key concepts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/core.html" class="btn btn-neutral float-right" title="The core submodule" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

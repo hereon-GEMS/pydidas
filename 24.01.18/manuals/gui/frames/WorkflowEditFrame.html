@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workflow edit frame &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9284fa43"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Workflow test frame" href="WorkflowTestFrame.html" />
+    <link rel="prev" title="Define scan frame" href="DefineScanFrame.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.01.18"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../commandline.html">Command line manuals</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#the-ui-state">The UI state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#generic-gui-information">Generic GUI information</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../graphical_user_interface.html#frames">Frames</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineDiffractionExpFrame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineScanFrame.html">Define scan frame</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Workflow edit frame</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#plugin-browser">Plugin browser</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#workflow-tree-canvas">Workflow tree canvas</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#plugin-parameter-editing">Plugin Parameter editing</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#import-and-export">Import and Export</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#using-the-workflowtree">Using the WorkflowTree</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#windows">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#recipes">Recipes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../graphical_user_interface.html">Graphical user interface</a></li>
+      <li class="breadcrumb-item active">Workflow edit frame</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/manuals/gui/frames/WorkflowEditFrame.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="workflow-edit-frame">
+<span id="id1"></span><h1>Workflow edit frame<a class="headerlink" href="#workflow-edit-frame" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#plugin-browser" id="id3">Plugin browser</a></p></li>
+<li><p><a class="reference internal" href="#workflow-tree-canvas" id="id4">Workflow tree canvas</a></p>
+<ul>
+<li><p><a class="reference internal" href="#removing-nodes-from-the-workflowtree" id="id5">Removing nodes from the WorkflowTree</a></p></li>
+<li><p><a class="reference internal" href="#rearranging-nodes-in-the-workflowtree" id="id6">Rearranging nodes in the WorkflowTree</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#plugin-parameter-editing" id="id7">Plugin Parameter editing</a></p></li>
+<li><p><a class="reference internal" href="#import-and-export" id="id8">Import and Export</a></p></li>
+<li><p><a class="reference internal" href="#using-the-workflowtree" id="id9">Using the WorkflowTree</a></p></li>
+</ul>
+</nav>
+<p>The <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> can
+be visualized and edited in the Workflow edit frame. The starting layout of the
+frame is shown below.</p>
+<a class="reference internal image-reference" href="../../../_images/workflow_edit_overview.png"><img alt="../../../_images/workflow_edit_overview.png" class="align-center" src="../../../_images/workflow_edit_overview.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>I/O buttons</dt><dd><p>Buttons for importing and exporting the workflow are situated here.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Workflow tree canvas</dt><dd><p>This is the area where the visualization of the
+<a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
+and its <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNodes</span></code></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>PluginBrowser</dt><dd><p>This widget displays all available Plugins in the PluginCollection on the
+left as well as a description of the selected plugin on the right.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Plugin parameter edit area</dt><dd><p>Once a Plugin has been added to the WorkflowTree, its Parameters can be
+edited here after selecting the respective plugin.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="plugin-browser">
+<span id="workflow-plugin-presenter"></span><h2>Plugin browser<a class="headerlink" href="#plugin-browser" title="Link to this heading"></a></h2>
+<p>The Plugin collection presenter consists of two parts. On the left, it will show
+all Plugins which have been registered with the <a class="reference internal" href="../../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a> (for more information
+about how paths are managed, please refer to <a class="reference internal" href="../../cmdline_global/cmd_global.html#global-plugincollection"><span class="std std-ref">PluginCollection</span></a>).
+On the right, it shows detailed information about the selected plugin:</p>
+<a class="reference internal image-reference" href="../../../_images/workflow_edit_plugin_browser.png"><img alt="../../../_images/workflow_edit_plugin_browser.png" class="align-center" src="../../../_images/workflow_edit_plugin_browser.png" style="width: 500px;" /></a>
+<p>A filter can be selected at the top of the left part to display only plugins
+with matching names.</p>
+<p>A single click on a Plugin’s name on the left will show more information about
+the selected Plugin on the right. This information included the description, a
+full list of Parameters, the input and output data dimensions as well as further
+programmatic information (class name and plugin type).</p>
+<p>A double click on a Plugin’s name will append a new instance of the Plugin to
+the <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.
+The new instance will always be appended to the currently active Plugin (or it
+will become the new root Plugin if the Tree is empty).</p>
+<img alt="../../../_images/workflow_edit_plugin_menu.png" class="align-left" src="../../../_images/workflow_edit_plugin_menu.png" />
+<p>Left-clicking on a Plugin name will open a context menu with additional options:
+The user can replace the active node, append a new <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a> to the active node or append to a specific
+node. The <em>Append to a specific node</em> menu entry will open a new sub-menu with
+a list of all nodes in the <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Adding a new node to the WorkflowTree will also activate that node.</p>
+<p>To make a branching tree, you will need to activate the original node
+again after adding the first new node.</p>
+</div>
+</section>
+<section id="workflow-tree-canvas">
+<span id="id2"></span><h2>Workflow tree canvas<a class="headerlink" href="#workflow-tree-canvas" title="Link to this heading"></a></h2>
+<a class="reference internal image-reference" href="../../../_images/workflow_edit_workflow_canvas.png"><img alt="../../../_images/workflow_edit_workflow_canvas.png" class="align-center" src="../../../_images/workflow_edit_workflow_canvas.png" style="width: 500px;" /></a>
+<p>The image above shows an example <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> visualization. Each plugin is
+depicted in a box with its node number and name and connections between nodes
+are displayed with lines. The color and frame indicate the status of the
+selected <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Blue background, bold frame</dt><dd><p>The currently selected, active <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Grey background, regular frame</dt><dd><p>A consistent <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a> in the <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>; not currently selected.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Red background</dt><dd><p>An inconsistent <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a> in the <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>: The input data
+dimension of the node’s plugin do not match the output data dimension of
+its parent.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Red background, bold frame</dt><dd><p>An inconsistent <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a> which has been selected as active
+node.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>By clicking on a plugin, this plugin gets selected and is highlighted
+(bold  border and change in background color). In addition, the
+<a class="reference internal" href="#workflow-plugin-param-editing"><span class="std std-ref">Plugin Parameter editing</span></a> widget will display the selected plugin’s
+Parameters.</p>
+<section id="removing-nodes-from-the-workflowtree">
+<h3>Removing nodes from the WorkflowTree<a class="headerlink" href="#removing-nodes-from-the-workflowtree" title="Link to this heading"></a></h3>
+<img alt="../../../_images/workflow_edit_node_x_button.png" class="align-left" src="../../../_images/workflow_edit_node_x_button.png" />
+<p>Clicking on the <code class="xref py py-data docutils literal notranslate"><span class="pre">x</span></code> button in the top right corner of a
+<a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a> widget will open a
+context menu to delete the current node or branch:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Delete this node</dt><dd><p>Using this option will remove only the current node and connect the node’s
+children with the node’s parent.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Delete this branch</dt><dd><p>This option will delete the current node and all its children (recursively).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="rearranging-nodes-in-the-workflowtree">
+<h3>Rearranging nodes in the WorkflowTree<a class="headerlink" href="#rearranging-nodes-in-the-workflowtree" title="Link to this heading"></a></h3>
+<p>The Workflow tree canvas supports rearranging <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNodes</span></code></a> by drag &amp; drop: Click and hold a node and move
+it on another plugin, then release. This will make the dropped node a child of
+the node on which it was dropped. All of the dragged node’s children will be
+moved as well.</p>
+</section>
+</section>
+<section id="plugin-parameter-editing">
+<span id="workflow-plugin-param-editing"></span><h2>Plugin Parameter editing<a class="headerlink" href="#plugin-parameter-editing" title="Link to this heading"></a></h2>
+<img alt="../../../_images/workflow_edit_plugin_param_edit.png" class="align-left" src="../../../_images/workflow_edit_plugin_param_edit.png" />
+<p>After selecting a Plugin in the <a class="reference internal" href="#workflow-tree-canvas"><span class="std std-ref">Workflow tree canvas</span></a>, the Plugin
+Parameter editing widget will be updated with the information from the selected
+Plugin. The first two lines are the plugin name and the node ID.</p>
+<p>The “Restore default Parameters” button can be used to reset all of the active
+plugin’s Parameters to their defaults.</p>
+<p>Below, all of the Plugin’s Parameters are listed. Please refer to the
+<a class="reference internal" href="../editing_parameters.html#gui-editing-parameters"><span class="std std-ref">Editing Parameters in the GUI</span></a> manual on how to change these.</p>
+<p>All Plugins have two generic Parameters: <code class="xref py py-data docutils literal notranslate"><span class="pre">always_store_results</span></code> and
+<code class="xref py py-data docutils literal notranslate"><span class="pre">label</span></code>. By default, pydidas only stores results of workflow leaves,
+i.e. if a <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNode</span></code></a> does not
+have any children. When <code class="xref py py-data docutils literal notranslate"><span class="pre">always_store_results</span></code> is set to
+<code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>, pydidas will store this node’s results irrespective of its
+position in the WorkflowTree.</p>
+<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">label</span></code> allows the user to give the plugin a reference name. This
+name will be used as identifier when displaying or exporting data.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>When saving Workflow results, the filenames will be in the format</p>
+<p>node_<strong>&lt;node ID&gt;</strong>_<strong>&lt;label&gt;</strong>_&lt;plugin_class&gt;.&lt;extension&gt;</p>
+<p>where all placeholders in &lt;&gt; brackets will be replaced by values. Users are
+therefore encouraged to select meaningful labels for their Plugins and to
+make a note of the plugin node IDs.</p>
+</div>
+<p>Some plugin have additional advanced Parameters, which can be edited after
+clicking the “Display advanced Parameters” button at the bottom of the list.</p>
+<p>Also, some plugin have unique Parameter editing widgets which might have
+additional functionality or logic. For example, pyFAI integration plugins have
+the option to select the integration region graphically buttons are added to
+use this functionality.</p>
+</section>
+<section id="import-and-export">
+<h2>Import and Export<a class="headerlink" href="#import-and-export" title="Link to this heading"></a></h2>
+<img alt="../../../_images/workflow_edit_import_export.png" class="align-left" src="../../../_images/workflow_edit_import_export.png" />
+<p>Workflows can be imported and exported using the respective buttons in the
+top left corner of the frame. Both buttons will open a file selection
+dialogue and have filters implemented to allow only supported file types and
+extensions.</p>
+</section>
+<section id="using-the-workflowtree">
+<h2>Using the WorkflowTree<a class="headerlink" href="#using-the-workflowtree" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
+is used automatically by pydidas to run processing workflows. The user does not
+need to access it directly.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DefineScanFrame.html" class="btn btn-neutral float-left" title="Define scan frame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="WorkflowTestFrame.html" class="btn btn-neutral float-right" title="Workflow test frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

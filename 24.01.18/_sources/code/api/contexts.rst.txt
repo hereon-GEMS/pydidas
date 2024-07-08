@@ -1,0 +1,23 @@
+..
+    This file is licensed under the
+    Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+The contexts sub-package
+------------------------
+
+.. autoclass:: pydidas.contexts.diffraction_exp_context.DiffractionExperiment
+    :members:
+    :show-inheritance:
+    :inherited-members: QObject
+
+.. autoclass:: pydidas.contexts.scan_context.Scan
+    :members:
+    :show-inheritance:
+    :inherited-members: QObject
+
+.. automodule:: pydidas.contexts
+    :members:
+    :inherited-members:
+

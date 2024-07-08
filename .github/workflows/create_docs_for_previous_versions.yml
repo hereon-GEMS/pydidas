@@ -8,7 +8,10 @@
 
 name: Create documentation for previous versions
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - "release_branch_for_documentation"
 
 
 jobs:

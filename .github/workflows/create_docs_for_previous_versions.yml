@@ -8,6 +8,8 @@
 
 name: Create documentation for previous versions
 
+on:
+  workflow_call
 
 jobs:
 

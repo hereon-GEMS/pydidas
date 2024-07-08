@@ -10,38 +10,29 @@ name: Release and Documentation
 
 on:
   push:
-    branches: [  ]
     tags:
-      - '*'
+      - 'v*'
 
 jobs:
 
 
   create_release_and_docs:
 
-    strategy:
-      max-parallel: 1
-      matrix:
-            tag: [ "24.01.18", "v23.12.08", "v23.10.20", "23.7.5", "v24.03.25", "24.06.05" ]
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.1
-        with:
-            ref: ${{ matrix.tag }}
-            fetch-tags: true
-            fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: "3.11"
-#      - name: Cache virtualenv
-#        uses: actions/cache@v3
-#        with:
-#          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
-#          path: .venv
+      - name: Cache virtualenv
+        uses: actions/cache@v3
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('requirements.txt') }}
+          path: .venv
       - name: Install dependencies
         run: |          
           # python -m venv .venv
@@ -95,19 +86,3 @@ jobs:
           user_email: 'github-actions[bot]@users.noreply.github.com'
           keep_files: true
 
-#  deploy_docs:
-#    needs: create_release_and_docs
-#
-#    permissions:
-#      pages: write
-#      id-token: write
-#
-#    environment:
-#      name: github-pages
-#      url: _site
-#
-#    runs-on: ubuntu-latest
-#    steps:
-#    - name: Deploy to Github Pages
-#      id: deployment
-#      uses: actions/deploy-pages@v3

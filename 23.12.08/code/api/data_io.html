@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The data_io sub-package &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=41fa6165"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The contexts sub-package" href="contexts.html" />
+    <link rel="prev" title="The multiprocessing sub-package" href="multiprocessing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                23.12.08
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The data_io sub-package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.data_io.IoMaster"><code class="docutils literal notranslate"><span class="pre">IoMaster</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.clear_registry"><code class="docutils literal notranslate"><span class="pre">IoMaster.clear_registry()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.export_to_file"><code class="docutils literal notranslate"><span class="pre">IoMaster.export_to_file()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.get_registered_formats"><code class="docutils literal notranslate"><span class="pre">IoMaster.get_registered_formats()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.get_string_of_formats"><code class="docutils literal notranslate"><span class="pre">IoMaster.get_string_of_formats()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.import_from_file"><code class="docutils literal notranslate"><span class="pre">IoMaster.import_from_file()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.is_extension_registered"><code class="docutils literal notranslate"><span class="pre">IoMaster.is_extension_registered()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.register_class"><code class="docutils literal notranslate"><span class="pre">IoMaster.register_class()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#pydidas.data_io.IoMaster.verify_extension_is_registered"><code class="docutils literal notranslate"><span class="pre">IoMaster.verify_extension_is_registered()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.data_io.export_data"><code class="docutils literal notranslate"><span class="pre">export_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pydidas.data_io.import_data"><code class="docutils literal notranslate"><span class="pre">import_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../code_documentation.html">Code documentation</a></li>
+      <li class="breadcrumb-item active">The data_io sub-package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/code/api/data_io.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pydidas.data_io">
+<span id="the-data-io-sub-package"></span><h1>The data_io sub-package<a class="headerlink" href="#module-pydidas.data_io" title="Link to this heading"></a></h1>
+<p>The data_io subpackage includes functionality to load and save data in
+various formats.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.data_io.</span></span><span class="sig-name descname"><span class="pre">IoMaster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clsname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster" title="Link to this definition"></a></dt>
+<dd><p>Metaclass to manage imports and exporters for different file types.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.clear_registry">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.clear_registry" title="Link to this definition"></a></dt>
+<dd><p>Clear the registry and remove all items.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.export_to_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.export_to_file" title="Link to this definition"></a></dt>
+<dd><p>Export the data to file using the exporter based on the extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The full filename and path.</p></li>
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – The data to be exported.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any kwargs which should be passed to the underlying exporter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.get_registered_formats">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_registered_formats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'import'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'export'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'import'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.get_registered_formats" title="Link to this definition"></a></dt>
+<dd><p>Get the names and file extensins of all registered formats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>&quot;import&quot;</em><em>, </em><em>&quot;export&quot;</em><em>]</em>) – The mode to use: Choose between import and export. The default is
+import.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary with &lt;format name&gt; : &lt;extensions&gt; entries.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.get_string_of_formats">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_string_of_formats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'import'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'export'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'import'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.get_string_of_formats" title="Link to this definition"></a></dt>
+<dd><p>Get a list of strings with the different formats and extensions.</p>
+<p>This class method is designed to have an easy way of creating the
+required lists for QFileDialog windows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>&quot;import&quot;</em><em>, </em><em>&quot;export&quot;</em><em>]</em>) – The mode to use: Choose between import and export. The default is
+import.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The string entries for each format and one entry for all formats,
+each separated by a “;;”.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.import_from_file">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.data_io.IoMaster.import_from_file" title="Link to this definition"></a></dt>
+<dd><p>Import data from a file, using the importer based on the extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The full filename and path.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments for the concrete importer implementation call.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The imported Dataset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.is_extension_registered">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_extension_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'import'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'export'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'import'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.is_extension_registered" title="Link to this definition"></a></dt>
+<dd><p>Check if the extension of filename corresponds to a registered
+class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extension</strong> (<em>str</em>) – The extension to be checked.</p></li>
+<li><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>&quot;import&quot;</em><em>, </em><em>&quot;export&quot;</em><em>]</em>) – The mode to use: Choose between import and export. The default is
+import.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag whether the extension is registered or not.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.register_class">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_registry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.register_class" title="Link to this definition"></a></dt>
+<dd><p>Register a class as object for its native extensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_class</strong> (<em>type</em>) – The class to be registered.</p></li>
+<li><p><strong>update_registry</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to allow updating / overwriting of registered extensions.
+The default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If an extension associated with new_class has already been
+    registered and update_registry is False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.data_io.IoMaster.verify_extension_is_registered">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">verify_extension_is_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'import'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'export'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'import'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.verify_extension_is_registered" title="Link to this definition"></a></dt>
+<dd><p>Verify the extension is registered with the MetaClass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ext</strong> (<em>str</em>) – The file extension</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>[</em><em>import</em><em>, </em><em>export</em><em>]</em><em>, </em><em>optional</em>) – The mode to use: Choose between import and export. The default is
+import.</p></li>
+<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>str</em><em>]</em>) – The filename of the file to be checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If the extension is not registered.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.data_io.export_data">
+<span class="sig-prename descclassname"><span class="pre">pydidas.data_io.</span></span><span class="sig-name descname"><span class="pre">export_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.export_data" title="Link to this definition"></a></dt>
+<dd><p>Export data to a file using the pydidas.data_io.IoMaster metaclass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The filename to be used for the exported data.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>pydidas.core.Dataset</em></a>) – The data to be exported.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments. These will be passed to the implemented exporter
+and the supported keywords vary depending on the selected file
+extension.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.data_io.import_data">
+<span class="sig-prename descclassname"><span class="pre">pydidas.data_io.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.import_data" title="Link to this definition"></a></dt>
+<dd><p>Import data from a file using the pydidas.data_io.IoMaster metaclass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The filename to be used for the exported data.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments. These will be passed to the implemented importer
+and the supported keywords vary depending on the selected file
+extension.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="multiprocessing.html" class="btn btn-neutral float-left" title="The multiprocessing sub-package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contexts.html" class="btn btn-neutral float-right" title="The contexts sub-package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

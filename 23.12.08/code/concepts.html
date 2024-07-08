@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Key concepts &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=41fa6165"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Package structure" href="package_structure.html" />
+    <link rel="prev" title="Code documentation" href="code_documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydidas
+              <img src="../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                23.12.08
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_documentation.html#further-code-documentation">Further code documentation</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Key concepts</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#variable-handling">Variable handling</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#parameter">Parameter</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#parametercollection">ParameterCollection</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#de-coupling-of-processing-and-user-interface">De-coupling of processing and user interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#use-cases">Use cases</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parallelization">Parallelization</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="package_structure.html">Package structure</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_documentation.html#api-documentation">API documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="code_documentation.html">Code documentation</a></li>
+      <li class="breadcrumb-item active">Key concepts</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/code/concepts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="key-concepts">
+<h1>Key concepts<a class="headerlink" href="#key-concepts" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#variable-handling" id="id3">Variable handling</a></p>
+<ul>
+<li><p><a class="reference internal" href="#parameter" id="id4">Parameter</a></p></li>
+<li><p><a class="reference internal" href="#parametercollection" id="id5">ParameterCollection</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#de-coupling-of-processing-and-user-interface" id="id6">De-coupling of processing and user interface</a></p></li>
+<li><p><a class="reference internal" href="#use-cases" id="id7">Use cases</a></p></li>
+<li><p><a class="reference internal" href="#parallelization" id="id8">Parallelization</a></p></li>
+</ul>
+</nav>
+<section id="variable-handling">
+<h2>Variable handling<a class="headerlink" href="#variable-handling" title="Link to this heading"></a></h2>
+<p>Variables accessible by the user have been wrapped in their own class as
+<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. These
+<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>, in turn, are handled by a
+subclassed dictionary.</p>
+<section id="parameter">
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading"></a></h3>
+<p>All (externally by the user accessible) variables are handled as
+<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>. These objects have a reference
+key, a type and value. Additional metadata can be handled in form of a longer
+name, a unit and pre-defined choices for the value.</p>
+<p><a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> enforce type-checking when
+setting the value which makes input/output operations by the user more
+esilient.</p>
+<p>Generic parameters have been pre-defined in the core.constants sub-package and
+these can be used without the need to re-define the full Parameter.</p>
+</section>
+<section id="parametercollection">
+<h3>ParameterCollection<a class="headerlink" href="#parametercollection" title="Link to this heading"></a></h3>
+<p><a class="reference internal" href="api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span> <span class="pre">collections</span></code></a> are
+subclassed dictionaries which allow only
+<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> values. They are used by most
+pydidas objects and allow an easy and standardized access to all Parameters.
+For the full documentation of the
+<a class="reference internal" href="api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>, please
+refer to the documentation of the
+<a class="reference internal" href="api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a> object.</p>
+</section>
+</section>
+<section id="de-coupling-of-processing-and-user-interface">
+<h2>De-coupling of processing and user interface<a class="headerlink" href="#de-coupling-of-processing-and-user-interface" title="Link to this heading"></a></h2>
+<p>The full functionality of the pydidas suite <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>*<span class="fn-bracket">]</span></a> is available from the command
+line and can be used in scripted application without the need to invoke the
+graphical user interface.
+While the GUI allows for a convenient editing of Parameters and Workflows, it
+is not required for processing data.</p>
+</section>
+<section id="use-cases">
+<h2>Use cases<a class="headerlink" href="#use-cases" title="Link to this heading"></a></h2>
+<p>pydidas has been developed with diffraction data analysis in mind, but the
+structure is flexible enough to allow other use cases as well. Each single use
+case has been defined as a unique
+<a class="reference internal" href="api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Application</span></code></a> which can be called via command
+line. Alternatively, pydidas includes a GUI frame for each generic application.</p>
+</section>
+<section id="parallelization">
+<h2>Parallelization<a class="headerlink" href="#parallelization" title="Link to this heading"></a></h2>
+<p>pydidas includes functionality for parallel processing of applications
+(or functions). The  <a class="reference internal" href="api/multiprocessing.html#module-pydidas.multiprocessing" title="pydidas.multiprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a>
+sub-package includes the required functionality. Results can be received using
+the PyQt5 signal/slot mechanism.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">*</a><span class="fn-bracket">]</span></span>
+<p>Some functionality like image browsing and viewing inherently requires a
+graphical interface and is not available from the command line.</p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="code_documentation.html" class="btn btn-neutral float-left" title="Code documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="package_structure.html" class="btn btn-neutral float-right" title="Package structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

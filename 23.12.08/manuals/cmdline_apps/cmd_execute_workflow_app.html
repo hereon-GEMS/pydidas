@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial for the ExecuteWorkflowApp &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=41fa6165"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tutorial for the DirectorySpyApp" href="cmd_directory_spy_app.html" />
+    <link rel="prev" title="Tutorial for the CompositeCreatorApp" href="cmd_composite_creator_app.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                23.12.08
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../commandline.html">Command line manuals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_global.html">pydidas general command line tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_diffraction_exp_context.html">The DiffractionExperimentContext class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_scan_context.html">The ScanContext class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_workflow_tree.html">The WorkflowTree class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_workflow_results.html">The WorkflowResults class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_global/cmd_running_workflows.html">Running pydidas workflows from the command line</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="cmd_apps.html">Command line applications</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cmd_running_apps.html">Running pydidas applications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cmd_composite_creator_app.html">Tutorial for the CompositeCreatorApp</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Tutorial for the ExecuteWorkflowApp</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#motivation">Motivation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#globally-controlled-settings">Globally controlled settings</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#setup-of-the-executeworkflowapp">Setup of the ExecuteWorkflowApp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#running-the-executeworkflowapp">Running the ExecuteWorkflowApp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#accessing-results">Accessing results</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#list-of-all-executeworkflowapp-parameters">List of all ExecuteWorkflowApp Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="cmd_directory_spy_app.html">Tutorial for the DirectorySpyApp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/graphical_user_interface.html">Graphical user interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../commandline.html">Command line manuals</a></li>
+          <li class="breadcrumb-item"><a href="cmd_apps.html">Command line applications</a></li>
+      <li class="breadcrumb-item active">Tutorial for the ExecuteWorkflowApp</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/cmdline_apps/cmd_execute_workflow_app.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tutorial-for-the-executeworkflowapp">
+<span id="execute-workflow-app"></span><h1>Tutorial for the ExecuteWorkflowApp<a class="headerlink" href="#tutorial-for-the-executeworkflowapp" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#motivation" id="id1">Motivation</a></p></li>
+<li><p><a class="reference internal" href="#globally-controlled-settings" id="id2">Globally controlled settings</a></p></li>
+<li><p><a class="reference internal" href="#setup-of-the-executeworkflowapp" id="id3">Setup of the ExecuteWorkflowApp</a></p>
+<ul>
+<li><p><a class="reference internal" href="#live-processing" id="id4">Live processing</a></p></li>
+<li><p><a class="reference internal" href="#automatic-saving" id="id5">Automatic saving</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#running-the-executeworkflowapp" id="id6">Running the ExecuteWorkflowApp</a></p></li>
+<li><p><a class="reference internal" href="#accessing-results" id="id7">Accessing results</a></p>
+<ul>
+<li><p><a class="reference internal" href="#using-autosave" id="id8">Using autosave</a></p></li>
+<li><p><a class="reference internal" href="#accessing-results-within-python" id="id9">Accessing results within Python</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#list-of-all-executeworkflowapp-parameters" id="id10">List of all ExecuteWorkflowApp Parameters</a></p></li>
+</ul>
+</nav>
+<section id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a> is one of
+the most important objects in pydidas as it allows to process workflows. Note
+that most of the configuration is not performed by the ExecuteWorkflowApp itself
+but by the global objects for
+<a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.scan_context.Scan" title="pydidas.contexts.scan_context.Scan"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>,
+and <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
+<p>Documentation on the use of these objects is given in <a class="reference internal" href="../cmdline_global/cmd_scan_context.html#scan-context"><span class="std std-ref">The ScanContext class</span></a>,
+<a class="reference internal" href="../cmdline_global/cmd_diffraction_exp_context.html#diffraction-exp-context"><span class="std std-ref">The DiffractionExperimentContext class</span></a> and <a class="reference internal" href="../cmdline_global/cmd_workflow_tree.html#workflow-tree"><span class="std std-ref">The WorkflowTree class</span></a>, respectively.</p>
+</section>
+<section id="globally-controlled-settings">
+<h2>Globally controlled settings<a class="headerlink" href="#globally-controlled-settings" title="Link to this heading"></a></h2>
+<p>Some settings for parallel processing additionally used by the
+ExecuteWorkflowApp are controlled globally by pydidas. These are:</p>
+<ul class="simple">
+<li><p>The number of parallel worker processes (<cite>global/mp_n_workers</cite>)</p></li>
+<li><p>The size of the data exchange buffer (in MB) (<cite>global/shared_buffer_size</cite>)</p></li>
+<li><p>The number of datasets which can be held in the buffer
+(<cite>global/shared_buffer_max_n</cite>)</p></li>
+</ul>
+<p>Because these settings will typically be set up once for each workstation and
+then reused quite often, they have been implemented as global
+<a class="reference internal" href="../cmdline_global/cmd_global.html#pydidas-qsettings"><span class="std std-ref">pydidas QSettings</span></a>.</p>
+<p>The default values for multiprocessing are 4 worker processes, a maximum shared
+buffer size of 100 MB and a maximum of 20 datasets in the buffer. These settings
+should normally work quite well and it is not recommended to change them without
+thorough thought.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For standard applications, the number of independent processes should not be
+increased because pyFAI uses inherent multiprocessing in addition to the
+pydidas multiprocessing and synergies can only be achieved by parallelizing
+the processing and data loading.</p>
+<p>Loading from disk with too many processes also slows all processes down as
+the processes interfere with each other for file access to disk.</p>
+<p>Only plugins with long serial computations (e.g. fitting, depending on
+the implementation) might benefit from more processes but this has to be
+weighted against disk access to the raw data.</p>
+</div>
+<p>The global detector mask file must be specified with the full and absolute path.
+The detector mask can be supplied in any image format.</p>
+<p>To modify these values, the user needs to create a QSettings instance and adjust
+these values, if required:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">PydidasQsettings</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s1">&#39;global/mp_n_workers&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="setup-of-the-executeworkflowapp">
+<h2>Setup of the ExecuteWorkflowApp<a class="headerlink" href="#setup-of-the-executeworkflowapp" title="Link to this heading"></a></h2>
+<p>The ExecuteWorkflowApp has only a very limited number of Parameters because it
+uses the aforementioned objects (
+<a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.scan_context.Scan" title="pydidas.contexts.scan_context.Scan"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>,
+and <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>)
+which include most of the required configuration.</p>
+<p>In the app, only the flags for <em>live processing</em> and for automatic saving of
+results need to be set.</p>
+<section id="live-processing">
+<h3>Live processing<a class="headerlink" href="#live-processing" title="Link to this heading"></a></h3>
+<p>The live processing flag determines whether pydidas will check all files at
+the start of processing or accept file names without corresponding written
+files. This flag is modified using the <code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code> Parameter:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;live_processing&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="automatic-saving">
+<h3>Automatic saving<a class="headerlink" href="#automatic-saving" title="Link to this heading"></a></h3>
+<p>The ExecuteWorkflowApp includes the possibility to write results dynamically to
+disk as soon as they have been processed. The behaviour is controlled by the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_results``flag.</span> <span class="pre">A</span> <span class="pre">parent</span> <span class="pre">directory</span> <span class="pre">for</span> <span class="pre">all</span> <span class="pre">results</span> <span class="pre">must</span> <span class="pre">be</span>
+<span class="pre">defined</span> <span class="pre">using</span> <span class="pre">the</span> <span class="pre">:py:data:`autosave_dir</span></code> Parameter and the saving format can
+be selected using the <code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_format</span></code> Parameter. The different
+formats are predefined and only implemented formats can be chosen. To query the
+available choices, please look at the code in the example below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
+
+<span class="go"># We will activate the auto-saving and specify the path:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;autosave_results&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;autosave_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;/scratch/data/scan42_results&#39;</span><span class="p">)</span>
+
+<span class="go"># To check, for the available formats, we need to get the Parameter and check</span>
+<span class="go"># its choices property:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s1">&#39;autosave_format&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">choices</span>
+<span class="go">[&#39;None&#39;, &#39;HDF5&#39;]</span>
+
+<span class="go"># Now, update the formats:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;autosave_format&#39;</span><span class="p">,</span> <span class="s1">&#39;HDF5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Note that auto-saving each frame will result will have a significant
+performance cost because the output files will need to be accessed for
+each processed scan point. Using auto-saving is only encouraged for very
+long processing times, e.g. multiple fittings for each scan data point.</p>
+</div>
+</section>
+</section>
+<section id="running-the-executeworkflowapp">
+<h2>Running the ExecuteWorkflowApp<a class="headerlink" href="#running-the-executeworkflowapp" title="Link to this heading"></a></h2>
+<p>Once configured, the <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a>
+is run like any pydidas app, as described in detail in
+<a class="reference internal" href="cmd_running_apps.html#running-pydidas-applications"><span class="std std-ref">Running pydidas applications</span></a>.</p>
+<p>As a recap, to run the app serially, use the <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp.run" title="pydidas.apps.ExecuteWorkflowApp.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To run it utilizing parallelization, set up an
+<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use the
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">start</span></code> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="go"># After running, get the updated app with the results back:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_app</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-results">
+<h2>Accessing results<a class="headerlink" href="#accessing-results" title="Link to this heading"></a></h2>
+<section id="using-autosave">
+<h3>Using autosave<a class="headerlink" href="#using-autosave" title="Link to this heading"></a></h3>
+<p>If autosave has been enabled, the results are written to files and can be
+accessed externally by any program which can read the defined data type.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please be advised that accessing the data while processing is still running
+can corrupt the output files and make them illegible.</p>
+</div>
+</section>
+<section id="accessing-results-within-python">
+<h3>Accessing results within Python<a class="headerlink" href="#accessing-results-within-python" title="Link to this heading"></a></h3>
+<p>The results from the ExecuteWorkflowApp are written in the global
+<code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code> (the
+Singleton instance of <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>) which is described in
+detail in <a class="reference internal" href="../cmdline_global/cmd_workflow_results.html#workflow-results"><span class="std std-ref">The WorkflowResults class</span></a>.</p>
+</section>
+</section>
+<section id="list-of-all-executeworkflowapp-parameters">
+<h2>List of all ExecuteWorkflowApp Parameters<a class="headerlink" href="#list-of-all-executeworkflowapp-parameters" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>live_processing (type: bool, default: False)</dt><dd><p>Set live processing to True if the files do not yet exist at process
+startup. This will skip checks on file existence and size.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>autosave_results (type: bool, default: False)</dt><dd><p>Save the results automatically after finishing processing. The results
+for each plugin will be saved in a separete file (or files if multiple
+formats have been selected).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>autosave_dir (type: Union[str, Path], default: [empty])</dt><dd><p>The directory for autosave files.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>autosave_format (type: str, default: ‘HDF5’)</dt><dd><p>The file format(s) for the data to be saved after the workflow has been
+excuted. All data will be saved in a single folder for each run with
+one file for each plugin. Note that the Parameter choices are defined
+in pydidas and the value can only correspond to any of these choices.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_composite_creator_app.html" class="btn btn-neutral float-left" title="Tutorial for the CompositeCreatorApp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_directory_spy_app.html" class="btn btn-neutral float-right" title="Tutorial for the DirectorySpyApp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The WorkflowTree class &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=41fa6165"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The WorkflowResults class" href="cmd_workflow_results.html" />
+    <link rel="prev" title="The ScanContext class" href="cmd_scan_context.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                23.12.08
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../commandline.html">Command line manuals</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cmd_global.html">pydidas general command line tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_diffraction_exp_context.html">The DiffractionExperimentContext class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_scan_context.html">The ScanContext class</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The WorkflowTree class</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction-to-the-workflowtree">Introduction to the WorkflowTree</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#assembling-a-workflowtree">Assembling a WorkflowTree</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-workflows">Running workflows</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#test-individual-plugins">Test individual plugins</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#run-the-full-workflowtree">Run the full WorkflowTree</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_workflow_results.html">The WorkflowResults class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_running_workflows.html">Running pydidas workflows from the command line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cmdline_apps/cmd_apps.html">Command line applications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/graphical_user_interface.html">Graphical user interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../commandline.html">Command line manuals</a></li>
+      <li class="breadcrumb-item active">The WorkflowTree class</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/cmdline_global/cmd_workflow_tree.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-workflowtree-class">
+<span id="workflow-tree"></span><h1>The WorkflowTree class<a class="headerlink" href="#the-workflowtree-class" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#introduction-to-the-workflowtree" id="id1">Introduction to the WorkflowTree</a></p></li>
+<li><p><a class="reference internal" href="#assembling-a-workflowtree" id="id2">Assembling a WorkflowTree</a></p></li>
+<li><p><a class="reference internal" href="#running-workflows" id="id3">Running workflows</a></p>
+<ul>
+<li><p><a class="reference internal" href="#test-individual-plugins" id="id4">Test individual plugins</a></p></li>
+<li><p><a class="reference internal" href="#run-the-full-workflowtree" id="id5">Run the full WorkflowTree</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="introduction-to-the-workflowtree">
+<h2>Introduction to the WorkflowTree<a class="headerlink" href="#introduction-to-the-workflowtree" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
+consists of multipke <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNodes</span></code></a>
+which store information about their position in the tree and their parents and
+children as well as their associated processing plugin but the nodes are
+agnostic to any meta-information.</p>
+<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
+is a pydidas singleton object with only a single instance at runtime. It manages
+the interactions between the user and the individual nodes.</p>
+<p>Its instance can be obtained by calling the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TREE</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowTree</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Processing with the WorkflowTree is separated in two steps. First, any
+operations which need to be performed only once (i.e. initializations) are
+executed. Second, processing is performed for each data frame at a time. This
+allows to easily run the WorkflowTree in serial or parallel processing.</p>
+</section>
+<section id="assembling-a-workflowtree">
+<h2>Assembling a WorkflowTree<a class="headerlink" href="#assembling-a-workflowtree" title="Link to this heading"></a></h2>
+<p>To assemble a
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>, users
+need to know which Plugins they want to use and they need to configure these
+plugins. Then, they can add these plugins to the tree. If the plugins are
+passed to the WorkflowTree without any further information, they will be
+connected in a linear manner, with every plugin appended to the last one.</p>
+<p><a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugins</span></code></a> can be configured either in the
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> or
+before adding them to the tree. Access to the individual plugins in the tree
+is somewhat hidded, though, and it is recommended to configure each
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugins</span></code></a> before adding it to
+the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
+<p>To create a new node with a plugin and add it to the
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>, use the
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.create_and_add_node" title="pydidas.workflow.ProcessingTree.create_and_add_node"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_and_add_node</span></code></a> method:</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ProcessingTree.</span></span><span class="sig-name descname"><span class="pre">create_and_add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span></dt>
+<dd><p>Create a new node and add it to the tree.</p>
+<p>If the tree is empty, the new node is set as root node. If no parent
+is given, the node will be created as child of the latest node in
+the tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plugin</strong> (<em>pydidas.Plugin</em>) – The plugin to be added to the tree.</p></li>
+<li><p><strong>parent</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><em>WorkflowNode</em></a><em>, </em><em>int</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The parent node of the newly created node. If an integer, this will
+be interpreted as the node_id of the parent and the respective
+parent will be selected. If None, this will select the latest node
+in the tree. The default is None.</p></li>
+<li><p><strong>node_id</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The node ID of the newly created node, used for referencing the
+node in the WorkflowTree. If not specified(ie. None), the
+WorkflowTree will create a new node ID. The default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>node_id</strong> – The node ID of the added node.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The following example will create a WorkflowTree which loads data from a single
+Hdf5 file and performs two separate integrations in different angular ranges:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TREE</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowTree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">PluginCollection</span><span class="p">()</span>
+
+<span class="go"># Create a loader plugin and set the file path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">COLLECTION</span><span class="o">.</span><span class="n">get_plugin_by_name</span><span class="p">(</span><span class="s1">&#39;Hdf5FileSeriesLoader&#39;</span><span class="p">)()</span>
+<span class="go"># The configuration of the loader is not detailed here.</span>
+
+<span class="go"># Create an integrator plugin for a specific radial range</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator1</span> <span class="o">=</span> <span class="n">COLLECTION</span><span class="o">.</span><span class="n">get_plugin_by_name</span><span class="p">(</span><span class="s1">&#39;PyFAIazimuthalIntegration&#39;</span><span class="p">)()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator1</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_use_range&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator1</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_npoint&#39;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator1</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_range_lower&#39;</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator1</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_range_upper&#39;</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">)</span>
+
+<span class="go"># Create an integrator plugin for a second radial range</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator2</span> <span class="o">=</span> <span class="n">COLLECTION</span><span class="o">.</span><span class="n">get_plugin_by_name</span><span class="p">(</span><span class="s1">&#39;PyFAIazimuthalIntegration&#39;</span><span class="p">)()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator2</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_use_range&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator2</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_npoint&#39;</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator2</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_range_lower&#39;</span><span class="p">,</span> <span class="mf">12.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator2</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;rad_range_upper&#39;</span><span class="p">,</span> <span class="mf">16.1</span><span class="p">)</span>
+
+<span class="go"># Add the plugins to the WorkflowTree. The return value of the node ID of</span>
+<span class="go"># the newly added plugin.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TREE</span><span class="o">.</span><span class="n">create_and_add_node</span><span class="p">(</span><span class="n">loader</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TREE</span><span class="o">.</span><span class="n">create_and_add_node</span><span class="p">(</span><span class="n">integrator1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="go"># because plugins will always be attached to the last node, the first</span>
+<span class="go"># integrator plugin did not need to specify a parent, but the second one</span>
+<span class="go"># will have to do just that:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TREE</span><span class="o">.</span><span class="n">create_and_add_node</span><span class="p">(</span><span class="n">integrator2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</section>
+<section id="running-workflows">
+<h2>Running workflows<a class="headerlink" href="#running-workflows" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
+includes several methods to run either the full Workflow or just individual
+plugins for testing.</p>
+<section id="test-individual-plugins">
+<h3>Test individual plugins<a class="headerlink" href="#test-individual-plugins" title="Link to this heading"></a></h3>
+<p>To test individual plugins, users can use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_single_plugin</span></code> method.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ProcessingTree.</span></span><span class="sig-name descname"><span class="pre">execute_single_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg:</span> <span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs:</span> <span class="pre">dict)</span> <span class="pre">-&gt;</span> <span class="pre">(&lt;class</span> <span class="pre">'object'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'dict'&gt;</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Execute a single node Plugin and get the return.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node_id</strong> (<em>int</em>) – The ID of the node in the tree.</p></li>
+<li><p><strong>arg</strong> (<em>object</em>) – The input argument for the Plugin.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments for the Plugin execution.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If the node ID is not registered.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>res</strong> (<em>object</em>) – The return value of the Plugin. Depending on the plugin, it can
+be a single value or an array.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – The (updated) kwargs dictionary.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>This method will execute a single plugin only. This method can be used to check
+intermediate results and make sure that a workflow works as intended.</p>
+<p>The following example shows how to use this method to read a frame from an hdf5
+file and store it for further processing. (This example assumes that the objects
+from the previous example are still existing).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="p">,</span> <span class="n">kws</span> <span class="o">=</span> <span class="n">TREE</span><span class="o">.</span><span class="n">execute_single_plugin</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kws</span>
+<span class="go">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
+<span class="go">Dataset(</span>
+<span class="go">axis_labels: {</span>
+<span class="go">    0: &quot;detector y&quot;,</span>
+<span class="go">    1: &quot;detector x&quot;},</span>
+<span class="go">axis_ranges: {</span>
+<span class="go">    0: None</span>
+<span class="go">    1: None},</span>
+<span class="go">axis_units: {</span>
+<span class="go">    0: &quot;pixel&quot;,</span>
+<span class="go">    1: &quot;pixel&quot;},</span>
+<span class="go">metadata: {&#39;slicing_axes&#39;: [0], &#39;frame&#39;: [0], &#39;dataset&#39;:</span>
+<span class="go">   &#39;/entry/data/data&#39;},</span>
+<span class="go">array([[0, 1, 0, ..., 1, 0, 1],</span>
+<span class="go">       [0, 0, 1, ..., 2, 0, 0],</span>
+<span class="go">       [0, 0, 0, ..., 0, 3, 0],</span>
+<span class="go">       ...,</span>
+<span class="go">       [0, 0, 0, ..., 0, 0, 0],</span>
+<span class="go">       [0, 0, 0, ..., 0, 0, 0],</span>
+<span class="go">       [0, 0, 0, ..., 0, 1, 1]], dtype=uint32)</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+</section>
+<section id="run-the-full-workflowtree">
+<h3>Run the full WorkflowTree<a class="headerlink" href="#run-the-full-workflowtree" title="Link to this heading"></a></h3>
+<p>Two different methods are available to run the full
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>. First,
+there is the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.execute_process" title="pydidas.workflow.ProcessingTree.execute_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_process</span></code></a> method which
+will run the full workflow for a single frame but will not gather any results
+from the nodes nor return any values. This method is used by the automatic
+processing where pydidas organizes results. Secondly, the
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.execute_process_and_get_results" title="pydidas.workflow.ProcessingTree.execute_process_and_get_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_process_and_get_results</span></code></a>
+method will do the same calculations but also gathers the results from the
+individual plugins and returns them to the user. The documentation for the
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.execute_process_and_get_results" title="pydidas.workflow.ProcessingTree.execute_process_and_get_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_process_and_get_results</span></code></a>
+method is given below.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ProcessingTree.</span></span><span class="sig-name descname"><span class="pre">execute_process_and_get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span></dt>
+<dd><p>Execute the WorkflowTree process and get the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg</strong> (<em>object</em>) – Any argument that need to be passed to the plugin chain.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments which need to be passed to the plugin chain.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>results</strong> – A dictionary with results in the form of entries with node_id keys
+and results items.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Using the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
+from the example above, the following example demonstrates the usage.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This method will not return any results:</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">TREE</span><span class="o">.</span><span class="n">execute_process</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="kc">True</span>
+
+<span class="c1"># This method will return results:</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">TREE</span><span class="o">.</span><span class="n">execute_process_and_get_results</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">res</span>
+<span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">(</span>
+ <span class="n">axis_labels</span><span class="p">:</span> <span class="p">{</span>
+     <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;2theta&#39;</span><span class="p">},</span>
+ <span class="n">axis_ranges</span><span class="p">:</span> <span class="p">{</span>
+     <span class="mi">0</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">5.505</span>     <span class="p">,</span> <span class="mf">5.51500001</span><span class="p">,</span> <span class="mf">5.52500001</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>
+               <span class="mf">7.47500088</span><span class="p">,</span> <span class="mf">7.48500089</span><span class="p">,</span> <span class="mf">7.49500089</span><span class="p">])},</span>
+ <span class="n">axis_units</span><span class="p">:</span> <span class="p">{</span>
+     <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;deg&#39;</span><span class="p">},</span>
+ <span class="n">metadata</span><span class="p">:</span> <span class="p">{},</span>
+ <span class="n">array</span><span class="p">([</span><span class="mf">2.357937</span> <span class="p">,</span> <span class="mf">2.29853</span>  <span class="p">,</span> <span class="mf">2.3073444</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">2.0363004</span><span class="p">,</span> <span class="mf">2.039918</span> <span class="p">,</span>
+        <span class="mf">2.0199535</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+ <span class="p">),</span>
+ <span class="mi">2</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">(</span>
+ <span class="n">axis_labels</span><span class="p">:</span> <span class="p">{</span>
+     <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;2theta&#39;</span><span class="p">},</span>
+ <span class="n">axis_ranges</span><span class="p">:</span> <span class="p">{</span>
+     <span class="mi">0</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">12.105</span>     <span class="p">,</span> <span class="mf">12.11500001</span><span class="p">,</span> <span class="mf">12.12500001</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>
+               <span class="mf">16.07500191</span><span class="p">,</span> <span class="mf">16.08500191</span><span class="p">,</span> <span class="mf">16.09500192</span><span class="p">])},</span>
+ <span class="n">axis_units</span><span class="p">:</span> <span class="p">{</span>
+     <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;deg&#39;</span><span class="p">},</span>
+ <span class="n">metadata</span><span class="p">:</span> <span class="p">{},</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">1.4057364</span><span class="p">,</span>  <span class="mf">1.4105228</span><span class="p">,</span>  <span class="mf">1.4086472</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">8.046747</span> <span class="p">,</span> <span class="mf">17.791353</span> <span class="p">,</span>
+        <span class="mf">22.341616</span> <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+ <span class="p">)}</span>
+</pre></div>
+</div>
+<p>To run the workflow for multiple data frames, it is recommended to use the
+<a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a>. Please refer
+to the <a class="reference internal" href="../cmdline_apps/cmd_execute_workflow_app.html#execute-workflow-app"><span class="std std-ref">Tutorial for the ExecuteWorkflowApp</span></a>.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_scan_context.html" class="btn btn-neutral float-left" title="The ScanContext class" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_workflow_results.html" class="btn btn-neutral float-right" title="The WorkflowResults class" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View workflow results frame &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=41fa6165"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Utilities frame" href="UtilitiesFrame.html" />
+    <link rel="prev" title="Run full workflow frame" href="WorkflowRunFrame.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                23.12.08
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../commandline.html">Command line manuals</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#the-ui-state">The UI state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#generic-gui-information">Generic GUI information</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../graphical_user_interface.html#frames">Frames</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineDiffractionExpFrame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineScanFrame.html">Define scan frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">View workflow results frame</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#importing-results">Importing results</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#result-selection">Result selection</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#export-of-results">Export of results</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#data-display">Data display</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#windows">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#recipes">Recipes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../graphical_user_interface.html">Graphical user interface</a></li>
+      <li class="breadcrumb-item active">View workflow results frame</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/manuals/gui/frames/ViewResultsFrame.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>.._view_results_frame:</p>
+<section id="view-workflow-results-frame">
+<h1>View workflow results frame<a class="headerlink" href="#view-workflow-results-frame" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#importing-results" id="id3">Importing results</a></p></li>
+<li><p><a class="reference internal" href="#result-selection" id="id4">Result selection</a></p>
+<ul>
+<li><p><a class="reference internal" href="#node-results" id="id5">Node results</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#export-of-results" id="id6">Export of results</a></p></li>
+<li><p><a class="reference internal" href="#data-display" id="id7">Data display</a></p>
+<ul>
+<li><p><a class="reference internal" href="#pydidas-1d-plot" id="id8">Pydidas 1D plot</a></p></li>
+<li><p><a class="reference internal" href="#pydidas-2d-plot" id="id9">Pydidas 2D plot</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<p>The <em>View workflow results</em> frame is very similar to the <em>Run full workflow</em>
+frame except that it does not allow to start the processing but to import
+results.</p>
+<p>This frame allow to explore current and past results.</p>
+<a class="reference internal image-reference" href="../../../_images/view_results_overview.png"><img alt="../../../_images/view_results_overview.png" class="align-center" src="../../../_images/view_results_overview.png" style="width: 600px;" /></a>
+<p>The configuration on the left holds the following functions which will be
+described in more detail below:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Import results</p></li>
+<li><p>Selecting the results to be displayed</p></li>
+<li><p>Manually exporting results</p></li>
+</ul>
+</div></blockquote>
+<section id="importing-results">
+<h2>Importing results<a class="headerlink" href="#importing-results" title="Link to this heading"></a></h2>
+<p>Using the <em>Import results from directory</em> button in the top left of the frame
+opens a window to select a directory. The selected directory is scanned for
+pydidas-written node result files which will be imported.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Importing results will also import Scan and Diffraction Experiment
+defintions into separate instances in the background. Therefore, the
+imported data is completely independent from any current processing.</p>
+</div>
+</section>
+<section id="result-selection">
+<h2>Result selection<a class="headerlink" href="#result-selection" title="Link to this heading"></a></h2>
+<section id="node-results">
+<h3>Node results<a class="headerlink" href="#node-results" title="Link to this heading"></a></h3>
+<img alt="../../../_images/workflow_results_no_selection.png" class="align-left" src="../../../_images/workflow_results_no_selection.png" />
+<p>Results from individual nodes can be selected from the drop-down menu. Opening
+it will show a list of all nodes in the WorkflowTree with stored results (see
+image below).</p>
+<img alt="../../../_images/workflow_results_dropdown.png" class="align-right" src="../../../_images/workflow_results_dropdown.png" />
+<img alt="../../../_images/workflow_results_selector_overview.png" class="align-left" src="../../../_images/workflow_results_selector_overview.png" />
+<p>Once a node has been selected, additional information for these node’s results
+will be displayed, see the image to the left.</p>
+<section id="result-arrangement">
+<h4>Result Arrangement<a class="headerlink" href="#result-arrangement" title="Link to this heading"></a></h4>
+<img alt="../../../_images/workflow_results_timeline.png" class="align-left" src="../../../_images/workflow_results_timeline.png" />
+<p>For some applications, it can be interesting to arrange the results not by
+scan shape but as a timeline, effictively collapsing all scan dimensions to a
+single frame index dimension. Changing between the two is done by selecting the
+corrsponding radio button item. This will also trigger an update of the results
+metadata, as seen on the image to the left. Note that the first dimension is
+now labelled <em>Chronological scan points</em>.</p>
+</section>
+<section id="result-metadata">
+<h4>Result metadata<a class="headerlink" href="#result-metadata" title="Link to this heading"></a></h4>
+<p>The name of the plugin and the data label and unit are shown at the top of the
+metadata, followed by descriptions of the different data axes. The axes are
+labelled with <em>scan</em> or <em>data</em>, depending on whether the respective data axis
+has been defined in the scan or is an axis from the processed data. In addition,
+the label (either from the scan definition or from the plugin data
+dimension) is given with the number of points in this axis and the axis range.</p>
+</section>
+<section id="select-plot-type">
+<h4>Select plot type<a class="headerlink" href="#select-plot-type" title="Link to this heading"></a></h4>
+<p>The user can select between 1-dimensional line plots or 2-dimensional images.
+Use <em>1D plot</em> to plot a single line or <em>group of 1D plots</em> to plot multiple
+lines at once. <em>2D full axes</em> and <em>2D data subset</em> will display data in image
+form.</p>
+</section>
+<section id="result-subset-selection">
+<h4>Result subset selection<a class="headerlink" href="#result-subset-selection" title="Link to this heading"></a></h4>
+<figure class="align-right" id="id2" style="width: 302px">
+<img alt="../../../_images/workflow_results_data_selection.png" src="../../../_images/workflow_results_data_selection.png" />
+<figcaption>
+<p><span class="caption-text">Data selection. In this example, the axes 1 will be used for the line
+plot. The axis zero is sliced at the index corresponding to the data value
+0 and the axis two is sliced at the value 0.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The <em>Data selection</em> radio buttons allow to toggle the selection of data
+between data values and axis indices. If axis indices are toggled, integer
+values must be used for the selection. Data values must be given in the
+respective unit for each dimension (unit and range are given for each axis in
+the metadata window). Any data value will be converted to the closest matching
+index.</p>
+<p>Depending on the selection, up to two drop-down menus are shown which allow
+to select the dimensions to be used in the plot. In addition, the slice points
+for additional dimensions must be specified (either as <em>index</em> or <em>data value</em>)
+to show the correct data subset. Multiple selections are possible when items
+are separated by commas. Ranges can be selected following the Python slicing
+syntax. Any duplicate entries will be discarded.</p>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 25.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>example</p></th>
+<th class="head"><p>python equivalent</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1,2,4,5</p></td>
+<td><p>[1, 2, 4, 5]</p></td>
+<td><p>The four individual points 1, 2, 4, 5 will be used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>1:5</p></td>
+<td><p>slice(1, 5)</p></td>
+<td><p>The slice includes all the values from 1..4 (note that the end point is
+not included).</p></td>
+</tr>
+<tr class="row-even"><td><p>1,2,1:8:2</p></td>
+<td><p>[1, 2, slice(4, 10, 2)]</p></td>
+<td><p>The numbers 1, 2 and a slice object which takes every second value from
+3 to 10, i.e. 3, 5, 7, 9.</p></td>
+</tr>
+<tr class="row-odd"><td><p>:</p></td>
+<td><p>slice(0, <em>n</em>)</p></td>
+<td><p>The slice of the full dimension.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The default data dimensions are zero (and one in case of a 2D image) and the
+default slices are all zero. These values usually need to be modified to
+show a useful plot or image.</p>
+</div>
+</section>
+<section id="confirmation">
+<h4>Confirmation<a class="headerlink" href="#confirmation" title="Link to this heading"></a></h4>
+<p>The “Confirm selection” button will process the inputs given above and will
+select the corresponding data subset and pass it to the plot widget.</p>
+</section>
+</section>
+</section>
+<section id="export-of-results">
+<h2>Export of results<a class="headerlink" href="#export-of-results" title="Link to this heading"></a></h2>
+<img alt="../../../_images/workflow_export.png" class="align-left" src="../../../_images/workflow_export.png" />
+<p>The data export section allows users to export results either for the current
+node or for all nodes. The current node is the selected node for visualization.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The export will always export the full node dataset, not just the subset
+which has been selected for display.</p>
+</div>
+<p>The first Parameter allows to select the export format(s). The second Parameter
+controls overwriting of results. If True, existing data files will be
+overwritten without any additional warning. If False and an existing file is
+detected, an Exception will be raised.</p>
+<p>Clicking either the “Export current node results” or the “Export all results”
+button will open a dialogue to select the folder.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To achieve naming consistency, it is not possible for the user to change
+the filenames of exported data, only the directory.</p>
+</div>
+</section>
+<section id="data-display">
+<h2>Data display<a class="headerlink" href="#data-display" title="Link to this heading"></a></h2>
+<p>1D and 2D data can be displayed using the two widgets described below.</p>
+<section id="pydidas-1d-plot">
+<h3>Pydidas 1D plot<a class="headerlink" href="#pydidas-1d-plot" title="Link to this heading"></a></h3>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot1d</span></code> is a
+subclassed <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot1D">silx Plot1d</a>
+with additional features useful in pydidas.</p>
+<a class="reference internal image-reference" href="../../../_images/standard_plot1d.png"><img alt="../../../_images/standard_plot1d.png" class="align-center" src="../../../_images/standard_plot1d.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
+functionality. The detailed menu icons and actions are described below
+in the menu entries description.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The plot display</dt><dd><p>This plot shows the data. Depending on the zoom level, this is either
+the full image or a sub-region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
+the mouse cursor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="menu-entries-description">
+<h4>menu entries description<a class="headerlink" href="#menu-entries-description" title="Link to this heading"></a></h4>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>menu icon</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
+</td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
+of the data to be visualized.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
+</td>
+<td><p>Panning mode: clicking with the mouse and dragging moves the data on the
+canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_unzoom.png" class="align-center" src="../../../_images/menu_unzoom.png" />
+</td>
+<td><p>Unzoom: Reset the display region to the full data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_x_autoscale.png" class="align-center" src="../../../_images/menu_x_autoscale.png" />
+</td>
+<td><p>Activate autoscaling of the x-axis. If enabled, the x-axis will be
+matched to the data range upon activation or upon using the “Unzoom”
+button.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_y_autoscale.png" class="align-center" src="../../../_images/menu_y_autoscale.png" />
+</td>
+<td><p>Activate autoscaling of the y-axis. If enabled, the y-axis will be
+matched to the data range upon activation or upon using the “Unzoom”
+button.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_x_log.png" class="align-center" src="../../../_images/menu_x_log.png" />
+</td>
+<td><p>Switch between a linear and a logarithmic x-axis.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_y_log.png" class="align-center" src="../../../_images/menu_y_log.png" />
+</td>
+<td><p>Switch between a linear and a logarithmic y-axis.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_grid.png" class="align-center" src="../../../_images/menu_grid.png" />
+</td>
+<td><p>Toggle a grid in the main plotting canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_style.png" class="align-center" src="../../../_images/menu_style.png" />
+</td>
+<td><p>Change the drawing style. Repeatedly using this button will cycle
+through lines, dots, and lines &amp; dots styles for the curve.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+</td>
+<td><p>Copy the currently visible figure to the clipboard.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+</td>
+<td><p>Save the currently loaded full data to file, ignoring any zooming. This
+function will open a dialogue to select the file type and filename.
+Depending on the selected file type, the colormap and scaling will be
+retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+</td>
+<td><p>Print the currently visible figure. This will print the current canvas
+(and therefore only the data visible on the canvas).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="pydidas-2d-plot">
+<h3>Pydidas 2D plot<a class="headerlink" href="#pydidas-2d-plot" title="Link to this heading"></a></h3>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot2d</span></code> is a
+subclassed <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D">silx Plot2d</a>
+with additional features useful in pydidas.</p>
+<a class="reference internal image-reference" href="../../../_images/standard_plot2d.png"><img alt="../../../_images/standard_plot2d.png" class="align-center" src="../../../_images/standard_plot2d.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
+functionality. The detailed menu icons and actions are described below
+in the menu entries description.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The image display</dt><dd><p>This widget shows the image data. Depending on the zoom level, this is
+either the full image or a sub-region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The colorbar</dt><dd><p>The colorbar shows the reference for the used colormap to map data levels to
+colors.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
+the mouse cursor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Two-dimensional plots are presented in a <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D">silx Plot2D widget</a>.
+The toolbar options will be explained in detail below. Moving the mouse over the
+canvas will update the labels for x/y position and data value at the bottom of
+the canvas. Note that the x and y axis positions for each pixel are defined at
+the pixel center and the given values must be treated carefully with respect to
+the pixel shape, especially for coarse pixels.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The scaling of the results can be achieved by modifying the colormap
+settings.</p>
+</div>
+<section id="id1">
+<h4>menu entries description<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>menu icon</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
+</td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
+of the data to be visualized.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
+</td>
+<td><p>Panning mode: clicking with the mouse and dragging moves the data on the
+canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_unzoom.png" class="align-center" src="../../../_images/menu_unzoom.png" />
+</td>
+<td><p>Unzoom: Reset the display region to the full data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_match_canvas.png" class="align-center" src="../../../_images/menu_match_canvas.png" />
+</td>
+<td><p>Match canvas: Set the aspect ratio to 1 and match the canvas size to
+the data to allow a tight fit.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_expand_canvas.png" class="align-center" src="../../../_images/menu_expand_canvas.png" />
+</td>
+<td><p>Expand canvas: Reset the canvas size to take up all available space.
+This option does also change the data aspect to make use of the full
+canvas.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_palette.png" class="align-center" src="../../../_images/menu_palette.png" />
+</td>
+<td><p>Open the colormap editor. This button opens a window with selections
+for the colormap and scaling of the displayed minimum and maximum
+values.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_crop_histogram_outliers.png" class="align-center" src="../../../_images/menu_crop_histogram_outliers.png" />
+</td>
+<td><p>Crop histogram outliers: Calculate the histogram of the image and set
+the colormap to ignore the low <em>x% and the top *y%</em> of the image
+histogram. The levels of <em>x</em> and <em>y</em> can be adjusted in the pydidas
+user settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_cmap_autoscale.png" class="align-center" src="../../../_images/menu_cmap_autoscale.png" />
+</td>
+<td><p>Autoscale the colormap to the image mean value +/- 3 standard
+deviations.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_aspect.png" class="align-center" src="../../../_images/menu_aspect.png" />
+</td>
+<td><p>This action allows to control the aspect of the displayed data and
+allows to stretch the data to fill the available canvas or keep its
+original aspect ratio.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_orientation.png" class="align-center" src="../../../_images/menu_orientation.png" />
+</td>
+<td><p>Control the position of the origin in the image: Select between the top
+left and bottom left corner.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_colorbar.png" class="align-center" src="../../../_images/menu_colorbar.png" />
+</td>
+<td><p>Display or hide the colorbar on the drawing canvas.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_mask.png" class="align-center" src="../../../_images/menu_mask.png" />
+</td>
+<td><p>Mask tools: This button opens an additional widget at the bottom of the
+canvas with tools for importing or setting a mask to mask certain
+data regions.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_coordinate_system.png" class="align-center" src="../../../_images/menu_coordinate_system.png" />
+</td>
+<td><p>Set coordinate system: This button will open a submenu which allows to
+select the coordinate system (cartesian or cylindrical). Note that the
+cylindrical coordinate system use the global <a class="reference internal" href="../../../code/api/contexts.html#pydidas.contexts.diffraction_exp_context.DiffractionExperiment" title="pydidas.contexts.diffraction_exp_context.DiffractionExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code></a>
+calibration to determine the beam center. Therefore, looking at data
+with a different calibration will display a wrong center and therefore
+also wrong coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_get_data_info.png" class="align-center" src="../../../_images/menu_get_data_info.png" />
+</td>
+<td><p>Get information for selected datapoint: This button will allow the user
+to click on a point in the image and show a window with additional
+information about this point (specifically: all indices / data values).</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+</td>
+<td><p>Copy the currently visible figure to the clipboard. This will only copy
+the main figure and not the colorbar.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+</td>
+<td><p>Save the currently loaded full data to file, ignoring any zooming. This
+function will open a dialogue to select the file type and filename.
+Depending on the selected file type, the colormap and scaling will be
+retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+</td>
+<td><p>Print the currently visible figure. This will print only the data
+visible on the canvas and it will retain colormap and scaling settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_profile.png" class="align-center" src="../../../_images/menu_profile.png" />
+</td>
+<td><p>Create and delete line profiles. This function allows the selection and
+editing of line profiles. The line profiles are shown in the histograms
+plots for the vertical and horizontal, respectively.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="WorkflowRunFrame.html" class="btn btn-neutral float-left" title="Run full workflow frame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="UtilitiesFrame.html" class="btn btn-neutral float-right" title="Utilities frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

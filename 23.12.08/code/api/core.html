@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The core submodule &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=41fa6165"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Parameter" href="core/parameter.html" />
+    <link rel="prev" title="Package structure" href="../package_structure.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                23.12.08
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The core submodule</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter.html">Parameter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html">ParameterCollection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html">ObjectWithParameterCollection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html">BaseApp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/dataset.html">Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/others.html">Other core classes and functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apps.html">The apps sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../code_documentation.html">Code documentation</a></li>
+      <li class="breadcrumb-item active">The core submodule</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/code/api/core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-core-submodule">
+<h1>The core submodule<a class="headerlink" href="#the-core-submodule" title="Link to this heading"></a></h1>
+<p>The core classes which are used throughout the package. These include data structure,
+generic items, and factories. It should not be necessary for the standard user to use
+the core submodule directly.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core/parameter.html">Parameter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter"><code class="docutils literal notranslate"><span class="pre">Parameter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.allow_None"><code class="docutils literal notranslate"><span class="pre">Parameter.allow_None</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.choices"><code class="docutils literal notranslate"><span class="pre">Parameter.choices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.copy"><code class="docutils literal notranslate"><span class="pre">Parameter.copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.deepcopy"><code class="docutils literal notranslate"><span class="pre">Parameter.deepcopy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.default"><code class="docutils literal notranslate"><span class="pre">Parameter.default</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.dtype"><code class="docutils literal notranslate"><span class="pre">Parameter.dtype</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.dump"><code class="docutils literal notranslate"><span class="pre">Parameter.dump()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.export_refkey_and_value"><code class="docutils literal notranslate"><span class="pre">Parameter.export_refkey_and_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.name"><code class="docutils literal notranslate"><span class="pre">Parameter.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional"><code class="docutils literal notranslate"><span class="pre">Parameter.optional</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.refkey"><code class="docutils literal notranslate"><span class="pre">Parameter.refkey</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.restore_default"><code class="docutils literal notranslate"><span class="pre">Parameter.restore_default()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.tooltip"><code class="docutils literal notranslate"><span class="pre">Parameter.tooltip</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.unit"><code class="docutils literal notranslate"><span class="pre">Parameter.unit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.update_value_and_choices"><code class="docutils literal notranslate"><span class="pre">Parameter.update_value_and_choices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.value"><code class="docutils literal notranslate"><span class="pre">Parameter.value</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.value_for_export"><code class="docutils literal notranslate"><span class="pre">Parameter.value_for_export</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/parameter_collection.html">ParameterCollection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/parameter_collection.html#class-name-with-own-methods-only">ParameterCollection with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection"><code class="docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.add_param"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.add_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.add_params"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.add_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.copy"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.deepcopy"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.deepcopy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.delete_param"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.delete_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.get_param"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.get_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.get_params"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.get_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.get_value"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.get_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.set_value"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.set_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection.values_equal"><code class="docutils literal notranslate"><span class="pre">ParameterCollection.values_equal()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/parameter_collection.html#class-name-with-inherited-methods-too">ParameterCollection with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/object_with_parameter_collection.html">ObjectWithParameterCollection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/object_with_parameter_collection.html#class-name-with-all-methods">ObjectWithParameterCollection with all methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.add_param"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.add_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.add_params"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.add_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.copy"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.deepcopy"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.deepcopy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.get_default_params_copy"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.get_default_params_copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.get_param"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.get_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.get_param_keys"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.get_param_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.get_param_value"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.get_param_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.get_param_values_as_dict"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.get_param_values_as_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.get_params"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.get_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.param_values"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.param_values</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.print_param_values"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.print_param_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.q_settings_get"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.q_settings_get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.q_settings_set"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.q_settings_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.restore_all_defaults"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.restore_all_defaults()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.set_default_params"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.set_default_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.set_param_value"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.set_param_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.set_param_values_from_dict"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.set_param_values_from_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.update_param_values_from_kwargs"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.update_param_values_from_kwargs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/object_with_parameter_collection.html#pydidas.core.ObjectWithParameterCollection.update_params_from_init"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.update_params_from_init()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/base_app.html">BaseApp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/base_app.html#class-name-with-own-methods-only">BaseApp with own methods only</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp"><code class="docutils literal notranslate"><span class="pre">BaseApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.copy"><code class="docutils literal notranslate"><span class="pre">BaseApp.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.export_state"><code class="docutils literal notranslate"><span class="pre">BaseApp.export_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.get_config"><code class="docutils literal notranslate"><span class="pre">BaseApp.get_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.import_state"><code class="docutils literal notranslate"><span class="pre">BaseApp.import_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.initialize_shared_memory"><code class="docutils literal notranslate"><span class="pre">BaseApp.initialize_shared_memory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.multiprocessing_carryon"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_carryon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.multiprocessing_func"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.multiprocessing_get_tasks"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_get_tasks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.multiprocessing_post_run"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_post_run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.multiprocessing_pre_cycle"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_pre_cycle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.multiprocessing_pre_run"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_pre_run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.multiprocessing_store_results"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_store_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.parse_args_and_set_params"><code class="docutils literal notranslate"><span class="pre">BaseApp.parse_args_and_set_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp.run"><code class="docutils literal notranslate"><span class="pre">BaseApp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/base_app.html#class-name-with-inherited-methods-too">BaseApp with inherited methods too</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/dataset.html">Dataset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset"><code class="docutils literal notranslate"><span class="pre">Dataset</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.array"><code class="docutils literal notranslate"><span class="pre">Dataset.array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.axis_labels"><code class="docutils literal notranslate"><span class="pre">Dataset.axis_labels</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.axis_ranges"><code class="docutils literal notranslate"><span class="pre">Dataset.axis_ranges</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.axis_units"><code class="docutils literal notranslate"><span class="pre">Dataset.axis_units</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.copy"><code class="docutils literal notranslate"><span class="pre">Dataset.copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.data_label"><code class="docutils literal notranslate"><span class="pre">Dataset.data_label</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.data_unit"><code class="docutils literal notranslate"><span class="pre">Dataset.data_unit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.flatten"><code class="docutils literal notranslate"><span class="pre">Dataset.flatten()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.flatten_dims"><code class="docutils literal notranslate"><span class="pre">Dataset.flatten_dims()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.get_description_of_point"><code class="docutils literal notranslate"><span class="pre">Dataset.get_description_of_point()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.get_rebinned_copy"><code class="docutils literal notranslate"><span class="pre">Dataset.get_rebinned_copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.metadata"><code class="docutils literal notranslate"><span class="pre">Dataset.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.property_dict"><code class="docutils literal notranslate"><span class="pre">Dataset.property_dict</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.squeeze"><code class="docutils literal notranslate"><span class="pre">Dataset.squeeze()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.take"><code class="docutils literal notranslate"><span class="pre">Dataset.take()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.transpose"><code class="docutils literal notranslate"><span class="pre">Dataset.transpose()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.update_axis_label"><code class="docutils literal notranslate"><span class="pre">Dataset.update_axis_label()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.update_axis_range"><code class="docutils literal notranslate"><span class="pre">Dataset.update_axis_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset.update_axis_unit"><code class="docutils literal notranslate"><span class="pre">Dataset.update_axis_unit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/others.html">Other core classes and functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.FileReadError"><code class="docutils literal notranslate"><span class="pre">FileReadError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.Hdf5key"><code class="docutils literal notranslate"><span class="pre">Hdf5key</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.Hdf5key.hdf5_filename"><code class="docutils literal notranslate"><span class="pre">Hdf5key.hdf5_filename</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.add_param"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.add_param()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.add_params"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.add_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.get_default_params_copy"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.get_default_params_copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.get_param"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.get_param()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.get_param_keys"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.get_param_keys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.get_param_value"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.get_param_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.get_param_values_as_dict"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.get_param_values_as_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.get_params"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.get_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.param_values"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.param_values</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.print_param_values"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.print_param_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.restore_all_defaults"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.restore_all_defaults()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.set_default_params"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.set_default_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.set_param_value"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.set_param_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.set_param_values_from_dict"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.set_param_values_from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.update_param_values_from_kwargs"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.update_param_values_from_kwargs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.ParameterCollectionMixIn.update_params_from_init"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.update_params_from_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.PydidasConfigError"><code class="docutils literal notranslate"><span class="pre">PydidasConfigError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.PydidasGuiError"><code class="docutils literal notranslate"><span class="pre">PydidasGuiError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettings"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettings.get_all_stored_q_settings"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.get_all_stored_q_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettings.set_value"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.set_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettings.show_all_stored_q_settings"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.show_all_stored_q_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettings.value"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettingsMixin"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettingsMixin.q_settings_get"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin.q_settings_get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.PydidasQsettingsMixin.q_settings_set"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin.q_settings_set()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.SingletonFactory"><code class="docutils literal notranslate"><span class="pre">SingletonFactory</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core/others.html#pydidas.core.SingletonFactory.instance"><code class="docutils literal notranslate"><span class="pre">SingletonFactory.instance</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.UserConfigError"><code class="docutils literal notranslate"><span class="pre">UserConfigError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.get_generic_param_collection"><code class="docutils literal notranslate"><span class="pre">get_generic_param_collection()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/others.html#pydidas.core.get_generic_parameter"><code class="docutils literal notranslate"><span class="pre">get_generic_parameter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../package_structure.html" class="btn btn-neutral float-left" title="Package structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="core/parameter.html" class="btn btn-neutral float-right" title="Parameter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

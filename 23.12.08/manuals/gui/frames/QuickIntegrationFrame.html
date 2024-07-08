@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick Integration frame &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=41fa6165"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Image math frame" href="ImageMathFrame.html" />
+    <link rel="prev" title="Directory spy frame" href="DirectorySpyFrame.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                23.12.08
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../commandline.html">Command line manuals</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#the-ui-state">The UI state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#generic-gui-information">Generic GUI information</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../graphical_user_interface.html#frames">Frames</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Quick Integration frame</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#input-selection">Input selection</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#experiment-description">Experiment description</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#beamcenter">Beamcenter</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#integration-region-of-interest">Integration region of interest</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#run-the-integration">Run the integration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#data-visualization">Data visualization</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineDiffractionExpFrame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineScanFrame.html">Define scan frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#windows">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#recipes">Recipes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../graphical_user_interface.html">Graphical user interface</a></li>
+      <li class="breadcrumb-item active">Quick Integration frame</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/manuals/gui/frames/QuickIntegrationFrame.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quick-integration-frame">
+<h1>Quick Integration frame<a class="headerlink" href="#quick-integration-frame" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#input-selection" id="id2">Input selection</a></p></li>
+<li><p><a class="reference internal" href="#experiment-description" id="id3">Experiment description</a></p></li>
+<li><p><a class="reference internal" href="#beamcenter" id="id4">Beamcenter</a></p>
+<ul>
+<li><p><a class="reference internal" href="#image-display" id="id5">Image display</a></p></li>
+<li><p><a class="reference internal" href="#point-list-and-controls" id="id6">Point list and controls</a></p></li>
+<li><p><a class="reference internal" href="#control-buttons" id="id7">Control buttons</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#integration-region-of-interest" id="id8">Integration region of interest</a></p>
+<ul>
+<li><p><a class="reference internal" href="#selecting-radial-integration-range-in-image" id="id9">Selecting radial integration range in image</a></p></li>
+<li><p><a class="reference internal" href="#selecting-azimuthal-integration-range-in-image" id="id10">Selecting azimuthal integration range in image</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#run-the-integration" id="id11">Run the integration</a></p></li>
+<li><p><a class="reference internal" href="#data-visualization" id="id12">Data visualization</a></p>
+<ul>
+<li><p><a class="reference internal" href="#pydidas-1d-plot" id="id13">Pydidas 1D plot</a></p></li>
+<li><p><a class="reference internal" href="#pydidas-2d-plot" id="id14">Pydidas 2D plot</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<p>The <em>Quick integration</em> frame allows to perform a quick integration without
+needing to set up the full <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code> and
+<a class="reference internal" href="../../../code/api/contexts.html#pydidas.contexts.scan_context.Scan" title="pydidas.contexts.scan_context.Scan"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code></a>.</p>
+<p>The frame does, however, have some limitations: Processing is limited to data
+loading and integrating (azimuthal, radial or 2-dimensional) and the detector is
+assumed to be perfectly aligned, i.e. all rotations are set to zero.</p>
+<a class="reference internal image-reference" href="../../../_images/quick_integration_frame_overview.png"><img alt="../../../_images/quick_integration_frame_overview.png" class="align-center" src="../../../_images/quick_integration_frame_overview.png" style="width: 600px;" /></a>
+<p>The left side shows the configuration and most configuration options will become
+available once an image has been imported. The right side holds two plots for
+input image and integration results in tabs.</p>
+<p>The configuration on the left holds the following functions which will be
+described in more detail below:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Input selection</p></li>
+<li><p>Experiment description</p></li>
+<li><p>Beamcenter</p></li>
+<li><p>Integration region of interest</p></li>
+<li><p>Run the integration</p></li>
+</ul>
+</div></blockquote>
+<section id="input-selection">
+<h2>Input selection<a class="headerlink" href="#input-selection" title="Link to this heading"></a></h2>
+<p>The input file can be selected in any one of four ways:</p>
+<img alt="../../../_images/input.png" class="align-left" src="../../../_images/input.png" />
+<ol class="arabic simple">
+<li><p>Use the “Select image file” button at the top.</p></li>
+<li><p>Enter the full file path in the input field.</p></li>
+<li><p>Use the small “open” button right of the input field.</p></li>
+<li><p>Drag and drop a file from the system’s file explorer.</p></li>
+</ol>
+<img alt="../../../_images/input_hdf5.png" class="align-right" src="../../../_images/input_hdf5.png" />
+<p>If the filename is valid, the selected file will be displayed immediately.</p>
+<p>For hdf5 files, however, you need to select data the dataset and frame number
+first and confirm the selection with the “Confirm input selection” button before
+any frame is loaded and displayed.</p>
+<p>After loading an image, the current integration region is shown as an overlay.
+By default,the overlay is orange and will cover the full image (because the full
+detector is used by default).</p>
+</section>
+<section id="experiment-description">
+<h2>Experiment description<a class="headerlink" href="#experiment-description" title="Link to this heading"></a></h2>
+<img alt="../../../_images/quick_integration_frame_experiment.png" class="align-left" src="../../../_images/quick_integration_frame_experiment.png" />
+<p>The detailed experiment description is hidden upon startup. Default values for
+the detector pixel size, detector distance and X-ray energy allow to run any
+integration right away without needing to modify any values. The only Parameter
+displayed directly is the detector model. If the shape of the input image
+corresponds to a known detector, the choices are updated correspondingly.
+Choosing the correct detector model allows pyFAI to use the generic mask for
+this detector make, for example to mask module gaps.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The integration can be run directly with the defaults but as a result, the
+scaling of the integration results (i.e. 2theta / Q / r values) are wrong.
+Nonetheless, the integration profile can be inspected and assessed.</p>
+</div>
+<img alt="../../../_images/quick_integration_frame_experiment_full.png" class="align-right" src="../../../_images/quick_integration_frame_experiment_full.png" />
+<p>The expanded experiment description section offers the options of importing a
+full calibration or by manually setting X-ray energy, sample-detector distance
+and the detector pixel size. Note that square pixels are assumed.</p>
+<p>A custom detector mask can be used as well. This will take precedence over the
+generic detector mask.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</section>
+<section id="beamcenter">
+<h2>Beamcenter<a class="headerlink" href="#beamcenter" title="Link to this heading"></a></h2>
+<img alt="../../../_images/quick_integration_frame_beamcenter.png" class="align-left" src="../../../_images/quick_integration_frame_beamcenter.png" />
+<p>The beamcenter position (in detector pixel coordinates) can be set directly,
+if it is known. The position is also updated if the experimental description
+has been imported.</p>
+<p>The “Start graphical beamcenter selection” button will toggle the graphical
+selection mode. This will show additional control buttons, a panel with a list
+of selected points and disable other settings. In addition, clicking in the
+image will select the clicked pixel positions and store them in the list.</p>
+<a class="reference internal image-reference" href="../../../_images/quick_integration_frame_beamcenter_selection.png"><img alt="../../../_images/quick_integration_frame_beamcenter_selection.png" class="align-center" src="../../../_images/quick_integration_frame_beamcenter_selection.png" style="width: 600px;" /></a>
+<p>The image above shows the initial view after enabling the graphical beamcenter
+selection. The additional control buttons and center panel with the point list
+are described in detail below.</p>
+<section id="image-display">
+<h3>Image display<a class="headerlink" href="#image-display" title="Link to this heading"></a></h3>
+<p>The image display is a <a class="reference internal" href="../silx/plots.html#plot-plot2d"><span class="std std-ref">PydidasPlot2d</span></a> with all the
+functionality described in the linked description. In addition, clicking with
+the left mouse buttons allows to store the selected positions. Points are
+visualized by different symbols, as explained below.</p>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 5.0%" />
+<col style="width: 95.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>point symbol</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/bc_point.png" class="align-center" src="../../../_images/bc_point.png" />
+</td>
+<td><p>A generic <strong>x</strong> marker to signal that this point has been stored.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/bc_selected_point.png" class="align-center" src="../../../_images/bc_selected_point.png" />
+</td>
+<td><p>Selected points are highlighted with a filled circle.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/bc_center.png" class="align-center" src="../../../_images/bc_center.png" />
+</td>
+<td><p>The beamcenter is marker with a diamond-shaped marker.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="point-list-and-controls">
+<h3>Point list and controls<a class="headerlink" href="#point-list-and-controls" title="Link to this heading"></a></h3>
+<p>Located at the top are controls for how to select points and for the overlay
+color.</p>
+<p>The <em>Use 2 click point selection</em> toggles how points are selected in the image:</p>
+<blockquote>
+<div><ul>
+<li><p>Disabled 2-click point selection:</p>
+<p>If disabled, points will be selected directly with a single click in the
+image. This requires the user to manually zoom in to select points with
+high accuracy.</p>
+</li>
+<li><p>Enabled 2-click point selection:</p>
+<p>When enabled, clicking on a point in the image will zoom in on the selected
+point to allow a higher degree of precision for the point selection.
+The second click will select the point and reset the zoom to the previous
+settings.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>The second item is a configuration widget to change the color of all the plot
+overlay items like the points to increase the contrast, depending on the chosen
+colormap for the image. Changing the color in the drop-down selection will
+automatically update the color in all overlay items.</p>
+<p>The point list displays the positions of all clicked points. Left-clicking on
+a point in the list will select this point and also highlight it in the image
+by changing the marker. Multiple points can be selected by holding
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Shift</span></code> when selecting the second point to select all points inbetween
+or by holding <code class="xref py py-data docutils literal notranslate"><span class="pre">Ctrl</span></code> while selecting points to add only single points
+to the selection. All selected points will be highlighted in the image.</p>
+<p>The two buttons at the bottom of the point list allow to delete the current
+selection of points or all points. The current selection of points can also be
+deleted by pressing <code class="xref py py-data docutils literal notranslate"><span class="pre">Del</span></code> while the plot list has the focus.</p>
+</section>
+<section id="control-buttons">
+<h3>Control buttons<a class="headerlink" href="#control-buttons" title="Link to this heading"></a></h3>
+<img alt="../../../_images/quick_integration_frame_beamcenter_control_buttons.png" class="align-left" src="../../../_images/quick_integration_frame_beamcenter_control_buttons.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+<p>The control buttons allow give two choices for setting the beamcenter:</p>
+<ol class="arabic simple">
+<li><p>A single selected point can be set as beamcenter. This requires that exactly
+one point was selected in the image. The beamcenter marker will be updated
+and the coordinates will be copied as the new beamcenter.</p></li>
+<li><p>A circle can be fitted through all selected points. The circle center is
+taken as the beamcenter position. The circle fit will be shown with a dotted
+line to allow verification of the quality.</p></li>
+</ol>
+<p>The last button, “confirm beamcenter” will disable the graphical beamcenter
+selection and enable the other configurations again.</p>
+</section>
+</section>
+<section id="integration-region-of-interest">
+<h2>Integration region of interest<a class="headerlink" href="#integration-region-of-interest" title="Link to this heading"></a></h2>
+<img alt="../../../_images/quick_integration_frame_roi_options.png" class="align-left" src="../../../_images/quick_integration_frame_roi_options.png" />
+<p>The integration region of interest can be selected either by entering values
+for the radial and azimuthal range or graphically after clicking the
+“Select radial / azimuthal integration range in image” button.</p>
+<section id="selecting-radial-integration-range-in-image">
+<h3>Selecting radial integration range in image<a class="headerlink" href="#selecting-radial-integration-range-in-image" title="Link to this heading"></a></h3>
+<p>If the azimuthal range is “Full detector”, nothing will be displayed to start
+with. If a range has been selected, the limits of the range will be marked by
+two lines starting from the beamcenter. Clicking on the first point will set
+the inner radial limit, which will be displayed as a circle. Clicking a second
+time will set the upper limit and the selected integration ROI will be displayed
+as overlay.</p>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><a class="reference internal image-reference" href="../../../_images/integration_roi_azimuthal.png"><img alt="../../../_images/integration_roi_azimuthal.png" class="align-center" src="../../../_images/integration_roi_azimuthal.png" style="width: 200px;" /></a>
+</th>
+<th class="head"><a class="reference internal image-reference" href="../../../_images/integration_roi_azimuthal_inner_radial.png"><img alt="../../../_images/integration_roi_azimuthal_inner_radial.png" class="align-center" src="../../../_images/integration_roi_azimuthal_inner_radial.png" style="width: 200px;" /></a>
+</th>
+<th class="head"><a class="reference internal image-reference" href="../../../_images/integration_roi_final_roi.png"><img alt="../../../_images/integration_roi_final_roi.png" class="align-center" src="../../../_images/integration_roi_final_roi.png" style="width: 200px;" /></a>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>The starting azimuthal limits without any radial selection.</p></td>
+<td><p>After selecting the inner radial limit, it is shown as a circle.</p></td>
+<td><p>After selecting the outer radial limit as well, the final integration
+ROI is displayed.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="selecting-azimuthal-integration-range-in-image">
+<h3>Selecting azimuthal integration range in image<a class="headerlink" href="#selecting-azimuthal-integration-range-in-image" title="Link to this heading"></a></h3>
+<p>If the radial range is “Full detector”, nothing will be displayed to start
+with. If a range has been selected, the limits of the range will be marked by
+two circles around the beamcenter. Clicking on the first point will set the
+starting radial limit and draw a line from the beamcenter. Clicking a second
+time will set the upper limit and the selected integration ROI will be displayed
+as overlay.</p>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><a class="reference internal image-reference" href="../../../_images/integration_roi_radial.png"><img alt="../../../_images/integration_roi_radial.png" class="align-center" src="../../../_images/integration_roi_radial.png" style="width: 200px;" /></a>
+</th>
+<th class="head"><a class="reference internal image-reference" href="../../../_images/integration_roi_radial_azi_start.png"><img alt="../../../_images/integration_roi_radial_azi_start.png" class="align-center" src="../../../_images/integration_roi_radial_azi_start.png" style="width: 200px;" /></a>
+</th>
+<th class="head"><a class="reference internal image-reference" href="../../../_images/integration_roi_final_roi.png"><img alt="../../../_images/integration_roi_final_roi.png" class="align-center" src="../../../_images/integration_roi_final_roi.png" style="width: 200px;" /></a>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>The starting radial limits without any azimuthal selection.</p></td>
+<td><p>After selecting the lower azimuthal limit, it is shown as a line from
+the beamcenter.</p></td>
+<td><p>After selecting the upper azimuthal limit as well, the final integration
+ROI is displayed.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="run-the-integration">
+<h2>Run the integration<a class="headerlink" href="#run-the-integration" title="Link to this heading"></a></h2>
+<img alt="../../../_images/quick_integration_frame_run.png" class="align-left" src="../../../_images/quick_integration_frame_run.png" />
+<p>To run, the integration, select the corresponding direction and number of points
+from the list and click the button to run. The results will be displayed in the
+second plot tab, labeled <em>Integration results</em>.</p>
+</section>
+<section id="data-visualization">
+<h2>Data visualization<a class="headerlink" href="#data-visualization" title="Link to this heading"></a></h2>
+<p>Two separate plots for input and integration results are organized as tabs on
+the right side of the frame.</p>
+<p>The modified silx Plot1D and Plot2D widgets are used for displaying the data
+and the are described in detail below.</p>
+<section id="pydidas-1d-plot">
+<h3>Pydidas 1D plot<a class="headerlink" href="#pydidas-1d-plot" title="Link to this heading"></a></h3>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot1d</span></code> is a
+subclassed <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot1D">silx Plot1d</a>
+with additional features useful in pydidas.</p>
+<a class="reference internal image-reference" href="../../../_images/standard_plot1d.png"><img alt="../../../_images/standard_plot1d.png" class="align-center" src="../../../_images/standard_plot1d.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
+functionality. The detailed menu icons and actions are described below
+in the menu entries description.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The plot display</dt><dd><p>This plot shows the data. Depending on the zoom level, this is either
+the full image or a sub-region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
+the mouse cursor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="menu-entries-description">
+<h4>menu entries description<a class="headerlink" href="#menu-entries-description" title="Link to this heading"></a></h4>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>menu icon</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
+</td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
+of the data to be visualized.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
+</td>
+<td><p>Panning mode: clicking with the mouse and dragging moves the data on the
+canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_unzoom.png" class="align-center" src="../../../_images/menu_unzoom.png" />
+</td>
+<td><p>Unzoom: Reset the display region to the full data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_x_autoscale.png" class="align-center" src="../../../_images/menu_x_autoscale.png" />
+</td>
+<td><p>Activate autoscaling of the x-axis. If enabled, the x-axis will be
+matched to the data range upon activation or upon using the “Unzoom”
+button.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_y_autoscale.png" class="align-center" src="../../../_images/menu_y_autoscale.png" />
+</td>
+<td><p>Activate autoscaling of the y-axis. If enabled, the y-axis will be
+matched to the data range upon activation or upon using the “Unzoom”
+button.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_x_log.png" class="align-center" src="../../../_images/menu_x_log.png" />
+</td>
+<td><p>Switch between a linear and a logarithmic x-axis.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_y_log.png" class="align-center" src="../../../_images/menu_y_log.png" />
+</td>
+<td><p>Switch between a linear and a logarithmic y-axis.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_grid.png" class="align-center" src="../../../_images/menu_grid.png" />
+</td>
+<td><p>Toggle a grid in the main plotting canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_style.png" class="align-center" src="../../../_images/menu_style.png" />
+</td>
+<td><p>Change the drawing style. Repeatedly using this button will cycle
+through lines, dots, and lines &amp; dots styles for the curve.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+</td>
+<td><p>Copy the currently visible figure to the clipboard.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+</td>
+<td><p>Save the currently loaded full data to file, ignoring any zooming. This
+function will open a dialogue to select the file type and filename.
+Depending on the selected file type, the colormap and scaling will be
+retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+</td>
+<td><p>Print the currently visible figure. This will print the current canvas
+(and therefore only the data visible on the canvas).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="pydidas-2d-plot">
+<h3>Pydidas 2D plot<a class="headerlink" href="#pydidas-2d-plot" title="Link to this heading"></a></h3>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot2d</span></code> is a
+subclassed <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D">silx Plot2d</a>
+with additional features useful in pydidas.</p>
+<a class="reference internal image-reference" href="../../../_images/standard_plot2d.png"><img alt="../../../_images/standard_plot2d.png" class="align-center" src="../../../_images/standard_plot2d.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
+functionality. The detailed menu icons and actions are described below
+in the menu entries description.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The image display</dt><dd><p>This widget shows the image data. Depending on the zoom level, this is
+either the full image or a sub-region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The colorbar</dt><dd><p>The colorbar shows the reference for the used colormap to map data levels to
+colors.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
+the mouse cursor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Two-dimensional plots are presented in a <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D">silx Plot2D widget</a>.
+The toolbar options will be explained in detail below. Moving the mouse over the
+canvas will update the labels for x/y position and data value at the bottom of
+the canvas. Note that the x and y axis positions for each pixel are defined at
+the pixel center and the given values must be treated carefully with respect to
+the pixel shape, especially for coarse pixels.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The scaling of the results can be achieved by modifying the colormap
+settings.</p>
+</div>
+<section id="id1">
+<h4>menu entries description<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>menu icon</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
+</td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
+of the data to be visualized.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
+</td>
+<td><p>Panning mode: clicking with the mouse and dragging moves the data on the
+canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_unzoom.png" class="align-center" src="../../../_images/menu_unzoom.png" />
+</td>
+<td><p>Unzoom: Reset the display region to the full data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_match_canvas.png" class="align-center" src="../../../_images/menu_match_canvas.png" />
+</td>
+<td><p>Match canvas: Set the aspect ratio to 1 and match the canvas size to
+the data to allow a tight fit.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_expand_canvas.png" class="align-center" src="../../../_images/menu_expand_canvas.png" />
+</td>
+<td><p>Expand canvas: Reset the canvas size to take up all available space.
+This option does also change the data aspect to make use of the full
+canvas.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_palette.png" class="align-center" src="../../../_images/menu_palette.png" />
+</td>
+<td><p>Open the colormap editor. This button opens a window with selections
+for the colormap and scaling of the displayed minimum and maximum
+values.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_crop_histogram_outliers.png" class="align-center" src="../../../_images/menu_crop_histogram_outliers.png" />
+</td>
+<td><p>Crop histogram outliers: Calculate the histogram of the image and set
+the colormap to ignore the low <em>x% and the top *y%</em> of the image
+histogram. The levels of <em>x</em> and <em>y</em> can be adjusted in the pydidas
+user settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_cmap_autoscale.png" class="align-center" src="../../../_images/menu_cmap_autoscale.png" />
+</td>
+<td><p>Autoscale the colormap to the image mean value +/- 3 standard
+deviations.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_aspect.png" class="align-center" src="../../../_images/menu_aspect.png" />
+</td>
+<td><p>This action allows to control the aspect of the displayed data and
+allows to stretch the data to fill the available canvas or keep its
+original aspect ratio.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_orientation.png" class="align-center" src="../../../_images/menu_orientation.png" />
+</td>
+<td><p>Control the position of the origin in the image: Select between the top
+left and bottom left corner.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_colorbar.png" class="align-center" src="../../../_images/menu_colorbar.png" />
+</td>
+<td><p>Display or hide the colorbar on the drawing canvas.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_mask.png" class="align-center" src="../../../_images/menu_mask.png" />
+</td>
+<td><p>Mask tools: This button opens an additional widget at the bottom of the
+canvas with tools for importing or setting a mask to mask certain
+data regions.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_coordinate_system.png" class="align-center" src="../../../_images/menu_coordinate_system.png" />
+</td>
+<td><p>Set coordinate system: This button will open a submenu which allows to
+select the coordinate system (cartesian or cylindrical). Note that the
+cylindrical coordinate system use the global <a class="reference internal" href="../../../code/api/contexts.html#pydidas.contexts.diffraction_exp_context.DiffractionExperiment" title="pydidas.contexts.diffraction_exp_context.DiffractionExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code></a>
+calibration to determine the beam center. Therefore, looking at data
+with a different calibration will display a wrong center and therefore
+also wrong coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_get_data_info.png" class="align-center" src="../../../_images/menu_get_data_info.png" />
+</td>
+<td><p>Get information for selected datapoint: This button will allow the user
+to click on a point in the image and show a window with additional
+information about this point (specifically: all indices / data values).</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+</td>
+<td><p>Copy the currently visible figure to the clipboard. This will only copy
+the main figure and not the colorbar.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+</td>
+<td><p>Save the currently loaded full data to file, ignoring any zooming. This
+function will open a dialogue to select the file type and filename.
+Depending on the selected file type, the colormap and scaling will be
+retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+</td>
+<td><p>Print the currently visible figure. This will print only the data
+visible on the canvas and it will retain colormap and scaling settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_profile.png" class="align-center" src="../../../_images/menu_profile.png" />
+</td>
+<td><p>Create and delete line profiles. This function allows the selection and
+editing of line profiles. The line profiles are shown in the histograms
+plots for the vertical and horizontal, respectively.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DirectorySpyFrame.html" class="btn btn-neutral float-left" title="Directory spy frame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ImageMathFrame.html" class="btn btn-neutral float-right" title="Image math frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

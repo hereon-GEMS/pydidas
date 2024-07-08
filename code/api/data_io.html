@@ -7,7 +7,7 @@
   <title>The data_io sub-package &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../manuals.html">Manuals</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../code_documentation.html">Code documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../code_documentation.html#introduction">Introduction</a></li>
@@ -207,16 +206,12 @@ each separated by a “;;”.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.data_io.IoMaster.is_extension_registered">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_extension_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'import'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'export'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'import'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.IoMaster.is_extension_registered" title="Link to this definition"></a></dt>
-<dd><p>Check if the extension of filename corresponds to a registered class.</p>
-<p>The extension is stored without the leading dot. If the given extension
-includes a leading dot, it is stripped before checking the extension.
-This behaviour allows to use pathlib.Path instances’ suffix property to
-be used directly.</p>
+<dd><p>Check if the extension of filename corresponds to a registered
+class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>extension</strong> (<em>str</em>) – The extension to be checked. If the extension includes a leading
-dot, it is stripped.</p></li>
+<li><p><strong>extension</strong> (<em>str</em>) – The extension to be checked.</p></li>
 <li><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>&quot;import&quot;</em><em>, </em><em>&quot;export&quot;</em><em>]</em>) – The mode to use: Choose between import and export. The default is
 import.</p></li>
 </ul>
@@ -272,13 +267,13 @@ import.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.data_io.export_data">
-<span class="sig-prename descclassname"><span class="pre">pydidas.data_io.</span></span><span class="sig-name descname"><span class="pre">export_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.export_data" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.data_io.</span></span><span class="sig-name descname"><span class="pre">export_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.export_data" title="Link to this definition"></a></dt>
 <dd><p>Export data to a file using the pydidas.data_io.IoMaster metaclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The filename to be used for the exported data.</p></li>
-<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>pydidas.core.Dataset</em></a><em>]</em>) – The data to be exported.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>pydidas.core.Dataset</em></a>) – The data to be exported.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments. These will be passed to the implemented exporter
 and the supported keywords vary depending on the selected file
 extension.</p></li>
@@ -289,7 +284,7 @@ extension.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.data_io.import_data">
-<span class="sig-prename descclassname"><span class="pre">pydidas.data_io.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.data_io.import_data" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.data_io.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.data_io.import_data" title="Link to this definition"></a></dt>
 <dd><p>Import data from a file using the pydidas.data_io.IoMaster metaclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

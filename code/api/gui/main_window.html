@@ -7,7 +7,7 @@
   <title>MainWindow &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
@@ -153,8 +152,8 @@ centralWidget.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.MainWindow.export_main_window_state">
-<span class="sig-name descname"><span class="pre">export_main_window_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.MainWindow.export_main_window_state" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pydidas.gui.MainWindow.export_mainwindow_state">
+<span class="sig-name descname"><span class="pre">export_mainwindow_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.MainWindow.export_mainwindow_state" title="Link to this definition"></a></dt>
 <dd><p>Export the main window’s state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -172,9 +171,9 @@ centralWidget.</p>
 <dd><p>Register a frame class with the MainWindow and add it to the
 PydidasFrameStack.</p>
 <p>This method takes a <a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a>
-and creates an instance which is registers with the
+and creates an instance which is registeres with the
 PydidasFrameStack. It also stores the required metadata to create
-an actionbar link to open the frame.</p>
+a actionbar link to open the frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>frame</strong> (<em>type</em><em>[</em><a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>pydidas.widgets.framework.BaseFrame</em></a><em>]</em>) – The class of the Frame. This must be a subclass of BaseFrame.
@@ -203,8 +202,8 @@ if the state kwarg is set to “manual”.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.MainWindow.restore_main_window_state">
-<span class="sig-name descname"><span class="pre">restore_main_window_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.MainWindow.restore_main_window_state" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pydidas.gui.MainWindow.restore_mainwindow_state">
+<span class="sig-name descname"><span class="pre">restore_mainwindow_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.MainWindow.restore_mainwindow_state" title="Link to this definition"></a></dt>
 <dd><p>Restore the main window’s state from saved information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -272,7 +271,7 @@ default values will be used. The default is None.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">check_for_updates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Check if the pydidas version is up-to-date and show a dialog if not.</p>
+<dd><p>Check if the pydidas version is up to date and show a dialog if not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -345,7 +344,7 @@ centralWidget.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">export_main_window_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">export_mainwindow_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Export the main window’s state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -363,9 +362,9 @@ centralWidget.</p>
 <dd><p>Register a frame class with the MainWindow and add it to the
 PydidasFrameStack.</p>
 <p>This method takes a <a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a>
-and creates an instance which is registers with the
+and creates an instance which is registeres with the
 PydidasFrameStack. It also stores the required metadata to create
-an actionbar link to open the frame.</p>
+a actionbar link to open the frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>frame</strong> (<em>type</em><em>[</em><a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>pydidas.widgets.framework.BaseFrame</em></a><em>]</em>) – The class of the Frame. This must be a subclass of BaseFrame.
@@ -406,7 +405,7 @@ if the state kwarg is set to “manual”.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">restore_main_window_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">restore_mainwindow_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restore the main window’s state from saved information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

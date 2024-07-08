@@ -7,7 +7,7 @@
   <title>The User config window &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../manuals.html">Manuals</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../commandline.html">Command line manuals</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><ul class="current">
@@ -65,9 +64,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ExportEigerPixelmaskWindow.html">Export Eiger pixel mask window</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">The User config window</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#font-settings">Font settings</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#update-settings">Update settings</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#composite-creator-settings">Composite creator settings</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#plot-settings">Plot settings</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#settings">Settings</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#plugins">Plugins</a></li>
 </ul>
 </li>
@@ -116,10 +113,8 @@
              
   <section id="the-user-config-window">
 <span id="user-config-window"></span><h1>The User config window<a class="headerlink" href="#the-user-config-window" title="Link to this heading"></a></h1>
-<p>The <em>User config window</em> allows the user to customize the behaviour of their
-pydidas copy. The <em>User config window</em> can either be accessed through the GUI menu
-(Options <span class="raw-html">&rarr;</span> User config) or through the <a class="reference internal" href="../frames/UtilitiesFrame.html#utilities-frame"><span class="std std-ref">Utilities frame</span></a>.</p>
-<p>The individual Parameters are described below.</p>
+<p>The <em>User config window</em> allows the user to customize the bahaviour of their
+pydidas copy. The individual Parameters are described below.</p>
 <img alt="../../../_images/user_config_overview.png" class="align-center" src="../../../_images/user_config_overview.png" />
 <p>Using the <code class="xref py py-data docutils literal notranslate"><span class="pre">Restore</span> <span class="pre">defaults</span></code> button will change all settings back to
 their default values.</p>
@@ -134,34 +129,8 @@ scalable systems fonts are also available in pydidas.</p>
 the selection font size &amp; family configuration. Selecting larger fonts will
 grow all widgets and allows to rescale for high-DPI displays.</p>
 </section>
-<section id="update-settings">
-<h2>Update settings<a class="headerlink" href="#update-settings" title="Link to this heading"></a></h2>
-<p>The <em>Check for Updates</em> settings manages whether pydidas will automatically
-check the github repository for an updated version. This check will only be
-carried out with an active internet connection and the <em>Check for updates</em>
-setting set to True.</p>
-<table class="tight-table docutils align-default">
-<colgroup>
-<col style="width: 25.0%" />
-<col style="width: 75.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Check for updates</p></td>
-<td><p>Toggle whether pydidas will automatically check the github repository
-for an updated version at startup.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="composite-creator-settings">
-<h2>Composite creator settings<a class="headerlink" href="#composite-creator-settings" title="Link to this heading"></a></h2>
-<p>These settings determine how individual images are arranged into a mosaic
-with the composite creator.</p>
+<section id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading"></a></h2>
 <table class="tight-table docutils align-default">
 <colgroup>
 <col style="width: 25.0%" />
@@ -181,50 +150,18 @@ composites.</p></td>
 <td><p>The value to be assigned to the pixels on the border between adjacent
 images.</p></td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="plot-settings">
-<h2>Plot settings<a class="headerlink" href="#plot-settings" title="Link to this heading"></a></h2>
-<p>These settings determine how plots are displayed and how specific buttons behave.
-For detailed descriptions, please see the list below.</p>
-<table class="tight-table docutils align-default">
-<colgroup>
-<col style="width: 25.0%" />
-<col style="width: 75.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Histogram outlier fraction (low)</p></td>
-<td><p>[This setting is for 2D image displays only]. This Parameter defines
-which portion of the histogram should be ignored when defining the
-lower limit for the colormap. The default value of 0.02 means that the
-lowest 2% of the histogram will be ignored for setting the colormap.</p></td>
-</tr>
-<tr class="row-odd"><td><p>Histogram outlier fraction (high)</p></td>
+<tr class="row-even"><td><p>Histogram outlier fraction</p></td>
 <td><p>[This setting is for 2D image displays only]. This Parameter defines
 which portion of the histogram should be ignored when defining the
 upper limit for the colormap. The default value of 0.07 means that the
 top 7% of the histogram will be ignored for setting the colormap. The
 default value was selected to cover all pixels in module gaps for an
-Eiger detector.</p></td>
+Eiger 9M detector.</p></td>
 </tr>
-<tr class="row-even"><td><p>Default colormap</p></td>
+<tr class="row-odd"><td><p>Default colormap</p></td>
 <td><p>The default colormap to be used for displaying 2D datasets. The
 colormap can still be changed in each individual data window but those
-local changes are not persistent.</p></td>
-</tr>
-<tr class="row-odd"><td><p>Color for invalid data / no data</p></td>
-<td><p>The color given for invalid data points or missing data points to
-distinguish them from the regular colormap. The color must be given in
-a RGB color code. The selected color is displayed in a box below the
-selection mask. A new color can also be selected in an interactive
-pop-up by using the <em>Pick a new color for invalid data / no data / NaN</em>
-button.</p></td>
+changes are not persistent.</p></td>
 </tr>
 </tbody>
 </table>
@@ -232,16 +169,10 @@ button.</p></td>
 <section id="plugins">
 <h2>Plugins<a class="headerlink" href="#plugins" title="Link to this heading"></a></h2>
 <p>The <em>Plugin paths</em> allows to modify the path where pydidas plugins are located
-or to add additional paths, for example for custom plugins.
-The generic plugin path is given for reference only. The custom plugin paths accepts
-multiple entries and <strong>entries must be separated by a double semicolon “;;”</strong>.</p>
+or to add additional paths, for example for custom plugins. <strong>Entries must be
+separated by a double semicolon “;;”.</strong></p>
 <p>Changes to the plugin path will only take effect after using the
 <code class="xref py py-data docutils literal notranslate"><span class="pre">Update</span> <span class="pre">plugin</span> <span class="pre">collection</span></code> button.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Updating the plugin collection will also clear any WorkflowTree currently
-defined / in use.</p>
-</div>
 </section>
 </section>
 

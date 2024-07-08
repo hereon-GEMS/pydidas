@@ -7,7 +7,7 @@
   <title>The widgets.silx_plot sub-package &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
@@ -90,7 +89,6 @@
 <li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlotStack"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings"><code class="docutils literal notranslate"><span class="pre">get_2d_silx_plot_ax_settings()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#pydidas.widgets.silx_plot.user_config_update_func"><code class="docutils literal notranslate"><span class="pre">user_config_update_func()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
@@ -147,7 +145,7 @@
 <dl class="simple">
 <dt>parent<span class="classifier">Union[None, QObject], optional</span></dt><dd><p>The parent QObject. The default is None.</p>
 </dd>
-<dt>forced_image_legend<span class="classifier">Union[None, str], optional</span></dt><dd><p>A fixed image legend to use for enforcing the rescaling, if multiple
+<dt>forced_image_legend<span class="classifier">Union[None, str], optional</span></dt><dd><p>A fixed image legend to use for enfocing the rescaling, if multiple
 image items are in a plot. None defaults to the active image.
 The default is None.</p>
 </dd>
@@ -186,7 +184,7 @@ corresponds to minimal final bins of 32 counts.</p>
 <dl class="simple">
 <dt>parent<span class="classifier">Union[None, QObject], optional</span></dt><dd><p>The parent QObject. The default is None.</p>
 </dd>
-<dt>forced_image_legend<span class="classifier">Union[None, str], optional</span></dt><dd><p>A fixed image legend to use for enforcing the rescaling, if multiple
+<dt>forced_image_legend<span class="classifier">Union[None, str], optional</span></dt><dd><p>A fixed image legend to use for enfocing the rescaling, if multiple
 image items are in a plot. None defaults to the active image.
 The default is None.</p>
 </dd>
@@ -234,8 +232,8 @@ is True.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.display_image">
-<span class="sig-name descname"><span class="pre">display_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.display_image" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.setData">
+<span class="sig-name descname"><span class="pre">setData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.setData" title="Link to this definition"></a></dt>
 <dd><p>Set the image data, handle the coordinate system and forward the data to
 plotting.</p>
 <dl class="field-list simple">
@@ -258,20 +256,6 @@ plotting.</p>
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.update_mpl_fonts">
 <span class="sig-name descname"><span class="pre">update_mpl_fonts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.update_mpl_fonts" title="Link to this definition"></a></dt>
 <dd><p>Update the plot’s fonts.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasImageView.user_config_update">
-<span class="sig-name descname"><span class="pre">user_config_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasImageView.user_config_update" title="Link to this definition"></a></dt>
-<dd><p>Handle a user config update.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<em>str</em>) – The name of the updated key.</p></li>
-<li><p><strong>value</strong> – The new value of the updated key.</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -346,22 +330,6 @@ The default is None.</p></li>
 <p>Additional features are implemented through additional SilxActions which
 are added to the toolbar.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.addImage">
-<span class="sig-name descname"><span class="pre">addImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage" title="Link to this definition"></a></dt>
-<dd><p>Add an image to the plot.</p>
-<p>This method implements an additional dimensionality check before passing
-the image to the Plot2d.addImage method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>np.ndarray</em>) – The input data to be displayed.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any supported Plot2d.addImage keyword arguments.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot">
 <span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot" title="Link to this definition"></a></dt>
 <dd><p>Clear the plot and remove all items.</p>
@@ -398,9 +366,9 @@ the image to the Plot2d.addImage method.</p>
 <dd><p>Add a 2D dataset or an image to the plot.</p>
 <p>It displays either an array of data using a colormap or a RGB(A) image.</p>
 <p>Images are uniquely identified by their legend.
-To add multiple images, call <a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage" title="pydidas.widgets.silx_plot.PydidasPlot2D.addImage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addImage()</span></code></a> multiple times with
+To add multiple images, call <code class="xref py py-meth docutils literal notranslate"><span class="pre">addImage()</span></code> multiple times with
 different legend argument.
-To replace/update an existing image, call <a class="reference internal" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage" title="pydidas.widgets.silx_plot.PydidasPlot2D.addImage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addImage()</span></code></a> with the
+To replace/update an existing image, call <code class="xref py py-meth docutils literal notranslate"><span class="pre">addImage()</span></code> with the
 existing image legend.</p>
 <p>When image parameters are not provided, if an image with the
 same legend is displayed in the plot, its parameters are used.</p>
@@ -470,20 +438,6 @@ False to use provided arrays.</p></li>
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts">
 <span class="sig-name descname"><span class="pre">update_mpl_fonts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts" title="Link to this definition"></a></dt>
 <dd><p>Update the plot’s fonts.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update">
-<span class="sig-name descname"><span class="pre">user_config_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update" title="Link to this definition"></a></dt>
-<dd><p>Handle a user config update.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<em>str</em>) – The name of the updated key.</p></li>
-<li><p><strong>value</strong> – The new value of the updated key.</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -613,20 +567,6 @@ DiffractionExperimentContext.</p>
 dimensions for silx ImageView.</p></li>
 </ul>
 </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.user_config_update_func">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">user_config_update_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.user_config_update_func" title="Link to this definition"></a></dt>
-<dd><p>Handle a user config update.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<em>str</em>) – The name of the updated key.</p></li>
-<li><p><strong>value</strong> – The new value of the updated key.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>

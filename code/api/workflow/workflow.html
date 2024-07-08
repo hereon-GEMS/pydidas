@@ -7,7 +7,7 @@
   <title>workflow &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
@@ -137,7 +136,7 @@ this, if you explicitly require a different context. The default is None.</p></l
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.clear_all_results">
 <span class="sig-name descname"><span class="pre">clear_all_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.clear_all_results" title="Link to this definition"></a></dt>
-<dd><p>Clear all internally stored results and reset the instance attributes.</p>
+<dd><p>Clear all interally stored results and reset the instance attributes.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -200,7 +199,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f4144549190&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7ff498c38ed0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition"></a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -281,8 +280,8 @@ values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
+<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be retured.</p></li>
+<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple used for slicing/indexing the np.ndaray.</p></li>
 <li><p><strong>flattened_scan_dim</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to process flattened Scan dimensions. If True, the Scan
 is assumed to be 1-d only and the first slice item will be used
 for the Scan whereas the remaining slice items will be used for
@@ -305,7 +304,7 @@ the resulting data. The default is False.</p></li>
 <dd><p>Get the combined results for the requested node_id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p>
+<dd class="field-odd"><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be retured.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
@@ -324,7 +323,7 @@ dimensions flatted into a timeline</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
+<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be retured.</p></li>
 <li><p><strong>squeeze</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle squeezing of data dimensions of the final dataset. If
 True, all dimensions with a length of 1 will be removed. The default is
 False.</p></li>
@@ -1540,7 +1539,7 @@ this, if you explicitly require a different context. The default is None.</p></l
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.clear_all_results">
 <span class="sig-name descname"><span class="pre">clear_all_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.clear_all_results" title="Link to this definition"></a></dt>
-<dd><p>Clear all internally stored results and reset the instance attributes.</p>
+<dd><p>Clear all interally stored results and reset the instance attributes.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1603,7 +1602,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f4144549190&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7ff498c38ed0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition"></a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1684,8 +1683,8 @@ values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
+<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be retured.</p></li>
+<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple used for slicing/indexing the np.ndaray.</p></li>
 <li><p><strong>flattened_scan_dim</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to process flattened Scan dimensions. If True, the Scan
 is assumed to be 1-d only and the first slice item will be used
 for the Scan whereas the remaining slice items will be used for
@@ -1708,7 +1707,7 @@ the resulting data. The default is False.</p></li>
 <dd><p>Get the combined results for the requested node_id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p>
+<dd class="field-odd"><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be retured.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
@@ -1727,7 +1726,7 @@ dimensions flatted into a timeline</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
+<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be retured.</p></li>
 <li><p><strong>squeeze</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle squeezing of data dimensions of the final dataset. If
 True, all dimensions with a length of 1 will be removed. The default is
 False.</p></li>

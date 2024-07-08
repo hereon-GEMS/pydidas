@@ -7,7 +7,7 @@
   <title>pydidas general command line tutorial &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../manuals.html">Manuals</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../commandline.html">Command line manuals</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydidas general command line tutorial</a><ul>
@@ -232,33 +231,23 @@ a dictionary to process further:</p>
 <span class="go"> &#39;detector_rot3&#39;: 5.799041608456517e-08}</span>
 </pre></div>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>You can also use the <code class="xref py py-data docutils literal notranslate"><span class="pre">param_values</span></code> property to retrieve
-all parameter values in a dictionary.</p>
-</div>
 </div></blockquote>
 <p>4. Set the value of the <em>xray_energy</em>
 <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. This is a float value,
-however, the <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> will attempt
-to convert other types to float. If successful,
 for demonstration purposes, let us set it with a string first. This will
 raise a :py:data:ValueError` and the Parameter will not be updated.</p>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
 <span class="go">15.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">,</span> <span class="s1">&#39;12.0&#39;</span><span class="p">)</span>
+<span class="go">ValueError: Cannot set Parameter (object ID:2506714567632,</span>
+<span class="go">refkey: &quot;xray_energy&quot;, name: &quot;X-ray energy&quot;) because it is of the</span>
+<span class="go">wrong data type.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
+<span class="go">15.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
 <span class="go">12.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
-<span class="go">13.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">,</span> <span class="s2">&quot;twelve&quot;</span><span class="p">)</span>
-<span class="go">ValueError: Cannot set Parameter (object ID:2129071369296, refkey:</span>
-<span class="go">&#39;xray_energy&#39;, name: &#39;X-ray energy&#39;) because it is of the wrong data type.</span>
-<span class="go">(expected: &lt;class &#39;numbers.Real&#39;&gt;, input type: &lt;class &#39;str&#39;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
-<span class="go">13.0</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -336,28 +325,23 @@ This section handles only the most common use cases.</p>
 </div>
 <section id="management-of-stored-paths">
 <h4>Management of stored paths<a class="headerlink" href="#management-of-stored-paths" title="Link to this heading"></a></h4>
-<p>Paths can be managed by various methods. New paths can be added using the
+<p>Paths can be managed by three methods. New paths can be added using the
 <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins" title="pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_and_register_plugins</span></code></a>
 method and a list of all currently registered paths can be obtained by the
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_all_registered_paths</span></code>
 method. To permanently remove a stored paths, a user can use the
 <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_plugin_path</span></code></a>
-method. To remove all stored paths and plugin, use
-the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_all_paths</span></code></a> method.
+method. To remove all stored paths and plugins from the current instance, use
+the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.clear_collection" title="pydidas.plugins.plugin_collection.PluginRegistry.clear_collection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">clear_collection</span></code></a> method.
 This method must be called with a <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> flag to take effect and is
 ignored otherwise.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Note that the generic plugin path is always included and cannot be removed from
-the collection by the user.</p>
-</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Using the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_all_paths</span></code></a>
-method will remove all custom paths which have ever been registered and the
-user is responsible to add all required paths again.</p>
-<p>This method will not keep any references to the original stored paths and they
-are truly lost.</p>
+<p>Using the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.clear_collection" title="pydidas.plugins.plugin_collection.PluginRegistry.clear_collection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">clear_collection</span></code></a>
+method will remove all paths which have ever been registered and the user is
+responsible to add all new paths again.</p>
+<p>Also, if a user tries to access the  empty PluginCollection, the default
+plugin path will be added automatically.</p>
 </div>
 <p>An example of the use of stored paths is given below.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
@@ -382,21 +366,20 @@ are truly lost.</p>
 <span class="go">[Path(&#39;/home/someuser/path/to/plugins&#39;),</span>
 <span class="go"> Path(&#39;/home/someuser/another/path&#39;),</span>
 <span class="go"> Path(&#39;&#39;/home/someuser/yet/another/path&#39;)]</span>
-<span class="go"># Using the ``unregister_plugin_path`` method allows to remove a single path:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">unregister_plugin_path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/home/someuser/another/path&#39;</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
-<span class="go">[Path(&#39;/home/someuser/path/to/plugins&#39;),</span>
-<span class="go"> Path(&#39;&#39;/home/someuser/yet/another/path&#39;)]</span>
-<span class="go"># Using the ``unregister_all_paths`` method without the confirmation flag</span>
+
+<span class="go"># Using the ``clear_collection`` method without the confirmation flag</span>
 <span class="go"># will be ignored:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">unregister_all_paths</span><span class="p">()</span>
-<span class="go">&#39;Confirmation for unregistering all paths was not given. Aborting...&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">clear_collection</span><span class="p">()</span>
+<span class="go">&#39;The confirmation flag was not given. The PluginCollection has not been reset.&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
 <span class="go">[Path(&#39;/home/someuser/path/to/plugins&#39;),</span>
+<span class="go"> Path(&#39;/home/someuser/another/path&#39;),</span>
 <span class="go"> Path(&#39;/home/someuser/yet/another/path&#39;)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">unregister_all_paths</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">clear_collection</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go"># When accessing the COLLECTION with no paths registered, the default</span>
+<span class="go"># Path will be added:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
-<span class="go">[]</span>
+<span class="go">[Path(&#39;/generic/plugin/path&#39;)]</span>
 </pre></div>
 </div>
 </section>
@@ -415,7 +398,6 @@ name for the Plugin.</p>
 a path further down in the list will take precedence over an earlier path.
 The loading of Plugins can be controlled by organizing the sequence
 of paths.</p>
-<p>The generic plugins are always loaded first.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -628,12 +610,6 @@ matplotlib colormap name.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="simple">
-<dt>Default color for invalid data (key: user/cmap_nan_color, type: str, default: #9AFEFF)</dt><dd><p>The RGB color code to use for invalid / missing data to distinguish it from the
-generic colormap and its data points.</p>
-</dd>
-</dl>
-</li>
 </ul>
 </dd>
 </dl>
@@ -641,10 +617,10 @@ generic colormap and its data points.</p>
 <li><dl class="simple">
 <dt>Plugins</dt><dd><ul>
 <li><dl class="simple">
-<dt>Custom plugin paths (key: user/plugin_path, type: str, default: “”)</dt><dd><p>The names of custom paths where pydidas will look for plugins. Generic plugins
-and the generic plugin path is handled independently for greater clarity.
-Multiple paths can be added by appending them with a double semicolon “;;”
-as separator.</p>
+<dt>Plugin paths (key: user/plugin_path, type: str, default: n/a)</dt><dd><p>The names of the paths where pydidas will look for plugins.
+The default is normally per-determined by pydidas and should not be
+changed except for expert users. Additional paths can be added by
+appending them with a double semicolon “;;” as separator.</p>
 </dd>
 </dl>
 </li>

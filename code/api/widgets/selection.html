@@ -7,7 +7,7 @@
   <title>The widgets.selection sub-package &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
@@ -157,19 +156,19 @@ file system model to display the contents of directories.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_widget</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_key_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">viewWidget</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasetKeyFilters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code>, <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a></p>
 <p>A compound widget to select datasets in Hdf5 files.</p>
 <p>The Hdf5DatasetSelector is a compound widget which allows to select
-a hdf5 dataset key and the frame number. By convention, the first
-dimension of an n-dimensional (n &gt;= 3) dataset is the frame number. Any
+an hdf5 dataset key and the frame number. By convention, the first
+dimension of a n-dimensional (n &gt;= 3) dataset is the frame number. Any
 2-dimensional datasets will be interpreted as single frames.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>plot_widget</strong> (<em>Union</em><em>[</em><em>QWidget</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A widget for a full view. It can also be registered later using
+<li><p><strong>viewWidget</strong> (<em>Union</em><em>[</em><em>QWidget</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A widget for a full view. It can also be registered later using
 the  <em>register_plot_widget</em> method. The default is None.</p></li>
-<li><p><strong>dataset_key_filters</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A dictionary with dataset keys to be filtered from the list
+<li><p><strong>datasetKeyFilters</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A dictionary with dataset keys to be filtered from the list
 of displayed datasets. Entries must be in the format
 {&lt;Key to filter&gt;: &lt;Descriptive text for checkbox&gt;}.
 The default is None.</p></li>
@@ -205,7 +204,7 @@ used.</p>
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.new_filename">
 <span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename" title="Link to this definition"></a></dt>
 <dd><p>Process the new filename.</p>
-<p>If the new filename has a suffix associated with hdf5 files,
+<p>If the new filename has a suffix associated with raw files,
 show the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -219,19 +218,13 @@ show the widget.</p>
 <span class="sig-name descname"><span class="pre">register_plot_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.register_plot_widget" title="Link to this definition"></a></dt>
 <dd><p>Register a view widget to be used for full visualization of data.</p>
 <p>This method registers an external view widget for data visualization.
-Note that the widget must accept frames through a <code class="docutils literal notranslate"><span class="pre">addImage</span></code> method.</p>
+Note that the widget must accept frames through a <code class="docutils literal notranslate"><span class="pre">setData</span></code> method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>self</strong> (<em>object</em>) – The class to call this method.</p></li>
-<li><p><strong>widget</strong> (<em>QWidget</em>) – A widget with an <code class="docutils literal notranslate"><span class="pre">addImage</span></code> or <code class="docutils literal notranslate"><span class="pre">display_image</span></code> method to pass frames to.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>widget</strong> (<em>QWidget</em>) – A widget with a <code class="docutils literal notranslate"><span class="pre">setData</span></code> method to pass frames.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>TypeError</strong> – If the widget is not a QWidget.</p></li>
-<li><p><strong>AttributeError</strong> – if the widget does not have a <code class="docutils literal notranslate"><span class="pre">addImage</span></code> or <code class="docutils literal notranslate"><span class="pre">display_image</span></code> method.</p></li>
-</ul>
+<dd class="field-even"><p><strong>TypeError</strong> – If the widget does not have a <code class="docutils literal notranslate"><span class="pre">setData</span></code> method.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -273,19 +266,13 @@ show the widget.</p>
 <span class="sig-name descname"><span class="pre">register_plot_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.RawMetadataSelector.register_plot_widget" title="Link to this definition"></a></dt>
 <dd><p>Register a view widget to be used for full visualization of data.</p>
 <p>This method registers an external view widget for data visualization.
-Note that the widget must accept frames through a <code class="docutils literal notranslate"><span class="pre">addImage</span></code> method.</p>
+Note that the widget must accept frames through a <code class="docutils literal notranslate"><span class="pre">setData</span></code> method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>self</strong> (<em>object</em>) – The class to call this method.</p></li>
-<li><p><strong>widget</strong> (<em>QWidget</em>) – A widget with an <code class="docutils literal notranslate"><span class="pre">addImage</span></code> or <code class="docutils literal notranslate"><span class="pre">display_image</span></code> method to pass frames to.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>widget</strong> (<em>QWidget</em>) – A widget with a <code class="docutils literal notranslate"><span class="pre">setData</span></code> method to pass frames.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>TypeError</strong> – If the widget is not a QWidget.</p></li>
-<li><p><strong>AttributeError</strong> – if the widget does not have a <code class="docutils literal notranslate"><span class="pre">addImage</span></code> or <code class="docutils literal notranslate"><span class="pre">display_image</span></code> method.</p></li>
-</ul>
+<dd class="field-even"><p><strong>TypeError</strong> – If the widget does not have a <code class="docutils literal notranslate"><span class="pre">setData</span></code> method.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,19 +295,23 @@ to hande the Scan as a “timeline” is given. In a timeline, all Scan points
 will be flattened to a 1d-dataset.</p>
 <p class="rubric">Notes</p>
 <p>The ResultSelectionWidget offers the following signal which can be used:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">sig_new_selection</span> <span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span>
-    <span class="n">use_timeline</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">active_dims</span> <span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-    <span class="n">active_node</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">selection</span> <span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-    <span class="n">plot_type</span> <span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>The signal signature is: flag to use timeline or scan shape,
+<blockquote>
+<div><p>sig_new_selection : QtCore.Signal(</p>
+<blockquote>
+<div><p>use_timeline : int,
+active_dims : list,
+active_node : int,
+selection : tuple,
+plot_type : str</p>
+</div></blockquote>
+<p>)</p>
+<blockquote>
+<div><p>The signal signature is: flag to use timeline or scan shape,
 active scan dimensions, node ID of the active node,
 the selection in form of a tuple with entries for every dimension
 (in form of a numpy array), the type of plot in form of a string.</p>
+</div></blockquote>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

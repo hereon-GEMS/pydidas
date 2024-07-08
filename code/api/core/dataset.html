@@ -7,7 +7,7 @@
   <title>Dataset &mdash; pydidas</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
 
   
   <!--[if lt IE 9]>
@@ -16,7 +16,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=853907ea"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
               <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                "24.06.05"
+                "24.03.25"
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Pydidas quick-start guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
@@ -120,38 +119,20 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 <p>Dataset class, a subclass of a numpy.ndarray with metadata.</p>
-<p>The metadata is accessible and modifiable through the respective properties:</p>
-<ul class="simple">
-<li><p>axis_units : The units of the axis ranges (in str format).</p></li>
-<li><p>axis_labels : The descriptive labels for all array axes (in str format).</p></li>
-<li><p>axis_ranges : The data values corresponding to the respective axes indices,
-given in form of 1-d arrays.</p></li>
-<li><p>data_unit : The unit for the data values (in str format).</p></li>
-<li><p>data_label : The label for the data values (in str format).</p></li>
-</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>array</strong> (<em>np.ndarray</em>) – The data array.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
-<dl class="simple">
-<dt>axis_labels<span class="classifier">Union[dict, list, tuple], optional</span></dt><dd><p>The labels for the axes. The length must correspond to the array
-dimensions. The default is None.</p>
-</dd>
-<dt>axis_ranges<span class="classifier">Union[dict, list, tuple], optional</span></dt><dd><p>The ranges for the axes. The length must correspond to the array
-dimensions. The default is None.</p>
-</dd>
-<dt>axis_units<span class="classifier">Union[dict, list, tuple], optional</span></dt><dd><p>The units for the axes. The length must correspond to the array
-dimensions. The default is None.</p>
-</dd>
-<dt>metadata<span class="classifier">Union[dict, None], optional</span></dt><dd><p>A dictionary with metadata. The default is None.</p>
-</dd>
-<dt>data_unit<span class="classifier">str, optional</span></dt><dd><p>The description of the data unit. The default is an empty string.</p>
-</dd>
-<dt>data_label<span class="classifier">str, optional</span></dt><dd><p>The description of the data. The default is an empty string.</p>
-</dd>
-</dl>
-</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Optional keyword arguments.</p></li>
+<li><p><strong>**axis_labels</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>list</em><em>, </em><em>tuple</em><em>]</em><em>, </em><em>optional</em>) – The labels for the axes. The length must correspond to the array
+dimensions. The default is None.</p></li>
+<li><p><strong>**axis_ranges</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>list</em><em>, </em><em>tuple</em><em>]</em><em>, </em><em>optional</em>) – The ranges for the axes. The length must correspond to the array
+dimensions. The default is None.</p></li>
+<li><p><strong>**axis_units</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>list</em><em>, </em><em>tuple</em><em>]</em><em>, </em><em>optional</em>) – The units for the axes. The length must correspond to the array
+dimensions. The default is None.</p></li>
+<li><p><strong>**metadata</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A dictionary with metadata. The default is None.</p></li>
+<li><p><strong>**data_unit</strong> (<em>str</em><em>, </em><em>optional</em>) – The description of the data unit. The default is an empty string.</p></li>
+<li><p><strong>**data_label</strong> (<em>str</em><em>, </em><em>optional</em>) – The description of the data. The default is an empty string.</p></li>
 </ul>
 </dd>
 </dl>
@@ -424,7 +405,7 @@ as well.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>indices</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>ArrayLike</em><em>]</em>) – The indices of the values to extract.</p></li>
+<li><p><strong>indices</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>ArrayLike</em><em>]</em>) – The indicies of the values to extract.</p></li>
 <li><p><strong>axis</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – The axis to take the data from. If None, data will be taken from the
 flattened array. The default is None.</p></li>
 <li><p><strong>out</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – An optional output array. If None, a new array is created. The default is

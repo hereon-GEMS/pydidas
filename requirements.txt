@@ -160,7 +160,10 @@ sphinx==7.3.7
     #   -r requirements.in
     #   pydata-sphinx-theme
     #   sphinx-copybutton
+    #   sphinx-design
 sphinx-copybutton==0.5.2
+    # via -r requirements.in
+sphinx-design==0.6.0
     # via -r requirements.in
 sphinxcontrib-applehelp==1.0.8
     # via sphinx

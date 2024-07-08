@@ -19,7 +19,7 @@ jobs:
 
     strategy:
         matrix:
-            tag: [ "24.06.05"]#, "v24.03.25" ]
+            tag: [ "24.06.05", "v24.03.25" ]
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,6 +55,7 @@ jobs:
         id: extract_version
         run: |
           export QT_QPA_PLATFORM=offscreen
+          # need the first 'dummy' echo to set up pydidas with sphinx for old version.
           echo $(python -c "import pydidas" --no-sphinx)
           {
             echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
@@ -90,3 +91,20 @@ jobs:
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
           keep_files: true
+
+  deploy_docs:
+    needs: create_release_and_docs
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: _site
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to Github Pages
+      id: deployment
+      uses: actions/deploy-pages@v3

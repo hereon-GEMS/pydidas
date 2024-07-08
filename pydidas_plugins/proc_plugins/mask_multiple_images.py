@@ -61,7 +61,7 @@ class MaskMultipleImages(ProcPlugin):
         Parameter(
             "background_value",
             float,
-            np.nan,
+            0,
             name="Background value",
             tooltip="The value used for pixels that are masked in every image",
         ),

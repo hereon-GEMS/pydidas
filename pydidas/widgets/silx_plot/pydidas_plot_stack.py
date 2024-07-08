@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,17 +21,19 @@ datasets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
 from qtpy import QtCore, QtWidgets
+from silx.gui.data.DataViews import IMAGE_MODE
 
 from ...core import Dataset
 from .pydidas_plot1d import PydidasPlot1D
 from .pydidas_plot2d import PydidasPlot2D
+from .silx_data_viewer import SilxDataViewer
 
 
 class PydidasPlotStack(QtWidgets.QStackedWidget):
@@ -65,8 +67,11 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self._frame1d.setLayout(QtWidgets.QGridLayout())
         self._frame2d = QtWidgets.QWidget()
         self._frame2d.setLayout(QtWidgets.QGridLayout())
+        self._frame3d = QtWidgets.QWidget()
+        self._frame3d.setLayout(QtWidgets.QGridLayout())
         self._1dplot = None
         self._2dplot = None
+        self._3dplot = None
         self._config = {
             "use_data_info_action": kwargs.get("use_data_info_action", False),
             "cs_transform": kwargs.get("cs_transform", True),
@@ -74,6 +79,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         }
         self.addWidget(self._frame1d)
         self.addWidget(self._frame2d)
+        self.addWidget(self._frame3d)
 
     def plot_data(self, data: Dataset, **kwargs: dict):
         """
@@ -87,15 +93,22 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
             Any additional keywords to be passed to the plot.
         """
         _dim = data.ndim
+        print("incoming data dim", _dim)
+        if _dim > 2:
+            _dim = 3
+        print("final data dim", _dim)
         self._create_widget_if_required(_dim)
         self.setCurrentIndex(_dim - 1)
-        if _dim > 2:
-            return
         _plot = getattr(self, f"_{_dim}dplot")
         _title = kwargs.pop("title", None)
-        if _title is not None:
+        if _title is not None and _dim < 3:
             _plot.setGraphTitle(_title)
-        _plot.plot_pydidas_dataset(data, **kwargs)
+        if _dim < 3:
+            _plot.plot_pydidas_dataset(data, **kwargs)
+        else:
+            print("plotting 3d data", type(data))
+            _plot.setData(data)
+            _plot.setDisplayMode(IMAGE_MODE)
 
     def clear_plots(self):
         """
@@ -105,6 +118,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
             self._1dplot.clear_plot()
         if self._2dplot is not None:
             self._2dplot.clear_plot()
+        if self._3dplot is not None:
+            self._3dplot.clear_plot()
 
     def _create_widget_if_required(self, dim: int):
         """
@@ -115,11 +130,13 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         dim : int
             The data dimension
         """
-        if dim > 2:
-            return
         _plot = getattr(self, f"_{dim}dplot")
         if _plot is None:
-            _plot = PydidasPlot1D() if dim == 1 else PydidasPlot2D(**self._config)
+            _plot = (
+                PydidasPlot1D()
+                if dim == 1
+                else (PydidasPlot2D(**self._config) if dim == 2 else SilxDataViewer())
+            )
             setattr(self, f"_{dim}dplot", _plot)
             _widget = getattr(self, f"_frame{dim}d")
             _widget.layout().addWidget(_plot)

@@ -30,6 +30,7 @@ __all__ = ["PydidasPlot2D"]
 
 import inspect
 from functools import partial
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore
@@ -254,7 +255,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             return
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
-    def addImage(self, data: np.ndarray, **kwargs: dict):
+    def addImage(self, data: Union[Dataset, np.ndarray], **kwargs: dict):
         """
         Add an image to the plot.
 
@@ -263,7 +264,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        data : np.ndarray
+        data : Union[Dataset, np.ndarray]
             The input data to be displayed.
 
         **kwargs : dict

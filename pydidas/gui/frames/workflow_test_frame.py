@@ -246,7 +246,7 @@ class WorkflowTestFrame(BaseFrame):
             self._tree.nodes[node_id].plugin.params
         )
 
-        _arg = self._tree.nodes[node_id].plugin._config["input_data"].copy()
+        _arg = copy.copy(self._tree.nodes[node_id].plugin._config["input_data"])
         _kwargs = self._tree.nodes[node_id].plugin._config["input_kwargs"].copy() | {
             "force_store_results": True,
             "store_input_data": True,

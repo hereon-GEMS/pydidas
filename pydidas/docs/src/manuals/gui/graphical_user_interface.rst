@@ -4,6 +4,8 @@
     Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
+.. _graphical_user_interface:
+
 Graphical user interface
 ========================
 
@@ -82,46 +84,26 @@ Generic GUI information
 Frames
 ------
 
-Detailed descriptions of the individual frames are given here.
+Detailed descriptions of the individual frames are given section about :ref:`frames_main`.
 
 .. toctree::
     :maxdepth: 1
+    :hidden:
 
-    frames/DataBrowsingFrame
-    frames/PyfaiCalibFrame
-    frames/DirectorySpyFrame
-    frames/QuickIntegrationFrame
-    frames/ImageMathFrame
-    frames/DefineDiffractionExpFrame
-    frames/DefineScanFrame
-    frames/WorkflowEditFrame
-    frames/WorkflowTestFrame
-    frames/WorkflowRunFrame
-    frames/ViewResultsFrame
-    frames/UtilitiesFrame
-
+    frames/frames_main
 
 .. _gui_windows:
 
 Windows
 -------
 
-Detailed information about the individual windows is given here.
+Detailed information about the individual windows are given in hte section about :ref:`windows_main`.
 
 .. toctree::
     :maxdepth: 1
+    :hidden:
 
-    windows/ImageSeriesOperationsWindow
-    windows/MaskEditorWindow
-    windows/ExportEigerPixelmaskWindow
-    windows/_UserConfigWindow
-    windows/_GlobalSettingsWindow
-    windows/TweakPluginParameterWindow
-    windows/ShowDetailedPluginResultsWindow
-    windows/ManuallySetBeamcenterWindow
-    windows/SelectIntegrationRegionWindow
-    frames/CompositeCreatorFrame
-    windows/Hdf5BrowserWindow
+    windows/windows_main
 
 .. _gui_recipes:
 

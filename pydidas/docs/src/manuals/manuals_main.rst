@@ -4,6 +4,9 @@
     Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
+
+.. _manuals:
+
 Manuals
 =======
 
@@ -18,5 +21,6 @@ the same for both interfaces, the setup typically is very different.
 .. toctree::
     :maxdepth: 2
 
-    manuals/commandline
-    manuals/gui/graphical_user_interface
+    quickstart
+    commandline_start
+    gui/graphical_user_interface

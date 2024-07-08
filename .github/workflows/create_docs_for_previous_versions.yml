@@ -21,7 +21,19 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        tag: [ "24.01.18", "v23.12.08", "v23.10.20", "23.7.5", "v24.03.25", "24.06.05" ]
+        tag:
+          - version: "24.06.05"
+            source: "pydidas/docs/src"
+          - version: "v24.03.25"
+            source: "pydidas/docs/src"
+          - version: "24.01.18"
+            source: "pydidas/docs/source"
+          - version: "v23.12.08"
+            source: "pydidas/docs/source"
+          - version: "v23.10.20"
+            source: "pydidas/docs/source"
+          - version: "23.7.5"
+            source: "pydidas/docs/source"
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -29,7 +41,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.1
         with:
-          ref: ${{ matrix.tag }}
+          ref: ${{ matrix.tag.version }}
           fetch-tags: true
           fetch-depth: 0
       - name: Set up Python
@@ -43,7 +55,7 @@ jobs:
       - name: Build Sphinx documentation
         run: |
           export QT_QPA_PLATFORM=offscreen
-          sphinx-build pydidas/docs/src _site
+          sphinx-build ${{ matrix.tag.source }} _site
       - name: Extract version
         id: extract_version
         run: |

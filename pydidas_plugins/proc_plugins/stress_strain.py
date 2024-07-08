@@ -366,7 +366,6 @@ def extract_d_spacing(ds1, pos_key, pos_idx):
             _slices.append(slice(None, None))
         elif _dim == pos_key:
             _slices.append(slice(pos_idx, pos_idx + 1))
-        print(f"Dimension {_dim}, Slices: {_slices}")
      
         
     d_spacing = ds1[*_slices]

@@ -671,16 +671,43 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
         
     return (d_spacing_pos, d_spacing_neg)
 
-#TODO: Fix this function, no copying
+
 def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
-    '''
-    Combines the positive and negative slopes of d_spacing and sorts them in ascending order of sin2chi.
-    Parameters:
-    - d_spacing_pos (Dataset): Dataset of d_spacing values for positive slopes.
-    - d_spacing_neg (Dataset): Dataset of d_spacing values for negative slopes.
-    Returns:
-    - d_spacing_combined (Dataset): Dataset of combined d_spacing values.
-    '''
+    """
+    Combines and sorts d-spacing datasets with positive and negative slopes based on sin^2(chi) values.
+
+    This function takes two datasets, one representing d-spacing values with positive slopes and the other with negative slopes, with respect to their sin^2(chi) values. It combines these datasets and sorts the combined dataset in ascending order of sin^2(chi) values.
+
+    Parameters
+    ----------
+    d_spacing_pos : Dataset
+        A Dataset instance containing d-spacing values for positive slope values of sin^2(chi). The dataset must have 'sin^2(chi)' as one of its axis labels.
+    d_spacing_neg : Dataset
+        A Dataset instance containing d-spacing values for negative slope values of sin^2(chi). Must have the same axis labels and units as `d_spacing_pos`.
+
+    Returns
+    -------
+    d_spacing_combined : Dataset
+        A Dataset instance containing the combined and sorted d-spacing values from both input datasets. The combined dataset will have a new axis label distinguishing between positive and negative slopes ('0: d-, 1: d+') and will be sorted based on 'sin^2(chi)' values.
+
+    Raises
+    ------
+    TypeError
+        If either `d_spacing_pos` or `d_spacing_neg` is not an instance of Dataset.
+    ValueError
+        If the axis labels or axis ranges of the input datasets do not match.
+
+    Notes
+    -----
+    The function ensures that the input datasets have matching axis labels and ranges for 'sin^2(chi)', which is crucial for the correct combination and sorting of the datasets. The sorting is stable, meaning that the relative order of records with equal values in 'sin^2(chi)' is preserved from the input datasets to the output dataset.
+
+    Examples
+    --------
+    >>> d_spacing_pos = Dataset(np.array([1.0, 1.1, 1.2]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
+    >>> d_spacing_neg = Dataset(np.array([0.9, 0.95, 1.05]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
+    >>> d_spacing_combined = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    >>> print(d_spacing_combined)
+    """
     # Check if the input is of type Dataset
     if not isinstance(d_spacing_pos, Dataset) or not isinstance(d_spacing_neg, Dataset):
         raise TypeError('Input has to be of type Dataset.')
@@ -729,28 +756,51 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg):
 
 
 def pre_regression_calculation(d_spacing_combined):
-    ''' 
-
+    """
     Prepares data for regression analysis based on d-spacing values.
 
-    Parameters:
-    d_spacing_combined (Dataset): Pydidas Dataset with d-spacing values vs sin^2(chi) values.
-        - Shape (2, N) where d_spacing_combined[0, :] represents d(-) values and
-        d_spacing_combined[1, :] represents d(+) values.
-        - If a value in either d(+) or d(-) is missing (np.nan), it is not taken into account for the calculations.
+    This function processes a combined dataset of d-spacing values for both positive and negative slopes (d+ and d- respectively)
+    against sin^2(chi) values. It calculates the average and difference of d+ and d- for each sin^2(chi) value, preparing the
+    data for subsequent regression analysis. The average d-spacing is calculated as (d(+) + d(-))/2, and the difference is d(+) - d(-).
+    The function also transforms sin^2(chi) to sin(2*chi) for the difference calculation.
 
-    Returns:
-    d_spacing_avg (Dataset): Pydidas Dataset containing the average of (d(+) + d(-))/2 vs sin^2(chi).
-        - axis_ranges[0] corresponds to sin^2(chi).
-        - axis_labels[0] is 'sin^2(chi)'.
-        - data_label is 'd_spacing_mean'.
+    Parameters
+    ----------
+    d_spacing_combined : Dataset
+        A Pydidas Dataset object containing d-spacing values vs sin^2(chi) values. The dataset should have a shape of (2, N),
+        where d_spacing_combined[0, :] represents d(-) values and d_spacing_combined[1, :] represents d(+) values. Missing
+        values (np.nan) in either d(+) or d(-) are excluded from calculations.
 
-    d_spacing_diff (Dataset): Pydidas Dataset containing the difference of d(+) - d(-) vs sin(2*chi).
-        - axis_ranges[0] corresponds to sin(2*chi).
-        - axis_labels[0] is 'sin(2*chi)'.
-        - data_label is 'd_spacing_diff'.
-    
-    '''
+    Returns
+    -------
+    d_spacing_avg : Dataset
+        A Pydidas Dataset containing the average of (d(+) + d(-))/2 vs sin^2(chi). The dataset includes:
+        - axis_ranges[0]: sin^2(chi) values.
+        - axis_labels[0]: 'sin^2(chi)'.
+        - data_label: 'd_spacing_mean'.
+
+    d_spacing_diff : Dataset
+        A Pydidas Dataset containing the difference of d(+) - d(-) vs sin(2*chi). The dataset includes:
+        - axis_ranges[0]: Calculated sin(2*chi) values from the original sin^2(chi) values.
+        - axis_labels[0]: 'sin(2*chi)'.
+        - data_label: 'd_spacing_diff'.
+
+    Raises
+    ------
+    TypeError
+        If `d_spacing_combined` is not an instance of Dataset.
+
+    Notes
+    -----
+    The function assumes that the input dataset `d_spacing_combined` is correctly formatted and contains the necessary
+    axis labels and ranges. It is crucial for the dataset to have a shape of (2, N) where N is the number of sin^2(chi)
+    values. The calculation of sin(2*chi) from sin^2(chi) is based on the arcsin and sqrt functions for the transformation. 
+
+    Examples
+    --------
+    >>> d_spacing_combined = Dataset(...)
+    >>> d_spacing_avg, d_spacing_diff = pre_regression_calculation(d_spacing_combined)
+    """
     # Check if d_spacing_combined is an instance of Dataset
     if not isinstance(d_spacing_combined, Dataset):
         raise TypeError("Input d_spacing_combined must be an instance of Dataset.")

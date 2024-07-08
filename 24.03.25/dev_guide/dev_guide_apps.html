@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developers guide to pydidas applications &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=f6546a40"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developers guide to pydidas multiprocessing" href="dev_guide_multiprocessing.html" />
+    <link rel="prev" title="Developer guide" href="../developer_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydidas
+              <img src="../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.03.25"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manuals.html">Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../developer_guide.html">Developer guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Developers guide to pydidas applications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#generic-attributes-and-methods">Generic attributes and methods</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#class-attributes">Class attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#instance-attributes">Instance attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generic-methods">Generic methods</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-an-app-instance">Creating an app instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-an-app">Running an app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-the-app-s-shared-memory">Using the app’s shared memory</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide_multiprocessing.html">Developers guide to pydidas multiprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dev_guide_list_of_signals.html">Developers guide to pydidas signals</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../developer_guide.html">Developer guide</a></li>
+      <li class="breadcrumb-item active">Developers guide to pydidas applications</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guide/dev_guide_apps.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developers-guide-to-pydidas-applications">
+<span id="developer-guide-to-apps"></span><h1>Developers guide to pydidas applications<a class="headerlink" href="#developers-guide-to-pydidas-applications" title="Link to this heading"></a></h1>
+<p>All pydidas applications should inherit from the <a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseApp</span></code></a> class.</p>
+<section id="generic-attributes-and-methods">
+<h2>Generic attributes and methods<a class="headerlink" href="#generic-attributes-and-methods" title="Link to this heading"></a></h2>
+<section id="class-attributes">
+<h3>Class attributes<a class="headerlink" href="#class-attributes" title="Link to this heading"></a></h3>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>class attribute</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code></p></td>
+<td><p>A pydidas <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a> which define the
+<a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> required to use the app.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">parse_func</span></code></p></td>
+<td><p>The function used to parse command line arguments to starting Parameter
+values.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">attributes_not_to_copy_to_slave_app</span></code></p></td>
+<td><p>A list with the names of instance attributes which must not be copied
+to a slave app. This is relevant for using the AppRunner for parallel
+processing, where it should be avoided to copy large objects because
+of the serialization of all objects during pickling.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="instance-attributes">
+<h3>Instance attributes<a class="headerlink" href="#instance-attributes" title="Link to this heading"></a></h3>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>instance attribute</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">slave_app</span></code></p></td>
+<td><p>A boolean flag to toggle whether the current app instance is a master
+or slave.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_config</span></code></p></td>
+<td><p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">_config</span></code> dictionary should be used to store all app
+configuration which is not directly controlled by a Parameter. The
+<code class="xref py py-data docutils literal notranslate"><span class="pre">_config</span></code> is saved in the app state for export / import.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">params</span></code></p></td>
+<td><p>The <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>
+instance for the app. It should be accessed indirectly through the
+control methods for Parameters <a class="reference internal" href="../code/api/core/object_with_prm_cllct.html#pydidas.core.ObjectWithParameterCollection" title="pydidas.core.ObjectWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="generic-methods">
+<h3>Generic methods<a class="headerlink" href="#generic-methods" title="Link to this heading"></a></h3>
+<p>This list gives a short description for all generic methods. For details like
+return values and calling parameters, please refer to the class documentation:
+<a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseApp</span></code></a>.</p>
+<table class="tight-table docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>method names</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">run</span></code></p></td>
+<td><p>Run the app’s task list serially in the present process. Note that this
+will freeze the process and may take a lot of time, depending on the
+number of tasks and the processing steps.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_get_tasks</span></code></p></td>
+<td><p>This method must return all the tasks (as an iterable object) defined
+in the app. The app configuration should be done using Parameters and
+this method process the input from all Parameters to create the task
+list. <strong>This method must be defined in a custom app.</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_pre_run</span></code></p></td>
+<td><p>This method runs all the required initialization which needs to be
+performed once before processing tasks. By default, this method
+passes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_post_run</span></code></p></td>
+<td><p>Final processing which needs to be performed after all tasks have been
+completed. By default, this method passes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_pre_cycle</span></code></p></td>
+<td><p>This method is called once before each task is performed. By default,
+this method passes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_carryon</span></code></p></td>
+<td><p>This method allows to check whether processing can carry on or needs to
+wait (for example for new data). It is called after the pre_cycle and
+is called repeatedly until it returns a True. By default, this method
+returns True.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_func</span></code></p></td>
+<td><p>This is the core processing function in which the computation for each
+task should be defined. <strong>This method must be defined in a custom app.</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_store_results</span></code></p></td>
+<td><p>This method takes the task index and the function results and stores
+them in whichever way the app defined. It is separated from the
+processing to separate it in parallel processing and only store the
+results in the master process. <strong>This method must be defined in a
+custom app.</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">initialize_shared_memory</span></code></p></td>
+<td><p>This method is used to create shared memory objects to be shared between
+master and slave apps or it initialize it again. Details must be defined
+by the app which wishes to use it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">export_state</span></code></p></td>
+<td><p>This method returns a dictionary with the app state in a serializable
+format, i.e. all entries are safe to process in YAML or pickle.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">import_state</span></code></p></td>
+<td><p>This method takes a state dictionary and restores the app to its
+previous state.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="creating-an-app-instance">
+<h2>Creating an app instance<a class="headerlink" href="#creating-an-app-instance" title="Link to this heading"></a></h2>
+<p>An app instance can be created as any generic python object by calling its
+class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pydidas</span>
+
+<span class="k">class</span> <span class="nc">RandomImageGeneratorApp</span><span class="p">(</span><span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">BaseApp</span><span class="p">):</span>
+<span class="n">default_params</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">(</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)),</span>
+<span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>All pydidas apps can be configured at creation in one of three ways:</p>
+<blockquote>
+<div><p>1. By specifrying the <code class="xref py py-data docutils literal notranslate"><span class="pre">parse_func</span></code> and using the python argparse
+package and sys.argv:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">app_param_parser</span><span class="p">(</span><span class="n">caller</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-num_images&quot;</span><span class="p">,</span> <span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The number of images&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-image_shape&quot;</span><span class="p">,</span> <span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The image size&quot;</span><span class="p">)</span>
+    <span class="n">_input</span><span class="p">,</span> <span class="n">_unknown</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">()</span>
+    <span class="n">_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;num_images&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;num_images&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_args</span><span class="p">[</span><span class="s2">&quot;num_images&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;image_shape&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;image_shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;image_shape&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_args</span>
+
+<span class="k">class</span> <span class="nc">RandomImageGeneratorApp</span><span class="p">(</span><span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">BaseApp</span><span class="p">):</span>
+    <span class="n">default_params</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">(</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">parse_func</span> <span class="o">=</span> <span class="n">app_param_parser</span>
+</pre></div>
+</div>
+<p>With the default sys.argv, the app will initialize with the default values.
+When the sys.argv arguments have been set, the app will initialize with
+those:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">get_param_values_as_dict</span><span class="p">()</span>
+<span class="go">{&#39;num_images&#39;: 50, &#39;image_shape&#39;: (100, 100)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;-num_images&quot;</span><span class="p">,</span> <span class="s2">&quot;30&quot;</span><span class="p">,</span> <span class="s2">&quot;-image_shape&quot;</span><span class="p">,</span> <span class="s2">&quot;(25, 50)&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app2</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app2</span><span class="o">.</span><span class="n">get_param_values_as_dict</span><span class="p">()</span>
+<span class="go">{&#39;num_images&#39;: 30, &#39;image_shape&#39;: (25, 50)}</span>
+</pre></div>
+</div>
+<p>2. By passing the values for the Parameters as keyword arguments. Without
+any keywords, Parameters are created with their default values (see code
+block above). Giving the Parameter refkeys as keywords, it is possible to
+update the Parameter values directly at creation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">get_param_values_as_dict</span><span class="p">()</span>
+<span class="go">{&#39;num_images&#39;: 50, &#39;image_shape&#39;: (100, 100)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">(</span><span class="n">num_images</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">image_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">get_param_values_as_dict</span><span class="p">()</span>
+<span class="go">{&#39;num_images&#39;: 20, &#39;image_shape&#39;: (20, 20)}</span>
+</pre></div>
+</div>
+<p>3. By sharing Parameters with other objects. One of the key advantages of
+using pydidas Parameter for handling app data  is that they are objects
+which can be shared between different python objects. Any changes to the
+object will be directly available to all linked apps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app_1</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_param</span> <span class="o">=</span> <span class="n">app_1</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_2</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">(</span><span class="n">num_param</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">id</span><span class="p">(</span><span class="n">app_1</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">))</span>
+<span class="go">2638563877360</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">id</span><span class="p">(</span><span class="n">app_2</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">))</span>
+<span class="go">2638563877360</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;Num images: &quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">app_1</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">app_2</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="go">Num images:  50 50</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_1</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;Num images: &quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">app_1</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">app_2</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="go">Num images:  30 30</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The order of precedence (from lowest to highest) is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>shared Parameters</p></li>
+<li><p>keyword arguments at creation</p></li>
+<li><p>parsed sys.argv arguments</p></li>
+</ul>
+</div></blockquote>
+<p>This allows the user to set presets in scripts but still change the
+behaviour dynamically by changing calling arguments on the command line.</p>
+</div>
+</section>
+<section id="running-an-app">
+<h2>Running an app<a class="headerlink" href="#running-an-app" title="Link to this heading"></a></h2>
+<p>The app can be run locally (and serially) using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code> method.
+The run method’s definition is given below to demonstrate the exact sequence:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the app without multiprocessing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_pre_run</span><span class="p">()</span>
+    <span class="n">tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_get_tasks</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_pre_cycle</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="n">_carryon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_carryon</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">_carryon</span><span class="p">:</span>
+            <span class="n">_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_func</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_store_results</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">_results</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_post_run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To run an app with parallelization or simple in the background, please refer to
+<a class="reference internal" href="dev_guide_multiprocessing.html#developer-guide-to-multiprocessing"><span class="std std-ref">Developers guide to pydidas multiprocessing</span></a>.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>As example, let us extend the RandomImageGeneratorApp to a fully functional app.
+The app will create a random noisy image of the given shape as its core
+function.
+It will utilize a shared memory array to store results to demonstrate how
+master and slave apps interact in multiprocessing.
+Just for demonstration purposes, it will wait for 50 ms for every 5th index
+and fail every 2nd carryon check. These methods will also print some info for
+demonstration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="kn">from</span> <span class="nn">pydidas.core</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">ParameterCollection</span>
+
+
+<span class="k">def</span> <span class="nf">app_param_parser</span><span class="p">(</span><span class="n">caller</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-num_images&quot;</span><span class="p">,</span> <span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The number of images&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-image_shape&quot;</span><span class="p">,</span> <span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The image size&quot;</span><span class="p">)</span>
+    <span class="n">_input</span><span class="p">,</span> <span class="n">_unknown</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_known_args</span><span class="p">()</span>
+    <span class="n">_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;num_images&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;num_images&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_args</span><span class="p">[</span><span class="s2">&quot;num_images&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;image_shape&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;image_shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">_args</span><span class="p">[</span><span class="s2">&quot;image_shape&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_args</span>
+
+
+<span class="k">class</span> <span class="nc">RandomImageGeneratorApp</span><span class="p">(</span><span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">BaseApp</span><span class="p">):</span>
+    <span class="n">default_params</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">(</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+        <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">attributes_not_to_copy_to_slave_app</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;shared_array&quot;</span><span class="p">,</span> <span class="s2">&quot;shared_index_in_use&quot;</span><span class="p">,</span> <span class="s2">&quot;_tasks&quot;</span><span class="p">]</span>
+    <span class="n">parse_func</span> <span class="o">=</span> <span class="n">app_param_parser</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">BaseApp</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;buffer_n&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_memory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;carryon_counter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_array</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_index_in_use</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform operations prior to running main parallel processing function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tasks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">))</span>
+        <span class="c1"># only the master must initialize the shared memory, the slaves are passed</span>
+        <span class="c1"># the reference:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">slave_mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialize_shared_memory</span><span class="p">()</span>
+        <span class="c1"># create the shared arrays:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_index_in_use</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_memory&quot;</span><span class="p">][</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_obj</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_memory&quot;</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_obj</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;buffer_n&quot;</span><span class="p">],)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tasks</span><span class="o">.</span><span class="n">size</span><span class="p">,)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">initialize_shared_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;buffer_n&quot;</span><span class="p">]</span>
+        <span class="n">_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;buffer_n&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_memory&quot;</span><span class="p">][</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="n">_n</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="n">mp</span><span class="o">.</span><span class="n">Lock</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_memory&quot;</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">_num</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="n">mp</span><span class="o">.</span><span class="n">Lock</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_get_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tasks</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_pre_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sleep for 50 ms for every 5th task.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Processing task &quot;</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Index divisible by 5, sleeping ...&quot;</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_carryon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Count up and carry on only for every second call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;carryon_counter&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">_carryon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;carryon_counter&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Carry on check: &quot;</span><span class="p">,</span> <span class="n">_carryon</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_carryon</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a random image and store it in the buffer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">)</span>
+        <span class="c1"># now, acquire the lock for the shared array and find the first empty</span>
+        <span class="c1"># buffer position and write the image to it:</span>
+        <span class="n">_index_lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_memory&quot;</span><span class="p">][</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">_index_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="n">_zeros</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_index_in_use</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">_zeros</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">_buffer_pos</span> <span class="o">=</span> <span class="n">_zeros</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shared_index_in_use</span><span class="p">[</span><span class="n">_buffer_pos</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+            <span class="n">_index_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_array</span><span class="p">[</span><span class="n">_buffer_pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">_shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">_index_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_buffer_pos</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_store_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_index</span><span class="p">,</span> <span class="n">buffer_index</span><span class="p">):</span>
+        <span class="n">_index_lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shared_memory&quot;</span><span class="p">][</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span>
+        <span class="n">_index_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">task_index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared_array</span><span class="p">[</span><span class="n">buffer_index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_index_in_use</span><span class="p">[</span><span class="n">buffer_index</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">_index_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This app is fully functional and can be used for testing. Running it will fill
+the app’s <code class="xref py py-data docutils literal notranslate"><span class="pre">results</span></code> attribute with random images:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="go">Processing task  0</span>
+<span class="go">Index divisible by 5, sleeping ...</span>
+<span class="go">Carry on check:  False</span>
+<span class="go">Carry on check:  True</span>
+
+<span class="go">Processing task  1</span>
+<span class="go">Carry on check:  False</span>
+<span class="go">Carry on check:  True</span>
+
+<span class="go">Processing task  2</span>
+<span class="go">Carry on check:  False</span>
+<span class="go">Carry on check:  True</span>
+
+<span class="go">[...]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">results</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go"> (array([], dtype=int64), array([], dtype=int64), array([], dtype=int64))</span>
+</pre></div>
+</div>
+<section id="using-the-app-s-shared-memory">
+<h3>Using the app’s shared memory<a class="headerlink" href="#using-the-app-s-shared-memory" title="Link to this heading"></a></h3>
+<p>To use the app’s shared memory, we only need to create a copy of the app (in the
+slave mode). This will allow the two apps to use the joint shared memory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">multiprocessing_pre_run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_slave</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">slave_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_slave</span><span class="o">.</span><span class="n">multiprocessing_pre_run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">buffer_index</span> <span class="o">=</span> <span class="n">app_slave</span><span class="o">.</span><span class="n">multiprocessing_func</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The first buffer has now been used:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">shared_index_in_use</span>
+<span class="go">array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># now, the data from the slave is stored in the shared array and</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># also accessible by the master app:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">shared_array</span><span class="p">[</span><span class="n">buffer_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],</span>
+<span class="go">  dtype=float32)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_slave</span><span class="o">.</span><span class="n">shared_array</span><span class="p">[</span><span class="n">buffer_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],</span>
+<span class="go">  dtype=float32)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># we can now get the results from the shared buffer and store them</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># in the app properly:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">multiprocessing_store_results</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">buffer_index</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],</span>
+<span class="go">  dtype=float32)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../developer_guide.html" class="btn btn-neutral float-left" title="Developer guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dev_guide_multiprocessing.html" class="btn btn-neutral float-right" title="Developers guide to pydidas multiprocessing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

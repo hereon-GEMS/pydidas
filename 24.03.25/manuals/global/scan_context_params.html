@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>List of all ScanContext Parameters &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f6546a40"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.03.25"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../manuals.html">Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">List of all ScanContext Parameters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/global/scan_context_params.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="list-of-all-scancontext-parameters">
+<h1>List of all ScanContext Parameters<a class="headerlink" href="#list-of-all-scancontext-parameters" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_dim (type: int, default: 2, unit: “”)</dt><dd><p>The scan dimensionality. This defines the number of processed dimensions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_title (type: str, default: “”, unit: “”)</dt><dd><p>The scan name or title. This is used exclusively for reference in axis
+labels and result exporters.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_base_directory (type: Path, default: “.”, unit: “”)</dt><dd><p>The base directory in which the raw scan data is stored.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_name_pattern (type: str, default: “”, unit: “”)</dt><dd><p>The name pattern for scan files, subdirectories etc. User hashes (“#”) to
+mark wildcard characters to be filled in with the current index.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_start_index (type: int, default: 0, unit: “”)</dt><dd><p>The starting index for files etc. of the first point in the scan.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_index_stepping (type: int, default: 1, unit: “”)</dt><dd><p>The stepping of the index, i.e. the difference in the index between two
+adjacent scan points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_multiplicity (type: int, default: 1, unit: “”)</dt><dd><p>The image multiplicity: The number of frames acquired at each unique scan
+point. Use this value only if the multiple images should be combined.
+Otherwise, use an additional scan dimension for the multiplicity.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_multi_image_handling (type: str, default: “Average”, unit: “”)</dt><dd><p>The handling instructions for multiple frames at each scan point. Can be
+either “Average” or “Sum”.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The following Parameters exist for each scan dimension, i.e. scan_dim<em>{i}</em>_label stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
+scan_dim3_label. For clarity, only the generic form is described here.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
+for labelling.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
+counter / motor position for scan step #0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

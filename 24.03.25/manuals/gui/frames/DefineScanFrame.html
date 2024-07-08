@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Define scan frame &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Workflow edit frame" href="WorkflowEditFrame.html" />
+    <link rel="prev" title="DefineDiffractionExpFrame" href="DefineDiffractionExpFrame.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.03.25"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../manuals.html">Manuals</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../commandline.html">Command line manuals</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#the-ui-state">The UI state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#generic-gui-information">Generic GUI information</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../graphical_user_interface.html#frames">Frames</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DefineDiffractionExpFrame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Define scan frame</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#control-buttons">Control buttons</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#scan-dimension-explanation">Scan dimension explanation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#global-parameters">Global Parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#configuring-a-scan-dimension">Configuring a scan dimension</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#list-of-all-scancontext-parameters">List of all ScanContext Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#windows">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graphical_user_interface.html#recipes">Recipes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/code_documentation.html">Code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../manuals.html">Manuals</a></li>
+          <li class="breadcrumb-item"><a href="../graphical_user_interface.html">Graphical user interface</a></li>
+      <li class="breadcrumb-item active">Define scan frame</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/manuals/gui/frames/DefineScanFrame.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="define-scan-frame">
+<span id="id1"></span><h1>Define scan frame<a class="headerlink" href="#define-scan-frame" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#control-buttons" id="id2">Control buttons</a></p>
+<ul>
+<li><p><a class="reference internal" href="#import-scan-settings" id="id3">Import scan settings</a></p></li>
+<li><p><a class="reference internal" href="#reset-parameters" id="id4">Reset Parameters</a></p></li>
+<li><p><a class="reference internal" href="#export-scan-settings" id="id5">Export scan settings</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#scan-dimension-explanation" id="id6">Scan dimension explanation</a></p></li>
+<li><p><a class="reference internal" href="#global-parameters" id="id7">Global Parameters</a></p></li>
+<li><p><a class="reference internal" href="#configuring-a-scan-dimension" id="id8">Configuring a scan dimension</a></p></li>
+<li><p><a class="reference internal" href="#list-of-all-scancontext-parameters" id="id9">List of all ScanContext Parameters</a></p></li>
+</ul>
+</nav>
+<p>The <em>Scan setup</em> frame is a graphical interface to configure the
+<a class="reference internal" href="../../../code/api/contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code></a>
+which holds information about the scan setup.</p>
+<p>The frame only holds the configuration widgets for its Parameters as well as
+some buttons for convenience functionality.</p>
+<a class="reference internal image-reference" href="../../../_images/overview.png"><img alt="../../../_images/overview.png" class="align-center" src="../../../_images/overview.png" style="width: 600px;" /></a>
+<section id="control-buttons">
+<h2>Control buttons<a class="headerlink" href="#control-buttons" title="Link to this heading"></a></h2>
+<section id="import-scan-settings">
+<h3>Import scan settings<a class="headerlink" href="#import-scan-settings" title="Link to this heading"></a></h3>
+<img alt="../../../_images/import.png" class="align-left" src="../../../_images/import.png" />
+<p>The Scan settings can be imported from file. Clicking the corresponding
+button will open a selection dialogue to pick the file with the stored settings.
+File extensions will be pre-selected based on the available importers.</p>
+</section>
+<section id="reset-parameters">
+<h3>Reset Parameters<a class="headerlink" href="#reset-parameters" title="Link to this heading"></a></h3>
+<img alt="../../../_images/reset.png" class="align-left" src="../../../_images/reset.png" />
+<p>The “Reset all scan settings” button allows the user to change all Parameters
+back to their default values.</p>
+</section>
+<section id="export-scan-settings">
+<h3>Export scan settings<a class="headerlink" href="#export-scan-settings" title="Link to this heading"></a></h3>
+<img alt="../../../_images/export1.png" class="align-left" src="../../../_images/export1.png" />
+<p>At the bottom of the Frame, the export button allows users to export the current
+<a class="reference internal" href="../../../code/api/contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code></a>
+Parameters to a file. This button will open a filename dialogue.</p>
+</section>
+</section>
+<section id="scan-dimension-explanation">
+<h2>Scan dimension explanation<a class="headerlink" href="#scan-dimension-explanation" title="Link to this heading"></a></h2>
+<img alt="../../../_images/more_dim_info.png" class="align-left" src="../../../_images/more_dim_info.png" />
+<p>The scan dimension explanation section gives detailed information about the
+ordering of scan scan dimensions. The <em>slowest</em> scan dimension is dimension no.
+1 and the fastest is the last scan dimension. This ordering corresponds to how
+the scan must be performed algorithmically. The button opens a window with an
+in-depth explanation, including images.</p>
+</section>
+<section id="global-parameters">
+<h2>Global Parameters<a class="headerlink" href="#global-parameters" title="Link to this heading"></a></h2>
+<img alt="../../../_images/globals.png" class="align-left" src="../../../_images/globals.png" />
+<p>Here, <em>global</em> refers to general scan Parameters in contrast to Parameters for
+a specific scan dimension. The scan dimensionality defines the number of used
+dimensions (and also shows or hides the corresponding widgets for the selected
+dimensions). The scan title is used as reference in titles and captions.</p>
+<p>The base directory and scan name pattern are used for <a class="reference internal" href="../../../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugins</span></code></a> to define the raw data source. The starting index
+defines the number of the first data file.</p>
+<p>For a detailed description of each Parameter, please refer to the
+<a class="reference internal" href="#scan-context-params"><span class="std std-ref">list of ScanContext Parameters</span></a> found at the bottom of
+this page.</p>
+</section>
+<section id="configuring-a-scan-dimension">
+<h2>Configuring a scan dimension<a class="headerlink" href="#configuring-a-scan-dimension" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Following the python nomenclature, the first index is 0 (zero) and so forth.</p>
+</div>
+<img alt="../../../_images/dimension.png" class="align-left" src="../../../_images/dimension.png" />
+<p>The configuration for each scan dimension is the same, and dimension #1 is shown
+only exemplarily.</p>
+<p>At the top, next to the name, are two small buttons with up and down arrows
+which allow to move the given scan dimension up or down in the list to change
+the order. Only reasonable arrows are shown, for example the first scan
+dimension cannot be further moved upwards.</p>
+<p>Each scan dimension has one mandatory field which is the number of scan points.
+This number determines the layout of the data in pydidas. The other information
+is metadata which is used to determine labels and axis ranges (for plots and
+export metadata) but which has no further relevance. The name of the scan
+dimension corresponds to the label. The unit is also used to label the
+dimension range.</p>
+<p>The range of each scan dimension is determined by the number of points
+<span class="math notranslate nohighlight">\(N\)</span>, the step width <span class="math notranslate nohighlight">\(\Delta x\)</span> between two points and the offset
+<span class="math notranslate nohighlight">\(x_0\)</span>. The full range is thus</p>
+<div class="math notranslate nohighlight">
+\[x_0,\ x_0 + \Delta x,\ x_0 + 2 * \Delta x,\ ...,\ x_0 + (N - 1) * \Delta x.\]</div>
+<span class="target" id="scan-context-params"></span></section>
+<section id="list-of-all-scancontext-parameters">
+<h2>List of all ScanContext Parameters<a class="headerlink" href="#list-of-all-scancontext-parameters" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_dim (type: int, default: 2, unit: “”)</dt><dd><p>The scan dimensionality. This defines the number of processed dimensions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_title (type: str, default: “”, unit: “”)</dt><dd><p>The scan name or title. This is used exclusively for reference in axis
+labels and result exporters.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_base_directory (type: Path, default: “.”, unit: “”)</dt><dd><p>The base directory in which the raw scan data is stored.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_name_pattern (type: str, default: “”, unit: “”)</dt><dd><p>The name pattern for scan files, subdirectories etc. User hashes (“#”) to
+mark wildcard characters to be filled in with the current index.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_start_index (type: int, default: 0, unit: “”)</dt><dd><p>The starting index for files etc. of the first point in the scan.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_index_stepping (type: int, default: 1, unit: “”)</dt><dd><p>The stepping of the index, i.e. the difference in the index between two
+adjacent scan points.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_multiplicity (type: int, default: 1, unit: “”)</dt><dd><p>The image multiplicity: The number of frames acquired at each unique scan
+point. Use this value only if the multiple images should be combined.
+Otherwise, use an additional scan dimension for the multiplicity.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_multi_image_handling (type: str, default: “Average”, unit: “”)</dt><dd><p>The handling instructions for multiple frames at each scan point. Can be
+either “Average” or “Sum”.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The following Parameters exist for each scan dimension, i.e. scan_dim<em>{i}</em>_label stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
+scan_dim3_label. For clarity, only the generic form is described here.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
+for labelling.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
+counter / motor position for scan step #0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim<em>{i}</em>_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="DefineDiffractionExpFrame.html" class="btn btn-neutral float-left" title="DefineDiffractionExpFrame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="WorkflowEditFrame.html" class="btn btn-neutral float-right" title="Workflow edit frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

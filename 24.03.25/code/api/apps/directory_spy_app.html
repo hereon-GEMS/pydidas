@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DirectorySpyApp &mdash; pydidas</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=f6546a40"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The widgets sub-package" href="../widgets.html" />
+    <link rel="prev" title="ExecuteWorkflowApp" href="execute_workflow_app.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #4444AA" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pydidas
+              <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                "24.03.25"
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../manuals.html">Manuals</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../code_documentation.html">Code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_documentation.html#further-code-documentation">Further code documentation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../code_documentation.html#api-documentation">API documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../apps.html">The apps sub-package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="composite_creator_app.html">CompositeCreatorApp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="execute_workflow_app.html">ExecuteWorkflowApp</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">DirectorySpyApp</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#class-name-with-inherited-methods">DirectorySpyApp with inherited methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pydidas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../code_documentation.html">Code documentation</a></li>
+          <li class="breadcrumb-item"><a href="../apps.html">The apps sub-package</a></li>
+      <li class="breadcrumb-item active">DirectorySpyApp</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/code/api/apps/directory_spy_app.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="class-name">
+<h1>DirectorySpyApp<a class="headerlink" href="#class-name" title="Link to this heading"></a></h1>
+<section id="class-name-with-inherited-methods">
+<span id="all-methods-directoryspyapp"></span><h2>DirectorySpyApp with inherited methods<a class="headerlink" href="#class-name-with-inherited-methods" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.apps.</span></span><span class="sig-name descname"><span class="pre">DirectorySpyApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseApp</span></code></a></p>
+<p>An App to scan a folder and load the latest image and keep it in shared memory.</p>
+<p>To run the app in the background, please refer to the
+<a class="reference internal" href="../multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydidas.multiprocessing.AppRunner</span></code></a> documentation.</p>
+<p class="rubric">Notes</p>
+<p>The full list of keyword arguments used by the DirectorySpyApp:</p>
+<dl class="simple">
+<dt>scan_for_all<span class="classifier">bool, optional</span></dt><dd><p>Flag to toggle scanning for all new files or only for files matching
+the input pattern (defined with the Paramteter <cite>filename_pattern</cite>).
+The default is False.</p>
+</dd>
+<dt>filename_pattern<span class="classifier">pathlib.Path, optional</span></dt><dd><p>The pattern of the filename. Use hashes “#” for wildcards which will
+be filled in with numbers. This Parameter must be set if <cite>scan_for_all</cite>
+is False. The default is an empty Path().</p>
+</dd>
+<dt>directory_path<span class="classifier">pathlib.Path, optional</span></dt><dd><p>The absolute path of the directory to be used. This Parameter is only
+used when <cite>scan_for_all</cite> is True but it is mandatory then. The default
+is an empty Path().</p>
+</dd>
+<dt>hdf5_key<span class="classifier">Hdf5key, optional</span></dt><dd><p>Used only for hdf5 files: The dataset key. The default is
+entry/data/data.</p>
+</dd>
+<dt>use_det_mask<span class="classifier">bool, optional</span></dt><dd><p>Keyword to enable or disable using the global detector mask as
+defined by the global mask file and mask value. The default is True.</p>
+</dd>
+<dt>detector_mask_file<span class="classifier">Union[pathlib.Path, str], optional</span></dt><dd><p>The full path to the detector mask file.</p>
+</dd>
+<dt>det_mask_val<span class="classifier">float, optional</span></dt><dd><p>The display value for masked pixels. The default is 0.</p>
+</dd>
+<dt>use_bg_file<span class="classifier">bool, optional</span></dt><dd><p>Keyword to toggle usage of background subtraction. The default is
+False.</p>
+</dd>
+<dt>bg_file<span class="classifier">Union[str, pathlib.Path], optional</span></dt><dd><p>The name of the file used for background correction. The default is
+an empty Path.</p>
+</dd>
+<dt>bg_hdf5_key<span class="classifier">Hdf5key, optional</span></dt><dd><p>Required for hdf5 background image files: The dataset key with the
+image for the background file. The default is entry/data/data</p>
+</dd>
+<dt>bg_hdf5_frame<span class="classifier">int, optional</span></dt><dd><p>Required for hdf5 background image files: The image number of the
+background image in the dataset. The default is 0.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>tuple</em>) – Any number of Parameters. These will be added to the app’s
+ParameterCollection.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Parameters supplied with their reference key as dict key and the
+Parameter itself as value.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.add_param">
+<span class="sig-name descname"><span class="pre">add_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.add_param" title="Link to this definition"></a></dt>
+<dd><p>Add a parameter to the ParameterCollection.</p>
+<p>This is a wrapper for the ParameterCollection.add_parameter method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a>) – An instance of a Parameter object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.add_params">
+<span class="sig-name descname"><span class="pre">add_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.add_params" title="Link to this definition"></a></dt>
+<dd><p>Add parameters to the object.</p>
+<p>This method adds Parameters to the ParameterCollection of the object.
+Parameters can be either supplies as args or a ParameterCollection
+or dictionary in the form of &lt;ref_key&gt;: &lt;Parameter&gt;.
+This method is explicitly separate from the __init__ method to allow
+subclasses full control over args and kwargs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*params</strong> (<em>Tuple</em><em>[</em><em>Union</em><em>[</em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em>, </em><em>dict</em><em>, </em><a class="reference internal" href="../core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><em>ParameterCollection</em></a><em>]</em><em>]</em>) – Any Parameter or ParameterCollection</p></li>
+<li><p><strong>**kwed_params</strong> (<em>dict</em>) – A dictionary with Parameters. Note that the dictionary keys will
+be ignored and only the Parameter.refkey attributes will be used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slave_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.copy" title="Link to this definition"></a></dt>
+<dd><p>Get a copy of the App.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slave_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle creation of a slave app which does not include
+attributes marked in the classes slave_mode attribute.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>App</strong> – A copy of the App instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp">BaseApp</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.deepcopy">
+<span class="sig-name descname"><span class="pre">deepcopy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.deepcopy" title="Link to this definition"></a></dt>
+<dd><p>Get a deepcopy of the object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The object’s deepcopy.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../core/object_with_prm_cllct.html#pydidas.core.ObjectWithParameterCollection" title="pydidas.core.ObjectWithParameterCollection">ObjectWithParameterCollection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.define_path_and_name">
+<span class="sig-name descname"><span class="pre">define_path_and_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.define_path_and_name" title="Link to this definition"></a></dt>
+<dd><p>Define the path and the name pattern to search for files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If the naming pattern could not be interpreted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.export_state" title="Link to this definition"></a></dt>
+<dd><p>Get the sanitized app Parameters and configuration for export.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The state dictionary.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.filename">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filename</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.filename" title="Link to this definition"></a></dt>
+<dd><p>Get the curently stored filename.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The filename.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_config" title="Link to this definition"></a></dt>
+<dd><p>Get the App configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The App configuration stored in the _config dictionary.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_default_params_copy">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_default_params_copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_default_params_copy" title="Link to this definition"></a></dt>
+<dd><p>Get a copy of the default ParameterCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A copy of the default ParameterCollection.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection">ParameterCollection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_image">
+<span class="sig-name descname"><span class="pre">get_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_image" title="Link to this definition"></a></dt>
+<dd><p>Get an image from the given filename.</p>
+<p>In case of HDF5 files, the method will always return the last frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname</strong> (<em>Union</em><em>[</em><em>pathlib.Path</em><em>, </em><em>str</em><em>]</em>) – The filename (including full path) to the image file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The image.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_param">
+<span class="sig-name descname"><span class="pre">get_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_param" title="Link to this definition"></a></dt>
+<dd><p>Get a parameter.</p>
+<p><em>Note</em>: This method returns the Parameter itself, <em>not</em> a copy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_key</strong> (<em>str</em>) – The key name of the Parameter.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Parameter object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter">Parameter</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_param_keys">
+<span class="sig-name descname"><span class="pre">get_param_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_param_keys" title="Link to this definition"></a></dt>
+<dd><p>Get the keys of all registered Parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The keys of all registered Parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_param_value">
+<span class="sig-name descname"><span class="pre">get_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_export</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_param_value" title="Link to this definition"></a></dt>
+<dd><p>Get a Parameter value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_key</strong> (<em>str</em>) – The key name of the Parameter.</p></li>
+<li><p><strong>default</strong> (<em>object</em>) – The default value if the param_key does not exist.</p></li>
+<li><p><strong>dtype</strong> (<em>type</em><em>, </em><em>optional</em>) – A datatype to convert the value into. If None, the native
+datatype is returned. The default is None.</p></li>
+<li><p><strong>for_export</strong> (<em>bool</em><em>, </em><em>optional</em>) – An optional flag to force converting the Parameter value to an export-
+compatible format. This flag is not compatible with a specific dtype.
+The default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the Parameter.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_param_values_as_dict">
+<span class="sig-name descname"><span class="pre">get_param_values_as_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_types_for_export</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_param_values_as_dict" title="Link to this definition"></a></dt>
+<dd><p>Get a dictionary with Parameter names and values only.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>name_val_pairs</strong> (<em>dict</em>) – The dictionary with Parameter &lt;name&gt;: &lt;value&gt; pairs.</p></li>
+<li><p><strong>filter_types_for_export</strong> (<em>bool</em>) – Flag to return objects in</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">param_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_params" title="Link to this definition"></a></dt>
+<dd><p>Get multiple parameters based on their reference keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*param_keys</strong> (<em>Tuple</em><em>[</em><em>str</em><em>, </em><em>...</em><em>]</em>) – Any number of reference keys.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list with the Parameter instances referenced by the supplied
+keys.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.image">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.image" title="Link to this definition"></a></dt>
+<dd><p>Get the currently stored image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The image data</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.image_metadata">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">image_metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.image_metadata" title="Link to this definition"></a></dt>
+<dd><p>Get the currently stored image metadata.</p>
+<p>For non-Hdf5 files, this will be an empty dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The metadata.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.import_state">
+<span class="sig-name descname"><span class="pre">import_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.import_state" title="Link to this definition"></a></dt>
+<dd><p>Import a stored state including Parameters and configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – The stored state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.initialize_shared_memory">
+<span class="sig-name descname"><span class="pre">initialize_shared_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.initialize_shared_memory" title="Link to this definition"></a></dt>
+<dd><p>Initialize the shared memory arrays based on the buffer size and
+the result shapes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_carryon">
+<span class="sig-name descname"><span class="pre">multiprocessing_carryon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_carryon" title="Link to this definition"></a></dt>
+<dd><p>Wait for specific tasks to give the clear signal.</p>
+<p>This method will be re-implemented by the prepare_run method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag whether processing can continue or should wait.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_func">
+<span class="sig-name descname"><span class="pre">multiprocessing_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_func" title="Link to this definition"></a></dt>
+<dd><p>Read the latest image. If the latest image cannot be read (e.g. the
+file is currently being written), the 2nd latest file will be read.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>index</strong> (<em>Union[int, None]</em>) – The input index. As this parameter is not used for this app and
+only implemented for compatibility, this will generally be None
+for the DirectorySpyApp. The default is None.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – The full filename of the file being read</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_get_tasks">
+<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_get_tasks" title="Link to this definition"></a></dt>
+<dd><p>The DirectorySpyApp does not use tasks and will always return an empty
+list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_post_run">
+<span class="sig-name descname"><span class="pre">multiprocessing_post_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_post_run" title="Link to this definition"></a></dt>
+<dd><p>Perform operatinos after running main parallel processing function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_pre_cycle">
+<span class="sig-name descname"><span class="pre">multiprocessing_pre_cycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_pre_cycle" title="Link to this definition"></a></dt>
+<dd><p>Perform operations in the pre-cycle of every task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The image iamge.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_pre_run">
+<span class="sig-name descname"><span class="pre">multiprocessing_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_pre_run" title="Link to this definition"></a></dt>
+<dd><p>Perform operations prior to running main parallel processing function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_store_results">
+<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_store_results" title="Link to this definition"></a></dt>
+<dd><p>Store the multiprocessing results for other pydidas apps and processes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The frame index. This entry is kept for compatibility and not used
+in this app.</p></li>
+<li><p><strong>fname</strong> (<em>str</em>) – The filename</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.param_values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">param_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span></em><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.param_values" title="Link to this definition"></a></dt>
+<dd><p>Get the values of all stored Parameters along with their refkeys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.parse_args_and_set_params">
+<span class="sig-name descname"><span class="pre">parse_args_and_set_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.parse_args_and_set_params" title="Link to this definition"></a></dt>
+<dd><p>Parse the command line arguments and update the corresponding Parameter values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.parse_func">
+<span class="sig-name descname"><span class="pre">parse_func</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.parse_func" title="Link to this definition"></a></dt>
+<dd><p>Parse the command line arguments for the DirectorySpyApp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>caller</strong> (<em>object</em><em>, </em><em>optional</em>) – If this function is called by a class as method, it requires a single
+argument which corresponds to the instance.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary with the parsed arugments which holds all the entries
+and entered values or  - if missing - the default values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.prepare_run">
+<span class="sig-name descname"><span class="pre">prepare_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.prepare_run" title="Link to this definition"></a></dt>
+<dd><p>Prepare running the directory spy app.</p>
+<p>For the main App (i.e. running not in slave_mode), this involves the
+following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Get the shape of all results from the WorkflowTree and store
+them for internal reference.</p></li>
+<li><p>Get all multiprocessing tasks from the ScanContext.</p></li>
+<li><p>Calculate the required buffer size and verify that the memory
+requirements are okay.</p></li>
+<li><p>Initialize the shared memory arrays.</p></li>
+</ol>
+</div></blockquote>
+<p>Both the slaved and the main applications then initialize local numpy
+arrays from the shared memory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.print_param_values">
+<span class="sig-name descname"><span class="pre">print_param_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.print_param_values" title="Link to this definition"></a></dt>
+<dd><p>Print the name and value of all Parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.q_settings_get">
+<span class="sig-name descname"><span class="pre">q_settings_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.q_settings_get" title="Link to this definition"></a></dt>
+<dd><p>Get the value from a QSetting key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The QSetting reference key.</p></li>
+<li><p><strong>dtype</strong> (<em>Union</em><em>[</em><em>type</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A return datatype. If not None, the output will be returned as
+dtype(value), otherwise, the generic string/int will be returned. The
+default is None.</p></li>
+<li><p><strong>default</strong> (<em>type</em><em>, </em><em>optional</em>) – The default value which is returned if the key defaults to None. The
+default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>value</strong> – The value, converted to the type associated with the Parameter
+referenced by param_key or dtype, if given.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.q_settings_set">
+<span class="sig-name descname"><span class="pre">q_settings_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.q_settings_set" title="Link to this definition"></a></dt>
+<dd><p>Set the value of a QSettings key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The name of the key.</p></li>
+<li><p><strong>value</strong> (<em>object</em>) – The value to be stored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.reset_runtime_vars">
+<span class="sig-name descname"><span class="pre">reset_runtime_vars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.reset_runtime_vars" title="Link to this definition"></a></dt>
+<dd><p>Reset the runtime variables for a new run.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.restore_all_defaults">
+<span class="sig-name descname"><span class="pre">restore_all_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">confirm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.restore_all_defaults" title="Link to this definition"></a></dt>
+<dd><p>Restore the default values to all entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>confirm</strong> (<em>bool</em>) – Confirmation flag as safety feature.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.run" title="Link to this definition"></a></dt>
+<dd><p>Run the app serially without multiprocessing support.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.set_default_params">
+<span class="sig-name descname"><span class="pre">set_default_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.set_default_params" title="Link to this definition"></a></dt>
+<dd><p>Set default entries.</p>
+<p>This method will go through the supplied defaults iterable.
+If there are no entries for the Parameter keys, it will add a
+Parameter with default value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.set_param_value">
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.set_param_value" title="Link to this definition"></a></dt>
+<dd><p>Set a parameter value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_key</strong> (<em>str</em>) – The key name of the Parameter.</p></li>
+<li><p><strong>value</strong> – The value to be set. This has to be the datatype associated with
+the Parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.set_param_values_from_dict">
+<span class="sig-name descname"><span class="pre">set_param_values_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.set_param_values_from_dict" title="Link to this definition"></a></dt>
+<dd><p>Set the Parameter values from a dict with name, value paris.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value_dict</strong> (<em>dict</em>) – The dictionary with the stored information.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.update_param_values_from_kwargs">
+<span class="sig-name descname"><span class="pre">update_param_values_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.update_param_values_from_kwargs" title="Link to this definition"></a></dt>
+<dd><p>Update the Parameter values corresponding to the given keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – The dictionary with Parameter refkeys and values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.update_params_from_init">
+<span class="sig-name descname"><span class="pre">update_params_from_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.update_params_from_init" title="Link to this definition"></a></dt>
+<dd><p>Update the Parameters from the given init args and kwargs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>Tuple</em>) – The input arguments.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Dict</em>) – The input keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="execute_workflow_app.html" class="btn btn-neutral float-left" title="ExecuteWorkflowApp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../widgets.html" class="btn btn-neutral float-right" title="The widgets sub-package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

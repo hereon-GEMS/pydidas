@@ -1,134 +1,468 @@
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../../../">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WorkflowEditFrame &mdash; pydidas</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>WorkflowEditFrame &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/_css/pydidas-custom.css?v=9d9b2af9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=87e54e7c" />
   
-        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../_static/documentation_options.js?v=f6546a40"></script>
-        <script src="../../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../../_static/js/theme.js"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=6d92c56a"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/gui/frames/workflow_edit_frame';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/_gh_pages_release_versions/pydata_version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '24.03.25';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
+        </script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="WorkflowTestFrame" href="workflow_test_frame.html" />
-    <link rel="prev" title="DefineScanFrame" href="define_scan_frame.html" /> 
-</head>
+    <link rel="prev" title="DefineScanFrame" href="define_scan_frame.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: #4444AA" >
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-          
-          
-          <a href="../../../../index.html" class="icon icon-home">
-            pydidas
-              <img src="../../../../_static/pydidas_snakes_circ_bg.png" class="logo" alt="Logo"/>
-          </a>
-              <div class="version">
-                "24.03.25"
-              </div>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../../manuals.html">Manuals</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../../code_documentation.html">Code documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#architecture">Architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../code_documentation.html#further-code-documentation">Further code documentation</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../../../code_documentation.html#api-documentation">API documentation</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../core.html">The core submodule</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../multiprocessing.html">The multiprocessing sub-package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../data_io.html">The data_io sub-package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../contexts.html">The contexts sub-package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../managers.html">The managers sub-package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../plugins.html">The plugins sub-package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../workflow.html">The workflow sub-package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../apps.html">The apps sub-package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../widgets.html">The widgets sub-package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../../gui.html">The gui submodule</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="../../gui.html#global-gui-classes">Global GUI classes</a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="../../gui.html#frames">Frames</a><ul class="current">
-<li class="toctree-l5"><a class="reference internal" href="data_browsing_frame.html">DataBrowsingFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="pyfai_calib_frame.html">PyfaiCalibFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="composite_creator_frame.html">CompositeCreatorFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="define_diffraction_exp_frame.html">DefineDiffractionExpFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="define_scan_frame.html">DefineScanFrame</a></li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">WorkflowEditFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="workflow_test_frame.html">WorkflowTestFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="workflow_run_frame.html">WorkflowRunFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="view_results_frame.html">ViewResultsFrame</a></li>
-<li class="toctree-l5"><a class="reference internal" href="builders.html">Builder classes</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="../../gui.html#windows">Windows</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide.html">Developer guide</a></li>
-</ul>
 
-        </div>
-      </div>
-    </nav>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #4444AA" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">pydidas</a>
-      </nav>
+  
+    
+  
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../../code_documentation.html">Code documentation</a></li>
-          <li class="breadcrumb-item"><a href="../../gui.html">The gui submodule</a></li>
-      <li class="breadcrumb-item active">WorkflowEditFrame</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="../../../../_sources/code/api/gui/frames/workflow_edit_frame.rst.txt" rel="nofollow"> View page source</a>
-      </li>
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <script>document.write(`<img src="../../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../manuals.html">
+    Manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
   </ul>
-  <hr/>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../manuals.html">
+    Manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../concepts.html">Key concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../package_structure.html">Package structure</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../core.html">The core submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../managers.html">The managers sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apps.html">The apps sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../gui.html">The gui submodule</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../main_window.html">MainWindow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_browsing_frame.html">DataBrowsingFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyfai_calib_frame.html">PyfaiCalibFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="composite_creator_frame.html">CompositeCreatorFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="define_diffraction_exp_frame.html">DefineDiffractionExpFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="define_scan_frame.html">DefineScanFrame</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">WorkflowEditFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow_test_frame.html">WorkflowTestFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow_run_frame.html">WorkflowRunFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="view_results_frame.html">ViewResultsFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="builders.html">Builder classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../widgets/windows/global_settings_window.html">GlobalSettingsWindow</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../code_documentation.html" class="nav-link">Code documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../gui.html" class="nav-link">The gui submodule</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">WorkflowEditFrame</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="class-name">
-<h1>WorkflowEditFrame<a class="headerlink" href="#class-name" title="Link to this heading"></a></h1>
+<h1>WorkflowEditFrame<a class="headerlink" href="#class-name" title="Link to this heading">#</a></h1>
 <ul class="simple">
 <li><p>WorkflowEditFrame documentation <a class="reference internal" href="#own-methods-workfloweditframe"><span class="std std-ref">with own methods only</span></a></p></li>
 <li><p>WorkflowEditFrame documentation <a class="reference internal" href="#all-methods-workfloweditframe"><span class="std std-ref">with inherited methods too</span></a></p></li>
 </ul>
 <section id="class-name-with-own-methods-only">
-<span id="own-methods-workfloweditframe"></span><h2>WorkflowEditFrame with own methods only<a class="headerlink" href="#class-name-with-own-methods-only" title="Link to this heading"></a></h2>
+<span id="own-methods-workfloweditframe"></span><h2>WorkflowEditFrame with own methods only<a class="headerlink" href="#class-name-with-own-methods-only" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">WorkflowEditFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">WorkflowEditFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame" title="Link to this definition">#</a></dt>
 <dd><dl class="simple">
 <dt>The WorkflowEditFrame includes three major objects:</dt><dd><ol class="loweralpha simple">
 <li><p>The editing canvas which shows the WorkflowTree structure.</p></li>
@@ -141,13 +475,13 @@ plugins.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.build_frame">
-<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.build_frame" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.build_frame" title="Link to this definition">#</a></dt>
 <dd><p>Build the frame and create all widgets.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.configure_plugin">
-<span class="sig-name descname"><span class="pre">configure_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.configure_plugin" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">configure_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.configure_plugin" title="Link to this definition">#</a></dt>
 <dd><p>Get the signal that a new Plugin has been selected to be edited and
 pass the information to the PluginEditCanvas.</p>
 <dl class="field-list simple">
@@ -159,13 +493,13 @@ pass the information to the PluginEditCanvas.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.connect_signals">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.connect_signals" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.connect_signals" title="Link to this definition">#</a></dt>
 <dd><p>Connect all signals and slots in the frame.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.export_state">
-<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.export_state" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.export_state" title="Link to this definition">#</a></dt>
 <dd><p>Export the state of the Frame for saving.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -181,7 +515,7 @@ frame’s state.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.frame_activated">
-<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.frame_activated" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.frame_activated" title="Link to this definition">#</a></dt>
 <dd><p>Received a signal that a new frame has been selected.</p>
 <p>This method checks whether the selected frame is the current class
 and if yes, it will call some updates.</p>
@@ -194,14 +528,14 @@ and if yes, it will call some updates.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.load_tree_from_file">
-<span class="sig-name descname"><span class="pre">load_tree_from_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.load_tree_from_file" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load_tree_from_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.load_tree_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Open a Qdialog to select a filename, read the file and import an
 existing WorkflowTree from the retrieved information.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.resizeEvent">
-<span class="sig-name descname"><span class="pre">resizeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.resizeEvent" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">resizeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.resizeEvent" title="Link to this definition">#</a></dt>
 <dd><p>Handle the resizeEvent and also update the node positions in the WorkflowTree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -212,7 +546,7 @@ existing WorkflowTree from the retrieved information.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.restore_state">
-<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.restore_state" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.restore_state" title="Link to this definition">#</a></dt>
 <dd><p>Restore the frame’s state from stored information.</p>
 <p>The default implementation in the BaseFrame will update all Parameters
 (and associated widgets) and restore the visibility of all widgets. If the
@@ -228,7 +562,7 @@ information for both.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.save_tree_to_file">
-<span class="sig-name descname"><span class="pre">save_tree_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.save_tree_to_file" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">save_tree_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.save_tree_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Open a QFileDialog to geta save name and export the WorkflowTree to
 the selected file with the specified format.</p>
 </dd></dl>
@@ -237,7 +571,7 @@ the selected file with the specified format.</p>
 
 </section>
 <section id="class-name-with-inherited-methods-too">
-<span id="all-methods-workfloweditframe"></span><h2>WorkflowEditFrame with inherited methods too<a class="headerlink" href="#class-name-with-inherited-methods-too" title="Link to this heading"></a></h2>
+<span id="all-methods-workfloweditframe"></span><h2>WorkflowEditFrame with inherited methods too<a class="headerlink" href="#class-name-with-inherited-methods-too" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">WorkflowEditFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
@@ -669,19 +1003,19 @@ widget.</p>
 </dd>
 <dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>gridPos</strong> (<em>tuple</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The grid position in the layout. The default is (-1, 0, 1, 1)</p></li>
-<li><p><strong>width_text</strong> (<em>float</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The relative width of the text field for the Parameter name. The default
+<li><p><strong>gridPos</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The grid position in the layout. The default is (-1, 0, 1, 1)</p></li>
+<li><p><strong>width_text</strong> (<em>float</em><em>, </em><em>optional</em>) – The relative width of the text field for the Parameter name. The default
 is 0.5.</p></li>
-<li><p><strong>width_unit</strong> (<em>float</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The relative width of the text field for the Parameter unit. The default
+<li><p><strong>width_unit</strong> (<em>float</em><em>, </em><em>optional</em>) – The relative width of the text field for the Parameter unit. The default
 is 0.07.</p></li>
-<li><p><strong>width_io</strong> (<em>int</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The relative width of the input widget. The default is 0.43.</p></li>
-<li><p><strong>linebreak</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to toggle a line break between the text label and the
+<li><p><strong>width_io</strong> (<em>int</em><em>, </em><em>optional</em>) – The relative width of the input widget. The default is 0.43.</p></li>
+<li><p><strong>linebreak</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle a line break between the text label and the
 input widget. The default is False.</p></li>
-<li><p><strong>halign_io</strong> (<em>QtCore.Qt.Alignment</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The horizontal alignment for the input widget. The default is
+<li><p><strong>halign_io</strong> (<em>QtCore.Qt.Alignment</em><em>, </em><em>optional</em>) – The horizontal alignment for the input widget. The default is
 QtCore.Qt.AlignRight.</p></li>
-<li><p><strong>halign_text</strong> (<em>QtCore.Qt.Alignment</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The horizontal alignment for the text (label) widget. The default
+<li><p><strong>halign_text</strong> (<em>QtCore.Qt.Alignment</em><em>, </em><em>optional</em>) – The horizontal alignment for the text (label) widget. The default
 is QtCore.Qt.AlignRight.</p></li>
-<li><p><strong>parent_widget</strong> (<em>Union</em><em>[</em><em>QWidget</em><em>, </em><em>str</em><em>, </em><em>None</em><em>]</em><em>, </em><a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The widget to which the label is added. If a string, this picks up the
+<li><p><strong>parent_widget</strong> (<em>Union</em><em>[</em><em>QWidget</em><em>, </em><em>str</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The widget to which the label is added. If a string, this picks up the
 calling class’s ._widgets dictionary and selects the string key’s value.
 The default is self.</p></li>
 </ul>
@@ -2566,45 +2900,133 @@ parameter referenced with &lt;key&gt;.</p>
 </section>
 
 
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="define_scan_frame.html" class="btn btn-neutral float-left" title="DefineScanFrame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="workflow_test_frame.html" class="btn btn-neutral float-right" title="WorkflowTestFrame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="define_scan_frame.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">DefineScanFrame</p>
       </div>
-    </section>
+    </a>
+    <a class="right-next"
+       href="workflow_test_frame.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">WorkflowTestFrame</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-    <!-- Theme Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-name-with-own-methods-only">WorkflowEditFrame with own methods only</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.build_frame"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.build_frame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.configure_plugin"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.configure_plugin()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.connect_signals"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.connect_signals()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.export_state"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.export_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.frame_activated"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.frame_activated()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.load_tree_from_file"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.load_tree_from_file()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.resizeEvent"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.resizeEvent()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.restore_state"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.restore_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.WorkflowEditFrame.save_tree_to_file"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrame.save_tree_to_file()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-name-with-inherited-methods-too">WorkflowEditFrame with inherited methods too</a></li>
+</ul>
+  </nav></div>
 
-      gtag('config', 'G-XXXXXXXXXX', {
-          'anonymize_ip': false,
-      });
-    </script> 
+  <div class="sidebar-secondary-item">
 
-</body>
+  <div class="tocsection sourcelink">
+    <a href="../../../../_sources/code/api/gui/frames/workflow_edit_frame.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
 </html>

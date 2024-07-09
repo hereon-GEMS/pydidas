@@ -61,12 +61,35 @@ class MaskMultipleImages(ProcPlugin):
         Parameter(
             "background_value",
             float,
-            0,
+            None,
             name="Background value",
             tooltip="The value used for pixels that are masked in every image",
+            allow_None=True,
+        ),
+        Parameter(
+            "adc_mask",
+            str,
+            "No mask",
+            name="ADC artifacts direction",
+            choices=[
+                "No mask",
+                "Mask Y-axis",
+                "Mask X-axis",
+                "Mask half Y-axis",
+                "Mask half X-axis",
+            ],
+            tooltip="Direction to mask ADC artifacts, originating from a hotspot",
+        ),
+        Parameter(
+            "adc_mask_threshold",
+            float,
+            None,
+            name="ADC artifacts threshold",
+            tooltip="Threshold needed to mask ADC artifacts from that point",
+            allow_None=True,
         ),
     )
-    advanced_parameters = ("background_value",)
+    advanced_parameters = ("background_value", "adc_mask", "adc_mask_threshold")
     input_data_dim = 3
     output_data_dim = 2
     output_data_label = "Masked images"
@@ -79,11 +102,21 @@ class MaskMultipleImages(ProcPlugin):
 
     def pre_execute(self):
         """
-        Check thresholds and select grow/shrink operation
+        Set background value, check threshold values,
+        select grow/shrink operation and configure adc mask
         """
+        if self.get_param_value("background_value") is None:
+            self._background = np.nan
+        else:
+            self._background = self.get_param_value("background_value")
+        self._adc_mask = (
+            self.get_param_value("adc_mask_threshold") is not None
+            and self.get_param_value("adc_mask") != "No mask"
+        )
         if (
             self.get_param_value("mask_threshold_low") is None
             and self.get_param_value("mask_threshold_high") is None
+            and self._adc_mask is False
         ):
             self._trivial = True
             return
@@ -129,24 +162,41 @@ class MaskMultipleImages(ProcPlugin):
             return np.sum(data, axis=0) / data.shape[0], kwargs
         _mask_data = np.full(data.shape[1:], data.shape[0])
         _image_sum = np.zeros(data.shape[1:], dtype=float)
+        _thresh_low = self.get_param_value("mask_threshold_low")
+        _thresh_high = self.get_param_value("mask_threshold_high")
         for image in data:
-            _image_mask = np.zeros((data.shape[1], data.shape[2]))
-            if self.get_param_value("mask_threshold_low") is not None:
-                _image_mask = np.where(
-                    image < self.get_param_value("mask_threshold_low"), 1, 0
-                )
-            else:
-                _image_mask = np.zeros(image.shape, dtype=bool)
-            if self.get_param_value("mask_threshold_high") is not None:
-                _image_mask = _image_mask + np.where(
-                    image > self.get_param_value("mask_threshold_high"), 1, 0
-                )
+            _image_mask = (
+                np.where(image < _thresh_low, 1, 0)
+                if _thresh_low is not None
+                else np.zeros(image.shape, dtype=bool)
+            )
+            if _thresh_high is not None:
+                _image_mask = _image_mask + np.where(image > _thresh_high, 1, 0)
             if self.get_param_value("mask_grow") != 0:
                 _image_mask = self._operation(
                     _image_mask,
                     structure=self._kernel,
                     iterations=self.get_param_value("kernel_iterations"),
                 )
+            if self._adc_mask is True:
+                _ycenter = image.shape[0] // 2
+                _xcenter = image.shape[1] // 2
+                _y, _x = np.where(image > self.get_param_value("adc_mask_threshold"))
+                match self.get_param_value("adc_mask"):
+                    case "Mask Y-axis":
+                        _image_mask[:, _x] = 1
+                    case "Mask X-axis":
+                        _image_mask[_y, :] = 1
+                    case "Mask half Y-axis":
+                        _xlow = [__x for (__x, __y) in zip(_x, _y) if __y < _ycenter]
+                        _image_mask[slice(None, _ycenter), _xlow] = 1
+                        _xhigh = [__x for (__x, __y) in zip(_x, _y) if __y >= _ycenter]
+                        _image_mask[slice(_ycenter, None), _xhigh] = 1
+                    case "Mask half X-axis":
+                        _ylow = [__y for (__x, __y) in zip(_x, _y) if __x < _xcenter]
+                        _image_mask[_ylow, slice(None, _xcenter)] = 1
+                        _yhigh = [__y for (__x, __y) in zip(_x, _y) if __x >= _xcenter]
+                        _image_mask[_yhigh, slice(_xcenter, None)] = 1
             _mask_data = _mask_data - _image_mask
             _image_sum = np.where((_image_mask == 0), _image_sum + image, _image_sum)
         _final_image = np.divide(
@@ -158,20 +208,21 @@ class MaskMultipleImages(ProcPlugin):
 
         _final_image = np.where(
             ~np.isfinite(_final_image),
-            self.get_param_value("background_value"),
+            self._background,
             _final_image,
         )
 
-        if isinstance(data, Dataset):
-            data_kwargs = {
+        data_kwargs = (
+            {
                 "axis_labels": list(data.axis_labels.values())[1:],
                 "axis_ranges": list(data.axis_ranges.values())[1:],
                 "axis_units": list(data.axis_units.values())[1:],
                 "data_label": data.data_label,
                 "data_unit": data.data_unit,
             }
-        else:
-            data_kwargs = {"axis_labels": ["pixel y", "pixel x"]}
+            if isinstance(data, Dataset)
+            else {"axis_labels": ["pixel y", "pixel x"]}
+        )
 
         new_data = Dataset(_final_image, **data_kwargs)
         return new_data, kwargs

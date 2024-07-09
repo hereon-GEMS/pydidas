@@ -83,7 +83,7 @@ class TestMaskMultipleImages(unittest.TestCase):
         with self.assertRaises(UserConfigError):
             plugin.pre_execute()
 
-    def test_pre_execute__no_thresholds(self):
+    def test_pre_execute__trivial(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskMultipleImages")()
         plugin.pre_execute()
         self.assertTrue(plugin._trivial)
@@ -196,6 +196,50 @@ class TestMaskMultipleImages(unittest.TestCase):
                     self.assertTrue(np.all(np.isnan(_data[1, 1])))
                 else:
                     self.assertTrue(_data[1, 1] == background_value)
+
+    def test_execute__adc_y(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskMultipleImages")()
+        plugin.set_param_value("adc_mask", "Mask Y-axis")
+        plugin.set_param_value("adc_mask_threshold", 5)
+        plugin.pre_execute()
+        self._data = np.ones(self._shape, dtype=np.uint8)
+        self._data[0:, 1, 1] = 10
+        _data, _kwargs = plugin.execute(self._data)
+        self.assertTrue(np.isnan(_data[:, 1]).all())
+        self.assertTrue(np.all(_data[:, 2:] == 1))
+
+    def test_execute__adc_x(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskMultipleImages")()
+        plugin.set_param_value("adc_mask", "Mask X-axis")
+        plugin.set_param_value("adc_mask_threshold", 5)
+        plugin.pre_execute()
+        self._data = np.ones(self._shape, dtype=np.uint8)
+        self._data[0:, 1, 1] = 10
+        _data, _kwargs = plugin.execute(self._data)
+        self.assertTrue(np.isnan(_data[1, :]).all())
+        self.assertTrue(np.all(_data[2:, :] == 1))
+
+    def test_execute__adc_half_y(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskMultipleImages")()
+        plugin.set_param_value("adc_mask", "Mask half Y-axis")
+        plugin.set_param_value("adc_mask_threshold", 5)
+        plugin.pre_execute()
+        self._data = np.ones(self._shape, dtype=np.uint8)
+        self._data[0:, 1, 1] = 10
+        _data, _kwargs = plugin.execute(self._data)
+        self.assertTrue(np.isnan(_data[:50, 1]).all())
+        self.assertTrue(np.all(_data[51:, 1] == 1))
+
+    def test_execute__adc_half_x(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskMultipleImages")()
+        plugin.set_param_value("adc_mask", "Mask half X-axis")
+        plugin.set_param_value("adc_mask_threshold", 5)
+        plugin.pre_execute()
+        self._data = np.ones(self._shape, dtype=np.uint8)
+        self._data[0:, 1, 1] = 10
+        _data, _kwargs = plugin.execute(self._data)
+        self.assertTrue(np.isnan(_data[1, :50]).all())
+        self.assertTrue(np.all(_data[1, 51:] == 1))
 
 
 if __name__ == "__main__":

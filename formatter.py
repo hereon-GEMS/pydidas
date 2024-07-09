@@ -404,7 +404,7 @@ class CopyrightYearUpdater:
                     _contents = f.read()
                 except UnicodeDecodeError:
                     _timed_print(
-                        "Error reading file: ", _fname, verbose=self._flags["verbose"]
+                        f"Error reading file: {_fname}", verbose=self._flags["verbose"]
                     )
             _original = _contents[:]
             _contents = re.sub(self._regex_full, self._update_long_regex, _contents)

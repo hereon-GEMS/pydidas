@@ -162,7 +162,7 @@ class Dataset(ndarray):
             for _key in METADATA_KEYS
         }
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
-            if isinstance(_slicer, ndarray) and _slicer.size == obj.size:
+            if isinstance(_slicer, ndarray) and _slicer.dtype == np.bool_ and _slicer.size == obj.size:
                 # in the case of a masked array, keep all axis keys.
                 break
             if isinstance(_slicer, Integral):

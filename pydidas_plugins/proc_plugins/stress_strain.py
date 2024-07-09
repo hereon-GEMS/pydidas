@@ -36,6 +36,7 @@ from pydidas.core import Dataset
 # TODO: Write
 
 
+
 def chi_pos_verification(ds):
     """
     Verify if the dataset `ds` contains 'chi' and 'position' for d-spacing.
@@ -577,13 +578,6 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     # both are ordered in ascending order of increasing sin2chi
     s2c_unique_labels = np.unique(s2c_labels)
     s2c_unique_values = s2c[s2c_unique_labels]
-
-    # print('s2c_labels', s2c_labels)
-    # print('chi', chi)
-    # print('s2c_values', s2c)
-    # print('s2c unique labels', np.unique(s2c_labels))
-    # print('s2c unique values', s2c[np.unique(s2c_labels)])
-    # print('s2c', s2c.shape, s2c)
 
     # Calculate first derivative
     first_derivative = np.gradient(s2c, edge_order=2)

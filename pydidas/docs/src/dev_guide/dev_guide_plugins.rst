@@ -262,6 +262,8 @@ any |parameter| objects with other plugins.
 For further examples of how to define the :py:data:`default_params`, please have a
 look at the :ref:`plugin_default_params_examples`.
 
+Please also see :ref:`generic_params`.
+
 :ref:`(go back to top of the page) <developer_guide_to_plugins>`
 
 .. _handle_dynamic_data_dimensionality:

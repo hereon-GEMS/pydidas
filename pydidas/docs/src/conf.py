@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-
+import importlib
 import os
 import sys
 from pathlib import Path
@@ -43,6 +43,12 @@ with open(Path(__file__).parents[2].joinpath("version.py"), "r") as f:
 
 release = pydidas_version.strip("\"'")
 version = release
+
+spec = importlib.util.spec_from_file_location(
+    "generic_params", "../../core/generic_params/generic_params.py"
+)
+generic_params = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(generic_params)
 
 # -- General configuration ---------------------------------------------------
 
@@ -114,6 +120,9 @@ if os.getenv("GITHUB_ACTIONS", "false") == "true":
 html_static_path = ["_static"]
 html_logo = "./images/logo/pydidas_snakes_circ_bg.png"
 html_title = "pydidas"
+
+# -- generate generic parameters page ---------------------------------------
+generic_params.create_generic_params_rst_docu()
 
 
 def setup(app):

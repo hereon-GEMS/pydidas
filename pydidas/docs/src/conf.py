@@ -71,7 +71,7 @@ with open(Path(__file__).parents[2].joinpath("version.py"), "r") as f:
             pydidas_version = _line.split("=")[1].strip()
             break
 
-release = pydidas_version
+release = pydidas_version.strip("\"'")
 version = release
 
 # -- General configuration ---------------------------------------------------
@@ -123,15 +123,19 @@ html_theme_options = {
         "alt_text": "pydidas",
     },
 }
-if is_on_github_actions():
+if True:  # is_on_github_actions():
     html_theme_options["switcher"] = {
-        "version_match": pydidas_version.strip("\"'"),
+        "version_match": pydidas_version,
         "json_url": (
             "https://raw.githubusercontent.com/hereon-GEMS/pydidas/"
             "_gh_pages_release_versions/pydata_version_switcher.json"
         ),
     }
-    html_theme_options["navbar_end"] = ["version-switcher", "navbar-icon-links"]
+    html_theme_options["navbar_end"] = [
+        "version-switcher",
+        "theme-switcher",
+        "navbar-icon-links",
+    ]
 
 
 # Add any paths that contain custom static files (such as style sheets) here,

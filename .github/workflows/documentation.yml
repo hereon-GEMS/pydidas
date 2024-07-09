@@ -6,11 +6,11 @@
 # This workflow will create the github pages documentation for pydidas
 # which is accessible at https://hereon-gems.github.io/pydidas/
 
-name: Github-pages documentation
+name: Github-pages dev documentation
 
 on:
   push:
-    branches: [ "release" ]
+    branches: [ "master" ]
 
 jobs:
   create_docs:
@@ -39,19 +39,12 @@ jobs:
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v2
 
-  deploy_docs:
-    needs: create_docs
-
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: _site
-
-    runs-on: ubuntu-latest
-    steps:
-    - name: Deploy to Github Pages
-      id: deployment
-      uses: actions/deploy-pages@v3
+    - name: Deploy to GitHub Pages version subdirectory
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./_site
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        destination_dir: dev
+        keep_files: true

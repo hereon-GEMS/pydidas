@@ -67,7 +67,7 @@ class CenterOfMass1dData(ProcPlugin):
 
         Returns
         -------
-        sum : Dataset
+        _new_data : pydidas.core.Dataset
             The data sum in form of an array of shape (1,).
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

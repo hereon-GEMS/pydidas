@@ -73,7 +73,7 @@ class AverageOppositeSectors(ProcPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        _new_data : pydidas.core.Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

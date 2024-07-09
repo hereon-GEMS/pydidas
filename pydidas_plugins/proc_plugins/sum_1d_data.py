@@ -93,7 +93,7 @@ class Sum1dData(ProcPlugin):
 
         Returns
         -------
-        sum : Dataset
+        _new_data : Dataset
             The data sum in form of a Dataset of shape (1,).
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

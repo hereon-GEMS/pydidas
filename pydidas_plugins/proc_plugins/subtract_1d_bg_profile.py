@@ -30,6 +30,7 @@ __all__ = ["Subtract1dBackgroundProfile"]
 
 
 from pathlib import Path
+from typing import Union
 
 import numpy as np
 
@@ -88,7 +89,9 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             self._profile *= self.get_param_value("multiplicator")
 
     @process_1d_with_multi_input_dims
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+    ) -> tuple[Dataset, dict]:
         """
         Subtract a one-dimensional background profile.
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ integration of diffraction pattern to acquire a radial profile.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -75,10 +75,18 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
 
         Parameters
         ----------
-        data : Dataset
+        data : pydidas.core.Dataset
             The radial integration results.
         kwargs : dict
             Any keyword arguments from the ProcessingTree.
+
+        Returns
+        -------
+        _dataset : pydidas.core.Dataset
+            The integrated data.
+        kwargs : dict
+            Any keyword arguments from the ProcessingTree, appended by any
+            changes in the function.
         """
         self.check_and_set_custom_mask(**kwargs)
         _newdata = self._ai.integrate1d(

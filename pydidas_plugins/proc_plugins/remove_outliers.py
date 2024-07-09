@@ -117,7 +117,7 @@ class RemoveOutliers(ProcPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        data : pydidas.core.Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
@@ -208,7 +208,7 @@ class RemoveOutliers(ProcPlugin):
 
         Returns
         -------
-        np.ndarray
+        outliers : np.ndarray
             The filtered outlier index array.
         """
         _neighbor_indices = (

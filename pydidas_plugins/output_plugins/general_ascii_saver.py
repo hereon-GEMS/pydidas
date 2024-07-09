@@ -31,6 +31,7 @@ __all__ = ["GeneralAsciiSaver"]
 import datetime
 import time
 from pathlib import Path
+from typing import Union
 
 import numpy as np
 
@@ -83,7 +84,7 @@ class GeneralAsciiSaver(OutputPlugin):
         )
     )
 
-    def execute(self, data: Dataset, **kwargs: dict):
+    def execute(self, data: Union[np.ndarray, Dataset], **kwargs: dict):
         """
         Save data to file in raw ascii text format.
 
@@ -146,7 +147,7 @@ class GeneralAsciiSaver(OutputPlugin):
 
         Returns
         -------
-        str
+        _header : str
             The header string.
         """
         _header = "# Metadata:\n"

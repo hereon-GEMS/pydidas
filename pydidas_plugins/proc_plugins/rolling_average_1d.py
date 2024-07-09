@@ -109,7 +109,7 @@ class RollingAverage1d(ProcPlugin):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        _new_data : pydidas.core.Dataset
             The averaged profile.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

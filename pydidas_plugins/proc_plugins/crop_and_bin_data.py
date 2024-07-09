@@ -81,14 +81,14 @@ class CropAndBinImage(ProcPlugin):
 
         Parameters
         ----------
-        index : int
-            The index of the scan point.
+        data : pydidas.core.Dataset
+            Input data.
         **kwargs : dict
             Keyword arguments passed to the execute method.
 
         Returns
         -------
-        pydidas.core.Dataset
+        data : pydidas.core.Dataset
             The image data frame.
         kwargs : dict
             The updated input keyword arguments.

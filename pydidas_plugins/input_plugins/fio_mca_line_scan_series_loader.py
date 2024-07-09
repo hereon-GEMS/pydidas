@@ -245,9 +245,9 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
 
         Returns
         -------
-        Dataset :
+        _dataset : pydidas.core.Dataset
             The loaded dataset.
-        dict :
+        kwargs : dict
             The updated kwargs.
         """
         _fname = self.get_filename(index)

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ data thresholds.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["CreateDynamicMask"]
 
 
 import pathlib
+from typing import Union
 
 import numpy as np
 import scipy.ndimage
@@ -129,7 +130,9 @@ class CreateDynamicMask(ProcPlugin):
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
 
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+    ) -> tuple[Dataset, dict]:
         """
         Create a dynamic mask based on the input data.
 

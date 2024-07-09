@@ -75,10 +75,18 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
 
         Parameters
         ----------
-        data : Dataset
+        data : pydidas.core.Dataset
             The radial integration results.
         kwargs : dict
             Any keyword arguments from the ProcessingTree.
+
+        Returns
+        -------
+        _dataset : pydidas.core.Dataset
+            The integrated data.
+        kwargs : dict
+            Any keyword arguments from the ProcessingTree, appended by any
+            changes in the function.
         """
         self.check_and_set_custom_mask(**kwargs)
         _newdata = self._ai.integrate1d(

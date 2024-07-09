@@ -28,6 +28,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Remove1dPolynomialBackground"]
 
+from typing import Union
+
 import numpy as np
 from numpy.polynomial import Polynomial
 
@@ -156,7 +158,9 @@ class Remove1dPolynomialBackground(ProcPlugin):
             self._kernel = None
 
     @process_1d_with_multi_input_dims
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+    ) -> tuple[Dataset, dict]:
         """
         Fit and remove a polynomial background to the data.
 
@@ -280,7 +284,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         gives a title for each subplot. Third, "plot_ylabels" gives a y axis label for
         each subplot. Fourth, "items" provides  a list with the different items to be
         plotted. Each list entry must be a dictionary with the following keys: "plot"
-        [to detemine the plot number], "label" [for the legend label] and "data" with
+        [to determine the plot number], "label" [for the legend label] and "data" with
         the actual data.
 
         Returns

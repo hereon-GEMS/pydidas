@@ -22,12 +22,33 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
+    - name: Extract version
+      id: extract_version
+      run: |
+        export QT_QPA_PLATFORM=offscreen
+        # need the first 'dummy' echo to set up pydidas
+        echo $(python -c "import pydidas" --no-sphinx)
+        {
+          echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
+        } >> $GITHUB_OUTPUT
     - name: Sphinx build
       run: |
         export QT_QPA_PLATFORM=offscreen
-        sphinx-build pydidas/docs/src _site
-    - name: Create .nojekyll file
-      run: touch _site/.nojekyll
+        sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.VERSION }}
+    - name: Create temporary branch for gh-pages-output
+      run: |
+        git checkout -b temp-gh-pages
+        git add versions/${{ steps.extract_version.outputs.VERSION }}
+        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
+        git push origin temp-gh-pages
+    - name: Merge latest version into gh-pages-versions-snapshot
+      run: |
+        git pull origin gh-pages-version-snapshots
+        git checkout gh-pages-version-snapshots
+        git checkout temp-gh-pages -- versions/${{ steps.extract_version.outputs.VERSION }}
+        git add versions/${{ steps.extract_version.outputs.VERSION }}
+        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
+        git push origin gh-pages-version-snapshots
     - name: Set permissions
       run: |
         chmod -c -R +rX "_site/" | while read line; do

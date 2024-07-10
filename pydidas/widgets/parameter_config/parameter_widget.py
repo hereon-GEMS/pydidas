@@ -42,6 +42,7 @@ from ...core.constants import (
 )
 from ...core.utils import convert_special_chars_to_unicode
 from ..factory import EmptyWidget, PydidasLabel
+from .param_io_widget_checkbox import ParamIoWidgetCheckBox
 from .param_io_widget_combo_box import ParamIoWidgetComboBox
 from .param_io_widget_file import ParamIoWidgetFile
 from .param_io_widget_hdf5key import ParamIoWidgetHdf5Key
@@ -84,7 +85,8 @@ class ParameterWidget(EmptyWidget):
         self.__store_config_from_kwargs(kwargs)
         self.__store_layout_args_for_widgets()
 
-        self.__create_name_widget()
+        if self.param.choices is None or set(self.param.choices) != {True, False}:
+            self.__create_name_widget()
         self.__create_param_io_widget()
         if self._config["width_unit"] > 0:
             self.__create_unit_widget()
@@ -192,7 +194,11 @@ class ParameterWidget(EmptyWidget):
             "linebreak": self._config["linebreak"],
         }
         if self.param.choices:
-            _widget = ParamIoWidgetComboBox(self.param, **kwargs)
+            if set(self.param.choices) == {True, False}:
+                _widget = ParamIoWidgetCheckBox(self.param, **kwargs)
+                _widget.set_param_name(self.param.name)
+            else:
+                _widget = ParamIoWidgetComboBox(self.param, **kwargs)
         else:
             if self.param.dtype == Path:
                 _widget = ParamIoWidgetFile(self.param, **kwargs)

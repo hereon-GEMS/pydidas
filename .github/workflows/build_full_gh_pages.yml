@@ -25,71 +25,87 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.11"
-    - name: Identify trigger branch or tag
+#    - name: Identify trigger branch or tag
+#      run: |
+#        if [[ ${{ github.ref }} == refs/tags/* ]]; then
+#          echo "Triggered by a tag: ${GITHUB_REF#refs/tags/}"
+#        elif [[ ${{ github.ref }} == refs/heads/* ]]; then
+#          echo "Triggered by a branch: ${GITHUB_REF#refs/heads/}"
+#        else
+#          echo "Triggered by another ref: ${GITHUB_REF}"
+#        fi
+#      env:
+#        GITHUB_REF: ${{ github.ref }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt
+    - name: Extract version
+      id: extract_version
+      run: |
+        export QT_QPA_PLATFORM=offscreen
+        if [[ ${{ github.ref }} == refs/tags/* ]]; then
+          # need the first 'dummy' echo to set up pydidas
+          echo $(python -c "import pydidas" --no-sphinx)
+          {
+            echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
+          } >> $GITHUB_OUTPUT         
+        elif [[ ${{ github.ref }} == refs/heads/* ]]; then
+          echo "VERSION=dev" >> $GITHUB_OUTPUT
+        else
+          exit 1
+        fi
+    - name: Set stable version if a new release tag is pushed
       run: |
         if [[ ${{ github.ref }} == refs/tags/* ]]; then
-          echo "Triggered by a tag: ${GITHUB_REF#refs/tags/}"
-        elif [[ ${{ github.ref }} == refs/heads/* ]]; then
-          echo "Triggered by a branch: ${GITHUB_REF#refs/heads/}"
+          echo "{{ steps.extract_version.outputs.VERSION }}" > stable_version.txt
         else
-          echo "Triggered by another ref: ${GITHUB_REF}"
+          git checkout gh-pages-version-snapshots -- stable_version.txt
         fi
-      env:
-        GITHUB_REF: ${{ github.ref }}
-#    - name: Install dependencies
-#      run: |
-#        python -m pip install --upgrade pip
-#        python -m pip install -r requirements.txt
-#    - name: Extract version
-#      id: extract_version
-#      run: |
-#        export QT_QPA_PLATFORM=offscreen
+    - name: Sphinx build
+      run: |
+        export QT_QPA_PLATFORM=offscreen
+        sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.VERSION }}
+    - name: Create temporary branch for gh-pages-output
+      run: |
+        git checkout -b temp-gh-pages
+        git add versions/${{ steps.extract_version.outputs.VERSION }}
+        git add stable_version.txt
+        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
+    - name: Merge latest version into gh-pages-versions-snapshot
+      run: |
+        git pull origin gh-pages-version-snapshots
+        git checkout gh-pages-version-snapshots
+        git checkout temp-gh-pages -- versions/${{ steps.extract_version.outputs.VERSION }}      
+        git checkout temp-gh-pages -- stable_version.txt
+        git add versions/${{ steps.extract_version.outputs.VERSION }}
+        git add stable_version.txt
 #        if [[ ${{ github.ref }} == refs/tags/* ]]; then
-#          # need the first 'dummy' echo to set up pydidas
-#          echo $(python -c "import pydidas" --no-sphinx)
-#          {
-#            echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
-#          } >> $GITHUB_OUTPUT
-#        elif [[ ${{ github.ref }} == refs/heads/* ]]; then
-#          echo "VERSION=dev}"
-#        else
-#          exit 1
+#          rm -r versions/stable/*
+#          cp -r versions/${{ steps.extract_version.outputs.VERSION }}/* versions/stable/
 #        fi
-#    - name: Sphinx build
-#      run: |
-#        export QT_QPA_PLATFORM=offscreen
-#        sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.VERSION }}
-#    - name: Create temporary branch for gh-pages-output
-#      run: |
-#        git checkout -b temp-gh-pages
-#        git add versions/${{ steps.extract_version.outputs.VERSION }}
-#        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
-##        git push origin temp-gh-pages
-#    - name: Merge latest version into gh-pages-versions-snapshot
-#      run: |
-#        git pull origin gh-pages-version-snapshots
-#        git checkout gh-pages-version-snapshots
-#        git checkout temp-gh-pages -- versions/${{ steps.extract_version.outputs.VERSION }}
-#        git add versions/${{ steps.extract_version.outputs.VERSION }}
-#        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
-#        git push origin gh-pages-version-snapshots
-#    - name: Remove temporary branch
-#        run: |
-#            git branch -D temp-gh-pages
-#    - name: Copy full docs into _site folder
-#      run: |
-#
-#        cp -r versions/${{ steps.extract_version.outputs.VERSION }} _site
-#
-#    - name: Set permissions
-#      run: |
-#        chmod -c -R +rX "versions/" | while read line; do
-#          echo "::warning title=Invalid file permissions automatically fixed::$line"
-#        done
+        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
+        git push origin gh-pages-version-snapshots
+    - name: Remove temporary branch
+      run: |
+        git branch -D temp-gh-pages
+    - name: Copy full docs into _site folder
+      run: |
+        mkdir -p _site
+        cp -r versions _site/versions
+        export STABLE_VER=$(cat stable_version.txt)
+        cp -r versions/${STABLE_VER}/* _site/
+    - name: Set permissions
+      run: |
+        chmod -c -R +rX "versions/" | while read line; do
+          echo "::warning title=Invalid file permissions automatically fixed::$line"
+        done
+    - name: Get paths
+      run: |
+        ls -maxdepth 3 -d */
+
 #    - name: Upload Pages artifact
 #      uses: actions/upload-pages-artifact@v2
-#      with:
-#        path: versions
 #
 #  deploy_docs:
 #    needs: create_docs

@@ -10,9 +10,10 @@ name: Building gh-pages including docs for old versions.
 
 on:
   push:
-    - "release_branch_for_documentation"
-  tags:
-    - "v*"
+    branches:
+      - "release_branch_for_documentation"
+    tags:
+      - "v*"
 
 jobs:
   create_docs:

@@ -10,7 +10,7 @@ name: Github-pages dev documentation
 
 on:
   push:
-    branches: [ "master", "release_branch_for_documentation" ]
+    branches: [ "master"]
 
 jobs:
   create_docs:

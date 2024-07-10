@@ -30,16 +30,15 @@ __all__ = ["ParamIoWidgetCheckBox"]
 
 from typing import Union
 
-from qtpy import QtCore
 import qtpy as __qtpy
 
 from ...core import Parameter
-from ...core.constants import POLICY_EXP_FIX
 from ..factory import PydidasCheckBox
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
 IS_QT6 = __qtpy.QT_VERSION[0] == "6"
+
 
 class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
     """Widgets for I/O during plugin parameter editing with boolean choices."""

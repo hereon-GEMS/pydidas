@@ -136,9 +136,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         ]:
             self.param_widgets[_key].io_edited.connect(self.__update_n_image)
 
-        self.param_widgets["use_roi"].io_edited.connect(
-            self.__toggle_roi_selection
-        )
+        self.param_widgets["use_roi"].io_edited.connect(self.__toggle_roi_selection)
         self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
         self.param_widgets["hdf5_key"].io_edited.connect(self.__selected_hdf5_key)
         self.param_widgets["use_bg_file"].io_edited.connect(

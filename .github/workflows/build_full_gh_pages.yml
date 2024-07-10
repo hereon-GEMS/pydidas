@@ -78,7 +78,7 @@ jobs:
         if [[ ${{ github.ref }} == refs/tags/* ]]; then
           echo "{{ steps.extract_version.outputs.VERSION }}" > stable_version.txt
         else
-          git fetch origin gh-pages-version-snapshots
+          git fetch origin gh-pages-version-snapshots:gh-pages-version-snapshots
           git checkout gh-pages-version-snapshots -- stable_version.txt
         fi
     - name: Sphinx build

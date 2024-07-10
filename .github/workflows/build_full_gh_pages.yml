@@ -90,7 +90,7 @@ jobs:
         git commit -m "Add temporary gh-pages."
     - name: Merge latest version into gh-pages-versions-snapshot
       run: |
-#        git pull origin gh-pages-version-snapshots
+        # git pull origin gh-pages-version-snapshots
         git checkout gh-pages-version-snapshots
         git checkout temp-gh-pages -- versions/${{ steps.extract_version.outputs.VERSION }}      
         git checkout temp-gh-pages -- stable_version.txt

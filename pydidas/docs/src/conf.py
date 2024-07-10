@@ -128,7 +128,7 @@ if True:  # is_on_github_actions():
         "version_match": pydidas_version,
         "json_url": (
             "https://raw.githubusercontent.com/hereon-GEMS/pydidas/"
-            "_gh_pages_release_versions/pydata_version_switcher.json"
+            "gh-pages-version-snapshots/pydata_version_switcher.json"
         ),
     }
     html_theme_options["navbar_end"] = [

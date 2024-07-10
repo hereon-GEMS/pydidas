@@ -30,17 +30,6 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.11"
-#    - name: Identify trigger branch or tag
-#      run: |
-#        if [[ ${{ github.ref }} == refs/tags/* ]]; then
-#          echo "Triggered by a tag: ${GITHUB_REF#refs/tags/}"
-#        elif [[ ${{ github.ref }} == refs/heads/* ]]; then
-#          echo "Triggered by a branch: ${GITHUB_REF#refs/heads/}"
-#        else
-#          echo "Triggered by another ref: ${GITHUB_REF}"
-#        fi
-#      env:
-#        GITHUB_REF: ${{ github.ref }}
     - name: Set environment variable "commit-message"
       run: |
         echo "commit-message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
@@ -87,23 +76,22 @@ jobs:
         sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.VERSION }}
     - name: Create temporary branch for gh-pages-output
       run: |
-        git checkout -b temp-gh-pages
+        git checkout -b __temp-gh-pages
         git add versions/${{ steps.extract_version.outputs.VERSION }}
         git add stable_version.txt
         git commit -m "Add temporary gh-pages."
     - name: Merge latest version into gh-pages-versions-snapshot
       run: |
         git checkout gh-pages-version-snapshots
-        git checkout temp-gh-pages -- versions/${{ steps.extract_version.outputs.VERSION }}      
-        git checkout temp-gh-pages -- stable_version.txt
+        git checkout __temp-gh-pages -- versions/${{ steps.extract_version.outputs.VERSION }}      
+        git checkout __temp-gh-pages -- stable_version.txt
         git add versions/${{ steps.extract_version.outputs.VERSION }}
         git add stable_version.txt
         git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
         git push origin gh-pages-version-snapshots
     - name: Remove temporary branch
       run: |
-        git branch -D temp-gh-pages
-        git push origin --delete temp-gh-pages
+        git branch -D __temp-gh-pages
     - name: Copy full docs into _site folder
       run: |
         mkdir -p _site

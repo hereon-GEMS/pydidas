@@ -97,8 +97,9 @@ class MaskMultipleImages(ProcPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._background = None
+        self._adc_mask = False
         self._trivial = False
-        self._mask_data = []
 
     def pre_execute(self):
         """
@@ -120,6 +121,8 @@ class MaskMultipleImages(ProcPlugin):
         ):
             self._trivial = True
             return
+        else:
+            self._trivial = False
         if (
             self.get_param_value("mask_threshold_low") is not None
             and self.get_param_value("mask_threshold_high") is not None
@@ -199,17 +202,14 @@ class MaskMultipleImages(ProcPlugin):
                         _image_mask[_yhigh, slice(_xcenter, None)] = 1
             _mask_data = _mask_data - _image_mask
             _image_sum = np.where((_image_mask == 0), _image_sum + image, _image_sum)
-        _final_image = np.divide(
-            _image_sum,
-            _mask_data,
-            where=self._mask_data != 0,
-            dtype=np.float64,
-        )
-
         _final_image = np.where(
-            ~np.isfinite(_final_image),
+            _mask_data != 0,
+            np.divide(
+                _image_sum,
+                _mask_data,
+                dtype=np.float64,
+            ),
             self._background,
-            _final_image,
         )
 
         data_kwargs = (

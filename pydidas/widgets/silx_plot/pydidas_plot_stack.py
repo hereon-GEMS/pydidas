@@ -93,10 +93,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
             Any additional keywords to be passed to the plot.
         """
         _dim = data.ndim
-        print("incoming data dim", _dim)
         if _dim > 2:
             _dim = 3
-        print("final data dim", _dim)
         self._create_widget_if_required(_dim)
         self.setCurrentIndex(_dim - 1)
         _plot = getattr(self, f"_{_dim}dplot")

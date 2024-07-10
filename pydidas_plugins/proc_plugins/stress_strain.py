@@ -26,6 +26,7 @@ __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
 import numpy as np
+from enum import Enum
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
@@ -35,6 +36,17 @@ from pydidas.core import Dataset
 # TODO: d_spacing is d-spacing. Or do we want to have q in nm^-1?
 # TODO: Write
 
+
+# Define the Enum
+# 1 is close to zero
+# 2 is positive
+# 0 is negative
+class Category(Enum):
+    NEGATIVE = 0
+    ZERO = 1
+    POSITIVE = 2
+
+    
 
 
 def chi_pos_verification(ds):
@@ -586,20 +598,18 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     zero_threshold = 1e-4
 
     # Categorize the values of the first_derivative
-    # 1 is close to zero
-    # 2 is positive
-    # 0 is negative
+ 
     categories = np.zeros_like(first_derivative, dtype=int)
-    categories[first_derivative > zero_threshold] = 2
-    categories[first_derivative < -zero_threshold] = 0
+    categories[first_derivative > zero_threshold] = Category.POSITIVE
+    categories[first_derivative < -zero_threshold] = Category.NEGATIVE
     categories[
         (first_derivative >= -zero_threshold) & (first_derivative <= zero_threshold)
-    ] = 1
+    ] = Category.ZERO
 
     # Filter
     # values close to zero (categories == 1) are added to both sides of the maximum or minimum
-    mask_pos = (categories == 2) | (categories == 1)
-    mask_neg = (categories == 0) | (categories == 1)
+    mask_pos = (categories == Category.POSITIVE) | (categories == Category.ZERO)
+    mask_neg = (categories == Category.NEGATIVE) | (categories == Category.ZERO)
 
     # Advanced indexing
     # Here, s2c_labels specifies the row indices, and np.arange(s2c_num_elements) specifies the column indices.

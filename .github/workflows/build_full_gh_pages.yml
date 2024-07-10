@@ -103,6 +103,7 @@ jobs:
     - name: Remove temporary branch
       run: |
         git branch -D temp-gh-pages
+        git push origin --delete temp-gh-pages
     - name: Copy full docs into _site folder
       run: |
         mkdir -p _site
@@ -116,7 +117,8 @@ jobs:
         done
     - name: Get paths
       run: |
-        ls -maxdepth 3 -d */
+        cd _site
+        ls -d ./*/*/
 
 #    - name: Upload Pages artifact
 #      uses: actions/upload-pages-artifact@v2

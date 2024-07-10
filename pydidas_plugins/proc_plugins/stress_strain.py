@@ -37,16 +37,7 @@ from pydidas.core import Dataset
 # TODO: Write
 
 
-# Define the Enum
-# 1 is close to zero
-# 2 is positive
-# 0 is negative
-class Category(Enum):
-    NEGATIVE = 0
-    ZERO = 1
-    POSITIVE = 2
 
-    
 
 
 def chi_pos_verification(ds):
@@ -530,6 +521,14 @@ def idx_s2c_grouping(chi, tolerance=1e-4):
 
     return n_components, s2c_labels
 
+# Define the Enum
+# 1 is close to zero
+# 2 is positive
+# 0 is negative
+class Category(Enum):
+    NEGATIVE = 0
+    ZERO = 1
+    POSITIVE = 2
 
 def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     """
@@ -573,6 +572,7 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     >>> d_spacing_pos, d_spacing_neg = group_d_spacing_by_chi(d_spacing, chi)
     >>> print(d_spacing_pos, d_spacing_neg)
     """
+    
 
     if not isinstance(chi, np.ndarray):
         raise TypeError("Chi has to be of type np.ndarray")
@@ -600,16 +600,16 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     # Categorize the values of the first_derivative
  
     categories = np.zeros_like(first_derivative, dtype=int)
-    categories[first_derivative > zero_threshold] = Category.POSITIVE
-    categories[first_derivative < -zero_threshold] = Category.NEGATIVE
+    categories[first_derivative > zero_threshold] = Category.POSITIVE.value
+    categories[first_derivative < -zero_threshold] = Category.NEGATIVE.value
     categories[
         (first_derivative >= -zero_threshold) & (first_derivative <= zero_threshold)
-    ] = Category.ZERO
+    ] = Category.ZERO.value
 
     # Filter
     # values close to zero (categories == 1) are added to both sides of the maximum or minimum
-    mask_pos = (categories == Category.POSITIVE) | (categories == Category.ZERO)
-    mask_neg = (categories == Category.NEGATIVE) | (categories == Category.ZERO)
+    mask_pos = (categories == Category.POSITIVE.value) | (categories == Category.ZERO.value)
+    mask_neg = (categories == Category.NEGATIVE.value) | (categories == Category.ZERO.value)
 
     # Advanced indexing
     # Here, s2c_labels specifies the row indices, and np.arange(s2c_num_elements) specifies the column indices.

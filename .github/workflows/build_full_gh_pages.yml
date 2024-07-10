@@ -6,7 +6,7 @@
 # This workflow will check the formatting of the newly pushed commits
 # to verify that all files are corretly formatted.
 
-name: Building gh-pages including docs for old versions.
+name: Build github-pages
 
 on:
   push:
@@ -18,7 +18,9 @@ on:
 jobs:
   create_docs:
     runs-on: ubuntu-latest
-
+    env:
+      CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
+      CI_COMMIT_AUTHOR: Continuous Integration
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
@@ -36,6 +38,20 @@ jobs:
 #        fi
 #      env:
 #        GITHUB_REF: ${{ github.ref }}
+    - name: Set environment variable "commit-message"
+      run: |
+        echo "commit-message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
+        echo "commit-message=${{ env.commit-message }}"
+    - name: Set environment variable "commit-author"
+      run: |
+        echo "commit-author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
+        echo "commit-author=${{ env.commit-author }}"
+    - name: Configure local git
+      run: |
+        git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+        git config --global user.email "username@users.noreply.github.com"
+#        git config user.name github-actions
+#        git config user.email github-actions@github.com
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -80,10 +96,6 @@ jobs:
         git checkout temp-gh-pages -- stable_version.txt
         git add versions/${{ steps.extract_version.outputs.VERSION }}
         git add stable_version.txt
-#        if [[ ${{ github.ref }} == refs/tags/* ]]; then
-#          rm -r versions/stable/*
-#          cp -r versions/${{ steps.extract_version.outputs.VERSION }}/* versions/stable/
-#        fi
         git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
         git push origin gh-pages-version-snapshots
     - name: Remove temporary branch

@@ -34,6 +34,7 @@ from typing import Callable
 import numpy as np
 import pytest
 
+
 from pydidas.core import Dataset
 from pydidas_plugins.proc_plugins.stress_strain import (
     chi_pos_verification,

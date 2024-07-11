@@ -62,6 +62,7 @@ jobs:
         else
           exit 1
         fi
+        echo "~~~pwd:\n$(pwd)"
     - name: Set stable version if a new release tag is pushed
       run: |
         if [[ ${{ github.ref }} == refs/tags/* ]]; then
@@ -91,13 +92,12 @@ jobs:
         git push origin gh-pages-version-snapshots
     - name: Debugging paths
       run: |
-        echo $(git branch)
-        echo $(pwd)
-        echo $(ls)
+        echo "~~~Git branch:\n$(git branch)"
+        echo "~~~pwd:\n$(pwd)"
+        echo "~~~ls:\n$(ls)"
         cd ~
-        echo $(pwd)
-        echo $(ls)
-        echo $(ls versions)
+        echo "~~~Home pwd:\n$(pwd)"
+        echo "~~~Home ls:\n$(ls)"
     - name: Update pydata version switcher
       if: ${{ startsWith(github.ref, 'refs/tags/') }}
       run: |

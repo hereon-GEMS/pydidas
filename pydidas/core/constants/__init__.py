@@ -39,7 +39,7 @@ from .paths import *
 from .pyfai_names import *
 from .q_settings import *
 from .qt_presets import *
-from .unicode_greek_letters import *
+from .unicode_letters import *
 
 from . import image_ops
 
@@ -95,7 +95,7 @@ from . import qt_presets
 __all__.extend(qt_presets.__all__)
 del qt_presets
 
-from . import unicode_greek_letters
+from . import unicode_letters
 
-__all__.extend(unicode_greek_letters.__all__)
-del unicode_greek_letters
+__all__.extend(unicode_letters.__all__)
+del unicode_letters

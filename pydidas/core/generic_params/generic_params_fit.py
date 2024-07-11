@@ -30,7 +30,7 @@ __all__ = ["GENERIC_PARAMS_FIT"]
 
 from itertools import combinations
 
-from ..constants import GREEK_ASCII_TO_UNI
+from ..constants import ASCII_TO_UNI
 from .param_lists import FIT_OUTPUT_OPTIONS
 
 
@@ -39,7 +39,7 @@ GENERIC_PARAMS_FIT = (
         "fit_sigma_threshold": {
             "type": float,
             "default": 0.25,
-            "name": f"Fit {GREEK_ASCII_TO_UNI['sigma']} rejection threshold",
+            "name": f"Fit {ASCII_TO_UNI['sigma']} rejection threshold",
             "choices": None,
             "allow_None": False,
             "unit": "",
@@ -200,7 +200,7 @@ GENERIC_PARAMS_FIT = (
             "name": (
                 "Peak "
                 + (f"#{_num} " if _num != "" else "")
-                + f"fit {GREEK_ASCII_TO_UNI['sigma']} or {GREEK_ASCII_TO_UNI['Gamma']} "
+                + f"fit {ASCII_TO_UNI['sigma']} or {ASCII_TO_UNI['Gamma']} "
                 + "start guess"
             ),
             "choices": None,

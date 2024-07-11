@@ -1,1 +1,1 @@
-24.06.05
+{{ steps.extract_version.outputs.VERSION }}

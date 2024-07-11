@@ -123,7 +123,7 @@ html_theme_options = {
         "alt_text": "pydidas",
     },
 }
-if True:  # is_on_github_actions():
+if is_on_github_actions():
     html_theme_options["switcher"] = {
         "version_match": pydidas_version,
         "json_url": (

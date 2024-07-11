@@ -26,7 +26,7 @@ __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
 import numpy as np
-from enum import Enum
+from enum import StrEnum, IntEnum
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
@@ -37,7 +37,27 @@ from pydidas.core import Dataset
 # TODO: Write
 
 
+class Labels(StrEnum):
+    CHI = "chi"
+    POSITION = "position"
 
+    def __str__(self) -> str:
+        return self.value
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}.{self.name}({self.value!r})'
+    
+
+
+
+# Define the Enum
+# 1 is close to zero
+# 2 is positive
+# 0 is negative
+class Category(IntEnum):
+    NEGATIVE = 0
+    ZERO = 1
+    POSITIVE = 2
 
 
 def chi_pos_verification(ds):
@@ -83,7 +103,7 @@ def chi_pos_verification(ds):
     axis_labels = ds.axis_labels
 
     # Collect indices where 'chi' is found
-    chi_indices = [key for key, value in axis_labels.items() if value == "chi"]
+    chi_indices = [key for key, value in axis_labels.items() if value == Labels.CHI]
 
     # Check for multiple 'chi'
     if len(chi_indices) > 1:
@@ -240,14 +260,14 @@ def chi_pos_unit_verification(ds):
     # TODO: Currently only chi in degree is allowed. If chi [rad] has to be allowed, adjust the calculation of sin^2(chi).
     chi_units_allowed = ["deg"]
 
-    params_to_check = ["position", "chi"]
+    params_to_check = [Labels.POSITION, Labels.CHI]
 
     for item, val in ds_units.items():
         if item in params_to_check:
-            if item == "position":
+            if item == Labels.POSITION:
                 if val not in pos_units_allowed:
                     raise ValueError(f"Unit {val} not allowed for {item}.")
-            if item == "chi":
+            if item == Labels.CHI:
                 if val not in chi_units_allowed:
                     raise ValueError(f"Unit {val} not allowed for {item}.")
 
@@ -304,7 +324,7 @@ def get_param_unit_at_index(ds_units, pos_idx):
     param_info = ds_units[pos_idx]
     param_name, unit = param_info
 
-    if param_name != "position":
+    if param_name != Labels.POSITION:
         raise ValueError(f"The parameter name at pos_idx {pos_idx} is not 'position'")
 
     return param_name, unit
@@ -521,14 +541,6 @@ def idx_s2c_grouping(chi, tolerance=1e-4):
 
     return n_components, s2c_labels
 
-# Define the Enum
-# 1 is close to zero
-# 2 is positive
-# 0 is negative
-class Category(Enum):
-    NEGATIVE = 0
-    ZERO = 1
-    POSITIVE = 2
 
 def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     """
@@ -573,7 +585,6 @@ def group_d_spacing_by_chi(d_spacing, chi, tolerance=1e-4):
     >>> print(d_spacing_pos, d_spacing_neg)
     """
     
-
     if not isinstance(chi, np.ndarray):
         raise TypeError("Chi has to be of type np.ndarray")
 

@@ -27,34 +27,6 @@ sys.path.insert(0, os.path.abspath("./../../.."))
 sys.path.insert(0, os.path.abspath("./../.."))
 
 
-def is_on_github_actions():
-    """
-    Check if the current build is running on GitHub Actions.
-
-    The code is adapted  from the discussion at:
-    https://github.com/orgs/community/discussions/49224
-
-    Returns
-    -------
-    bool
-        True if the build is running on GitHub Actions, False otherwise.
-    """
-    if (
-        "CI" not in os.environ
-        or not os.environ["CI"]
-        or "GITHUB_RUN_ID" not in os.environ
-    ):
-        return False
-
-    headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
-    url = (
-        "https://api.github.com/repos/"
-        f"{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
-    )
-    response = requests.get(url, headers=headers)
-    return response.status_code == 200 and "workflow_runs" in response.json()
-
-
 # -- Project information -----------------------------------------------------
 
 project = "pydidas"
@@ -123,7 +95,7 @@ html_theme_options = {
         "alt_text": "pydidas",
     },
 }
-if is_on_github_actions():
+if os.getenv("GITHUB_ACTIONS", "false") == "true":
     html_theme_options["switcher"] = {
         "version_match": pydidas_version,
         "json_url": (

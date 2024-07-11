@@ -6,20 +6,16 @@
         "preferred": true
     },
     {
-        "name": "development (unreleased)",
-        "version": "24.06.05",
-        "url": "https://hereon-gems.github.io/pydidas/dev/"
-    },
-    {
-        "version": "24.06.05",
-        "url": "https://hereon-gems.github.io/pydidas/24.06.05/"
-    },
-    {
         "version": "24.03.25",
         "url": "https://hereon-gems.github.io/pydidas/24.03.25/"
     },
     {
         "version": "24.01.18",
         "url": "https://hereon-gems.github.io/pydidas/24.01.18/"
-    }   
+    },
+    {
+        "name": "development (unreleased)",
+        "version": "master",
+        "url": "https://hereon-gems.github.io/pydidas/dev/"
+    }
 ]

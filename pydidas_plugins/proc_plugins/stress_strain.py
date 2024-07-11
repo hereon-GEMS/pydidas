@@ -31,7 +31,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
 from pydidas.core import Dataset
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict
 
 
 # TODO: d_spacing is d-spacing. Or do we want to have q in nm^-1?
@@ -48,7 +48,17 @@ class Labels(StrEnum):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}.{self.name}({self.value!r})'
     
+class Units(StrEnum):
+    NANOMETER: str = "nm"
+    ANGSTROM: str = "A"
+    DEGREE: str = "deg"
 
+    def __str__(self) -> str:
+        return self.value
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}.{self.name}({self.value!r})'
+    
 
 
 # Define the Enum
@@ -257,9 +267,9 @@ def chi_pos_unit_verification(ds: Dataset) -> bool:
     ds_units: Dict[str, List[str]] = extract_units(ds)
 
     # position/pos contains the unit for d_spacing
-    pos_units_allowed: List[str] = ["nm", "A"]
-    # TODO: Currently only chi in degree is allowed. If chi [rad] has to be allowed, adjust the calculation of sin^2(chi).
-    chi_units_allowed: List[str] = ["deg"]
+    pos_units_allowed: List[str] = [Units.NANOMETER, Units.ANGSTROM]
+    # Only chi in degree is allowed.
+    chi_units_allowed: List[str] = [Units.DEGREE]
 
     params_to_check = [Labels.POSITION, Labels.CHI]
 

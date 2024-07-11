@@ -65,6 +65,7 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         else:
             self.stateChanged.connect(self.emit_signal)
         self.set_value(param.value)
+        self.setText(param.name)
 
     def __convert_bool(self, value: Union[int, str]) -> bool:
         """
@@ -120,18 +121,6 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         value : str
             The value to be set, "0" or "1".
         """
-        print(value)
         value = self.__convert_bool(value)
         self._old_value = value
         self.setChecked(value)
-
-    def set_param_name(self, name: str):
-        """
-        Set the name of the parameter.
-
-        Parameters
-        ----------
-        name : str
-            The name of the parameter.
-        """
-        self.setText(name)

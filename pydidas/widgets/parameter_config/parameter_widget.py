@@ -194,11 +194,12 @@ class ParameterWidget(EmptyWidget):
             "linebreak": self._config["linebreak"],
         }
         if self.param.choices:
-            if set(self.param.choices) == {True, False}:
-                _widget = ParamIoWidgetCheckBox(self.param, **kwargs)
-                _widget.set_param_name(self.param.name)
-            else:
-                _widget = ParamIoWidgetComboBox(self.param, **kwargs)
+            _class = (
+                ParamIoWidgetCheckBox
+                if set(self.param.choices) == {True, False}
+                else ParamIoWidgetComboBox
+            )
+            _widget = _class(self.param, **kwargs)
         else:
             if self.param.dtype == Path:
                 _widget = ParamIoWidgetFile(self.param, **kwargs)

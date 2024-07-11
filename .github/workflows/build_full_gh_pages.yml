@@ -89,8 +89,7 @@ jobs:
         git add stable_version.txt
         git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
         git push origin gh-pages-version-snapshots
-    - name: Update pydata version switcher
-      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    - name: Debugging paths
       run: |
         echo $(git branch)
         echo $(pwd)
@@ -98,6 +97,10 @@ jobs:
         cd ~
         echo $(pwd)
         echo $(ls)
+        echo $(ls versions)
+    - name: Update pydata version switcher
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      run: |
         python update_pydata_version_switcher.py --new-version
         git add pydata_version_switcher.json
         git commit -m "Added version ${{ steps.extract_version.outputs.VERSION }} to pydata_version_switcher.json"

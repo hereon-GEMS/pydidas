@@ -23,7 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import json
+
 import math
 import multiprocessing as mp
 import os
@@ -36,7 +36,6 @@ from pathlib import Path
 from typing import Literal, Optional
 
 import git
-import requests
 
 
 HELP_TEXT = """
@@ -46,7 +45,11 @@ Formatting checks for pydidas
 Supported python modules are:
 1. ruff `format` for automatic code re-formatting.
 2. ruff `check` for style guide checks.
-4. reuse for copyright information checking.
+3. reuse for copyright information checking.
+4. black for automatic code re-formatting.
+5. isort for automatic import sorting.
+6. flake8 for style guide checks.
+
 
 In addition, a function to update the copyright in changed files to be consistent
 with the year of the change is included.
@@ -194,36 +197,9 @@ def check_version_tags(directory: Optional[Path] = None):
     _citation_okay = f"version: {_version}" in _lines
     if not _citation_okay:
         _timed_print("The CITATION.cff does not include the latest version tag.")
-    _gh_pages_okay = __check_gh_pages_release_versions(_version)
-    if not _gh_pages_okay:
-        _timed_print(
-            "The current version is not included in the pydata version scheme for the "
-            "github pages."
-        )
-    if not (_citation_okay and _changelog_okay and _gh_pages_okay):
+    if not (_citation_okay and _changelog_okay):
         sys.exit(1)
     _timed_print("Version tag check sucessfully concluded.")
-
-
-def __check_gh_pages_release_versions(version: str):
-    """
-    Check that the current release is included in the  pydata scheme version.
-
-    Returns
-    -------
-    bool
-        True if the version is included in the pydata version scheme.
-    """
-    _config = json.loads(
-        requests.get(
-            "https://raw.githubusercontent.com/hereon-GEMS/pydidas/"
-            "_gh_pages_release_versions/pydata_version_switcher.json"
-        ).content
-    )
-    for _item in _config:
-        if version in _item["version"]:
-            return True
-    return False
 
 
 class CopyrightYearUpdater:

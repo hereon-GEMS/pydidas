@@ -6,7 +6,7 @@
 
 # pydidas
 
-![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)
+[![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://zenodo.org/records/11487652)
 
 pydidas (the Python DIffraction Data Analysis Suite) is a toolkit for
 the analysis of diffraction datasets, both live at beamlines and
@@ -25,7 +25,7 @@ the [ESRF](https://www.esrf.fr/).
 ## References
 * Please check the citation file CITATION.cff
 * Pydidas has also been issued with a global DOI for citations: 10.5281/zenodo.7568610 
-  ![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)
+  [![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://zenodo.org/records/11487652)
 
 
 ## Installation
@@ -145,7 +145,7 @@ https://hereon-gems.github.io/pydidas/
 For the full citation  information of pydidas, please see the CITATION.cff file.
 
 Pydidas can also be cited by its global DOI on zenodo: 10.5281/zenodo.7568610 
-![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)
+[![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://zenodo.org/records/11487652)
 
 
 ## License

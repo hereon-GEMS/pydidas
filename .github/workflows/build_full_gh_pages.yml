@@ -74,7 +74,7 @@ jobs:
       id: check_version_tag
       if: ${{ startsWith(github.ref, 'refs/tags/') }}
       run: |
-        if [[ ${{ steps.extract_version.outputs.THIS_VERSION }} == ${{ steps.fetch_stable_version.outputs.STABLE_VERSION ]]; then
+        if [[ ${{ steps.extract_version.outputs.THIS_VERSION }} == ${{ steps.fetch_stable_version.outputs.STABLE_VERSION }} ]]; then
           echo "The pydidas.version for the new git tag is the same as the stable version. Please update the version in pydidas" >> $GITHUB_STEP_SUMMARY
           exit 1
         fi

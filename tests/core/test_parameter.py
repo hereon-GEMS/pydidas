@@ -355,7 +355,7 @@ class TestParameter(unittest.TestCase):
     def test_dump(self):
         for _type, _val in TYPES_AND_VALS:
             _ret_type = (
-                Integral if _type == int else (Real if _type == float else _type)
+                Integral if _type is int else (Real if _type is float else _type)
             )
             with self.subTest(datatype=_type, value=_val):
                 obj = Parameter("Test0", _type, _val)

@@ -171,7 +171,7 @@ class TestTiffIo(unittest.TestCase):
 
     def test_export_to_file__1282bit_float(self):
         _fname = self._path.joinpath(self.get_fname())
-        _raw = (np.random.random((11, 12, 13))).astype(np.longfloat)
+        _raw = (np.random.random((11, 12, 13))).astype(np.longdouble)
         TiffIo.export_to_file(_fname, _raw)
         _data = TiffIo.import_from_file(_fname)
         self.assertTrue(np.allclose(_data, _raw))

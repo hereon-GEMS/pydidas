@@ -68,7 +68,7 @@ jobs:
       run: |
         git fetch origin gh-pages-version-snapshots:gh-pages-version-snapshots
         git checkout gh-pages-version-snapshots -- stable_version.txt
-        echo "STABLE_VERSION=$(cat stable_version.txt)$" >> $GITHUB_OUTPUT
+        echo "STABLE_VERSION=$(cat stable_version.txt)" >> $GITHUB_OUTPUT
         rm stable_version.txt
     - name: Verify tagged version has a new version tag
       id: check_version_tag

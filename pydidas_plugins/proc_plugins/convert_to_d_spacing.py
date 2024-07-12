@@ -31,7 +31,12 @@ __all__ = ["ConvertToDSpacing"]
 import numpy as np
 
 from pydidas.contexts import DiffractionExperimentContext
-from pydidas.core import Dataset, get_generic_param_collection, get_generic_parameter
+from pydidas.core import (
+    Dataset,
+    UserConfigError,
+    get_generic_param_collection,
+    get_generic_parameter,
+)
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.plugins import ProcPlugin
 
@@ -39,6 +44,9 @@ from pydidas.plugins import ProcPlugin
 class ConvertToDSpacing(ProcPlugin):
     """
     Convert Q, r or 2θ data from an integration plugin to d-spacing.
+
+    NOTE: this plugin must be used immediately after an integration plugin
+    to assert that the input data is in the correct format.
 
     WARNING: pydidas is not yet capable of displaying non-uniform data.
     """
@@ -58,6 +66,8 @@ class ConvertToDSpacing(ProcPlugin):
     def pre_execute(self):
         self._lambda = self._EXP.get_param_value("xray_wavelength")
         self._detector_dist = self._EXP.get_param_value("detector_dist")
+        self._allowed_ax_choices = get_generic_parameter("rad_unit").choices
+        self._config["ax_index"] = None
 
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -75,33 +85,40 @@ class ConvertToDSpacing(ProcPlugin):
             kwargs : dict
                 Any calling kwargs, appended by any changes in the function.
         """
-        for axis, label in data.axis_labels.items():
-            if (
-                f"{label} / {data.axis_units[axis]}"
-                in get_generic_parameter("rad_unit").choices
-            ):
-                _range = data.axis_ranges[axis]
-                match label:
-                    case "Q":
-                        if data.axis_units[axis] == "nm^-1":
-                            _range = _range / 10
-                        _range = (2 * np.pi) / _range
-                    case "r":
-                        _range = self._lambda / (
-                            2
-                            * np.sin(
-                                np.arctan(_range / (self._detector_dist * 1e3)) / 2
-                            )
-                        )
-                    case "2theta":
-                        if data.axis_units[axis] == "deg":
-                            _range = np.radians(_range)
-                        _range = self._lambda / (2 * np.sin(_range / 2))
-                if self.get_param_value("d_spacing_unit") == "nm":
-                    _range /= 10
-                    data.update_axis_unit(axis, "nm")
-                else:
-                    data.update_axis_unit(axis, "A")
-                data.update_axis_range(axis, _range)
-                data.update_axis_label(axis, "d-spacing")
+        if self._config["ax_index"] is None:
+            self._set_ax_index(data)
+        _axis = self._config["ax_index"]
+        _range = data.axis_ranges[_axis]
+        match data.axis_labels[_axis]:
+            case "Q":
+                if data.axis_units[_axis] == "nm^-1":
+                    _range = _range / 10
+                _range = (2 * np.pi) / _range
+            case "r":
+                _range = self._lambda / (
+                    2 * np.sin(np.arctan(_range / (self._detector_dist * 1e3)) / 2)
+                )
+            case "2theta":
+                if data.axis_units[_axis] == "deg":
+                    _range = np.radians(_range)
+                _range = self._lambda / (2 * np.sin(_range / 2))
+        if self.get_param_value("d_spacing_unit") == "nm":
+            _range /= 10
+            data.update_axis_unit(_axis, "nm")
+        else:
+            data.update_axis_unit(_axis, "A")
+        data.update_axis_range(_axis, _range)
+        data.update_axis_label(_axis, "d-spacing")
         return data, kwargs
+
+    def _set_ax_index(self, data: Dataset):
+        for axis, label in data.axis_labels.items():
+            if f"{label} / {data.axis_units[axis]}" in self._allowed_ax_choices:
+                self._config["ax_index"] = axis
+                return
+        raise UserConfigError(
+            "Could not find a suitable axis to convert to d-spacing. "
+            "Please check the input data.\n\n"
+            "This plugin must be used immediately after an integration plugin "
+            "to assert that the input data is in the correct format."
+        )

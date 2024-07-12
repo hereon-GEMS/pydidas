@@ -29,7 +29,8 @@ import unittest
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.core import Dataset
+from pydidas.contexts import DiffractionExperiment
+from pydidas.core import Dataset, UserConfigError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
@@ -42,6 +43,10 @@ class TestConvertToDSpacing(unittest.TestCase):
     def setUpClass(cls):
         cls._lambda = 1.3
         cls._detector_distance = 1.6
+        cls._EXP = DiffractionExperiment()
+        cls._EXP.set_param_values(
+            xray_wavelength=cls._lambda, detector_dist=cls._detector_distance
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -49,8 +54,8 @@ class TestConvertToDSpacing(unittest.TestCase):
         qs.remove("unittesting")
 
     def setUp(self):
-        self._data = Dataset(np.ones(8))
-        self._data.update_axis_range(0, (0, 10, 25, 325, -5, 2, 10000, 1e6))
+        self._data = Dataset(np.ones(7))
+        self._data.update_axis_range(0, (0, 10, 25, 325, 2, 10000, 1e6))
         self._ref_q = (2 * np.pi) / self._data.axis_ranges[0]
         self._ref_r = self._lambda / (
             2
@@ -64,32 +69,40 @@ class TestConvertToDSpacing(unittest.TestCase):
         )
         self._ref_trad = self._lambda / (2 * np.sin(self._data.axis_ranges[0] / 2))
 
+    def get_standard_plugin(self):
+        return PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")(
+            diffraction_exp=self._EXP
+        )
+
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")()
+        plugin = self.get_standard_plugin()
         self.assertIsInstance(plugin, BasePlugin)
 
-    def test__execute_qnm(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")()
+    def test_execute__q_in_nm(self):
+        plugin = self.get_standard_plugin()
         self._data.update_axis_label(0, "Q")
         self._data.update_axis_unit(0, "nm^-1")
+        plugin.pre_execute()
         _result, _kwargs = plugin.execute(self._data)
         self.assertEqual(_result.axis_labels[0], "d-spacing")
         self.assertEqual(_result.axis_units[0], "A")
         self.assertTrue(np.allclose(_result.axis_ranges[0], self._ref_q * 10))
 
-    def test__execute_qna(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")()
+    def test_execute__q_in_a(self):
+        plugin = self.get_standard_plugin()
         self._data.update_axis_label(0, "Q")
         self._data.update_axis_unit(0, "A^-1")
+        plugin.pre_execute()
         _result, _kwargs = plugin.execute(self._data)
         self.assertEqual(_result.axis_labels[0], "d-spacing")
         self.assertEqual(_result.axis_units[0], "A")
         self.assertTrue(np.allclose(_result.axis_ranges[0], self._ref_q))
 
-    def test__execute_rmm(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")()
+    def test_execute__r_mm(self):
+        plugin = self.get_standard_plugin()
         self._data.update_axis_label(0, "r")
         self._data.update_axis_unit(0, "mm")
+        plugin.pre_execute()
         plugin._lambda = self._lambda
         plugin._detector_dist = self._detector_distance
         _result, _kwargs = plugin.execute(self._data)
@@ -97,32 +110,41 @@ class TestConvertToDSpacing(unittest.TestCase):
         self.assertEqual(_result.axis_units[0], "A")
         self.assertTrue(np.allclose(_result.axis_ranges[0], self._ref_r))
 
-    def test__execute_tdeg(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")()
+    def test_execute__2theta_in_deg(self):
+        plugin = self.get_standard_plugin()
         self._data.update_axis_label(0, "2theta")
         self._data.update_axis_unit(0, "deg")
+        plugin.pre_execute()
         plugin._lambda = self._lambda
         _result, _kwargs = plugin.execute(self._data)
         self.assertEqual(_result.axis_labels[0], "d-spacing")
         self.assertEqual(_result.axis_units[0], "A")
         self.assertTrue(np.allclose(_result.axis_ranges[0], self._ref_tdeg))
 
-    def test__execute_trad(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")()
+    def test_execute__2theta_in_rad(self):
+        plugin = self.get_standard_plugin()
         self._data.update_axis_label(0, "2theta")
         self._data.update_axis_unit(0, "rad")
+        plugin.pre_execute()
         plugin._lambda = self._lambda
         _result, _kwargs = plugin.execute(self._data)
         self.assertEqual(_result.axis_labels[0], "d-spacing")
         self.assertEqual(_result.axis_units[0], "A")
         self.assertTrue(np.allclose(_result.axis_ranges[0], self._ref_trad))
 
-    def test__execute_output_nm(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")()
+    def test_execute__output_in_nm(self):
+        plugin = self.get_standard_plugin()
         plugin.set_param_value("d_spacing_unit", "nm")
         self._data.update_axis_label(0, "Q")
         self._data.update_axis_unit(0, "nm^-1")
+        plugin.pre_execute()
         _result, _kwargs = plugin.execute(self._data)
         self.assertEqual(_result.axis_labels[0], "d-spacing")
         self.assertEqual(_result.axis_units[0], "nm")
         self.assertTrue(np.allclose(_result.axis_ranges[0], self._ref_q))
+
+    def test_execute__missing_axis_label(self):
+        plugin = self.get_standard_plugin()
+        plugin.pre_execute()
+        with self.assertRaises(UserConfigError):
+            plugin.execute(self._data)

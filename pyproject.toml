@@ -60,7 +60,7 @@ dependencies = [
     "hdf5plugin>=4.4.0",
     "pyyaml>=6.0",
     "requests>=2.31.0",
-    "PyQt5==5.15.10",
+    "PyQt5>=5.15",
     "build>=1.0.3",
     "setuptools>69.0.0"
 ]

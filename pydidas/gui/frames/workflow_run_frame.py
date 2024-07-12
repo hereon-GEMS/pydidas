@@ -49,7 +49,7 @@ logger = pydidas_logger()
 
 class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     """
-    A widget for running the ExecuteWorkflowApp  and visualizing the results.
+    A widget for running the ExecuteWorkflowApp and visualizing the results.
     """
 
     menu_icon = "qta::msc.run-all"

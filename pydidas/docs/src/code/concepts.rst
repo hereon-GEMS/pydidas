@@ -69,7 +69,7 @@ Parallelization
 ^^^^^^^^^^^^^^^ 
 
 pydidas includes functionality for parallel processing of applications 
-(or functions). The  :py:mod:`multiprocessing <pydidas.multiprocessing>` 
+(or functions). The :py:mod:`multiprocessing <pydidas.multiprocessing>`
 sub-package includes the required functionality. Results can be received using 
 the PyQt5 signal/slot mechanism.
 

@@ -527,7 +527,7 @@ class Dataset(ndarray):
         if len(self._meta[key]) != self.ndim:
             warnings.warn(
                 f"The number of {key.replace('_', ' ')} entries "
-                f"does not match the number of  dimensions of the Dataset. "
+                f"does not match the number of dimensions of the Dataset. "
                 f"Resetting the{key}."
             )
             self._meta[key] = {

@@ -131,7 +131,7 @@ def get_time_string(epoch: Union[float, None] = None, human_output: bool = True)
         system time will be used. The default is None.
 
     human_output : bool, optional
-        Keyword to control special  separation characters. If True, the
+        Keyword to control special separation characters. If True, the
         output will be human-readable friendly (with special sep. chars).
         If False, only a "_" will be included between the date and time.
         The default is True.

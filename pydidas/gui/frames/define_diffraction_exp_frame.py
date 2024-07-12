@@ -68,7 +68,7 @@ class DefineDiffractionExpFrame(BaseFrame):
     """
 
     menu_icon = "pydidas::frame_icon_define_diffraction_exp.png"
-    menu_title = "Define Diffraction setup"
+    menu_title = "Define diffraction setup"
     menu_entry = "Workflow processing/Define diffraction setup"
 
     def __init__(self, **kwargs: dict):

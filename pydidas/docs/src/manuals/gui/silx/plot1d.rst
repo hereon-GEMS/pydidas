@@ -13,7 +13,7 @@ subclassed `silx Plot1d
 with additional features useful in pydidas.
 
 .. image:: ../silx/images/standard_plot1d.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 - The menu

@@ -75,7 +75,7 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
 
     This function will also overload the generic tasks and add an CropHistogramOutlier
     action to the toolbars and change the default file dialog to use the pydidas
-    file  dialog.
+    file dialog.
 
     Returns
     -------

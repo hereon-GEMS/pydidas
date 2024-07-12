@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ opening pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -41,13 +41,13 @@ _GENERIC_INTRO = (
     "- The pydidas GUI is organized in 'frames' with individual functionalities.\n"
     "- The help is available as webpages either through the menu or by pressing 'F1'\n"
     "  to open the specific help for the current frame directly.\n"
-    "- The configuration and inputs can be stored and restored using the File->GUI\n"
-    "  state menu entries."
+    "- The configuration and inputs can be stored and restored using the\n"
+    "  File->GUI state menu entries."
 )
 
 _TOOOLBAR_USER_TEXT = (
     "Use the menu toolbar on the left to switch between different frames. Some menu "
-    "toolbars will open an additional submenu on  the left. The active frame is "
+    "toolbars will open an additional submenu on the left. The active frame is "
     "highlighted."
 )
 
@@ -61,12 +61,12 @@ _HELP_TEXT = (
 _PROC_SETUP_TEXT = (
     "Setting up a processing job requires three different object to be set: "
     "\n  1. The experimental setup. This includes values such as the beamline "
-    "energy, \n      detector and detector geometry. \n      "
-    "It is modified in the 'Workflow processing'->'Experimental Setup' frame."
+    "energy,\n      detector and detector geometry.\n      "
+    "It is modified in the 'Workflow processing'->'Define diffraction setup' frame."
     "\n  2. The scan setup. This includes the number of scan dimensions and "
     "number\n      of scan points per dimension."
     "\n  3. The processing workflow. The workflow must includes all the "
-    "plugins \n      which should be executed."
+    "plugins\n      which should be executed."
     "\n\nEach object has its own dedicated setup frame with importers and "
     "exporters for the various supported formats."
 )
@@ -75,10 +75,10 @@ _processing_recipe_link = DOC_HOME_ADDRESS.replace(
     "index.html", "/manuals/gui/recipes/pydidas_processing.html"
 )
 _PROC_TEXT = (
-    "The processing can be started for a single datapoint using the 'Test Workflow' "
-    "frame (in the 'Workflow Processing' submenu). The test also allows to view all "
+    "The processing can be started for a single datapoint using the 'Test workflow' "
+    "frame (in the 'Workflow processing' submenu). The test also allows to view all "
     "intermediate results.<br>"
-    "The full automatic processing can be started using the 'Run Full Processing' "
+    "The full automatic processing can be started using the 'Run full workflow' "
     "frame. It will run in separate processes and the GUI will stay responsive. <br>"
     "Results can be visualized on the fly while the processing is still running by "
     "selecting the desired node and axes.<br>"

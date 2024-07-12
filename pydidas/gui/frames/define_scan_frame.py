@@ -69,7 +69,7 @@ class DefineScanFrame(BaseFrame):
     """
 
     menu_icon = "pydidas::frame_icon_define_scan.png"
-    menu_title = "Define\nScan"
+    menu_title = "Define\nscan"
     menu_entry = "Workflow processing/Define scan"
 
     def __init__(self, **kwargs: dict):

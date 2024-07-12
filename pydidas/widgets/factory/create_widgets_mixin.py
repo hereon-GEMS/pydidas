@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ add convenience widget creation methods to other classes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -216,7 +216,7 @@ class CreateWidgetsMixIn:
             Any attributes supported by QCheckBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the QProgressBar's position in its parent's layout.
-            The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
+            The 'fontsize_offset', 'bold', 'italic', 'underline' can be used
             to control the font properties or generic Qt properties.
         """
         self.create_any_widget(ref, PydidasCheckBox, text, **kwargs)
@@ -233,7 +233,7 @@ class CreateWidgetsMixIn:
             Any attributes supported by QComboBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the QComboBox's position in its parent's layout.
-            The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
+            The 'fontsize_offset', 'bold', 'italic', 'underline' can be used
             to control the font properties or generic Qt properties.
         """
         self.create_any_widget(ref, PydidasComboBox, **kwargs)
@@ -254,7 +254,7 @@ class CreateWidgetsMixIn:
             Any attributes supported by the generic QWidget with a setAttribute
             method are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the RadioButtonGroup's position in its parent's layout.
-            The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
+            The 'fontsize_offset', 'bold', 'italic', 'underline' can be used
             to control the font properties or generic Qt properties.
             The 'entries' keyword takes a list of entries for the buttons and the
             number of rows and columns can be specified with the 'rows' and

@@ -535,7 +535,7 @@ the input data:
     axis_labels: {
         0: 'x'},
     axis_ranges: {
-        0: array([ 0,  5, 10, 15, 20])},
+        0: array([ 0, 5, 10, 15, 20])},
     axis_units: {
         0: 'px'},
     metadata: {},

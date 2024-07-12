@@ -51,9 +51,9 @@ PYDIDAS_INFO = (
     "more permissive licenses and copyrighted by their respective "
     "owners (particularly the ESRF for pyFAI and silx)."
     "<br><br>pydidas Copyright 2024, Helmholtz-Zentrum Hereon"
-    "<br><br>pydidas Homepage: "
+    "<br><br>pydidas homepage: "
     "<a href='https://pydidas.hereon.de/index.php.en'>pydidas.hereon.de</a>"
-    "<br><br>pydidas github: "
+    "<br><br>pydidas GitHub: "
     "<a href='https://github.com/hereon-GEMS/pydidas'>pydidas@github</a>"
 )
 

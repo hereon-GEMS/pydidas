@@ -96,24 +96,28 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def __init__(self, ds:Dataset):
         self.ds = ds
         self._config["s2c_group_labels"] = None
+        
+        
+        self._chi_key = None
+        self._pos_key = None
+        self._pos_idx = None
     
     
     def pre_execute(self):
-        
-        _chi_key, (_pos_key, _pos_idx) = _chi_pos_verification(self.ds)
-        
-        
-        
         pass
+        #self._chi_key, (self._pos_key, self._pos_idx) = self._chi_pos_verification(ds)
+        
+        
     
     def execute(self):
         
+        chi_key, (pos_key, pos_idx) = self._chi_pos_verification(ds)
         chi, d_spacing = self._ds_slicing(ds) 
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
         d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
         
-        pass
+        
     
     
     def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:

@@ -45,6 +45,7 @@ jobs:
         git config pull.ff true
     - name: Install dependencies
       run: |
+        python -m pip cache purge
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
     - name: Extract version
@@ -55,17 +56,32 @@ jobs:
           # need the first 'dummy' echo to set up pydidas
           echo $(python -c "import pydidas" --no-sphinx)
           {
-            echo $(python -c "from pydidas import VERSION; print(f'VERSION={VERSION}')" --no-sphinx)
-          } >> $GITHUB_OUTPUT         
+            echo $(python -c "from pydidas import VERSION; print(f'THIS_VERSION={VERSION}')" --no-sphinx)
+          } >> $GITHUB_OUTPUT
         elif [[ ${{ github.ref }} == refs/heads/* ]]; then
-          echo "VERSION=dev" >> $GITHUB_OUTPUT
+          echo "THIS_VERSION=dev" >> $GITHUB_OUTPUT
         else
+          exit 1
+        fi
+    - name: Fetch stable_version
+      id: fetch_stable_version
+      run: |
+        git fetch origin gh-pages-version-snapshots:gh-pages-version-snapshots
+        git checkout gh-pages-version-snapshots -- stable_version.txt
+        echo "STABLE_VERSION=$(cat stable_version.txt)$ >> $GITHUB_OUTPUT
+        rm stable_version.txt
+    - name: Verify tagged version has a new version tag
+      id: check_version_tag
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      run: |
+        if [[ ${{ steps.extract_version.outputs.THIS_VERSION }} == ${{ steps.fetch_stable_version.outputs.STABLE_VERSION ]]; then
+          echo "The pydidas.version for the new git tag is the same as the stable version. Please update the version in pydidas" >> $GITHUB_STEP_SUMMARY
           exit 1
         fi
     - name: Set stable version if a new release tag is pushed
       run: |
         if [[ ${{ github.ref }} == refs/tags/* ]]; then
-          echo "${{ steps.extract_version.outputs.VERSION }}" > stable_version.txt
+          echo "${{ steps.extract_version.outputs.THIS_VERSION }}" > stable_version.txt
         else
           git fetch origin gh-pages-version-snapshots:gh-pages-version-snapshots
           git checkout gh-pages-version-snapshots -- stable_version.txt
@@ -73,34 +89,28 @@ jobs:
     - name: Sphinx build
       run: |
         export QT_QPA_PLATFORM=offscreen
-        sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.VERSION }}
+        sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.THIS_VERSION }}
     - name: Create temporary branch for gh-pages-output
       run: |
         git checkout -b __temp-gh-pages
-        git add versions/${{ steps.extract_version.outputs.VERSION }}
+        git add versions/${{ steps.extract_version.outputs.THIS_VERSION }}
         git add stable_version.txt
         git commit -m "Add temporary gh-pages."
     - name: Merge latest version into gh-pages-versions-snapshot
       run: |
         git checkout gh-pages-version-snapshots
-        git checkout __temp-gh-pages -- versions/${{ steps.extract_version.outputs.VERSION }}      
+        git checkout __temp-gh-pages -- versions/${{ steps.extract_version.outputs.THIS_VERSION }}      
         git checkout __temp-gh-pages -- stable_version.txt
-        git add versions/${{ steps.extract_version.outputs.VERSION }}
+        git add versions/${{ steps.extract_version.outputs.THIS_VERSION }}
         git add stable_version.txt
-        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.VERSION }}"
+        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.THIS_VERSION }}"
         git push origin gh-pages-version-snapshots
-    - name: Debugging paths
-      run: |
-        echo "~~~Git branch:\n$(git branch)"
-        echo "~~~pwd:\n$(pwd)"
-        echo "~~~ls:\n$(ls)"
-        echo "~~~Home ls:\n$(ls ~)"
     - name: Update pydata version switcher
       if: ${{ startsWith(github.ref, 'refs/tags/') }}
       run: |
         python update_pydata_version_switcher.py --new-version
         git add pydata_version_switcher.json
-        git commit -m "Added version ${{ steps.extract_version.outputs.VERSION }} to pydata_version_switcher.json"
+        git commit -m "Added version ${{ steps.extract_version.outputs.THIS_VERSION }} to pydata_version_switcher.json"
         git push origin gh-pages-version-snapshots
     - name: Remove temporary branch
       run: |

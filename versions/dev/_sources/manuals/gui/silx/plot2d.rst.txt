@@ -7,9 +7,9 @@
 Pydidas 2D plot
 ^^^^^^^^^^^^^^^
 
-.. include:: ./plot2d_general.rst
+.. include:: ../silx/plot2d_general.rst
 
 menu entries description
 """"""""""""""""""""""""
 
-.. include:: ./plot2d_icons.rst
+.. include:: ../silx/plot2d_icons.rst

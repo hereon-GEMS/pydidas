@@ -34,7 +34,7 @@ changelog = "https://github.com/hereon-GEMS/pydidas/blob/master/CHANGELOG.md"
 [tool.setuptools.dynamic]
 version = { attr = "pydidas.version.VERSION" }
 dependencies = { file = ["requirements.txt"]}
-optional-dependencies = { file = ["requirements_dev.txt"]}
+optional-dependencies.dev = { file = ["requirements_dev.txt"]}
 
 [tool.setuptools]
 packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]

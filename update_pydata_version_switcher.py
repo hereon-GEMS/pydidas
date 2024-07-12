@@ -49,12 +49,14 @@ for _item in _json_content:
 
 _new_item = None
 for _item in _json_content:
-    if _item.get("name", "None") == "latest release":
+    if _item.get("name", "None").startswith("latest release"):
         _new_item = {
             "version": _item["version"],
-            "url": _item["url"].replace("stable", _item["version"]),
+            "url": _item["url"],
         }
+        _item["url"] = _item["url"].replace(_item["version"], _current_version)
         _item["version"] = _current_version
+        _item["name"] = f"latest release ({_current_version})"
         _json_content.insert(1, _new_item)
         break
 

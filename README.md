@@ -64,7 +64,7 @@ following command:
 #### Using the source code directly
 
 Download the pydidas source code or clone the git repository and navigate to the
-folder with the project metadata files (like this README.rst). Then, install
+folder with the project metadata files (like this README.md). Then, install
 the package and any missing dependencies:
 
     python -m pip install .

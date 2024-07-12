@@ -14,6 +14,10 @@ Improvements
 - Added type-checking for Datasets axis_ranges and axis_units.  
 - Added mean, sum, min, max methods to Dataset to keep metadata consistent.
 - Added reshape metadata handling to Dataset.
+- Added a new plugin to convert pyFAI integration results to d-spacing.
+- Added check boxes for Parameters with only True/False choices.
+- Improved the documentation for GitHub pages which now includes documentation
+  for older versions.
 
 Bugfixes
 --------
@@ -25,7 +29,8 @@ Bugfixes
 - Fixed an issue in Dataset's flatten implementation.
 - Fixed an issue with restoring the UI after the number of screens was reduced.  
 - Fixed an issue in Dataset's reshape after using np.array with ndmin parameter.
-
+- Fixed an issue when deleting the root WorkflowNode with multiple children.
+- Fixed inconsistencies in plugin docstrings.
 
 v24.06.05
 =========

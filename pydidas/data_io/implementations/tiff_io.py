@@ -111,7 +111,7 @@ class TiffIo(IoBase):
         cls.check_for_existing_file(filename, **kwargs)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            if data.dtype.type in [np.float64, np.float_, np.longdouble]:
+            if data.dtype.type in [np.float64, np.longdouble]:
                 imsave(filename, data.astype(np.float32))
             else:
                 imsave(filename, data)

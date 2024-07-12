@@ -1,0 +1,147 @@
+# This file is part of pydidas.
+#
+# Copyright 2024, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# This workflow will check the formatting of the newly pushed commits
+# to verify that all files are corretly formatted.
+
+name: Build GitHub-pages
+
+on:
+  push:
+    branches:
+      - "master"
+    tags:
+      - "v*"
+
+jobs:
+  create_docs:
+    runs-on: ubuntu-latest
+    env:
+      CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
+      CI_COMMIT_AUTHOR: Continuous Integration
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Set environment variable "commit-message"
+      run: |
+        echo "commit-message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
+        echo "commit-message=${{ env.commit-message }}"
+    - name: Set environment variable "commit-author"
+      run: |
+        echo "commit-author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
+        echo "commit-author=${{ env.commit-author }}"
+    - name: Configure local git
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git config pull.ff true
+    - name: Install dependencies
+      run: |
+        python -m pip cache purge
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt
+    - name: Extract version
+      id: extract_version
+      run: |
+        export QT_QPA_PLATFORM=offscreen
+        if [[ ${{ github.ref }} == refs/tags/* ]]; then
+          # need the first 'dummy' echo to set up pydidas
+          echo $(python -c "import pydidas" --no-sphinx)
+          {
+            echo $(python -c "from pydidas import VERSION; print(f'THIS_VERSION={VERSION}')" --no-sphinx)
+          } >> $GITHUB_OUTPUT
+        elif [[ ${{ github.ref }} == refs/heads/* ]]; then
+          echo "THIS_VERSION=dev" >> $GITHUB_OUTPUT
+        else
+          exit 1
+        fi
+    - name: Fetch stable_version
+      id: fetch_stable_version
+      run: |
+        git fetch origin gh-pages-version-snapshots:gh-pages-version-snapshots
+        git checkout gh-pages-version-snapshots -- stable_version.txt
+        echo "STABLE_VERSION=$(cat stable_version.txt)" >> $GITHUB_OUTPUT
+        rm stable_version.txt
+    - name: Verify tagged version has a new version tag
+      id: check_version_tag
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      run: |
+        if [[ ${{ steps.extract_version.outputs.THIS_VERSION }} == ${{ steps.fetch_stable_version.outputs.STABLE_VERSION }} ]]; then
+          echo "The pydidas.version for the new git tag is the same as the stable version. Please update the version in pydidas" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+    - name: Set stable version if a new release tag is pushed
+      run: |
+        if [[ ${{ github.ref }} == refs/tags/* ]]; then
+          echo "${{ steps.extract_version.outputs.THIS_VERSION }}" > stable_version.txt
+        else
+          git fetch origin gh-pages-version-snapshots:gh-pages-version-snapshots
+          git checkout gh-pages-version-snapshots -- stable_version.txt
+        fi
+    - name: Sphinx build
+      run: |
+        export QT_QPA_PLATFORM=offscreen
+        sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.THIS_VERSION }}
+    - name: Create temporary branch for gh-pages-output
+      run: |
+        git checkout -b __temp-gh-pages
+        git add versions/${{ steps.extract_version.outputs.THIS_VERSION }}
+        git add stable_version.txt
+        git commit -m "Add temporary gh-pages."
+    - name: Merge latest version into gh-pages-versions-snapshot
+      run: |
+        git checkout gh-pages-version-snapshots
+        git checkout __temp-gh-pages -- versions/${{ steps.extract_version.outputs.THIS_VERSION }}      
+        git checkout __temp-gh-pages -- stable_version.txt
+        git add versions/${{ steps.extract_version.outputs.THIS_VERSION }}
+        git add stable_version.txt
+        git commit -m "Add gh-pages for version ${{ steps.extract_version.outputs.THIS_VERSION }}"
+        git push origin gh-pages-version-snapshots
+    - name: Update pydata version switcher
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      run: |
+        python update_pydata_version_switcher.py --new-version
+        git add pydata_version_switcher.json
+        git commit -m "Added version ${{ steps.extract_version.outputs.THIS_VERSION }} to pydata_version_switcher.json"
+        git push origin gh-pages-version-snapshots
+    - name: Remove temporary branch
+      run: |
+        git branch -D __temp-gh-pages
+    - name: Copy full docs into _site folder
+      run: |
+        mkdir -p _site
+        cp -r versions _site/versions
+        export STABLE_VER=$(cat stable_version.txt)
+        cp -r versions/${STABLE_VER}/* _site/
+    - name: Set permissions
+      run: |
+        chmod -c -R +rX "versions/" | while read line; do
+          echo "::warning title=Invalid file permissions automatically fixed::$line"
+        done
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v2
+
+  deploy_docs:
+    needs: create_docs
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: _site
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to Github Pages
+      id: deployment
+      uses: actions/deploy-pages@v3

@@ -20,12 +20,9 @@ build/*
 *egg*
 .coverage
 htmlcov
-<<<<<<< HEAD
 coverage_html_report
 .ruff_cache/*
-=======
 pydidas/docs/src/dev_guide/generic_params.rst
->>>>>>> a395183d (Added dynamically created page for generic parameters)
 
 # logging
 *.log

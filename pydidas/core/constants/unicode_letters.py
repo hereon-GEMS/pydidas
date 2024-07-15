@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 
 """
-The unicode_greek_letters module holds dictionaries to convert unicode Greek
+The unicode_letters module holds dictionaries to convert unicode
 letters to their ASCII names and vice versa.
 """
 
@@ -24,10 +24,10 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["GREEK_UNI_TO_ASCII", "GREEK_ASCII_TO_UNI"]
+__all__ = ["UNI_TO_ASCII", "ASCII_TO_UNI"]
 
 
-GREEK_UNI_TO_ASCII = {
+UNI_TO_ASCII = {
     "\u0391": "Alpha",
     "\u0392": "Beta",
     "\u0393": "Gamma",
@@ -77,7 +77,8 @@ GREEK_UNI_TO_ASCII = {
     "\u03c8": "psi",
     "\u03c9": "omega",
     "\u03b7": "eta",
+    "\u00c5": "Angstrom",
 }
 
 
-GREEK_ASCII_TO_UNI = dict(zip(GREEK_UNI_TO_ASCII.values(), GREEK_UNI_TO_ASCII.keys()))
+ASCII_TO_UNI = dict(zip(UNI_TO_ASCII.values(), UNI_TO_ASCII.keys()))

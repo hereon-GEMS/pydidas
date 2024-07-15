@@ -41,7 +41,7 @@ from silx.opencl.common import OpenCL
 from ..contexts import DiffractionExperimentContext
 from ..core import UserConfigError, get_generic_param_collection
 from ..core.constants import (
-    GREEK_ASCII_TO_UNI,
+    ASCII_TO_UNI,
     PROC_PLUGIN,
     PROC_PLUGIN_IMAGE,
     pyFAI_METHOD,
@@ -58,7 +58,7 @@ logger = pydidas_logger()
 
 OCL = OpenCL()
 
-PI_STR = GREEK_ASCII_TO_UNI["pi"]
+PI_STR = ASCII_TO_UNI["pi"]
 
 
 class pyFAIintegrationBase(ProcPlugin):

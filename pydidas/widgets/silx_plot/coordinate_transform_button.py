@@ -35,12 +35,12 @@ from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from ...contexts import DiffractionExperimentContext
 from ...core import UserConfigError
-from ...core.constants import GREEK_ASCII_TO_UNI
+from ...core.constants import ASCII_TO_UNI
 from ...resources import icons
 
 
-THETA = GREEK_ASCII_TO_UNI["theta"]
-CHI = GREEK_ASCII_TO_UNI["chi"]
+THETA = ASCII_TO_UNI["theta"]
+CHI = ASCII_TO_UNI["chi"]
 DIFFRACTION_EXP = DiffractionExperimentContext()
 
 

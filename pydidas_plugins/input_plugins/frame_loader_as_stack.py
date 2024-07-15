@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["FrameStackLoader"]
+__all__ = ["FrameLoaderAsStack"]
 
 
 import numpy as np
@@ -33,18 +33,24 @@ import numpy as np
 from pydidas.core import (
     Dataset,
     FileReadError,
-    Parameter,
-    ParameterCollection,
     UserConfigError,
+    get_generic_param_collection,
 )
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
 
 
-class FrameStackLoader(InputPlugin):
+class FrameLoaderAsStack(InputPlugin):
     """
-    Load data frames from files with a single image in each, for example tif files.
+    Load a series of data frames from files with a single image in each.
+
+    This plugin can be used to apply a rolling average on input data.
+
+    NOTE: The FrameStackLoader Plugin is used to load a series of data frames into a
+    single 3D Dataset for further special analysis. Note that this plugin should
+    only be used if the next processing step is to apply individual masks or to
+    average / sum the frames.
 
     This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.
@@ -55,18 +61,10 @@ class FrameStackLoader(InputPlugin):
     to the raw image.
     """
 
-    plugin_name = "Frame stack loader"
+    plugin_name = "Single frame *stack* loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
-    default_params = ParameterCollection(
-        Parameter(
-            "frame_count",
-            int,
-            1,
-            name="Frame count",
-            tooltip="How many frames should be included in the stack.",
-        )
-    )
+    default_params = get_generic_param_collection("num_frames_to_use")
     input_data_dim = None
     output_data_dim = 3
 
@@ -81,7 +79,7 @@ class FrameStackLoader(InputPlugin):
         self.update_filename_string()
         self._image_metadata.update(filename=self.get_filename(0))
         self._config["result_shape"] = (
-            self.get_param_value("frame_count"),
+            self.get_param_value("num_frames_to_use"),
             *self._image_metadata.final_shape,
         )
         self._original_input_shape = (
@@ -108,25 +106,25 @@ class FrameStackLoader(InputPlugin):
         kwargs : dict
             The updated calling keyword arguments.
         """
-        frame_count = self.get_param_value("frame_count")
-        if frame_count < 1:
+        num_frames_to_use = self.get_param_value("num_frames_to_use")
+        if num_frames_to_use < 1:
             raise UserConfigError("Frame count must be at least 1.")
         _stack = None
-        for i in range(frame_count):
+        for i in range(num_frames_to_use):
             _fname = self.get_filename(frame_index + i)
             try:
                 _fdata = import_data(_fname, **kwargs)
             except FileReadError:
                 raise UserConfigError(
-                    f"""File {self.get_filename(frame_index + i)} not found.
-                    
-                    Try setting number of scan points to {frame_index - frame_count + i}
-                    or lowering frame count to {frame_count - 1}"""
+                    f"File {self.get_filename(frame_index + i)} not found. "
+                    "\n\nTry setting number of scan points to "
+                    f"{frame_index - num_frames_to_use + i} or lowering frame count "
+                    f"to {num_frames_to_use - 1}"
                 )
             _fdata.axis_units = ["pixel", "pixel"]
             _fdata.axis_labels = ["detector y", "detector x"]
             if _stack is None:
-                _stack = Dataset(np.zeros((frame_count, *_fdata.shape)))
+                _stack = np.zeros((num_frames_to_use, *_fdata.shape))
             _stack[i] = _fdata
 
         data_kwargs = {

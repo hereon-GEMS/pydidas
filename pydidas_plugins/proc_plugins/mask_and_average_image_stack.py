@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["MaskMultipleImages"]
+__all__ = ["MaskAndAverageImageStack"]
 
 
 from typing import Union
@@ -43,13 +43,25 @@ from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.plugins import ProcPlugin
 
 
-class MaskMultipleImages(ProcPlugin):
+class MaskAndAverageImageStack(ProcPlugin):
     """
-    This plugin generates and applies a dynamic data mask for each individual image,
-    then averages the remaining pixels
+    Mask each image in a stack of images and average the remaining pixels.
+
+    This plugin checks each input image in a stack and applies high/low thresholds
+    to each image before averaging all images. Masked pixels are ignored in the
+    averaging process and the statistics are calculated accordingly.
+
+    A `background value` can be given to set the value of those pixels which were
+    masked in every image. The default of `None` will set these pixels to `np.nan`.
+
+    The plugin can also apply a mask to remove ADC/quantum well artefacts from the
+    images, like stripes. A second threshold must be set to define the value
+    above which the artefacts are handled.
+
+    These settings can be configured in the plugin's advanced parameters, if required.
     """
 
-    plugin_name = "Mask multiple images"
+    plugin_name = "Mask and average image stack"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE

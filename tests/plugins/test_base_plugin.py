@@ -230,6 +230,25 @@ class TestBasePlugin(unittest.TestCase):
         self.assertEqual(_roi[1].start, _this_roi[2])
         self.assertEqual(_roi[1].stop, _this_roi[3])
 
+    def test_get_own_roi__w_high_output_dim_and_correct_roi_dim(self):
+        _this_roi = (3, 436, 17, 357)
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.output_data_dim = 3
+        plugin._roi_data_dim = 2
+        for _name in ["use_roi", "roi_ylow", "roi_yhigh", "roi_xlow", "roi_xhigh"]:
+            plugin.add_param(get_generic_parameter(_name))
+        plugin.set_param_value("use_roi", True)
+        plugin.set_param_value("roi_ylow", _this_roi[0])
+        plugin.set_param_value("roi_yhigh", _this_roi[1])
+        plugin.set_param_value("roi_xlow", _this_roi[2])
+        plugin.set_param_value("roi_xhigh", _this_roi[3])
+        plugin.input_shape = (1257, 1235)
+        _roi = plugin._get_own_roi()
+        self.assertEqual(_roi[0].start, _this_roi[0])
+        self.assertEqual(_roi[0].stop, _this_roi[1])
+        self.assertEqual(_roi[1].start, _this_roi[2])
+        self.assertEqual(_roi[1].stop, _this_roi[3])
+
     def test_update_legacy_image_ops_with_this_plugin__fresh(self):
         _roi1 = (5, -55, 5, -55)
         _this_roi = (slice(3, 436, None), slice(17, 967, None))

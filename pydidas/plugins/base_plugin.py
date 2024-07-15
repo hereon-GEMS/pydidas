@@ -251,6 +251,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._legacy_image_ops = []
         self._original_input_shape = None
         self.node_id = None
+        self._roi_data_dim = None
 
     def __copy__(self) -> Self:
         """
@@ -587,13 +588,18 @@ class BasePlugin(ObjectWithParameterCollection):
         Union[tuple[slice. slice], None]
             The tuple with two slice objects which define the image ROI.
         """
-        if self.output_data_dim == 1:
+        _roi_data_dim = (
+            self._roi_data_dim
+            if self._roi_data_dim is not None
+            else self.output_data_dim
+        )
+        if _roi_data_dim == 1:
             _roi_bounds = (
                 self.get_param_value("roi_xlow"),
                 self.get_param_value("roi_xhigh"),
             )
             _dim = 1
-        elif self.output_data_dim == 2:
+        elif _roi_data_dim == 2:
             _roi_bounds = (
                 self.get_param_value("roi_ylow"),
                 self.get_param_value("roi_yhigh"),

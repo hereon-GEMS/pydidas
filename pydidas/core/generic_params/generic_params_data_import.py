@@ -296,4 +296,17 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "decoded as image data."
         ),
     },
+    "num_frames_to_use": {
+        "type": int,
+        "default": 2,
+        "name": "Number of frame to use",
+        "choices": None,
+        "unit": "bytes",
+        "allow_None": False,
+        "tooltip": (
+            "The number of frames to be loaded and included in the stack. "
+            "Frames are loaded starting with the first frame index and thus "
+            "allow a rolling average over the frames."
+        ),
+    },
 }

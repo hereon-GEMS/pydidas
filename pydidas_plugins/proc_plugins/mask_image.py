@@ -83,13 +83,17 @@ class MaskImage(ProcPlugin):
 
         Returns
         -------
-        data : pydidas.core.Dataset
-            The image data.
+        new_data : pydidas.core.Dataset
+            The masked image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
         if data.shape != self._mask.shape:
             _roi, _binning = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _binning) > 0, 1, 0)
-        data = np.where(self._mask, self._maskval, data)
-        return data, kwargs
+        new_data = Dataset(
+            np.where(self._mask, self._maskval, data),
+            **(data.property_dict if hasattr(data, "property_dict") else {}),
+        )
+
+        return new_data, kwargs

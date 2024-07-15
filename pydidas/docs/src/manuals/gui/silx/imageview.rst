@@ -15,7 +15,7 @@ with additional features useful in pydidas.
 Its layout is shown below:
 
 .. image:: ../silx/images/standard_imageview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 - The menu

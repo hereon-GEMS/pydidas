@@ -28,7 +28,7 @@ as overlay.
       -  .. image:: ../integration_roi/_images/final_roi.png
             :align: center
             :width: 200
-    * -  The starting azimuthal limits without any radial selection.
+    * - The starting azimuthal limits without any radial selection.
       - After selecting the inner radial limit, it is shown as a circle.
       - After selecting the outer radial limit as well, the final integration
         ROI is displayed.
@@ -57,7 +57,7 @@ as overlay.
       -  .. image:: ../integration_roi/_images/final_roi.png
             :align: center
             :width: 200
-    * -  The starting radial limits without any azimuthal selection.
+    * - The starting radial limits without any azimuthal selection.
       - After selecting the lower azimuthal limit, it is shown as a line from 
         the beamcenter.
       - After selecting the upper azimuthal limit as well, the final integration

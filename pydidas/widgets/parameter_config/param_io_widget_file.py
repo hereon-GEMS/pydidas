@@ -63,7 +63,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             A Parameter instance.
         **kwargs : dict
             Optional keyword arguments. Supported kwargs are "width" (in pixels) for
-            the with of the I/O widget and  "persistent_qsettings_ref" for the
+            the with of the I/O widget and "persistent_qsettings_ref" for the
             persistent reference label of the open directory.
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)

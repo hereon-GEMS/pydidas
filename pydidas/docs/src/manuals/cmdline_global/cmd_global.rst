@@ -188,7 +188,7 @@ yield the same object:
     >>> SCAN = pydidas.contexts.ScanContext()
     >>> SCAN
     <pydidas.contexts.scan.Scan at 0x1d4a257b820>
-    >>> SCAN2  = pydidas.contexts.ScanContext()
+    >>> SCAN2 = pydidas.contexts.ScanContext()
     >>> SCAN2
     <pydidas.contexts.scan.Scan at 0x1d4a257b820>
     >>> SCAN == SCAN2

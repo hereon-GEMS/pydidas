@@ -19,7 +19,7 @@ be visualized and edited in the Workflow edit frame. The starting layout of the
 frame is shown below.
 
 .. image:: images/edit/overview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 - I/O buttons
@@ -48,7 +48,7 @@ about how paths are managed, please refer to :ref:`global_plugincollection`).
 On the right, it shows detailed information about the selected plugin:
 
 .. image:: images/edit/browser.png
-    :width:  500px
+    :width: 500px
     :align: center
 
 A filter can be selected at the top of the left part to display only plugins
@@ -86,7 +86,7 @@ Workflow tree canvas
 --------------------
 
 .. image:: images/edit/canvas.png
-    :width:  500px
+    :width: 500px
     :align: center
 
 The image above shows an example :py:class:`WorkflowTree
@@ -118,7 +118,7 @@ selected :py:class:`WorkflowNode <pydidas.workflow.WorkflowNode>`:
     inconsistent, irrespective of the actual consistency.
 
 By clicking on a plugin, this plugin gets selected and is highlighted
-(bold  border and change in background color). In addition, the
+(bold border and change in background color). In addition, the
 :ref:`workflow_plugin_param_editing` widget will display the selected plugin's
 Parameters.
 

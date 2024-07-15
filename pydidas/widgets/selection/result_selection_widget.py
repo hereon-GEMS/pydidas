@@ -70,7 +70,7 @@ class ResultSelectionWidget(
     :py:class:`ScanContext <pydidas.core.ScanContext<` and
     :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
     singletons.
-    It displays information  for all dimensions in the results (label, unit,
+    It displays information for all dimensions in the results (label, unit,
     range) and allows selecting data dimension(s) (based on the dimensionality
     of the plot) and slice indices for other dimensions. In addition, an option
     to hande the Scan as a "timeline" is given. In a timeline, all Scan points

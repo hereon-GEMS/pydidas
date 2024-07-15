@@ -32,7 +32,7 @@ The rational behind these two use cases are
 The pyDIDAS project is funded by `Helmholtz-Zentrum Hereon 
 <http://www.hereon.de>`_\ .
 
-The pyDIDAS software uses widgets and tools from the  
+The pyDIDAS software uses widgets and tools from the
 `pyFAI <https://pyfai.readthedocs.io/>`_ and `silx <http://www.silx.org/>`_ 
 projects at the ESRF. The azimuthal integration routines are also taken 
 from the pyFAI distribution.

@@ -195,7 +195,7 @@ All pydidas apps can be configured at creation in one of three ways:
         {'num_images': 20, 'image_shape': (20, 20)}
 
     3. By sharing Parameters with other objects. One of the key advantages of
-    using pydidas Parameter for handling app data  is that they are objects
+    using pydidas Parameter for handling app data is that they are objects
     which can be shared between different python objects. Any changes to the
     object will be directly available to all linked apps:
 

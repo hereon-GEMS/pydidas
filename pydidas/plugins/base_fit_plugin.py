@@ -445,7 +445,7 @@ class BaseFitPlugin(ProcPlugin):
         format is a dictionary with four keys:
         First, "n_plots" which determines the number of plots. Second, "plot_titles"
         gives a title for each subplot. Third, "plot_ylabels" gives a y axis label for
-        each subplot. Fourth, "items" provides  a list with the different items to be
+        each subplot. Fourth, "items" provides a list with the different items to be
         plotted. Each list entry must be a dictionary with the following keys: "plot"
         [to detemine the plot number], "label" [for the legend label] and "data" with
         the actual data.

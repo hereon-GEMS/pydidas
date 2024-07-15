@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The menu_utils module includes functions used in the pydidas main_menu.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -125,8 +125,8 @@ def get_generic_menu_entries():
     return {
         "Workflow processing": {
             "label": "Expand\nWorkflow\nprocessing",
-            "label_visible": "Hide\nWorkflow\nProcessing",
-            "label_invisible": "Expand\nWorkflow\nProcessing",
+            "label_visible": "Hide\nworkflow\nprocessing",
+            "label_invisible": "Expand\nworkflow\nprocessing",
             "icon": get_pyqt_icon_from_str("pydidas::workflow_processing_expand.png"),
             "icon_visible": get_pyqt_icon_from_str(
                 "pydidas::workflow_processing_hide.png"

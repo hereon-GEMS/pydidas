@@ -190,7 +190,7 @@ boundaries can be defined by the :py:data:`roi_xlow`, :py:data:`roi_xhigh`,
 boundaries.
 These values are modulated by the image width and height, respectively. A value 
 of :py:data:`roi_yhigh = -5` thus corresponds to cropping the five rightmost pixel 
-rows.  
+rows.
 
 The defaults are :py:data:`roi_xlow = 0`, :py:data:`roi_xhigh = None`, 
 :py:data:`roi_ylow = 0`, and :py:data:`roi_yhigh = None`. Note that if the ROI 
@@ -246,7 +246,7 @@ thresholds for the upper and lower value must be given. To activate the use
 of thresholds, set the :py:data:`use_thresholds` Parameter to :py:data:`True`. 
 The values for the lower and upper thresholds are given by the 
 :py:data:`threshold_low` and :py:data:`threshold_high` Parameters, respectively. 
-A value of :py:data:`None` for a threshold  will disable this specific 
+A value of :py:data:`None` for a threshold will disable this specific
 threshold. The default value for threshold values is :py:data:`None`.
 
 As example, let us define an upper threshold of 42.0 and disable the lower

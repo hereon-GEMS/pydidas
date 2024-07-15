@@ -17,7 +17,7 @@ The frame offers three buffers for input images and three buffers for result
 images.
 
 .. image:: images/img_math/overview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 The left side holds the configurations while the image is displayed on the
@@ -178,7 +178,7 @@ current image to disk.
 Data visualization
 ------------------
 
-A modified silx Plot2D widget is  used for displaying the data and is
+A modified silx Plot2D widget is used for displaying the data and is
 described in detail below.
 
 .. include:: ../silx/plot2d.rst

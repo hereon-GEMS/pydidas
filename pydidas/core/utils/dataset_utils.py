@@ -290,7 +290,7 @@ def get_input_as_dict(
     Raises
     ------
     PydidasConfigError
-        If the entries is not Iterable or the  length of the keys does not match the
+        If the entries is not Iterable or the length of the keys does not match the
         number of dimensions.
 
     Returns

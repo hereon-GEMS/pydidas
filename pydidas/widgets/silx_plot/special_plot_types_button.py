@@ -67,7 +67,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         ----------
         x : np.ndarray
             The input x data.
-        y :  np.ndarray
+        y : np.ndarray
             The input y data.
 
         Returns
@@ -109,7 +109,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         ----------
         x : np.ndarray
             The input x data.
-        y :  np.ndarray
+        y : np.ndarray
             The input y data.
 
         Returns

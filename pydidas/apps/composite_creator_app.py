@@ -269,7 +269,7 @@ class CompositeCreatorApp(BaseApp):
             - If the selected background file does not exist
             - If the selected dataset key does not exist (in case of hdf5
               files)
-            - If the  selected dataset number does not exist (in case of
+            - If the selected dataset number does not exist (in case of
               hdf5 files)
             - If the image dimensions for the background file differ from the
               image files.

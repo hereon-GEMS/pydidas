@@ -82,7 +82,7 @@ class MultiPeakMixin:
                 The order of the background. The default is None.
             - center{i}_bounds : Union[None, tuple[float, float]], optional
                 The low and high bounds for the i-th peak's center position.
-            - center{i}_start :  Union[None, tuple[float, float]], optional
+            - center{i}_start : Union[None, tuple[float, float]], optional
                 The starting value for the peak{i} fit. If not given, this defaults to
                 the data maximum in the bounds.
             - width{i}_start : Union[None, float], optional

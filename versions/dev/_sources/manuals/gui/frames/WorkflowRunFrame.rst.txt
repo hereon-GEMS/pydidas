@@ -24,7 +24,7 @@ visualization widget for 1d plots or 2d images, depending on the result
 selection.
 
 .. image:: images/run/overview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 The configuration on the left holds four different functionalities which will be 

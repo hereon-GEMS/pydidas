@@ -60,7 +60,7 @@ Further code documentation
     concepts
     package_structure
 
-  
+
 API documentation
 -----------------
 

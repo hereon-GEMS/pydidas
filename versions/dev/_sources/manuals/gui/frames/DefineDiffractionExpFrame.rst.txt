@@ -76,7 +76,7 @@ a detector based on manufacturer and model.
     :width: 361px
     :align: right
 
-Confirming the selection in the dialogue will update the detector Parameters.  
+Confirming the selection in the dialogue will update the detector Parameters.
 
 |
 
@@ -117,7 +117,7 @@ definition* opens a new window. The window is described in detail in
 
 The button *Convert Fit2D geometry* allows to convert an existing calibration 
 in Fit2D geometry to pyFAI's PONI geometry. Clicking the button temporarily 
-disables the frame's inputs and opens a new  window to input the existing 
+disables the frame's inputs and opens a new window to input the existing
 calibration:
 Input all parameters as required (sample-detector distance, beamcenter x/y, 
 detector tilt plane and tilt angle). The *Convet to pyFAI geometry* button will

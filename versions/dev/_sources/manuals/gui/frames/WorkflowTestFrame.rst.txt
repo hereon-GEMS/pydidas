@@ -20,7 +20,7 @@ for a single scan point and visualize all results, including intermediate
 results.
 
 .. image:: images/test/overview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 The frame holds control and result selection widgets on the left and a plot 

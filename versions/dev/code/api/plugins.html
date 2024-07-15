@@ -737,7 +737,7 @@ pydidas.core.fitting package.</p>
 format is a dictionary with four keys:
 First, “n_plots” which determines the number of plots. Second, “plot_titles”
 gives a title for each subplot. Third, “plot_ylabels” gives a y axis label for
-each subplot. Fourth, “items” provides  a list with the different items to be
+each subplot. Fourth, “items” provides a list with the different items to be
 plotted. Each list entry must be a dictionary with the following keys: “plot”
 [to detemine the plot number], “label” [for the legend label] and “data” with
 the actual data.</p>
@@ -1523,8 +1523,8 @@ is returned.</p>
 <span class="sig-name descname"><span class="pre">get_azimuthal_range_in_deg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_in_deg" title="Link to this definition">#</a></dt>
 <dd><p>Get the azimuthal range from the Parameters in degree.</p>
 <p>If use_azimuthal_range is True and both the lower and upper range
-limits are larger than zero, the  tuple with both values is returned.
-Otherwise, the return is None  which corresponds to pyFAI auto ranges.</p>
+limits are larger than zero, the tuple with both values is returned.
+Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration in degrees.</p>
@@ -1540,8 +1540,8 @@ Otherwise, the return is None  which corresponds to pyFAI auto ranges.</p>
 <span class="sig-name descname"><span class="pre">get_azimuthal_range_in_rad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_in_rad" title="Link to this definition">#</a></dt>
 <dd><p>Get the azimuthal range from the Parameters in radians.</p>
 <p>If use_azimuthal_range is True and both the lower and upper range
-limits are larger than zero, the  tuple with both values is returned.
-Otherwise, the return is None  which corresponds to pyFAI auto ranges.</p>
+limits are larger than zero, the tuple with both values is returned.
+Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration in radian.</p>
@@ -1557,8 +1557,8 @@ Otherwise, the return is None  which corresponds to pyFAI auto ranges.</p>
 <span class="sig-name descname"><span class="pre">get_azimuthal_range_native</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_native" title="Link to this definition">#</a></dt>
 <dd><p>Get the azimuthal range from the Parameters in native units.</p>
 <p>If use_azimuthal_range is True and both the lower and upper range
-limits are larger than zero, the  tuple with both values is returned.
-Otherwise, the return is None  which corresponds to pyFAI auto ranges.</p>
+limits are larger than zero, the tuple with both values is returned.
+Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration.</p>
@@ -1605,8 +1605,8 @@ Otherwise, the return is None  which corresponds to pyFAI auto ranges.</p>
 <span class="sig-name descname"><span class="pre">get_radial_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range" title="Link to this definition">#</a></dt>
 <dd><p>Get the radial range from the Parameters.</p>
 <p>If use_radial_range is True and both the lower and upper range limits
-are larger than zero, the  tuple with both values is returned.
-Otherwise, the return is None  which corresponds to pyFAI auto ranges.</p>
+are larger than zero, the tuple with both values is returned.
+Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The radial range for the pyFAI integration.</p>

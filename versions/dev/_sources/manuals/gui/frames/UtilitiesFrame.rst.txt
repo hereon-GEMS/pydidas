@@ -18,7 +18,7 @@ The *Utilties* frame allows users to access various stand-alone windows with
 various functionalities.
 
 .. image:: images/utilities_overview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 The following windows can be opened:

@@ -11,7 +11,7 @@ subclassed `silx Plot2d
 with additional features useful in pydidas.
 
 .. image:: ../silx/images/standard_plot2d.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 - The menu

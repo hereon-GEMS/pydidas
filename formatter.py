@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 import math
 import multiprocessing as mp
 import os
@@ -44,7 +45,11 @@ Formatting checks for pydidas
 Supported python modules are:
 1. ruff `format` for automatic code re-formatting.
 2. ruff `check` for style guide checks.
-4. reuse for copyright information checking.
+3. reuse for copyright information checking.
+4. black for automatic code re-formatting.
+5. isort for automatic import sorting.
+6. flake8 for style guide checks.
+
 
 In addition, a function to update the copyright in changed files to be consistent
 with the year of the change is included.
@@ -404,7 +409,7 @@ class CopyrightYearUpdater:
                     _contents = f.read()
                 except UnicodeDecodeError:
                     _timed_print(
-                        "Error reading file: ", _fname, verbose=self._flags["verbose"]
+                        f"Error reading file: {_fname}", verbose=self._flags["verbose"]
                     )
             _original = _contents[:]
             _contents = re.sub(self._regex_full, self._update_long_regex, _contents)

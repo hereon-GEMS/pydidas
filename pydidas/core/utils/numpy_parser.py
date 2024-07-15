@@ -248,7 +248,7 @@ class _NumpyParser:
         ):
             if len(_args) > 0:
                 _tmp_arg = _args.pop(0)
-                if _type == bool:
+                if _type is bool:
                     _tmp_arg = _tmp_arg.lower() in ("true", "1")
                 _kwargs[_key] = _type(_tmp_arg)
         # print("arange kwargs", _kwargs)
@@ -287,7 +287,7 @@ class _NumpyParser:
                 _tmp_arg = _args.pop(0)
                 _kwargs[_key] = (
                     _tmp_arg.lower() in ("true", "1")
-                    if _type == bool
+                    if _type is bool
                     else _type(_tmp_arg)
                 )
         _kwargs["dtype"] = NUMPY_DTYPES[_kwargs["dtype"]]

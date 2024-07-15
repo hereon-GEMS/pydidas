@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 name = "pydidas"
 authors = [{name = "Malte Storm"}]
 description = "pydidas - the PYthon DIffraction Data Analysis Suite"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "GNU General Public License v3"}
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
@@ -22,7 +22,8 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Physics",
 ]
-dynamic = ["version", "dependencies"]
+dynamic = ["version", "dependencies", "optional-dependencies"]
+
 
 [project.urls]
 homepage = "https://pydidas.hereon.de/"
@@ -33,6 +34,7 @@ changelog = "https://github.com/hereon-GEMS/pydidas/blob/master/CHANGELOG.md"
 [tool.setuptools.dynamic]
 version = { attr = "pydidas.version.VERSION" }
 dependencies = { file = ["requirements.txt"]}
+optional-dependencies.dev = { file = ["requirements_dev.txt"]}
 
 [tool.setuptools]
 packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]
@@ -48,25 +50,14 @@ remove-pydidas = "pydidas_scripts.remove_pydidas_from_system:remove_pydidas_from
 [project.gui-scripts]
 pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
 
-[tool.pip-compile]
-dependencies = [
-    "pyFAI==2024.2.0",
-    "scikit-image>=0.22.0",
-    "qtawesome>=1.3",
-    "sphinx>=7.2.0",
-    "sphinx_rtd_theme>=2.0.0",
-    "pyopencl>=2024.1",
-    "qtpy>=2.4.0",
-    "hdf5plugin>=4.4.0",
-    "pyyaml>=6.0",
-    "requests>=2.31.0",
-    "PyQt5==5.15.10",
-    "build>=1.0.3",
-    "setuptools>69.0.0"
-]
+[tool.coverage.run]
+branch = true
 
-[tools.coverage.report]
-omit = ['*/tests/*']
+[tool.coverage.report]
+omit = ["tests/*", "pydidas/gui/*", "pydidas/widgets/*"]
+
+[tool.coverage.html]
+directory = "coverage_html_report"
 
 [tool.isort]
 profile = 'black'
@@ -89,7 +80,6 @@ extend-select = ["I", "C90", "F401"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
-
 
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 12.

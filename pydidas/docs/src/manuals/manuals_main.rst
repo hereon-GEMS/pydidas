@@ -4,8 +4,11 @@
     Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
-Manuals
-=======
+
+.. _manuals:
+
+User manuals
+============
 
 The manuals section is intended for end users and included documents 
 that guide users through the various features and apps included in the 
@@ -18,5 +21,6 @@ the same for both interfaces, the setup typically is very different.
 .. toctree::
     :maxdepth: 2
 
-    manuals/commandline
-    manuals/gui/graphical_user_interface
+    quickstart
+    commandline_start
+    gui/graphical_user_interface

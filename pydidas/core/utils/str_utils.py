@@ -53,7 +53,7 @@ from typing import Union
 
 import numpy as np
 
-from ..constants import GREEK_ASCII_TO_UNI, GREEK_UNI_TO_ASCII
+from ..constants import ASCII_TO_UNI, UNI_TO_ASCII
 
 
 def get_fixed_length_str(
@@ -131,7 +131,7 @@ def get_time_string(epoch: Union[float, None] = None, human_output: bool = True)
         system time will be used. The default is None.
 
     human_output : bool, optional
-        Keyword to control special  separation characters. If True, the
+        Keyword to control special separation characters. If True, the
         output will be human-readable friendly (with special sep. chars).
         If False, only a "_" will be included between the date and time.
         The default is True.
@@ -305,8 +305,8 @@ def convert_special_chars_to_unicode(obj: Union[str, list]) -> Union[str, list]:
     if isinstance(obj, str):
         _parts = obj.split()
         for _index, _part in enumerate(_parts):
-            if _part in GREEK_ASCII_TO_UNI.keys():
-                _parts[_index] = GREEK_ASCII_TO_UNI[_part]
+            if _part in ASCII_TO_UNI.keys():
+                _parts[_index] = ASCII_TO_UNI[_part]
         obj = " ".join(_parts)
         # insert Angstrom sign (in context of ^-1):
         obj = obj.replace("A^-1", "\u212b\u207b\u00b9")
@@ -338,8 +338,8 @@ def convert_unicode_to_ascii(obj: Union[str, list]) -> Union[str, list]:
     if isinstance(obj, str):
         _parts = obj.split()
         for _index, _part in enumerate(_parts):
-            if _part in GREEK_UNI_TO_ASCII:
-                _parts[_index] = GREEK_UNI_TO_ASCII[_part]
+            if _part in UNI_TO_ASCII:
+                _parts[_index] = UNI_TO_ASCII[_part]
         obj = " ".join(_parts)
         obj = obj.replace("\u212b", "A")
         obj = obj.replace("\u207b\u00b9", "^-1")

@@ -69,6 +69,7 @@ from . import gui
 
 IS_QT6 = __qtpy.QT_VERSION[0] == "6"
 
+__version__ = VERSION
 __all__.extend(
     [
         "core",
@@ -92,7 +93,7 @@ __all__.extend(
 
 # Check whether the sphinx documentation has been built and build it if it
 # has not:
-if not core.utils.check_sphinx_html_docs():
+if not core.utils.check_sphinx_html_docs() and "--no-sphinx" not in __sys.argv:
     core.utils.run_sphinx_html_build()
 
 # Disable the pyFAI logging to console

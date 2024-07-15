@@ -22,7 +22,7 @@ The frame only holds the configuration widgets for its Parameters as well as
 some buttons for convenience functionality.
 
 .. image:: images/scan/overview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 Control buttons

@@ -143,7 +143,7 @@ class WorkflowTestFrame(BaseFrame):
 
     The selection of a frame can be done either using the absolute frame number
     (if the ``image_selection`` Parameter equals "Use global index") or by
-    supplying scan indices for all active scan dimensions  (if the
+    supplying scan indices for all active scan dimensions (if the
     ``image_selection`` Parameter equals "Use scan indices").
     """
 

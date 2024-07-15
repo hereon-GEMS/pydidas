@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ CompositeCreatorApp.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -49,7 +49,7 @@ def composite_creator_app_parser(caller: Union[object, None] = None) -> dict:
     -------
     dict
         A dictionary with the parsed arugments which holds all the entries
-        and entered values or  - if missing - the default values.
+        and entered values or - if missing - the default values.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(

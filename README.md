@@ -6,7 +6,7 @@
 
 # pydidas
 
-![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)
+[![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://zenodo.org/records/11487652)
 
 pydidas (the Python DIffraction Data Analysis Suite) is a toolkit for
 the analysis of diffraction datasets, both live at beamlines and
@@ -25,7 +25,7 @@ the [ESRF](https://www.esrf.fr/).
 ## References
 * Please check the citation file CITATION.cff
 * Pydidas has also been issued with a global DOI for citations: 10.5281/zenodo.7568610 
-  ![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)
+  [![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://zenodo.org/records/11487652)
 
 
 ## Installation
@@ -64,7 +64,7 @@ following command:
 #### Using the source code directly
 
 Download the pydidas source code or clone the git repository and navigate to the
-folder with the project metadata files (like this README.rst). Then, install
+folder with the project metadata files (like this README.md). Then, install
 the package and any missing dependencies:
 
     python -m pip install .
@@ -142,20 +142,20 @@ https://hereon-gems.github.io/pydidas/
 
 ## Referencing pydidas
 
-For the full citation  information of pydidas, please see the CITATION.cff file.
+For the full citation information of pydidas, please see the CITATION.cff file.
 
 Pydidas can also be cited by its global DOI on zenodo: 10.5281/zenodo.7568610 
-![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)
+[![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://zenodo.org/records/11487652)
 
 
 ## License
 
 The pydidas source code is released under the GNU General Public License
-Version 3.  
+Version 3.
 The documentation is licensed under the Creative Commons Attribution 4.0
-International Public License (CC-BY-4.0).  
+International Public License (CC-BY-4.0).
 Images and logos are licensed under Creative Commons Attribution-NoDerivatives
-4.0 International Public License (CC-BY-ND-4.0).  
+4.0 International Public License (CC-BY-ND-4.0).
 Insignificant files (e.g. changelog) are released under the CC0 1.0 Universal
-Public Domain Dedication (CC0-1.0).  
+Public Domain Dedication (CC0-1.0).
 

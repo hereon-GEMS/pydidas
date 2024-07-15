@@ -23,7 +23,7 @@ assumed to be perfectly aligned, i.e. all rotations are set to zero.
 
 
 .. image:: images/quick_int/overview.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 The left side shows the configuration and most configuration options will become
@@ -92,7 +92,7 @@ of selected points and disable other settings. In addition, clicking in the
 image will select the clicked pixel positions and store them in the list.
 
 .. image:: images/quick_int/bc_selection.png
-    :width:  600px
+    :width: 600px
     :align: center
 
 The image above shows the initial view after enabling the graphical beamcenter 
@@ -124,7 +124,7 @@ The control buttons allow give two choices for setting the beamcenter:
    taken as the beamcenter position. The circle fit will be shown with a dotted
    line to allow verification of the quality.
    
-The last button, "confirm beamcenter" will disable the graphical beamcenter  
+The last button, "confirm beamcenter" will disable the graphical beamcenter
 selection and enable the other configurations again.
 
 

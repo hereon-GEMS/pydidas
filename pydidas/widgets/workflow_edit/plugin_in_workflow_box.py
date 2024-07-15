@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ to display plugin processing steps in the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -64,7 +64,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             The widget's parent. The default is None.
         label : str, optional
             The node's label. The default is an empty string.
-        stardard_size : tuple[int, int]
+        standard_size : tuple[int, int]
             The standard size in pixel.
     """
 
@@ -179,11 +179,11 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self._del_actions["delete"].triggered.connect(
             partial(self.sig_widget_delete_request.emit, self.widget_id)
         )
-        self._del_actions["delete"].triggered.connect(self.deleteLater)
+        # self._del_actions["delete"].triggered.connect(self.deleteLater)
         self._del_actions["delete_branch"].triggered.connect(
             partial(self.sig_widget_delete_branch_request.emit, self.widget_id)
         )
-        self._del_actions["delete_branch"].triggered.connect(self.deleteLater)
+        # self._del_actions["delete_branch"].triggered.connect(self.deleteLater)
         self._delete_node_context.addAction(self._del_actions["delete"])
         self._delete_node_context.addAction(self._del_actions["delete_branch"])
 

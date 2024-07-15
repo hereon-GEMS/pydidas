@@ -15,11 +15,14 @@ __*
 # local build files
 pydidas/sphinx
 *.html
+!versions/**/*.html
 dist/*
 build/*
 *egg*
 .coverage
 htmlcov
+coverage_html_report
+.ruff_cache/*
 
 # logging
 *.log

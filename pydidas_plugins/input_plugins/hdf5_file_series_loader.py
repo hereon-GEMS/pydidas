@@ -119,7 +119,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        _data : pydidas.core.Dataset
             The image data.
         kwargs : dict
             The updated kwargs for importing the frame.

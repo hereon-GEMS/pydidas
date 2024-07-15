@@ -61,7 +61,7 @@ class TiffIo(IoBase):
         roi : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
-            as 2-tuples of integers or slice  objects. If None, the full image
+            as 2-tuples of integers or slice objects. If None, the full image
             will be returned. The default is None.
         returnType : Union[datatype, 'auto'], optional
             If 'auto', the image will be returned in its native data type.
@@ -111,7 +111,7 @@ class TiffIo(IoBase):
         cls.check_for_existing_file(filename, **kwargs)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            if data.dtype.type in [np.float64, np.float_, np.longdouble]:
+            if data.dtype.type in [np.float64, np.longdouble]:
                 imsave(filename, data.astype(np.float32))
             else:
                 imsave(filename, data)

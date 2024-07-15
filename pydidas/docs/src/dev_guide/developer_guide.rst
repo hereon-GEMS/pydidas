@@ -4,6 +4,8 @@
     Copyright 2024, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
+.. _developer_guide:
+
 Developer guide
 ===============
 
@@ -15,7 +17,7 @@ It will be expanded as required by the user community.
 .. toctree::
     :maxdepth: 2
 
-    dev_guide/dev_guide_plugins.rst
-    dev_guide/dev_guide_apps.rst
-    dev_guide/dev_guide_multiprocessing.rst
-    dev_guide/dev_guide_list_of_signals.rst
+    dev_guide_plugins.rst
+    dev_guide_apps.rst
+    dev_guide_multiprocessing.rst
+    dev_guide_list_of_signals.rst

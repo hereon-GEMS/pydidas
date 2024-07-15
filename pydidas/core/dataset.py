@@ -162,7 +162,11 @@ class Dataset(ndarray):
             for _key in METADATA_KEYS
         }
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
-            if isinstance(_slicer, ndarray) and _slicer.size == obj.size:
+            if (
+                isinstance(_slicer, ndarray)
+                and _slicer.dtype == np.bool_
+                and _slicer.size == obj.size
+            ):
                 # in the case of a masked array, keep all axis keys.
                 break
             if isinstance(_slicer, Integral):
@@ -523,7 +527,7 @@ class Dataset(ndarray):
         if len(self._meta[key]) != self.ndim:
             warnings.warn(
                 f"The number of {key.replace('_', ' ')} entries "
-                f"does not match the number of  dimensions of the Dataset. "
+                f"does not match the number of dimensions of the Dataset. "
                 f"Resetting the{key}."
             )
             self._meta[key] = {

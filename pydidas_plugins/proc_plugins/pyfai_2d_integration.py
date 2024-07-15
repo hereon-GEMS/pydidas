@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,13 @@ patterns into a 2D radial/azimuthal map.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PyFAI2dIntegration"]
 
+from typing import Union
 
 import numpy as np
 
@@ -86,7 +87,9 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             "data_unit": "counts",
         }
 
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+    ) -> tuple[Dataset, dict]:
         """
         Perform a 2D integration of the input dataset.
 
@@ -99,7 +102,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        _dataset : pydidas.core.Dataset
             The integrated intensity data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

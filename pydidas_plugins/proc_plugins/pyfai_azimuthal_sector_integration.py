@@ -173,6 +173,14 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
             The radial integration data for the given sectors.
         kwargs : dict
             The input kwargs used for processing.
+
+        Returns
+        -------
+        _dataset : Dataset
+            The integrated data.
+        kwargs : dict
+            The input kwargs used for processing,
+            appended by any changes in the function.
         """
         self.check_and_set_custom_mask(**kwargs)
         _results = [

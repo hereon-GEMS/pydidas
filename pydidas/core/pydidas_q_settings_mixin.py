@@ -116,7 +116,7 @@ class PydidasQsettingsMixin:
                 return int(_value)
             if dtype == Real:
                 return float(_value)
-            if dtype == bool:
+            if dtype is bool:
                 return _value in ["true", "True", True]
             return dtype(_value)
         return _value

@@ -136,9 +136,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         ]:
             self.param_widgets[_key].io_edited.connect(self.__update_n_image)
 
-        self.param_widgets["use_roi"].currentTextChanged.connect(
-            self.__toggle_roi_selection
-        )
+        self.param_widgets["use_roi"].io_edited.connect(self.__toggle_roi_selection)
         self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
         self.param_widgets["hdf5_key"].io_edited.connect(self.__selected_hdf5_key)
         self.param_widgets["use_bg_file"].io_edited.connect(
@@ -146,10 +144,10 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         )
         self.param_widgets["bg_file"].io_edited.connect(self.__selected_bg_file)
         self.param_widgets["bg_hdf5_key"].io_edited.connect(self.__selected_bg_hdf5_key)
-        self.param_widgets["use_thresholds"].currentTextChanged.connect(
+        self.param_widgets["use_thresholds"].io_edited.connect(
             self.__toggle_use_threshold
         )
-        self.param_widgets["use_detector_mask"].currentTextChanged.connect(
+        self.param_widgets["use_detector_mask"].io_edited.connect(
             self.__toggle_use_det_mask
         )
         # disconnect the generic param update connections and re-route to

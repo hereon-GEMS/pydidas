@@ -41,7 +41,7 @@ from silx.opencl.common import OpenCL
 from ..contexts import DiffractionExperimentContext
 from ..core import UserConfigError, get_generic_param_collection
 from ..core.constants import (
-    GREEK_ASCII_TO_UNI,
+    ASCII_TO_UNI,
     PROC_PLUGIN,
     PROC_PLUGIN_IMAGE,
     pyFAI_METHOD,
@@ -58,7 +58,7 @@ logger = pydidas_logger()
 
 OCL = OpenCL()
 
-PI_STR = GREEK_ASCII_TO_UNI["pi"]
+PI_STR = ASCII_TO_UNI["pi"]
 
 
 class pyFAIintegrationBase(ProcPlugin):
@@ -186,8 +186,8 @@ class pyFAIintegrationBase(ProcPlugin):
         Get the azimuthal range from the Parameters in radians.
 
         If use_azimuthal_range is True and both the lower and upper range
-        limits are larger than zero, the  tuple with both values is returned.
-        Otherwise, the return is None  which corresponds to pyFAI auto ranges.
+        limits are larger than zero, the tuple with both values is returned.
+        Otherwise, the return is None which corresponds to pyFAI auto ranges.
 
         Returns
         -------
@@ -205,8 +205,8 @@ class pyFAIintegrationBase(ProcPlugin):
         Get the azimuthal range from the Parameters in degree.
 
         If use_azimuthal_range is True and both the lower and upper range
-        limits are larger than zero, the  tuple with both values is returned.
-        Otherwise, the return is None  which corresponds to pyFAI auto ranges.
+        limits are larger than zero, the tuple with both values is returned.
+        Otherwise, the return is None which corresponds to pyFAI auto ranges.
 
         Returns
         -------
@@ -224,8 +224,8 @@ class pyFAIintegrationBase(ProcPlugin):
         Get the azimuthal range from the Parameters in native units.
 
         If use_azimuthal_range is True and both the lower and upper range
-        limits are larger than zero, the  tuple with both values is returned.
-        Otherwise, the return is None  which corresponds to pyFAI auto ranges.
+        limits are larger than zero, the tuple with both values is returned.
+        Otherwise, the return is None which corresponds to pyFAI auto ranges.
 
         Returns
         -------
@@ -428,8 +428,8 @@ class pyFAIintegrationBase(ProcPlugin):
         Get the radial range from the Parameters.
 
         If use_radial_range is True and both the lower and upper range limits
-        are larger than zero, the  tuple with both values is returned.
-        Otherwise, the return is None  which corresponds to pyFAI auto ranges.
+        are larger than zero, the tuple with both values is returned.
+        Otherwise, the return is None which corresponds to pyFAI auto ranges.
 
         Returns
         -------

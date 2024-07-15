@@ -29,6 +29,7 @@ __all__ = ["SubtractBackgroundImage"]
 
 
 import os
+from typing import Union
 
 import numpy as np
 
@@ -96,7 +97,9 @@ class SubtractBackgroundImage(ProcPlugin):
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None
 
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+    ) -> tuple[Dataset, dict]:
         """
         Subtract a background image from the input data.
 
@@ -109,7 +112,7 @@ class SubtractBackgroundImage(ProcPlugin):
 
         Returns
         -------
-        corrected_data : pydidas.core.Dataset
+        _corrected_data : pydidas.core.Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

@@ -41,7 +41,7 @@ with open(Path(__file__).parents[2].joinpath("version.py"), "r") as f:
             pydidas_version = _line.split("=")[1].strip()
             break
 
-release = pydidas_version
+release = pydidas_version.strip("\"'")
 version = release
 
 # -- General configuration ---------------------------------------------------
@@ -54,8 +54,9 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.coverage",
-    "sphinx_rtd_theme",
     "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
+    "sphinx_design",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,37 +70,44 @@ tls_verify = False
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
+# The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
+# further. For a list of options available for each theme, see the
 # documentation.
 #
-# nature scheme options
-# html_theme_options = {'sidebarwidth': '350px',
-#                       "body_min_width": 800,
-#                      }
 html_theme_options = {
-    "analytics_id": "G-XXXXXXXXXX",  # Provided by Google in your dashboard
-    "analytics_anonymize_ip": False,
-    "logo_only": False,
-    "display_version": True,
-    "prev_next_buttons_location": "bottom",
-    "style_external_links": False,
-    "vcs_pageview_mode": "",
-    "style_nav_header_background": "#4444AA",
     # Toc options
     "collapse_navigation": True,
-    "sticky_navigation": True,
     "navigation_depth": 5,
-    "includehidden": True,
-    "titles_only": False,
     # manual options
     "body_min_width": 800,
+    # pydata scheme options:
+    "show_version_warning_banner": True,
+    "github_url": "https://github.com/hereon-GEMS/pydidas",
+    "logo": {
+        "text": " pydidas",
+        "alt_text": "pydidas",
+    },
 }
+if os.getenv("GITHUB_ACTIONS", "false") == "true":
+    html_theme_options["switcher"] = {
+        "version_match": pydidas_version,
+        "json_url": (
+            "https://raw.githubusercontent.com/hereon-GEMS/pydidas/"
+            "gh-pages-version-snapshots/pydata_version_switcher.json"
+        ),
+    }
+    html_theme_options["navbar_end"] = [
+        "version-switcher",
+        "theme-switcher",
+        "navbar-icon-links",
+    ]
+
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".

@@ -20,7 +20,7 @@ recursive-exclude tests *
 recursive-exclude pydidas/docs/build *
 
 include MANIFEST.in
-include README.rst
+include README.md
 include LICENSE.md
 include pyproject.toml
 include CHANGELOG.rst

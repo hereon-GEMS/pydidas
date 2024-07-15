@@ -249,7 +249,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
 
     def test_store_results_to_disk__used_dir(self):
         RESULTS.update_shapes_from_scan_and_workflow()
-        _dir = self.get_empty_dir_name()  #
+        _dir = self.get_empty_dir_name()
         _dir.mkdir()
         with open(_dir.joinpath("node_02.h5"), "w") as f:
             f.write("dummy")
@@ -259,7 +259,7 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
 
     def test_store_results_to_disk__used_dir_w_overwrite(self):
         RESULTS.update_shapes_from_scan_and_workflow()
-        _dir = self.get_empty_dir_name()  #
+        _dir = self.get_empty_dir_name()
         _dir.mkdir()
         with open(_dir.joinpath("node_02.h5"), "w") as f:
             f.write("dummy")

@@ -204,7 +204,7 @@ Parameter names is given below:
       - detector_dist
       - m
     * - :math:`rot_1`
-      - detector_rot1  
+      - detector_rot1
       - rad
     * - :math:`rot_2`
       - detector_rot2

@@ -4,6 +4,8 @@
     Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
+.. _code_documentation:
+
 Code documentation
 ==================
 
@@ -58,7 +60,7 @@ Further code documentation
     concepts
     package_structure
 
-  
+
 API documentation
 -----------------
 

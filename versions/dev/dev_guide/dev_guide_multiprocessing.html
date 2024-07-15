@@ -153,15 +153,8 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../manuals.html">
-    Manuals
+  <a class="nav-link nav-internal" href="../manuals/manuals_main.html">
+    User manuals
   </a>
 </li>
 
@@ -174,7 +167,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../developer_guide.html">
+  <a class="nav-link nav-internal" href="developer_guide.html">
     Developer guide
   </a>
 </li>
@@ -304,15 +297,8 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../quickstart.html">
-    Pydidas quick-start guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../manuals.html">
-    Manuals
+  <a class="nav-link nav-internal" href="../manuals/manuals_main.html">
+    User manuals
   </a>
 </li>
 
@@ -325,7 +311,7 @@ document.write(`
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../developer_guide.html">
+  <a class="nav-link nav-internal" href="developer_guide.html">
     Developer guide
   </a>
 </li>
@@ -444,7 +430,7 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../developer_guide.html" class="nav-link">Developer guide</a></li>
+    <li class="breadcrumb-item"><a href="developer_guide.html" class="nav-link">Developer guide</a></li>
     
     <li class="breadcrumb-item active" aria-current="page">Developers...</li>
   </ul>
@@ -719,7 +705,8 @@ thread alive and allow the submission of new tasks.</p>
 <p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> is the specialized
 subclass to work with pydidas <a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apps</span></code></a>.</p>
 <p>A sequence diagram of the communication with the <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> is given below.</p>
-<a class="reference internal image-reference" href="../_images/AppRunner_sequence.png"><img alt="../_images/AppRunner_sequence.png" class="align-center" src="../_images/AppRunner_sequence.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/AppRunner_sequence.png"><img alt="../_images/AppRunner_sequence.png" class="align-center" src="../_images/AppRunner_sequence.png" style="width: 400px;" />
+</a>
 <p>It is a QObject and uses signals and slots for communicating with the main event
 loop. The <a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">app</span></code></a> will be executed in independent
 processes in the <a class="reference internal" href="#the-app-processor">The app_processor</a> .</p>
@@ -777,7 +764,8 @@ own taste. Because all queued data is pickled, it is not advisable to send large
 data over the queue but instead to use the multiprocessing shared memory.</p>
 <p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.app_processor" title="pydidas.multiprocessing.app_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">app_processor's</span></code></a> event
 loop is summarized in the flowchart below:</p>
-<a class="reference internal image-reference" href="../_images/app_proc_logic_flow_chart.png"><img alt="../_images/app_proc_logic_flow_chart.png" class="align-center" src="../_images/app_proc_logic_flow_chart.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/app_proc_logic_flow_chart.png"><img alt="../_images/app_proc_logic_flow_chart.png" class="align-center" src="../_images/app_proc_logic_flow_chart.png" style="width: 400px;" />
+</a>
 </section>
 <section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h3>

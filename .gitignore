@@ -15,6 +15,7 @@ __*
 # local build files
 pydidas/sphinx
 *.html
+!versions/**/*.html
 dist/*
 build/*
 *egg*

@@ -392,7 +392,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _scan = Scan()
         _exp = DiffractionExperiment()
         _data = import_data(filename)
-        with h5py.File(filename, "r") as _file:
+        with h5py.File(filename, "r", locking=False) as _file:
             try:
                 for _key, _param in _exp.params.items():
                     _exp.set_param_value(

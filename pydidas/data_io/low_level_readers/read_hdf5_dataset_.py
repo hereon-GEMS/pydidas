@@ -70,7 +70,7 @@ def read_hdf5_dataset(filename, dataset="entry/data/data", axes=None):
         The dataset as a numpy array.
     """
     axes = axes if axes is not None else []
-    with h5py.File(filename, "r", locking=False) as _file:
+    with h5py.File(filename, "r") as _file:
         _ds = _file[dataset]
 
         limits = np.r_[[(0, _shape) for _shape in _ds.shape]]

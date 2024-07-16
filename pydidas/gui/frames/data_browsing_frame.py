@@ -141,7 +141,7 @@ class DataBrowsingFrame(BaseFrame):
             self.__open_file.close()
             self.__open_file = None
         if _extension in HDF5_EXTENSIONS:
-            self.__open_file = h5py.File(filename, mode="r", locking=False)
+            self.__open_file = h5py.File(filename, mode="r")
             return
         if _extension in BINARY_EXTENSIONS:
             return

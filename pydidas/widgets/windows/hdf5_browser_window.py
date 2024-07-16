@@ -187,7 +187,7 @@ class Hdf5BrowserWindow(PydidasWindow):
         if self.__open_file is not None:
             self.__open_file.close()
             self.__open_file = None
-        self.__open_file = h5py.File(filename, mode="r", locking=False)
+        self.__open_file = h5py.File(filename, mode="r")
         _h5_model = self._h5_treeview.findHdf5TreeModel()
         _h5_model.clear()
         _h5_model.insertH5pyObject(self.__open_file, filename=filename)

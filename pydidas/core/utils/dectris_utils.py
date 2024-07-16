@@ -43,7 +43,7 @@ def store_eiger_pixel_mask_from_master_file(master_filename: str, new_filename: 
         The filename for the output file.
     """
     _key = "/entry/instrument/detector/detectorSpecific/pixel_mask"
-    with h5py.File(master_filename, "r", locking=False) as _file:
+    with h5py.File(master_filename, "r") as _file:
         _pixel_mask = _file[_key][()]
     _pixel_mask = _pixel_mask.astype(np.int8)
     np.save(new_filename, _pixel_mask)
@@ -61,6 +61,6 @@ def store_eiger_flat_field_from_master_file(master_filename: str, new_filename: 
         The filename for the output file.
     """
     _key = "/entry/instrument/detector/detectorSpecific/flatfield"
-    with h5py.File(master_filename, "r", locking=False) as _file:
+    with h5py.File(master_filename, "r") as _file:
         _flat_field = _file[_key][()]
     np.save(new_filename, _flat_field)

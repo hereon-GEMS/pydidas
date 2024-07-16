@@ -112,7 +112,7 @@ def get_hdf5_populated_dataset_keys(
 
     if isinstance(item, (str, Path)):
         _hdf5_filename_check(item)
-        item = h5py.File(item, "r", locking=False)
+        item = h5py.File(item, "r")
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
     _datasets = []
@@ -307,7 +307,7 @@ def get_hdf5_metadata(
     if not isinstance(meta, (set, list, tuple)):
         raise TypeError("meta parameter must be of type str, set, list, tuple.")
     _results = {}
-    with h5py.File(_fname, "r", locking=False) as _file:
+    with h5py.File(_fname, "r") as _file:
         if "dtype" in meta:
             _results["dtype"] = _file[_dset].dtype
         if "shape" in meta:

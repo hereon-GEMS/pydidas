@@ -121,8 +121,9 @@ html_static_path = ["_static"]
 html_logo = "./images/logo/pydidas_snakes_circ_bg.png"
 html_title = "pydidas"
 
-# -- generate generic parameters page ---------------------------------------
-generic_params.create_generic_params_rst_docu()
+# dynamically create documentation for generic parameters:
+_fname = Path(__file__).parent / "dev_guide" / "dev_guide_list_of_generic_params.rst"
+generic_params.create_generic_params_rst_docs(_fname)
 
 
 def setup(app):

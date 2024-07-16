@@ -22,7 +22,7 @@ build/*
 htmlcov
 coverage_html_report
 .ruff_cache/*
-pydidas/docs/src/dev_guide/generic_params.rst
+pydidas/docs/src/dev_guide/dev_guide_list_of_generic_params.rst
 
 # logging
 *.log

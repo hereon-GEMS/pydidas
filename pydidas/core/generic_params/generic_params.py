@@ -93,8 +93,8 @@ available:
 .. contents::
    :local:
 
-
 """
+
 
 def create_generic_params_rst_docs(filename: Path):
     """

@@ -673,18 +673,20 @@ class DspacingSin2chiGrouping(ProcPlugin):
             raise TypeError("d_spacing has to be of type Pydidas Dataset.")
 
         # n_components: number of groups after grouping
-        # s2c_lables: sin2chi divided into different groups
+        # s2c_labels: sin2chi divided into different groups
         if self.config._s2c_labels is None or self.config._n_components is None:       
             self.config._n_components, self.config._s2c_labels = self._idx_s2c_grouping(chi, tolerance=tolerance)
         else: 
-
+            n_components, s2c_labels = self._idx_s2c_grouping(chi, tolerance=tolerance)
+            if self.config._n_components != n_components or not np.array_equal(self.config._s2c_labels, s2c_labels):
+                raise ValueError("Number of groups or s2c_labels do not match with previous dataset.")
 
 
         # Calculate sin2chi
         s2c = np.sin(np.deg2rad(chi)) ** 2
 
         # both are ordered in ascending order of increasing sin2chi
-        s2c_unique_labels = np.unique(s2c_labels)
+        s2c_unique_labels = np.unique(self.config._s2c_labels)
         s2c_unique_values = s2c[s2c_unique_labels]
 
         # Calculate first derivative

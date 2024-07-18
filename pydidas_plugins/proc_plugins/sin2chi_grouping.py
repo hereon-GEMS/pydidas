@@ -106,9 +106,9 @@ class DictViaAttrs:
       self._dict[attr] = value
     
     
-stress_strain_config = DictViaAttrs(
-    dict()
-)
+#stress_strain_config = DictViaAttrs(
+#    dict()
+#)
 
 
 class DspacingSin2chiGrouping(ProcPlugin):
@@ -135,15 +135,12 @@ class DspacingSin2chiGrouping(ProcPlugin):
     output_data_label = "0: d_combined; 1: d_spacing_avg; 2: d_spacing_diff"
     new_dataset = True
     
-    def __init__(self, stress_strain_config):
+    def __init__(self, stress_strain_config=DictViaAttrs(dict())):
         super().__init__()
         
         self._config.update(stress_strain_config.__dict__)
-        self.config = DictViaAttrs2(self._config)
-        
-        self._ds = None
-        #self._config["s2c_group_labels"] = None
-       
+        self.config = DictViaAttrs(self._config)
+              
         
     
     def execute(self, ds: Dataset):

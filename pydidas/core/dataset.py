@@ -39,6 +39,7 @@ import numpy as np
 from numpy import ndarray
 from numpy.typing import ArrayLike, DTypeLike
 
+from .exceptions import UserConfigError
 from .utils.dataset_utils import (
     FLATTEN_DIM_DEFAULTS,
     METADATA_KEYS,
@@ -980,6 +981,79 @@ class Dataset(ndarray):
     sum = partialmethod(__reimplement_numpy_method, ndarray.sum)
     max = partialmethod(__reimplement_numpy_method, ndarray.max, has_dtype_arg=False)
     min = partialmethod(__reimplement_numpy_method, ndarray.min, has_dtype_arg=False)
+
+    def sort(
+        self,
+        axis: Optional[int] = -1,
+        kind: Optional[str] = None,
+        order: Optional[Union[str, list[str]]] = None,
+        stable: Optional[bool] = None,
+    ) -> None:
+        """
+        Sort the Dataset in place.
+
+        Parameters
+        ----------
+        axis : int, optional
+            The axis to sort the array. The default is -1.
+        kind : str, optional
+            Please see the numpy.sort documentation for more information on the
+            `kind` parameter.
+        order : Union[str, list[str]], optional
+            Please see the numpy.sort documentation for more information on the
+            `order` parameter.
+        stable : bool, optional
+            Please see the numpy.sort documentation for more information on the
+            `stable` parameter.
+        """
+        if axis is not None and self.ndim > 1:
+            raise UserConfigError(
+                "Sorting a non-flattened Dataset with more than one dimension is not "
+                "allowed because it would destroy the metadata. "
+                "\nPlease either flatten the array or specifically sort the ndarray "
+                "representation available as Dataset.array. Note that the latter will "
+                "remove any Dataset metadata and the resulting class will be ndarray."
+            )
+        if axis is None:
+            if self.ndim > 1:
+                self.shape = (-1,)
+            axis = 0
+            _new_ax = None
+        else:
+            axis = np.mod(axis, self.ndim)
+            _new_indices = np.argsort(self, axis=axis, kind=kind, order=order)
+            _new_ax = self._meta["axis_ranges"][axis][_new_indices]
+        ndarray.sort(self, axis=axis, kind=kind, order=order, stable=stable)
+        if _new_ax is not None:
+            self._meta["axis_ranges"][axis] = _new_ax
+
+    def argsort(
+        self,
+        axis: Optional[int] = -1,
+        kind: Optional[str] = None,
+        order: Optional[Union[str, list[str]]] = None,
+        stable: Optional[bool] = None,
+    ) -> ndarray:
+        """
+        Get the indices which would sort the Dataset.
+
+        Parameters
+        ----------
+        axis : int, optional
+            The axis to sort the array. The default is -1.
+        kind : str, optional
+            Please see the numpy.argsort documentation for more information on the
+            `kind` parameter.
+        order : Union[str, list[str]], optional
+            Please see the numpy.argsort documentation for more information on the
+            `order` parameter.
+        stable : bool, optional
+            Please see the numpy.argsort documentation for more information on the
+            `stable` parameter.
+        """
+        return ndarray.argsort(
+            self, axis=axis, kind=kind, order=order, stable=stable
+        ).array
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """

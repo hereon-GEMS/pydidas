@@ -30,7 +30,7 @@ from numbers import Real
 
 import numpy as np
 
-from pydidas.core import Dataset, PydidasConfigError
+from pydidas.core import Dataset, PydidasConfigError, UserConfigError
 from pydidas.core.utils import rebin2d
 from pydidas.core.utils.dataset_utils import get_corresponding_dims
 
@@ -287,6 +287,15 @@ class TestDataset(unittest.TestCase):
                 self.assertTrue(np.allclose(_new_range, self._dset["ranges"][2][5:10]))
             else:
                 self.assertTrue(np.allclose(_new_range, self._dset["ranges"][_dim]))
+
+    def test_array_finalize__reordering(self):
+        obj = self.get_random_dataset(1)
+        _slicer = np.arange(obj.shape[0] - 1, -1, -1)
+        _new = obj[_slicer]
+        self.assertEqual(_new.axis_labels, obj.axis_labels)
+        self.assertEqual(_new.axis_units, obj.axis_units)
+        self.assertTrue(np.allclose(_new.axis_ranges[0], obj.axis_ranges[0][_slicer]))
+        self.assertEqual(obj.shape, _new.shape)
 
     def test_array_finalize__insert_data_simple(self):
         obj = self.create_large_dataset()
@@ -1230,6 +1239,47 @@ class TestDataset(unittest.TestCase):
     def test_np_tile(self):
         obj = self.get_random_dataset(2)
         _new = np.tile(obj, (1, 2, 3))
+        self.assertIsInstance(_new, Dataset)
+
+    def test_argsort(self):
+        for _dim in range(1, 6):
+            with self.subTest(dim=_dim):
+                obj = self.get_random_dataset(_dim)
+                _indices = obj.argsort()
+                self.assertIsInstance(_indices, np.ndarray)
+                self.assertNotIsInstance(_indices, Dataset)
+                self.assertEqual(_indices.shape, obj.shape)
+
+    def test_sort__1d_np_sort(self):
+        obj = self.get_random_dataset(1, shape=(50,))
+        _indices = obj.argsort()
+        _range = obj.axis_ranges[0]
+        _new = np.sort(obj)
+        self.assertTrue(np.allclose(obj[_indices], _new))
+        self.assertTrue(np.allclose(_new.axis_ranges[0], _range[_indices]))
+
+    def test_sort__1d_self_sort(self):
+        obj = self.get_random_dataset(1, shape=(50,))
+        _range = obj.axis_ranges[0]
+        _indices = obj.argsort()
+        obj.sort()
+        self.assertTrue(np.all(np.diff(obj) >= 0))
+        self.assertTrue(np.allclose(obj.axis_ranges[0], _range[_indices]))
+
+    def test_sort__multidim(self):
+        for _dim in range(2, 5):
+            with self.subTest(dim=_dim):
+                obj = self.get_random_dataset(_dim)
+                with self.assertRaises(UserConfigError):
+                    obj.sort()
+
+    def test_sort__multidim_axis_None(self):
+        for _dim in range(2, 5):
+            with self.subTest(dim=_dim):
+                obj = self.get_random_dataset(_dim)
+                obj.sort(axis=None)
+                self.assertTrue(np.all(np.diff(obj) >= 0))
+                self.assertEqual(obj.shape, (obj.size,))
 
 
 if __name__ == "__main__":

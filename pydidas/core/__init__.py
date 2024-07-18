@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ suite.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -34,10 +34,12 @@ from . import utils
 
 __all__.extend(["constants", "generic_params", "io_registry", "utils"])
 
+# import exceptions first to be used in other modules
+from .exceptions import *
+
 # import __all__ items from modules:
 from .base_app import *
 from .dataset import *
-from .exceptions import *
 from .generic_parameters import *
 from .hdf5_key import *
 from .object_with_parameter_collection import *

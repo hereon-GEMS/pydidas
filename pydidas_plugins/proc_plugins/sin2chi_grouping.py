@@ -29,7 +29,7 @@ __status__ = "Development"
 __all__ = ["DspacingSin2chiGrouping"]
 
 import numpy as np
-from enum import StrEnum, IntEnum
+from enum import StrEnum, IntEnum, Enum
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
@@ -711,7 +711,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # Advanced indexing
         # Here, s2c_labels specifies the row indices, and np.arange(s2c_num_elements) specifies the column indices.
-        s2c_advanced_idx = (s2c_labels, np.arange(s2c.size))
+        s2c_advanced_idx = (self.config._s2c_labels, np.arange(s2c.size))
         # expected shape for future matrices
         s2c_groups_matrix_shape = s2c_unique_labels.size, s2c.size
         # print('s2c_groups_matrix_shape', s2c_groups_matrix_shape)

@@ -110,17 +110,24 @@ Running a workflow is very simple and only requires calling the
 
 .. code-block::
 
-    >>> import pydidas
-    >>> executor = pydidas.apps.ExecuteWorkflowRunner(
-    ...     workflow='/home/username/data/experiment/workflow.yml',
-    ...     scan='/home/username/data/experiment/scan01.yml',
-    ...     diffraction_exp='/home/username/data/experiment/exp.yml',
-    ...     output_dir='/home/username/data/experiment/results/scan01',
-    ... )
-    >>> executor.process_scan()
+    import pydidas
+
+    def run_workflow():
+        executor = pydidas.apps.ExecuteWorkflowRunner(
+            workflow='/home/username/data/experiment/workflow.yml',
+            scan='/home/username/data/experiment/scan01.yml',
+            diffraction_exp='/home/username/data/experiment/exp.yml',
+            output_dir='/home/username/data/experiment/results/scan01',
+        )
+        executor.process_scan()
+
+    if __name__ == '__main__':
+        run_workflow()
 
 The code above will execute the workflow, save the results in the given
-directory and exit the event loop for additional user input.
+directory and exit the event loop for additional user input. **Please be aware
+that the call to the ExecuteWorkflowRunner must be made from within a function
+due to using of python's :py:module:`multiprocessing` module.**
 
 .. tip::
     

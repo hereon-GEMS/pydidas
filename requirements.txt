@@ -16,7 +16,7 @@ beautifulsoup4==4.12.3
     # via pydata-sphinx-theme
 build==1.2.1
     # via -r requirements.in
-certifi==2024.6.2
+certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests

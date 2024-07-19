@@ -301,7 +301,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "default": 2,
         "name": "Number of frame to use",
         "choices": None,
-        "unit": "bytes",
+        "unit": "",
         "allow_None": False,
         "tooltip": (
             "The number of frames to be loaded and included in the stack. "

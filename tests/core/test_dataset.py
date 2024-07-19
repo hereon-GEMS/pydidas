@@ -1258,6 +1258,14 @@ class TestDataset(unittest.TestCase):
         self.assertTrue(np.allclose(obj[_indices], _new))
         self.assertTrue(np.allclose(_new.axis_ranges[0], _range[_indices]))
 
+    def test_sort__1d_None_ax(self):
+        obj = self.get_random_dataset(1, shape=(50,))
+        _indices = obj.argsort()
+        _range = obj.axis_ranges[0]
+        _new = np.sort(obj, axis=None)
+        self.assertTrue(np.allclose(obj[_indices], _new))
+        self.assertTrue(np.allclose(_new.axis_ranges[0], _range[_indices]))
+
     def test_sort__1d_self_sort(self):
         obj = self.get_random_dataset(1, shape=(50,))
         _range = obj.axis_ranges[0]

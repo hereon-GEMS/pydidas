@@ -956,6 +956,11 @@ class Dataset(ndarray):
         ndarray
             The mean of the array elements.
         """
+        if axis is not None:
+            axis = tuple(
+                np.mod(_ax, self.ndim)
+                for _ax in ((axis,) if isinstance(axis, int) else axis)
+            )
         if has_dtype_arg:
             kwargs["dtype"] = dtype
         _result = numpy_method(self, axis=axis, out=out, **kwargs)

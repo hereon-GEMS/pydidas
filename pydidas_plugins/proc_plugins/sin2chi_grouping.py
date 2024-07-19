@@ -83,33 +83,33 @@ class Category(IntEnum):
     
     
 class DictViaAttrs:
-  ''' Access a dict via attributes. This class will enhance the dict for self._config to support IDE functionalities.
-  A (data)class offers comfort and reduction of errors due to the code-analysis feature of an IDE.
-  '''
+    ''' Access a dict via attributes. This class will enhance the dict for self._config to support IDE functionalities.
+    A (data)class offers comfort and reduction of errors due to the code-analysis feature of an IDE.
+    '''
 
-  def __init__(self, d):
-      self.__dict__['_dict'] = d
-      self._chi_key: int | None = None
-      self._pos_key: int | None = None
-      self._pos_idx: int | None = None
-      self._s2c_labels: np.ndarray | None = None
-      self._n_components: int | None = None
-           
+    def __init__(self, d):
+        self.__dict__['_dict'] = d
+        self._chi_key: int | None = None
+        self._pos_key: int | None = None
+        self._pos_idx: int | None = None
+        self._s2c_labels: np.ndarray | None = None
+        self._n_components: int | None = None
+            
 
-  def __getattr__(self, attr):
-      try:
-          return self._dict[attr]
-      except KeyError:
-          raise AttributeError(attr)
+    def __getattr__(self, attr):
+        if attr == '_dict':
+            # getattr before ._dict is set up
+            raise AttributeError(attr)
+        try:
+            return self._dict[attr]
+        except KeyError:
+            raise AttributeError(attr)
 
-  def __setattr__(self, attr, value):
-      self._dict[attr] = value
+
+    def __setattr__(self, attr, value):
+        self._dict[attr] = value
     
     
-#stress_strain_config = DictViaAttrs(
-#    dict()
-#)
-
 
 class DspacingSin2chiGrouping(ProcPlugin):
     """
@@ -130,7 +130,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
-    input_data_dim = 3 #TODO: Check if this is correct
+    input_data_dim = -1 #TODO: Check if this is correct
     output_data_dim = -1 #TODO: Check if this is correct
     output_data_label = "0: d_combined; 1: d_spacing_avg; 2: d_spacing_diff"
     new_dataset = True
@@ -140,18 +140,18 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         self._config.update(stress_strain_config.__dict__)
         self.config = DictViaAttrs(self._config)
-              
-        
-    
-    def execute(self, ds: Dataset):
+            
+    def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
         
         chi, d_spacing = self._ds_slicing(ds) 
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
         d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
         
-        #return Dataset(d_spacing_pos, d_spacing_neg, d_spacing_avg, d_spacing_diff )
-    
+        #add *kwargs
+        #return Dataset(d_spacing_pos, d_spacing_neg, d_spacing_avg, d_spacing_diff)
+        #a dummy version
+        return d_spacing_avg, kwargs
     
     def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:
         """
@@ -404,7 +404,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         index, aiding in data validation and consistency checks.
         """
 
-        if self._pos_idx not in ds_units:
+        if self.config._pos_idx not in ds_units:
             raise IndexError(f"pos_idx {pos_idx} is out of range for the dictionary keys")
 
         param_info = ds_units[pos_idx]
@@ -544,10 +544,10 @@ class DspacingSin2chiGrouping(ProcPlugin):
           
 
         # select the chi values
-        chi = ds.axis_ranges[self._chi_key]
+        chi = ds.axis_ranges[self.config._chi_key]
 
         # Extract d-spacing values
-        d_spacing = self._extract_d_spacing(ds, self._pos_key, self._pos_idx)
+        d_spacing = self._extract_d_spacing(ds, self.config._pos_key, self.config._pos_idx)
 
         # Slicing out of indeces/bounds returns an empty array
         # Check for empty array

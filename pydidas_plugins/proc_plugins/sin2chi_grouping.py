@@ -109,19 +109,23 @@ class DictViaAttrs:
     def __setattr__(self, attr, value):
         self._dict[attr] = value
     
-    
 
 class DspacingSin2chiGrouping(ProcPlugin):
     """
-    Grouping of d-spacing values according to the slopes in sin^2(chi) and similiarity in sin^2(chi) values. chi is the azimuthal angle of one diffraction image.
+    Grouping of d-spacing values according to the slopes in sin^2(chi) and similiarity in sin^2(chi) values.
+    chi is the azimuthal angle of one diffraction image.
     Output: Mean of d-spacing branche (d(+), d(-)) vs. sin^2(chi) , difference of d-spacing branches vs. sin(2*chi), and
     both d-spacing branches for each group.
     
-    In a fist step, the grouping is done by a clustering algorithm which uses sin^2(chi) and its values as reference. Similar values are identified as one group.
-    In a second step, the algorithm will group the d-spacing values into groups based on similiarity of sin^2(chi) values and its slope sign (positive or negative)
-    After the grouping, d-spacing values are categorized by their group labels and the slope sign. In each d-spacing branch, positive or negative, multiple groups can be identified.
+    In a fist step, the grouping is done by a clustering algorithm which uses sin^2(chi) and its values as reference.
+    Similar values are identified as one group.
+    In a second step, the algorithm will group the d-spacing values into groups based on similiarity of sin^2(chi) values
+    and its slope sign (positive or negative)
+    After the grouping, d-spacing values are categorized by their group labels and the slope sign.
+    In each d-spacing branch, positive or negative, multiple groups can be identified.
     d-spacing values for each group and slope sign follow. 
-    The mean of positive and negative d-spacing values vs. sin^2(chi) is calculated, and in a final step, the difference of positive and negative d-spacing values vs. sin(2*chi) is calculated.
+    The mean of positive and negative d-spacing values vs. sin^2(chi) is calculated,
+    and in a final step, the difference of positive and negative d-spacing values vs. sin(2*chi) is calculated.
     
     NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data.
     
@@ -142,16 +146,23 @@ class DspacingSin2chiGrouping(ProcPlugin):
         self.config = DictViaAttrs(self._config)
             
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
-        
+
         chi, d_spacing = self._ds_slicing(ds) 
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
         d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
-        
-        #add *kwargs
+  
+        #TODO: add function to combine all 4 results in one Dataset
         #return Dataset(d_spacing_pos, d_spacing_neg, d_spacing_avg, d_spacing_diff)
         #a dummy version
         return d_spacing_avg, kwargs
+    
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the Plugin results.
+        """
+        #self._config["result_shape"] = (self._config["input_shape"][0]//2,)   #wrong input from Malte, not 4,  but 2
+        raise NotImplementedError("This function is not implemented yet.")
     
     def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:
         """
@@ -275,7 +286,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         `fit_labels` should be a semicolon-separated list of parameter names, formatted as "index: name". The function matches
         parameters based on these indices and extracts corresponding units.
         """
-
+       
+        
         # Ensure ds is an instance of Dataset
         if not isinstance(ds, Dataset):
             raise TypeError("Input must be an instance of Dataset")
@@ -301,6 +313,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 unit = unit.strip()
                 data_label_dict[name] = unit
 
+        
         # Step 3: Create a mapping of fit_labels (with their indices) to their corresponding units
         result = {}
         for index, param in fit_labels_dict.items():
@@ -464,6 +477,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
 
         ds_units = self._extract_units(ds)
+                
         key_at_pos_idx, unit_at_pos_idx = self._get_param_unit_at_index(ds_units, pos_idx)
 
         # slice(None, None, None) is equivalent to "":"" in one dimension of the array. Explicit representation of the slice object shows all three parameters, even if the step parameter is not explicitly provided.
@@ -715,7 +729,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # s2c_label_matrix and d_spacing_matrix are useful for quality assurance via visual inspection
         s2c_labels_matrix = np.full(s2c_groups_matrix_shape, np.nan)
-        s2c_labels_matrix[*s2c_advanced_idx] = s2c_labels
+        s2c_labels_matrix[*s2c_advanced_idx] = self.config._s2c_labels
         # print('s2c_labels_matrix\n', s2c_labels_matrix)
 
         d_spacing_matrix = np.full(s2c_groups_matrix_shape, np.nan)

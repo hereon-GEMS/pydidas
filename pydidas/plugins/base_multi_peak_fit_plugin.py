@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ number of peaks to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -63,7 +63,6 @@ class FitMultiPeak(BaseFitPlugin):
         Calculate the shape of the Plugin results.
         """
         _output = self.get_param_value("fit_output")
-        self.output_data_label = _output
         _dim1 = len(_output.split(";"))
         self._config["result_shape"] = (
             (self.num_peaks, _dim1) if _dim1 > 1 else (self.num_peaks,)

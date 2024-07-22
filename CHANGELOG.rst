@@ -31,6 +31,8 @@ Bugfixes
 - Fixed an issue in Dataset's reshape after using np.array with ndmin parameter.
 - Fixed an issue when deleting the root WorkflowNode with multiple children.
 - Fixed inconsistencies in plugin docstrings.
+- Fixed an issue with fit plugins which would not forward the result units in 
+  the WorkflowTestFrame on repeated calls.
 
 v24.06.05
 =========

@@ -157,6 +157,9 @@ class BaseFitPlugin(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        if data.axis_ranges[0][1] < data.axis_ranges[0][0]:
+            data = data[::-1]
+            
         self.prepare_input_data(data)
         if not self.check_min_peak_height():
             return self.create_result_dataset(valid=False), kwargs

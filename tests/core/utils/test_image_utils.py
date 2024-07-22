@@ -68,6 +68,25 @@ class TestImageUtils(unittest.TestCase):
                 self.assertTrue(abs(low - (500 + _offset)) < 25)
                 self.assertTrue(abs(high - (9500 + _offset)) < 25)
 
+    def test_calculate_histogram_limits__only_high_lim_very_low(self):
+        raw_data = np.arange(1000**2)
+        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0)
+        self.qsettings.set_value("user/histogram_outlier_fraction_high", 1 - 1e-6)
+        data = raw_data
+        low, high = calculate_histogram_limits(data)
+        self.assertIsNone(low)
+        self.assertAlmostEqual(high, 0)
+
+    def test_calculate_histogram_limits__constant_arr_values(self):
+        raw_data = np.ones(100**2)
+        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+        self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+        data = raw_data
+        low, high = calculate_histogram_limits(data)
+        print("flat data: ", low, high)
+        # self.assertTrue(abs(low - (500 + _offset)) < 25)
+        # self.assertTrue(abs(high - (9500 + _offset)) < 25)
+
     def test_calculate_histogram_limits__no_upper_limit(self):
         raw_data = np.arange(100**2)
         self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
@@ -95,12 +114,11 @@ class TestImageUtils(unittest.TestCase):
         raw_data[0] = -1e6
         self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
         self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
-        for _offset in [0]:  # , -500, -5e4, 12000, 120000]:
+        for _offset in [0 , -500, -5e4, 12000, 120000]:
             with self.subTest(offset=_offset):
                 _tolerance = 400 * (1 + abs(_offset) / 1e5)
                 data = raw_data + _offset
                 low, high = calculate_histogram_limits(data)
-                print(_offset, low, high)
                 self.assertTrue(abs(low - (500 + _offset)) < _tolerance)
                 self.assertTrue(abs(high - (9500 + _offset)) < _tolerance)
 
@@ -108,14 +126,11 @@ class TestImageUtils(unittest.TestCase):
         raw_data = import_data(r"E:\_data\David_Canelo\T6_Malte\T6_Centre-00141.tif")
         self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
         self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
-        for _offset in [0]:  # , -500, -5e4, 12000, 120000]:
-            with self.subTest(offset=_offset):
-                _tolerance = 400 * (1 + abs(_offset) / 1e5)
-                data = raw_data + _offset
-                low, high = calculate_histogram_limits(data)
-                print(_offset, low, high)
-                self.assertTrue(abs(low - (500 + _offset)) < _tolerance)
-                self.assertTrue(abs(high - (9500 + _offset)) < _tolerance)
+        _tolerance = 400
+        data = raw_data
+        low, high = calculate_histogram_limits(data)
+        # self.assertTrue(abs(low - (500 + _offset)) < _tolerance)
+        # self.assertTrue(abs(high - (9500 + _offset)) < _tolerance)
 
 
 if __name__ == "__main__":

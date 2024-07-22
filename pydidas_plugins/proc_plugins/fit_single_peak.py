@@ -98,6 +98,5 @@ class FitSinglePeak(BaseFitPlugin):
         Calculate the shape of the Plugin results.
         """
         _output = self.get_param_value("fit_output")
-        self.output_data_label = _output
         self._config["result_shape"] = (len(_output.split(";")),)
         self._config["single_result_shape"] = self._config["result_shape"]

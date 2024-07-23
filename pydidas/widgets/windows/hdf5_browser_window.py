@@ -31,6 +31,7 @@ from functools import partial
 from pathlib import Path
 from typing import Union
 
+import h5py
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui import icons as silx_icons
 from silx.gui.hdf5 import Hdf5TreeModel, Hdf5TreeView, NexusSortFilterProxyModel
@@ -59,6 +60,7 @@ class Hdf5BrowserWindow(PydidasWindow):
         self.__qtapp = PydidasQApplication.instance()
         PydidasWindow.__init__(self, title="Hdf5 structure browser", **kwargs)
         # self.setWindowIcon(pydidas_icons.pydidas_icon_with_bg())
+        self.__open_file = None
 
     def build_frame(self):
         """
@@ -182,8 +184,13 @@ class Hdf5BrowserWindow(PydidasWindow):
         """
         Open a file in the browser
         """
-        self._h5_treeview.findHdf5TreeModel().clear()
-        self._h5_treeview.findHdf5TreeModel().appendFile(filename)
+        if self.__open_file is not None:
+            self.__open_file.close()
+            self.__open_file = None
+        self.__open_file = h5py.File(filename, mode="r")
+        _h5_model = self._h5_treeview.findHdf5TreeModel()
+        _h5_model.clear()
+        _h5_model.insertH5pyObject(self.__open_file, filename=filename)
         _root = self._h5_treeview.model().index(0, 0)
         if _root.isValid():
             self._h5_treeview.expandRecursively(_root, 2)
@@ -197,5 +204,6 @@ class Hdf5BrowserWindow(PydidasWindow):
         """
         Handle the close event of the widget and assure all files are closed.
         """
+        self.__open_file.close()
         self._h5_treeview.findHdf5TreeModel().clear()
         super().closeEvent(event)

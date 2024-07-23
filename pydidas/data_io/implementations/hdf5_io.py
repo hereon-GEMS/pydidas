@@ -180,7 +180,7 @@ class Hdf5Io(IoBase):
 
         with (
             CatchFileErrors(filename),
-            h5py.File(filename, "r", locking=False) as _h5file,
+            h5py.File(filename, "r") as _h5file,
         ):
             _raw_data = _h5file[dataset][_indices]
             _human_readable_indices = _get_slice_repr(_indices)

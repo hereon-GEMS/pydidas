@@ -294,6 +294,7 @@ class BaseFitPlugin(ProcPlugin):
         if not self._config["settings_updated_from_data"]:
             self._update_node_output_labels()
             self._update_peak_bounds_from_data()
+            self._config["settings_updated_from_data"] = True
 
     def _crop_data_to_selected_range(self):
         """
@@ -372,7 +373,6 @@ class BaseFitPlugin(ProcPlugin):
             _xhigh = np.amax(self._data_x)
             if self._config["bounds_high"][_index] > _xhigh:
                 self._config["bounds_high"][_index] = _xhigh
-        self._config["settings_updated_from_data"] = True
 
     def update_fit_param_bounds(self):
         """

@@ -145,6 +145,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
         self._config.update(stress_strain_config.__dict__)
         self.config = DictViaAttrs(self._config)
             
+    def pre_execute(self):
+        print(30*" \N{Hot pepper}")
+        print(self._config["input_shape"])  
+        print(30*" \N{Hot pepper}")        
+
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
 
         chi, d_spacing = self._ds_slicing(ds) 
@@ -161,8 +166,12 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
         Calculate the shape of the Plugin results.
         """
+        print(30*" \N{Peach}")
+        print(self._config["result_shape"])  
+        print(30*" \N{Peach}")   
+        
         #self._config["result_shape"] = (self._config["input_shape"][0]//2,)   #wrong input from Malte, not 4,  but 2
-        raise NotImplementedError("This function is not implemented yet.")
+        #raise NotImplementedError("This function is not implemented yet.")
     
     def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:
         """

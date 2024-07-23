@@ -31,6 +31,7 @@ Bugfixes
 - Fixed an issue in Dataset's reshape after using np.array with ndmin parameter.
 - Fixed an issue when deleting the root WorkflowNode with multiple children.
 - Fixed inconsistencies in plugin docstrings.
+- Fixed a bug in histogram calculations with high outliers.
 
 v24.06.05
 =========

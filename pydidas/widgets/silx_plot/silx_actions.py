@@ -35,7 +35,6 @@ __all__ = [
 ]
 
 
-from numbers import Real
 from typing import NewType
 
 import silx.gui.plot
@@ -230,9 +229,6 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         _colormap = image.getColormap()
         _cmap_limit_low, _cmap_limit_high = calculate_histogram_limits(image.getData())
 
-        if isinstance(_cmap_limit_low, Real) and isinstance(_cmap_limit_high, Real):
-            if _cmap_limit_low >= _cmap_limit_high:
-                _cmap_limit_low = 0.8 * _cmap_limit_high
         _colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
 
 

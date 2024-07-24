@@ -570,18 +570,25 @@ non-empty directories.</p></td>
 <h3>Running a workflow<a class="headerlink" href="#running-a-workflow" title="Link to this heading">#</a></h3>
 <p>Running a workflow is very simple and only requires calling the
 py:method:<cite>process_scan &lt;pydidas.apps.execute_workflow_runner.ExecuteWorkflowRunner.process_scan&gt;</cite> method, as shown in the example below.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">executor</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowRunner</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">workflow</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/workflow.yml&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">scan</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/scan01.yml&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">diffraction_exp</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/exp.yml&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/results/scan01&#39;</span><span class="p">,</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">executor</span><span class="o">.</span><span class="n">process_scan</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pydidas</span>
+
+<span class="k">def</span> <span class="nf">run_workflow</span><span class="p">():</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowRunner</span><span class="p">(</span>
+        <span class="n">workflow</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/workflow.yml&#39;</span><span class="p">,</span>
+        <span class="n">scan</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/scan01.yml&#39;</span><span class="p">,</span>
+        <span class="n">diffraction_exp</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/exp.yml&#39;</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;/home/username/data/experiment/results/scan01&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">executor</span><span class="o">.</span><span class="n">process_scan</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">run_workflow</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>The code above will execute the workflow, save the results in the given
-directory and exit the event loop for additional user input.</p>
+directory and exit the event loop for additional user input. <strong>Please be aware
+that the call to the ExecuteWorkflowRunner must be made from within a function
+due to using of python’s :py:module:`multiprocessing` module.</strong></p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>All the keywords from the initialization can also be given in the

@@ -104,7 +104,6 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         if _dim < 3:
             _plot.plot_pydidas_dataset(data, **kwargs)
         else:
-            print("plotting 3d data", type(data))
             _plot.setData(data)
             _plot.setDisplayMode(IMAGE_MODE)
 

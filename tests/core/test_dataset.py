@@ -37,7 +37,7 @@ from pydidas.core.utils.dataset_utils import get_corresponding_dims
 
 _np_random_generator = np.random.default_rng()
 
-_AXIS_SLICES = [0, 1, 3, (0,), (2,), (0, 1), (1, 3), (2, 0), (1, 2, 3), (0, 2, 3)]
+_AXIS_SLICES = [0, 3, -1, -3, (0,), (2,), (0, 1), (1, 3), (2, 0), (1, 2, 3), (0, 2, 3)]
 _IMPLEMENTED_METHODS = ["mean", "sum", "max", "min"]
 _METHOD_TAKES_INT_ONLY = ["cumsum"]
 _METHOD_REQUIRES_INITIAL = ["max", "min"]
@@ -99,6 +99,12 @@ class TestDataset(unittest.TestCase):
                 + (0.1 + _np_random_generator.random()) * np.arange(shape[_dim])
                 for _dim in range(ndim)
             ],
+        )
+
+    def ax_tuple(self, obj: Dataset, axes: tuple[int]) -> tuple[int]:
+        return tuple(
+            np.mod(_x, obj.ndim)
+            for _x in (axes if isinstance(axes, tuple) else (axes,))
         )
 
     def get_dict(self, key):
@@ -929,10 +935,9 @@ class TestDataset(unittest.TestCase):
                 ("np.mean(Dataset)", np.mean(obj, axis=_ax)),
             ]:
                 with self.subTest(axis=_ax, method=_method):
-                    if isinstance(_ax, int):
-                        _ax = (_ax,)
+                    _ax_tuple = self.ax_tuple(obj, _ax)
                     self.assertTrue(np.allclose(_mean, obj.array.mean(axis=_ax)))
-                    self.__assert_new_metadata_correct(_mean, _ax, "mean")
+                    self.__assert_new_metadata_correct(_mean, _ax_tuple, "mean")
 
     def test_sum__simple(self):
         obj = self.create_large_dataset()
@@ -942,20 +947,20 @@ class TestDataset(unittest.TestCase):
                 ("np.sum(Dataset)", np.sum(obj, axis=_ax)),
             ]:
                 with self.subTest(axis=_ax, method=_method):
-                    if isinstance(_ax, int):
-                        _ax = (_ax,)
+                    _ax_tuple = self.ax_tuple(obj, _ax)
                     self.assertTrue(np.allclose(_sum, obj.array.sum(axis=_ax)))
-                    self.__assert_new_metadata_correct(_sum, _ax, "sum")
+                    self.__assert_new_metadata_correct(_sum, _ax_tuple, "sum")
 
     def test_np_reimplementation__w_out_ndarray(self):
         obj = self.create_large_dataset()
         for _method_name in ["max", "mean", "sum"]:
             for _ax in _AXIS_SLICES:
-                if isinstance(_ax, int):
-                    _ax = (_ax,)
-                _new_shape = tuple(n for i, n in enumerate(obj.shape) if i not in _ax)
+                _ax_tuple = self.ax_tuple(obj, _ax)
+                _new_shape = tuple(
+                    n for i, n in enumerate(obj.shape) if i not in _ax_tuple
+                )
                 _out = np.zeros(_new_shape)
-                with self.subTest(method=_method_name):
+                with self.subTest(method=_method_name, axis=_ax):
                     _method = getattr(obj, _method_name)
                     _ = _method(axis=_ax, out=_out)
                     _ref = getattr(obj.array, _method_name)(axis=_ax)
@@ -967,7 +972,7 @@ class TestDataset(unittest.TestCase):
             for _ax in _AXIS_SLICES:
                 if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
                     continue
-                _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+                _ax_tuple = self.ax_tuple(obj, _ax)
                 _new_shape = tuple(
                     n for i, n in enumerate(obj.shape) if i not in _ax_tuple
                 )
@@ -999,7 +1004,7 @@ class TestDataset(unittest.TestCase):
             for _ax in _AXIS_SLICES:
                 if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
                     continue
-                _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+                _ax_tuple = self.ax_tuple(obj, _ax)
                 with self.subTest(method=_method_name, axis=_ax):
                     _method = getattr(obj, _method_name)
                     _result = _method(axis=_ax, dtype=np.float32)
@@ -1011,7 +1016,7 @@ class TestDataset(unittest.TestCase):
     def test_np_reimplementation__w_keepdims(self):
         obj = self.create_large_dataset()
         for _ax in _AXIS_SLICES:
-            _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+            _ax_tuple = self.ax_tuple(obj, _ax)
             for _method_name in _IMPLEMENTED_METHODS:
                 if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
                     continue
@@ -1031,7 +1036,7 @@ class TestDataset(unittest.TestCase):
         _mask = np.ones(obj.shape, dtype=bool)
         _mask[obj.shape[0] // 2 :] = False
         for _ax in _AXIS_SLICES:
-            _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+            _ax_tuple = self.ax_tuple(obj, _ax)
             for _method_name in _IMPLEMENTED_METHODS:
                 if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
                     continue
@@ -1078,7 +1083,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj[0, 0, :, 0] = np.nan
         for _ax in _AXIS_SLICES:
-            _ax_tuple = _ax if isinstance(_ax, tuple) else (_ax,)
+            _ax_tuple = self.ax_tuple(obj, _ax)
             with self.subTest(axis=_ax):
                 _result = np.nanmean(obj, axis=_ax)
                 self.__assert_new_metadata_correct(_result, _ax_tuple, "sum")
@@ -1206,14 +1211,16 @@ class TestDataset(unittest.TestCase):
 
     def test_reshape_1d(self):
         obj = self.get_random_dataset(1)
-        obj.update_axis_range(0, 0.5 * np.arange(obj.shape[0]))
+        _axlabel = obj.axis_labels[0]
+        _axunit = obj.axis_units[0]
+        _axrange = obj.axis_ranges[0]
         _new_shape = (1, obj.size)
         obj.shape = _new_shape
         self.assertEqual(obj.shape, _new_shape)
-        self.assertEqual(obj.axis_labels, {0: "", 1: ""})
-        self.assertEqual(obj.axis_units, {0: "", 1: ""})
-        for _i, _len in enumerate(obj.shape):
-            self.assertTrue(np.allclose(obj.axis_ranges[_i], np.arange(_len)))
+        self.assertEqual(obj.axis_labels, {0: "", 1: _axlabel})
+        self.assertEqual(obj.axis_units, {0: "", 1: _axunit})
+        self.assertTrue(np.allclose(obj.axis_ranges[0], np.arange(1)))
+        self.assertTrue(np.allclose(obj.axis_ranges[1], _axrange))
 
     def test_repeat(self):
         obj = self.get_random_dataset(4)
@@ -1298,6 +1305,40 @@ class TestDataset(unittest.TestCase):
                 obj.sort(axis=None)
                 self.assertTrue(np.all(np.diff(obj) >= 0))
                 self.assertEqual(obj.shape, (obj.size,))
+
+    def test_is_axis_nonlinear__simple(self):
+        obj = self.create_large_dataset()
+        for _ax in range(obj.ndim):
+            self.assertFalse(obj.is_axis_nonlinear(_ax))
+
+    def test_is_axis_nonlinear__falling_numbers(self):
+        obj = self.create_large_dataset()
+        obj = obj[::-1, :, ::-1]
+        for _ax in range(obj.ndim):
+            self.assertFalse(obj.is_axis_nonlinear(_ax))
+
+    def test_is_axis_nonlinear__linear_w_jitter(self):
+        obj = self.create_large_dataset()
+        for _level in [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]:
+            with self.subTest(jitter_level=_level):
+                obj.update_axis_range(
+                    1, np.arange(obj.shape[1]) + _level * np.random.random(obj.shape[1])
+                )
+            self.assertEqual(obj.is_axis_nonlinear(1), _level > 1e-4)
+            for _ax in [0, 2, 3]:
+                self.assertFalse(obj.is_axis_nonlinear(_ax))
+
+    def test_is_axis_nonlinear__inverse_func(self):
+        obj = self.create_large_dataset()
+        obj.update_axis_range(1, 1 / (1 + obj.axis_ranges[1]))
+        for _ax in range(obj.ndim):
+            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
+
+    def test_is_axis_nonlinear__sine_func(self):
+        obj = self.create_large_dataset()
+        obj.update_axis_range(1, np.sin(np.arange(obj.shape[1])))
+        for _ax in range(obj.ndim):
+            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
 
 
 if __name__ == "__main__":

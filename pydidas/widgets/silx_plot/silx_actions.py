@@ -35,16 +35,15 @@ __all__ = [
 ]
 
 
-from numbers import Real
 from typing import NewType
 
-import numpy as np
 import silx.gui.plot
 from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot.actions import PlotAction
 
 from ...core import PydidasQsettingsMixin, UserConfigError
+from ...core.utils import calculate_histogram_limits
 from ...data_io import IoMaster, import_data
 from ...resources import icons
 from ..file_dialog import PydidasFileDialog
@@ -227,53 +226,10 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
 
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
+        _colormap = image.getColormap()
+        _cmap_limit_low, _cmap_limit_high = calculate_histogram_limits(image.getData())
 
-        _fraction_low = self.q_settings_get(
-            "user/histogram_outlier_fraction_low", dtype=float
-        )
-        _fraction_high = 1 - self.q_settings_get(
-            "user/histogram_outlier_fraction_high", dtype=float
-        )
-        if _fraction_high - _fraction_low <= 0:
-            raise UserConfigError(
-                "The selected outlier fractions are too large. No data left to display."
-            )
-
-        _data = image.getData()
-        colormap = image.getColormap()
-        _cmap_limit_low = None
-        _cmap_limit_high = None
-
-        if _fraction_high < 1:
-            _counts, _edges = np.histogram(_data[np.isfinite(_data)], bins=4096)
-            _cumcounts = np.cumsum(_counts / _data.size)
-            _index_stop = max(1, np.where(_cumcounts <= _fraction_high)[0].size)
-
-            _counts2, _edges2 = np.histogram(
-                _data, bins=32768, range=(0, _edges[_index_stop])
-            )
-            _cumcounts2 = np.cumsum(_counts2 / _data.size)
-            _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction_high)[0].size)
-
-            _cmap_limit_high = _edges2[_index_stop2]
-
-        if _fraction_low > 0:
-            _counts, _edges = np.histogram(_data[np.isfinite(_data)], bins=4096)
-            _cumcounts = np.cumsum(_counts / _data.size)
-            _index_stop = np.where(_fraction_low <= _cumcounts)[0].size
-
-            _counts2, _edges2 = np.histogram(
-                _data, bins=32768, range=(_edges[0], _edges[_index_stop])
-            )
-            _cumcounts2 = np.cumsum(_counts2 / _data.size)
-            _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction_low)[0].size)
-
-            _cmap_limit_low = _edges2[_index_stop2]
-
-        if isinstance(_cmap_limit_low, Real) and isinstance(_cmap_limit_high, Real):
-            if _cmap_limit_low >= _cmap_limit_high:
-                _cmap_limit_low = 0.8 * _cmap_limit_high
-        colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
+        _colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
 
 
 class PydidasLoadImageAction(QtWidgets.QAction):

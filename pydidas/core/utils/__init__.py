@@ -37,6 +37,7 @@ from .format_arguments_ import *
 from .get_documentation_targets import *
 from .hdf5_dataset_utils import *
 from .logger import *
+from .image_utils import *
 from .math_utils import *
 from .numpy_parser import *
 from .no_print import *
@@ -83,6 +84,11 @@ from . import hdf5_dataset_utils
 
 __all__.extend(hdf5_dataset_utils.__all__)
 del hdf5_dataset_utils
+
+from . import image_utils
+
+__all__.extend(image_utils.__all__)
+del image_utils
 
 from . import iterable_utils
 

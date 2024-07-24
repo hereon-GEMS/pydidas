@@ -213,6 +213,14 @@ class TestFitSinglePeak(unittest.TestCase):
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
+    def test_execute__gaussian_0d_bg_repeat(self):
+        plugin = self.create_generic_plugin()
+        plugin.set_param_value("fit_bg_order", 0)
+        plugin.pre_execute()
+        _data, _kwargs = plugin.execute(self._data)
+        _data2, _kwargs = plugin.execute(self._data)
+        self.assertEqual(_data.data_label, _data2.data_label)
+
     def test_execute__gaussian_1d_bg(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", 1)

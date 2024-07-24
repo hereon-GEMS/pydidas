@@ -67,6 +67,20 @@ class Dataset(ndarray):
     - data_unit : The unit for the data values (in str format).
     - data_label : The label for the data values (in str format).
 
+    PLEASE NOTE: While axis metadata is preserved during operations like reshaping or
+    transposing, units are not automatically converted. The operator is responsible for
+    ensuring that the units are consistent.
+    For example, if the data_unit is meters, Dataset**2 will still have the unit
+    meters which must be updated in the calling function
+
+    Metadata is **not** preserved when operating on two datasets. The second dataset
+    will be interpreted as a numpy.ndarray and the metadata will be lost.
+
+    The following numpy ufuncs are reimplemented to preserver the metadata:
+    transpose, flatten, reshape, repeat, squeeze, take, shape, sort, mean, max, min,
+    sum.
+    For other numpy ufuncs, metadata preservation is not guaranteed.
+
     Parameters
     ----------
     array : ndarray

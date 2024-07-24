@@ -1192,14 +1192,16 @@ class TestDataset(unittest.TestCase):
 
     def test_reshape_1d(self):
         obj = self.get_random_dataset(1)
-        obj.update_axis_range(0, 0.5 * np.arange(obj.shape[0]))
+        _axlabel = obj.axis_labels[0]
+        _axunit = obj.axis_units[0]
+        _axrange = obj.axis_ranges[0]
         _new_shape = (1, obj.size)
         obj.shape = _new_shape
         self.assertEqual(obj.shape, _new_shape)
-        self.assertEqual(obj.axis_labels, {0: "", 1: ""})
-        self.assertEqual(obj.axis_units, {0: "", 1: ""})
-        for _i, _len in enumerate(obj.shape):
-            self.assertTrue(np.allclose(obj.axis_ranges[_i], np.arange(_len)))
+        self.assertEqual(obj.axis_labels, {0: "", 1: _axlabel})
+        self.assertEqual(obj.axis_units, {0: "", 1: _axunit})
+        self.assertTrue(np.allclose(obj.axis_ranges[0], np.arange(1)))
+        self.assertTrue(np.allclose(obj.axis_ranges[1], _axrange))
 
     def test_repeat(self):
         obj = self.get_random_dataset(4)
@@ -1244,7 +1246,6 @@ class TestDataset(unittest.TestCase):
     def test_is_axis_nonlinear__falling_numbers(self):
         obj = self.create_large_dataset()
         obj = obj[::-1, :, ::-1]
-        print(obj.axis_ranges)
         for _ax in range(obj.ndim):
             self.assertFalse(obj.is_axis_nonlinear(_ax))
 

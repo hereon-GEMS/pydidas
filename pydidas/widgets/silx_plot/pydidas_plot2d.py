@@ -33,10 +33,10 @@ from functools import partial
 from typing import Union
 
 import numpy as np
+from matplotlib.image import NonUniformImage
 from qtpy import QtCore
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D, backends
-from matplotlib.image import NonUniformImage
 
 from pydidas_qtcore import PydidasQApplication
 

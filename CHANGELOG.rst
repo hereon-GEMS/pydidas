@@ -12,7 +12,8 @@ Improvements
 - Improved the design of the DataBrowsingFrame and selectors for raw or hdf5 
   data are now located directly above the plots.
 - Added type-checking for Datasets axis_ranges and axis_units.  
-- Added mean, sum, min, max methods to Dataset to keep metadata consistent.
+- Added mean, sum, min, max, sort methods to Dataset to keep metadata 
+  consistent.
 - Added reshape metadata handling to Dataset.
 - Added a new plugin to convert pyFAI integration results to d-spacing.
 - Added check boxes for Parameters with only True/False choices.

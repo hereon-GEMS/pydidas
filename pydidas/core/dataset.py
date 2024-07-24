@@ -39,6 +39,7 @@ import numpy as np
 from numpy import ndarray
 from numpy.typing import ArrayLike, DTypeLike
 
+from .exceptions import UserConfigError
 from .utils.dataset_utils import (
     FLATTEN_DIM_DEFAULTS,
     METADATA_KEYS,
@@ -65,6 +66,20 @@ class Dataset(ndarray):
       given in form of 1-d arrays.
     - data_unit : The unit for the data values (in str format).
     - data_label : The label for the data values (in str format).
+
+    PLEASE NOTE: While axis metadata is preserved during operations like reshaping or
+    transposing, units are not automatically converted. The operator is responsible for
+    ensuring that the units are consistent.
+    For example, if the data_unit is meters, Dataset**2 will still have the unit
+    meters which must be updated in the calling function
+
+    Metadata is **not** preserved when operating on two datasets. The second dataset
+    will be interpreted as a numpy.ndarray and the metadata will be lost.
+
+    The following numpy ufuncs are reimplemented to preserver the metadata:
+    flatten, max, mean, min, repeat, reshape, shape, sort, squeeze, sum, take,
+    transpose.
+    For other numpy ufuncs, metadata preservation is not guaranteed.
 
     Parameters
     ----------
@@ -634,6 +649,43 @@ class Dataset(ndarray):
             else ""
         )
 
+    def get_axis_range(self, index: int) -> ndarray:
+        """
+        Get a copy of the range for the specified axis.
+
+        Parameters
+        ----------
+        index : int
+            The axis index.
+
+        Returns
+        -------
+        ndarray
+            The range of the axis.
+        """
+        return self._meta["axis_ranges"][index].copy()
+
+    def is_axis_nonlinear(self, index: int, threshold: float = 1e-4) -> bool:
+        """
+        Check if the axis range is nonlinear.
+
+        Parameters
+        ----------
+        index : int
+            The axis index.
+        threshold : float, optional
+            The threshold for the standard deviation of the range differences. The
+            default is 1e-4.
+
+        Returns
+        -------
+        bool
+            True if the axis range is nonlinear, False otherwise.
+        """
+        _range = self._meta["axis_ranges"][index]
+        _range_diff = np.diff(_range[np.isfinite(_range)])
+        return abs(_range_diff.std() / _range_diff.mean()) > threshold
+
     @property
     def data_description(self) -> str:
         """
@@ -985,6 +1037,79 @@ class Dataset(ndarray):
     sum = partialmethod(__reimplement_numpy_method, ndarray.sum)
     max = partialmethod(__reimplement_numpy_method, ndarray.max, has_dtype_arg=False)
     min = partialmethod(__reimplement_numpy_method, ndarray.min, has_dtype_arg=False)
+
+    def sort(
+        self,
+        axis: Optional[int] = -1,
+        kind: Optional[str] = None,
+        order: Optional[Union[str, list[str]]] = None,
+        stable: Optional[bool] = None,
+    ) -> None:
+        """
+        Sort the Dataset in place.
+
+        Parameters
+        ----------
+        axis : int, optional
+            The axis to sort the array. The default is -1.
+        kind : str, optional
+            Please see the numpy.sort documentation for more information on the
+            `kind` parameter.
+        order : Union[str, list[str]], optional
+            Please see the numpy.sort documentation for more information on the
+            `order` parameter.
+        stable : bool, optional
+            Please see the numpy.sort documentation for more information on the
+            `stable` parameter.
+        """
+        if axis is not None and self.ndim > 1:
+            raise UserConfigError(
+                "Sorting a non-flattened Dataset with more than one dimension is not "
+                "allowed because it would destroy the metadata. "
+                "\nPlease either flatten the array or specifically sort the ndarray "
+                "representation available as Dataset.array. Note that the latter will "
+                "remove any Dataset metadata and the resulting class will be ndarray."
+            )
+        if axis is None:
+            if self.ndim > 1:
+                self.shape = (-1,)
+            axis = 0
+            _new_ax = None
+        else:
+            axis = np.mod(axis, self.ndim)
+            _new_indices = np.argsort(self, axis=axis, kind=kind, order=order)
+            _new_ax = self._meta["axis_ranges"][axis][_new_indices]
+        ndarray.sort(self, axis=axis, kind=kind, order=order, stable=stable)
+        if _new_ax is not None:
+            self._meta["axis_ranges"][axis] = _new_ax
+
+    def argsort(
+        self,
+        axis: Optional[int] = -1,
+        kind: Optional[str] = None,
+        order: Optional[Union[str, list[str]]] = None,
+        stable: Optional[bool] = None,
+    ) -> ndarray:
+        """
+        Get the indices which would sort the Dataset.
+
+        Parameters
+        ----------
+        axis : int, optional
+            The axis to sort the array. The default is -1.
+        kind : str, optional
+            Please see the numpy.argsort documentation for more information on the
+            `kind` parameter.
+        order : Union[str, list[str]], optional
+            Please see the numpy.argsort documentation for more information on the
+            `order` parameter.
+        stable : bool, optional
+            Please see the numpy.argsort documentation for more information on the
+            `stable` parameter.
+        """
+        return ndarray.argsort(
+            self, axis=axis, kind=kind, order=order, stable=stable
+        ).array
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """

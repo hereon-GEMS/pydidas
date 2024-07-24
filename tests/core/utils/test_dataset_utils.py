@@ -202,6 +202,9 @@ class Test_dataset_utils(unittest.TestCase):
             [(1, 14, 14, 14), (1, 1, 1, 14, 1, 1, 14, 1, 14), {0: 0, 3: 1, 6: 2, 8: 3}],
             [(1, 1, 14, 14, 14, 1), (14, 14, 14), {0: 2, 1: 3, 2: 4}],
             [(14, 1, 1, 14, 14), (14, 14, 1, 14), {0: 0, 1: 3, 3: 4}],
+            [(5,), (1, 5, 1), {1: 0}],
+            ((5,), (1, 1, 5), {2: 0}),
+            [(42,), (42, 1, 1), {0: 0}],
         ]:
             with self.subTest(old_shape=_shape1, new_shape=_shape2):
                 _dim_matches = get_corresponding_dims(_shape1, _shape2)

@@ -30,7 +30,7 @@ from numbers import Real
 
 import numpy as np
 
-from pydidas.core import Dataset, PydidasConfigError
+from pydidas.core import Dataset, PydidasConfigError, UserConfigError
 from pydidas.core.utils import rebin2d
 from pydidas.core.utils.dataset_utils import get_corresponding_dims
 
@@ -294,15 +294,34 @@ class TestDataset(unittest.TestCase):
             else:
                 self.assertTrue(np.allclose(_new_range, self._dset["ranges"][_dim]))
 
+    def test_array_finalize__reordering(self):
+        obj = self.get_random_dataset(1)
+        _slicer = np.arange(obj.shape[0] - 1, -1, -1)
+        _new = obj[_slicer]
+        self.assertEqual(_new.axis_labels, obj.axis_labels)
+        self.assertEqual(_new.axis_units, obj.axis_units)
+        self.assertTrue(np.allclose(_new.axis_ranges[0], obj.axis_ranges[0][_slicer]))
+        self.assertEqual(obj.shape, _new.shape)
+
     def test_array_finalize__insert_data_simple(self):
         obj = self.create_large_dataset()
         _new = np.random.random((12, 14, 16))
         obj[2] = _new
+        for _key in ["labels", "units"]:
+            self.assertEqual(
+                getattr(obj, f"axis_{_key}"),
+                {i: k for i, k in enumerate(self._dset.get(_key))},
+            )
 
     def test_array_finalize__insert_data(self):
         obj = self.create_large_dataset()
         _new = np.random.random((14, 16))
         obj[2, 3] = _new
+        for _key in ["labels", "units"]:
+            self.assertEqual(
+                getattr(obj, f"axis_{_key}"),
+                {i: k for i, k in enumerate(self._dset.get(_key))},
+            )
 
     def test_array_finalize__get_single_value(self):
         obj = self.create_simple_dataset()[0]
@@ -1192,14 +1211,16 @@ class TestDataset(unittest.TestCase):
 
     def test_reshape_1d(self):
         obj = self.get_random_dataset(1)
-        obj.update_axis_range(0, 0.5 * np.arange(obj.shape[0]))
+        _axlabel = obj.axis_labels[0]
+        _axunit = obj.axis_units[0]
+        _axrange = obj.axis_ranges[0]
         _new_shape = (1, obj.size)
         obj.shape = _new_shape
         self.assertEqual(obj.shape, _new_shape)
-        self.assertEqual(obj.axis_labels, {0: "", 1: ""})
-        self.assertEqual(obj.axis_units, {0: "", 1: ""})
-        for _i, _len in enumerate(obj.shape):
-            self.assertTrue(np.allclose(obj.axis_ranges[_i], np.arange(_len)))
+        self.assertEqual(obj.axis_labels, {0: "", 1: _axlabel})
+        self.assertEqual(obj.axis_units, {0: "", 1: _axunit})
+        self.assertTrue(np.allclose(obj.axis_ranges[0], np.arange(1)))
+        self.assertTrue(np.allclose(obj.axis_ranges[1], _axrange))
 
     def test_repeat(self):
         obj = self.get_random_dataset(4)
@@ -1235,6 +1256,89 @@ class TestDataset(unittest.TestCase):
     def test_np_tile(self):
         obj = self.get_random_dataset(2)
         _new = np.tile(obj, (1, 2, 3))
+        self.assertIsInstance(_new, Dataset)
+
+    def test_argsort(self):
+        for _dim in range(1, 6):
+            with self.subTest(dim=_dim):
+                obj = self.get_random_dataset(_dim)
+                _indices = obj.argsort()
+                self.assertIsInstance(_indices, np.ndarray)
+                self.assertNotIsInstance(_indices, Dataset)
+                self.assertEqual(_indices.shape, obj.shape)
+
+    def test_sort__1d_np_sort(self):
+        obj = self.get_random_dataset(1, shape=(50,))
+        _indices = obj.argsort()
+        _range = obj.axis_ranges[0]
+        _new = np.sort(obj)
+        self.assertTrue(np.allclose(obj[_indices], _new))
+        self.assertTrue(np.allclose(_new.axis_ranges[0], _range[_indices]))
+
+    def test_sort__1d_None_ax(self):
+        obj = self.get_random_dataset(1, shape=(50,))
+        _indices = obj.argsort()
+        _range = obj.axis_ranges[0]
+        _new = np.sort(obj, axis=None)
+        self.assertTrue(np.allclose(obj[_indices], _new))
+        self.assertTrue(np.allclose(_new.axis_ranges[0], _range[_indices]))
+
+    def test_sort__1d_self_sort(self):
+        obj = self.get_random_dataset(1, shape=(50,))
+        _range = obj.axis_ranges[0]
+        _indices = obj.argsort()
+        obj.sort()
+        self.assertTrue(np.all(np.diff(obj) >= 0))
+        self.assertTrue(np.allclose(obj.axis_ranges[0], _range[_indices]))
+
+    def test_sort__multidim(self):
+        for _dim in range(2, 5):
+            with self.subTest(dim=_dim):
+                obj = self.get_random_dataset(_dim)
+                with self.assertRaises(UserConfigError):
+                    obj.sort()
+
+    def test_sort__multidim_axis_None(self):
+        for _dim in range(2, 5):
+            with self.subTest(dim=_dim):
+                obj = self.get_random_dataset(_dim)
+                obj.sort(axis=None)
+                self.assertTrue(np.all(np.diff(obj) >= 0))
+                self.assertEqual(obj.shape, (obj.size,))
+
+    def test_is_axis_nonlinear__simple(self):
+        obj = self.create_large_dataset()
+        for _ax in range(obj.ndim):
+            self.assertFalse(obj.is_axis_nonlinear(_ax))
+
+    def test_is_axis_nonlinear__falling_numbers(self):
+        obj = self.create_large_dataset()
+        obj = obj[::-1, :, ::-1]
+        for _ax in range(obj.ndim):
+            self.assertFalse(obj.is_axis_nonlinear(_ax))
+
+    def test_is_axis_nonlinear__linear_w_jitter(self):
+        obj = self.create_large_dataset()
+        for _level in [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]:
+            with self.subTest(jitter_level=_level):
+                obj.update_axis_range(
+                    1, np.arange(obj.shape[1]) + _level * np.random.random(obj.shape[1])
+                )
+            self.assertEqual(obj.is_axis_nonlinear(1), _level > 1e-4)
+            for _ax in [0, 2, 3]:
+                self.assertFalse(obj.is_axis_nonlinear(_ax))
+
+    def test_is_axis_nonlinear__inverse_func(self):
+        obj = self.create_large_dataset()
+        obj.update_axis_range(1, 1 / (1 + obj.axis_ranges[1]))
+        for _ax in range(obj.ndim):
+            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
+
+    def test_is_axis_nonlinear__sine_func(self):
+        obj = self.create_large_dataset()
+        obj.update_axis_range(1, np.sin(np.arange(obj.shape[1])))
+        for _ax in range(obj.ndim):
+            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
 
 
 if __name__ == "__main__":

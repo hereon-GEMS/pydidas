@@ -33,10 +33,9 @@ from functools import partial
 from typing import Union
 
 import numpy as np
-from matplotlib.image import NonUniformImage
 from qtpy import QtCore
 from silx.gui.colors import Colormap
-from silx.gui.plot import Plot2D, backends
+from silx.gui.plot import Plot2D
 
 from pydidas_qtcore import PydidasQApplication
 
@@ -108,11 +107,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         if self._config["use_data_info_action"]:
             self._add_data_info_action()
-
-        if isinstance(self._backend, backends.BackendMatplotlib.BackendMatplotlib):
-            self._nui = NonUniformImage(self._backend.ax)
-        else:
-            self._nui = None
 
     def _add_canvas_resize_actions(self):
         """
@@ -314,18 +308,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._check_data_dim(data)
         if data.axis_units[0] != "" and data.axis_units[1] != "":
             self.update_cs_units(data.axis_units[1], data.axis_units[0])
-
-        if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
-            _ax0 = data.get_axis_range(0)
-            _ax1 = data.get_axis_range(1)
-            print("Nonlinear axes in image.")
-            # The set data expects the ranges to be x, y:
-            self._nui.set_data(_ax1, _ax0, data.array)
-            self._nui.set_extent((_ax1.min(), _ax1.max(), _ax0.min(), _ax0.max()))
-            self._backend.ax.clear()
-            self._backend.ax.add_image(self._nui)
-            return
-        print("Linear axes in image.")
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
         _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
         self._plot_config = {

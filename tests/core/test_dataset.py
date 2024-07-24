@@ -301,11 +301,21 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _new = np.random.random((12, 14, 16))
         obj[2] = _new
+        for _key in ["labels", "units"]:
+            self.assertEqual(
+                getattr(obj, f"axis_{_key}"),
+                {i: k for i, k in enumerate(self._dset.get(_key))},
+            )
 
     def test_array_finalize__insert_data(self):
         obj = self.create_large_dataset()
         _new = np.random.random((14, 16))
         obj[2, 3] = _new
+        for _key in ["labels", "units"]:
+            self.assertEqual(
+                getattr(obj, f"axis_{_key}"),
+                {i: k for i, k in enumerate(self._dset.get(_key))},
+            )
 
     def test_array_finalize__get_single_value(self):
         obj = self.create_simple_dataset()[0]

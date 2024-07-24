@@ -77,8 +77,8 @@ class Dataset(ndarray):
     will be interpreted as a numpy.ndarray and the metadata will be lost.
 
     The following numpy ufuncs are reimplemented to preserver the metadata:
-    transpose, flatten, reshape, repeat, squeeze, take, shape, sort, mean, max, min,
-    sum.
+    flatten, max, mean, min, repeat, reshape, shape, sort, squeeze, sum, take,
+    transpose.
     For other numpy ufuncs, metadata preservation is not guaranteed.
 
     Parameters

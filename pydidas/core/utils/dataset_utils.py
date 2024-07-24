@@ -433,6 +433,7 @@ def get_corresponding_dims(ref_shape: tuple[int], new_shape: tuple[int]) -> dict
     _index_new_offset = 0
     _ref = [[_shape, _cp] for _shape, _cp in zip(ref_shape, np.cumprod(ref_shape))]
     _new = [[_shape, _cp] for _shape, _cp in zip(new_shape, np.cumprod(new_shape))]
+    print(_ref, _new)
     _current_ref = _ref.pop(0)
     _current_new = _new.pop(0)
     _key_indices = {}
@@ -440,7 +441,8 @@ def get_corresponding_dims(ref_shape: tuple[int], new_shape: tuple[int]) -> dict
     while True:
         if _current_new == _current_ref and not _factorized:
             _key_indices[_index_ref + _index_new_offset] = _index_ref
-        if len(_ref) == 0 or len(_new) == 0:
+        if (len(_ref) == 0 and _current_ref[0] < _current_new[0]) or (
+                len(_new) == 0 and _current_ref[0] > _current_new[0]):
             break
         if _current_ref[1] == _current_new[1]:
             _factorized = False

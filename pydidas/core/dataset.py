@@ -634,6 +634,43 @@ class Dataset(ndarray):
             else ""
         )
 
+    def get_axis_range(self, index: int) -> ndarray:
+        """
+        Get a copy of the range for the specified axis.
+
+        Parameters
+        ----------
+        index : int
+            The axis index.
+
+        Returns
+        -------
+        ndarray
+            The range of the axis.
+        """
+        return self._meta["axis_ranges"][index].copy()
+
+    def is_axis_nonlinear(self, index: int, threshold: float = 1e-4) -> bool:
+        """
+        Check if the axis range is nonlinear.
+
+        Parameters
+        ----------
+        index : int
+            The axis index.
+        threshold : float, optional
+            The threshold for the standard deviation of the range differences. The
+            default is 1e-4.
+
+        Returns
+        -------
+        bool
+            True if the axis range is nonlinear, False otherwise.
+        """
+        _range = self._meta["axis_ranges"][index]
+        _range_diff = np.diff(_range[np.isfinite(_range)])
+        return abs(_range_diff.std() / _range_diff.mean()) > threshold
+
     @property
     def data_description(self) -> str:
         """

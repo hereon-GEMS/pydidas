@@ -900,17 +900,36 @@ def create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg):
         if not (isinstance(d_spacing_combined, Dataset) and isinstance(d_spacing_avg, Dataset)):
             raise TypeError("Both objects must be instances of Dataset")
         
-        if not np.allclose(d_spacing_combined.axis_ranges[1], d_spacing_avg.axis_ranges[0]):
-            raise ValueError("Axis_ranges do not match")
+        if not d_spacing_combined.shape[0] == 2:
+            raise ValueError("Dataset d_spacing_combined must have a shape of (2, N).")
         
-        #If axis labels are not equal, raise an error indicating that the labels must be equal.  
-        #If the labels are equal, ensure that the equal labels are 'sin^2(chi)'  
-        if d_spacing_combined.axis_labels[1] != d_spacing_avg.axis_labels[0] and d_spacing_combined.axis_labels[1] != Labels.SIN2CHI:
-            raise ValueError(f"Axis labels must be equal and {Labels.SIN2CHI}.")
+        if not d_spacing_combined.shape[1] == d_spacing_avg.shape[0]:
+            raise ValueError("The datasets must have compatible shapes for combination.")
+        
+        #I expect element-wise equality 
+        print(30*"\N{Mango}")
+        print(d_spacing_combined.axis_ranges[1])
+        print(d_spacing_avg.axis_ranges[0])
+        print(30*"\N{Blueberries} ")
+        print(np.array_equal(d_spacing_combined.axis_ranges[1], d_spacing_avg.axis_ranges[0]))
+        if not np.array_equal(d_spacing_combined.axis_ranges[1], d_spacing_avg.axis_ranges[0]):
+            raise ValueError("Axis_ranges do not match.")
+        
+        #Explanation:
+        #d_spacing_combined.axis_labels[1] == d_spacing_avg.axis_labels[0]: Ensures the axis labels are equal.
+        #d_spacing_combined.axis_labels[1] == Labels.SIN2CHI: Ensures the equal labels are specifically Labels.SIN2CHI.
+        #The not outside the parentheses ensures that if either of these conditions is not met, the error is raised.
+        if not (d_spacing_combined.axis_labels[1] == d_spacing_avg.axis_labels[0] and d_spacing_combined.axis_labels[1] == Labels.SIN2CHI):
+            error_message = f'Axis_labels must be equal and {Labels.SIN2CHI}.'
+            print("Error message:", error_message)  # Add this line to print the error message
+            raise ValueError(error_message)
+        
+        if not d_spacing_combined.data_unit == d_spacing_avg.data_unit:
+            raise ValueError("Data units must match.")
         
                 
         d_spacing_avg=d_spacing_avg.reshape(1,-1)
-        print('d_spacing_avg changed\n',d_spacing_avg )
+        print('d_spacing_avg changed\n',d_spacing_avg)
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
         print(arr.shape, arr.ndim)

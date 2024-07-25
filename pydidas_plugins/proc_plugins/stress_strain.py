@@ -41,6 +41,8 @@ from typing import List, Tuple, Dict
 class Labels(StrEnum):
     CHI: str = "chi"
     POSITION: str = "position"
+    SIN2CHI: str = "sin^2(chi)"
+    SIN_2CHI: str = "sin(2* chi)"
 
     def __str__(self) -> str:
         return self.value
@@ -742,8 +744,8 @@ def combine_sort_d_spacing_pos_neg(d_spacing_pos: Dataset, d_spacing_neg: Datase
 
     Examples
     --------
-    >>> d_spacing_pos = Dataset(np.array([1.0, 1.1, 1.2]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
-    >>> d_spacing_neg = Dataset(np.array([0.9, 0.95, 1.05]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: 'sin^2(chi)'})
+    >>> d_spacing_pos = Dataset(np.array([1.0, 1.1, 1.2]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: Labels.SIN2CHI})
+    >>> d_spacing_neg = Dataset(np.array([0.9, 0.95, 1.05]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: Labels.SIN2CHI})
     >>> d_spacing_combined = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     >>> print(d_spacing_combined)
     """
@@ -863,3 +865,60 @@ def pre_regression_calculation(d_spacing_combined: Dataset) -> Tuple[Dataset, Da
     }
 
     return d_spacing_avg, d_spacing_diff
+
+
+def create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg):
+        """
+        Creates a final result dataset by combining d-spacing values from two datasets.
+
+        This function takes two Dataset objects: one representing combined d-spacing values (d-, d+) 
+        and another representing average d-spacing values. 
+        The function combines these datasets into a new Dataset object that includes both the combined and average d-spacing values, along with 
+        updated axis ranges and labels.
+
+        Parameters:
+        - d_spacing_combined (Dataset): A Dataset object containing combined d-spacing values, (d-, d+).
+        - d_spacing_avg (Dataset): A Dataset object containing the mean of the combined d-spacing values.
+
+        Returns:
+        - Dataset: A new Dataset object that combines the input datasets with updated axis ranges 
+        and labels.
+
+        Raises:
+        - TypeError: If either of the input arguments is not an instance of Dataset.
+        - ValueError: If the axis ranges of the input datasets do not match or if the axis labels 
+        do not meet the required conditions (must be equal and labeled as 'sin^2(chi)').
+
+        Note:
+        The function assumes that the second axis of `d_spacing_combined` and the first axis of 
+        `d_spacing_avg` are the relevant axes for comparison and combination. It also reshapes 
+        `d_spacing_avg` to ensure compatibility for combination.
+    """
+
+        
+        #checks
+        if not (isinstance(d_spacing_combined, Dataset) and isinstance(d_spacing_avg, Dataset)):
+            raise TypeError("Both objects must be instances of Dataset")
+        
+        if not np.allclose(d_spacing_combined.axis_ranges[1], d_spacing_avg.axis_ranges[0]):
+            raise ValueError("Axis_ranges do not match")
+        
+        #If axis labels are not equal, raise an error indicating that the labels must be equal.  
+        #If the labels are equal, ensure that the equal labels are 'sin^2(chi)'  
+        if d_spacing_combined.axis_labels[1] != d_spacing_avg.axis_labels[0] and d_spacing_combined.axis_labels[1] != Labels.SIN2CHI:
+            raise ValueError(f"Axis labels must be equal and {Labels.SIN2CHI}.")
+        
+                
+        d_spacing_avg=d_spacing_avg.reshape(1,-1)
+        print('d_spacing_avg changed\n',d_spacing_avg )
+        
+        arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
+        print(arr.shape, arr.ndim)
+        
+        print(d_spacing_combined.data_label, d_spacing_avg.data_label)
+
+        result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 
+                axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI}, data_unit=d_spacing_combined.data_unit,
+                data_label='d_spacing'
+            )
+        return result

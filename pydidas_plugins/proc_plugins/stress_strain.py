@@ -907,11 +907,6 @@ def create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg):
             raise ValueError("The datasets must have compatible shapes for combination.")
         
         #I expect element-wise equality 
-        print(30*"\N{Mango}")
-        print(d_spacing_combined.axis_ranges[1])
-        print(d_spacing_avg.axis_ranges[0])
-        print(30*"\N{Blueberries} ")
-        print(np.array_equal(d_spacing_combined.axis_ranges[1], d_spacing_avg.axis_ranges[0]))
         if not np.array_equal(d_spacing_combined.axis_ranges[1], d_spacing_avg.axis_ranges[0]):
             raise ValueError("Axis_ranges do not match.")
         

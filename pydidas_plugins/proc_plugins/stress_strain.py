@@ -927,10 +927,7 @@ def create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg):
         print('d_spacing_avg changed\n',d_spacing_avg)
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
-        print(arr.shape, arr.ndim)
-        
-        print(d_spacing_combined.data_label, d_spacing_avg.data_label)
-
+               
         result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 
                 axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI}, data_unit=d_spacing_combined.data_unit,
                 data_label='d_spacing'

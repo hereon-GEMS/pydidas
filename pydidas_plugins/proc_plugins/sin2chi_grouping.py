@@ -136,7 +136,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     plugin_subtype = PROC_PLUGIN_INTEGRATED
     input_data_dim = -1 #TODO: Check if this is correct
     output_data_dim = -1 #TODO: Check if this is correct
-    output_data_label = "0: d_combined; 1: d_spacing_avg; 2: d_spacing_diff"
+    output_data_label = "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
     new_dataset = True
     
     def __init__(self, stress_strain_config=DictViaAttrs(dict())):
@@ -167,6 +167,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         Calculate the shape of the Plugin results.
         """
         print(30*" \N{Peach}")
+        print(self._config["input_shape"])
         print(self._config["result_shape"])  
         print(30*" \N{Peach}")   
         

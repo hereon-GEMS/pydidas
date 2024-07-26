@@ -181,6 +181,24 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         #self._config["result_shape"] = (self._config["input_shape"][0]//2,)   #wrong input from Malte, not 4,  but 2
         #raise NotImplementedError("This function is not implemented yet.")
+        
+        
+        
+    def _ensure_dataset_instance(self, ds: Dataset) -> None:
+        """
+        Ensure the input is an instance of Dataset.
+
+        Parameters:
+        ds (Dataset): The input to check.
+
+        Raises:
+        TypeError: If ds is not an instance of Dataset.
+        """
+        if not isinstance(ds, Dataset):
+            raise TypeError("Input must be an instance of Dataset")
+        
+        
+    
     
     def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:
         """
@@ -219,8 +237,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         This function checks the `axis_labels` of the dataset for the presence of 'chi' and 'position'. It ensures that there is exactly one 'chi' and at least one 'position' descriptor. The function raises errors if the conditions are not met, ensuring the dataset's structure is as expected for further processing.
         """
 
-        if not isinstance(ds, Dataset):
-            raise TypeError("Input has to be of type Dataset.")
+        self._ensure_dataset_instance(ds)
 
         axis_labels = ds.axis_labels
 
@@ -307,8 +324,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
        
         
         # Ensure ds is an instance of Dataset
-        if not isinstance(ds, Dataset):
-            raise TypeError("Input must be an instance of Dataset")
+        self._ensure_dataset_instance(ds)
 
         chi_key, (pos_key, _) = self._chi_pos_verification(ds)
 
@@ -371,8 +387,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         - The function currently only allows 'chi' to be in degrees ('deg'). If there is a need to allow 'chi' in radians
         ('rad'), adjustments will be necessary in the calculation of sin^2(chi).
         """
-        if not isinstance(ds, Dataset):
-            raise TypeError("Input must be an instance of Dataset")
+        self._ensure_dataset_instance(ds)
 
         ds_units: Dict[str, List[str]] = self._extract_units(ds)
 
@@ -559,8 +574,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         >>> print(d_spacing)
         """
 
-        if not isinstance(ds, Dataset):
-            raise TypeError('Input has to be of type Dataset.')
+        self._ensure_dataset_instance(ds)
 
         # Identification of chi and position
         if self.config._chi_key is None or self.config._pos_key is None or self.config._pos_idx is None:

@@ -982,7 +982,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         return d_spacing_avg, d_spacing_diff
     
     
-    def _create_final_result_sin2chi_method(self, d_spacing_combined, d_spacing_avg):
+    def _create_final_result_sin2chi_method(d_spacing_combined: Dataset, d_spacing_avg: Dataset) -> Dataset:
         """
         Creates a final result dataset by combining d-spacing values from two datasets.
 

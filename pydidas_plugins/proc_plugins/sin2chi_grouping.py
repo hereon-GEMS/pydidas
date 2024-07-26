@@ -43,7 +43,7 @@ class Labels(StrEnum):
     CHI: str = "chi"
     POSITION: str = "position"
     SIN2CHI: str = "sin^2(chi)"
-    SIN_2CHI: str = "sin(2* chi)"
+    SIN_2CHI: str = "sin(2*chi)"
 
     def __str__(self) -> str:
         return self.value

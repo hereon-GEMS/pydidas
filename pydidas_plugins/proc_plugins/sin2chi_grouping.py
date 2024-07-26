@@ -162,13 +162,15 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
         
-        d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
+        #d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
+        d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined, d_spacing_combined.mean)
+        
         
   
         #TODO: add function to combine all 4 results in one Dataset
         #return Dataset(d_spacing_pos, d_spacing_neg, d_spacing_avg, d_spacing_diff)
         #a dummy version
-        return d_spacing_avg, kwargs
+        return d_output_sin2chi_method, kwargs
     
     def calculate_result_shape(self):
         """
@@ -179,7 +181,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(self._config["result_shape"])  
         print(30*" \N{Peach}")   
         
-        #self._config["result_shape"] = (self._config["input_shape"][0]//2,)   #wrong input from Malte, not 4,  but 2
+        #self._config["result_shape"] = (3, self._config["input_shape"][0]//2+1)   #wrong input from Malte, not 4,  but 2
         #raise NotImplementedError("This function is not implemented yet.")
         
         
@@ -982,7 +984,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         return d_spacing_avg, d_spacing_diff
     
     
-    def _create_final_result_sin2chi_method(d_spacing_combined: Dataset, d_spacing_avg: Dataset) -> Dataset:
+    def _create_final_result_sin2chi_method(self, d_spacing_combined: Dataset, d_spacing_avg: Dataset) -> Dataset:
+        #sq sin_sq_chi 2 durch sq esetzen? ??
         """
         Creates a final result dataset by combining d-spacing values from two datasets.
 
@@ -1041,6 +1044,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_avg=d_spacing_avg.reshape(1,-1)
         print('d_spacing_avg changed\n',d_spacing_avg)
         
+        #dummy_array=np.nan(self.result_shape) #verheirtate das mit array
+        #adjust axis label to correct length for dummy_array
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
                
         result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 

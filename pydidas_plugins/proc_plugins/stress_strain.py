@@ -867,7 +867,7 @@ def pre_regression_calculation(d_spacing_combined: Dataset) -> Tuple[Dataset, Da
     return d_spacing_avg, d_spacing_diff
 
 
-def create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg):
+def create_final_result_sin2chi_method(d_spacing_combined: Dataset, d_spacing_avg: Dataset) -> Dataset:
         """
         Creates a final result dataset by combining d-spacing values from two datasets.
 

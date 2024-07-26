@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ different coordinate systems.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -92,7 +92,7 @@ class PydidasPositionInfo(PositionInfo):
     ):
         """
         Receive the signal that a new coordinate system has been selected and
-        update the interal reference.
+        update the internal reference.
 
         Parameters
         ----------
@@ -106,15 +106,7 @@ class PydidasPositionInfo(PositionInfo):
 
     def update_coordinate_labels(self):
         """
-        Update the position info widget coordinate labels based on the coordinate
-        system.
-
-        Parameters
-        ----------
-        xlabel : str
-            The label for the first (generic "x") coordinate.
-        ylabel : str
-            The label for the second (generic "y") coordinate.
+        Update the position info widget coordinate labels based on the stored units.
         """
         _x_text = AX_LABELS[self._cs_name][0] + f" [{self._cs_x_unit}]"
         _y_text = AX_LABELS[self._cs_name][2] + f" [{self._cs_y_unit}]"

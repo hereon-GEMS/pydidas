@@ -56,6 +56,7 @@ class CoordinateTransformButton(PlotToolButton):
         if self.STATE is None:
             self.__set_state()
         PlotToolButton.__init__(self, parent=parent, plot=plot)
+        self.__current_cs = "cartesian"
         self.__define_actions_and_create_menu()
 
     def __set_state(self):
@@ -137,9 +138,11 @@ class CoordinateTransformButton(PlotToolButton):
         cs_name : Literal["cartesian", "r_chi", "2theta_chi", "q_chi"]
             The descriptive name of the coordinate system.
         """
-        self.setIcon(self.STATE[cs_name, "icon"])
-        self.setToolTip(self.STATE[cs_name, "state"])
-        self.sig_new_coordinate_system.emit(cs_name)
+        if cs_name != self.__current_cs:
+            self.setIcon(self.STATE[cs_name, "icon"])
+            self.setToolTip(self.STATE[cs_name, "state"])
+            self.sig_new_coordinate_system.emit(cs_name)
+            self.__current_cs = cs_name
 
     @QtCore.Slot()
     def check_detector_is_set(self, silent: bool = False):

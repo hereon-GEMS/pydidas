@@ -26,33 +26,40 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["get_2d_silx_plot_ax_settings", "user_config_update_func"]
 
+
 from contextlib import nullcontext
 
-from numpy import ndarray
 from qtpy import QtCore
 
+from ...core import Dataset
 
-def get_2d_silx_plot_ax_settings(axis: ndarray) -> tuple[float, float]:
+
+def get_2d_silx_plot_ax_settings(data: Dataset) -> tuple[float, float]:
     """
     Get the axis settings to have pixels centered at their values.
 
     Parameters
     ----------
-    axis : np.ndarray
-        The numpy array with the axis positions.
+    data : Dataset
+        The dataset to get the axis settings from.
 
     Returns
     -------
-    _origin : float
-        The value for the axis origin.
-    _scale : float
-        The value for the axis scale to squeeze it into the correct
-        dimensions for silx ImageView.
+    origins : tuple[float, float]
+        The values for the axis origins.
+    scales : tuple[float, float]
+        The values for the axis scales to squeeze it into the correct
+        dimensions for silx plotting.
     """
-    _delta = axis[1] - axis[0]
-    _scale = (axis[-1] - axis[0] + _delta) / axis.size
-    _origin = axis[0] - _delta / 2
-    return _origin, _scale
+    origins = []
+    scales = []
+    # calling axis #1 with x first because silx expects (x, y) values.
+    for _dim in (1, 0):
+        _ax = data.get_axis_range(_dim)
+        _delta = (_ax.max() - _ax.min()) / _ax.size
+        scales.append(_delta * (_ax.size + 1) / _ax.size)
+        origins.append(_ax[0] - _delta / 2)
+    return tuple(origins), tuple(scales)
 
 
 @QtCore.Slot(str, str)

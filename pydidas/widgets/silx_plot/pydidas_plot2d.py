@@ -33,10 +33,9 @@ from functools import partial
 from typing import Union
 
 import numpy as np
-from matplotlib.image import NonUniformImage
 from qtpy import QtCore
 from silx.gui.colors import Colormap
-from silx.gui.plot import Plot2D, backends
+from silx.gui.plot import Plot2D
 
 from pydidas_qtcore import PydidasQApplication
 
@@ -100,6 +99,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         }
         self._plot_config = {"kwargs": {}}
 
+        self._update_position_widget()
         self._add_canvas_resize_actions()
         self._add_histogram_actions()
         if self._config["cs_transform"]:
@@ -109,10 +109,23 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if self._config["use_data_info_action"]:
             self._add_data_info_action()
 
-        if isinstance(self._backend, backends.BackendMatplotlib.BackendMatplotlib):
-            self._nui = NonUniformImage(self._backend.ax)
-        else:
-            self._nui = None
+    def _update_position_widget(self):
+        """
+        Update the position widget to be able to display units.
+        """
+
+        _pos_widget_converters = [
+            (_field[1], _field[2]) for _field in self._positionWidget._fields
+        ]
+        _new_position_widget = PydidasPositionInfo(
+            plot=self,
+            converters=_pos_widget_converters,
+            diffraction_exp=self._config["diffraction_exp"],
+        )
+        _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
+        _layout = self.findChild(self._positionWidget.__class__).parent().layout()
+        _layout.replaceWidget(self._positionWidget, _new_position_widget)
+        self._positionWidget = _new_position_widget
 
     def _add_canvas_resize_actions(self):
         """
@@ -169,22 +182,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.update_exp_setup_params()
         self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
         self._toolbar.addWidget(self.cs_transform)
-
-        _pos_widget_converters = [
-            (_field[1], _field[2]) for _field in self._positionWidget._fields
-        ]
-        _new_position_widget = PydidasPositionInfo(
-            plot=self,
-            converters=_pos_widget_converters,
-            diffraction_exp=self._config["diffraction_exp"],
-        )
-        _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
-        _layout = self.findChild(self._positionWidget.__class__).parent().layout()
-        _layout.replaceWidget(self._positionWidget, _new_position_widget)
         self.cs_transform.sig_new_coordinate_system.connect(
-            _new_position_widget.new_coordinate_system
+            self._positionWidget.new_coordinate_system
         )
-        self._positionWidget = _new_position_widget
 
     def _set_colormap_and_bar(self):
         """
@@ -257,8 +257,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         y_unit : str
             The unit for the data y-axis
         """
-        if not self._config["cs_transform"]:
-            return
+        x_unit = "no unit" if x_unit == "" else x_unit
+        y_unit = "no unit" if y_unit == "" else y_unit
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
     def addImage(self, data: Union[Dataset, np.ndarray], **kwargs: dict):
@@ -280,14 +280,49 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.plot_pydidas_dataset(data, **kwargs)
         else:
             self._check_data_dim(data)
-            self._plot2d_add_image(data, **kwargs)
+            self.__plot2d_add(Plot2D.addImage, data, **kwargs)
+            self.update_cs_units("", "")
 
-    def _plot2d_add_image(self, data: np.ndarray, **kwargs: dict):
+    def addNonUniformImage(
+        self,
+        data: Union[Dataset, np.ndarray],
+        x: np.ndarray = None,
+        y: np.ndarray = None,
+        **kwargs,
+    ):
+        """
+        Add a non-uniform image to the plot.
+
+        This method implements an additional dimensionality check before passing
+        the image to the Plot2d.addImage method.
+
+        Parameters
+        ----------
+        data : Union[Dataset, np.ndarray]
+            The input data to be displayed.
+        x : np.ndarray
+            The x-axis data. Must only be given if the data is not a pydidas Dataset.
+        y : np.ndarray
+            The y-axis data. Must only be given if the data is not a pydidas Dataset.
+
+        **kwargs : dict
+            Any supported Plot2d.addImage keyword arguments.
+        """
+        if isinstance(data, Dataset):
+            self.plot_pydidas_dataset(data, **kwargs)
+        else:
+            self._check_data_dim(data)
+            self.__plot2d_add(Plot2D.addNonUniformImage, data, x, y, **kwargs)
+            self.update_cs_units("", "")
+
+    def __plot2d_add(self, method: callable, *args: tuple, **kwargs: dict):
         """
         Call the original Plot2D.addImage method.
 
         Parameters
         ----------
+        method : callable
+            The method to be called in the Plot2d base class.
         data : np.ndarray
             The input data to be displayed.
 
@@ -295,7 +330,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             Any supported Plot2d.addImage keyword arguments.
         """
         kwargs.update({"legend": "pydidas image", "replace": True})
-        Plot2D.addImage(self, data, **kwargs)
+        method(self, *args, **kwargs)
         self.enable_cs_transform()
         if self.cs_transform.isEnabled():
             self.changeCanvasToDataAction._actionTriggered()
@@ -312,29 +347,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             Additional keyword arguments to be passed to the silx plot method.
         """
         self._check_data_dim(data)
-        if data.axis_units[0] != "" and data.axis_units[1] != "":
-            self.update_cs_units(data.axis_units[1], data.axis_units[0])
-
-        if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
-            _ax0 = data.get_axis_range(0)
-            _ax1 = data.get_axis_range(1)
-            print("Nonlinear axes in image.")
-            # The set data expects the ranges to be x, y:
-            self._nui.set_data(_ax1, _ax0, data.array)
-            self._nui.set_extent((_ax1.min(), _ax1.max(), _ax0.min(), _ax0.max()))
-            self._backend.ax.clear()
-            self._backend.ax.add_image(self._nui)
-            return
-        print("Linear axes in image.")
-        _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
-        _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
+        self.update_cs_units(data.axis_units[1], data.axis_units[0])
         self._plot_config = {
             "ax_labels": [data.get_axis_description(i) for i in [0, 1]],
             "kwargs": {
                 "replace": kwargs.pop("replace", True),
                 "copy": kwargs.pop("copy", False),
-                "origin": (_originx, _originy),
-                "scale": (_scalex, _scaley),
                 "legend": "pydidas image",
             }
             | {
@@ -343,9 +361,21 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 if _key in self._config["allowed_add_image_kwargs"]
             },
         }
+        if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
+            _ax0 = data.get_axis_range(0)
+            _ax1 = data.get_axis_range(1)
+            __add_args = (Plot2D.addNonUniformImage, data.array, _ax1, _ax0)
+            self.profile.setEnabled(False)
+        else:
+            __add_args = (Plot2D.addImage, data.array)
+            _origin, _scale = get_2d_silx_plot_ax_settings(data)
+            self._plot_config["kwargs"]["origin"] = _origin
+            self._plot_config["kwargs"]["scale"] = _scale
+            self.profile.setEnabled(True)
+
         self.setGraphYLabel(self._plot_config["ax_labels"][0])
         self.setGraphXLabel(self._plot_config["ax_labels"][1])
-        self._plot2d_add_image(data, **self._plot_config["kwargs"])
+        self.__plot2d_add(*__add_args, **self._plot_config["kwargs"])
         self._plot_config["cbar_legend"] = ""
         if len(data.data_label) > 0:
             self._plot_config["cbar_legend"] += data.data_label

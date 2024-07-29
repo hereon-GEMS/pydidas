@@ -869,48 +869,43 @@ def pre_regression_calculation(d_spacing_combined: Dataset) -> Tuple[Dataset, Da
 
 def create_final_result_sin2chi_method(d_spacing_combined: Dataset) -> Dataset:
         """
-        Creates a final result dataset by combining d-spacing values from two datasets.
+        Calculates the mean of d-spacing values and combines them into a final result Dataset.
 
-        This function takes two Dataset objects: one representing combined d-spacing values (d-, d+) 
-        and another representing average d-spacing values. 
-        The function combines these datasets into a new Dataset object that includes both the combined and average d-spacing values, along with 
-        updated axis ranges and labels.
+        This function takes a Dataset object containing combined d-spacing values (d-, d+), calculates 
+        the average d-spacing values, and combines them into a new Dataset object. The resulting 
+        Dataset includes updated axis ranges and labels.
 
         Parameters:
-        - d_spacing_combined (Dataset): A Dataset object containing combined d-spacing values, (d-, d+).
-        - d_spacing_avg (Dataset): A Dataset object containing the mean of the combined d-spacing values.
+        - d_spacing_combined (Dataset): A Dataset object containing combined d-spacing values (d-, d+).
 
         Returns:
-        - Dataset: A new Dataset object that combines the input datasets with updated axis ranges 
-        and labels.
-
-        Raises:
-        - TypeError: If either of the input arguments is not an instance of Dataset.
-        - ValueError: If the axis ranges of the input datasets do not match or if the axis labels 
-        do not meet the required conditions (must be equal and labeled as 'sin^2(chi)').
-
-        Note:
-        The function assumes that the second axis of `d_spacing_combined` and the first axis of 
-        `d_spacing_avg` are the relevant axes for comparison and combination. It also reshapes 
-        `d_spacing_avg` to ensure compatibility for combination.
-    """
-
+        - Dataset: A new Dataset object that combines the input dataset with the calculated mean of d-spacing values. 
         
-        #checks
+        Raises:
+        - TypeError: If the input is not an instance of Dataset.
+        - ValueError: If the shape of d_spacing_combined is not (2, N).
+        - ValueError: If axis_labels[0] does not match '0: d-, 1: d+'.
+        - ValueError: If axis_labels[1] does not match 'sin^2(chi)'.
+        """
+        
         if not isinstance(d_spacing_combined, Dataset):
             raise TypeError("Input must be an instance of Dataset")
         
         if not d_spacing_combined.shape[0] == 2:
             raise ValueError("Dataset d_spacing_combined must have a shape of (2, N).")
         
-        d_spacing_avg = d_spacing_combined.mean(axis=0)       
+        if d_spacing_combined.axis_labels[0] != '0: d-, 1: d+':
+            raise ValueError("axis_labels[0] does not match '0: d-, 1: d+'.")
         
-        
+        if d_spacing_combined.axis_labels[1] != Labels.SIN2CHI:
+            raise ValueError("axis_labels[1] does not match 'sin^2(chi)'.")
                 
+        d_spacing_avg = d_spacing_combined.mean(axis=0) 
         d_spacing_avg=d_spacing_avg.reshape(1,-1)
-        print('d_spacing_avg changed\n',d_spacing_avg)
+        
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
+        
                
         result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 
                 axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI}, data_unit=d_spacing_combined.data_unit,

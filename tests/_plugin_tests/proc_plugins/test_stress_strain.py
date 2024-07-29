@@ -1618,7 +1618,7 @@ def test_create_final_result_sin2chi_method_shape():
         data_unit='nm', 
         data_label='0: position_neg'
     )
-    with pytest.raises(ValueError, match="Dataset d_spacing_combined must have a shape of \(2, N\)."):
+    with pytest.raises(ValueError, match=r"Dataset d_spacing_combined must have a shape of \(2, N\)."):
         create_final_result_sin2chi_method(invalid_d_spacing_combined)
     
 
@@ -1636,6 +1636,8 @@ def test_create_final_result_sin2chi_method_label_2(results_sin2chi_method_fixtu
 
     with pytest.raises(ValueError, match=r'axis_labels\[1\] does not match sin\^2\(chi\).'):
         create_final_result_sin2chi_method(d_spacing_combined)  
+
+
 
 
 

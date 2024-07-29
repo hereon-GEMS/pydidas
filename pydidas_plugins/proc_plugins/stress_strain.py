@@ -895,10 +895,10 @@ def create_final_result_sin2chi_method(d_spacing_combined: Dataset) -> Dataset:
             raise ValueError("Dataset d_spacing_combined must have a shape of (2, N).")
         
         if d_spacing_combined.axis_labels[0] != '0: d-, 1: d+':
-            raise ValueError("axis_labels[0] does not match '0: d-, 1: d+'.")
+            raise ValueError(f"axis_labels[0] does not match '0: d-, 1: d+'.")
         
         if d_spacing_combined.axis_labels[1] != Labels.SIN2CHI:
-            raise ValueError("axis_labels[1] does not match 'sin^2(chi)'.")
+            raise ValueError(f'axis_labels[1] does not match {Labels.SIN2CHI}.')
                 
         d_spacing_avg = d_spacing_combined.mean(axis=0) 
         d_spacing_avg=d_spacing_avg.reshape(1,-1)

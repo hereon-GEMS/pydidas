@@ -1579,71 +1579,38 @@ def results_sin2chi_method_fixture():
         data_label='0: position_neg, 1: position_pos'
     )
     
-    d_spacing_avg = Dataset(
-        np.array([3, 4, 5, 6]), 
-        axis_ranges={0: [0, 1, 2, 3]}, 
-        axis_labels={0: Labels.SIN2CHI.value}, 
+    d_spacing_result = Dataset(
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]]),
+        axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]}, 
+        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI},
         data_unit='nm', 
-        data_label='Mean of 0: position_neg, 1: position_pos'
+        data_label='d_spacing'
     )
     
-    return d_spacing_combined, d_spacing_avg
+    return d_spacing_combined, d_spacing_result
 
 def test_create_final_result_sin2chi_method_validation(results_sin2chi_method_fixture):
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
+    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
     
-    expected_data = np.vstack((d_spacing_combined.array, d_spacing_avg.array.reshape(1, -1)))
-    expected_axis_ranges = {0: np.arange(3), 1: d_spacing_combined.axis_ranges[1]}
-    expected_axis_labels = {0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI.value}
-    expected_data_unit = d_spacing_combined.data_unit
-    
-    result = create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
+    result = create_final_result_sin2chi_method(d_spacing_combined)
 
-    assert np.array_equal(result.array, expected_data)
+    assert np.array_equal(result.array, d_spacing_result.array)
     # Compare each key-value pair in the axis_ranges
-    for key in expected_axis_ranges:
-        assert key in result.axis_ranges
-        assert np.array_equal(result.axis_ranges[key], expected_axis_ranges[key])
-    assert result.axis_labels == expected_axis_labels
+    for key, value in result.axis_ranges.items():
+        assert key in d_spacing_result.axis_ranges.keys()
+        assert np.array_equal(value, d_spacing_result.axis_ranges[key])
+    assert result.axis_labels == d_spacing_result.axis_labels
     assert result.data_label == 'd_spacing'
-    assert result.data_unit == expected_data_unit
+    assert result.data_unit == d_spacing_result.data_unit
 
 def test_create_final_result_sin2chi_method_type_error(results_sin2chi_method_fixture):
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
+    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
 
-    with pytest.raises(TypeError, match="Both objects must be instances of Dataset"):
-        create_final_result_sin2chi_method([], d_spacing_avg)
-    
-    with pytest.raises(TypeError, match="Both objects must be instances of Dataset"):
-        create_final_result_sin2chi_method(d_spacing_combined, [])
-
-def test_create_final_result_sin2chi_method_axis_ranges_1(results_sin2chi_method_fixture):
-    
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
-    
-    d_spacing_combined.update_axis_range(1, np.ones(4))
-    with pytest.raises(ValueError, match="Axis_ranges do not match."):
-        create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
-
-def test_create_final_result_sin2chi_method_axis_ranges_2(results_sin2chi_method_fixture):
-    
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
-    d_spacing_avg.update_axis_range(0, np.ones(4))
-    print(d_spacing_avg)
-    with pytest.raises(ValueError, match="Axis_ranges do not match."):
-        create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
-
-def test_create_final_result_sin2chi_method_axis_ranges_3(results_sin2chi_method_fixture):
-
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
-    d_spacing_combined.update_axis_range(1, 5*np.ones(4))
-    d_spacing_avg.update_axis_range(0, np.ones(4))
-    with pytest.raises(ValueError, match="Axis_ranges do not match."):
-        create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
+    with pytest.raises(TypeError, match="Input must be an instance of Dataset"):
+        create_final_result_sin2chi_method([])
        
         
-def test_create_final_result_sin2chi_method_shape(results_sin2chi_method_fixture):
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
+def test_create_final_result_sin2chi_method_shape():
     invalid_d_spacing_combined = Dataset(
         np.array([1, 2, 3, 4]), 
         axis_ranges={0: [0, 1, 2, 3]}, 
@@ -1652,46 +1619,25 @@ def test_create_final_result_sin2chi_method_shape(results_sin2chi_method_fixture
         data_label='0: position_neg'
     )
     with pytest.raises(ValueError, match="Dataset d_spacing_combined must have a shape of \(2, N\)."):
-        create_final_result_sin2chi_method(invalid_d_spacing_combined, d_spacing_avg)
+        create_final_result_sin2chi_method(invalid_d_spacing_combined)
     
-def test_create_final_result_sin2chi_method_number_columns(results_sin2chi_method_fixture):
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture    
-    invalid_d_spacing_avg=  Dataset(
-        np.array([3, 4, 5]), 
-        axis_ranges={0: [0, 1, 2]}, 
-        axis_labels={0: Labels.SIN2CHI}, 
-        data_unit='nm', 
-        data_label='Mean of 0: position_neg, 1: position_pos'
-    )
-    with pytest.raises(ValueError, match="The datasets must have compatible shapes for combination."):
-        create_final_result_sin2chi_method(d_spacing_combined, invalid_d_spacing_avg)    
 
-def test_create_final_result_sin2chi_method_units_1(results_sin2chi_method_fixture):
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
-    d_spacing_combined.data_unit = 'm'
-    with pytest.raises(ValueError, match="Data units must match."):
-        create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
+def test_create_final_result_sin2chi_method_label_1(results_sin2chi_method_fixture):
+    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
+    d_spacing_combined.update_axis_label(0, 'blub')
     
-def test_create_final_result_sin2chi_method_units_2(results_sin2chi_method_fixture):    
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
-    d_spacing_avg.data_unit = 'm'
-    with pytest.raises(ValueError, match="Data units must match."):
-        create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)
+    with pytest.raises(ValueError, match=r"axis_labels\[0\] does not match '0: d-, 1: d\+'."):
+        create_final_result_sin2chi_method(d_spacing_combined)
 
-
-def test_create_final_result_sin2chi_method_label_1(results_sin2chi_method_fixture):    
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
-    d_spacing_avg.update_axis_label(0, 'blub')
-      
-    with pytest.raises(ValueError, match=f'Axis_labels must be equal and sin\\^2\\(chi\\).'):
-        create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)  
 
 def test_create_final_result_sin2chi_method_label_2(results_sin2chi_method_fixture):    
     d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
     d_spacing_combined.update_axis_label(1, 'blub')
 
-    with pytest.raises(ValueError, match=f'Axis_labels must be equal and sin\\^2\\(chi\\).'):
-        create_final_result_sin2chi_method(d_spacing_combined, d_spacing_avg)  
+    with pytest.raises(ValueError, match=r'axis_labels\[1\] does not match sin\^2\(chi\).'):
+        create_final_result_sin2chi_method(d_spacing_combined)  
+
+
 
 
 

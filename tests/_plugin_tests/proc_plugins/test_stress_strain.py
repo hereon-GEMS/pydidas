@@ -789,8 +789,8 @@ def test_group_d_spacing_by_chi_basic():
     assert d_spacing_pos.axis_ranges[0].size == d_spacing_neg.axis_ranges[0].size
     assert d_spacing_pos.data_label == f"{ d_spacing.data_label}_pos"
     assert d_spacing_neg.data_label == f"{ d_spacing.data_label}_neg"
-    assert d_spacing_pos.axis_labels[0] == "sin^2(chi)"
-    assert d_spacing_neg.axis_labels[0] == "sin^2(chi)"
+    assert d_spacing_pos.axis_labels[0] == Labels.SIN2CHI
+    assert d_spacing_neg.axis_labels[0] == Labels.SIN2CHI
 
 
 def test_group_d_spacing_by_chi_type_error():
@@ -1046,17 +1046,17 @@ ds_case1 = DSpacingTestConfig(
     d_spacing_pos=Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     ),
     d_spacing_neg=Dataset(
         np.array([3.0, 2.0, 1.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     ),
     ds_expected=Dataset(
         np.vstack((np.array([1.0, 2.0, 3.0]), np.array([3.0, 2.0, 1.0]))),
         axis_ranges={0: np.arange(2), 1: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "0: d-, 1: d+", 1: "sin^2(chi)"},
+        axis_labels={0: "0: d-, 1: d+", 1: Labels.SIN2CHI},
         data_label="d_spacing",
     ),
 )
@@ -1091,7 +1091,7 @@ def test_combine_sort_d_spacing_pos_neg_axis_labels_mismatch():
     d_spacing_pos = Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
     d_spacing_neg = Dataset(
         np.array([3.0, 2.0, 1.0]),
@@ -1107,12 +1107,12 @@ def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch():
     d_spacing_pos = Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
     d_spacing_neg = Dataset(
         np.array([3.0, 2.0, 1.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.4])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
 
     with pytest.raises(ValueError, match="Axis ranges do not match."):
@@ -1123,12 +1123,12 @@ def test_combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape():
     d_spacing_pos = Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
     d_spacing_neg = Dataset(
         np.array([3.0, 2.0, 1.0, 0.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3, 0.4])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
 
     with pytest.raises(ValueError, match="Axis ranges do not have the same length."):
@@ -1139,20 +1139,20 @@ def test_combine_sort_d_spacing_pos_neg_valid():
     d_spacing_pos = Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
         data_label="position_pos",
     )
     d_spacing_neg = Dataset(
         np.array([3.0, 2.0, 1.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
         data_label="position_neg",
     )
 
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
     assert np.array_equal(result.array, np.array([[3.0, 2.0, 1.0], [1.0, 2.0, 3.0]]))
     assert np.array_equal(result.axis_ranges[1], np.array([0.1, 0.2, 0.3]))
-    assert result.axis_labels == {0: "0: d-, 1: d+", 1: "sin^2(chi)"}
+    assert result.axis_labels == {0: "0: d-, 1: d+", 1: Labels.SIN2CHI}
     assert result.data_label == "0: position_neg, 1: position_pos"
 
 
@@ -1163,12 +1163,12 @@ def test_combine_sort_d_spacing_pos_neg_stablesort():
     d_spacing_pos = Dataset(
         np.array([3.0, 1.0, 2.0]),
         axis_ranges={0: sin2chi_values},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
     d_spacing_neg = Dataset(
         np.array([2.0, 3.0, 1.0]),
         axis_ranges={0: sin2chi_values},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
 
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
@@ -1197,12 +1197,12 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
     d_spacing_pos = Dataset(
         np.array([3.0, np.nan, 2.0]),
         axis_ranges={0: sin2chi_values},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
     d_spacing_neg = Dataset(
         np.array([2.0, 3.0, np.nan]),
         axis_ranges={0: sin2chi_values},
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
     )
 
     result = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
@@ -1227,7 +1227,7 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
 @pytest.fixture
 def d_spacing_datasets():
     d_spacing_pos = Dataset(
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
         axis_ranges={
             0: np.array(
                 [
@@ -1264,7 +1264,7 @@ def d_spacing_datasets():
         ),
     )
     d_spacing_neg = Dataset(
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
         axis_ranges={
             0: np.array(
                 [
@@ -1302,7 +1302,7 @@ def d_spacing_datasets():
     )
 
     d_spacing_combined = Dataset(
-        axis_labels={0: "0: d-, 1: d+", 1: "sin^2(chi)"},
+        axis_labels={0: "0: d-, 1: d+", 1: Labels.SIN2CHI},
         axis_ranges={
             0: np.array([0, 1]),
             1: np.array(
@@ -1391,7 +1391,7 @@ def d_spacing_combined_fixture():
     data = np.array([[1, 2, np.nan], [4, 5, 6]])  # Example data
     d_spacing_combined = Dataset(
         axis_ranges={1: np.array([0.1, 0.2, 0.3])},  # Example sin^2(chi) values
-        axis_labels={0: "0: d-, 1: d+", 1: "sin^2(chi)"},
+        axis_labels={0: "0: d-, 1: d+", 1: Labels.SIN2CHI},
         axis_units={0: "", 1: ""},
         data_unit="nm",
         data_label="0: position_neg, 1: position_pos",
@@ -1409,7 +1409,7 @@ def test_pre_regression_calculation_valid_input(d_spacing_combined_fixture):
     # Verify the shape and content of the returned datasets
     assert d_spacing_avg.shape == (3,), "Average dataset shape is incorrect"
     assert (
-        d_spacing_avg.axis_labels[0] == "sin^2(chi)"
+        d_spacing_avg.axis_labels[0] == Labels.SIN2CHI
     ), "Average dataset axis label is incorrect"
     assert (
         d_spacing_avg.data_unit == d_spacing_combined_fixture.data_unit
@@ -1498,7 +1498,7 @@ def test_pre_regression_calculation_precision(d_spacing_datasets):
                 ]
             )
         },
-        axis_labels={0: "sin^2(chi)"},
+        axis_labels={0: Labels.SIN2CHI},
         axis_units={0: ""},
         metadata={},
         data_unit="nm",
@@ -1639,7 +1639,7 @@ def test_create_final_result_sin2chi_method_label_2(results_sin2chi_method_fixtu
 
 
 
-# Testing for various Dataset modifications
+# Testing for various Dataset modifications for create_final_result_sin2chi_method
 @pytest.fixture
 def base_dataset():
     return Dataset(
@@ -1674,9 +1674,18 @@ def test_create_final_result_sin2chi_method(base_dataset, modifications, expecte
         data_label='d_spacing'
     )
     
+    # Compare array data
     assert np.array_equal(result.array, expected.array, equal_nan=True)
-    assert result.axis_ranges == expected.axis_ranges
+    
+    # Compare axis ranges
+    for key in expected.axis_ranges:
+        assert key in result.axis_ranges
+        assert np.array_equal(result.axis_ranges[key], expected.axis_ranges[key])
+    
+    # Compare axis labels
     assert result.axis_labels == expected.axis_labels
+    
+    # Compare data labels and units
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit
 

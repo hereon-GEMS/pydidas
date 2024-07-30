@@ -1820,15 +1820,19 @@ def test_Dataset_mean_base(dataset_mean_fixture):
     # Check that base is None for mean operations
     assert arr.mean().base is None, "Expected base to be None for np.ndarray.mean()"
     assert arr.mean(axis=0).base is None, "Expected base to be None for np.ndarray.mean(axis=0)"
+    assert arr.mean(axis=1).base is None, "Expected base to be None for np.ndarray.mean(axis=1)"
     assert np.mean(arr).base is None, "Expected base to be None for np.mean()"
     
     assert np.mean(ds).base is None, "Expected base to be None for np.mean(Dataset)"
     assert ds.mean().base == None, "Expected base to be None for Dataset.mean()"
     
+    
+def test_Dataset_mean_base_axis_1(dataset_mean_fixture):
+    arr, ds = dataset_mean_fixture  # Corrected variable name
+    assert ds.mean(axis=1).base is None, "Expected base to be None for Dataset.mean(axis=1)" #breaks here
+    
+def test_Dataset_mean_base_axis_0(dataset_mean_fixture):
+    arr, ds = dataset_mean_fixture  # Corrected variable name  
     assert ds.mean(axis=0).base is None, "Expected base to be None for Dataset.mean(axis=0)" #breaks here
-    
-    
-    
-
     
 

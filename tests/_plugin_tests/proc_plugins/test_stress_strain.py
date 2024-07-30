@@ -1639,6 +1639,52 @@ def test_create_final_result_sin2chi_method_label_2(results_sin2chi_method_fixtu
 
 
 
+# Testing for various Dataset modifications
+@pytest.fixture
+def base_dataset():
+    return Dataset(
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=float), 
+        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]}, 
+        axis_labels={0: '0: d-, 1: d+', 1: Labels.SIN2CHI.value}, 
+        data_unit='nm', 
+        data_label='0: position_neg, 1: position_pos'
+    )
+
+@pytest.mark.parametrize("modifications, expected_array", [
+    # No modifications
+    ([], np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]])),
+    # Set first value of d- to np.nan
+    ([(0, 0, np.nan)], np.array([[np.nan, 2, 3, 4], [5, 6, 7, 8], [np.nan, 4, 5, 6]])),
+    # Set second value of d+ to np.nan
+    ([(1, 1, np.nan)], np.array([[1, 2, 3, 4], [5, np.nan, 7, 8], [3, np.nan, 5, 6]])),
+])
+def test_create_final_result_sin2chi_method(base_dataset, modifications, expected_array):
+    # Apply modifications
+    for i, j, value in modifications:
+        base_dataset.array[i, j] = value
+    
+    result = create_final_result_sin2chi_method(base_dataset)
+    
+    # Expected attributes for the resulting Dataset
+    expected = Dataset(
+        expected_array,
+        axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]},
+        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI.value},
+        data_unit='nm',
+        data_label='d_spacing'
+    )
+    
+    assert np.array_equal(result.array, expected.array, equal_nan=True)
+    assert result.axis_ranges == expected.axis_ranges
+    assert result.axis_labels == expected.axis_labels
+    assert result.data_label == expected.data_label
+    assert result.data_unit == expected.data_unit
+
+
+
+
+
+
 
 
 

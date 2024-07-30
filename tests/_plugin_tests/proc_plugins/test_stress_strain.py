@@ -1691,13 +1691,6 @@ def test_create_final_result_sin2chi_method(base_dataset, modifications, expecte
 
 
 
-
-
-
-
-
-
-
 # Test the Dataset against the expected values
 @pytest.fixture
 def data_values():
@@ -1806,3 +1799,36 @@ def test_numpy_indexing_with_ndarray():
 
     assert np.allclose(ds_sorted.array, np.array([1, 5, 4, 3, 2]))
     assert np.allclose(ds_sorted.axis_ranges[0], [0.3, 0.2, 0.1, 0.5, 0.4])
+
+
+# Regression test to document partially wrong behaviour of  __reimplement_numpy_method
+@pytest.fixture
+def dataset_mean_fixture():
+    arr=np.ones ( (4,4))
+    arr[::2,::2] = 0
+    arr[:,1::2]=3
+
+    ds = Dataset(
+        arr.copy()
+        )
+    
+    return arr, ds
+
+def test_Dataset_mean_base(dataset_mean_fixture):
+    arr, ds = dataset_mean_fixture  # Corrected variable name
+
+    # Check that base is None for mean operations
+    assert arr.mean().base is None, "Expected base to be None for np.ndarray.mean()"
+    assert arr.mean(axis=0).base is None, "Expected base to be None for np.ndarray.mean(axis=0)"
+    assert np.mean(arr).base is None, "Expected base to be None for np.mean()"
+    
+    assert np.mean(ds).base is None, "Expected base to be None for np.mean(Dataset)"
+    assert ds.mean().base == None, "Expected base to be None for Dataset.mean()"
+    
+    assert ds.mean(axis=0).base is None, "Expected base to be None for Dataset.mean(axis=0)" #breaks here
+    
+    
+    
+
+    
+

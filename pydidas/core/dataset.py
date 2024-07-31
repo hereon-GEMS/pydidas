@@ -58,9 +58,9 @@ class Dataset(ndarray):
     """
     Dataset class, a subclass of a numpy.ndarray with metadata.
 
-    The Dataset provides a view on the underlying data array, meaning any 
-    modifications to the Dataset's data will affect the original array, and 
-    vice versa. This subclass extends ndarray with additional metadata, 
+    The Dataset provides a view on the underlying data array, meaning any
+    modifications to the Dataset's data will affect the original array, and
+    vice versa. This subclass extends ndarray with additional metadata,
     accessible and modifiable through the respective properties:
 
     - axis_units : The units of the axis ranges (in str format).
@@ -974,9 +974,9 @@ class Dataset(ndarray):
         dtype: DTypeLike = None,
         out: Optional[ArrayLike] = None,
         **kwargs: dict,
-    ) -> ndarray:
+    ) -> Self:
         """
-        Compute the mean of the array elements over a given axis.
+        Reimplement a NumPy method with additional metadata handling and optional arguments.
 
         Parameters
         ----------
@@ -1008,8 +1008,11 @@ class Dataset(ndarray):
 
         Returns
         -------
-        ndarray
-            The mean of the array elements.
+        Self or ndarray
+            The result of applying the NumPy method to the array. If `out` is an instance of
+            the subclass (e.g., `Dataset`), the result is a `Self` instance with default metadata
+            applied. If `out` is not an instance of the subclass, the result is returned as a plain
+            `ndarray`.
         """
         if axis is not None:
             axis = tuple(

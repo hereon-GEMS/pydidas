@@ -56,7 +56,7 @@ class CoordinateTransformButton(PlotToolButton):
         if self.STATE is None:
             self.__set_state()
         PlotToolButton.__init__(self, parent=parent, plot=plot)
-        self.__current_cs = "cartesian"
+        self.__current_cs = "None"
         self.__define_actions_and_create_menu()
 
     def __set_state(self):

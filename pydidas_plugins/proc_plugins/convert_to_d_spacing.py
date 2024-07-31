@@ -85,6 +85,7 @@ class ConvertToDSpacing(ProcPlugin):
             kwargs : dict
                 Any calling kwargs, appended by any changes in the function.
         """
+        _new_data = data.copy()
         if self._config["ax_index"] is None:
             self._set_ax_index(data)
         _axis = self._config["ax_index"]
@@ -104,12 +105,12 @@ class ConvertToDSpacing(ProcPlugin):
                 _range = self._lambda / (2 * np.sin(_range / 2))
         if self.get_param_value("d_spacing_unit") == "nm":
             _range /= 10
-            data.update_axis_unit(_axis, "nm")
+            _new_data.update_axis_unit(_axis, "nm")
         else:
-            data.update_axis_unit(_axis, "A")
-        data.update_axis_range(_axis, _range)
-        data.update_axis_label(_axis, "d-spacing")
-        return data, kwargs
+            _new_data.update_axis_unit(_axis, "A")
+        _new_data.update_axis_range(_axis, _range)
+        _new_data.update_axis_label(_axis, "d-spacing")
+        return _new_data, kwargs
 
     def _set_ax_index(self, data: Dataset):
         for axis, label in data.axis_labels.items():

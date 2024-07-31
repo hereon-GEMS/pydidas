@@ -58,7 +58,10 @@ class Dataset(ndarray):
     """
     Dataset class, a subclass of a numpy.ndarray with metadata.
 
-    The metadata is accessible and modifiable through the respective properties:
+    The Dataset provides a view on the underlying data array, meaning any 
+    modifications to the Dataset's data will affect the original array, and 
+    vice versa. This subclass extends ndarray with additional metadata, 
+    accessible and modifiable through the respective properties:
 
     - axis_units : The units of the axis ranges (in str format).
     - axis_labels : The descriptive labels for all array axes (in str format).

@@ -1803,8 +1803,16 @@ def test_numpy_indexing_with_ndarray():
 
 # Regression test to document partially wrong behaviour of  __reimplement_numpy_method
 @pytest.fixture
+def array_mean_fixture():
+    arr=np.ones ( (4,4))
+    arr[::2,::2] = 0
+    arr[:,1::2]=3
+    return arr
+
+
+@pytest.fixture
 def dataset_mean_fixture():
-    arr=np.ones( (4,4))
+    arr=np.ones ((4,4))
     arr[::2,::2] = 0
     arr[:,1::2]=3
 
@@ -1812,27 +1820,30 @@ def dataset_mean_fixture():
         arr.copy()
         )
     
-    return arr, ds
+    return ds
 
-def test_Dataset_mean_base(dataset_mean_fixture):
-    arr, ds = dataset_mean_fixture 
 
+def test_array_mean_base(array_mean_fixture):
+    arr = array_mean_fixture
+    
     # Check that base is None for mean operations
     assert arr.mean().base is None, "Expected base to be None for np.ndarray.mean()"
     assert arr.mean(axis=0).base is None, "Expected base to be None for np.ndarray.mean(axis=0)"
     assert arr.mean(axis=1).base is None, "Expected base to be None for np.ndarray.mean(axis=1)"
     assert np.mean(arr).base is None, "Expected base to be None for np.mean()"
+
+def test_Dataset_mean_base(dataset_mean_fixture):
+    ds = dataset_mean_fixture  
     
+    # Check that base is None for mean operations
     assert np.mean(ds).base is None, "Expected base to be None for np.mean(Dataset)"
-    assert ds.mean().base == None, "Expected base to be None for Dataset.mean()"
+    assert ds.mean().base is None, "Expected base to be None for Dataset.mean()"
     
     
 def test_Dataset_mean_base_axis_1(dataset_mean_fixture):
-    arr, ds = dataset_mean_fixture 
+    ds = dataset_mean_fixture 
     assert ds.mean(axis=1).base is None, "Expected base to be None for Dataset.mean(axis=1)" #breaks here
     
 def test_Dataset_mean_base_axis_0(dataset_mean_fixture):
-    arr, ds = dataset_mean_fixture 
+    ds = dataset_mean_fixture  
     assert ds.mean(axis=0).base is None, "Expected base to be None for Dataset.mean(axis=0)" #breaks here
-    
-

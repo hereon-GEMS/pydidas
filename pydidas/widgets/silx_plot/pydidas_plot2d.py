@@ -285,9 +285,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
     def addNonUniformImage(
         self,
+        x: np.ndarray,
+        y: np.ndarray,
         data: Union[Dataset, np.ndarray],
-        x: np.ndarray = None,
-        y: np.ndarray = None,
         **kwargs,
     ):
         """
@@ -298,12 +298,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        data : Union[Dataset, np.ndarray]
-            The input data to be displayed.
         x : np.ndarray
             The x-axis data. Must only be given if the data is not a pydidas Dataset.
         y : np.ndarray
             The y-axis data. Must only be given if the data is not a pydidas Dataset.
+        data : Union[Dataset, np.ndarray]
+            The input data to be displayed.
 
         **kwargs : dict
             Any supported Plot2d.addImage keyword arguments.
@@ -312,7 +312,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.plot_pydidas_dataset(data, **kwargs)
         else:
             self._check_data_dim(data)
-            self.__plot2d_add(Plot2D.addNonUniformImage, data, x, y, **kwargs)
+            self.__plot2d_add(Plot2D.addNonUniformImage, x, y, data, **kwargs)
             self.update_cs_units("", "")
 
     def __plot2d_add(self, method: callable, *args: tuple, **kwargs: dict):
@@ -364,7 +364,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
             _ax0 = data.get_axis_range(0)
             _ax1 = data.get_axis_range(1)
-            __add_args = (Plot2D.addNonUniformImage, data.array, _ax1, _ax0)
+            __add_args = (Plot2D.addNonUniformImage, _ax1, _ax0, data.array)
             self.profile.setEnabled(False)
         else:
             __add_args = (Plot2D.addImage, data.array)

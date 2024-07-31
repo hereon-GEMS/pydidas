@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath("./../.."))
 # -- Project information -----------------------------------------------------
 
 project = "pydidas"
-copyright = "2023 - 2024, Helmholtz-Zentrum Hereon"
+copyright = "2021 - 2024, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 
@@ -73,6 +73,7 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 tls_verify = False
+add_function_parentheses = False
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -98,6 +99,7 @@ html_theme_options = {
         "text": " pydidas",
         "alt_text": "pydidas",
     },
+    "use_edit_page_button": True,
 }
 if os.getenv("GITHUB_ACTIONS", "false") == "true":
     html_theme_options["switcher"] = {
@@ -118,8 +120,16 @@ if os.getenv("GITHUB_ACTIONS", "false") == "true":
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+html_show_sourcelink = True
 html_logo = "./images/logo/pydidas_snakes_circ_bg.png"
 html_title = "pydidas"
+html_context = {
+    "github_url": "https://github.com",
+    "github_user": "hereon-GEMS",
+    "github_repo": "pydidas",
+    "github_version": "master",
+    "doc_path": "pydidas/docs/src",
+}
 
 # dynamically create documentation for generic parameters:
 _fname = Path(__file__).parent / "dev_guide" / "dev_guide_list_of_generic_params.rst"

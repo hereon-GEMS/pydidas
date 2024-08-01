@@ -58,10 +58,10 @@ class Dataset(ndarray):
     """
     Dataset class, a subclass of a numpy.ndarray with metadata.
 
-    The Dataset provides a view on the underlying data array, meaning any
-    modifications to the Dataset's data will affect the original array, and
-    vice versa. This subclass extends ndarray with additional metadata,
-    accessible and modifiable through the respective properties:
+    The Dataset creates a new ndarray object from the array-like input and provides a
+    view of the underlying ndarray as Dataset instance. This subclass extends ndarray
+    with additional metadata, accessible and modifiable through the respective
+    properties:
 
     - axis_units : The units of the axis ranges (in str format).
     - axis_labels : The descriptive labels for all array axes (in str format).
@@ -70,14 +70,18 @@ class Dataset(ndarray):
     - data_unit : The unit for the data values (in str format).
     - data_label : The label for the data values (in str format).
 
-    PLEASE NOTE: While axis metadata is preserved during operations like reshaping or
-    transposing, units are not automatically converted. The operator is responsible for
-    ensuring that the units are consistent.
-    For example, if the data_unit is meters, Dataset**2 will still have the unit
-    meters which must be updated in the calling function
-
-    Metadata is **not** preserved when operating on two datasets. The second dataset
-    will be interpreted as a numpy.ndarray and the metadata will be lost.
+    PLEASE NOTE:
+    1.  While axis metadata is preserved during operations like reshaping or
+        transposing, units are not automatically converted. The operator is responsible
+        for ensuring that the units are consistent.
+        For example, if the data_unit is meters, Dataset**2 will still have the unit
+        meters which must be updated in the calling function
+    2.  Metadata is **not** preserved when operating on two datasets. The second dataset
+        will be interpreted as a numpy.ndarray and the metadata will be lost.
+    3.  The ndarray.base property of Datasets is never None because the Dataset class
+        is a subclass of ndarray. This means that the base property will always point to
+        an ndarray. However, Dataset views never share memory and each Dataset view
+        will create a new memory object.
 
     The following numpy ufuncs are reimplemented to preserver the metadata:
     flatten, max, mean, min, repeat, reshape, shape, sort, squeeze, sum, take,
@@ -108,7 +112,7 @@ class Dataset(ndarray):
             The description of the data. The default is an empty string.
     """
 
-    def __new__(cls, array: ndarray, **kwargs: dict) -> Self:
+    def __new__(cls, array: ArrayLike, **kwargs: dict) -> Self:
         """
         Create a new Dataset.
 
@@ -123,10 +127,10 @@ class Dataset(ndarray):
 
         Returns
         -------
-        obj : Dataset
+        Dataset
             The new dataset object.
         """
-        obj = np.asarray(array).view(cls)
+        obj = np.array(array).view(cls)
         update_dataset_properties_from_kwargs(obj, kwargs)
         return obj
 
@@ -141,7 +145,7 @@ class Dataset(ndarray):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The sliced new dataset.
         """
         self._meta["_get_item_key"] = key if isinstance(key, tuple) else (key,)
@@ -221,11 +225,7 @@ class Dataset(ndarray):
             _vals.insert(dim, _new_entry)
             self._meta[_item] = {_i: _val for _i, _val in enumerate(_vals)}
 
-    def flatten_dims(
-        self,
-        *args: tuple,
-        **kwargs: dict,
-    ):
+    def flatten_dims(self, *args: tuple[int], **kwargs: dict):
         """
         Flatten the specified dimensions **in place** in the Dataset.
 
@@ -237,7 +237,7 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        *args : tuple
+        *args : tuple[int]
             The tuple of the dimensions to be flattened. Each dimension must
             be an integer entry.
         **kwargs: dict
@@ -290,8 +290,8 @@ class Dataset(ndarray):
 
         Returns
         -------
-        pydidas.core.Dataset
-            The binned Dataset.
+        Dataset
+            The re-binned Dataset.
         """
         from .utils.rebin_ import get_cropping_slices, rebin
 
@@ -736,7 +736,7 @@ class Dataset(ndarray):
     # Reimplementation of generic ndarray methods
     # ###########################################
 
-    def transpose(self, *axes: tuple) -> Self:
+    def transpose(self, *axes: tuple[int]) -> Self:
         """
         Overload the generic transpose method to transpose the metadata as well.
 
@@ -821,7 +821,7 @@ class Dataset(ndarray):
         ]
         return _new
 
-    def repeat(self, repeats, axis: Optional[int] = None):
+    def repeat(self, repeats, axis: Optional[int] = None) -> Self:
         """
         Overload the generic repeat method to update the metadata.
 
@@ -835,7 +835,7 @@ class Dataset(ndarray):
 
         Returns
         -------
-        ndarray
+        Dataset
             The repeated array.
         """
         _new = ndarray.repeat(self, repeats, axis)
@@ -858,13 +858,13 @@ class Dataset(ndarray):
         return ndarray.shape.__get__(self)
 
     @shape.setter
-    def shape(self, shape: tuple):
+    def shape(self, shape: tuple[int]):
         """
         Set the shape of the array.
 
         Parameters
         ----------
-        shape : tuple
+        shape : tuple[int]
             The new shape of the array.
         """
         _reshaped = self.reshape(shape)
@@ -898,7 +898,7 @@ class Dataset(ndarray):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The squeezed Dataset.
         """
         if axis is None:
@@ -947,7 +947,7 @@ class Dataset(ndarray):
 
         Returns
         -------
-        new : pydidas.core.Dataset
+        Dataset
             The new dataset.
         """
         _new = ndarray.take(self, indices, axis, out, mode)
@@ -976,7 +976,10 @@ class Dataset(ndarray):
         **kwargs: dict,
     ) -> Self:
         """
-        Reimplement a NumPy method with additional metadata handling and optional arguments.
+        Reimplement a NumPy method with additional metadata handling.
+
+        Note that if `out` is an instance of ndarray (and not Dataset), only the raw
+        values without metadata will be returned.
 
         Parameters
         ----------
@@ -1008,11 +1011,11 @@ class Dataset(ndarray):
 
         Returns
         -------
-        Self or ndarray
-            The result of applying the NumPy method to the array. If `out` is an instance of
-            the subclass (e.g., `Dataset`), the result is a `Self` instance with default metadata
-            applied. If `out` is not an instance of the subclass, the result is returned as a plain
-            `ndarray`.
+        Union[Dataset, ndarray]
+            The result of applying the NumPy method to the array. This method will
+            always return a Dataset with the singular exception of using the `out`
+            argument with an ndarray instance.
+            If using the `out` argument, the out object reference will be returned.
         """
         if axis is not None:
             axis = tuple(
@@ -1254,7 +1257,9 @@ class Dataset(ndarray):
         self.__dict__ = state[-1]
         ndarray.__setstate__(self, state[0:-1])
 
-    def __array_wrap__(self, obj: ndarray, context: Optional[object] = None) -> Self:
+    def __array_wrap__(
+        self, obj: ndarray, context: Optional[object] = None, return_scalar=False
+    ) -> Self:
         """
         Return 0-d results from ufuncs as single values.
 
@@ -1275,8 +1280,8 @@ class Dataset(ndarray):
             greater zero or of the basic datatype for 0-d return values.
         """
         if obj.shape == ():
-            return np.atleast_1d(obj)[0]
-        return ndarray.__array_wrap__(self, obj, context)
+            return obj[()]
+        return ndarray.__array_wrap__(self, obj, context, return_scalar)
 
     def __hash__(self) -> int:
         """

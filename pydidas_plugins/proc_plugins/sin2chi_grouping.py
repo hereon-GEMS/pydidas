@@ -151,6 +151,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def pre_execute(self):
         print(30*" \N{Hot pepper}")
         print(self._config["input_shape"])  
+        print(self._config["input_shape"][0])
+        print(int(self._config["input_shape"][0]/2+1))
         print(30*" \N{Hot pepper}")        
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
@@ -181,8 +183,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(self._config["result_shape"])  
         print(30*" \N{Peach}")   
         
-        #self._config["result_shape"] = (3, self._config["input_shape"][0]//2+1)   #wrong input from Malte, not 4,  but 2
-        #raise NotImplementedError("This function is not implemented yet.")
+        self._config["result_shape"] = (3, self._config["input_shape"][0]//2+1)   
+        
         
         
         
@@ -984,7 +986,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         return d_spacing_avg, d_spacing_diff
     
     
-    def _create_final_result_sin2chi_method(d_spacing_combined: Dataset) -> Dataset:
+    def _create_final_result_sin2chi_method(self,d_spacing_combined: Dataset) -> Dataset:
         """
         Calculates the mean of d-spacing values and combines them into a final result Dataset.
 
@@ -1020,12 +1022,30 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_avg = d_spacing_combined.mean(axis=0) 
         d_spacing_avg=d_spacing_avg.reshape(1,-1)
         
+        print('My shape:', self._config["input_shape"])
+                              
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
+        print('arr shape', arr.shape)
         
-               
-        result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 
+        dummy_arr= np.full((3, self._config["input_shape"][0]//2+1), np.nan)
+        dummy_arr[:,0:arr.shape[1]] = arr
+        print('dummy_arr ', dummy_arr)
+        
+        dummy_axis_ranges= np.ones(self._config["input_shape"][0]//2+1)
+        print(dummy_axis_ranges.shape)
+        dummy_axis_ranges[0:len(d_spacing_combined.axis_ranges[1])] = d_spacing_combined.axis_ranges[1]
+        print(dummy_axis_ranges)   
+        
+        # Create the final result Dataset, when dynamic array allocation is not implemented
+        result=Dataset(dummy_arr, axis_ranges={0: np.arange(dummy_arr.shape[0]), 1: dummy_axis_ranges}, 
                 axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI}, data_unit=d_spacing_combined.data_unit,
                 data_label='d_spacing'
             )
+        
+        # Create the final result Dataset, when dynamic array allocation is implemented       
+        #result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 
+        #        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI}, data_unit=d_spacing_combined.data_unit,
+        #        data_label='d_spacing'
+        #    )
         return result

@@ -170,6 +170,37 @@ class TestDataset(unittest.TestCase):
         _new = obj[_mask == 0]
         self.assertTrue(np.allclose(obj.flatten(), _new))
 
+    def test_new__from_array(self):
+        _ndarray = np.random.random((10, 12))
+        obj = Dataset(_ndarray)
+        self.assertNotEqual(id(_ndarray), id(obj))
+        self.assertNotEqual(id(_ndarray), id(obj.base))
+
+    def test_new__assure_memory_not_shared(self):
+        _ndarray = np.random.random((10, 12))
+        obj = Dataset(_ndarray)
+        _ndarray[0, 0] = 42
+        self.assertTrue(obj[0, 0] <= 1)
+
+    def test_view__assure_memory_shared_in_view(self):
+        obj = Dataset(np.random.random((10, 12)))
+        _view = obj[0]
+        _view[0] = 42
+        self.assertEqual(obj[0, 0], 42)
+
+    def test_new__from_iterable(self):
+        for _base in [[1, 4, 42], (0.5, 7, 1.2)]:
+            with self.subTest(base=_base):
+                obj = Dataset(_base)
+                for _index, _item in enumerate(_base):
+                    self.assertEqual(obj[_index], _item)
+
+    def test_new__from_scalar(self):
+        _val = 42.0
+        obj = Dataset(_val)
+        self.assertEqual(obj.shape, ())
+        self.assertEqual(obj[()], _val)
+
     def test_get_rebinned_copy__bin2(self):
         obj = self.create_large_dataset()
         _new = obj.get_rebinned_copy(2)

@@ -39,6 +39,7 @@ from typing import List, Tuple, Dict
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
 
+
 class Labels(StrEnum):
     CHI: str = "chi"
     POSITION: str = "position"
@@ -65,7 +66,7 @@ class Units(StrEnum):
     
     
 class Tolerance(Enum):
-    S2C_TOLERANCE : float = 1e-4
+    S2C_TOLERANCE : float = 1e-3
 
     def __str__(self) -> str:
         return str(self.value)
@@ -157,7 +158,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
 
-        chi, d_spacing = self._ds_slicing(ds) 
+        chi, d_spacing = self._ds_slicing(ds.copy()) 
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
           

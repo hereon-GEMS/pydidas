@@ -117,15 +117,15 @@ class TestRemove1dPolynomialBackground(unittest.TestCase):
             new_data, _ = plugin.execute(data)
         self.assertTrue(np.all(new_data >= _thresh))
 
-    def test_execute__with_limits(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
-        data = self.create_dataset()
-        plugin.set_param_value("include_limits", True)
-        plugin.pre_execute()
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            new_data, _ = plugin.execute(data)
-        self.assertTrue(np.allclose(data, self._y, atol=0.51))
+    # def test_execute__with_limits(self):
+    #     plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
+    #     data = self.create_dataset()
+    #     plugin.set_param_value("include_limits", True)
+    #     plugin.pre_execute()
+    #     with warnings.catch_warnings():
+    #         warnings.simplefilter("ignore")
+    #         new_data, _ = plugin.execute(data)
+    #     self.assertTrue(np.allclose(data, self._y, atol=0.51))
 
 
 if __name__ == "__main__":

@@ -36,6 +36,7 @@ import numpy as np
 from qtpy import QtCore
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
+from silx.gui.plot.items import Scatter
 
 from pydidas_qtcore import PydidasQApplication
 
@@ -52,6 +53,10 @@ from .silx_actions import (
 )
 from .silx_tickbar import tickbar_paintEvent, tickbar_paintTick
 from .utilities import get_2d_silx_plot_ax_settings, user_config_update_func
+
+
+_SCATTER_LEGEND = "pydidas non-uniform image"
+_IMAGE_LEGEND = "pydidas image"
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
@@ -280,16 +285,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.plot_pydidas_dataset(data, **kwargs)
         else:
             self._check_data_dim(data)
-            self.__plot2d_add(Plot2D.addImage, data, **kwargs)
+            kwargs.update({"legend": "pydidas image", "replace": True})
+            Plot2D.addImage(self, data, **kwargs)
+            self.__handle_cs_transform()
             self.update_cs_units("", "")
 
-    def addNonUniformImage(
-        self,
-        x: np.ndarray,
-        y: np.ndarray,
-        data: Union[Dataset, np.ndarray],
-        **kwargs,
-    ):
+    def addNonUniformImage(self, data: Dataset,**kwargs: dict):
         """
         Add a non-uniform image to the plot.
 
@@ -308,29 +309,25 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Any supported Plot2d.addImage keyword arguments.
         """
-        if isinstance(data, Dataset):
-            self.plot_pydidas_dataset(data, **kwargs)
-        else:
-            self._check_data_dim(data)
-            self.__plot2d_add(Plot2D.addNonUniformImage, x, y, data, **kwargs)
-            self.update_cs_units("", "")
+        self._check_data_dim(data)
+        _scatter = self.getScatter(_SCATTER_LEGEND)
+        if _scatter is None:
+            _scatter = Scatter()
+            _scatter.setName(_SCATTER_LEGEND)
+        _ax0 = data.get_axis_range(0)
+        _ax1 = data.get_axis_range(1)
+        _grid_x, _grid_y = np.meshgrid(_ax0, _ax1)
+        _scatter.setData(_grid_x.ravel(), _grid_y.ravel(), data.array.ravel())
+        _scatter.setVisualization(_scatter.Visualization.IRREGULAR_GRID)
+        Plot2D.addItem(self, _scatter)
+        self.resetZoom()
+        self.update_cs_units("", "")
+        self.__handle_cs_transform()
 
-    def __plot2d_add(self, method: callable, *args: tuple, **kwargs: dict):
+    def __handle_cs_transform(self):
         """
-        Call the original Plot2D.addImage method.
-
-        Parameters
-        ----------
-        method : callable
-            The method to be called in the Plot2d base class.
-        data : np.ndarray
-            The input data to be displayed.
-
-        **kwargs : dict
-            Any supported Plot2d.addImage keyword arguments.
+        Handle the setting of the CS transform.
         """
-        kwargs.update({"legend": "pydidas image", "replace": True})
-        method(self, *args, **kwargs)
         self.enable_cs_transform()
         if self.cs_transform.isEnabled():
             self.changeCanvasToDataAction._actionTriggered()
@@ -353,7 +350,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             "kwargs": {
                 "replace": kwargs.pop("replace", True),
                 "copy": kwargs.pop("copy", False),
-                "legend": "pydidas image",
+                "legend": _IMAGE_LEGEND,
             }
             | {
                 _key: _val
@@ -364,14 +361,16 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
             _ax0 = data.get_axis_range(0)
             _ax1 = data.get_axis_range(1)
-            __add_args = (Plot2D.addNonUniformImage, _ax1, _ax0, data.array)
+            _scatter = self.addNonUniformImage(data, **kwargs)
             self.profile.setEnabled(False)
+            self.setActiveScatter(_SCATTER_LEGEND)
         else:
             __add_args = (Plot2D.addImage, data.array)
             _origin, _scale = get_2d_silx_plot_ax_settings(data)
             self._plot_config["kwargs"]["origin"] = _origin
             self._plot_config["kwargs"]["scale"] = _scale
             self.profile.setEnabled(True)
+
 
         self.setGraphYLabel(self._plot_config["ax_labels"][0])
         self.setGraphXLabel(self._plot_config["ax_labels"][1])

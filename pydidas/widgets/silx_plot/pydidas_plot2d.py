@@ -281,11 +281,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Any supported Plot2d.addImage keyword arguments.
         """
+        self.remove(_SCATTER_LEGEND)
         if isinstance(data, Dataset):
             self.plot_pydidas_dataset(data, **kwargs)
         else:
             self._check_data_dim(data)
-            kwargs.update({"legend": "pydidas image", "replace": True})
+            kwargs.update({"legend": _IMAGE_LEGEND, "replace": True})
             Plot2D.addImage(self, data, **kwargs)
             self.__handle_cs_transform()
             self.update_cs_units("", "")
@@ -310,16 +311,18 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             Any supported Plot2d.addImage keyword arguments.
         """
         self._check_data_dim(data)
+        self.remove(_IMAGE_LEGEND, kind="image")
         _scatter = self.getScatter(_SCATTER_LEGEND)
         if _scatter is None:
             _scatter = Scatter()
             _scatter.setName(_SCATTER_LEGEND)
+            Plot2D.addItem(self, _scatter)
         _ax0 = data.get_axis_range(0)
         _ax1 = data.get_axis_range(1)
-        _grid_x, _grid_y = np.meshgrid(_ax0, _ax1)
+        _grid_x, _grid_y = np.meshgrid(_ax1, _ax0)
         _scatter.setData(_grid_x.ravel(), _grid_y.ravel(), data.array.ravel())
         _scatter.setVisualization(_scatter.Visualization.IRREGULAR_GRID)
-        Plot2D.addItem(self, _scatter)
+        self._notifyContentChanged(_scatter)
         self.resetZoom()
         self.update_cs_units("", "")
         self.__handle_cs_transform()
@@ -358,23 +361,25 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 if _key in self._config["allowed_add_image_kwargs"]
             },
         }
-        if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
-            _ax0 = data.get_axis_range(0)
-            _ax1 = data.get_axis_range(1)
-            _scatter = self.addNonUniformImage(data, **kwargs)
-            self.profile.setEnabled(False)
-            self.setActiveScatter(_SCATTER_LEGEND)
-        else:
-            __add_args = (Plot2D.addImage, data.array)
-            _origin, _scale = get_2d_silx_plot_ax_settings(data)
-            self._plot_config["kwargs"]["origin"] = _origin
-            self._plot_config["kwargs"]["scale"] = _scale
-            self.profile.setEnabled(True)
+        from pydidas.core.utils import Timer
 
-
+        with Timer():
+            if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
+                _ax0 = data.get_axis_range(0)
+                _ax1 = data.get_axis_range(1)
+                _scatter = self.addNonUniformImage(data, **kwargs)
+                self.profile.setEnabled(False)
+                self.setActiveScatter(_SCATTER_LEGEND)
+            else:
+                __add_args = (Plot2D.addImage, data.array)
+                _origin, _scale = get_2d_silx_plot_ax_settings(data)
+                self._plot_config["kwargs"]["origin"] = _origin
+                self._plot_config["kwargs"]["scale"] = _scale
+                self.profile.setEnabled(True)
+                Plot2D.addImage(self, data.array, **self._plot_config["kwargs"])
+                self.setActiveImage(_IMAGE_LEGEND)
         self.setGraphYLabel(self._plot_config["ax_labels"][0])
         self.setGraphXLabel(self._plot_config["ax_labels"][1])
-        self.__plot2d_add(*__add_args, **self._plot_config["kwargs"])
         self._plot_config["cbar_legend"] = ""
         if len(data.data_label) > 0:
             self._plot_config["cbar_legend"] += data.data_label

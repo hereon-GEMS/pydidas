@@ -19,6 +19,8 @@ Improvements
 - Added check boxes for Parameters with only True/False choices.
 - Improved the documentation for GitHub pages which now includes documentation
   for older versions.
+- Added support for images with non-uniform axes.
+- Added a new plugin to convert integration results to d-spacing.
 
 Bugfixes
 --------

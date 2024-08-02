@@ -68,6 +68,11 @@ class ConvertToDSpacing(ProcPlugin):
         self._detector_dist = self._EXP.get_param_value("detector_dist")
         self._allowed_ax_choices = get_generic_parameter("rad_unit").choices
         self._config["ax_index"] = None
+        self._config["new_range"] = None
+        self._config["ax_indices"] = None
+        self._config["unit"] = (
+            "nm" if self.get_param_value("d_spacing_unit") == "nm" else "A"
+        )
 
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -85,9 +90,42 @@ class ConvertToDSpacing(ProcPlugin):
             kwargs : dict
                 Any calling kwargs, appended by any changes in the function.
         """
+        _new_data = data.copy()
         if self._config["ax_index"] is None:
             self._set_ax_index(data)
+        if self._config["new_range"] is None:
+            self._calculate_new_range(_new_data)
         _axis = self._config["ax_index"]
+        _new_data.update_axis_unit(_axis, self._config["unit"])
+        _new_data = _new_data[self._slicer]
+        _new_data.update_axis_range(_axis, self._config["new_range"])
+        _new_data.update_axis_label(_axis, "d-spacing")
+        return _new_data, kwargs
+
+    def _set_ax_index(self, data: Dataset):
+        for axis, label in data.axis_labels.items():
+            if f"{label} / {data.axis_units[axis]}" in self._allowed_ax_choices:
+                self._config["ax_index"] = axis
+                self._slicer = tuple(slice(None) for _ in range(axis))
+                return
+        raise UserConfigError(
+            "Could not find a suitable axis to convert to d-spacing. "
+            "Please check the input data.\n\n"
+            "This plugin must be used immediately after an integration plugin "
+            "to assert that the input data is in the correct format."
+        )
+
+    def _calculate_new_range(self, data: Dataset):
+        """
+        Calculate the new range for the d-spacing axis.
+
+        Parameters
+        ----------
+        data : Dataset
+            The input data.
+        """
+        _axis = self._config["ax_index"]
+        _slicer = [slice(None)] * data.ndim
         _range = data.axis_ranges[_axis]
         match data.axis_labels[_axis]:
             case "Q":
@@ -104,21 +142,9 @@ class ConvertToDSpacing(ProcPlugin):
                 _range = self._lambda / (2 * np.sin(_range / 2))
         if self.get_param_value("d_spacing_unit") == "nm":
             _range /= 10
-            data.update_axis_unit(_axis, "nm")
-        else:
-            data.update_axis_unit(_axis, "A")
-        data.update_axis_range(_axis, _range)
-        data.update_axis_label(_axis, "d-spacing")
-        return data, kwargs
-
-    def _set_ax_index(self, data: Dataset):
-        for axis, label in data.axis_labels.items():
-            if f"{label} / {data.axis_units[axis]}" in self._allowed_ax_choices:
-                self._config["ax_index"] = axis
-                return
-        raise UserConfigError(
-            "Could not find a suitable axis to convert to d-spacing. "
-            "Please check the input data.\n\n"
-            "This plugin must be used immediately after an integration plugin "
-            "to assert that the input data is in the correct format."
-        )
+        _valid = np.isfinite(_range)
+        if not np.all(_valid):
+            _range = _range[_valid]
+        _slicer[_axis] = np.where(_valid)[0][::-1]
+        self._config["new_range"] = _range[::-1]
+        self._slicer = tuple(_slicer)

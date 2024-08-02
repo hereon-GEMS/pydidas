@@ -35,7 +35,7 @@ from ..exceptions import UserConfigError
 from ..pydidas_q_settings import PydidasQsettings
 
 
-__NUM_BINS = 16384
+__NUM_BINS = 32768
 
 
 def calculate_histogram_limits(data: np.ndarray) -> tuple:
@@ -101,12 +101,13 @@ def __calc_upper_limit(data: np.ndarray, threshold_high: float) -> float:
     """
     _counts, _edges = np.histogram(data, bins=__NUM_BINS)
     _cumcounts = np.cumsum(_counts / data.size)
-    _bin_index_low = np.max(np.where(_cumcounts <= threshold_high)[0], initial=0)
+    _bin_index_low = np.max(np.where(_cumcounts <= threshold_high)[0], initial=-1)
     try:
         # new range must be range of bin following low bin:
         _new_range = (_edges[_bin_index_low + 1], _edges[_bin_index_low + 2])
     except IndexError:
-        _new_range = (_edges[_bin_index_low], _edges[_bin_index_low + 1])
+        _index = max(_bin_index_low, 0)
+        _new_range = (_edges[_index], _edges[_index + 1])
     _counts_fine, _edges_fine = np.histogram(data, bins=__NUM_BINS, range=_new_range)
     _cumcounts_fine = np.cumsum(_counts_fine / data.size) + _cumcounts[_bin_index_low]
     _index_new = np.max(np.where(_cumcounts_fine <= threshold_high)[0], initial=0)

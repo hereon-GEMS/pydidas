@@ -532,7 +532,7 @@ tasks on the fly. The default is app_processor.</p></li>
 <span class="sig-name descname"><span class="pre">cycle_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.cycle_pre_run" title="Link to this definition">#</a></dt>
 <dd><p>Perform pre-multiprocessing operations.</p>
 <p>This time slot is used to prepare the App by running the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">app.multiprocessing_pre_run()</span></code>, settings the tasks and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">app.multiprocessing_pre_run</span></code>, settings the tasks and
 starting the workers.</p>
 </dd></dl>
 
@@ -932,40 +932,56 @@ keyword arguments from the calling arguments of processor.</p></li>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner"><code class="docutils literal notranslate"><span class="pre">AppRunner</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.call_app_method"><code class="docutils literal notranslate"><span class="pre">AppRunner.call_app_method()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_post_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_pre_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.get_app"><code class="docutils literal notranslate"><span class="pre">AppRunner.get_app()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.set_app_param"><code class="docutils literal notranslate"><span class="pre">AppRunner.set_app_param()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.call_app_method"><code class="docutils literal notranslate"><span class="pre">AppRunner.call_app_method</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_post_run</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">AppRunner.cycle_pre_run</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.get_app"><code class="docutils literal notranslate"><span class="pre">AppRunner.get_app</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.AppRunner.set_app_param"><code class="docutils literal notranslate"><span class="pre">AppRunner.set_app_param</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController"><code class="docutils literal notranslate"><span class="pre">WorkerController</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.add_task"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_task()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.add_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_tasks()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.change_function"><code class="docutils literal notranslate"><span class="pre">WorkerController.change_function()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_post_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_pre_run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.exit"><code class="docutils literal notranslate"><span class="pre">WorkerController.exit()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.finalize_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.finalize_tasks()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.join_queues"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_queues()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.join_workers"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_workers()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.add_task"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_task</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.add_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.add_tasks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.change_function"><code class="docutils literal notranslate"><span class="pre">WorkerController.change_function</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.cycle_post_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_post_run</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.cycle_pre_run"><code class="docutils literal notranslate"><span class="pre">WorkerController.cycle_pre_run</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.exit"><code class="docutils literal notranslate"><span class="pre">WorkerController.exit</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.finalize_tasks"><code class="docutils literal notranslate"><span class="pre">WorkerController.finalize_tasks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.join_queues"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_queues</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.join_workers"><code class="docutils literal notranslate"><span class="pre">WorkerController.join_workers</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.n_workers"><code class="docutils literal notranslate"><span class="pre">WorkerController.n_workers</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.progress"><code class="docutils literal notranslate"><span class="pre">WorkerController.progress</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.requestInterruption"><code class="docutils literal notranslate"><span class="pre">WorkerController.requestInterruption()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.reset_task_list"><code class="docutils literal notranslate"><span class="pre">WorkerController.reset_task_list()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.restart"><code class="docutils literal notranslate"><span class="pre">WorkerController.restart()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.run"><code class="docutils literal notranslate"><span class="pre">WorkerController.run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.send_stop_signal"><code class="docutils literal notranslate"><span class="pre">WorkerController.send_stop_signal()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.stop"><code class="docutils literal notranslate"><span class="pre">WorkerController.stop()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.suspend"><code class="docutils literal notranslate"><span class="pre">WorkerController.suspend()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.write_lock"><code class="docutils literal notranslate"><span class="pre">WorkerController.write_lock()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.requestInterruption"><code class="docutils literal notranslate"><span class="pre">WorkerController.requestInterruption</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.reset_task_list"><code class="docutils literal notranslate"><span class="pre">WorkerController.reset_task_list</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.restart"><code class="docutils literal notranslate"><span class="pre">WorkerController.restart</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.run"><code class="docutils literal notranslate"><span class="pre">WorkerController.run</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.send_stop_signal"><code class="docutils literal notranslate"><span class="pre">WorkerController.send_stop_signal</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.stop"><code class="docutils literal notranslate"><span class="pre">WorkerController.stop</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.suspend"><code class="docutils literal notranslate"><span class="pre">WorkerController.suspend</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.write_lock"><code class="docutils literal notranslate"><span class="pre">WorkerController.write_lock</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor"><code class="docutils literal notranslate"><span class="pre">app_processor()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor_without_tasks"><code class="docutils literal notranslate"><span class="pre">app_processor_without_tasks()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.processor"><code class="docutils literal notranslate"><span class="pre">processor()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor"><code class="docutils literal notranslate"><span class="pre">app_processor</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor_without_tasks"><code class="docutils literal notranslate"><span class="pre">app_processor_without_tasks</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.processor"><code class="docutils literal notranslate"><span class="pre">processor</span></code></a></li>
 </ul>
   </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/multiprocessing.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
 
   <div class="sidebar-secondary-item">
 
@@ -1001,7 +1017,7 @@ keyword arguments from the calling arguments of processor.</p></li>
 
   <p class="copyright">
     
-      © Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.
+      © Copyright 2021 - 2024, Helmholtz-Zentrum Hereon.
       <br/>
     
   </p>

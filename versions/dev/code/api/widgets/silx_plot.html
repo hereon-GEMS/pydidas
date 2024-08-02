@@ -642,6 +642,22 @@ the image to the Plot2d.addImage method.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.addNonUniformImage">
+<span class="sig-name descname"><span class="pre">addNonUniformImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addNonUniformImage" title="Link to this definition">#</a></dt>
+<dd><p>Add a non-uniform image to the plot.</p>
+<p>This method implements an additional dimensionality check before passing
+the image to the Plot2d.addImage method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a>) – The input data to be displayed.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any supported Plot2d.addImage keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot">
 <span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot" title="Link to this definition">#</a></dt>
 <dd><p>Clear the plot and remove all items.</p>
@@ -824,17 +840,17 @@ DiffractionExperimentContext.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">get_2d_silx_plot_ax_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">get_2d_silx_plot_ax_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings" title="Link to this definition">#</a></dt>
 <dd><p>Get the axis settings to have pixels centered at their values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>axis</strong> (<em>np.ndarray</em>) – The numpy array with the axis positions.</p>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a>) – The dataset to get the axis settings from.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>_origin</strong> (<em>float</em>) – The value for the axis origin.</p></li>
-<li><p><strong>_scale</strong> (<em>float</em>) – The value for the axis scale to squeeze it into the correct
-dimensions for silx ImageView.</p></li>
+<li><p><strong>origins</strong> (<em>tuple[float, float]</em>) – The values for the axis origins.</p></li>
+<li><p><strong>scales</strong> (<em>tuple[float, float]</em>) – The values for the axis scales to squeeze it into the correct
+dimensions for silx plotting.</p></li>
 </ul>
 </p>
 </dd>
@@ -911,38 +927,55 @@ dimensions for silx ImageView.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasLoadImageAction"><code class="docutils literal notranslate"><span class="pre">PydidasLoadImageAction</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasMaskToolsWidget"><code class="docutils literal notranslate"><span class="pre">PydidasMaskToolsWidget</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.clear_plot()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.plot_pydidas_dataset()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.update_mpl_fonts"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.update_mpl_fonts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.clear_plot</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.plot_pydidas_dataset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.update_mpl_fonts"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.update_mpl_fonts</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.addImage()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.clear_plot()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.enable_cs_transform"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.enable_cs_transform()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.plot_pydidas_dataset()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_cs_units"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_cs_units()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_exp_setup_params"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_exp_setup_params()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_mpl_fonts()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.user_config_update()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addImage"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.addImage</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.addNonUniformImage"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.addNonUniformImage</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.clear_plot</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.enable_cs_transform"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.enable_cs_transform</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.plot_pydidas_dataset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_cs_units"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_cs_units</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_exp_setup_params"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_exp_setup_params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_mpl_fonts"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_mpl_fonts</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.user_config_update"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.user_config_update</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_circle"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_circle()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_integration_region"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_integration_region()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.set_marker_color"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.set_marker_color()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_circle"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_circle</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_integration_region"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_integration_region</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.draw_line_from_beamcenter</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions.set_marker_color"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2DwithIntegrationRegions.set_marker_color</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.clear_plots()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.plot_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.clear_plots</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.plot_data</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings"><code class="docutils literal notranslate"><span class="pre">get_2d_silx_plot_ax_settings()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.user_config_update_func"><code class="docutils literal notranslate"><span class="pre">user_config_update_func()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.get_2d_silx_plot_ax_settings"><code class="docutils literal notranslate"><span class="pre">get_2d_silx_plot_ax_settings</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.user_config_update_func"><code class="docutils literal notranslate"><span class="pre">user_config_update_func</span></code></a></li>
 </ul>
   </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/widgets/silx_plot.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
 
   <div class="sidebar-secondary-item">
 
@@ -978,7 +1011,7 @@ dimensions for silx ImageView.</p></li>
 
   <p class="copyright">
     
-      © Copyright 2023 - 2024, Helmholtz-Zentrum Hereon.
+      © Copyright 2021 - 2024, Helmholtz-Zentrum Hereon.
       <br/>
     
   </p>

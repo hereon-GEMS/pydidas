@@ -71,6 +71,23 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
     user_config_update = user_config_update_func
 
+    @staticmethod
+    def _check_data_dim(data: np.ndarray):
+        """
+        Check the data dimensionality.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data to be checked.
+        """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition:\n The input data has {data.ndim} "
+                "dimensions."
+            )
+
     def __init__(self, **kwargs: dict):
         PydidasQsettingsMixin.__init__(self)
         Plot2D.__init__(
@@ -241,10 +258,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if _data is None or not self._config["cs_transform"]:
             return
         _data = _data.getData()
-        _enable = _data.shape == (
-            self._config["diffraction_exp"].get_param_value("detector_npixy"),
-            self._config["diffraction_exp"].get_param_value("detector_npixx"),
-        )
+        _enable = self._data_has_det_dim(_data)
         if not _enable:
             self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(_enable and self._config["cs_transform_valid"])
@@ -281,7 +295,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : dict
             Any supported Plot2d.addImage keyword arguments.
         """
-        self.remove(_SCATTER_LEGEND)
+        self.remove(_SCATTER_LEGEND, kind="scatter")
         if isinstance(data, Dataset):
             self.plot_pydidas_dataset(data, **kwargs)
         else:
@@ -291,7 +305,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.__handle_cs_transform()
             self.update_cs_units("", "")
 
-    def addNonUniformImage(self, data: Dataset,**kwargs: dict):
+    def addNonUniformImage(self, data: Dataset, **kwargs: dict):
         """
         Add a non-uniform image to the plot.
 
@@ -300,11 +314,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        x : np.ndarray
-            The x-axis data. Must only be given if the data is not a pydidas Dataset.
-        y : np.ndarray
-            The y-axis data. Must only be given if the data is not a pydidas Dataset.
-        data : Union[Dataset, np.ndarray]
+        data : Dataset
             The input data to be displayed.
 
         **kwargs : dict
@@ -312,20 +322,19 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         self._check_data_dim(data)
         self.remove(_IMAGE_LEGEND, kind="image")
+        self.cs_transform.set_coordinates("cartesian")
+        self.cs_transform.setEnabled(False)
+        self.profile.setEnabled(False)
         _scatter = self.getScatter(_SCATTER_LEGEND)
         if _scatter is None:
             _scatter = Scatter()
             _scatter.setName(_SCATTER_LEGEND)
             Plot2D.addItem(self, _scatter)
-        _ax0 = data.get_axis_range(0)
-        _ax1 = data.get_axis_range(1)
-        _grid_x, _grid_y = np.meshgrid(_ax1, _ax0)
+        _grid_x, _grid_y = np.meshgrid(data.get_axis_range(1), data.get_axis_range(0))
         _scatter.setData(_grid_x.ravel(), _grid_y.ravel(), data.array.ravel())
         _scatter.setVisualization(_scatter.Visualization.IRREGULAR_GRID)
         self._notifyContentChanged(_scatter)
-        self.resetZoom()
-        self.update_cs_units("", "")
-        self.__handle_cs_transform()
+        self.setActiveScatter(_SCATTER_LEGEND)
 
     def __handle_cs_transform(self):
         """
@@ -361,23 +370,17 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 if _key in self._config["allowed_add_image_kwargs"]
             },
         }
-        from pydidas.core.utils import Timer
-
-        with Timer():
-            if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
-                _ax0 = data.get_axis_range(0)
-                _ax1 = data.get_axis_range(1)
-                _scatter = self.addNonUniformImage(data, **kwargs)
-                self.profile.setEnabled(False)
-                self.setActiveScatter(_SCATTER_LEGEND)
-            else:
-                __add_args = (Plot2D.addImage, data.array)
-                _origin, _scale = get_2d_silx_plot_ax_settings(data)
-                self._plot_config["kwargs"]["origin"] = _origin
-                self._plot_config["kwargs"]["scale"] = _scale
-                self.profile.setEnabled(True)
-                Plot2D.addImage(self, data.array, **self._plot_config["kwargs"])
-                self.setActiveImage(_IMAGE_LEGEND)
+        if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
+            self.addNonUniformImage(data, **kwargs)
+        else:
+            self.remove(_SCATTER_LEGEND, kind="scatter")
+            _origin, _scale = get_2d_silx_plot_ax_settings(data)
+            self._plot_config["kwargs"]["origin"] = _origin
+            self._plot_config["kwargs"]["scale"] = _scale
+            self.profile.setEnabled(True)
+            Plot2D.addImage(self, data.array, **self._plot_config["kwargs"])
+            self.setActiveImage(_IMAGE_LEGEND)
+            self.__handle_cs_transform()
         self.setGraphYLabel(self._plot_config["ax_labels"][0])
         self.setGraphXLabel(self._plot_config["ax_labels"][1])
         self._plot_config["cbar_legend"] = ""
@@ -387,22 +390,26 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self._plot_config["cbar_legend"] += f" / {data.data_unit}"
         if len(self._plot_config["cbar_legend"]) > 0:
             self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
+        _action = (
+            self.changeCanvasToDataAction
+            if self._data_has_det_dim(data)
+            else self.expandCanvasAction
+        )
+        _action._actionTriggered()
 
-    def _check_data_dim(self, data: np.ndarray):
+    def _data_has_det_dim(self, data: np.ndarray):
         """
-        Check the data dimensionality.
+        Check if the data has the detector dimensions.
 
         Parameters
         ----------
         data : np.ndarray
             The input data to be checked.
         """
-        if not data.ndim == 2:
-            raise UserConfigError(
-                "The given dataset does not have exactly 2 dimensions. Please check "
-                f"the input data definition:\n The input data has {data.ndim} "
-                "dimensions."
-            )
+        return data.shape == (
+            self._config["diffraction_exp"].get_param_value("detector_npixy"),
+            self._config["diffraction_exp"].get_param_value("detector_npixx"),
+        )
 
     def clear_plot(self):
         """

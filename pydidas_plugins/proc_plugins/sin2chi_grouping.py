@@ -152,6 +152,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         self._config.update(stress_strain_config.__dict__)
         self.config = DictViaAttrs(self._config)
+        self.set_param_value("always_store_results", True) #we need the results to be able to work globally on results
+        
             
     def pre_execute(self):
         print(30*" \N{Hot pepper}")

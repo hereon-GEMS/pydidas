@@ -70,7 +70,7 @@ class Units(StrEnum):
     
     
 class Tolerance(Enum):
-    S2C_TOLERANCE : float = 1e-3
+    S2C_TOLERANCE : float = 2e-4
 
     def __str__(self) -> str:
         return str(self.value)
@@ -152,7 +152,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         self._config.update(stress_strain_config.__dict__)
         self.config = DictViaAttrs(self._config)
-        self.set_param_value("always_store_results", True) #we need the results to be able to work globally on results
+        #self.set_param_value("always_store_results", True) #we need the results to be able to work globally on results , This is how to add later a param
         
             
     def pre_execute(self):
@@ -164,7 +164,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
 
-        chi, d_spacing = self._ds_slicing(ds.copy()) 
+        chi, d_spacing = self._ds_slicing(ds) #.copy() remove .copy() because the error previously was caused by pickle 
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
           
@@ -623,7 +623,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
         Groups chi angles based on the similarity of their sin^2(chi) values within a specified tolerance.
 
-        This function takes an array of chi angles in degrees and groups them based on the similarity of their sin^2(chi) values. Two chi values belong to the same group if the absolute difference between their sin^2(chi) values is less than the specified tolerance.
+        This function takes an array of chi angles in degrees and groups them based on the similarity of their sin^2(chi) values.
+        Two chi values belong to the same group if the absolute difference between their sin^2(chi) values is less than the specified tolerance.
 
         Parameters
         ----------

@@ -154,10 +154,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
     output_data_label = "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
     new_dataset = True
     
-    def __init__(self, stress_strain_config=DictViaAttrs(dict())):
+    def __init__(self):
         super().__init__()
         
-        self._config.update(stress_strain_config.__dict__)
         self.config = DictViaAttrs(self._config)
         #self.set_param_value("always_store_results", True) #we need the results to be able to work globally on results , This is how to add later a param
         

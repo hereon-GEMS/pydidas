@@ -113,10 +113,17 @@ class DictViaAttrs:
         except KeyError:
             raise AttributeError(attr)
 
-
     def __setattr__(self, attr, value):
         self._dict[attr] = value
-    
+        
+    def keys(self):
+        return self._dict.keys()
+
+    def __getitem__(self, k):
+        return self._dict[k]
+        
+    def items(self):
+        return self._dict.items()
 
 class DspacingSin2chiGrouping(ProcPlugin):
     """
@@ -175,10 +182,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined)
         
         
-  
-        #TODO: add function to combine all 4 results in one Dataset
-        #return Dataset(d_spacing_pos, d_spacing_neg, d_spacing_avg, d_spacing_diff)
-        #a dummy version
         return d_output_sin2chi_method, kwargs
     
     def calculate_result_shape(self):

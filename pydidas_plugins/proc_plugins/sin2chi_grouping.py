@@ -165,9 +165,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
              
         # Set the parameter for storing the results, because we need later to work globally on results. 
         self.params.set_value(PARAMETER_KEEP_RESULTS, True)
-        
-        print('Moin, moin from the init', self.params.get_value(PARAMETER_KEEP_RESULTS)) 
-       
+               
             
     def pre_execute(self):
         print(30*" \N{Hot pepper}")
@@ -177,21 +175,18 @@ class DspacingSin2chiGrouping(ProcPlugin):
         #As it is not possible to overwrite the default-value of `keep_results', I check here again the current value and overwrite the state to True.`
         if not self.params.get_value(PARAMETER_KEEP_RESULTS):
             self.params.set_value(PARAMETER_KEEP_RESULTS, True)
-            print('Hello from the pre-execute', self.params.get_value(PARAMETER_KEEP_RESULTS))
+        
         print(30*" \N{Hot pepper}")   
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
-        print(30*" \N{Aubergine}")
-        print('Moin, moin from the execute', self.params.get_value(PARAMETER_KEEP_RESULTS))  #We need to be able to work globally on results.
-        print(30*" \N{Aubergine}")
-
+        
+        
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
-          
+         
         
         #d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
-
      
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined)
         

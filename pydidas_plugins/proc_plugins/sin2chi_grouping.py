@@ -162,10 +162,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         super().__init__()
         
         self.config = DictViaAttrs(self._config)
-                                    
-        for items in self.params.items():
-            print(items)
-         
+             
         # Set the parameter for storing the results, because we need later to work globally on results. 
         self.params.set_value(PARAMETER_KEEP_RESULTS, True)
         
@@ -188,13 +185,13 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print('Moin, moin from the execute', self.params.get_value(PARAMETER_KEEP_RESULTS))  #We need to be able to work globally on results.
         print(30*" \N{Aubergine}")
 
-        chi, d_spacing = self._ds_slicing(ds) #.copy() remove .copy() because the error previously was caused by pickle 
+        chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
           
         
         #d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
-        
+
      
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined)
         

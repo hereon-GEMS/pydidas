@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module for stress-strain analysis.
+Prototype module for stress-strain analysis.
 """
 
 __author__ = "Gudrun Lotze"

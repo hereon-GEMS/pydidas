@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The dataset module includes the Dataset subclasses of numpy.ndarray with additional
-embedded metadata.
+Test for prototype module for stress-strain analysis.
 """
 
 __author__ = "Gudrun Lotze"

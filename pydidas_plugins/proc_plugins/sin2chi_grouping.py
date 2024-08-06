@@ -29,7 +29,7 @@ __status__ = "Development"
 __all__ = ["DspacingSin2chiGrouping"]
 
 import numpy as np
-from enum import StrEnum, IntEnum, Enum
+from enum import IntEnum
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
@@ -39,50 +39,17 @@ from typing import List, Tuple, Dict
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
 
-
-from pydidas.core import ParameterCollection, get_generic_parameter
-
-
+LABELS_CHI = "chi"
 LABELS_SIN2CHI = "sin^2(chi)"
+LABELS_POSITION = "position"
+
+UNITS_NANOMETER = "nm"
+UNITS_ANGSTROM = "A"
+UNITS_DEGREE = "deg"
+
+TOLERANCE_S2C_TOL = 2e-4
 
 PARAMETER_KEEP_RESULTS = 'keep_results'
-
-
-
-class Labels(StrEnum):
-    CHI: str = "chi"
-    POSITION: str = "position"
-    SIN2CHI: str = "sin^2(chi)"
-    SIN_2CHI: str = "sin(2*chi)"
-
-    def __str__(self) -> str:
-        return self.value
-    
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}.{self.name}({self.value!r})'
-    
-    
-class Units(StrEnum):
-    NANOMETER: str = "nm"
-    ANGSTROM: str = "A"
-    DEGREE: str = "deg"
-
-    def __str__(self) -> str:
-        return self.value
-    
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}.{self.name}({self.value!r})'
-    
-    
-class Tolerance(Enum):
-    S2C_TOLERANCE : float = 2e-4
-
-    def __str__(self) -> str:
-        return str(self.value)
-    
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}.{self.name}({self.value!r})'
-
     
    
 # Define the Enum
@@ -140,7 +107,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data.
     
     """
-    plugin_name = "Group d-spacing values according to sin^2(chi) method"
+    plugin_name = "Group d-spacing according to sin^2(chi) method"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
@@ -171,6 +138,10 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(30*" \N{Hot pepper}")   
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
+        
+        print(30*" \N{Aubergine}")
+        print("Moin, moin from the execute. Value of 'keep_results':", self.params.get_value(PARAMETER_KEEP_RESULTS))
+        print(30*" \N{Aubergine}")
         
         
         chi, d_spacing = self._ds_slicing(ds)
@@ -254,7 +225,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         axis_labels = ds.axis_labels
 
         # Collect indices where 'chi' is found
-        chi_indices = [key for key, value in axis_labels.items() if value == Labels.CHI]
+        chi_indices = [key for key, value in axis_labels.items() if value == LABELS_CHI]
 
         # Check for multiple 'chi'
         if len(chi_indices) > 1:
@@ -404,18 +375,18 @@ class DspacingSin2chiGrouping(ProcPlugin):
         ds_units: Dict[str, List[str]] = self._extract_units(ds)
 
         # position/pos contains the unit for d_spacing
-        pos_units_allowed: List[str] = [Units.NANOMETER, Units.ANGSTROM]
+        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
         # Only chi in degree is allowed.
-        chi_units_allowed: List[str] = [Units.DEGREE]
+        chi_units_allowed: List[str] = [UNITS_DEGREE]
 
-        params_to_check = [Labels.POSITION, Labels.CHI]
+        params_to_check = [LABELS_POSITION, LABELS_CHI]
 
         for item, val in ds_units.items():
             if item in params_to_check:
-                if item == Labels.POSITION:
+                if item == LABELS_POSITION:
                     if val not in pos_units_allowed:
                         raise ValueError(f"Unit {val} not allowed for {item}.")
-                if item == Labels.CHI:
+                if item == LABELS_CHI:
                     if val not in chi_units_allowed:
                         raise ValueError(f"Unit {val} not allowed for {item}.")
 
@@ -468,7 +439,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         param_info = ds_units[pos_idx]
         param_name, unit = param_info
 
-        if param_name != Labels.POSITION:
+        if param_name != LABELS_POSITION:
             raise ValueError(f"The parameter name at pos_idx {pos_idx} is not 'position'")
 
         return param_name, unit
@@ -620,7 +591,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return chi, d_spacing
     
-    def _idx_s2c_grouping(self, chi: np.ndarray, tolerance: float = Tolerance.S2C_TOLERANCE.value) -> Tuple[int, np.ndarray]:
+    def _idx_s2c_grouping(self, chi: np.ndarray, tolerance: float = TOLERANCE_S2C_TOL) -> Tuple[int, np.ndarray]:
         """
         Groups chi angles based on the similarity of their sin^2(chi) values within a specified tolerance.
 
@@ -679,11 +650,12 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return n_components, s2c_labels
     
-    def _group_d_spacing_by_chi(self, d_spacing: Dataset, chi: np.ndarray, tolerance: float = Tolerance.S2C_TOLERANCE.value) -> Tuple[Dataset, Dataset]:
+    def _group_d_spacing_by_chi(self, d_spacing: Dataset, chi: np.ndarray, tolerance: float = TOLERANCE_S2C_TOL) -> Tuple[Dataset, Dataset]:
         """
-        Groups d-spacing values based on the chi angles, categorizing them by the slope of their sin^2(chi) values.
+        Groups d-spacing values based on the chi angles and categorize them by the slope of their sin^2(chi) values.
 
-        This function processes d-spacing values associated with different chi angles. It categorizes these values based on the slope (positive, negative, or near-zero) of their sin^2(chi) function. The categorization allows for the identification of groups with similar mechanical strain characteristics. The function returns two datasets, one for positive slopes and another for negative slopes, each containing the mean d-spacing values for their respective categories.
+        This function processes d-spacing values associated with different chi angles. It categorizes these values based on the slope (positive, negative, or near-zero) of their sin^2(chi) function.
+        The function returns two datasets, one for positive slopes and another for negative slopes, each containing the mean d-spacing values for their respective categories.
 
         Parameters
         ----------
@@ -1026,26 +998,29 @@ class DspacingSin2chiGrouping(ProcPlugin):
         if d_spacing_combined.axis_labels[0] != '0: d-, 1: d+':
             raise ValueError(f"axis_labels[0] does not match '0: d-, 1: d+'.")
         
-        if d_spacing_combined.axis_labels[1] != Labels.SIN2CHI:
-            raise ValueError(f'axis_labels[1] does not match {Labels.SIN2CHI}.')
+        if d_spacing_combined.axis_labels[1] != LABELS_SIN2CHI:
+            raise ValueError(f'axis_labels[1] does not match {LABELS_SIN2CHI}.')
                 
         d_spacing_avg = d_spacing_combined.mean(axis=0) 
         d_spacing_avg=d_spacing_avg.reshape(1,-1)
         
-        print('My shape:', self._config["input_shape"])
+        print('Input shape:', self._config["input_shape"])
                               
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
-        print('arr shape', arr.shape)
+        print('Resulting ds shape', arr.shape)
+        
         
         dummy_arr= np.full((3, self._config["input_shape"][0]//2+1), np.nan)
         dummy_arr[:,0:arr.shape[1]] = arr
-        print('dummy_arr ', dummy_arr)
+        
+        print('Dummy Array shape:', dummy_arr.shape)
+        print('Dummy Array\n', dummy_arr)
         
         dummy_axis_ranges= np.ones(self._config["input_shape"][0]//2+1)
-        print(dummy_axis_ranges.shape)
         dummy_axis_ranges[0:len(d_spacing_combined.axis_ranges[1])] = d_spacing_combined.axis_ranges[1]
-        print(dummy_axis_ranges)   
+        
+        print('Dummy axis range:\n', dummy_axis_ranges)   
         
         # Create the final result Dataset, when dynamic array allocation is not implemented
         result=Dataset(dummy_arr, axis_ranges={0: np.arange(dummy_arr.shape[0]), 1: dummy_axis_ranges}, 

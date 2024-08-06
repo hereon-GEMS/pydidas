@@ -40,8 +40,13 @@ from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
 
 
+from pydidas.core import ParameterCollection, get_generic_parameter
+
 
 LABELS_SIN2CHI = "sin^2(chi)"
+
+PARAMETER_KEEP_RESULTS = 'keep_results'
+
 
 
 class Labels(StrEnum):
@@ -129,46 +134,59 @@ class DspacingSin2chiGrouping(ProcPlugin):
     """
     Grouping of d-spacing values according to the slopes in sin^2(chi) and similiarity in sin^2(chi) values.
     chi is the azimuthal angle of one diffraction image.
-    Output: Mean of d-spacing branche (d(+), d(-)) vs. sin^2(chi) , difference of d-spacing branches vs. sin(2*chi), and
-    both d-spacing branches for each group.
+    Output: Mean of d-spacing branches (d(+), d(-)) and both d-spacing branches (d(+), d(-)) vs. sin^2(chi).
     
-    In a fist step, the grouping is done by a clustering algorithm which uses sin^2(chi) and its values as reference.
-    Similar values are identified as one group.
-    In a second step, the algorithm will group the d-spacing values into groups based on similiarity of sin^2(chi) values
-    and its slope sign (positive or negative)
+    In a fist step, a clustering algorithms groups chi values according to similiar sin^2(chi) values as reference. 
+    Chi values resulting in similiar sin^2(chi)-values belong to the same group.
+    In a second step, the algorithm separates the d-spacing values into groups based on similiarity of sin^2(chi) values
+    and its slope sign (positive or negative).
     After the grouping, d-spacing values are categorized by their group labels and the slope sign.
-    In each d-spacing branch, positive or negative, multiple groups can be identified.
-    d-spacing values for each group and slope sign follow. 
-    The mean of positive and negative d-spacing values vs. sin^2(chi) is calculated,
-    and in a final step, the difference of positive and negative d-spacing values vs. sin(2*chi) is calculated.
+    In each d-spacing branch, positive (d(+)) or negative (d(-)), multiple groups can be identified.
+  
+    Finally, the mean of positive and negative d-spacing values vs. sin^2(chi) is calculated for each group.
     
     NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data.
     
     """
-    plugin_name = "Group d-spacing values according to sin^2(chi)"
+    plugin_name = "Group d-spacing values according to sin^2(chi) method"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
-    input_data_dim = -1 #TODO: Check if this is correct
-    output_data_dim = -1 #TODO: Check if this is correct
+    input_data_dim = -1 
+    output_data_dim = -1 
     output_data_label = "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
     new_dataset = True
+
     
     def __init__(self):
         super().__init__()
         
         self.config = DictViaAttrs(self._config)
-        #self.set_param_value("always_store_results", True) #we need the results to be able to work globally on results , This is how to add later a param
+                                    
+        for items in self.params.items():
+            print(items)
+         
+        # Set the parameter for storing the results, because we need later to work globally on results. 
+        self.params.set_value(PARAMETER_KEEP_RESULTS, True)
         
+        print('Moin, moin from the init', self.params.get_value(PARAMETER_KEEP_RESULTS)) 
+       
             
     def pre_execute(self):
         print(30*" \N{Hot pepper}")
         print(self._config["input_shape"])  
-        print(self._config["input_shape"][0])
-        print(int(self._config["input_shape"][0]/2+1))
-        print(30*" \N{Hot pepper}")        
+        print(self._config["input_shape"][0], int(self._config["input_shape"][0]/2+1))
+            
+        #As it is not possible to overwrite the default-value of `keep_results', I check here again the current value and overwrite the state to True.`
+        if not self.params.get_value(PARAMETER_KEEP_RESULTS):
+            self.params.set_value(PARAMETER_KEEP_RESULTS, True)
+            print('Hello from the pre-execute', self.params.get_value(PARAMETER_KEEP_RESULTS))
+        print(30*" \N{Hot pepper}")   
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
+        print(30*" \N{Aubergine}")
+        print('Moin, moin from the execute', self.params.get_value(PARAMETER_KEEP_RESULTS))  #We need to be able to work globally on results.
+        print(30*" \N{Aubergine}")
 
         chi, d_spacing = self._ds_slicing(ds) #.copy() remove .copy() because the error previously was caused by pickle 
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)

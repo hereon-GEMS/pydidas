@@ -121,14 +121,6 @@ class DictViaAttrs:
     def __setattr__(self, attr, value):
         self._dict[attr] = value
         
-    def keys(self):
-        return self._dict.keys()
-
-    def __getitem__(self, k):
-        return self._dict[k]
-        
-    def items(self):
-        return self._dict.items()
 
 class DspacingSin2chiGrouping(ProcPlugin):
     """
@@ -202,9 +194,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(self._config["result_shape"])  
         print(30*" \N{Peach}")   
         
-        self._config["result_shape"] = (3, self._config["input_shape"][0]//2+1)   
-        
-        
+        self._config["result_shape"] = (3, self._config["input_shape"][0]//2+1)         
         
         
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
@@ -220,8 +210,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         if not isinstance(ds, Dataset):
             raise TypeError("Input must be an instance of Dataset")
         
-        
-    
+
     
     def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:
         """

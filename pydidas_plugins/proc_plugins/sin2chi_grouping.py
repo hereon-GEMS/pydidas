@@ -993,7 +993,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
         
         if not isinstance(d_spacing_combined, Dataset):
-            raise TypeError("Input must be an instance of Dataset")
+            raise TypeError("Input must be an instance of Dataset.")
         
         if not d_spacing_combined.shape[0] == 2:
             raise ValueError("Dataset d_spacing_combined must have a shape of (2, N).")
@@ -1014,13 +1014,13 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print('Resulting ds shape', arr.shape)
         
         
-        dummy_arr= np.full((3, self._config["input_shape"][0]//2+1), np.nan)
+        dummy_arr= np.full((3, int(np.ceil(self._config["input_shape"][0] / 2 + 1))), np.nan)
         dummy_arr[:,0:arr.shape[1]] = arr
         
         print('Dummy Array shape:', dummy_arr.shape)
         print('Dummy Array\n', dummy_arr)
         
-        dummy_axis_ranges= np.ones(self._config["input_shape"][0]//2+1)
+        dummy_axis_ranges= np.ones(int(np.ceil(self._config["input_shape"][0] / 2 + 1)))
         dummy_axis_ranges[0:len(d_spacing_combined.axis_ranges[1])] = d_spacing_combined.axis_ranges[1]
         
         print('Dummy axis range:\n', dummy_axis_ranges)   

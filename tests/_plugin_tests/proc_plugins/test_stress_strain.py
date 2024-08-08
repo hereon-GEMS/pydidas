@@ -1464,15 +1464,15 @@ def test_pre_regression_calculation_accuracy(d_spacing_combined_fixture):
 
 
 def test_pre_regression_calculation_with_nan_explicit(d_spacing_combined_fixture):
-    d_spacing_combined_fixture.array[0, 2] = np.nan
+    d_spacing_combined_fixture.array[0, 1] = np.nan
     d_spacing_avg, d_spacing_diff = pre_regression_calculation(
         d_spacing_combined_fixture
     )
 
     expected_avg = np.array(
-        [2.5, 3.5, np.nan]
+        [2.5, np.nan, np.nan]
     )  # Assuming mean calculation ignores np.nan
-    expected_diff = np.array([3, 3, np.nan])  # Assuming diff calculation result
+    expected_diff = np.array([3, np.nan, np.nan])  # Assuming diff calculation result
     np.testing.assert_array_equal(
         d_spacing_avg.array, expected_avg, "Average calculation is incorrect"
     )

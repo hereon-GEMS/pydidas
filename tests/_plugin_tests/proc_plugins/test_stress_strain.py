@@ -1395,7 +1395,7 @@ def d_spacing_combined_fixture():
     # Mocking a Dataset instance with sample data
     data = np.array([[1, 2, np.nan], [4, 5, 6]])  # Example data
     d_spacing_combined = Dataset(
-        axis_ranges={1: np.array([0.1, 0.2, 0.3])},  # Example sin^2(chi) values
+        axis_ranges={0:  np.arange(2), 1: np.array([0.1, 0.2, 0.3])},  # Example sin^2(chi) values
         axis_labels={0: "0: d-, 1: d+", 1: Labels.SIN2CHI},
         axis_units={0: "", 1: ""},
         data_unit="nm",

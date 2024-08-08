@@ -33,7 +33,7 @@ from enum import IntEnum
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
-from pydidas.core import Dataset
+from pydidas.core import Dataset, UserConfigError
 from typing import List, Tuple, Dict
 
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
@@ -112,7 +112,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
     input_data_dim = -1 
-    output_data_dim = -1 
+    output_data_dim = 2 
     output_data_label = "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
     new_dataset = True
 
@@ -129,8 +129,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def pre_execute(self):
         print(30*" \N{Hot pepper}")
         print(self._config["input_shape"])  
-        print(self._config["input_shape"][0], int(self._config["input_shape"][0]/2+1))
-            
+                    
         #As it is not possible to overwrite the default-value of `keep_results', I check here again the current value and overwrite the state to True.`
         if not self.params.get_value(PARAMETER_KEEP_RESULTS):
             self.params.set_value(PARAMETER_KEEP_RESULTS, True)
@@ -138,11 +137,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(30*" \N{Hot pepper}")   
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
-        
-        print(30*" \N{Aubergine}")
-        print("Moin, moin from the execute. Value of 'keep_results':", self.params.get_value(PARAMETER_KEEP_RESULTS))
-        print(30*" \N{Aubergine}")
-        
+           
         
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
@@ -160,12 +155,20 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
         Calculate the shape of the Plugin results.
         """
+        _shape = self._config.get("input_shape", None)
+        
+        if not isinstance(_shape, tuple):
+            raise UserConfigError(
+                f'Cannot calculate the result shape for the "{self.plugin_name}" '
+                'plugin because the input shape is unknown or invalid.'
+            )
+        
         print(30*" \N{Peach}")
-        print(self._config["input_shape"])
-        print(self._config["result_shape"])  
+        print(_shape)
+        print(_shape[0], _shape[0]//2+1)  
         print(30*" \N{Peach}")   
         
-        self._config["result_shape"] = (3, self._config["input_shape"][0]//2+1)         
+        self._config["result_shape"] = (3, _shape[0]//2+1)         
         
         
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
@@ -179,7 +182,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         TypeError: If ds is not an instance of Dataset.
         """
         if not isinstance(ds, Dataset):
-            raise TypeError("Input must be an instance of Dataset")
+            raise TypeError("Input must be an instance of Dataset.")
         
 
     
@@ -433,7 +436,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         index, aiding in data validation and consistency checks.
         """
 
-        if self.config._pos_idx not in ds_units:
+        if pos_idx not in ds_units:
             raise IndexError(f"pos_idx {pos_idx} is out of range for the dictionary keys")
 
         param_info = ds_units[pos_idx]

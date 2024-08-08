@@ -475,7 +475,13 @@ def test_chi_pos_verification_success():
     axis_labels = ["y", "x", "chi", fit_labels]
 
     ds = Dataset(result_array_spatial, axis_labels=axis_labels)
-    chi_pos_verification(ds)
+    chi_key, (pos_key, pos_idx) = chi_pos_verification(ds)
+    
+    assert chi_key == 2
+    assert pos_key == 3
+    assert pos_idx == 0 
+    
+
 
 
 def test_chi_pos_verification_missing_chi():

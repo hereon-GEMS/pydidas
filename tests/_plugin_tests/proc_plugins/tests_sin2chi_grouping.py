@@ -1708,7 +1708,7 @@ def results_sin2chi_method_fixture():
     
     return d_spacing_combined, d_spacing_result
 
-def test_create_final_result_sin2chi_method_validation(plugin_fixture, results_sin2chi_method_fixture):
+def test__create_final_result_sin2chi_method_validation(plugin_fixture, results_sin2chi_method_fixture):
     plugin = plugin_fixture
     plugin._config["input_shape"] = (5, 5) #chose this to avoid padding as above
     

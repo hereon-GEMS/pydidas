@@ -48,7 +48,7 @@ DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG = ParameterCollection(
         allow_None=True,
         name="Lower threshold",
         tooltip=(
-            "The lower threhold. Any values in the corrected"
+            "The lower threshold. Any values in the corrected"
             " dataset smaller than the threshold will be set "
             "to the threshold value."
         ),

@@ -81,9 +81,9 @@ def test_plugin_pre_execute_sets_keep_results(plugin_fixture):
 @pytest.mark.parametrize(
     "input_shape, result_shape",
     [
-        ((10, 20, 30), (3, 6)),   # Test case 1
-        ((20, 40, 60), (3, 11)),  # Test case 2
-        ((15, 30, 45), (3, 8)),   # Test case 3
+        ((10, 20), (3, 6)),   # Test case 1
+        ((20, 40), (3, 11)),  # Test case 2
+        ((15, 30), (3, 9)),   # Test case 3
     ]
 )
 def test_calulate_result_shape(plugin_fixture, input_shape, result_shape):
@@ -1556,7 +1556,8 @@ def test__create_final_result_sin2chi_method_with_nan_explicit(plugin_fixture, d
 def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing_datasets):
     """ 
     Ugly test due to pre-allocation requirements in pydidas, dynamic allocation is currently not yet supported. 
-    I delibertly left the Dataset expected as it is, as this is the future version when dynamic allocation is supported.
+    I delibertly left the Dataset expected as it is, as this is the future version when dynamic allocation is supported,
+    see also second test below.
     """
     
     _, _, d_spacing_combined = d_spacing_datasets
@@ -1564,7 +1565,77 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     plugin = plugin_fixture
     # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
     # We can deduct the incoming length of chi-values via the length of the sin2chi axis
-    plugin._config["input_shape"] = (2*d_spacing_combined.axis_ranges[1].size+1, 5)
+    plugin._config["input_shape"] = (2*(d_spacing_combined.axis_ranges[1].size-1), 5)
+        
+
+    expected = Dataset(
+        axis_ranges={
+            0: np.arange(3),
+            1: np.array(
+                [
+                    0.0,
+                    0.030154,
+                    0.116978,
+                    0.25,
+                    0.413176,
+                    0.586824,
+                    0.75,
+                    0.883022,
+                    0.969846,
+                    1.0,
+                ]
+            )
+        },
+        axis_labels = {0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
+        metadata={},
+        data_unit="nm",
+        data_label='d_spacing',
+        array=np.vstack((d_spacing_combined, np.array(
+            [
+                26.281715,
+                26.275108,
+                26.265263,
+                26.248177,
+                26.18344,
+                26.161894,
+                26.121524,
+                26.094265,
+                26.0692,
+                26.063213
+            ]
+            )
+        )
+    )
+    )
+    
+    #The desired length of the output array    
+    desired_length = int(np.ceil(plugin._config["input_shape"][0] / 2 + 1))
+   
+    # I pad here, because technically this is only necessary due to the pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    # Padding length needed to reach the desired length
+    padding_length = desired_length - expected.array.shape[1]
+
+    # Pad only the column dimension (2nd dimension) at the end
+    padded_array = np.pad(expected.array, ((0, 0), (0, padding_length)), mode='constant', constant_values=np.nan)
+    padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=1)
+
+    #Calculation for test
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
+
+    assert nan_allclose(result.array, padded_array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
+    assert np.allclose(result.axis_ranges[1], padded_axis_ranges)
+    assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
+    assert result.data_label == expected.data_label
+    assert result.data_unit == expected.data_unit
+    
+def test__create_final_result_sin2chi_method_precision2(plugin_fixture, d_spacing_datasets):
+       
+    _, _, d_spacing_combined = d_spacing_datasets
+    
+    plugin = plugin_fixture
+    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    # We can deduct the incoming length of chi-values via the length of the sin2chi axis
+    plugin._config["input_shape"] = (18, 5)
         
 
     expected = Dataset(
@@ -1607,22 +1678,51 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     )
     )
         
-    desired_length = int(np.ceil(plugin._config["input_shape"][0] / 2 + 1))
-   
-    # I pad here, because technically this is only necessary due to the pre-allocation requirements in pydidas, dynamic allocation is not yet supported
-    # Padding length needed to reach the desired length
-    padding_length = desired_length - expected.array.shape[1]
-
-    # Pad only the column dimension (2nd dimension) at the end
-    padded_array = np.pad(expected.array, ((0, 0), (0, padding_length)), mode='constant', constant_values=np.nan)
-
-    padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=1)
-
     #Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
-    assert nan_allclose(result.array, padded_array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
-    assert np.allclose(result.axis_ranges[1], padded_axis_ranges)
+    assert np.allclose(result.array, expected.array,rtol=1e-5, atol=1e-8) 
+    assert np.allclose(result.axis_ranges[1], expected.axis_ranges[1])
     assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit
+    
+    
+@pytest.fixture
+def results_sin2chi_method_fixture():
+    d_spacing_combined = Dataset(
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8]]), 
+        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]}, 
+        axis_labels={0: '0: d-, 1: d+', 1: LABELS_SIN2CHI}, 
+        data_unit='nm', 
+        data_label='0: position_neg, 1: position_pos'
+    )
+    
+    d_spacing_result = Dataset(
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]]),
+        axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]}, 
+        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI},
+        data_unit='nm', 
+        data_label='d_spacing'
+    )
+    
+    return d_spacing_combined, d_spacing_result
+
+def test_create_final_result_sin2chi_method_validation(plugin_fixture, results_sin2chi_method_fixture):
+    plugin = plugin_fixture
+    plugin._config["input_shape"] = (5, 5) #chose this to avoid padding as above
+    
+    
+    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
+    
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
+    
+
+    assert np.array_equal(result.array, d_spacing_result.array)
+    # Compare each key-value pair in the axis_ranges
+    for key, value in result.axis_ranges.items():
+        assert key in d_spacing_result.axis_ranges.keys()
+        assert np.array_equal(value, d_spacing_result.axis_ranges[key])
+    assert result.axis_labels == d_spacing_result.axis_labels
+    assert result.data_label == 'd_spacing'
+    assert result.data_unit == d_spacing_result.data_unit

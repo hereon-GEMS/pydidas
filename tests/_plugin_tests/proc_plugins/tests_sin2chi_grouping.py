@@ -1726,3 +1726,248 @@ def test__create_final_result_sin2chi_method_validation(plugin_fixture, results_
     assert result.axis_labels == d_spacing_result.axis_labels
     assert result.data_label == d_spacing_result.data_label
     assert result.data_unit == d_spacing_result.data_unit
+    
+    
+def test__create_final_result_sin2chi_method_type_error(plugin_fixture, results_sin2chi_method_fixture):
+    plugin = plugin_fixture    
+    
+    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
+
+    with pytest.raises(TypeError, match="Input must be an instance of Dataset"):
+        plugin._create_final_result_sin2chi_method([])
+        
+def test__create_final_result_sin2chi_method_shape(plugin_fixture):
+    plugin = plugin_fixture
+    
+    invalid_d_spacing_combined = Dataset(
+        np.array([1, 2, 3, 4]), 
+        axis_ranges={0: [0, 1, 2, 3]}, 
+        axis_labels={0: LABELS_SIN2CHI}, 
+        data_unit='nm', 
+        data_label='0: position_neg'
+    )
+    with pytest.raises(ValueError, match=r"Dataset d_spacing_combined must have a shape of \(2, N\)."):
+        plugin._create_final_result_sin2chi_method(invalid_d_spacing_combined)
+    
+def test__create_final_result_sin2chi_method_label_1(plugin_fixture, results_sin2chi_method_fixture):
+    plugin = plugin_fixture
+    
+    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
+    d_spacing_combined.update_axis_label(0, 'blub')
+    
+    with pytest.raises(ValueError, match=r"axis_labels\[0\] does not match '0: d-, 1: d\+'."):
+        plugin._create_final_result_sin2chi_method(d_spacing_combined)
+        
+
+def test__create_final_result_sin2chi_method_label_2(plugin_fixture, results_sin2chi_method_fixture):   
+    plugin = plugin_fixture
+     
+    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
+    d_spacing_combined.update_axis_label(1, 'blub')
+
+    with pytest.raises(ValueError, match=r'axis_labels\[1\] does not match sin\^2\(chi\).'):
+        plugin._create_final_result_sin2chi_method(d_spacing_combined)  
+        
+        
+# Testing for various Dataset modifications for create_final_result_sin2chi_method
+@pytest.fixture
+def base_dataset():
+    return Dataset(
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=float), 
+        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]}, 
+        axis_labels={0: '0: d-, 1: d+', 1: LABELS_SIN2CHI}, 
+        data_unit='nm', 
+        data_label='0: position_neg, 1: position_pos'
+    )
+
+@pytest.mark.parametrize("modifications, expected_array", [
+    # No modifications
+    ([], np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]])),
+    # Set first value of d- to np.nan
+    ([(0, 0, np.nan)], np.array([[np.nan, 2, 3, 4], [5, 6, 7, 8], [np.nan, 4, 5, 6]])),
+    # Set second value of d+ to np.nan
+    ([(1, 1, np.nan)], np.array([[1, 2, 3, 4], [5, np.nan, 7, 8], [3, np.nan, 5, 6]])),
+])
+def test__create_final_result_sin2chi_method(plugin_fixture, base_dataset, modifications, expected_array):
+    plugin = plugin_fixture
+    plugin._config["input_shape"] = (5, 5) #chose 5 in position 0 to avoid padding as above
+    
+    
+    # Apply modifications
+    for i, j, value in modifications:
+        base_dataset.array[i, j] = value
+    
+    result = plugin._create_final_result_sin2chi_method(base_dataset)
+    
+    # Expected attributes for the resulting Dataset
+    expected = Dataset(
+        expected_array,
+        axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]},
+        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI},
+        data_unit='nm',
+        data_label='d_spacing'
+    )
+    
+    # Compare array data
+    assert np.array_equal(result.array, expected.array, equal_nan=True)
+    
+    # Compare axis ranges
+    for key in expected.axis_ranges:
+        assert key in result.axis_ranges
+        assert np.array_equal(result.axis_ranges[key], expected.axis_ranges[key])
+    
+    # Compare axis labels
+    assert result.axis_labels == expected.axis_labels
+    
+    # Compare data labels and units
+    assert result.data_label == expected.data_label
+    assert result.data_unit == expected.data_unit
+    
+    
+# Test the Dataset against the expected values
+@pytest.fixture
+def data_values():
+    data_val = np.array([3, 2, 1, 5, 4])
+    axis_val = np.array([5, 4, 3, 2, 1]) / 10
+    ds = Dataset(
+        data_val.copy(),
+        axis_units={0: "um"},
+        data_label="position",
+        data_unit="nm",
+        axis_labels={0: "x"},
+        axis_ranges={0: axis_val.copy()},
+    )
+    return data_val, axis_val, ds
+
+
+def test_unsorted(data_values):
+    data_val, axis_val, ds = data_values
+    assert np.array_equal(axis_val, ds.axis_ranges[0])
+    assert np.array_equal(data_val, ds.array)
+
+
+def test_sort(data_values):
+    data_val, axis_val, ds = data_values
+    # inplace sorting
+    ds.sort(
+        axis=0
+    )  # sorts only the values in the array, but not the metadata (axis values). Metadata not aligned with sorted array
+
+    sorted_arr_idx = np.argsort(data_val)
+
+    print("comparison", ds.array, np.sort(data_val))
+    assert np.allclose(ds.array, np.sort(data_val))
+    assert np.allclose(ds.axis_ranges[0], axis_val[sorted_arr_idx])
+
+
+def test_sort_explicit():
+    ds = Dataset(
+        np.array([3, 2, 1, 5, 4]),
+        axis_units={0: "um"},
+        data_label="position",
+        data_unit="nm",
+        axis_labels={0: "x"},
+        axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])},
+    )
+
+    assert np.allclose(ds.array, np.array([3, 2, 1, 5, 4]))
+    assert np.allclose(ds.axis_ranges[0], np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
+    ds.sort(axis=0)  # in place sorting does not work on metadata
+    assert np.allclose(ds.array, np.array([1, 2, 3, 4, 5]))
+    assert np.allclose(ds.axis_ranges[0], [0.3, 0.4, 0.5, 0.1, 0.2])
+
+
+def test_argsort(data_values):
+    data_val, axis_val, ds = data_values
+    sorted_arr_idx = ds.argsort(axis=0)
+
+    ds_sorted = ds[sorted_arr_idx]
+
+    assert np.allclose(ds_sorted.array, data_val[sorted_arr_idx])
+    assert np.allclose(ds_sorted.axis_ranges[0], axis_val[sorted_arr_idx])
+
+
+def test_argsort_axis(data_values):
+    data_val, axis_val, ds = data_values
+    sorted_axis_idx = np.argsort(ds.axis_ranges[0], axis=0)
+    ds_sorted = ds[sorted_axis_idx]
+
+    assert np.allclose(ds_sorted.array, data_val[sorted_axis_idx])
+    assert np.allclose(ds_sorted.axis_ranges[0], axis_val[sorted_axis_idx])
+
+
+def test_numpy_indexing_with_list():
+    ds = Dataset(
+        np.array([3, 2, 1, 5, 4]),
+        axis_units={0: "um"},
+        data_label="position",
+        data_unit="nm",
+        axis_labels={0: "x"},
+        axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])},
+    )
+
+    assert np.allclose(ds.array, np.array([3, 2, 1, 5, 4]))
+    assert np.allclose(ds.axis_ranges[0], np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
+
+    ds_sorted = ds[[2, 3, 4, 0, 1]]
+
+    assert np.allclose(ds_sorted.array, np.array([1, 5, 4, 3, 2]))
+    assert np.allclose(ds_sorted.axis_ranges[0], [0.3, 0.2, 0.1, 0.5, 0.4])
+
+
+def test_numpy_indexing_with_ndarray():
+    ds = Dataset(
+        np.array([3, 2, 1, 5, 4]),
+        axis_units={0: "um"},
+        data_label="position",
+        data_unit="nm",
+        axis_labels={0: "x"},
+        axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])},
+    )
+
+    assert np.allclose(ds.array, np.array([3, 2, 1, 5, 4]))
+    assert np.allclose(ds.axis_ranges[0], np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
+
+    ds_sorted = ds[np.array([2, 3, 4, 0, 1])]
+
+    assert np.allclose(ds_sorted.array, np.array([1, 5, 4, 3, 2]))
+    assert np.allclose(ds_sorted.axis_ranges[0], [0.3, 0.2, 0.1, 0.5, 0.4])
+
+
+# Regression test to document partially wrong behaviour of  __reimplement_numpy_method
+@pytest.fixture
+def array_mean_fixture():
+    arr=np.ones ( (4,4))
+    arr[::2,::2] = 0
+    arr[:,1::2]=3
+    return arr
+
+
+@pytest.fixture
+def dataset_mean_fixture():
+    arr=np.ones ((4,4))
+    arr[::2,::2] = 0
+    arr[:,1::2]=3
+
+    ds = Dataset(
+        arr.copy()
+        )
+    
+    return ds
+
+
+def test_array_mean_base(array_mean_fixture):
+    arr = array_mean_fixture
+    
+    # Check that base is None for mean operations
+    assert arr.mean().base is None, "Expected base to be None for np.ndarray.mean()"
+    assert arr.mean(axis=0).base is None, "Expected base to be None for np.ndarray.mean(axis=0)"
+    assert arr.mean(axis=1).base is None, "Expected base to be None for np.ndarray.mean(axis=1)"
+    assert np.mean(arr).base is None, "Expected base to be None for np.mean()"
+
+def test_Dataset_mean_base(dataset_mean_fixture):
+    ds = dataset_mean_fixture  
+    
+    # Check that base is None for mean operations
+    assert np.mean(ds).base is None, "Expected base to be None for np.mean(Dataset)"
+    assert ds.mean().base is None, "Expected base to be None for Dataset.mean()"

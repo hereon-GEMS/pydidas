@@ -92,7 +92,7 @@ class RollingAverage1d(ProcPlugin):
         self._config["index_offset"] = self.get_param_value("kernel_width") // 2 + 1
         self._config["width"] = self.get_param_value("kernel_width")
         if self._config["width"] < 1:
-            raise UserConfigError("The averagin kernel must be at least of size 2.")
+            raise UserConfigError("The averaging kernel must be at least of size 2.")
         self._kernel = np.ones(self._config["width"]) / self._config["width"]
 
     @process_1d_with_multi_input_dims

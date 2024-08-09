@@ -164,11 +164,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
             )
         
         print(30*" \N{Peach}")
-        print(_shape)
-        print(_shape[0], _shape[0]//2+1)  
+        print('Input shape:', _shape)
+        print(_shape[0], int(np.ceil(_shape[0] / 2 + 1)))  
         print(30*" \N{Peach}")   
         
-        self._config["result_shape"] = (3, _shape[0]//2+1)         
+        self._config["result_shape"] = (3, int(np.ceil(_shape[0] / 2 + 1)))         
         
         
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
@@ -1011,10 +1011,13 @@ class DspacingSin2chiGrouping(ProcPlugin):
                               
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
-        print('Resulting ds shape', arr.shape)
+        print('Resulting arr shape', arr.shape)
         
         
         dummy_arr= np.full((3, int(np.ceil(self._config["input_shape"][0] / 2 + 1))), np.nan)
+        
+        print('Dummy array shape:', dummy_arr.shape)
+        
         dummy_arr[:,0:arr.shape[1]] = arr
         
         print('Dummy Array shape:', dummy_arr.shape)

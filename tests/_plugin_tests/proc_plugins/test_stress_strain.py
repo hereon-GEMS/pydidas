@@ -1228,7 +1228,6 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
         err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values, especially with NaN values.",
     )
 
-
 @pytest.fixture
 def d_spacing_datasets():
     d_spacing_pos = Dataset(

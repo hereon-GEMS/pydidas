@@ -1710,7 +1710,7 @@ def results_sin2chi_method_fixture():
 
 def test__create_final_result_sin2chi_method_validation(plugin_fixture, results_sin2chi_method_fixture):
     plugin = plugin_fixture
-    plugin._config["input_shape"] = (5, 5) #chose this to avoid padding as above
+    plugin._config["input_shape"] = (5, 5) #chose 5 in position 0 to avoid padding as above
     
     
     d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
@@ -1724,5 +1724,5 @@ def test__create_final_result_sin2chi_method_validation(plugin_fixture, results_
         assert key in d_spacing_result.axis_ranges.keys()
         assert np.array_equal(value, d_spacing_result.axis_ranges[key])
     assert result.axis_labels == d_spacing_result.axis_labels
-    assert result.data_label == 'd_spacing'
+    assert result.data_label == d_spacing_result.data_label
     assert result.data_unit == d_spacing_result.data_unit

@@ -39,7 +39,7 @@ from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 
 from pydidas.core import Dataset, UserConfigError
 
-from pydidas_plugins.proc_plugins.sin2chi_grouping import PARAMETER_KEEP_RESULTS
+from pydidas_plugins.proc_plugins.sin2chi_grouping import PARAMETER_KEEP_RESULTS, LABELS_SIN2CHI
 
 
 @pytest.fixture
@@ -755,7 +755,7 @@ def test__ds_slicing_dimension_mismatch(plugin_fixture):
 
 
 
-def test_ds_slicing_dimension_mismatch_3d(plugin_fixture):
+def test__ds_slicing_dimension_mismatch_3d(plugin_fixture):
     plugin = plugin_fixture
     
     
@@ -778,7 +778,7 @@ def test_ds_slicing_dimension_mismatch_3d(plugin_fixture):
         excinfo.value
     ), "Error message should indicate that d_spacing has a larger dimension."
 
-def test_extract_d_spacing_valid(plugin_fixture):
+def test__extract_d_spacing_valid(plugin_fixture):
     plugin = plugin_fixture
     
     fit_labels = (
@@ -796,9 +796,833 @@ def test_extract_d_spacing_valid(plugin_fixture):
     )
     pos_key_exp = 3
     pos_idx_exp = 0
-    ds_expected = ds[:, :, :, pos_idx_exp : pos_idx_exp + 1].squeeze()
-    
-    print(ds_expected)
-    
+    ds_expected = ds[:, :, :, pos_idx_exp : pos_idx_exp + 1].squeeze()   
     
     assert np.array_equal(plugin._extract_d_spacing(ds, pos_key_exp, pos_idx_exp), ds_expected)
+    
+def test__idx_s2c_grouping_basic(plugin_fixture):
+    plugin = plugin_fixture
+    
+    chi = np.arange(-175, 185, 10)
+    n_components, s2c_labels = plugin._idx_s2c_grouping(chi, tolerance=1e-3)
+    assert n_components > 0
+    assert len(s2c_labels) == len(chi)
+    
+    
+def test__idx_s2c_grouping_tolerance_effectiveness(plugin_fixture):
+    plugin = plugin_fixture
+    
+    chi = np.array([0, 0.001, 0.002, 0.003])
+    n_components, labels = plugin._idx_s2c_grouping(chi, tolerance=0.00001)
+    assert (
+        n_components == 1
+    )  # All should be in one group due to small variation and tight tolerance
+
+def test__idx_s2c_grouping_type_error(plugin_fixture):
+    plugin = plugin_fixture
+    
+    with pytest.raises(TypeError):
+        plugin._idx_s2c_grouping([0, 30, 60])  # Passing a list instead of np.ndarray
+
+
+def test__idx_s2c_grouping_empty_array(plugin_fixture):
+    plugin = plugin_fixture
+    
+    chi = np.array([])
+    n_components, labels = plugin._idx_s2c_grouping(chi)
+    assert n_components == 0  # No components should be found
+    assert len(labels) == 0  # No labels should be assigned
+    
+def test__idx_s2c_grouping_extreme_values(plugin_fixture):
+    plugin = plugin_fixture
+    
+    chi = np.array([-360, 360])
+    n_components, labels = plugin._idx_s2c_grouping(chi)
+    assert n_components == 1  # Extreme but equivalent values should be grouped together
+    
+    
+def test__idx_s2c_grouping_very_small_array(plugin_fixture):
+    plugin = plugin_fixture
+    
+    chi = np.array([0])
+    n_components, labels = plugin._idx_s2c_grouping(chi)
+    assert n_components == 1  # Single value should form one group
+    assert len(labels) == 1  # One label for the one value
+
+
+def test__group_d_spacing_by_chi_basic(plugin_fixture):
+    plugin = plugin_fixture
+    
+    
+    chi = np.arange(-175, 185, 10)
+    d_spacing = Dataset(
+        np.arange(0, len(chi)),
+        axis_ranges={0: chi},
+        axis_labels={0: "chi"},
+        data_label="position",
+    )
+    d_spacing_pos, d_spacing_neg = plugin._group_d_spacing_by_chi(
+        d_spacing, chi, tolerance=1e-3
+    )
+    assert d_spacing_pos.size == d_spacing_neg.size
+    assert d_spacing_pos.size > 0
+    assert d_spacing_neg.size > 0
+    assert d_spacing_pos.axis_ranges[0].size == d_spacing_neg.axis_ranges[0].size
+    assert d_spacing_pos.data_label == f"{ d_spacing.data_label}_pos"
+    assert d_spacing_neg.data_label == f"{ d_spacing.data_label}_neg"
+    assert d_spacing_pos.axis_labels[0] == LABELS_SIN2CHI
+    assert d_spacing_neg.axis_labels[0] == LABELS_SIN2CHI
+
+
+def test__group_d_spacing_by_chi_type_error(plugin_fixture):
+    plugin = plugin_fixture
+    
+    
+    chi = np.arange(-175, 185, 10)
+    d_spacing = Dataset(
+        np.arange(0, len(chi)), axis_ranges={0: chi}, axis_labels={0: "chi"}
+    )
+    with pytest.raises(TypeError) as excinfo:
+        plugin._group_d_spacing_by_chi(d_spacing, [], tolerance=1e-4)
+    assert "Chi has to be of type np.ndarray" in str(excinfo.value)
+
+    with pytest.raises(TypeError) as excinfo:
+        plugin._group_d_spacing_by_chi([], chi, tolerance=1e-4)
+    assert "d_spacing has to be of type Pydidas Dataset" in str(excinfo.value)
+    
+def test__group_d_spacing_by_chi_len_unique_groups(plugin_fixture):
+    plugin = plugin_fixture
+    
+    
+    delta_chi = 10
+    chi_start = -180
+    chi_stop = 181
+    chi = chi_gen(chi_start, chi_stop, delta_chi)
+    d_spacing = Dataset(
+        np.arange(0, len(chi), dtype=float),
+        axis_ranges={0: np.arange(0, len(chi))},
+        axis_labels={0: "chi"},
+        data_label="d_spacing",
+    )
+
+    # unique groups:
+    # dependent only on chi
+    # idx_s2c_grouping is tested separately
+    _, s2c_labels = plugin._idx_s2c_grouping(chi, tolerance=1e-4)
+    s2c_unique_labels = np.unique(s2c_labels)
+
+    (d_spacing_pos, d_spacing_neg) = plugin._group_d_spacing_by_chi(
+        d_spacing, chi, tolerance=1e-4
+    )
+
+    # Check the lengths of the output arrays
+    assert (
+        len(s2c_unique_labels) == d_spacing_pos.size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.size}"
+    assert (
+        len(s2c_unique_labels) == d_spacing_pos.axis_ranges[0].size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.axis_ranges[0].size}"
+    assert (
+        len(s2c_unique_labels) == d_spacing_neg.size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.size}"
+    assert (
+        len(s2c_unique_labels) == d_spacing_neg.axis_ranges[0].size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.axis_ranges[0].size}"
+    
+
+test_cases = [case9]    
+@pytest.mark.parametrize("case", test_cases)
+def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
+    """
+    A test function to validate the `group_d_spacing_by_chi` function via the via a different approach.
+
+    This test performs the following steps:
+    1. Initializes chi values and a Dataset instance for d_spacing using the provided case configuration.
+    2. Uses the second validation method to calculate mean d_spacing values for positive and negative slopes.
+    3. Uses the original `group_d_spacing_by_chi` function to calculate mean d_spacing values for positive and negative slopes.
+    4. Compares the results from both methods with each other and with the expected mean values provided in the case configuration.
+    5. Asserts that all elements in the comparisons are close within the specified tolerances.
+
+    Parameters
+    ----------
+    case : S2cTestConfig
+        The test configuration containing the parameters and expected values for the test case.
+
+    Raises
+    ------
+    AssertionError
+        If any of the comparisons fail, indicating that the methods do not produce close results.
+
+    """
+
+    def group_d_spacing_by_chi_second_validation(d_spacing, chi, tolerance=1e-4):
+        """
+        Group d_spacing values by chi using a secondary validation method.
+
+        Parameters
+        ----------
+        d_spacing : Dataset
+            The dataset containing d_spacing values.
+        chi : np.ndarray
+            The array of chi values.
+        tolerance : float, optional
+            The tolerance value for grouping by chi, by default 1e-4.
+
+        Returns
+        -------
+        tuple
+            A tuple containing two arrays: mean d_spacing values for positive slopes and negative slopes.
+
+        Raises
+        ------
+        TypeError
+            If chi is not an np.ndarray or d_spacing is not a Pydidas Dataset.
+        """
+
+        if not isinstance(chi, np.ndarray):
+            raise TypeError("Chi has to be of type np.ndarray")
+
+        if not isinstance(d_spacing, Dataset):
+            raise TypeError("d_spacing has to be of type Pydidas Dataset.")
+
+        n_components, s2c_labels = plugin._idx_s2c_grouping(chi, tolerance=tolerance)
+        s2c = np.sin(np.deg2rad(chi)) ** 2
+        s2c_unique_labels = np.unique(s2c_labels)
+        unique_groups = np.unique(s2c_labels)
+
+        # Calculate first derivative
+        first_derivative = np.gradient(s2c, edge_order=2)
+
+        # Define the threshold for being "close to zero", i.e. where is the slope=0
+        zero_threshold = 1e-4
+        # Categorize the values of the first_derivative
+        # 1 is close to zero
+        # 2 is positive
+        # 0 is negative
+        categories = np.zeros_like(first_derivative, dtype=int)
+        categories[first_derivative > zero_threshold] = 2
+        categories[first_derivative < -zero_threshold] = 0
+        categories[
+            (first_derivative >= -zero_threshold) & (first_derivative <= zero_threshold)
+        ] = 1
+
+        # Dynamic length of matrices
+        max_len = 0
+        for group in unique_groups:
+            mask_pos = (s2c_labels == group) & ((categories == 2) | (categories == 1))
+            mask_neg = (s2c_labels == group) & ((categories == 0) | (categories == 1))
+
+            d_pos = d_spacing[mask_pos]
+            d_neg = d_spacing[mask_neg]
+
+            len_d_pos = len(d_pos)
+            len_d_neg = len(d_neg)
+
+            current_max = max(len_d_pos, len_d_neg)
+
+            if current_max > max_len:
+                max_len = current_max
+
+        # array creation with initialization
+        data_pos = np.full(
+            (n_components, max_len + 2), np.nan
+        )  # group, max value for d_spacing for pos slope, average = max_len+2
+        data_neg = np.full((n_components, max_len + 2), np.nan)
+        data = np.full((n_components, 2 * max_len + 1), np.nan)
+
+        # Chi indices
+        idx_chi = np.arange(0, len(chi), 1)
+
+        for group in unique_groups:
+            mask_pos = (s2c_labels == group) & ((categories == 2) | (categories == 1))
+            mask_neg = (s2c_labels == group) & ((categories == 0) | (categories == 1))
+
+            chi_combi_pos = chi[mask_pos]
+            chi_combi_neg = chi[mask_neg]
+
+            d_pos = d_spacing[mask_pos]
+            d_neg = d_spacing[mask_neg]
+
+            data_pos[group, 0] = group
+            data_neg[group, 0] = group
+            data[group, 0] = group
+
+            # Check the length of d_pos to see if it should be assigned
+            if len(d_pos) > 0:
+                data_pos[group, 1 : len(d_pos) + 1] = d_pos
+                # print(d_pos.array, np.nanmean(data_pos[group, 1:len(d_pos)+1]))
+                data_pos[group, -1] = np.nanmean(data_pos[group, 1 : len(d_pos) + 1])
+                data[group, 1 : len(d_pos) + 1] = d_pos
+
+            # Check the length of d_neg to see if it should be assigned
+            if len(d_neg) > 0:
+                data_neg[group, 1 : len(d_neg) + 1] = d_neg
+                data_neg[group, -1] = np.nanmean(data_neg[group, 1 : len(d_neg) + 1])
+                data[group, -len(d_neg) :] = d_neg
+
+        return (data_pos[:, -1].T, data_neg[:, -1].T)
+
+    # Initialisation
+    
+    plugin = plugin_fixture
+    
+    
+    chi = chi_gen(case.chi_start, case.chi_stop, case.delta_chi)
+    d_spacing = Dataset(
+        case.d_spacing_func(chi),
+        axis_ranges={0: np.arange(0, len(chi))},
+        axis_labels={0: "d_spacing"},
+    )
+
+    # Calculate the expected values
+    (data_pos_mean, data_neg_mean) = group_d_spacing_by_chi_second_validation(
+        d_spacing, chi, tolerance=1e-4
+    )
+    (d_spacing_pos, d_spacing_neg) = plugin._group_d_spacing_by_chi(
+        d_spacing, chi, tolerance=1e-4
+    )
+
+    # Comparison of both calculation methods and, finally, with the expected values
+    res_pos_1 = np.isclose(
+        data_pos_mean, d_spacing_pos.array, equal_nan=True, atol=1e-8, rtol=1e-5
+    )
+    res_pos_2 = np.isclose(
+        d_spacing_pos.array, case.d_mean_pos, equal_nan=True, atol=1e-8, rtol=1e-5
+    )
+    res_pos_combined = np.logical_and(res_pos_1, res_pos_2)
+
+    # Assertions to ensure all elements are close
+    assert np.all(
+        res_pos_1
+    ), f"data_pos_mean and d_spacing_pos are not close: {res_pos_1}"
+    assert np.all(
+        res_pos_2
+    ), f"d_spacing_pos and case.d_mean_pos are not close: {res_pos_2}"
+    # Assertions to ensure all elements are close
+    assert np.all(
+        res_pos_combined
+    ), f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not close: {res_pos_combined}"
+
+    # Same for negative slopes
+    res_neg_1 = np.isclose(
+        data_neg_mean, d_spacing_neg.array, equal_nan=True, atol=1e-8, rtol=1e-5
+    )
+    res_neg_2 = np.isclose(
+        d_spacing_neg.array, case.d_mean_neg, equal_nan=True, atol=1e-8, rtol=1e-5
+    )
+    res_neg_combined = np.logical_and(res_neg_1, res_neg_2)
+
+    assert np.all(
+        res_neg_1
+    ), f"data_neg_mean and d_spacing_neg are not close: {res_neg_1}"
+    assert np.all(
+        res_neg_2
+    ), f"d_spacing_neg and case.d_mean_neg are not close: {res_neg_2}"
+    assert np.all(
+        res_neg_combined
+    ), f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not close: {res_neg_combined}"
+    
+    
+@dataclass
+class DSpacingTestConfig:
+    d_spacing_pos: Dataset
+    d_spacing_neg: Dataset
+    ds_expected: Dataset
+
+
+ds_case1 = DSpacingTestConfig(
+    d_spacing_pos=Dataset(
+        np.array([1.0, 2.0, 3.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: LABELS_SIN2CHI},
+    ),
+    d_spacing_neg=Dataset(
+        np.array([3.0, 2.0, 1.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: LABELS_SIN2CHI},
+    ),
+    ds_expected=Dataset(
+        np.vstack((np.array([1.0, 2.0, 3.0]), np.array([3.0, 2.0, 1.0]))),
+        axis_ranges={0: np.arange(2), 1: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: "0: d-, 1: d+", 1:LABELS_SIN2CHI},
+        data_label="d_spacing",
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    "d_spacing_pos, d_spacing_neg, expect_error",
+    [
+        (np.arange(0, 10), np.arange(0, 10)[::-1], True),  # Both inputs are non-Dataset
+        (ds_case1.d_spacing_pos, np.arange(0, 10), True),  # One input is non-Dataset
+        (
+            ds_case1.d_spacing_pos,
+            ds_case1.d_spacing_neg,
+            False,
+        ),  # Both inputs are Dataset
+        (ds_case1.d_spacing_pos, [], True),  # One input is empty list
+        ([], ds_case1.d_spacing_pos, True),  # One input is empty list
+    ],
+)
+def test__combine_sort_d_spacing_pos_neg_type_error(plugin_fixture,
+    d_spacing_pos, d_spacing_neg, expect_error
+):
+    plugin=plugin_fixture    
+    
+    if expect_error:
+        with pytest.raises(TypeError):
+            plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    else:
+        result = plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+        assert isinstance(result, Dataset), "Expected Dataset object as output"
+        
+        
+        
+def test__combine_sort_d_spacing_pos_neg_axis_labels_mismatch(plugin_fixture):
+    plugin= plugin_fixture
+    
+    d_spacing_pos = Dataset(
+        np.array([1.0, 2.0, 3.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: LABELS_SIN2CHI},
+    )
+    d_spacing_neg = Dataset(
+        np.array([3.0, 2.0, 1.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: "different_label"},
+    )
+
+    with pytest.raises(ValueError, match="Axis labels do not match."):
+        plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+
+
+def test__combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape(plugin_fixture):
+    plugin= plugin_fixture
+    
+    d_spacing_pos = Dataset(
+        np.array([1.0, 2.0, 3.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: LABELS_SIN2CHI},
+    )
+    d_spacing_neg = Dataset(
+        np.array([3.0, 2.0, 1.0, 0.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3, 0.4])},
+        axis_labels={0: LABELS_SIN2CHI},
+    )
+
+    with pytest.raises(ValueError, match="Axis ranges do not have the same length."):
+        plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+        
+        
+def test_combine_sort_d_spacing_pos_neg_valid(plugin_fixture):
+    plugin= plugin_fixture
+    
+    d_spacing_pos = Dataset(
+        np.array([1.0, 2.0, 3.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: LABELS_SIN2CHI},
+        data_label="position_pos",
+    )
+    d_spacing_neg = Dataset(
+        np.array([3.0, 2.0, 1.0]),
+        axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        axis_labels={0: LABELS_SIN2CHI},
+        data_label="position_neg",
+    )
+
+    result = plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+    assert np.array_equal(result.array, np.array([[3.0, 2.0, 1.0], [1.0, 2.0, 3.0]]))
+    assert np.array_equal(result.axis_ranges[1], np.array([0.1, 0.2, 0.3]))
+    assert result.axis_labels == {0: "0: d-, 1: d+", 1: LABELS_SIN2CHI}
+    assert result.data_label == "0: position_neg, 1: position_pos"
+
+def test_combine_sort_d_spacing_pos_neg_stablesort(plugin_fixture):
+    plugin= plugin_fixture
+        
+    # Create datasets with the same sin2chi values but in different unsorted order
+    sin2chi_values = np.array([0.3, 0.1, 0.2])
+
+    d_spacing_pos = Dataset(
+        np.array([3.0, 1.0, 2.0]),
+        axis_ranges={0: sin2chi_values},
+        axis_labels={0: LABELS_SIN2CHI},
+    )
+    d_spacing_neg = Dataset(
+        np.array([2.0, 3.0, 1.0]),
+        axis_ranges={0: sin2chi_values},
+        axis_labels={0: LABELS_SIN2CHI},
+    )
+
+    result = plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+
+    # Check that the sin2chi axis has been sorted
+    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.3])
+    np.testing.assert_array_equal(
+        result.axis_ranges[1],
+        expected_sin2chi_sorted,
+        err_msg="sin2chi values are not correctly sorted in ascending order.",
+    )
+
+    # Check that the d_spacing values have been sorted according to the sorted sin2chi values
+    expected_d_spacing_combined = np.array([[3.0, 1.0, 2.0], [1.0, 2.0, 3.0]])
+    np.testing.assert_array_equal(
+        result.array,
+        expected_d_spacing_combined,
+        err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values.",
+    )
+    
+    
+def test_combine_sort_d_spacing_pos_neg_with_nan(plugin_fixture):
+    plugin= plugin_fixture
+    
+    # Create datasets with the same sin2chi values but with NaN values in d_spacing
+    sin2chi_values = np.array([0.3, 0.1, 0.2])
+
+    d_spacing_pos = Dataset(
+        np.array([3.0, np.nan, 2.0]),
+        axis_ranges={0: sin2chi_values},
+        axis_labels={0: LABELS_SIN2CHI},
+    )
+    d_spacing_neg = Dataset(
+        np.array([2.0, 3.0, np.nan]),
+        axis_ranges={0: sin2chi_values},
+        axis_labels={0: LABELS_SIN2CHI},
+    )
+
+    result = plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
+
+    # Check that the sin2chi axis has been sorted
+    expected_sin2chi_sorted = np.array([0.1, 0.2, 0.3])
+    np.testing.assert_array_equal(
+        result.axis_ranges[1],
+        expected_sin2chi_sorted,
+        err_msg="sin2chi values are not correctly sorted in ascending order.",
+    )
+
+    # Check that the d_spacing values have been sorted according to the sorted sin2chi values
+    expected_d_spacing_combined = np.array([[3.0, np.nan, 2.0], [np.nan, 2.0, 3.0]])
+    np.testing.assert_array_equal(
+        result.array,
+        expected_d_spacing_combined,
+        err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values, especially with NaN values.",
+    )
+
+
+@pytest.fixture
+def d_spacing_datasets():
+    d_spacing_pos = Dataset(
+        axis_labels={0: LABELS_SIN2CHI},
+        axis_ranges={
+            0: np.array(
+                [
+                    0.75,
+                    0.883022,
+                    0.969846,
+                    1.0,
+                    0.586824,
+                    0.413176,
+                    0.25,
+                    0.116978,
+                    0.030154,
+                    0.0,
+                ]
+            )
+        },
+        axis_units={0: ""},
+        metadata={},
+        data_unit="nm",
+        data_label="position_pos",
+        array=np.array(
+            [
+                26.201953,
+                26.151003,
+                26.102181,
+                26.063213,
+                26.249156,
+                26.267693,
+                26.324825,
+                26.323819,
+                26.311725,
+                26.281715,
+            ]
+        ),
+    )
+    d_spacing_neg = Dataset(
+        axis_labels={0: LABELS_SIN2CHI},
+        axis_ranges={
+            0: np.array(
+                [
+                    0.75,
+                    0.883022,
+                    0.969846,
+                    1.0,
+                    0.586824,
+                    0.413176,
+                    0.25,
+                    0.116978,
+                    0.030154,
+                    0.0,
+                ]
+            )
+        },
+        axis_units={0: ""},
+        metadata={},
+        data_unit="nm",
+        data_label="position_neg",
+        array=np.array(
+            [
+                26.041096,
+                26.037526,
+                26.036219,
+                26.063213,
+                26.074632,
+                26.099187,
+                26.171528,
+                26.206706,
+                26.238491,
+                26.281715,
+            ]
+        ),
+    )
+
+    d_spacing_combined = Dataset(
+        axis_labels={0: "0: d-, 1: d+", 1: LABELS_SIN2CHI},
+        axis_ranges={
+            0: np.array([0, 1]),
+            1: np.array(
+                [
+                    0.0,
+                    0.030154,
+                    0.116978,
+                    0.25,
+                    0.413176,
+                    0.586824,
+                    0.75,
+                    0.883022,
+                    0.969846,
+                    1.0,
+                ]
+            ),
+        },
+        axis_units={0: "", 1: ""},
+        metadata={},
+        data_unit="nm",
+        data_label="0: position_neg, 1: position_pos",
+        array=np.array(
+            [
+                [
+                    26.281715,
+                    26.238491,
+                    26.206706,
+                    26.171528,
+                    26.099187,
+                    26.074632,
+                    26.041096,
+                    26.037526,
+                    26.036219,
+                    26.063213,
+                ],
+                [
+                    26.281715,
+                    26.311725,
+                    26.323819,
+                    26.324825,
+                    26.267693,
+                    26.249156,
+                    26.201953,
+                    26.151003,
+                    26.102181,
+                    26.063213,
+                ],
+            ]
+        ),
+    )
+    return d_spacing_pos, d_spacing_neg, d_spacing_combined
+
+def test_combine_sort_d_spacing_pos_neg_explicit(plugin_fixture, d_spacing_datasets):
+    plugin=plugin_fixture
+    
+    
+    d_spacing_pos, d_spacing_neg, d_spacing_combined = d_spacing_datasets
+    d_spacing_combined_cal =plugin._combine_sort_d_spacing_pos_neg(
+        d_spacing_pos, d_spacing_neg
+    )
+
+    assert np.allclose(d_spacing_combined_cal.array, d_spacing_combined.array)
+    assert np.allclose(
+        d_spacing_combined_cal.axis_ranges[1], d_spacing_combined.axis_ranges[1]
+    )
+    assert d_spacing_combined_cal.data_label == d_spacing_combined.data_label
+    assert d_spacing_combined_cal.data_unit == d_spacing_combined.data_unit
+    
+
+# Parameterized test for TypeError with list and 2D numpy array inputs
+@pytest.mark.parametrize(
+    "invalid_input",
+    [
+        [1.0, 2.0],  # List input
+        np.array([[1.0, 2.0]]),  # 2D numpy array input
+    ],
+)
+def test__create_final_result_sin2chi_method_type_error(plugin_fixture, invalid_input):
+    plugin = plugin_fixture
+    
+    with pytest.raises(
+        TypeError, match="Input must be an instance of Dataset."
+    ):
+        plugin._create_final_result_sin2chi_method(invalid_input)
+
+
+@pytest.fixture
+def d_spacing_combined_fixture():
+    # Mocking a Dataset instance with sample data
+    data = np.array([[1, 2, np.nan], [4, 5, 6]])  # Example data
+       
+    d_spacing_combined = Dataset(data,
+        axis_ranges={0:  np.arange(2) , 1: np.array([0.1, 0.2, 0.3])},  # Example sin^2(chi) values
+        axis_labels={0: "0: d-, 1: d+", 1: LABELS_SIN2CHI},
+        axis_units={0: "", 1: ""},
+        data_unit="nm",
+        data_label="d_spacing"
+    )
+    return d_spacing_combined
+
+
+def test__create_final_result_sin2chi_method_valid_input(plugin_fixture, d_spacing_combined_fixture):
+    
+    plugin = plugin_fixture
+    #dummy input shape: 3 chi-values and 5 fit results
+    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    plugin._config["input_shape"] = (3, 5)
+    
+    
+    # Calculation
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
+
+    # Verify the shape and content of the returned datasets
+    assert result.shape == (3, 3), "Average dataset shape is incorrect"
+    assert (result.axis_labels[0] == '0: d-, 1: d+, 2: d_mean'), "Expected axis_labels[0] is '0: d-, 1: d+, 2: d_mean'."
+    
+    assert (
+        result.axis_labels[1] == LABELS_SIN2CHI
+    ), f"Expected axis_labels[1] dataset axis label is {LABELS_SIN2CHI}."
+    assert (
+        result.data_unit == d_spacing_combined_fixture.data_unit
+    ), f'Resulting dataset data unit is incorrect. Expected unit: {d_spacing_combined_fixture.data_unit}'
+    assert (
+        result.data_label == d_spacing_combined_fixture.data_label
+    ), f'Resulting dataset data label is incorrect. Expected data label: {d_spacing_combined_fixture.data_label}'
+    
+
+def test__create_final_result_sin2chi_method_accuracy(plugin_fixture, d_spacing_combined_fixture):
+    
+    plugin = plugin_fixture
+    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    plugin._config["input_shape"] = (3, 5)
+    
+    
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
+
+    expected_avg = np.vstack((d_spacing_combined_fixture.array, [2.5, 3.5, np.nan]))  # Assuming mean calculation ignores np.nan
+    
+
+    np.testing.assert_allclose(
+        result.array,
+        expected_avg,
+        rtol=1e-6,
+        atol=1e-8,
+        equal_nan=True,
+        err_msg="Result calculation is incorrect",
+    )
+    
+def test__create_final_result_sin2chi_method_with_nan_explicit(plugin_fixture, d_spacing_combined_fixture):
+    plugin = plugin_fixture
+    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    plugin._config["input_shape"] = (3, 5)
+    
+        
+    d_spacing_combined_fixture.array[0, 1] = np.nan
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
+    print(result.array)
+
+    expected_avg = np.vstack((d_spacing_combined_fixture.array, [2.5, np.nan, np.nan]))  # Assuming mean calculation ignores np.nan
+    
+    
+    np.testing.assert_array_equal(
+        result.array, expected_avg, "Resulting calculation is incorrect"
+    )
+    
+    
+def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing_datasets):
+    """ 
+    Ugly test due to pre-allocation requirements in pydidas, dynamic allocation is currently not yet supported. 
+    I delibertly left the Dataset expected as it is, as this is the future version when dynamic allocation is supported.
+    """
+    
+    _, _, d_spacing_combined = d_spacing_datasets
+    
+    plugin = plugin_fixture
+    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    # We can deduct the incoming length of chi-values via the length of the sin2chi axis
+    plugin._config["input_shape"] = (2*d_spacing_combined.axis_ranges[1].size+1, 5)
+        
+
+    expected = Dataset(
+        axis_ranges={
+            0: np.arange(3),
+            1: np.array(
+                [
+                    0.0,
+                    0.030154,
+                    0.116978,
+                    0.25,
+                    0.413176,
+                    0.586824,
+                    0.75,
+                    0.883022,
+                    0.969846,
+                    1.0,
+                ]
+            )
+        },
+        axis_labels = {0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
+        metadata={},
+        data_unit="nm",
+        data_label='d_spacing',
+        array=np.vstack((d_spacing_combined, np.array(
+            [
+                26.281715,
+                26.275108,
+                26.265263,
+                26.248177,
+                26.18344,
+                26.161894,
+                26.121524,
+                26.094265,
+                26.0692,
+                26.063213
+            ]
+            )
+        )
+    )
+    )
+        
+    desired_length = int(np.ceil(plugin._config["input_shape"][0] / 2 + 1))
+   
+    # I pad here, because technically this is only necessary due to the pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    # Padding length needed to reach the desired length
+    padding_length = desired_length - expected.array.shape[1]
+
+    # Pad only the column dimension (2nd dimension) at the end
+    padded_array = np.pad(expected.array, ((0, 0), (0, padding_length)), mode='constant', constant_values=np.nan)
+
+    padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=1)
+
+    #Calculation for test
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
+
+    assert nan_allclose(result.array, padded_array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
+    assert np.allclose(result.axis_ranges[1], padded_axis_ranges)
+    assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
+    assert result.data_label == expected.data_label
+    assert result.data_unit == expected.data_unit

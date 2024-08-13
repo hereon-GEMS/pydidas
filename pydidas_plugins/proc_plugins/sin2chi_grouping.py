@@ -97,11 +97,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
     Output:
     - Mean of d-spacing branches (d(+), d(-))
-    - Both d-spacing branches (d(+), d(-)) vs. sin^2(chi)
+    - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
         
     Steps:
-    1. A clustering algorithm groups chi values using similar sin^2(chi) values as a reference. 
-       Chi values resulting in similar sin^2(chi) values belong to the same group.
+    1. A clustering algorithm groups chi values based on similar sin^2(chi) values. The tolerance level for similarity
+       between sin^2(chi) values is set to 2e-4. Chi values with similar sin^2(chi) values are grouped.
     2. The algorithm separates the d-spacing values into groups based on the similarity of sin^2(chi) values
        and their slope sign (positive or negative).
     3. After grouping, d-spacing values are categorized by their group labels and the slope sign.

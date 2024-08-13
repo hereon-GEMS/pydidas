@@ -91,20 +91,26 @@ class DictViaAttrs:
 
 class DspacingSin2chiGrouping(ProcPlugin):
     """
-    Grouping of d-spacing values according to the slopes in sin^2(chi) and similiarity in sin^2(chi) values.
+    Grouping of d-spacing values according to the slopes in sin^2(chi) and similarity in sin^2(chi) values.
+    
     chi is the azimuthal angle of one diffraction image.
-    Output: Mean of d-spacing branches (d(+), d(-)) and both d-spacing branches (d(+), d(-)) vs. sin^2(chi).
     
-    In a fist step, a clustering algorithms groups chi values according to similiar sin^2(chi) values as reference. 
-    Chi values resulting in similiar sin^2(chi)-values belong to the same group.
-    In a second step, the algorithm separates the d-spacing values into groups based on similiarity of sin^2(chi) values
-    and its slope sign (positive or negative).
-    After the grouping, d-spacing values are categorized by their group labels and the slope sign.
-    In each d-spacing branch, positive (d(+)) or negative (d(-)), multiple groups can be identified.
-  
-    Finally, the mean of positive and negative d-spacing values vs. sin^2(chi) is calculated for each group.
+    Output:
+    - Mean of d-spacing branches (d(+), d(-))
+    - Both d-spacing branches (d(+), d(-)) vs. sin^2(chi)
+        
+    Steps:
+    1. A clustering algorithm groups chi values using similar sin^2(chi) values as a reference. 
+       Chi values resulting in similar sin^2(chi) values belong to the same group.
+    2. The algorithm separates the d-spacing values into groups based on the similarity of sin^2(chi) values
+       and their slope sign (positive or negative).
+    3. After grouping, d-spacing values are categorized by their group labels and the slope sign.
+    4. In each d-spacing branch, positive (d(+)) or negative (d(-)), multiple groups can be identified.
+    5. Finally, the mean of positive and negative d-spacing values vs. sin^2(chi) is calculated for each group.
     
+        
     NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data.
+    
     
     """
     plugin_name = "Group d-spacing according to sin^2(chi) method"

@@ -1371,40 +1371,6 @@ class TestDataset(unittest.TestCase):
         for _ax in range(obj.ndim):
             self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
 
-    def test_is_axis_nonlinear__simple(self):
-        obj = self.create_large_dataset()
-        for _ax in range(obj.ndim):
-            self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__falling_numbers(self):
-        obj = self.create_large_dataset()
-        obj = obj[::-1, :, ::-1]
-        for _ax in range(obj.ndim):
-            self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__linear_w_jitter(self):
-        obj = self.create_large_dataset()
-        for _level in [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]:
-            with self.subTest(jitter_level=_level):
-                obj.update_axis_range(
-                    1, np.arange(obj.shape[1]) + _level * np.random.random(obj.shape[1])
-                )
-            self.assertEqual(obj.is_axis_nonlinear(1), _level > 1e-4)
-            for _ax in [0, 2, 3]:
-                self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__inverse_func(self):
-        obj = self.create_large_dataset()
-        obj.update_axis_range(1, 1 / (1 + obj.axis_ranges[1]))
-        for _ax in range(obj.ndim):
-            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
-
-    def test_is_axis_nonlinear__sine_func(self):
-        obj = self.create_large_dataset()
-        obj.update_axis_range(1, np.sin(np.arange(obj.shape[1])))
-        for _ax in range(obj.ndim):
-            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
-
 
 if __name__ == "__main__":
     unittest.main()

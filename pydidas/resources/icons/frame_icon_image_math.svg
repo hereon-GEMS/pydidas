@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="40"
+   height="40"
+   viewBox="0 0 40 40"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Pydidas frame icon: Image math</title>
+  <defs
+     id="defs1">
+    <rect
+       x="0.11325034"
+       y="11.041908"
+       width="39.750868"
+       height="19.592308"
+       id="rect2" />
+    <rect
+       x="0.67950201"
+       y="11.551534"
+       width="38.67499"
+       height="14.892419"
+       id="rect1" />
+    <rect
+       x="-2.7808754"
+       y="26.120365"
+       width="50.750975"
+       height="18.472958"
+       id="rect3" />
+    <linearGradient
+       id="linearGradient3">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         offset="0.63558418"
+         id="stop2" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient5488"
+       id="radialGradient5490"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(1.46259,0,0,1.46259,-28.197696,-69.515677)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5488">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5484" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         offset="0.33333334"
+         id="stop6286" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop5486" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient3"
+       id="radialGradient5490-6"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(1.46259,0,0,1.46259,-9.1976933,-64.515675)"
+       gradientUnits="userSpaceOnUse" />
+    <rect
+       x="33.203125"
+       y="57.03125"
+       width="39.212132"
+       height="17.609484"
+       id="rect1649" />
+  </defs>
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#6e6e6e;stroke-width:1.49999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+     id="rect4972"
+     width="19.500013"
+     height="19.500008"
+     x="0.74999499"
+     y="0.74999499"
+     ry="0" />
+  <ellipse
+     style="fill:url(#radialGradient5490);fill-opacity:1;stroke:none;stroke-width:2.93087;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+     id="path5026"
+     cx="10.500001"
+     cy="10.499999"
+     rx="9.7500067"
+     ry="9.7500038" />
+  <ellipse
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.685731;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.685731, 2.05718;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path9364"
+     cx="10.478806"
+     cy="10.480589"
+     rx="5.6795297"
+     ry="5.6784825" />
+  <ellipse
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.716779;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.716779, 1.43356;stroke-dashoffset:0.716779;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path9364-7"
+     cx="10.512108"
+     cy="10.514012"
+     rx="8.6548643"
+     ry="8.6556196" />
+  <ellipse
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.679294;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.679294, 2.03788;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path12148"
+     cx="10.500001"
+     cy="10.499999"
+     rx="1.1250006"
+     ry="1.1250005" />
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#6e6e6e;stroke-width:1.49999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+     id="rect4972-2"
+     width="19.500013"
+     height="19.500008"
+     x="19.749994"
+     y="5.7499943"
+     ry="0" />
+  <ellipse
+     style="fill:url(#radialGradient5490-6);fill-opacity:1;stroke:none;stroke-width:2.93087;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+     id="path5026-0"
+     cx="29.500002"
+     cy="15.500004"
+     rx="9.7500067"
+     ry="9.7500038" />
+  <ellipse
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.685731;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.685731, 2.05718;stroke-dashoffset:0;stroke-opacity:0.4;paint-order:stroke fill markers;stop-color:#000000"
+     id="path9364-9"
+     cx="29.478807"
+     cy="15.480595"
+     rx="5.6795297"
+     ry="5.6784825" />
+  <ellipse
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.679294;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.679294, 2.03788;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path12148-2"
+     cx="29.5"
+     cy="15.500004"
+     rx="1.1250006"
+     ry="1.1250005" />
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+      <cc:Work
+         rdf:about="">
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+        <dc:title>Pydidas frame icon: Image math</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon GmbH</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <text
+     xml:space="preserve"
+     id="text1"
+     fill="#ff115a"
+     font-family="Calibri"
+     font-weight="bold"
+     font-size="19px"
+     x="-3.8146973e-06"
+     y="18.999996">+−×÷</text>
+  <text
+     xml:space="preserve"
+     id="text2"
+     fill="#00AAE6"
+     font-family="Calibri"
+     font-size="15"
+     x="0"
+     y="36.5">log √...</text>
+</svg>

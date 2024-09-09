@@ -50,7 +50,7 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
     The ViewResultsFrame is used to import and visualize the pydidas WorkflowResults.
     """
 
-    menu_icon = "qta::mdi.monitor-eye"
+    menu_icon = "mdi::monitor-eye"
     menu_title = "Import and display workflow results"
     menu_entry = "Workflow processing/View workflow results"
 
@@ -74,7 +74,7 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
 
     def build_frame(self):
         """
-        Build the frame and polulate it with widgets.
+        Build the frame and populate it with widgets.
         """
         ViewResultsFrameBuilder.build_frame(self)
 

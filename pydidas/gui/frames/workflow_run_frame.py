@@ -52,7 +52,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     A widget for running the ExecuteWorkflowApp and visualizing the results.
     """
 
-    menu_icon = "qta::msc.run-all"
+    menu_icon = "pydidas::frame_icon_workflow_run"
     menu_title = "Run full workflow"
     menu_entry = "Workflow processing/Run full workflow"
 

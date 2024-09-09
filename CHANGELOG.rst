@@ -21,6 +21,7 @@ Improvements
   for older versions.
 - Added support for images with non-uniform axes.
 - Added a new plugin to convert integration results to d-spacing.
+- Removed dependency of qtawesome to circumvent issues with fonts in Windows.
 
 Bugfixes
 --------
@@ -37,6 +38,10 @@ Bugfixes
 - Fixed an issue with fit plugins which would not forward the result units in 
   the WorkflowTestFrame on repeated calls.
 - Fixed a bug in histogram calculations with high outliers.
+- Fixed a bug where qtawesome would hand with access issues to fonts on Windows
+  systems.
+- Fixed an issue with silx plot widgets when changing the font size through
+  PydidasQApplication.
 
 
 v24.06.05

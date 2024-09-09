@@ -437,3 +437,13 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _cb.update()
         self.addImage(_image.getData(), **self._plot_config["kwargs"])
         self.setGraphTitle(_title)
+
+    def _activeItemChanged(self, type_):
+        """
+        Listen for active item changed signal and broadcast signal
+
+        :param item.ItemChangedType type_: The type of item change
+        """
+        if self.sender() == self._qtapp:
+            return
+        Plot2D._activeItemChanged(self, type_)

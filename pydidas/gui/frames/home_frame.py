@@ -91,7 +91,7 @@ _PROC_TEXT = (
 class HomeFrame(BaseFrame):
     """The pydidas start-up/home frame with generic information."""
 
-    menu_icon = "qta::mdi.home"
+    menu_icon = "mdi::home-outline"
     menu_title = "Home"
     menu_entry = "Home"
 

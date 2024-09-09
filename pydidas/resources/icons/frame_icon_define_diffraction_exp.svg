@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Pydidas frame icon: Define diffraction experiment</title>
+  <defs
+     id="defs1">
+    <radialGradient
+       xlink:href="#linearGradient5488"
+       id="radialGradient5490"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(0.97505944,0,0,0.97505955,-9.7984494,-45.343762)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5488">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5484" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         offset="0.33333334"
+         id="stop6286" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop5486" />
+    </linearGradient>
+  </defs>
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#6e6e6e;stroke-width:0.999999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+     id="rect4972"
+     width="13"
+     height="13"
+     x="9.499999"
+     y="1.4999995"
+     ry="0" />
+  <circle
+     style="fill:url(#radialGradient5490);fill-opacity:1;stroke:none;stroke-width:1.95391;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+     id="path5026"
+     cx="15.999999"
+     cy="7.9999981"
+     r="6.5" />
+  <ellipse
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.457153;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.457153, 1.37146;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path9364"
+     cx="15.985869"
+     cy="7.9870586"
+     rx="3.7863512"
+     ry="3.7856534" />
+  <ellipse
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.477853;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.477853, 0.955703;stroke-dashoffset:0.477853;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path9364-7"
+     cx="16.008068"
+     cy="8.0093412"
+     rx="5.769906"
+     ry="5.770411" />
+  <circle
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.452863;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.452863, 1.35859;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path12148"
+     cx="16"
+     cy="7.9999981"
+     r="0.75" />
+  <path
+     style="fill:none;stroke:#e60046;stroke-width:0.37103;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:1.11309, 1.11309;stroke-dashoffset:0;stroke-opacity:1"
+     d="m 15.940757,2.185199 c -2.809041,3.7100106 -4.987899,10.218353 -7.9407573,13.8148"
+     id="path12695" />
+  <path
+     style="fill:none;stroke:#e60046;stroke-width:0.37103;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 16,8.000002 7.9999997,15.999999"
+     id="path12695-3" />
+  <text
+     xml:space="preserve"
+     transform="matrix(0.15417252,0,0,0.15417252,0.43880215,20.095699)"
+     id="text13881"
+     style="font-size:38.9174px;line-height:1.25;font-family:Calibri;white-space:pre;shape-inside:url(#rect13883);display:inline"><tspan
+       x="0"
+       y="0"
+       id="tspan3">λ</tspan></text>
+  <text
+     xml:space="preserve"
+     transform="matrix(0.081807,0,0,0.081807,0.21874984,5.0693383)"
+     id="text15431"
+     style="font-size:73.3434px;line-height:1.25;font-family:Calibri;white-space:pre;shape-inside:url(#rect15433);display:inline"><tspan
+       x="0"
+       y="0"
+       id="tspan4">det</tspan></text>
+  <text
+     xml:space="preserve"
+     transform="matrix(0.081807,0,0,0.081807,12.71875,20.069338)"
+     id="text15431-8"
+     style="font-size:73.3434px;line-height:1.25;font-family:Calibri;white-space:pre;shape-inside:url(#rect15433-3);display:inline"><tspan
+       x="0"
+       y="0"
+       id="tspan5">dist</tspan></text>
+  <path
+     style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:0.0818067px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 3.7499997,19.750001 2.5000002,1.5 V 17.75 l -2.5000002,-1.5 z"
+     id="path1" />
+  <path
+     style="fill:#32cede;fill-opacity:1;stroke:none;stroke-width:0.999999px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 6.2499999,21.250001 2.4999998,-1.5 V 16.25 l -2.4999998,1.503999 z"
+     id="path2" />
+  <path
+     style="fill:#00606a;fill-opacity:1;stroke:none;stroke-width:0.999999px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 3.7499997,16.25 2.5000002,1.5 2.4999998,-1.5 -2.4999998,-1.5 z"
+     id="path3" />
+  <path
+     style="fill:none;stroke:#e60046;stroke-width:0.37103;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+     d="m 5.2499997,18.750002 -4.24999995,4.25"
+     id="path12695-5" />
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+      <cc:Work
+         rdf:about="">
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:title>Pydidas frame icon: Define diffraction experiment</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

@@ -69,7 +69,7 @@ class _UserConfigWindow(PydidasWindow):
     The UserConfigWindow allows to set the user configuration for pydidas.
     """
 
-    menu_icon = "qta::mdi.application-cog"
+    menu_icon = "mdi::application-cog-outline"
     menu_title = "User configuration"
     menu_entry = "User configuration"
 
@@ -135,7 +135,7 @@ class _UserConfigWindow(PydidasWindow):
         )
         self.add_any_widget(
             "but_fontsize_reduce",
-            SquareButton(icon="qta::mdi.arrow-bottom-left-thick"),
+            SquareButton(icon="mdi::arrow-bottom-left-thick"),
             gridPos=(0, -1, 1, 1),
             parent_widget="fontsize_container",
         )
@@ -148,7 +148,7 @@ class _UserConfigWindow(PydidasWindow):
         )
         self.add_any_widget(
             "but_fontsize_increase",
-            SquareButton(icon="qta::mdi.arrow-top-right-thick"),
+            SquareButton(icon="mdi::arrow-top-right-thick"),
             gridPos=(0, -1, 1, 1),
             parent_widget="fontsize_container",
         )

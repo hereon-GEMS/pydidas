@@ -99,9 +99,9 @@ def create_generic_toolbar_entry(entry):
         "label_visible": format_input_to_multiline_str(
             "Hide " + entry, max_line_length=12
         ),
-        "icon": get_pyqt_icon_from_str("qta::mdi.arrow-right-circle"),
-        "icon_invisible": get_pyqt_icon_from_str("qta::mdi.arrow-right-circle"),
-        "icon_visible": get_pyqt_icon_from_str("qta::mdi.arrow-left-circle"),
+        "icon": get_pyqt_icon_from_str("mdi::arrow-right-circle"),
+        "icon_invisible": get_pyqt_icon_from_str("mdi::arrow-right-circle"),
+        "icon_visible": get_pyqt_icon_from_str("mdi::arrow-left-circle"),
         "menu_tree": [
             ("" if _path == Path() else _path.as_posix())
             for _path in reversed(Path(entry).parents)

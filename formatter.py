@@ -256,6 +256,8 @@ class CopyrightYearUpdater:
             The timestamp (in years) of the last change
             (either commit or file difference).
         """
+        if not Path(fname).is_file():
+            return fname, -1
         try:
             _commit_epoch = self.__repo.git.log("-1", "--format=%at", fname)
             _commit_year = datetime.fromtimestamp(int(_commit_epoch)).year

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="40"
+   height="40"
+   viewBox="0 0 40 40"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Pydidas frame icon: Quick intergration</title>
+  <defs
+     id="defs1">
+    <radialGradient
+       xlink:href="#linearGradient5488"
+       id="radialGradient5490"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(1.46259,0,0,1.46259,-28.197696,-69.515677)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5488">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5484" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         offset="0.33333334"
+         id="stop6286" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop5486" />
+    </linearGradient>
+  </defs>
+  <path
+     style="fill:none;stroke:#00aae6;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+     d="m 10.413755,29.884816 c 0,0 6.193166,3.158986 7.558546,1.995884 1.365381,-1.163102 1.483873,-2.338729 1.483873,-2.338729 0,0 1.048205,-9.661526 1.452762,-5.110258 0.404557,4.551269 0.0884,5.979679 1.719368,7.389741 1.635976,1.414389 3.050915,1.461438 3.050915,1.461438 0,0 2.767572,-0.05416 3.515335,-2.284311 1.043349,-3.111708 0.825252,-9.703021 1.703504,-3.994386 0.606836,3.944433 0.606836,3.236458 0.859684,5.360384 0.707976,3.185887 5.842157,4.229009 5.842157,4.229009"
+     id="path3" />
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#6e6e6e;stroke-width:1.49999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+     id="rect4972"
+     width="19.500013"
+     height="19.500008"
+     x="0.74999499"
+     y="0.74999499"
+     ry="0" />
+  <ellipse
+     style="fill:url(#radialGradient5490);fill-opacity:1;stroke:none;stroke-width:2.93087;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+     id="path5026"
+     cx="10.5"
+     cy="10.5"
+     rx="9.7500067"
+     ry="9.7500038" />
+  <ellipse
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.685731;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.685731, 2.05718;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path9364"
+     cx="10.478806"
+     cy="10.480589"
+     rx="5.6795297"
+     ry="5.6784825" />
+  <ellipse
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.637197;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.637197, 1.2744;stroke-dashoffset:0.637197;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path9364-7"
+     cx="10.508788"
+     cy="10.515488"
+     rx="7.6916761"
+     ry="7.6968894" />
+  <ellipse
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.679294;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.679294, 2.03788;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     id="path12148"
+     cx="10.5"
+     cy="10.5"
+     rx="1.1250006"
+     ry="1.1250005" />
+  <path
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 10,38.5 H 37.499826 V 40 L 40,38 37.499826,35.75 V 37.5 H 11 V 25 h 1.5 l -2,-2.5 -2,2.5 H 10 Z"
+     id="path1" />
+  <path
+     style="fill:none;stroke:#00aae6;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+     d="m 10.5,10.6 8.487575,-3.448371 c 0,0 -1.408893,-4.2395662 -6.370341,-5.5873191 C 7.6557864,0.21655702 4.3267356,3.5758145 4.3267356,3.5758145 Z"
+     id="path2" />
+  <path
+     style="fill:#e60046;fill-opacity:1;stroke:none;stroke-width:1.32869px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 10.709411,16.552958 4.246187,8.275022 -2.364292,1.213195 4.464096,0.696147 2.037704,-4.032437 -2.364291,1.213198 -4.246185,-8.27502 z"
+     id="path4" />
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Pydidas frame icon: Quick intergration</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon GmbH</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

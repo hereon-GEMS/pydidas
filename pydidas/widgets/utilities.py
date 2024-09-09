@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,12 +20,11 @@ Module with various utility functions for widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "BlockUpdates",
     "delete_all_items_in_layout",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str",
@@ -36,7 +35,6 @@ __all__ = [
 
 from typing import Union
 
-import qtawesome
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
@@ -92,14 +90,15 @@ def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
     """
     Get a QIcon from the reference string.
 
-    Four types of strings can be processsed:
-        1. References to a qtawesome icon. The reference must be preceeded
-           by 'qta::'.
-        2. A reference number of a QStandardIcon, preceeded by a 'qt-std::'.
-        3. A reference to a image file in the file system. This must be
-           preceeded by 'path::'.
-        4. A reference to a icon in pydidas.core.icons with the filename preceded
+    Four types of strings can be processed:
+        1. A reference number of a QStandardIcon, preceded by a 'qt-std::'.
+        2. A reference to an image file in the file system. This must be
+           preceded by 'path::'.
+        3. A reference to an icon in pydidas.core.icons with the filename preceded
            by a 'pydidas::'
+        4. A reference to a mdi icon with the filename preceded by a 'mdi::'
+           Note that this only works for those mdi icons which have been included
+           in pydidas.
 
     Parameters
     ----------
@@ -109,28 +108,25 @@ def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
     Raises
     ------
     TypeError
-        If no correct preceeding type has been found.
+        If no correct preceding type has been found.
 
     Returns
     -------
     QtGui.QIcon
         The icon
-
     """
     _type, _ref = ref_string.split("::")
-    if _type == "qta":
-        _menu_icon = qtawesome.icon(_ref)
-    elif _type == "qt-std":
+    if _type == "qt-std":
         _ref = getattr(QStyle, _ref)
         app = QtWidgets.QApplication.instance()
-        _menu_icon = app.style().standardIcon(_ref)
-    elif _type == "pydidas":
-        _menu_icon = icons.get_pydidas_qt_icon(_ref)
-    elif _type == "path":
-        _menu_icon = QtGui.QIcon(_ref)
-    else:
-        raise TypeError("Cannot interpret the string reference for the menu icon.")
-    return _menu_icon
+        return app.style().standardIcon(_ref)
+    if _type == "pydidas":
+        return icons.get_pydidas_qt_icon(_ref)
+    if _type == "path":
+        return QtGui.QIcon(_ref)
+    if _type == "mdi":
+        return icons.get_mdi_qt_icon(_ref)
+    raise TypeError("Cannot interpret the string reference for the menu icon.")
 
 
 def get_max_pixel_width_of_entries(entries: Union[str, tuple, list]) -> int:
@@ -245,7 +241,7 @@ def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: dict):
     return _grid_pos
 
 
-def update_param_and_widget_choices(param_widget, new_choices):
+def update_param_and_widget_choices(param_widget: QtWidgets.QWidget, new_choices: list):
     """
     Update the choices for the given Parameter and in its widget.
 
@@ -273,17 +269,3 @@ def update_param_and_widget_choices(param_widget, new_choices):
             return
         param_widget.io_widget.update_choices(new_choices)
         param_widget.io_widget.setCurrentText(new_choices[0])
-
-
-class BlockUpdates:
-    """Class to block UI updates from a QWidget."""
-
-    def __init__(self, caller):
-        self._caller = caller
-        self._update_status = caller.updatesEnabled()
-
-    def __enter__(self):
-        self._caller.setUpdatesEnabled(False)
-
-    def __exit__(self, type_, value, traceback):
-        self._caller.setUpdatesEnabled(self._update_status)

@@ -64,7 +64,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
     visualization.
     """
 
-    menu_icon = "qta::mdi.view-comfy"
+    menu_icon = "mdi::view-comfy"
     menu_title = "Composite image creator"
     menu_entry = "Composite image creator"
 

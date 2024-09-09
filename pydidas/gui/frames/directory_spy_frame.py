@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ directory spy app and visualize the results.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -57,7 +57,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
     and display the latest data.
     """
 
-    menu_icon = "qta::mdi.magnify-scan"
+    menu_icon = "mdi::magnify-scan"
     menu_title = "Directory spy"
     menu_entry = "Directory spy"
     default_params = ParameterCollection()

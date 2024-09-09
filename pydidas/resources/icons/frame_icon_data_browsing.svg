@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="40"
+   height="40"
+   viewBox="0 0 40 40"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="frame_icon_data_browsing.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Pydidas frame icon: Data browsing</title>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="20.137544"
+     inkscape:cx="33.345675"
+     inkscape:cy="16.585935"
+     inkscape:window-width="1350"
+     inkscape:window-height="1212"
+     inkscape:window-x="3801"
+     inkscape:window-y="53"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showgrid="true">
+    <inkscape:grid
+       id="grid2"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <radialGradient
+       xlink:href="#linearGradient3"
+       id="radialGradient5490-6"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(1.2536483,0,0,1.2536487,-5.1694458,-42.684866)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient3">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         offset="0.63558418"
+         id="stop2" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <ellipse
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.98491;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers"
+       id="path3"
+       cx="30.200129"
+       cy="-5.2622914"
+       transform="scale(1,-1)"
+       rx="4.2076735"
+       ry="4.2827611" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.98491;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 34.008582,8.6295761 39.007545,12.86154"
+       id="path2-4"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
+       d="M 26.5,0 24,2.5 H 2.5 v 35 h 35 V 14 L 40,16 V 40 H 0 V 0 Z"
+       id="path4"
+       sodipodi:nodetypes="ccccccccccc" />
+    <rect
+       style="fill:#e9de1d;fill-opacity:1;stroke:none;stroke-width:1.82567;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect2"
+       width="3"
+       height="3"
+       x="5.5"
+       y="8.5" />
+    <rect
+       style="fill:#a0a0a0;fill-opacity:1;stroke:none;stroke-width:1.54764;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect3"
+       width="3"
+       height="3"
+       x="4"
+       y="4.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 8,6 h 9"
+       id="path5"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.88562;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 10,10 h 8"
+       id="path5-0"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#e9de1d;fill-opacity:1;stroke:none;stroke-width:1.82567;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect2-3"
+       width="3"
+       height="3"
+       x="5.5"
+       y="12.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.88562;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 10,14 h 8"
+       id="path5-0-8"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#e9de1d;fill-opacity:1;stroke:none;stroke-width:1.82567;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect2-3-2"
+       width="3"
+       height="3"
+       x="5.5"
+       y="28.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.88562;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 10,30 h 8"
+       id="path5-0-8-9"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:1.82567;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect2-3-9"
+       width="3"
+       height="3"
+       x="7"
+       y="16.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2.16312;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 11.5,18.081559 H 18"
+       id="path5-0-8-6"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:1.82567;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect2-3-9-9"
+       width="3"
+       height="3"
+       x="7"
+       y="20.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2.16312;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 11.5,22.040779 H 18"
+       id="path5-0-8-6-1"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:1.82567;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect2-3-9-7"
+       width="3"
+       height="3"
+       x="7"
+       y="24.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2.16312;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 11.5,26 H 18"
+       id="path5-0-8-6-5"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:1.82567;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect2-3-9-9-6"
+       width="3"
+       height="3"
+       x="7"
+       y="32.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2.16312;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 11.5,33.918441 H 18"
+       id="path5-0-8-6-1-1"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#6e6e6e;stroke-width:1.28571;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect4972-2"
+       width="16.714294"
+       height="16.714293"
+       x="19.642853"
+       y="17.542854"
+       ry="0" />
+    <ellipse
+       style="fill:url(#radialGradient5490-6);fill-opacity:1;stroke:none;stroke-width:2.51217;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+       id="path5026-0"
+       cx="27.999998"
+       cy="25.900002"
+       rx="8.3571472"
+       ry="8.3571463" />
+    <ellipse
+       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.58777;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.58777, 1.76331;stroke-dashoffset:0;stroke-opacity:0.4;paint-order:stroke fill markers;stop-color:#000000"
+       id="path9364-9"
+       cx="27.981833"
+       cy="25.883366"
+       rx="4.8681669"
+       ry="4.8672709" />
+    <ellipse
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.509471;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.509471, 1.52841;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+       id="path12148-2"
+       cx="27.999998"
+       cy="25.779467"
+       rx="0.84375018"
+       ry="0.84374982" />
+    <rect
+       style="fill:#6e6e6e;fill-opacity:1;stroke:none;stroke-width:2.00818;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect5"
+       width="18"
+       height="2.0999999"
+       x="19"
+       y="14.9" />
+    <rect
+       style="fill:#6e6e6e;fill-opacity:1;stroke:none;stroke-width:2.00818;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="rect5-2"
+       width="18"
+       height="2.0999999"
+       x="19"
+       y="34.900002" />
+  </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Pydidas frame icon: Data browsing</dc:title>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

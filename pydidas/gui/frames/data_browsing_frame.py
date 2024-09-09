@@ -57,7 +57,7 @@ class DataBrowsingFrame(BaseFrame):
     through datasets.
     """
 
-    menu_icon = "qta::mdi.image-search-outline"
+    menu_icon = "pydidas::frame_icon_data_browsing"
     menu_title = "Data browsing"
     menu_entry = "Data browsing"
 

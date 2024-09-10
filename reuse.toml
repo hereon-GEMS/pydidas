@@ -40,6 +40,7 @@ path = [
     "pydidas/resources/mdi_icons/arrow-top-right-thick.svg",
     "pydidas/resources/mdi_icons/comment-quote-outline.svg",
     "pydidas/resources/mdi_icons/content-save-check-outline.svg",
+    "pydidas/resources/mdi_icons/folder-open-outline.svg",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Michael Irigoyen"

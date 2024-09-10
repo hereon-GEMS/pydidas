@@ -71,6 +71,7 @@ class Dataset(ndarray):
     - data_label : The label for the data values (in str format).
 
     PLEASE NOTE:
+
     1.  While axis metadata is preserved during operations like reshaping or
         transposing, units are not automatically converted. The operator is responsible
         for ensuring that the units are consistent.

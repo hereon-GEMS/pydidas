@@ -43,6 +43,8 @@ Bugfixes
 - Fixed an issue with silx plot widgets when changing the font size through
   PydidasQApplication.
 - Fixed an issue with the restored window size after closing pydidas.
+- Fixed an issue with the display of Parameter choices in the GUI when 
+  Parameters only allowed True or False.
 
 
 v24.06.05

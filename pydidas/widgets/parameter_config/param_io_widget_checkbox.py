@@ -66,6 +66,7 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
             self.stateChanged.connect(self.emit_signal)
         self.set_value(param.value)
         self.setText(param.name)
+        self.setEnabled(set(param.choices) == {True, False})
 
     def __convert_bool(self, value: Union[int, str]) -> bool:
         """

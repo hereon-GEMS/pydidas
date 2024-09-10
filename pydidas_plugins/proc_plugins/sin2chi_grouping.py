@@ -95,13 +95,18 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
     chi is the azimuthal angle of one diffraction image.
     
+    PLEASE NOTE:
+    Using chi instead of psi for the sin^2(psi) method is an approximation in the high-energy X-ray regime.
+    Psi is the angle between between the scattering vector q and the sample normal.
+    The geometry of the experiment requires that the sample normal is parallel to the z-axis, i.e. the
+    incoming beam is parallel to the sample surface.
+    
     Output:
     - Mean of d-spacing branches (d(+), d(-))
     - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
         
     Steps:
-    1. A clustering algorithm groups chi values based on similar sin^2(chi) values. The tolerance level for similarity
-       between sin^2(chi) values is set to 2e-4. Chi values with similar sin^2(chi) values are grouped.
+    1. A clustering algorithm groups chi values based on similar sin^2(chi) values. The tolerance level for similarity between sin^2(chi) values is set to 2e-4. Chi values with similar sin^2(chi) values are grouped.
     2. The algorithm separates the d-spacing values into groups based on the similarity of sin^2(chi) values
        and their slope sign (positive or negative).
     3. After grouping, d-spacing values are categorized by their group labels and the slope sign.

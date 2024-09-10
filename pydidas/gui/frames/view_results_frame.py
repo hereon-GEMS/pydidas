@@ -50,7 +50,7 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
     The ViewResultsFrame is used to import and visualize the pydidas WorkflowResults.
     """
 
-    menu_icon = "mdi::monitor-eye"
+    menu_icon = "pydidas::frame_icon_workflow_results"
     menu_title = "Import and display workflow results"
     menu_entry = "Workflow processing/View workflow results"
 

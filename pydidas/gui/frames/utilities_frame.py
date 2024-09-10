@@ -107,6 +107,9 @@ class UtilitiesFrame(BaseFrame):
         self._widgets["button_composite_creation"].clicked.connect(
             partial(self.create_and_show_frame, CompositeCreatorFrame)
         )
+        # self._widgets["button_directory_spy"].clicked.connect(
+        #     partial(self.create_and_show_frame, DirectorySpyFrame)
+        # )
 
     @QtCore.Slot(object)
     def create_and_show_temp_window(self, window: QtWidgets.QWidget):

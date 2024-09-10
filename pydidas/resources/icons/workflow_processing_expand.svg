@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="40"
+   height="40"
+   viewBox="0 0 40 40"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="workflow_processing_expand.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Pydidas icon: Expand Workflow Processing</title>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="19.774705"
+     inkscape:cx="19.01419"
+     inkscape:cy="22.73106"
+     inkscape:window-width="1920"
+     inkscape:window-height="1177"
+     inkscape:window-x="5352"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       fill="currentColor"
+       d="m 6.0706188,8.0069029 c 1.1487938,-0.01987 2.0685364,-0.965713 2.0485343,-2.106606 -0.020002,-1.140925 -0.9723408,-2.054372 -2.1211333,-2.034507 -1.1572839,0.02001 -2.0685369,0.965684 -2.0485361,2.106609 0.020002,1.140892 0.9638512,2.054516 2.1211351,2.034504 m 4.3987062,-1.572408 1.276618,0.958576 c 0.112267,0.09104 0.149024,0.242491 0.07486,0.379119 l -1.155458,2.065793 c -0.0716,0.127353 -0.225985,0.1838691 -0.363683,0.133136 L 8.8106158,9.4051309 C 8.5085831,9.6471129 8.1714597,9.8473359 7.8167111,10.005654 L 7.6144842,11.573075 C 7.6009222,11.71709 7.4742024,11.829193 7.329795,11.831691 l -2.3826871,0.0412 C 4.7940178,11.875591 4.6727701,11.767724 4.6448416,11.624426 L 4.3961584,10.064802 C 4.0275872,9.9190869 3.6922982,9.7303659 3.3818054,9.4990059 L 1.9030142,10.116349 c -0.1267925,0.05299 -0.2894558,0.005 -0.3596374,-0.1206291 L 0.31620966,7.9711279 c -0.077089,-0.124814 -0.050965,-0.286817 0.061516,-0.381477 L 1.6199698,6.5875179 1.5674418,6.0135889 1.5996708,5.4296959 0.32320266,4.4795839 c -0.1150802,-0.09111 -0.1467665,-0.251596 -0.074851,-0.379119 L 1.403808,2.0346699 c 0.065815,-0.136293 0.2263777,-0.189872 0.3550469,-0.141294 l 1.4996809,0.574274 C 3.5608911,2.2256629 3.8890555,2.0171609 4.252442,1.8671589 L 4.4461586,0.29138627 c 0.023361,-0.1355575 0.1404335,-0.2474944 0.2935253,-0.2501416 L 7.1223697,4.2670153e-5 C 7.2670985,-0.00245733 7.3967088,0.10521207 7.415801,0.24003567 L 7.6729961,1.8080109 c 0.3599347,0.137557 0.7038601,0.334438 1.0143516,0.565765 l 1.4701463,-0.62563 c 0.143838,-0.05329 0.289136,-0.005 0.368277,0.128788 l 1.227165,2.024593 c 0.07877,0.125486 0.04749,0.286741 -0.06152,0.381477 l -1.242392,0.993669 0.05268,0.582425 -0.03237,0.575397"
+       id="path2"
+       style="stroke-width:0.848159"
+       sodipodi:nodetypes="cssscccccccccsscccccccccccccccccsscccccccccc" />
+    <path
+       d="m 3.4935198,16.48703 c 0.6937066,0 1.2518858,-0.554355 1.2518858,-1.243343 0,-0.688956 -0.5581792,-1.251245 -1.2518858,-1.251245 -0.6958075,3e-6 -1.2598704,0.560204 -1.2598731,1.251245 0,0.688988 0.5661351,1.243343 1.2598731,1.243343 m 2.663291,-0.894884 0.7734518,0.586024 c 0.055755,0.05537 0.071727,0.150553 0.02411,0.229572 l -0.7176672,1.235411 c -0.039782,0.07932 -0.135619,0.110746 -0.2151823,0.07932 l -0.8930984,-0.35636 -0.5900642,0.348429 -0.1515927,0.942414 c -0.015069,0.0871 -0.0877,0.150553 -0.1754014,0.150553 H 2.7760636 c -0.095537,0 -0.1675651,-0.06345 -0.1832368,-0.150553 L 2.4653447,17.71454 1.8593374,17.366111 0.95032666,17.722472 c -0.071727,0.03173 -0.159428,0 -0.2073469,-0.07932 l -0.7176369,-1.23541 c -0.047919,-0.07932 -0.02411,-0.1742 0.039782,-0.229572 l 0.757509,-0.586024 -0.024111,-0.348459 0.024111,-0.34843 -0.757509,-0.586022 c -0.067536,-0.05683 -0.084302,-0.153588 -0.039782,-0.229573 l 0.7176369,-1.235411 c 0.047919,-0.07932 0.1356194,-0.110746 0.2073469,-0.07932 L 1.851381,13.121294 2.4653447,12.772835 2.5928268,11.830449 c 0.015068,-0.0871 0.0877,-0.150553 0.1832368,-0.150553 h 1.4353031 c 0.0877,0 0.1594289,0.06345 0.1754013,0.150553 l 0.1515927,0.942386 0.5900642,0.348459 0.8930985,-0.356363 c 0.079563,-0.03173 0.1754001,0 0.2151823,0.07932 l 0.7176667,1.235411 c 0.04792,0.07932 0.031946,0.1742 -0.024109,0.229573 l -0.7734519,0.586022 0.02411,0.34843 z"
+       style="fill:currentColor;stroke-width:0.794654"
+       id="path2135" />
+    <path
+       style="fill:none;stroke:#0091a0;stroke-width:1.49849;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 37.900976,14.68305 C 37.793838,8.9567069 33.233765,2.0736129 24.792908,2.1215559"
+       id="path7303-5"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0091a0;stroke-width:1.49849;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 23.014555,2.2944519 C 17.248724,2.4008589 10.318164,6.9296899 10.366439,15.31274"
+       id="path7303-5-6"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0091a0;stroke-width:1.49849;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 10.404902,17.185548 c 0.10714,5.726346 4.667205,12.60945 13.108064,12.561507"
+       id="path7303-5-7"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0091a0;stroke-width:1.49849;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 25.398021,29.930097 C 31.163849,29.823692 38.094418,25.294849 38.046144,16.911799"
+       id="path7303-5-0"
+       sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:type="star"
+       style="fill:#989898;fill-opacity:1;stroke:#ffffff;stroke-width:4.99999;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+       id="path9651"
+       inkscape:flatsided="true"
+       sodipodi:sides="3"
+       sodipodi:cx="236.41924"
+       sodipodi:cy="-98.927208"
+       sodipodi:r1="42.764889"
+       sodipodi:r2="21.382446"
+       sodipodi:arg1="-0.019605331"
+       sodipodi:arg2="1.0275922"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 279.17591,-99.765574 -63.40896,38.285912 -1.4521,-74.056728 z"
+       inkscape:transform-center-x="-1.4000153"
+       inkscape:transform-center-y="0.056442687"
+       transform="matrix(0.13557985,0,0,0.13465135,1.7614002,47.845015)" />
+    <path
+       sodipodi:type="star"
+       style="fill:#989898;fill-opacity:1;stroke:#ffffff;stroke-width:4.99999;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+       id="path9651-5"
+       inkscape:flatsided="true"
+       sodipodi:sides="3"
+       sodipodi:cx="236.41924"
+       sodipodi:cy="-98.927208"
+       sodipodi:r1="42.764889"
+       sodipodi:r2="21.382446"
+       sodipodi:arg1="-0.019605331"
+       sodipodi:arg2="1.0275922"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 279.17591,-99.765574 -63.40896,38.285912 -1.4521,-74.056728 z"
+       inkscape:transform-center-x="-1.4000152"
+       inkscape:transform-center-y="0.056443678"
+       transform="matrix(0.13557985,0,0,0.13465135,-2.7075849,47.840011)" />
+    <path
+       style="fill:none;stroke:#0091a0;stroke-width:0.998992;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 23.132491,19.147224 -4.740385,1.500013 m 9.48077,0 -4.740385,-1.500013 m 0,0 v -9.000077 l 3.74241,-2.0000171 4.740385,2.0000171"
+       id="path2-8"
+       sodipodi:nodetypes="cccccccc" />
+    <rect
+       style="fill:#4d4d4d;stroke:#6e6e6e;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect2305"
+       width="6.9858308"
+       height="4.0000343"
+       x="23.381983"
+       y="4.3970976"
+       ry="1.2245002" />
+    <rect
+       style="fill:#4d4d4d;stroke:#6e6e6e;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect2305-4"
+       width="6.9858308"
+       height="4.0000343"
+       x="19.639574"
+       y="9.8971443"
+       ry="1.2245002" />
+    <rect
+       style="fill:#4d4d4d;stroke:#6e6e6e;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect2305-4-4"
+       width="6.9858308"
+       height="4.0000343"
+       x="19.639574"
+       y="15.397192"
+       ry="1.2245002" />
+    <rect
+       style="fill:#4d4d4d;stroke:#6e6e6e;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect2305-4-4-6"
+       width="6.9858308"
+       height="4.0000343"
+       x="14.89919"
+       y="20.397236"
+       ry="1.2245002" />
+    <rect
+       style="fill:#4d4d4d;stroke:#6e6e6e;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect2305-4-4-5"
+       width="6.9858308"
+       height="4.0000343"
+       x="23.880972"
+       y="20.397236"
+       ry="1.2245002" />
+    <rect
+       style="fill:#4d4d4d;stroke:#6e6e6e;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect2305-4-7"
+       width="6.9858308"
+       height="4.0000343"
+       x="27.872875"
+       y="9.8971443"
+       ry="1.2245002" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.499496px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 23.074892,19.214133 Z"
+       id="path3" />
+    <path
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:0.998992px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 21.815751,27.750238 v 4.000034 l 2.993928,-2.000017 z"
+       id="path1"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:0.998992px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 36.008097,17.934274 H 40 l -1.995952,-3.000026 z"
+       id="path1-3"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:0.998992px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 26.526697,4.1091609 V 0.10912737 L 23.532769,2.1091439 Z"
+       id="path1-9"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:#0091a0;fill-opacity:1;stroke:none;stroke-width:0.998992px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 12.360426,13.493281 H 8.368524 l 1.995951,3.000025 z"
+       id="path1-90"
+       sodipodi:nodetypes="cccc" />
+  </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Pydidas icon: Expand Workflow Processing</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon GmbH</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

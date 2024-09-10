@@ -127,12 +127,10 @@ def get_generic_menu_entries():
             "label": "Expand\nWorkflow\nprocessing",
             "label_visible": "Hide\nworkflow\nprocessing",
             "label_invisible": "Expand\nworkflow\nprocessing",
-            "icon": get_pyqt_icon_from_str("pydidas::workflow_processing_expand.png"),
-            "icon_visible": get_pyqt_icon_from_str(
-                "pydidas::workflow_processing_hide.png"
-            ),
+            "icon": get_pyqt_icon_from_str("pydidas::workflow_processing_expand"),
+            "icon_visible": get_pyqt_icon_from_str("pydidas::workflow_processing_hide"),
             "icon_invisible": get_pyqt_icon_from_str(
-                "pydidas::workflow_processing_expand.png"
+                "pydidas::workflow_processing_expand"
             ),
             "menu_tree": ["", "Workflow processing"],
         }

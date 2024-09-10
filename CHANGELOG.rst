@@ -42,6 +42,7 @@ Bugfixes
   systems.
 - Fixed an issue with silx plot widgets when changing the font size through
   PydidasQApplication.
+- Fixed an issue with the restored window size after closing pydidas.
 
 
 v24.06.05

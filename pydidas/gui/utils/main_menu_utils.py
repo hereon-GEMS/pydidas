@@ -30,6 +30,7 @@ __all__ = [
     "clear_local_log_files",
     "open_doc_in_browser",
     "get_remote_version",
+    "restore_global_objects",
 ]
 
 import os
@@ -38,9 +39,14 @@ from pathlib import Path
 import requests
 from qtpy import QtCore, QtGui
 
+from ...contexts import GLOBAL_CONTEXTS
 from ...core import UserConfigError, utils
 from ...core.constants import PYDIDAS_CONFIG_PATHS, PYDIDAS_STANDARD_CONFIG_PATH
 from ...widgets.dialogues import QuestionBox
+from ...workflow import WorkflowTree
+
+
+TREE = WorkflowTree()
 
 
 def get_standard_state_full_filename(filename: str) -> Path:
@@ -116,3 +122,23 @@ def get_remote_version() -> str:
                 return _line.split('"')[1]
     except requests.RequestException:
         return "-1"
+
+
+def restore_global_objects(state: dict):
+    """
+    Get the states of pydidas's global objects (ScanContext,
+    DiffractionExperimentContext, WorkflowTree)
+
+    Parameters
+    ----------
+    state : dict
+        The restored global states which includes the states for the
+        global objects.
+    """
+    try:
+        TREE.restore_from_string(state["workflow_tree"])
+    except KeyError:
+        raise UserConfigError("Cannot import Workflow. Not all plugins found.")
+    for _context_key, _context in GLOBAL_CONTEXTS.items():
+        for _key, _val in state[_context_key].items():
+            _context.set_param_value(_key, _val)

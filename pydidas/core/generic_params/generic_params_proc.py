@@ -39,7 +39,8 @@ GENERIC_PARAMS_PROC = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            f"The output d-spacing unit. {ASCII_TO_UNI['Angstrom']} for Angstroms and nm for nanometers."
+            f"The output d-spacing unit. {ASCII_TO_UNI['Angstrom']} for Angstroms "
+            "and nm for nanometers."
         ),
     },
 }

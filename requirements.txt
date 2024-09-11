@@ -146,6 +146,8 @@ scipy==1.14.1
     #   scikit-image
 silx==2.1.1
     # via pyfai
+siphash24==1.6
+    # via -r requirements.in
 six==1.16.0
     # via python-dateutil
 snowballstemmer==2.2.0

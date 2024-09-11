@@ -137,12 +137,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def __init__(self):
         super().__init__()
         self.config = DictViaAttrs(self._config)
-              
             
     def pre_execute(self):
-        print(30*" \N{Hot pepper}")
-        print(self._config["input_shape"])  
-        print(30*" \N{Hot pepper}")   
+        pass
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
         
@@ -167,12 +164,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 f'Cannot calculate the result shape for the "{self.plugin_name}" '
                 'plugin because the input shape is unknown or invalid.'
             )
-        
-        print(30*" \N{Peach}")
-        print('Input shape:', _shape)
-        print(_shape[0], int(np.ceil(_shape[0] / 2 + 1)))  
-        print(30*" \N{Peach}")   
-        
+            
+        # currently an upper boundary for the expected shape of the result, affects only second dimension
         self._config["result_shape"] = (3, int(np.ceil(_shape[0] / 2 + 1)))         
         
         
@@ -1017,21 +1010,17 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
         print('Resulting arr shape', arr.shape)
+
         
-        
+        #Preallocation of shape for output array
         dummy_arr= np.full((3, int(np.ceil(self._config["input_shape"][0] / 2 + 1))), np.nan)
         
-        print('Dummy array shape:', dummy_arr.shape)
-        
+        # Filling of dummy array. All rows and all columns of real data. Rest remains np.nan.  
         dummy_arr[:,0:arr.shape[1]] = arr
         
-        print('Dummy Array shape:', dummy_arr.shape)
-        print('Dummy Array\n', dummy_arr)
-        
+        #Preallocation of axis ranges, non occupied values remain 1                
         dummy_axis_ranges= np.ones(int(np.ceil(self._config["input_shape"][0] / 2 + 1)))
         dummy_axis_ranges[0:len(d_spacing_combined.axis_ranges[1])] = d_spacing_combined.axis_ranges[1]
-        
-        print('Dummy axis range:\n', dummy_axis_ranges)   
         
         # Create the final result Dataset, when dynamic array allocation is not implemented
         result=Dataset(dummy_arr, axis_ranges={0: np.arange(dummy_arr.shape[0]), 1: dummy_axis_ranges}, 

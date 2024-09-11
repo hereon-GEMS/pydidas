@@ -97,9 +97,10 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
     PLEASE NOTE:
     Using chi instead of psi for the sin^2(psi) method is an approximation in the high-energy X-ray regime.
-    Psi is the angle between between the scattering vector q and the sample normal.
+    Psi is the angle between between the scattering vector q and the sample normal
     The geometry of the experiment requires that the sample normal is parallel to the z-axis, i.e. the
     incoming beam is parallel to the sample surface.
+    Results will be stored.
     
     Output:
     - Mean of d-spacing branches (d(+), d(-))
@@ -115,8 +116,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
         
     NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data.
-    
-    
+
     """
     plugin_name = "Group d-spacing according to sin^2(chi) method"
     basic_plugin = False
@@ -126,39 +126,33 @@ class DspacingSin2chiGrouping(ProcPlugin):
     output_data_dim = 2 
     output_data_label = "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
     new_dataset = True
+    
+    # modification of the keep_results parameter to ensure results are always stored
+    _generics = ProcPlugin.generic_params.copy()
+    _generics[PARAMETER_KEEP_RESULTS].value = True
+    _generics[PARAMETER_KEEP_RESULTS].choices = [True]
+    generic_params = _generics
 
     
     def __init__(self):
         super().__init__()
-        
         self.config = DictViaAttrs(self._config)
-             
-        # Set the parameter for storing the results, because we need later to work globally on results. 
-        self.params.set_value(PARAMETER_KEEP_RESULTS, True)
-               
+              
             
     def pre_execute(self):
         print(30*" \N{Hot pepper}")
         print(self._config["input_shape"])  
-                    
-        #As it is not possible to overwrite the default-value of `keep_results', I check here again the current value and overwrite the state to True.`
-        if not self.params.get_value(PARAMETER_KEEP_RESULTS):
-            self.params.set_value(PARAMETER_KEEP_RESULTS, True)
-        
         print(30*" \N{Hot pepper}")   
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
-           
         
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
-         
         
         #d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
      
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined)
-        
         
         return d_output_sin2chi_method, kwargs
     

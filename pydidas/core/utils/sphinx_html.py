@@ -30,12 +30,12 @@ __all__ = ["check_sphinx_html_docs", "run_sphinx_html_build"]
 
 
 import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Union
 
 from qtpy import QtWidgets
-from sphinx.cmd import build
 
 from .get_documentation_targets import (
     DOC_BUILD_DIRECTORY,
@@ -83,8 +83,12 @@ def run_sphinx_html_build(
     verbose : bool, optional
         Flag to control printing of a message. The default is True.
     """
-    if "sphinx-build" in sys.argv[0] or "-m unittest" in sys.argv[0]:
+    if "sphinx-build" in sys.argv or sys.argv[0].endswith(f"sphinx{os.sep}__main__.py"):
         return
+    if "-m" in sys.argv:
+        _index = sys.argv.index("-m")
+        if len(sys.argv) > _index and sys.argv[_index + 1] in ["unittest", "sphinx"]:
+            return
     if build_dir is None:
         build_dir = os.path.join(DOC_BUILD_DIRECTORY, "html")
     if verbose:
@@ -106,4 +110,14 @@ def run_sphinx_html_build(
                         "Building html documentation (required only once during first "
                         "startup)"
                     )
-    build.main([os.path.join(DOC_SOURCE_DIRECTORY, "src"), build_dir])
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "sphinx",
+            "-b",
+            "html",
+            os.path.join(DOC_SOURCE_DIRECTORY, "src"),
+            build_dir,
+        ]
+    )

@@ -1624,15 +1624,16 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     assert result.data_unit == expected.data_unit
     
 def test__create_final_result_sin2chi_method_precision2(plugin_fixture, d_spacing_datasets):
+    "Similar to the previous precision test, but removes the need for nan_allclose as expected output shape in 2nd dimension is hardcoded." 
        
     _, _, d_spacing_combined = d_spacing_datasets
     
     plugin = plugin_fixture
     # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
-    # We can deduct the incoming length of chi-values via the length of the sin2chi axis
-    plugin._config["input_shape"] = (18, 5)
-        
-
+    # We can deduct the incoming length of chi-values via the length of the sin2chi axis. 
+    # Current requirement: plugin._config["input_shape"][0] = plugin._config["result_shape"][1], hence we can deduct here:
+    plugin._config["input_shape"] = (10, 5)
+      
     expected = Dataset(
         axis_ranges={
             0: np.arange(3),

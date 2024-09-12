@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v24.09.15
+v24.09.16
 =========
 
 Improvements
@@ -45,6 +45,8 @@ Bugfixes
 - Fixed an issue with the restored window size after closing pydidas.
 - Fixed an issue with the display of Parameter choices in the GUI when 
   Parameters only allowed True or False.
+- Fixed an issue with sphinx (version >7) which changed built-in types when 
+  running in the same process as the main program.
 
 
 v24.06.05

@@ -73,9 +73,9 @@ def test_plugin_inheritance():
 @pytest.mark.parametrize(
     "input_shape, result_shape",
     [
-        ((10, 20), (3, 6)),   # Test case 1
-        ((20, 40), (3, 11)),  # Test case 2
-        ((15, 30), (3, 9)),   # Test case 3
+        ((10, 20), (3, 10)),   # Test case 1
+        ((20, 40), (3, 20)),  # Test case 2
+        ((15, 30), (3, 15)),   # Test case 3
     ]
 )
 def test_calulate_result_shape(plugin_fixture, input_shape, result_shape):

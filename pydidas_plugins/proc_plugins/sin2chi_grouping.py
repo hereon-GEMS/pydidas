@@ -143,17 +143,28 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
         
+        print(30*"\N{hot pepper}")
+        print('ds shape', ds.shape)
+        print('Input shape again ', self._config["input_shape"])
+        print(30*"\N{hot pepper}")
+        
+        
+        print(30*"\N{pineapple}")
+        print(ds)
+        print(30*"\N{pineapple}")
+        
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
         
         #d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
-     
+        print('d_spacing_combined shape', d_spacing_combined.shape)
+        
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined)
         
         return d_output_sin2chi_method, kwargs
     
-    def calculate_result_shape(self):
+    def calculate_result_shape(self) -> None:
         """
         Calculate the shape of the Plugin results.
         """
@@ -167,7 +178,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
             
         # currently an upper boundary for the expected shape of the result, affects only second dimension
         self._config["result_shape"] = (3, int(np.ceil(_shape[0] / 2 + 1)))         
-        
         
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
         """
@@ -1009,13 +1019,18 @@ class DspacingSin2chiGrouping(ProcPlugin):
                               
         
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
+        print(30*"\N{strawberry}")
         print('Resulting arr shape', arr.shape)
-
+        print(arr)
+        print(30*"\N{strawberry}")
         
         #Preallocation of shape for output array
         dummy_arr= np.full((3, int(np.ceil(self._config["input_shape"][0] / 2 + 1))), np.nan)
         
         # Filling of dummy array. All rows and all columns of real data. Rest remains np.nan.  
+        print('Dummy arr shape', dummy_arr.shape)
+       
+        
         dummy_arr[:,0:arr.shape[1]] = arr
         
         #Preallocation of axis ranges, non occupied values remain 1                
@@ -1033,4 +1048,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         #        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit=d_spacing_combined.data_unit,
         #        data_label='d_spacing'
         #    )
+    
+    
         return result

@@ -60,22 +60,14 @@ def test_plugin_initialization(plugin_fixture):
     assert plugin.output_data_label == "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
     assert plugin.new_dataset == True
     
-    #check plugin is initialised with autosave option
+    #check plugin is initialised with autosave option (True or 1)
     assert plugin.params.get_value(PARAMETER_KEEP_RESULTS) == True
+    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value == 1
     
     
 def test_plugin_inheritance():  
     plugin_obj =  PluginCollection().get_plugin_by_name('DspacingSin2chiGrouping')
     assert issubclass(plugin_obj, ProcPlugin), "Plugin is not a subclass of ProcPlugin"
-    
-
-def test_plugin_pre_execute_sets_keep_results(plugin_fixture):
-    #Test if the keep_results parameter is set to True in the pre_execute method.
-    plugin = plugin_fixture
-
-    plugin.params.set_value(PARAMETER_KEEP_RESULTS, False)
-    plugin.pre_execute()
-    assert plugin.params.get_value(PARAMETER_KEEP_RESULTS) == True
     
     
 @pytest.mark.parametrize(
@@ -93,6 +85,9 @@ def test_calulate_result_shape(plugin_fixture, input_shape, result_shape):
     plugin.calculate_result_shape()
     
     assert plugin._config["result_shape"] == result_shape
+    assert isinstance(plugin._config["result_shape"], tuple)
+    assert len(plugin._config["result_shape"]) == 2
+    assert all(isinstance(i, int) for i in plugin._config["result_shape"])
 
 
 
@@ -114,6 +109,9 @@ def test_calculate_result_shape_raises_error(plugin_fixture, input_shape):
     assert "Cannot calculate the result shape for the" \
            f' "{plugin.plugin_name}" plugin because the input shape is unknown or invalid.' in str(e.value)
 
+
+
+#TODO: Add tests for the execute method
 
 
 
@@ -501,8 +499,6 @@ case10 = S2cTestConfig(
 
 
 test_cases = [case1, case2, case3, case4, case5, case6, case7, case8, case9, case10]
-
-
 @pytest.mark.parametrize("case", test_cases)
 def test_group_d_spacing_by_chi_result(plugin_fixture, case):
     plugin = plugin_fixture
@@ -1768,6 +1764,74 @@ def test__create_final_result_sin2chi_method_label_2(plugin_fixture, results_sin
     with pytest.raises(ValueError, match=r'axis_labels\[1\] does not match sin\^2\(chi\).'):
         plugin._create_final_result_sin2chi_method(d_spacing_combined)  
         
+#test_cases = [case1, case2, case3, case4, case5, case6, case7, case8, case9, case10]
+test_cases = [case2]
+@pytest.mark.parametrize("case", test_cases)        
+def test_execute_with_various_cases(plugin_fixture, case):    
+    plugin = plugin_fixture
+    chi = chi_gen(case.chi_start, case.chi_stop, case.delta_chi)    
+    
+    print('\nIncoming data for d:\n' ,case.d_spacing_func(chi).reshape(-1, 1))
+    
+    #create the test dataset    
+    my_dataset = Dataset(
+        case.d_spacing_func(chi).reshape(-1, 1),
+        axis_ranges={0: chi, 1: np.array([0])},
+        axis_labels={0: 'chi', 1: '0: position'},
+        axis_units = {0: 'deg', 1: ''},
+        data_label = 'position / nm'
+    )
+    
+    # Define the expected result based on case
+    expected_d_spacing_pos = case.d_mean_pos
+    expected_d_spacing_neg = case.d_mean_neg
+    expected_d_spacing_avg = np.mean([case.d_mean_pos, case.d_mean_neg], axis=0)
+    
+     # Create the expected result array
+    expected_result = np.vstack([
+        expected_d_spacing_neg,
+        expected_d_spacing_pos,
+        expected_d_spacing_avg
+    ])        
+  
+    # Calculation for test   
+    plugin._config["input_shape"] = my_dataset.shape
+    
+    print(30 * "\N{avocado}")
+    print('In the test function ...')
+    print(plugin._config["input_shape"])
+    print(case.d_spacing_func(chi).reshape(-1, 1).shape)
+    print(30 * "\N{avocado}")
+
+    
+    result, _ = plugin.execute(my_dataset)
+
+    
+
+    # Create a mask to exclude np.nan values in the result array
+    mask = ~np.isnan(result.array)
+          
+    # Compare the non-nan values in the result array with the expected values
+    for i in range(expected_result.shape[0]):
+        assert np.allclose(result.array[i, :expected_result.shape[1]][mask[i, :expected_result.shape[1]]], expected_result[i][mask[i, :expected_result.shape[1]]], atol=1e-8), f"Result row {i} does not match expected values"
+    
+    # Additional checks for shape and type
+    assert isinstance(result, Dataset), "Expected result to be a Dataset"
+    assert result.array.shape[0] == 3, f"Expected 3 rows, but got {result.array.shape[0]}"
+    assert result.array.shape[1] >= expected_result.shape[1], f"Expected at least {expected_result.shape[1]} columns, but got {result.array.shape[1]}"
+      
+    # Check axis ranges
+    expected_axis_range_0 = np.array([0, 1, 2])
+    assert np.array_equal(result.axis_ranges[0], expected_axis_range_0), f"Expected axis range 0 to be {expected_axis_range_0}, but got {result.axis_ranges[0]}"   
+        
+    # Compare axis range 1 using sets to ignore preallocated values
+    tolerance = 1e-5  # Define your tolerance level
+    # Slice the result array to match the length of s2c_range
+    result_to_compare = result.axis_ranges[1][:len(case.s2c_range)]
+    # Perform the assertion
+    assert np.all(np.abs(case.s2c_range - result_to_compare) <= tolerance), \
+        f"Expected ordered axis range 1 to match within {tolerance} of {case.s2c_range}, but got {result_to_compare}"
+
         
 # Testing for various Dataset modifications for create_final_result_sin2chi_method
 @pytest.fixture

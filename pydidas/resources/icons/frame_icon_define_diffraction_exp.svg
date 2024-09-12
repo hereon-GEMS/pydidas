@@ -89,7 +89,7 @@
      xml:space="preserve"
      transform="matrix(0.15417252,0,0,0.15417252,0.43880215,20.095699)"
      id="text13881"
-     style="font-size:38.9174px;line-height:1.25;font-family:Calibri;white-space:pre;shape-inside:url(#rect13883);display:inline"><tspan
+     style="font-size:38.9174px;line-height:1.25;font-family:Arial;white-space:pre;shape-inside:url(#rect13883);display:inline"><tspan
        x="0"
        y="0"
        id="tspan3">λ</tspan></text>
@@ -97,7 +97,7 @@
      xml:space="preserve"
      transform="matrix(0.081807,0,0,0.081807,0.21874984,5.0693383)"
      id="text15431"
-     style="font-size:73.3434px;line-height:1.25;font-family:Calibri;white-space:pre;shape-inside:url(#rect15433);display:inline"><tspan
+     style="font-size:73.3434px;line-height:1.25;font-family:Arial;white-space:pre;shape-inside:url(#rect15433);display:inline"><tspan
        x="0"
        y="0"
        id="tspan4">det</tspan></text>
@@ -105,7 +105,7 @@
      xml:space="preserve"
      transform="matrix(0.081807,0,0,0.081807,12.71875,20.069338)"
      id="text15431-8"
-     style="font-size:73.3434px;line-height:1.25;font-family:Calibri;white-space:pre;shape-inside:url(#rect15433-3);display:inline"><tspan
+     style="font-size:73.3434px;line-height:1.25;font-family:Arial;white-space:pre;shape-inside:url(#rect15433-3);display:inline"><tspan
        x="0"
        y="0"
        id="tspan5">dist</tspan></text>

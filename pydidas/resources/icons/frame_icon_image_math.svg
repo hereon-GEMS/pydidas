@@ -38,11 +38,11 @@
     <linearGradient
        id="linearGradient3">
       <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
+         style="stop-color:#ffffff;stop-opacity:0.39525691;"
          offset="0"
          id="stop1" />
       <stop
-         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         style="stop-color:#c8c8c8;stop-opacity:0.3992095;"
          offset="0.63558418"
          id="stop2" />
       <stop
@@ -68,7 +68,7 @@
          id="stop5484" />
       <stop
          style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
-         offset="0.33333334"
+         offset="0.11551156"
          id="stop6286" />
       <stop
          style="stop-color:#000000;stop-opacity:0;"
@@ -108,14 +108,14 @@
      rx="9.7500067"
      ry="9.7500038" />
   <ellipse
-     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.685731;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.685731, 2.05718;stroke-dashoffset:0;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     style="fill:none;fill-opacity:1;stroke:#787878;stroke-width:0.685731;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.685731, 2.05718;stroke-dashoffset:0;stroke-opacity:0.80281699;paint-order:stroke fill markers;stop-color:#000000"
      id="path9364"
      cx="10.478806"
      cy="10.480589"
      rx="5.6795297"
      ry="5.6784825" />
   <ellipse
-     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.716779;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.716779, 1.43356;stroke-dashoffset:0.716779;stroke-opacity:0.802817;paint-order:stroke fill markers;stop-color:#000000"
+     style="fill:none;fill-opacity:1;stroke:#9b9b9b;stroke-width:0.716779;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.716779, 1.43356;stroke-dashoffset:0.716779;stroke-opacity:0.80281699;paint-order:stroke fill markers;stop-color:#000000"
      id="path9364-7"
      cx="10.512108"
      cy="10.514012"
@@ -144,7 +144,7 @@
      rx="9.7500067"
      ry="9.7500038" />
   <ellipse
-     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.685731;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.685731, 2.05718;stroke-dashoffset:0;stroke-opacity:0.4;paint-order:stroke fill markers;stop-color:#000000"
+     style="fill:none;fill-opacity:1;stroke:#969696;stroke-width:0.685731;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.685731, 2.05718;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
      id="path9364-9"
      cx="29.478807"
      cy="15.480595"
@@ -194,18 +194,19 @@
   <text
      xml:space="preserve"
      id="text1"
-     fill="#ff115a"
-     font-family="Calibri"
+     fill="#eeeeee"
+     font-family="Arial"
      font-weight="bold"
-     font-size="19px"
-     x="-3.8146973e-06"
-     y="18.999996">+−×÷</text>
+     font-size="17px"
+     x="0.4"
+     y="19.0">+−×÷</text>
   <text
      xml:space="preserve"
      id="text2"
      fill="#00AAE6"
-     font-family="Calibri"
-     font-size="15"
+     font-family="Arial"
+     font-size="12.5px"
+     font-weight="bold"
      x="0"
      y="36.5">log √...</text>
 </svg>

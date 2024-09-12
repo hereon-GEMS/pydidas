@@ -500,7 +500,7 @@ case10 = S2cTestConfig(
 
 test_cases = [case1, case2, case3, case4, case5, case6, case7, case8, case9, case10]
 @pytest.mark.parametrize("case", test_cases)
-def test_group_d_spacing_by_chi_result(plugin_fixture, case):
+def test__group_d_spacing_by_chi_result(plugin_fixture, case):
     plugin = plugin_fixture
     
     chi = chi_gen(case.chi_start, case.chi_stop, case.delta_chi)
@@ -1765,7 +1765,7 @@ def test__create_final_result_sin2chi_method_label_2(plugin_fixture, results_sin
         plugin._create_final_result_sin2chi_method(d_spacing_combined)  
         
 #test_cases = [case1, case2, case3, case4, case5, case6, case7, case8, case9, case10]
-test_cases = [case2]
+test_cases = [case4]
 @pytest.mark.parametrize("case", test_cases)        
 def test_execute_with_various_cases(plugin_fixture, case):    
     plugin = plugin_fixture
@@ -1806,14 +1806,13 @@ def test_execute_with_various_cases(plugin_fixture, case):
     
     result, _ = plugin.execute(my_dataset)
 
-    
-
     # Create a mask to exclude np.nan values in the result array
     mask = ~np.isnan(result.array)
           
     # Compare the non-nan values in the result array with the expected values
     for i in range(expected_result.shape[0]):
-        assert np.allclose(result.array[i, :expected_result.shape[1]][mask[i, :expected_result.shape[1]]], expected_result[i][mask[i, :expected_result.shape[1]]], atol=1e-8), f"Result row {i} does not match expected values"
+        assert np.allclose(result.array[i, :expected_result.shape[1]][mask[i, :expected_result.shape[1]]],
+                           expected_result[i][mask[i, :expected_result.shape[1]]], atol=1e-8), f"Result row {i} does not match expected values"
     
     # Additional checks for shape and type
     assert isinstance(result, Dataset), "Expected result to be a Dataset"

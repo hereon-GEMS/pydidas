@@ -1853,7 +1853,7 @@ def base_dataset():
 ])
 def test__create_final_result_sin2chi_method(plugin_fixture, base_dataset, modifications, expected_array):
     plugin = plugin_fixture
-    plugin._config["input_shape"] = (5, 5) #chose 5 in position 0 to avoid padding as above
+    plugin._config["input_shape"] = (4, 5) #chose 5 in position 0 to avoid padding as above
     
     
     # Apply modifications

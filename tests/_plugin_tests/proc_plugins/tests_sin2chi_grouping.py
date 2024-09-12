@@ -1561,8 +1561,8 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     plugin = plugin_fixture
     # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
     # We can deduct the incoming length of chi-values via the length of the sin2chi axis
-    plugin._config["input_shape"] = (2*(d_spacing_combined.axis_ranges[1].size-1), 5)
-        
+    #plugin._config["input_shape"] = (2*(d_spacing_combined.axis_ranges[1].size-1), 5)
+    plugin._config["input_shape"] = (d_spacing_combined.axis_ranges[1].size+2, 5)     
 
     expected = Dataset(
         axis_ranges={
@@ -1606,6 +1606,7 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     
     #The desired length of the output array    
     desired_length = int(np.ceil(plugin._config["input_shape"][0] / 2 + 1))
+    desired_length = int(plugin._config["input_shape"][0])
    
     # I pad here, because technically this is only necessary due to the pre-allocation requirements in pydidas, dynamic allocation is not yet supported
     # Padding length needed to reach the desired length
@@ -1613,13 +1614,13 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
 
     # Pad only the column dimension (2nd dimension) at the end
     padded_array = np.pad(expected.array, ((0, 0), (0, padding_length)), mode='constant', constant_values=np.nan)
-    padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=1)
+    padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=np.nan)
 
     #Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
     assert nan_allclose(result.array, padded_array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
-    assert np.allclose(result.axis_ranges[1], padded_axis_ranges)
+    assert nan_allclose(result.axis_ranges[1], padded_axis_ranges, atol=1e-8) 
     assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit

@@ -90,6 +90,26 @@ class TestGenericNode(unittest.TestCase):
         with self.assertRaises(TypeError):
             obj.node_id = [1, 2]
 
+    def test_children_ids_property__no_children(self):
+        obj = GenericNode()
+        self.assertEqual(obj.children_ids, [])
+
+    def test_children_ids_property__1_child(self):
+        obj = GenericNode()
+        _ = GenericNode(node_id=1, parent=obj)
+        self.assertEqual(obj.children_ids, [1])
+
+    def test_children_ids_property__w_children(self):
+        obj = GenericNode()
+        _child_ids = [1, 5, 7, 9, 12]
+        _children = [GenericNode(node_id=_id, parent=obj) for _id in _child_ids]
+        self.assertEqual(obj.children_ids, _child_ids)
+
+    def test_children_property(self):
+        obj = GenericNode()
+        _children = [GenericNode(node_id=_id, parent=obj) for _id in range(5)]
+        self.assertEqual(obj.children, _children)
+
     def test_verify_type__with_node(self):
         obj = GenericNode()
         node2 = GenericNode()
@@ -250,11 +270,12 @@ class TestGenericNode(unittest.TestCase):
             _nodes[1][0].delete_node_references(recursive=False)
 
     def test_delete_node_references__with_children_recursive(self):
-        _nodes, _target_conns, _n_nodes = self.create_node_tree(3, 1)
+        _nodes, _target_conns, _n_nodes = self.create_node_tree(5, 1)
         _root = _nodes[0][0]
         _nodes[1][0].delete_node_references(recursive=True)
         self.assertFalse(_nodes[1][0] in _root._children)
         self.assertEqual(_nodes[1][0].n_children, 0)
+        self.assertIsNone(_nodes[2][0].parent)
 
     def test_connect_parent_to_children__no_parent_no_children(self):
         root = GenericNode(node_id=0)

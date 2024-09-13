@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ structure.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -213,6 +213,30 @@ class GenericNode:
         if parent is not None:
             parent.add_child(self)
 
+    @property
+    def children(self) -> list[Self]:
+        """
+        Get the list of children.
+
+        Returns
+        -------
+        list
+            The list of children.
+        """
+        return self._children
+
+    @property
+    def children_ids(self) -> list[int]:
+        """
+        Get the list of children IDs.
+
+        Returns
+        -------
+        list[int]
+            The list of children IDs.
+        """
+        return [_child.node_id for _child in self._children]
+
     def get_children(self) -> list:
         """
         Get the child objects.
@@ -290,8 +314,7 @@ class GenericNode:
             raise RecursionError(
                 "Node children detected but deletion is not recursive."
             )
-        if self.parent is not None:
-            self.parent.remove_child_reference(self)
+        self.parent = None
         for _child in self._children:
             _child.delete_node_references(recursive)
 
@@ -313,9 +336,9 @@ class GenericNode:
         if self.parent is None:
             for _child in self._children:
                 _child.parent = None
-        else:
-            for _child in self._children[:]:
-                self.parent.add_child(_child)
+            return
+        while self.n_children:
+            self.parent.add_child(self.children[0])
         self._children = []
         self.parent = None
 

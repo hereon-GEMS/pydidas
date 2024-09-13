@@ -49,6 +49,7 @@ Bugfixes
   running in the same process as the main program.
 - Fixed an issue on linux where editing the WorkflowTree in the GUI caused a 
   segmentation fault.
+- Fixed an issue in generic_node.connect_parents_to_children method.
 
 
 

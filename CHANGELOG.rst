@@ -47,6 +47,9 @@ Bugfixes
   Parameters only allowed True or False.
 - Fixed an issue with sphinx (version >7) which changed built-in types when 
   running in the same process as the main program.
+- Fixed an issue on linux where editing the WorkflowTree in the GUI caused a 
+  segmentation fault.
+
 
 
 v24.06.05

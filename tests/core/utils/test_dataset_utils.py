@@ -32,11 +32,11 @@ import numpy as np
 from pydidas.core import PydidasConfigError
 from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
+    convert_ranges_and_check_length,
     dataset_default_attribute,
     get_corresponding_dims,
     get_input_as_dict,
     get_number_of_entries,
-    item_is_iterable_but_not_array,
     update_dataset_properties_from_kwargs,
 )
 
@@ -69,8 +69,8 @@ class Test_dataset_utils(unittest.TestCase):
         self.assertEqual(obj.axis_labels, _labels)
 
     def test_update_dataset_properties_from_kwargs__axis_ranges(self):
-        _ranges = {0: 12, 1: -5}
         obj = Dataset(np.random.random((10, 10)))
+        _ranges = {0: np.arange(obj.shape[0]) - 1, 1: np.arange(obj.shape[1]) + 5}
         update_dataset_properties_from_kwargs(obj, {"axis_ranges": _ranges.values()})
         self.assertEqual(obj.axis_ranges, _ranges)
 
@@ -147,34 +147,6 @@ class Test_dataset_utils(unittest.TestCase):
         with self.assertRaises(PydidasConfigError):
             get_input_as_dict(_obj, (3,))
 
-    def test_item_is_iterable_but_not_array__string(self):
-        _flag = item_is_iterable_but_not_array("a string")
-        self.assertFalse(_flag)
-
-    def test_item_is_iterable_but_not_array__float(self):
-        _flag = item_is_iterable_but_not_array(12.6)
-        self.assertFalse(_flag)
-
-    def test_item_is_iterable_but_not_array__int(self):
-        _flag = item_is_iterable_but_not_array(42)
-        self.assertFalse(_flag)
-
-    def test_item_is_iterable_but_not_array__ndarray(self):
-        _flag = item_is_iterable_but_not_array(np.arange(12))
-        self.assertFalse(_flag)
-
-    def test_item_is_iterable_but_not_array__list(self):
-        _flag = item_is_iterable_but_not_array([1, 2, 3])
-        self.assertTrue(_flag)
-
-    def test_item_is_iterable_but_not_array__tuple(self):
-        _flag = item_is_iterable_but_not_array((1, 2, 3))
-        self.assertTrue(_flag)
-
-    def test_item_is_iterable_but_not_array__set(self):
-        _flag = item_is_iterable_but_not_array({1, 2, 3})
-        self.assertTrue(_flag)
-
     def test_get_corresponding_dims__identity(self):
         _old = (10, 11, 12, 15)
         _dims = get_corresponding_dims(_old, _old)
@@ -209,6 +181,53 @@ class Test_dataset_utils(unittest.TestCase):
             with self.subTest(old_shape=_shape1, new_shape=_shape2):
                 _dim_matches = get_corresponding_dims(_shape1, _shape2)
                 self.assertEqual(_dim_matches, _matches)
+
+    def test_convert_ranges_and_check_length__correct(self):
+        _ranges = [
+            {0: np.arange(10), 1: np.arange(10)},
+            {0: np.arange(10), 1: list(np.arange(10))},
+            {0: np.arange(10), 1: tuple(np.arange(10))},
+            {0: list(np.arange(10)), 1: np.arange(10)},
+            {0: tuple(np.arange(10)), 1: np.arange(10)},
+            {0: list(np.arange(10)), 1: list(np.arange(10))},
+            {0: tuple(np.arange(10)), 1: tuple(np.arange(10))},
+        ]
+        for _curr_ranges in _ranges:
+            with self.subTest(range=_curr_ranges):
+                _new_ranges = convert_ranges_and_check_length(_curr_ranges, (10, 10))
+                for _key in _new_ranges:
+                    self.assertTrue(np.allclose(_new_ranges[_key], _curr_ranges[_key]))
+
+    def test_convert_ranges_and_check_length__incorrect_length(self):
+        _ranges = [
+            {0: np.arange(10), 1: np.arange(11)},
+            {0: np.arange(10), 1: np.arange(9)},
+            {0: np.arange(11), 1: np.arange(9)},
+        ]
+        _shape = (10, 10)
+        for _curr_ranges in _ranges:
+            with self.subTest(range=_curr_ranges):
+                with self.assertRaises(ValueError):
+                    convert_ranges_and_check_length(_curr_ranges, _shape)
+
+    def test_convert_ranges_and_check_length__incorrect_type(self):
+        _ranges = [
+            {0: np.arange(10), 1: 10 * "a"},
+            {0: np.arange(10), 1: set(np.arange(10))},
+            {0: np.arange(10), 1: {k: v for k, v in enumerate(np.arange(10))}},
+        ]
+        _shape = (10, 10)
+        for _curr_ranges in _ranges:
+            with self.subTest(range=_curr_ranges):
+                with self.assertRaises(ValueError):
+                    convert_ranges_and_check_length(_curr_ranges, _shape)
+
+    def test_convert_ranges_and_check_length__single_value(self):
+        _ranges = {0: np.arange(10), 1: 5, 2: 20 - np.arange(10)}
+        _shape = (10, 1, 10)
+        _new_ranges = convert_ranges_and_check_length(_ranges, _shape)
+        for _key in _new_ranges:
+            self.assertTrue(np.allclose(_new_ranges[_key], np.asarray(_ranges[_key])))
 
 
 if __name__ == "__main__":

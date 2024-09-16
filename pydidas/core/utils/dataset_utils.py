@@ -378,16 +378,19 @@ def convert_ranges_and_check_length(
         if isinstance(_range, list) or isinstance(_range, tuple):
             _range = np.asarray(_range)
             ranges[_dim] = _range
-        if shape[_dim] == 1 and isinstance(_range, Real):
+        if isinstance(_range, Real) and shape[_dim] == 1:
             _range = np.array([_range])
             ranges[_dim] = _range
         if not isinstance(_range, np.ndarray):
-            _wrong_dims.append([_dim, 1])
+            _wrong_dims.append([_dim, 1, shape[_dim]])
             continue
         if isinstance(_range, np.ndarray) and _range.size != shape[_dim]:
             _wrong_dims.append([_dim, _range.size, shape[_dim]])
     if len(_wrong_dims) > 0:
-        _error = "The length of the given ranges does not match the size of the data."
+        _error = (
+            "The type and or length of the given ranges does not match the size of "
+            "the data."
+        )
         for _dim, _len, _ndata in _wrong_dims:
             _error += (
                 f"\nDimension {_dim}: Given range length: `{_len}`; "

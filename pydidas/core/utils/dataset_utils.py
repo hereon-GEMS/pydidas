@@ -34,7 +34,6 @@ __all__ = [
     "get_dict_with_string_entries",
     "get_input_as_dict",
     "replace_none_entries",
-    "item_is_iterable_but_not_array",
     "convert_ranges_and_check_length",
     "get_corresponding_dims",
 ]
@@ -42,7 +41,7 @@ __all__ = [
 import textwrap
 import warnings
 from collections.abc import Iterable
-from numbers import Integral
+from numbers import Integral, Real
 from typing import List, Literal, NewType, Tuple, Union
 
 import numpy as np
@@ -343,28 +342,9 @@ def replace_none_entries(metadict: dict) -> dict:
     }
 
 
-def item_is_iterable_but_not_array(item: object) -> bool:
-    """
-    Check whether an item is iterable (ignoring strings) but not an array.
-
-    Parameters
-    ----------
-    item : object
-        Any object.
-
-    Returns
-    -------
-    bool
-        Flag whether the item is iterable (without being a string or ndarray)
-    """
-    return (
-        isinstance(item, Iterable)
-        and not isinstance(item, str)
-        and not isinstance(item, np.ndarray)
-    )
-
-
-def convert_ranges_and_check_length(ranges: dict, shape: tuple[int]) -> dict:
+def convert_ranges_and_check_length(
+    ranges: dict[int, Union[np.ndarray, tuple, list]], shape: tuple[int]
+) -> dict[int, np.ndarray]:
     """
     Convert ranges to ndarrays and check their length with respect to the shape.
 
@@ -375,7 +355,7 @@ def convert_ranges_and_check_length(ranges: dict, shape: tuple[int]) -> dict:
 
     Parameters
     ----------
-    ranges : dict
+    ranges : dict[int, Union[np.ndarray, tuple, list]]
         The dictionary with the loaded ranges.
     shape : tuple[int]
         The shape of the Dataset.
@@ -387,7 +367,7 @@ def convert_ranges_and_check_length(ranges: dict, shape: tuple[int]) -> dict:
 
     Returns
     -------
-    dict
+    dict[int, np.ndarray]
         The modified ranges dictionary.
     """
     _wrong_dims = []
@@ -395,9 +375,15 @@ def convert_ranges_and_check_length(ranges: dict, shape: tuple[int]) -> dict:
         if _range is None:
             ranges[_dim] = np.arange(shape[_dim])
             continue
-        if item_is_iterable_but_not_array(_range):
+        if isinstance(_range, list) or isinstance(_range, tuple):
             _range = np.asarray(_range)
             ranges[_dim] = _range
+        if shape[_dim] == 1 and isinstance(_range, Real):
+            _range = np.array([_range])
+            ranges[_dim] = _range
+        if not isinstance(_range, np.ndarray):
+            _wrong_dims.append([_dim, 1])
+            continue
         if isinstance(_range, np.ndarray) and _range.size != shape[_dim]:
             _wrong_dims.append([_dim, _range.size, shape[_dim]])
     if len(_wrong_dims) > 0:

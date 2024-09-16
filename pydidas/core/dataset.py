@@ -66,7 +66,9 @@ class Dataset(ndarray):
     - axis_units : The units of the axis ranges (in str format).
     - axis_labels : The descriptive labels for all array axes (in str format).
     - axis_ranges : The data values corresponding to the respective axes indices,
-      given in form of 1-d arrays.
+      given in form of 1-d np.ndarrays, lists or tuples. All axis_ranges values
+      will be internally converted to np.ndarrays. The axis_ranges keys are
+      integers corresponding to the axis indices.
     - data_unit : The unit for the data values (in str format).
     - data_label : The label for the data values (in str format).
 
@@ -99,9 +101,16 @@ class Dataset(ndarray):
         axis_labels : Union[dict, list, tuple], optional
             The labels for the axes. The length must correspond to the array
             dimensions. The default is None.
-        axis_ranges : Union[dict, list, tuple], optional
-            The ranges for the axes. The length must correspond to the array
-            dimensions. The default is None.
+        axis_ranges : Union[list, tuple, dict[int, Union[np.ndarray, list, tuple]]], optional
+            The ranges for the axes. If a dictionary is provided, the keys must
+            correspond to the axis indices, and the values must be sequences
+            (e.g., np.ndarray, list , or tuple ) with lengths matching the
+            dimension of the array. The length of each sequence must correspond
+            to the array dimension for that axis. Empty axis_ranges (e.g. None)
+            will be converted to indices. The default is None.
+        axis_ranges : Union[dict[int, Sequence], list, tuple], optional
+            The ranges for the axes. The length for each range must correspond
+            to the array dimensions. The default is None.
         axis_units : Union[dict, list, tuple], optional
             The units for the axes. The length must correspond to the array
             dimensions. The default is None.
@@ -521,9 +530,17 @@ class Dataset(ndarray):
         return self._meta["axis_ranges"].copy()
 
     @axis_ranges.setter
-    def axis_ranges(self, ranges: Union[Iterable, dict]):
+    def axis_ranges(
+        self, ranges: Union[list, tuple, dict[int, Union[ndarray, list, tuple]]]
+    ):
         """
         Set the axis_ranges metadata.
+
+        If a tuple or list is provided, the entries will be interpreted as sorted
+        for all dimensions, starting with dimension 0 and counting up.
+
+        If a dictionary is provided, the keys must be integer entries and
+        correspond to the axis indices.
 
         Parameters
         ----------

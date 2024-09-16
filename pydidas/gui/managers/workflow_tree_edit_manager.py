@@ -240,6 +240,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         TREE.active_node_id = node_id
         self.sig_plugin_selected.emit(node_id)
         self.sig_plugin_class_selected.emit(TREE.active_node.plugin.plugin_name)
+        QtCore.QTimer.singleShot(20, QtWidgets.QApplication.instance().processEvents)
 
     @QtCore.Slot(str)
     def replace_plugin(self, plugin_name: str):
@@ -393,8 +394,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         This includes all nodes and widgets.
         """
         _all_ids = list(self._node_widgets.keys())
-        self.__delete_references(*_all_ids)
         self.__delete_widgets(*_all_ids)
+        self.__delete_references(*_all_ids)
 
     @QtCore.Slot(int)
     def delete_branch(self, node_id: int):
@@ -478,8 +479,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             All integer widget/node IDs in any Iterable datatype.
         """
         for _id in node_ids:
-            self._node_widgets[_id].disconnect()
-            self._node_widgets[_id].deleteLater()
+            if _id in self._node_widgets:
+                self._node_widgets[_id].disconnect()
+                self._node_widgets[_id].deleteLater()
 
     @QtCore.Slot()
     def __app_font_changed(self):

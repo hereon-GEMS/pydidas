@@ -177,7 +177,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
             )
             
         # currently an upper boundary for the expected shape of the result, affects only second dimension
-        self._config["result_shape"] = (3, _shape[0])         
+        self._config["result_shape"] = (3, _shape[0])  
+        #self._config["result_shape"] = (3, int(np.ceil(_shape[0] / 2 + 1)))         
         
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
         """
@@ -1014,10 +1015,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 
         d_spacing_avg = d_spacing_combined.mean(axis=0) 
         d_spacing_avg=d_spacing_avg.reshape(1,-1)
-        
-        print('Input shape:', self._config["input_shape"])
-                              
-        
+                
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
         print(30*"\N{strawberry}")
         print('Resulting arr shape', arr.shape)
@@ -1025,7 +1023,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(30*"\N{strawberry}")
         
         #Preallocation of shape for output array
-        dummy_arr= np.full((3, int(np.ceil(self._config["input_shape"][0] / 2 + 1))), np.nan)
+        #dummy_arr= np.full((3, int(np.ceil(self._config["input_shape"][0] / 2 + 1))), np.nan)
+        dummy_arr= np.full((3, self._config["input_shape"][0]), np.nan)
+        
         
         # Filling of dummy array. All rows and all columns of real data. Rest remains np.nan.  
         print('Dummy arr shape', dummy_arr.shape)
@@ -1034,7 +1034,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
         dummy_arr[:,0:arr.shape[1]] = arr
         
         #Preallocation of axis ranges, non occupied values remain 1                
-        dummy_axis_ranges= np.ones(int(np.ceil(self._config["input_shape"][0] / 2 + 1)))
+        #dummy_axis_ranges= np.ones(int(np.ceil(self._config["input_shape"][0] / 2 + 1)))
+        #dummy_axis_ranges= np.ones(self._config["input_shape"][0])
+        #Preallocation of axis range, non occupied values remain np.nan (#TODO: Check again if 1 is not better than np.nan)
+        dummy_axis_ranges= np.full(self._config["input_shape"][0], np.nan)
+
         dummy_axis_ranges[0:len(d_spacing_combined.axis_ranges[1])] = d_spacing_combined.axis_ranges[1]
         
         # Create the final result Dataset, when dynamic array allocation is not implemented
@@ -1048,6 +1052,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
         #        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit=d_spacing_combined.data_unit,
         #        data_label='d_spacing'
         #    )
-    
+        
+        print(30*"\N{banana}")
+        print('Resulting arr shape', result.shape)
+        print(result)
+        print(30*"\N{banana}")
+        
     
         return result

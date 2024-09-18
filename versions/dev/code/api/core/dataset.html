@@ -31,14 +31,14 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=fdd3a990"></script>
+    <script src="../../../_static/documentation_options.js?v=4487a728"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.06.05"';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.09.16"';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -485,19 +485,19 @@ properties:</p>
 <li><p>axis_units : The units of the axis ranges (in str format).</p></li>
 <li><p>axis_labels : The descriptive labels for all array axes (in str format).</p></li>
 <li><p>axis_ranges : The data values corresponding to the respective axes indices,
-given in form of 1-d arrays.</p></li>
+given in form of 1-d np.ndarrays, lists or tuples. All axis_ranges values
+will be internally converted to np.ndarrays. The axis_ranges keys are
+integers corresponding to the axis indices.</p></li>
 <li><p>data_unit : The unit for the data values (in str format).</p></li>
 <li><p>data_label : The label for the data values (in str format).</p></li>
 </ul>
-<p>PLEASE NOTE:
-1.  While axis metadata is preserved during operations like reshaping or</p>
-<blockquote>
-<div><p>transposing, units are not automatically converted. The operator is responsible
+<p>PLEASE NOTE:</p>
+<ol class="arabic simple">
+<li><p>While axis metadata is preserved during operations like reshaping or
+transposing, units are not automatically converted. The operator is responsible
 for ensuring that the units are consistent.
 For example, if the data_unit is meters, Dataset**2 will still have the unit
-meters which must be updated in the calling function</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
+meters which must be updated in the calling function</p></li>
 <li><p>Metadata is <strong>not</strong> preserved when operating on two datasets. The second dataset
 will be interpreted as a numpy.ndarray and the metadata will be lost.</p></li>
 <li><p>The ndarray.base property of Datasets is never None because the Dataset class
@@ -518,8 +518,15 @@ For other numpy ufuncs, metadata preservation is not guaranteed.</p>
 <dt>axis_labels<span class="classifier">Union[dict, list, tuple], optional</span></dt><dd><p>The labels for the axes. The length must correspond to the array
 dimensions. The default is None.</p>
 </dd>
-<dt>axis_ranges<span class="classifier">Union[dict, list, tuple], optional</span></dt><dd><p>The ranges for the axes. The length must correspond to the array
-dimensions. The default is None.</p>
+<dt>axis_ranges<span class="classifier">Union[list, tuple, dict[int, Union[np.ndarray, list, tuple]]], optional</span></dt><dd><p>The ranges for the axes. If a dictionary is provided, the keys must
+correspond to the axis indices, and the values must be sequences
+(e.g., np.ndarray, list , or tuple ) with lengths matching the
+dimension of the array. The length of each sequence must correspond
+to the array dimension for that axis. Empty axis_ranges (e.g. None)
+will be converted to indices. The default is None.</p>
+</dd>
+<dt>axis_ranges<span class="classifier">Union[dict[int, Sequence], list, tuple], optional</span></dt><dd><p>The ranges for the axes. The length for each range must correspond
+to the array dimensions. The default is None.</p>
 </dd>
 <dt>axis_units<span class="classifier">Union[dict, list, tuple], optional</span></dt><dd><p>The units for the axes. The length must correspond to the array
 dimensions. The default is None.</p>
@@ -1234,7 +1241,7 @@ data and not only a view to prevent inconsistent metadata.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     <br/>
   </p>
 </div>

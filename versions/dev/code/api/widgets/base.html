@@ -31,14 +31,14 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=fdd3a990"></script>
+    <script src="../../../_static/documentation_options.js?v=4487a728"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.06.05"';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.09.16"';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -480,13 +480,6 @@ document.write(`
 <p>Package with modified widgets required for creating the pydidas graphical user
 interface.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.widgets.BlockUpdates">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">BlockUpdates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">caller</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.BlockUpdates" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to block UI updates from a QWidget.</p>
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">CreateWidgetsMixIn</span></span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -840,14 +833,15 @@ methods.</p>
 <span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">get_pyqt_icon_from_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QIcon</span></span></span><a class="headerlink" href="#pydidas.widgets.get_pyqt_icon_from_str" title="Link to this definition">#</a></dt>
 <dd><p>Get a QIcon from the reference string.</p>
 <dl class="simple">
-<dt>Four types of strings can be processsed:</dt><dd><ol class="arabic simple">
-<li><p>References to a qtawesome icon. The reference must be preceeded
-by ‘qta::’.</p></li>
-<li><p>A reference number of a QStandardIcon, preceeded by a ‘qt-std::’.</p></li>
-<li><p>A reference to a image file in the file system. This must be
-preceeded by ‘path::’.</p></li>
-<li><p>A reference to a icon in pydidas.core.icons with the filename preceded
+<dt>Four types of strings can be processed:</dt><dd><ol class="arabic simple">
+<li><p>A reference number of a QStandardIcon, preceded by a ‘qt-std::’.</p></li>
+<li><p>A reference to an image file in the file system. This must be
+preceded by ‘path::’.</p></li>
+<li><p>A reference to an icon in pydidas.core.icons with the filename preceded
 by a ‘pydidas::’</p></li>
+<li><p>A reference to a mdi icon with the filename preceded by a ‘mdi::’
+Note that this only works for those mdi icons which have been included
+in pydidas.</p></li>
 </ol>
 </dd>
 </dl>
@@ -856,7 +850,7 @@ by a ‘pydidas::’</p></li>
 <dd class="field-odd"><p><strong>ref_string</strong> (<em>str</em>) – The reference string for the icon.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>TypeError</strong> – If no correct preceeding type has been found.</p>
+<dd class="field-even"><p><strong>TypeError</strong> – If no correct preceding type has been found.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The icon</p>
@@ -869,7 +863,7 @@ by a ‘pydidas::’</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.widgets.update_param_and_widget_choices">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">update_param_and_widget_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_widget</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_choices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.update_param_and_widget_choices" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">update_param_and_widget_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.update_param_and_widget_choices" title="Link to this definition">#</a></dt>
 <dd><p>Update the choices for the given Parameter and in its widget.</p>
 <p>This function will update the choices and also set the combo box widget to an
 allowed choice.</p>
@@ -931,7 +925,6 @@ allowed choice.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.BlockUpdates"><code class="docutils literal notranslate"><span class="pre">BlockUpdates</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.add_any_widget"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.add_any_widget</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_any_widget"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_any_widget</span></code></a></li>
@@ -1021,7 +1014,7 @@ allowed choice.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     <br/>
   </p>
 </div>

@@ -31,14 +31,14 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=fdd3a990"></script>
+    <script src="../../../_static/documentation_options.js?v=4487a728"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.06.05"';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.09.16"';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -556,7 +556,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f3b268f3950&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f46f0b81e90&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -908,6 +908,34 @@ to import / export.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>new_parent</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#pydidas.workflow.GenericNode" title="pydidas.workflow.GenericNode"><em>pydidas.workflow.GenericNode</em></a><em>, </em><em>None</em><em>]</em>) – The new parent of the node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.workflow.GenericNode.children">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">children</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.workflow.GenericNode.children" title="Link to this definition">#</a></dt>
+<dd><p>Get the list of children.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of children.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.workflow.GenericNode.children_ids">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">children_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.workflow.GenericNode.children_ids" title="Link to this definition">#</a></dt>
+<dd><p>Get the list of children IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of children IDs.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[int]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1959,7 +1987,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f3b268f3950&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f46f0b81e90&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -2453,6 +2481,8 @@ processing has been started and the old information is no longer valid.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode"><code class="docutils literal notranslate"><span class="pre">GenericNode</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode.add_child"><code class="docutils literal notranslate"><span class="pre">GenericNode.add_child</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode.change_node_parent"><code class="docutils literal notranslate"><span class="pre">GenericNode.change_node_parent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode.children"><code class="docutils literal notranslate"><span class="pre">GenericNode.children</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode.children_ids"><code class="docutils literal notranslate"><span class="pre">GenericNode.children_ids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode.connect_parent_to_children"><code class="docutils literal notranslate"><span class="pre">GenericNode.connect_parent_to_children</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode.copy"><code class="docutils literal notranslate"><span class="pre">GenericNode.copy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode.deepcopy"><code class="docutils literal notranslate"><span class="pre">GenericNode.deepcopy</span></code></a></li>
@@ -2625,7 +2655,7 @@ processing has been started and the old information is no longer valid.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     <br/>
   </p>
 </div>

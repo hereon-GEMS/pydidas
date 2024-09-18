@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the DefineScanFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -220,7 +220,7 @@ class DefineScanFrameBuilder:
                 SquareButton,
                 alignment=constants.ALIGN_BOTTOM_RIGHT,
                 gridPos=(_row, 2, 1, 1),
-                icon=get_pyqt_icon_from_str("qta::fa.chevron-up"),
+                icon=get_pyqt_icon_from_str("mdi::chevron-up"),
                 parent_widget=_parent,
             )
             frame.create_any_widget(
@@ -228,7 +228,7 @@ class DefineScanFrameBuilder:
                 SquareButton,
                 alignment=constants.ALIGN_BOTTOM_RIGHT,
                 gridPos=(_row, 3, 1, 1),
-                icon=get_pyqt_icon_from_str("qta::fa.chevron-down"),
+                icon=get_pyqt_icon_from_str("mdi::chevron-down"),
                 parent_widget=_parent,
             )
             for basename in _param_names:

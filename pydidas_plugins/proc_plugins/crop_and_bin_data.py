@@ -48,12 +48,7 @@ class CropAndBinImage(ProcPlugin):
     input_data_dim = 2
     output_data_dim = 2
     default_params = get_generic_param_collection(
-        "use_roi",
-        "roi_xlow",
-        "roi_xhigh",
-        "roi_ylow",
-        "roi_yhigh",
-        "binning",
+        "use_roi", "roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh", "binning"
     )
 
     def __init__(self, *args: tuple, **kwargs: dict):

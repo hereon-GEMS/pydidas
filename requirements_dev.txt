@@ -7,5 +7,5 @@ ipython>=8.20
 isort>=5.13.2
 GitPython>=3.1.43
 pip-tools>=7.4.1
-reuse>=2.1.0
+reuse>=4.0.3
 ruff>=0.5.1

@@ -71,7 +71,7 @@ class ImageMathFrame(BaseFrame):
     frames or to combine multiple frames.
     """
 
-    menu_icon = "pydidas::frame_icon_image_math.png"
+    menu_icon = "pydidas::frame_icon_image_math"
     menu_title = "Image math"
     menu_entry = "Image math"
 

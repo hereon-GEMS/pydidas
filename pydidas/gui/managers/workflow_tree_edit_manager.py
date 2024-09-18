@@ -85,9 +85,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.__qtapp.sig_font_size_changed.connect(self.__app_font_changed)
             self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
             self.__app_font_changed()
-        PLUGIN_COLLECTION.sig_updated_plugins.connect(
-            self.__delete_all_nodes_and_widgets
-        )
+        PLUGIN_COLLECTION.sig_updated_plugins.connect(self.__delete_all_items)
 
     def update_qt_canvas(self, qt_canvas: Optional[QtWidgets.QWidget] = None):
         """
@@ -127,7 +125,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         by the name. An optional title can be used as name for the plugin
         widget but the title will be determined automatically from the plugin
         name if not selected.
-        New plugins will always be created as children of the active plugin,
+        New plugins will always be created as children of the active plugin
         and it is the users responsibility to select the correct parent
         prior to calling this method or to use the parent_node_id keyword.
 
@@ -138,7 +136,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         title : str, optional
             The title of the plugin widget. If no title is given, this will default
             to the widget name. The default is an empty string.
-        parent_node_id : Union[int, None], optional
+        parent_node : Union[int, None], optional
             The id of the parent node, if given. If None, this will default to the
             WorkflowTree's active node.
 
@@ -242,6 +240,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         TREE.active_node_id = node_id
         self.sig_plugin_selected.emit(node_id)
         self.sig_plugin_class_selected.emit(TREE.active_node.plugin.plugin_name)
+        QtCore.QTimer.singleShot(20, QtWidgets.QApplication.instance().processEvents)
 
     @QtCore.Slot(str)
     def replace_plugin(self, plugin_name: str):
@@ -364,7 +363,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             Flag to toggle resetting the active node. After loading a
             WorkflowTree from file, this can be used to reset the selection.
         """
-        self.__delete_all_nodes_and_widgets()
+        self.__delete_all_items()
         for _node_id, _node in TREE.nodes.items():
             _name = _node.plugin.plugin_name
             _label = _node.plugin.get_param_value("label")
@@ -387,13 +386,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.sig_consistent_plugins.emit(_consistent)
         self.sig_inconsistent_plugins.emit(_inconsistent)
 
-    def __delete_all_nodes_and_widgets(self):
+    @QtCore.Slot()
+    def __delete_all_items(self):
         """
-        Delete all nodes and widgets from the Tree to prepare loading a
-        new workflow.
+        Delete all managed items.
+
+        This includes all nodes and widgets.
         """
         _all_ids = list(self._node_widgets.keys())
-        self.__delete_nodes_and_widgets(*_all_ids)
+        self.__delete_widgets(*_all_ids)
+        self.__delete_references(*_all_ids)
 
     @QtCore.Slot(int)
     def delete_branch(self, node_id: int):
@@ -410,10 +412,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The node_id if the node to be deleted.
         """
         _ids = TREE.nodes[node_id].get_recursive_ids()
-        _branch_ids = [_id for _id in _ids if _id != node_id]
         TREE.delete_node_by_id(node_id)
         self._nodes[node_id].delete_node_references()
-        self.__delete_nodes_and_widgets(*_ids)
+        self.__delete_widgets(*[_id for _id in _ids if _id != node_id])
+        self.__delete_references(*_ids)
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
@@ -440,7 +442,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             elif self.root.n_children == 1:
                 self.root = self.root.get_children()[0]
         self._nodes[node_id].connect_parent_to_children()
-        self.__delete_nodes_and_widgets(node_id)
+        self.__delete_references(node_id)
         TREE.delete_node_by_id(node_id, keep_children=True, recursive=False)
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
@@ -449,23 +451,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.sig_plugin_selected.emit(-1)
         self._check_consistency()
 
-    def __delete_nodes_and_widgets(self, *ids: Iterable[int]):
+    def __delete_references(self, *node_ids: Iterable[int]):
         """
-        Delete all nodes and widgets with corresponding IDs from the manager.
+        Delete the references for all specified managed nodes.
 
         Parameters
         ----------
-        *ids : Iterable[int]
-            All integer widget/node IDs in any Iterable datatype.
+        node_ids : Iterable[int]
+            The list of node_ids to be dereferenced.
         """
-        for _id in ids:
-            self.sig_consistent_plugins.disconnect(
-                self._node_widgets[_id].receive_consistent_signal
-            )
-            self.sig_inconsistent_plugins.disconnect(
-                self._node_widgets[_id].receive_inconsistent_signal
-            )
-            self._node_widgets[_id].deleteLater()
+        for _id in node_ids:
             del self._nodes[_id]
             del self._node_widgets[_id]
             del self._node_positions[_id]
@@ -473,6 +468,20 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.root = None
             if self.qt_canvas is not None:
                 self.qt_canvas.update_widget_connections([])
+
+    def __delete_widgets(self, *node_ids: Iterable[int]):
+        """
+        Disconnect and delete all widgets with corresponding IDs from the manager.
+
+        Parameters
+        ----------
+        *node_ids : Iterable[int]
+            All integer widget/node IDs in any Iterable datatype.
+        """
+        for _id in node_ids:
+            if _id in self._node_widgets:
+                self._node_widgets[_id].disconnect()
+                self._node_widgets[_id].deleteLater()
 
     @QtCore.Slot()
     def __app_font_changed(self):

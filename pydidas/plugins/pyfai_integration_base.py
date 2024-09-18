@@ -166,7 +166,7 @@ class pyFAIintegrationBase(ProcPlugin):
             _method = _method + ((_platform.id, _device),)
             self._config["method"] = _method
 
-    def calculate_result_shape(self) -> Union[int, tuple[int, int]]:
+    def calculate_result_shape(self):
         """
         Get the shape of the integrated dataset to set up the CRS / LUT.
 

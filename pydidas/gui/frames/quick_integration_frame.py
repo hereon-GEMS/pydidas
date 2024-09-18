@@ -61,7 +61,7 @@ class QuickIntegrationFrame(BaseFrame):
     defining Scan, DiffractionExperiment and Workflow.
     """
 
-    menu_icon = "pydidas::frame_icon_quick_integration.png"
+    menu_icon = "pydidas::frame_icon_quick_integration"
     menu_title = "Quick integration"
     menu_entry = "Quick integration"
     default_params = get_generic_param_collection(

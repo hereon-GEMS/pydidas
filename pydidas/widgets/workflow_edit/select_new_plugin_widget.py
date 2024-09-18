@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The SelectNewPluginWidget class allows to browse through all registered plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -67,7 +67,7 @@ class SelectNewPluginWidget(CreateWidgetsMixIn, EmptyWidget):
         self.add_any_widget(
             "filter_edit",
             LineEditWithIcon(
-                icon="qta::fa5s.search", placeholderText="Search filter..."
+                icon="pydidas::generic_search", placeholderText="Search filter..."
             ),
             gridPos=(0, 0, 1, 1),
         )

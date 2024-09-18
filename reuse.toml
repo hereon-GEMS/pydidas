@@ -1,0 +1,119 @@
+# SPDX-FileCopyrightText: 2024, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC0-1.0
+
+version = 1
+
+[[annotations]]
+path = [
+    ".pre-commit-config.yaml",
+    "requirements.txt",
+    "pydidas/docs/make.bat",
+    "pydidas/docs/Makefile",
+    "pydidas/docs/src/_static/_css/pydidas-custom.css",
+    "tests/_data/*",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 - 2024 Helmholtz-Zentrum Hereon"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = [
+    "pydidas/docs/src/**/*.png",
+    "pydidas/resources/icons/*",
+    "pydidas/resources/**/*.png",
+    "resources/**/*.png",
+    "resources/**/*.svg",
+    "resources/**/*.ico",
+    "resources/graphics_for_gui/*",
+    "resources/documentation/dev_guide/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 - 2024 Helmholtz-Zentrum Hereon"
+SPDX-License-Identifier = "CC-BY-ND-4.0"
+
+[[annotations]]
+path = [
+    "pydidas/resources/mdi_icons/account-cog.svg",
+    "pydidas/resources/mdi_icons/application-cog.svg",
+    "pydidas/resources/mdi_icons/application-cog-outline.svg",
+    "pydidas/resources/mdi_icons/arrow-bottom-left-thick.svg",
+    "pydidas/resources/mdi_icons/arrow-top-right-thick.svg",
+    "pydidas/resources/mdi_icons/comment-quote-outline.svg",
+    "pydidas/resources/mdi_icons/content-save-check-outline.svg",
+    "pydidas/resources/mdi_icons/folder-open-outline.svg",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Michael Irigoyen"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = [
+    "pydidas/resources/mdi_icons/apps-box.svg",
+    "pydidas/resources/mdi_icons/backup-restore.svg",
+    "pydidas/resources/mdi_icons/book-open-outline.svg",
+    "pydidas/resources/mdi_icons/chevron-down.svg",
+    "pydidas/resources/mdi_icons/chevron-up.svg",
+    "pydidas/resources/mdi_icons/delete-outline.svg",
+    "pydidas/resources/mdi_icons/folder-outline.svg",
+    "pydidas/resources/mdi_icons/history.svg",
+    "pydidas/resources/mdi_icons/home-outline.svg",
+    "pydidas/resources/mdi_icons/image-multiple-outline.svg",
+    "pydidas/resources/mdi_icons/information-outline.svg",
+    "pydidas/resources/mdi_icons/update.svg",
+    "pydidas/resources/mdi_icons/view-comfy.svg",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Google"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "pydidas/resources/mdi_icons/magnify-scan.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Sascha Wohlgemuth"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = [
+    "pydidas/resources/mdi_icons/arrow-left-circle.svg",
+    "pydidas/resources/mdi_icons/arrow-right-circle.svg",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Austin Andrews"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "pydidas/resources/mdi_icons/monitor-eye.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "MasksUr"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "pydidas/resources/mdi_icons/folder-upload-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Michael Richins"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "pydidas/resources/mdi_icons/wrench-cog.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Andrej Sharapov"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "pydidas/resources/mdi_icons/image-lock-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Simran"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "pydidas/resources/mdi_icons/image-sync-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Colton Wiscombe"
+SPDX-License-Identifier = "Apache-2.0"
+
+
+[[annotations]]
+path = "pydidas/resources/mdi_icons/trash-can-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = ""
+SPDX-License-Identifier = "Apache-2.0"

@@ -159,3 +159,13 @@ class PydidasPlot1D(Plot1D):
         self.setGraphTitle(_title)
         self.setGraphXLabel(self._plot_config["ax_label_x"])
         self.setGraphYLabel(self._plot_config["ax_label_y"])
+
+    def _activeItemChanged(self, type_):
+        """
+        Listen for active item changed signal and broadcast signal
+
+        :param item.ItemChangedType type_: The type of item change
+        """
+        if self.sender() == self._qtapp:
+            return
+        Plot1D._activeItemChanged(self, type_)

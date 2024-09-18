@@ -67,7 +67,7 @@ class DefineDiffractionExpFrame(BaseFrame):
     saving the DiffractionExperimentContext in the GUI.
     """
 
-    menu_icon = "pydidas::frame_icon_define_diffraction_exp.png"
+    menu_icon = "pydidas::frame_icon_define_diffraction_exp"
     menu_title = "Define diffraction setup"
     menu_entry = "Workflow processing/Define diffraction setup"
 

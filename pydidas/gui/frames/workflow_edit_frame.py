@@ -81,7 +81,7 @@ class WorkflowEditFrame(BaseFrame):
 
     menu_title = "Workflow editing"
     menu_entry = "Workflow processing/Workflow editing"
-    menu_icon = "pydidas::frame_icon_workflow_edit.png"
+    menu_icon = "pydidas::frame_icon_workflow_edit"
     sig_workflow_edit_frame_activated = QtCore.Signal()
 
     def __init__(self, **kwargs: dict):

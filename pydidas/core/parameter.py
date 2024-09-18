@@ -82,7 +82,7 @@ class Parameter:
     |            |           | This key is used for accessing the        |
     |            |           | Parameter in the ParameterCollection      |
     +------------+-----------+-------------------------------------------+
-    | datatype   | False     | The datatype of the Parameter value.      |
+    | dtype      | False     | The datatype of the Parameter value.      |
     |            |           | This must be a base class or None.        |
     |            |           | If None, no type-checking is performed.   |
     +------------+-----------+-------------------------------------------+

@@ -85,7 +85,11 @@ class ParameterWidget(EmptyWidget):
         self.__store_config_from_kwargs(kwargs)
         self.__store_layout_args_for_widgets()
 
-        if self.param.choices is None or set(self.param.choices) != {True, False}:
+        if self.param.choices is None or set(self.param.choices) not in [
+            {True, False},
+            {True},
+            {False},
+        ]:
             self.__create_name_widget()
         self.__create_param_io_widget()
         if self._config["width_unit"] > 0:
@@ -196,7 +200,7 @@ class ParameterWidget(EmptyWidget):
         if self.param.choices:
             _class = (
                 ParamIoWidgetCheckBox
-                if set(self.param.choices) == {True, False}
+                if set(self.param.choices) in [{True, False}, {True}, {False}]
                 else ParamIoWidgetComboBox
             )
             _widget = _class(self.param, **kwargs)

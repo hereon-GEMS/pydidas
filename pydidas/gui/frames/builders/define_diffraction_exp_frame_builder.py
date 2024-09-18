@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ populate the DefineDiffractionExpFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -85,7 +85,7 @@ class DefineDiffractionExpFrameBuilder:
         frame.create_button(
             "but_copy_from_pyfai",
             "Copy experimental parameters from calibration",
-            icon=get_pyqt_icon_from_str("qta::fa.copy"),
+            icon=get_pyqt_icon_from_str("pydidas::generic_copy"),
             parent_widget=frame._widgets["config"],
         )
 

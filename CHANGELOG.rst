@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v24.XX.YY
+v24.09.16
 =========
 
 Improvements
@@ -21,6 +21,7 @@ Improvements
   for older versions.
 - Added support for images with non-uniform axes.
 - Added a new plugin to convert integration results to d-spacing.
+- Removed dependency of qtawesome to circumvent issues with fonts in Windows.
 
 Bugfixes
 --------
@@ -37,6 +38,20 @@ Bugfixes
 - Fixed an issue with fit plugins which would not forward the result units in 
   the WorkflowTestFrame on repeated calls.
 - Fixed a bug in histogram calculations with high outliers.
+- Fixed a bug where qtawesome would hand with access issues to fonts on Windows
+  systems.
+- Fixed an issue with silx plot widgets when changing the font size through
+  PydidasQApplication.
+- Fixed an issue with the restored window size after closing pydidas.
+- Fixed an issue with the display of Parameter choices in the GUI when 
+  Parameters only allowed True or False.
+- Fixed an issue with sphinx (version >7) which changed built-in types when 
+  running in the same process as the main program.
+- Fixed an issue on linux where editing the WorkflowTree in the GUI caused a 
+  segmentation fault.
+- Fixed an issue in generic_node.connect_parents_to_children method.
+- Fixed an issue when trying to open illegible hdf5 files in DataBrowsingFrame
+
 
 
 v24.06.05

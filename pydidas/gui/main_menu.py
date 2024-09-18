@@ -32,14 +32,14 @@ import os
 import sys
 from functools import partial
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import yaml
 from qtpy import QtCore, QtGui, QtWidgets
 
 from ..contexts import GLOBAL_CONTEXTS
 from ..core import PydidasQsettingsMixin, UserConfigError
-from ..core.constants import PYDIDAS_STANDARD_CONFIG_PATH
+from ..core.constants import MAIN_MENU_MENU_ACTIONS, PYDIDAS_STANDARD_CONFIG_PATH
 from ..core.utils import (
     DOC_HOME_QURL,
     doc_filename_for_frame_manual,
@@ -47,7 +47,7 @@ from ..core.utils import (
 )
 from ..resources import icons
 from ..version import VERSION
-from ..widgets import PydidasFileDialog
+from ..widgets import PydidasFileDialog, get_pyqt_icon_from_str
 from ..widgets.dialogues import AcknowledgeBox, QuestionBox, critical_warning
 from ..widgets.framework import PydidasFrameStack
 from ..widgets.windows import (
@@ -78,7 +78,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
     ----------
     parent : QtWidgets.QWidget, optional
         The widget's parent. The default is None.
-    geometry : Union[tuple, list, None], optional
+    geometry : Union[tuple, list, QtCore.QRect], optional
         The geometry as a 4-tuple or list. The entries are the top left
         corner coordinates (x0, y0) and width and height. If None, the
         default values will be used. The default is None.
@@ -89,7 +89,11 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
     sig_close_main_window = QtCore.Signal()
 
-    def __init__(self, parent=None, geometry=None):
+    def __init__(
+        self,
+        parent: Optional[QtWidgets.QWidget] = None,
+        geometry: Union[QtCore.QRect, list, tuple] = None,
+    ):
         QtWidgets.QMainWindow.__init__(self, parent)
         PydidasQsettingsMixin.__init__(self)
         sys.excepthook = gui_excepthook
@@ -111,19 +115,21 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _app.aboutToQuit.connect(self.centralWidget().reset)
         self.sig_close_main_window.connect(_app.send_gui_close_signal)
 
-    def _setup_main_window_widget(self, geometry):
+    def _setup_main_window_widget(self, geometry: Union[QtCore.QRect, list, tuple]):
         """
-        Set up the user interface.
+        Set up the main widget.
 
         Parameters
         ----------
-        geometry : Union[tuple, list, None], optional
+        geometry : Union[QtCore.QRect, tuple, list, None], optional
             The geometry as a 4-tuple or list. The entries are the top left
             corner coordinates (x0, y0) and width and height. If None, the
             default values will be used. The default is None.
         """
         if isinstance(geometry, (tuple, list)) and len(geometry) == 4:
             self.setGeometry(*geometry)
+        elif isinstance(geometry, QtCore.QRect):
+            self.setGeometry(geometry)
         else:
             self.setGeometry(40, 60, 1400, 1000)
         self.setCentralWidget(PydidasFrameStack())
@@ -134,8 +140,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
     def _add_config_windows(self):
         """
-        Add the required widgets and signals for the global configuration
-        window and create it.
+        Add the required widgets and signals for the global configuration window.
         """
         _frame = GlobalSettingsWindow()
         _frame.frame_activated(_frame.frame_index)
@@ -154,74 +159,20 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
     def _create_menu_actions(self):
         """
-        Create all required actions for the menu entries and store them in the
-        internal _actions dictionary.
+        Create all required actions for the menu entries and store them.
+
+        Actions are stored in the internal self._actions dictionary.
         """
-        store_state_action = QtWidgets.QAction("&Store GUI state", self)
-        store_state_action.setStatusTip(
-            "Store the current state of the graphical user interface including"
-            " all frame Parameters and App configurations. This action allows "
-            "users to store their state in the machines configuration for "
-            "loading it again at a later date."
-        )
-        self._actions["store_state"] = store_state_action
-
-        export_state_action = QtWidgets.QAction("&Export GUI state", self)
-        export_state_action.setStatusTip(
-            "Export the current state of the graphical user interface "
-            "to a user-defined file. This includes all frame Parameters and "
-            "App configurations."
-        )
-        self._actions["export_state"] = export_state_action
-
-        restore_state_action = QtWidgets.QAction("&Restore GUI state", self)
-        restore_state_action.setStatusTip(
-            "Restore the state of the graphical user interface from a "
-            "previously created snapshot."
-        )
-        self._actions["restore_state"] = restore_state_action
-
-        restore_state_action = QtWidgets.QAction("&Restore GUI state at exit", self)
-        restore_state_action.setStatusTip(
-            "Restore the state of the graphical user interface from the stored "
-            "information at the (correct) exit."
-        )
-        self._actions["restore_exit_state"] = restore_state_action
-
-        import_state_action = QtWidgets.QAction("&Import GUI state", self)
-        import_state_action.setStatusTip(
-            "Import the state of the graphical user interface from a "
-            "user-defined file."
-        )
-        self._actions["import_state"] = import_state_action
-
-        exit_action = QtWidgets.QAction(QtGui.QIcon("exit.png"), "E&xit", self)
-        exit_action.setStatusTip("Exit application")
-        self._actions["exit"] = exit_action
-
-        self._actions["open_settings"] = QtWidgets.QAction("&Settings", self)
-        self._actions["open_user_config"] = QtWidgets.QAction("&User config", self)
-
-        self._actions["tools_export_eiger_pixel_mask"] = QtWidgets.QAction(
-            "&Export Eiger pixel mask", self
-        )
-        self._actions["tools_image_series_ops"] = QtWidgets.QAction(
-            "&Image series processing", self
-        )
-        self._actions["tools_mask_editor"] = QtWidgets.QAction(
-            "Edit detector &mask", self
-        )
-        self._actions["tools_clear_local_logs"] = QtWidgets.QAction(
-            "&Clear local log files", self
-        )
-
-        self._actions["open_documentation_browser"] = QtWidgets.QAction(
-            "Open documentation in default web browser", self
-        )
-        self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
-        self._actions["open_paths"] = QtWidgets.QAction("Pydidas paths", self)
-        self._actions["check_for_update"] = QtWidgets.QAction("Check for update", self)
-        self._actions["open_feedback"] = QtWidgets.QAction("Open feedback form", self)
+        for _ref, _action_config in MAIN_MENU_MENU_ACTIONS.items():
+            _icon_name = _action_config.get("icon", None)
+            if _icon_name is not None:
+                _icon = get_pyqt_icon_from_str(_icon_name)
+                _action = QtWidgets.QAction(_icon, _action_config["label"], self)
+            else:
+                _action = QtWidgets.QAction(_action_config["label"], self)
+            if _action_config.get("status_tip", None) is not None:
+                _action.setStatusTip(_action_config["status_tip"])
+            self._actions[_ref] = _action
 
     def _connect_menu_actions(self):
         """
@@ -436,7 +387,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
                 self.q_settings_set("user/update_version_acknowledged", _remote_v)
 
     @QtCore.Slot(str)
-    def update_status(self, text):
+    def update_status(self, text: str):
         """
         Get a text message and show it in the global status widget.
 
@@ -454,7 +405,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self.__info_widget.add_status(text)
 
     @QtCore.Slot(str)
-    def show_window(self, name):
+    def show_window(self, name: str):
         """
         Show a separate window.
 
@@ -469,7 +420,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._child_windows[name].raise_()
 
     @QtCore.Slot(object)
-    def create_and_show_temp_window(self, window):
+    def create_and_show_temp_window(self, window: QtWidgets.QWidget):
         """
         Show the given temporary window.
 
@@ -487,7 +438,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._child_windows[_name].show()
 
     @QtCore.Slot(str)
-    def remove_window_from_children(self, name):
+    def remove_window_from_children(self, name: str):
         """
         Remove the specified window from the list of child window.
 
@@ -526,7 +477,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         with open(filename, "wt", encoding="UTF-8") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
 
-    def __get_window_states(self):
+    def __get_window_states(self) -> dict:
         """
         Get the states of the main window and all child windows for exporting.
 
@@ -543,7 +494,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _window_states["main"] = self.export_main_window_state()
         return _window_states
 
-    def export_main_window_state(self):
+    def export_main_window_state(self) -> dict:
         """
         Export the main window's state.
 
@@ -553,13 +504,15 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The state of the main window required to restore the look.
         """
         _app = QtWidgets.QApplication.instance()
-        return {
+        _state = {
             "geometry": self.geometry().getRect(),
+            "maximized": self.isMaximized(),
             "screen": _app.screens().index(self.window().windowHandle().screen()),
             "frame_index": self.centralWidget().currentIndex(),
         }
+        return _state
 
-    def restore_gui_state(self, state="saved", filename=None):
+    def restore_gui_state(self, state: str = "saved", filename: Optional[str] = None):
         """
         Restore the window states from saved information.
 
@@ -594,9 +547,10 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         if _state is None:
             return
         try:
-            self._restore_global_objects(_state)
-            self._restore_frame_states(_state)
-            self._restore_window_states(_state)
+            utils.restore_global_objects(_state)
+            self.restore_frame_states(_state)
+            self.restore_window_states(_state)
+            self.restore_main_window_state(_state.get("main", {}))
         except Exception as exc:
             if _state.get("pydidas_version", "0.0.0") != VERSION:
                 raise UserConfigError(
@@ -609,29 +563,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
                 f"The following error occurred: {exc}\n"
             )
 
-    @staticmethod
-    def _restore_global_objects(state):
+    def restore_window_states(self, state: dict):
         """
-        Get the states of pydidas's global objects (ScanContext,
-        DiffractionExperimentContext, WorkflowTree)
-
-        Parameters
-        ----------
-        state : dict
-            The restored global states which includes the states for the
-            global objects.
-        """
-        try:
-            TREE.restore_from_string(state["workflow_tree"])
-        except KeyError:
-            raise UserConfigError("Cannot import Workflow. Not all plugins found.")
-        for _contex_key, _context in GLOBAL_CONTEXTS.items():
-            for _key, _val in state[_contex_key].items():
-                _context.set_param_value(_key, _val)
-
-    def _restore_window_states(self, state):
-        """
-        Get the states of the main window and all child windows for exporting.
+        Get the states of the main's child windows for exporting.
 
         Returns
         -------
@@ -642,9 +576,8 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         for _key, _window in self._child_windows.items():
             if not _key.startswith("temp_window"):
                 _window.restore_window_state(state[_key])
-        self.restore_main_window_state(state["main"])
 
-    def restore_main_window_state(self, state):
+    def restore_main_window_state(self, state: dict):
         """
         Restore the main window's state from saved information.
 
@@ -656,18 +589,21 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _app = QtWidgets.QApplication.instance()
         _screens = _app.screens()
         _screen_no = state.get("screen", 0)
-        if _screen_no > len(_screens):
-            _screen_no = 0
-        _target_screen = _screens[_screen_no]
-        if _target_screen.availableGeometry().width() >= state["geometry"][0] - 50:
-            state["geometry"][0] = 40
+        _target_screen = _screens[_screen_no if _screen_no < len(_screens) else 0]
+        _target_screen_geo = _target_screen.availableGeometry()
+        if state["geometry"][0] + state["geometry"][2] > _target_screen_geo.width():
+            state["geometry"][2] = _target_screen_geo.width() - state["geometry"][0]
+        if state["geometry"][1] + state["geometry"][3] > _target_screen_geo.height():
+            state["geometry"][3] = _target_screen_geo.height() - state["geometry"][1]
         self.setGeometry(*state["geometry"])
+        if state["maximized"]:
+            self.setWindowState(QtCore.Qt.WindowMaximized)
         _frame_index = state["frame_index"]
         if _frame_index >= 0:
             self.centralWidget().setCurrentIndex(_frame_index)
         self.setScreen(_target_screen)
 
-    def _restore_frame_states(self, state):
+    def restore_frame_states(self, state: dict):
         """
         Restore the states of all the frames in the PydidasFrameStack.
 
@@ -717,7 +653,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
                 pass
         super().deleteLater()
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtCore.QEvent):
         """
         Handle the Qt closeEvent.
 

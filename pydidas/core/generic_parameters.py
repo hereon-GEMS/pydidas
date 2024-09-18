@@ -65,12 +65,13 @@ def get_generic_parameter(refkey: str) -> Parameter:
             f'No Parameter with the reference key "{refkey}" '
             "in the GENERIC_PARAM_DESCRIPTION collection."
         ) from _ke
-    if _config["type"] == "Path":
-        _config["type"] = Path
-        _config["default"] = Path(_config["default"])
-    if _config["type"] == "Hdf5key":
-        _config["type"] = Hdf5key
-        _config["default"] = Hdf5key(_config["default"])
+    match _config["type"]:
+        case "Path":
+            _config["type"] = Path
+            _config["default"] = Path(_config["default"])
+        case "Hdf5key":
+            _config["type"] = Hdf5key
+            _config["default"] = Hdf5key(_config["default"])
     _type = _config.pop("type")
     _default = _config.pop("default")
     return Parameter(refkey, _type, _default, **_config)

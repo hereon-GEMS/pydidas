@@ -81,10 +81,6 @@ Data display
 The data display widget is shown on the right with the default 2D image view for
 multi-dimensional data.
 
-.. image:: images/data_browse/display.png
-    :align: right
-    :width: 400px
-
 Key elements are:
 
   - The filename display at the top:  This widget shows the full path of the opened file.
@@ -95,6 +91,11 @@ Key elements are:
     select a two-dimensional slice for visualization.
   - The display modality selection: Select how to display the data.
 
+
+.. image:: images/data_browse/display.png
+    :align: right
+    :width: 300px
+
 Details for all elements are given below.
 
 .. note::
@@ -102,6 +103,9 @@ Details for all elements are given below.
     The data display cannot process any metadata like axis labels or ranges. Only
     the raw data is displayed and only indices can be used to select.
 
+|
+|
+|
 
 The hdf5 data selection widget
 """"""""""""""""""""""""""""""

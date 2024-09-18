@@ -47,8 +47,9 @@ _METHOD_TAKES_NO_DTYPE = ["max", "min"]
 class TestDataset(unittest.TestCase):
     def setUp(self):
         self._axis_labels = ["axis0", "axis1"]
-        self._axis_ranges = [1, 10]
+        self._axis_ranges = [1, [5, 10]]
         self._axis_units = {0: "m", 1: "rad"}
+        self._3x10_axis_ranges = [np.arange(10), 10 - np.arange(10), 3 * np.arange(10)]
 
     def tearDown(self): ...
 
@@ -615,13 +616,17 @@ class TestDataset(unittest.TestCase):
 
     def test_axis_ranges_property(self):
         obj = self.create_simple_dataset()
-        self.assertEqual(obj.axis_ranges, self.get_dict("_axis_ranges"))
+        _ranges_ref = self.get_dict("_axis_ranges")
+        for _dim in range(obj.ndim):
+            self.assertTrue(np.allclose(_ranges_ref[_dim], obj.axis_ranges[_dim]))
 
     def test_axis_ranges_property__modify_copy(self):
         obj = self.create_simple_dataset()
         _ranges = obj.axis_ranges
         _ranges[0] = 2 * _ranges[0] - 5
-        self.assertEqual(obj.axis_ranges, self.get_dict("_axis_ranges"))
+        _ranges_ref = self.get_dict("_axis_ranges")
+        for _dim in range(obj.ndim):
+            self.assertTrue(np.allclose(_ranges_ref[_dim], obj.axis_ranges[_dim]))
 
     def test_set_axis_str_property(self):
         obj = self.create_simple_dataset()
@@ -631,11 +636,12 @@ class TestDataset(unittest.TestCase):
                 setattr(obj, _method_name, _newkeys)
                 self.assertEqual(getattr(obj, _method_name), dict(enumerate(_newkeys)))
 
-    def test_set_axis_ranges_property__single_keys(self):
+    def test_set_axis_ranges_property__w_single_key(self):
         obj = self.create_simple_dataset()
-        _newkeys = [123, 456]
+        _newkeys = [123, [234, 456]]
         obj.axis_ranges = _newkeys
-        self.assertEqual(obj.axis_ranges, dict(enumerate(_newkeys)))
+        for _dim, _val in obj.axis_ranges.items():
+            self.assertTrue(np.allclose(_val, np.asarray(_newkeys[_dim])))
 
     def test_set_axis_ranges_property__w_none(self):
         obj = Dataset(np.random.random((20, 20)), axis_ranges=[None, np.arange(20)])
@@ -697,7 +703,7 @@ class TestDataset(unittest.TestCase):
 
     def test_update_axis_range__single_val(self):
         _val = 12
-        obj = self.create_large_dataset()
+        obj = Dataset(np.random.random((10, 1, 10)))
         obj.update_axis_range(1, _val)
         self.assertEqual(obj.axis_ranges[1], _val)
 
@@ -766,7 +772,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(
             _array,
             axis_labels=self._axis_labels,
-            axis_ranges=self._axis_ranges,
+            axis_ranges=[np.arange(10), 10 - np.arange(10)],
             axis_units=self._axis_units,
             metadata={},
         )
@@ -778,14 +784,14 @@ class TestDataset(unittest.TestCase):
 
     def test_dataset_creation__with_axis_ranges_property_single_values(self):
         _array = np.random.random((10, 10))
-        obj = Dataset(
-            _array,
-            axis_labels=self._axis_labels,
-            axis_ranges=self._axis_ranges,
-            axis_units=self._axis_units,
-            metadata={},
-        )
-        self.assertIsInstance(obj, Dataset)
+        with self.assertRaises(PydidasConfigError):
+            Dataset(
+                _array,
+                axis_labels=self._axis_labels,
+                axis_ranges=[np.arange(10)],
+                axis_units=self._axis_units,
+                metadata={},
+            )
 
     def test_dataset_creation__with_axis_ranges_property_ndarrays_of_correct_len(self):
         _array = np.random.random((10, 10))
@@ -868,7 +874,7 @@ class TestDataset(unittest.TestCase):
 
     def test_copy_dataset(self):
         _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array, axis_ranges=[0, 1, 2])
+        obj = Dataset(_array, axis_ranges=self._3x10_axis_ranges)
         obj.metadata = {"test": "something"}
         obj2 = copy.copy(obj)
         for _key, _item in obj2.__dict__.items():
@@ -881,14 +887,17 @@ class TestDataset(unittest.TestCase):
 
     def test_copy_dataset__update_ax_label(self):
         _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array, axis_ranges=[0, 1, 2], axis_labels=["a", "b", "c"])
+        obj = Dataset(
+            _array, axis_ranges=self._3x10_axis_ranges, axis_labels=["a", "b", "c"]
+        )
         obj2 = obj.copy()
         obj2.update_axis_label(2, "new")
         self.assertEqual(obj.axis_labels[2], "c")
 
     def test_hash(self):
-        obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])
-        obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])
+        _ranges = [np.arange(10), 12 - np.arange(10), 3 * np.arange(10) ** 2]
+        obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
+        obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
         self.assertIsInstance(hash(obj), int)
         self.assertNotEqual(hash(obj), hash(obj2))
 
@@ -1336,40 +1345,6 @@ class TestDataset(unittest.TestCase):
                 obj.sort(axis=None)
                 self.assertTrue(np.all(np.diff(obj) >= 0))
                 self.assertEqual(obj.shape, (obj.size,))
-
-    def test_is_axis_nonlinear__simple(self):
-        obj = self.create_large_dataset()
-        for _ax in range(obj.ndim):
-            self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__falling_numbers(self):
-        obj = self.create_large_dataset()
-        obj = obj[::-1, :, ::-1]
-        for _ax in range(obj.ndim):
-            self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__linear_w_jitter(self):
-        obj = self.create_large_dataset()
-        for _level in [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]:
-            with self.subTest(jitter_level=_level):
-                obj.update_axis_range(
-                    1, np.arange(obj.shape[1]) + _level * np.random.random(obj.shape[1])
-                )
-            self.assertEqual(obj.is_axis_nonlinear(1), _level > 1e-4)
-            for _ax in [0, 2, 3]:
-                self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__inverse_func(self):
-        obj = self.create_large_dataset()
-        obj.update_axis_range(1, 1 / (1 + obj.axis_ranges[1]))
-        for _ax in range(obj.ndim):
-            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
-
-    def test_is_axis_nonlinear__sine_func(self):
-        obj = self.create_large_dataset()
-        obj.update_axis_range(1, np.sin(np.arange(obj.shape[1])))
-        for _ax in range(obj.ndim):
-            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
 
     def test_is_axis_nonlinear__simple(self):
         obj = self.create_large_dataset()

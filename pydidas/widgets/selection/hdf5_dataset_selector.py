@@ -270,14 +270,22 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
             The full file system path to the new file.
         """
         _filename = Path(filename)
-        if (not _filename.is_file()) or filename == self._config["current_filename"]:
-            return
         _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
+        if (not _filename.is_file()) or filename == self._config["current_filename"]:
+            return
         self._config["current_filename"] = filename if _is_hdf5 else ""
         self._config["current_dataset"] = ""
         if _is_hdf5:
             self.__populate_dataset_list()
+
+    def clear(self):
+        """
+        Clear all entries for the widget.
+        """
+        self.setVisible(False)
+        self._config["current_dataset"] = ""
+        self._config["current_filename"] = ""
 
     def _toggle_details(self):
         """

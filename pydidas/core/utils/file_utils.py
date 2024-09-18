@@ -84,6 +84,8 @@ def get_extension(path: Union[Path, str], lowercase=False) -> str:
     str
         The extracted file extension.
     """
+    if path is None:
+        return ""
     if isinstance(path, str):
         path = Path(path)
     _ext = path.suffix
@@ -213,15 +215,24 @@ class CatchFileErrors:
         The filename of the file to be handled.
     *additional_exceptions : tuple
         Additional exception types to be handled.
+    raise_file_read_error : bool, optional
+        Flag to raise the FileReadError exception. The default is True.
     """
 
-    def __init__(self, filename: Union[Path, str], *additional_exceptions: tuple):
+    def __init__(
+        self,
+        filename: Union[Path, str],
+        *additional_exceptions: tuple,
+        raise_file_read_error=True,
+    ):
         self._exceptions = additional_exceptions + (
             ValueError,
             FileNotFoundError,
             OSError,
         )
         self._filename = str(filename)
+        self._raised_exception = False
+        self._raise_file_read_error = raise_file_read_error
 
     def __enter__(self):
         """
@@ -229,21 +240,59 @@ class CatchFileErrors:
 
         The CatchFileErrors has an empty __enter__ method.
         """
+        return self
 
     def __exit__(self, ex_type, ex_value, traceback):
         """
         Check the exception type and raise it as FileReadError.
         """
+        self._raised_exception = ex_type is not None
         if ex_type is None:
+            self._exception_msg = ""
             return
         if issubclass(ex_type, self._exceptions):
             _index = 1 if isinstance(ex_value.args[0], Integral) else 0
             if len(self._filename) > 60:
-                self._filename = "[...]" + self._filename[-55:]
-            _msg = (
-                ex_type.__class__.__name__
-                + ": "
-                + ex_value.args[_index]
-                + f"\n\nFilename: {self._filename}"
+                self._filename = "[...]" + self._filename[-50:]
+            _ex_repr = ex_value.args[_index].replace('"', "`").replace("'", "`")
+            self._exception_msg = (
+                ex_type.__name__ + ": " + _ex_repr + f"\n\nFilename: {self._filename}"
             )
-            raise FileReadError(_msg)
+            if self._raise_file_read_error:
+                raise FileReadError(self._exception_msg)
+            return True
+
+    def __call__(self):
+        """
+        Get the raised exception status.
+
+        Returns
+        -------
+        bool
+            The status of the raised exception.
+        """
+        return self._raised_exception
+
+    @property
+    def raised_exception(self) -> bool:
+        """
+        Get the raised exception status.
+
+        Returns
+        -------
+        bool
+            The status of the raised exception.
+        """
+        return self()
+
+    @property
+    def exception_message(self) -> str:
+        """
+        Get the exception message.
+
+        Returns
+        -------
+        str
+            The exception message.
+        """
+        return self._exception_msg

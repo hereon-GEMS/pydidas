@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DataBrowsingFrame"]
 
+from pathlib import Path
 from typing import Union
 
 import h5py
@@ -41,7 +42,8 @@ from pydidas_qtcore import PydidasQApplication
 
 from ...core import Dataset
 from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
-from ...core.utils import get_extension
+from ...core.exceptions import FileReadError
+from ...core.utils import CatchFileErrors, get_extension
 from ...data_io import IoMaster, import_data
 from ...widgets.framework import BaseFrame
 from ...widgets.windows import Hdf5BrowserWindow
@@ -57,7 +59,7 @@ class DataBrowsingFrame(BaseFrame):
     through datasets.
     """
 
-    menu_icon = "qta::mdi.image-search-outline"
+    menu_icon = "pydidas::frame_icon_data_browsing"
     menu_title = "Data browsing"
     menu_entry = "Data browsing"
 
@@ -78,9 +80,6 @@ class DataBrowsingFrame(BaseFrame):
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         self._widgets["explorer"].sig_new_file_selected.connect(
             self._widgets["raw_metadata_selector"].new_filename
-        )
-        self._widgets["explorer"].sig_new_file_selected.connect(
-            self._widgets["hdf5_dataset_selector"].new_filename
         )
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
@@ -134,19 +133,45 @@ class DataBrowsingFrame(BaseFrame):
             return
         if self.__browser_window is not None:
             self.__browser_window.hide()
+        self.__check_for_and_process_hdf5_file(filename)
         self.__current_filename = filename
         self._widgets["filename"].setText(self.__current_filename)
+        if _extension not in BINARY_EXTENSIONS + HDF5_EXTENSIONS:
+            _data = import_data(filename)
+            self.__display_dataset(_data)
+
+    def __check_for_and_process_hdf5_file(self, filename: str):
+        """
+        Process the input file and check whether it is a hdf5 file.
+
+        Parameters
+        ----------
+        filename : str
+            The filename of the hdf5 file to open.
+        """
         if self.__open_file is not None:
             self._widgets["viewer"].setData(None)
             self.__open_file.close()
             self.__open_file = None
-        if _extension in HDF5_EXTENSIONS:
+        if get_extension(filename) not in HDF5_EXTENSIONS:
+            self._widgets["hdf5_dataset_selector"].setVisible(False)
+            return
+        with CatchFileErrors(
+            filename, KeyError, raise_file_read_error=False
+        ) as catcher:
             self.__open_file = h5py.File(filename, mode="r")
-            return
-        if _extension in BINARY_EXTENSIONS:
-            return
-        _data = import_data(filename)
-        self.__display_dataset(_data)
+            self._widgets["hdf5_dataset_selector"].new_filename(filename)
+        if catcher.raised_exception:
+            try:
+                self.__open_file.close()
+            except (OSError, AttributeError):
+                pass
+            self.__open_file = None
+            self._widgets["hdf5_dataset_selector"].clear()
+            if get_extension(self.__current_filename) in HDF5_EXTENSIONS:
+                self._widgets["filename"].setText("")
+            self.__current_filename = None
+            raise FileReadError(catcher.exception_message)
 
     def __display_dataset(self, data: Union[Dataset, H5Node]):
         """
@@ -184,14 +209,21 @@ class DataBrowsingFrame(BaseFrame):
         if dataset == "":
             self._widgets["viewer"].setData(None)
             return
-        _item = Hdf5Item(
-            text=dataset,
-            obj=self.__open_file[dataset],
-            parent=self.__hdf5node,
-            openedPath=self.__current_filename,
-        )
-        _data = H5Node(_item)
-        self.__display_dataset(_data)
+        try:
+            _item = Hdf5Item(
+                text=dataset,
+                obj=self.__open_file[dataset],
+                parent=self.__hdf5node,
+                openedPath=self.__current_filename,
+            )
+            _data = H5Node(_item)
+            self.__display_dataset(_data)
+        except KeyError:
+            self._widgets["viewer"].setData(None)
+            raise FileReadError(
+                f"Dataset `{dataset}` could not be read from the file "
+                f"`{Path(self.__current_filename).name}`."
+            )
 
     @QtCore.Slot(object)
     def __display_raw_data(self, kwargs: dict):

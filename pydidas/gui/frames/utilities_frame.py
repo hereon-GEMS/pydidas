@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Module with the UtilitiesFrame which allows to present and open various utilitie
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -49,7 +49,7 @@ class UtilitiesFrame(BaseFrame):
     The UtilitiesFrame allows to open various independent utilities.
     """
 
-    menu_icon = "qta::fa.tasks"
+    menu_icon = "mdi::apps-box"
     menu_title = "Utilities"
     menu_entry = "Utilities"
 
@@ -107,6 +107,9 @@ class UtilitiesFrame(BaseFrame):
         self._widgets["button_composite_creation"].clicked.connect(
             partial(self.create_and_show_frame, CompositeCreatorFrame)
         )
+        # self._widgets["button_directory_spy"].clicked.connect(
+        #     partial(self.create_and_show_frame, DirectorySpyFrame)
+        # )
 
     @QtCore.Slot(object)
     def create_and_show_temp_window(self, window: QtWidgets.QWidget):

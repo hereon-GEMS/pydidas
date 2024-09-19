@@ -11,6 +11,10 @@ authors:
     email: malte.storm@hereon.de
     affiliation: Helmholtz-Zentrum Hereon
     orcid: 'https://orcid.org/0000-0002-1602-781X'
+  - given-names: Gudrun
+    family-names: Lotze
+    email: gudrun.lotze@hereon.de
+    affiliation: Helmholtz-Zentrum Hereon
 url: 'https://pydidas.hereon.de/'
 keywords:
   - X-ray diffraction
@@ -20,5 +24,5 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-date-released: 2024-09-16
-version: 24.09.16
+date-released: 2024-09-19
+version: 24.09.19

@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=4487a728"></script>
+    <script src="../_static/documentation_options.js?v=ac9d04ea"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.09.16"';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"24.09.19"';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -477,19 +477,48 @@ and <a class="reference internal" href="../code/api/core/others.html#pydidas.cor
 available:</p>
 <nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#pyfai" id="id1">Pyfai</a></p></li>
-<li><p><a class="reference internal" href="#proc" id="id2">Proc</a></p></li>
-<li><p><a class="reference internal" href="#image-ops" id="id3">Image ops</a></p></li>
-<li><p><a class="reference internal" href="#scan" id="id4">Scan</a></p></li>
-<li><p><a class="reference internal" href="#fit" id="id5">Fit</a></p></li>
-<li><p><a class="reference internal" href="#data-import" id="id6">Data import</a></p></li>
-<li><p><a class="reference internal" href="#settings" id="id7">Settings</a></p></li>
-<li><p><a class="reference internal" href="#experiment" id="id8">Experiment</a></p></li>
-<li><p><a class="reference internal" href="#other" id="id9">Other</a></p></li>
+<li><p><a class="reference internal" href="#proc" id="id1">Proc</a></p></li>
+<li><p><a class="reference internal" href="#pyfai" id="id2">Pyfai</a></p></li>
+<li><p><a class="reference internal" href="#scan" id="id3">Scan</a></p></li>
+<li><p><a class="reference internal" href="#data-import" id="id4">Data import</a></p></li>
+<li><p><a class="reference internal" href="#settings" id="id5">Settings</a></p></li>
+<li><p><a class="reference internal" href="#other" id="id6">Other</a></p></li>
+<li><p><a class="reference internal" href="#experiment" id="id7">Experiment</a></p></li>
+<li><p><a class="reference internal" href="#image-ops" id="id8">Image ops</a></p></li>
+<li><p><a class="reference internal" href="#fit" id="id9">Fit</a></p></li>
 </ul>
 </nav>
+<section id="proc">
+<h3><a class="toc-backref" href="#id1" role="doc-backlink">Proc</a><a class="headerlink" href="#proc" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">d_spacing_unit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Angstrom</div>
+<div class="line"><strong>name</strong> : d-spacing unit</div>
+<div class="line"><strong>choices</strong> : [‘Angstrom’, ‘nm’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The output d-spacing unit. Å for Angstroms and nm for nanometers.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="pyfai">
-<h3><a class="toc-backref" href="#id1" role="doc-backlink">Pyfai</a><a class="headerlink" href="#pyfai" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id2" role="doc-backlink">Pyfai</a><a class="headerlink" href="#pyfai" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -709,210 +738,8 @@ available:</p>
 </table>
 </div>
 </section>
-<section id="proc">
-<h3><a class="toc-backref" href="#id2" role="doc-backlink">Proc</a><a class="headerlink" href="#proc" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 80.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">d_spacing_unit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Angstrom</div>
-<div class="line"><strong>name</strong> : d-spacing unit</div>
-<div class="line"><strong>choices</strong> : [‘Angstrom’, ‘nm’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The output d-spacing unit. Å for Angstroms and nm for nanometers.</div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="image-ops">
-<h3><a class="toc-backref" href="#id3" role="doc-backlink">Image ops</a><a class="headerlink" href="#image-ops" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 80.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_roi</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Use ROI</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Keyword to toggle use of the ROI for cropping the original images before processing them.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xlow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : ROI lower x limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xhigh</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : ROI upper x limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use ‘None’ as value for the upper ROI limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_ylow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : ROI lower y limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_yhigh</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : ROI upper y limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use ‘None’ as value for the upper ROI limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_thresholds</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Use thresholds</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Keyword to toggle use of the thresholds for clipping the data range in the original images before combining them.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">threshold_low</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Lower threshold</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">threshold_high</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Upper threshold</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">binning</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Binning factor</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The re-binning factor for the images in the composite. The binning will be applied to the cropped images.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">image_shape</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : tuple</div>
-<div class="line"><strong>default</strong> : (0, 0)</div>
-<div class="line"><strong>name</strong> : Image shape</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The shape of an image.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_image_shape</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : tuple</div>
-<div class="line"><strong>default</strong> : (0, 0)</div>
-<div class="line"><strong>name</strong> : Raw image shape</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The image shape of the original image as loaded from the file.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">datatype</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : None</div>
-<div class="line"><strong>default</strong> : &lt;class ‘numpy.float32’&gt;</div>
-<div class="line"><strong>name</strong> : Datatype</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The datatype.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiplicator</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1.0</div>
-<div class="line"><strong>name</strong> : Multiplication factor</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The multiplication scaling factor to be applied to the resulting Dataset.</div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 <section id="scan">
-<h3><a class="toc-backref" href="#id4" role="doc-backlink">Scan</a><a class="headerlink" href="#scan" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">Scan</a><a class="headerlink" href="#scan" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -1313,349 +1140,8 @@ available:</p>
 </table>
 </div>
 </section>
-<section id="fit">
-<h3><a class="toc-backref" href="#id5" role="doc-backlink">Fit</a><a class="headerlink" href="#fit" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 80.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_sigma_threshold</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0.25</div>
-<div class="line"><strong>name</strong> : Fit σ rejection threshold</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The threshold to select which fitting points to reject, based on the normalized standard deviation. Any fit which has a normalized std which is worse than the threshold will be rejected as failed.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_min_peak_height</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Minimum peak height to fit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The minimum height a peak must have to attempt a fit. A value of ‘None’ will not impose any limits on the peak height.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_func</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Gaussian</div>
-<div class="line"><strong>name</strong> : Fit function</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Select the type of fit function to be used in the single peak fit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_bg_order</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Fit background order</div>
-<div class="line"><strong>choices</strong> : [None, 0, 1]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The order of the background. None corresponds to no background.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_upper_limit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak fit upper limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_lower_limit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak fit lower limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_output</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : position; area; FWHM</div>
-<div class="line"><strong>name</strong> : Output</div>
-<div class="line"><strong>choices</strong> : [‘no output’, ‘position’, ‘amplitude’, ‘area’, ‘FWHM’, ‘background at peak’, ‘total count intensity’, ‘position; amplitude’, ‘position; area’, ‘position; FWHM’, ‘position; background at peak’, ‘position; total count intensity’, ‘amplitude; area’, ‘amplitude; FWHM’, ‘amplitude; background at peak’, ‘amplitude; total count intensity’, ‘area; FWHM’, ‘area; background at peak’, ‘area; total count intensity’, ‘FWHM; background at peak’, ‘FWHM; total count intensity’, ‘background at peak; total count intensity’, ‘position; amplitude; area’, ‘position; amplitude; FWHM’, ‘position; amplitude; background at peak’, ‘position; amplitude; total count intensity’, ‘position; area; FWHM’, ‘position; area; background at peak’, ‘position; area; total count intensity’, ‘position; FWHM; background at peak’, ‘position; FWHM; total count intensity’, ‘position; background at peak; total count intensity’, ‘amplitude; area; FWHM’, ‘amplitude; area; background at peak’, ‘amplitude; area; total count intensity’, ‘amplitude; FWHM; background at peak’, ‘amplitude; FWHM; total count intensity’, ‘amplitude; background at peak; total count intensity’, ‘area; FWHM; background at peak’, ‘area; FWHM; total count intensity’, ‘area; background at peak; total count intensity’, ‘FWHM; background at peak; total count intensity’, ‘position; amplitude; area; FWHM’, ‘position; amplitude; area; background at peak’, ‘position; amplitude; area; total count intensity’, ‘position; amplitude; FWHM; background at peak’, ‘position; amplitude; FWHM; total count intensity’, ‘position; amplitude; background at peak; total count intensity’, ‘position; area; FWHM; background at peak’, ‘position; area; FWHM; total count intensity’, ‘position; area; background at peak; total count intensity’, ‘position; FWHM; background at peak; total count intensity’, ‘amplitude; area; FWHM; background at peak’, ‘amplitude; area; FWHM; total count intensity’, ‘amplitude; area; background at peak; total count intensity’, ‘amplitude; FWHM; background at peak; total count intensity’, ‘area; FWHM; background at peak; total count intensity’, ‘position; amplitude; area; FWHM; background at peak’, ‘position; amplitude; area; FWHM; total count intensity’, ‘position; amplitude; area; background at peak; total count intensity’, ‘position; amplitude; FWHM; background at peak; total count intensity’, ‘position; area; FWHM; background at peak; total count intensity’, ‘amplitude; area; FWHM; background at peak; total count intensity’, ‘position; amplitude; area; FWHM; background at peak; total count intensity’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The output of the fitting plugin. The plugin can either return the peak area, the peak position or the FWHM. Alternatively, any combination of these values can be retured as well. Note that the fit parameters are always stored in the metadata.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_xlow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak low x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the  peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_xlow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #0 low x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 0th peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_xlow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #1 low x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 1st peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_xlow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #2 low x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 2nd peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_xlow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #3 low x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 3rd peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_xhigh</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak high x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the  peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_xhigh</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #0 high x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 0th peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_xhigh</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #1 high x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 1st peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_xhigh</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #2 high x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 2nd peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_xhigh</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #3 high x boundary</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 3rd peak to be fitted.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_xstart</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak fit x0 start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_xstart</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #0 fit x0 start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_xstart</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #1 fit x0 start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_xstart</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #2 fit x0 start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_xstart</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #3 fit x0 start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_width</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak fit σ or Γ start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_width</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #0 fit σ or Γ start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_width</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #1 fit σ or Γ start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_width</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #2 fit σ or Γ start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_width</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Peak #3 fit σ or Γ start guess</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 <section id="data-import">
-<h3><a class="toc-backref" href="#id6" role="doc-backlink">Data import</a><a class="headerlink" href="#data-import" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Data import</a><a class="headerlink" href="#data-import" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -1971,7 +1457,7 @@ available:</p>
 </div>
 </section>
 <section id="settings">
-<h3><a class="toc-backref" href="#id7" role="doc-backlink">Settings</a><a class="headerlink" href="#settings" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Settings</a><a class="headerlink" href="#settings" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -2169,265 +1655,8 @@ available:</p>
 </table>
 </div>
 </section>
-<section id="experiment">
-<h3><a class="toc-backref" href="#id8" role="doc-backlink">Experiment</a><a class="headerlink" href="#experiment" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 80.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">xray_wavelength</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : X-ray wavelength</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : A</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The X-ray wavelength. Any changes to the wavelength will also update the X-ray energy setting.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">xray_energy</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 12.398</div>
-<div class="line"><strong>name</strong> : X-ray energy</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : keV</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The X-ray energy. Changing this parameter will also update the X-ray wavelength setting.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_name</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : detector</div>
-<div class="line"><strong>name</strong> : Detector name</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector name in pyFAI nomenclature.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_npixx</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector size X</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of detector pixels in x direction (horizontal).</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_npixy</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector size Y</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of detector pixels in x direction (vertical).</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_pxsizex</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 100</div>
-<div class="line"><strong>name</strong> : Detector pixel size X</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : um</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector pixel size in X-direction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_pxsizey</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 100</div>
-<div class="line"><strong>name</strong> : Detector pixel size Y</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : um</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector pixel size in Y-direction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_pxsize</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 100</div>
-<div class="line"><strong>name</strong> : Detector pixel size</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : um</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector pixel size in both X- and Y-direction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_dist</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Sample-detector distance</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : m</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The sample-detector distance.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_file</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : Path</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Detector mask file</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The path to the detector mask file.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_poni1</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector PONI1</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : m</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector PONI1 (point of normal incidence; in y direction). This is measured in meters from the detector origin.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_poni2</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector PONI2</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : m</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector PONI2 (point of normal incidence; in x direction). This is measured in meters from the detector origin.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_rot1</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector Rot1</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : rad</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector rotation 1 (lefthanded around the “up”-axis)</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_rot2</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector Rot2</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : rad</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector rotation 2 (pitching the detector; positive direction is tilting the detector top upstream while keeping the bottom of the detector stationary.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_rot3</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector Rot3</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : rad</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector rotation 3 (around the beam axis; right-handed when looking downstream with the beam.)</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">beamcenter_x</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Beamcenter x</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector x-coordinate for the beamcenter.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">beamcenter_y</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Beamcenter y</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector y-coordinate for the beamcenter.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_tilt_angle</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : detector tilt angle</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : deg</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector tilt angle (relative to the beam normal).</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_tilt_plane</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : detector tilt plane</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : deg</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector tilt plane orientation (relative to positive x-axis).</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_dist_fit2d</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Sample-detector distance</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : mm</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The sample-detector distance.</div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 <section id="other">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">Other</a><a class="headerlink" href="#other" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Other</a><a class="headerlink" href="#other" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -2980,6 +2209,777 @@ available:</p>
 </table>
 </div>
 </section>
+<section id="experiment">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Experiment</a><a class="headerlink" href="#experiment" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">xray_wavelength</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : X-ray wavelength</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : A</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The X-ray wavelength. Any changes to the wavelength will also update the X-ray energy setting.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">xray_energy</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 12.398</div>
+<div class="line"><strong>name</strong> : X-ray energy</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : keV</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The X-ray energy. Changing this parameter will also update the X-ray wavelength setting.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_name</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : detector</div>
+<div class="line"><strong>name</strong> : Detector name</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector name in pyFAI nomenclature.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_npixx</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector size X</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of detector pixels in x direction (horizontal).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_npixy</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector size Y</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of detector pixels in x direction (vertical).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_pxsizex</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 100</div>
+<div class="line"><strong>name</strong> : Detector pixel size X</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : um</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector pixel size in X-direction.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_pxsizey</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 100</div>
+<div class="line"><strong>name</strong> : Detector pixel size Y</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : um</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector pixel size in Y-direction.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_pxsize</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 100</div>
+<div class="line"><strong>name</strong> : Detector pixel size</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : um</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector pixel size in both X- and Y-direction.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_dist</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Sample-detector distance</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : m</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The sample-detector distance.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_file</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : Path</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Detector mask file</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The path to the detector mask file.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_poni1</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector PONI1</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : m</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector PONI1 (point of normal incidence; in y direction). This is measured in meters from the detector origin.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_poni2</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector PONI2</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : m</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector PONI2 (point of normal incidence; in x direction). This is measured in meters from the detector origin.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_rot1</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector Rot1</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : rad</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector rotation 1 (lefthanded around the “up”-axis)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_rot2</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector Rot2</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : rad</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector rotation 2 (pitching the detector; positive direction is tilting the detector top upstream while keeping the bottom of the detector stationary.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_rot3</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector Rot3</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : rad</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector rotation 3 (around the beam axis; right-handed when looking downstream with the beam.)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">beamcenter_x</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Beamcenter x</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector x-coordinate for the beamcenter.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">beamcenter_y</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Beamcenter y</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector y-coordinate for the beamcenter.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_tilt_angle</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : detector tilt angle</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : deg</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector tilt angle (relative to the beam normal).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_tilt_plane</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : detector tilt plane</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : deg</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector tilt plane orientation (relative to positive x-axis).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_dist_fit2d</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Sample-detector distance</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : mm</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The sample-detector distance.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="image-ops">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Image ops</a><a class="headerlink" href="#image-ops" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_roi</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Use ROI</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Keyword to toggle use of the ROI for cropping the original images before processing them.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xlow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : ROI lower x limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xhigh</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : ROI upper x limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use ‘None’ as value for the upper ROI limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_ylow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : ROI lower y limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">roi_yhigh</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : ROI upper y limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use ‘None’ as value for the upper ROI limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_thresholds</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Use thresholds</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Keyword to toggle use of the thresholds for clipping the data range in the original images before combining them.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">threshold_low</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Lower threshold</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">threshold_high</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Upper threshold</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">binning</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Binning factor</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The re-binning factor for the images in the composite. The binning will be applied to the cropped images.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">image_shape</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : tuple</div>
+<div class="line"><strong>default</strong> : (0, 0)</div>
+<div class="line"><strong>name</strong> : Image shape</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The shape of an image.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_image_shape</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : tuple</div>
+<div class="line"><strong>default</strong> : (0, 0)</div>
+<div class="line"><strong>name</strong> : Raw image shape</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The image shape of the original image as loaded from the file.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">datatype</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : None</div>
+<div class="line"><strong>default</strong> : &lt;class ‘numpy.float32’&gt;</div>
+<div class="line"><strong>name</strong> : Datatype</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The datatype.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiplicator</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1.0</div>
+<div class="line"><strong>name</strong> : Multiplication factor</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The multiplication scaling factor to be applied to the resulting Dataset.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="fit">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Fit</a><a class="headerlink" href="#fit" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_sigma_threshold</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0.25</div>
+<div class="line"><strong>name</strong> : Fit σ rejection threshold</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The threshold to select which fitting points to reject, based on the normalized standard deviation. Any fit which has a normalized std which is worse than the threshold will be rejected as failed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_min_peak_height</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Minimum peak height to fit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The minimum height a peak must have to attempt a fit. A value of ‘None’ will not impose any limits on the peak height.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_func</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Gaussian</div>
+<div class="line"><strong>name</strong> : Fit function</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Select the type of fit function to be used in the single peak fit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_bg_order</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Fit background order</div>
+<div class="line"><strong>choices</strong> : [None, 0, 1]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The order of the background. None corresponds to no background.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_upper_limit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak fit upper limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_lower_limit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak fit lower limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_output</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : position; area; FWHM</div>
+<div class="line"><strong>name</strong> : Output</div>
+<div class="line"><strong>choices</strong> : [‘no output’, ‘position’, ‘amplitude’, ‘area’, ‘FWHM’, ‘background at peak’, ‘total count intensity’, ‘position; amplitude’, ‘position; area’, ‘position; FWHM’, ‘position; background at peak’, ‘position; total count intensity’, ‘amplitude; area’, ‘amplitude; FWHM’, ‘amplitude; background at peak’, ‘amplitude; total count intensity’, ‘area; FWHM’, ‘area; background at peak’, ‘area; total count intensity’, ‘FWHM; background at peak’, ‘FWHM; total count intensity’, ‘background at peak; total count intensity’, ‘position; amplitude; area’, ‘position; amplitude; FWHM’, ‘position; amplitude; background at peak’, ‘position; amplitude; total count intensity’, ‘position; area; FWHM’, ‘position; area; background at peak’, ‘position; area; total count intensity’, ‘position; FWHM; background at peak’, ‘position; FWHM; total count intensity’, ‘position; background at peak; total count intensity’, ‘amplitude; area; FWHM’, ‘amplitude; area; background at peak’, ‘amplitude; area; total count intensity’, ‘amplitude; FWHM; background at peak’, ‘amplitude; FWHM; total count intensity’, ‘amplitude; background at peak; total count intensity’, ‘area; FWHM; background at peak’, ‘area; FWHM; total count intensity’, ‘area; background at peak; total count intensity’, ‘FWHM; background at peak; total count intensity’, ‘position; amplitude; area; FWHM’, ‘position; amplitude; area; background at peak’, ‘position; amplitude; area; total count intensity’, ‘position; amplitude; FWHM; background at peak’, ‘position; amplitude; FWHM; total count intensity’, ‘position; amplitude; background at peak; total count intensity’, ‘position; area; FWHM; background at peak’, ‘position; area; FWHM; total count intensity’, ‘position; area; background at peak; total count intensity’, ‘position; FWHM; background at peak; total count intensity’, ‘amplitude; area; FWHM; background at peak’, ‘amplitude; area; FWHM; total count intensity’, ‘amplitude; area; background at peak; total count intensity’, ‘amplitude; FWHM; background at peak; total count intensity’, ‘area; FWHM; background at peak; total count intensity’, ‘position; amplitude; area; FWHM; background at peak’, ‘position; amplitude; area; FWHM; total count intensity’, ‘position; amplitude; area; background at peak; total count intensity’, ‘position; amplitude; FWHM; background at peak; total count intensity’, ‘position; area; FWHM; background at peak; total count intensity’, ‘amplitude; area; FWHM; background at peak; total count intensity’, ‘position; amplitude; area; FWHM; background at peak; total count intensity’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The output of the fitting plugin. The plugin can either return the peak area, the peak position or the FWHM. Alternatively, any combination of these values can be retured as well. Note that the fit parameters are always stored in the metadata.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_xlow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak low x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the  peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_xlow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #0 low x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 0th peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_xlow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #1 low x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 1st peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_xlow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #2 low x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 2nd peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_xlow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #3 low x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary in x for the center position of the 3rd peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_xhigh</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak high x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the  peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_xhigh</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #0 high x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 0th peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_xhigh</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #1 high x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 1st peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_xhigh</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #2 high x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 2nd peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_xhigh</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #3 high x boundary</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary in x for the center position of the 3rd peak to be fitted.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_xstart</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak fit x0 start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_xstart</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #0 fit x0 start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_xstart</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #1 fit x0 start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_xstart</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #2 fit x0 start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_xstart</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #3 fit x0 start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak_width</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak fit σ or Γ start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak0_width</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #0 fit σ or Γ start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak1_width</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #1 fit σ or Γ start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak2_width</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #2 fit σ or Γ start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fit_peak3_width</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Peak #3 fit σ or Γ start guess</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 </section>
 </section>
 
@@ -3022,15 +3022,15 @@ available:</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-generic-parameters">List of generic Parameters</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pyfai">Pyfai</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proc">Proc</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-ops">Image ops</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pyfai">Pyfai</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scan">Scan</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit">Fit</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-import">Data import</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#settings">Settings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment">Experiment</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment">Experiment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-ops">Image ops</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit">Fit</a></li>
 </ul>
 </li>
 </ul>

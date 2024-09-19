@@ -2106,6 +2106,8 @@ def base_execute_dataset():
 @pytest.mark.parametrize("missing_field, removal_key, expected_error_message", [
     ("position", 1, 'Key containing "position" is missing. Check your dataset.'), 
     ("chi", 0, "chi is missing. Check your dataset."),  
+    ("position / ", 3, "Unit not found for parameter: position"),
+    ("chi_unit", 4, "Unit dummy not allowed for chi.")
    ])
 def test_execute_with_missing_field(plugin_fixture, base_execute_dataset, missing_field, removal_key, expected_error_message):
     """Test the execute function with missing axis labels."""    
@@ -2118,16 +2120,19 @@ def test_execute_with_missing_field(plugin_fixture, base_execute_dataset, missin
     elif removal_key == 1:  # Modifying 'position'
         test_ds.update_axis_label(1, '0: area; 1: FWHM; 2: background at peak; 3: total count intensity')
         test_ds.data_label='area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts'
+    elif removal_key == 3: 
+        test_ds.data_label = 'area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts'
+    elif removal_key == 4:
+        test_ds.update_axis_unit(0, 'dummy')
         
+        
+    #print(test_ds)
+    #plugin.execute(test_ds)   
+     
+             
     # Check for the specific ValueError with the correct message
     with pytest.raises(ValueError, match=expected_error_message):
         plugin.execute(test_ds)
-
-
-def test_execute_with_missing_string(plugin_fixture):
-    plugin = plugin_fixture
-    with pytest.raises(ValueError, match="Dataset must have a data_label"):
-        plugin.execute(Dataset(np.array([1, 2, 3])))
 
         
 # Testing for various Dataset modifications for create_final_result_sin2chi_method

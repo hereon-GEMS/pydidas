@@ -2140,8 +2140,8 @@ def test_execute_with_missing_field(plugin_fixture, base_execute_dataset, missin
 def base_dataset():
     return Dataset(
         np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=float), 
-        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]}, 
-        axis_labels={0: 'chi', 1: '0: position'}, 
+        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]},
+        axis_labels={0: '0: d-, 1: d+', 1: LABELS_SIN2CHI},
         axis_units={0: 'deg', 1: ''},
         data_unit='nm', 
         data_label='0: position_neg, 1: position_pos'

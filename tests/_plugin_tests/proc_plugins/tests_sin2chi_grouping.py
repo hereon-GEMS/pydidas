@@ -28,6 +28,7 @@ __status__ = "Development"
 import pytest
 
 import numpy as np
+import numpy.testing as npt
 from typing import Callable
 from numbers import Real
 from dataclasses import dataclass
@@ -262,6 +263,7 @@ def d_spacing_simu_noise(chi):
     d_spacing_noise = np.random.default_rng(seed=10).laplace(
         mean_value, scale, size=d_spacing.shape
     )
+     
     return d_spacing + d_spacing_noise    
 
 
@@ -427,7 +429,7 @@ case9 = S2cTestConfig(
             25.03313,
         ]
     ),
-    d_mean_neg=np.array(
+    d_mean_neg=np.array(  
         [
             25.25007,
             25.2124,
@@ -1146,6 +1148,7 @@ ds_case1 = DSpacingTestConfig(
 )
 
 
+
 @pytest.mark.parametrize(
     "d_spacing_pos, d_spacing_neg, expect_error",
     [
@@ -1764,72 +1767,367 @@ def test__create_final_result_sin2chi_method_label_2(plugin_fixture, results_sin
     with pytest.raises(ValueError, match=r'axis_labels\[1\] does not match sin\^2\(chi\).'):
         plugin._create_final_result_sin2chi_method(d_spacing_combined)  
         
-#test_cases = [case1, case2, case3, case4, case5, case6, case7, case8, case9, case10]
-test_cases = [case4]
+        
+@dataclass 
+class Ds2cTestConfig:
+    delta_chi: Real
+    chi_start: Real
+    chi_stop: Real
+    d_spacing_func: Callable
+    s2c_range_sorted: np.array
+    d_mean_pos: np.array
+    d_mean_neg: np.array
+    d_mean_avg: np.array
+    azimuth_name: str = 'chi'
+    chi_unit: str = 'deg'
+    d_unit: str = "nm"
+    d_label: str = "d_spacing"
+    description: str = ""
+        
+    def create_simple_input_ds(self):
+        chi = chi_gen(self.chi_start, self.chi_stop, self.delta_chi) 
+       
+        input_ds =  Dataset(self.d_spacing_func(chi).reshape(-1, 1),
+                        axis_ranges={0: chi, 1: np.array([0])},
+                        axis_labels={0: self.azimuth_name, 1: '0: position'},
+                        axis_units = {0: self.chi_unit, 1: ''},
+                        data_label = f'position / {self.d_unit}')
+    
+        return input_ds
+    
+    def create_output_ds(self):
+        expected_result = np.vstack([
+        self.d_mean_neg,
+        self.d_mean_pos,
+        np.mean([self.d_mean_neg, self.d_mean_pos], axis=0)
+        ])    
+        
+        output_ds =  Dataset(expected_result, axis_ranges= {0: np.arange(expected_result.shape[0]), 1: self.s2c_range_sorted}, 
+                             axis_labels = {0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit = self.d_unit, data_label='d_spacing')
+        
+        return output_ds
+    
+ds_case1_exe =  Ds2cTestConfig(
+    delta_chi=22.5,
+    chi_start=-180,
+    chi_stop=180,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array([4, 5, 6, 7, 8] +[np.nan] * 11),
+    d_mean_neg=np.array([8, 11, 10, 9, 8]  +[np.nan] * 11),
+    d_mean_avg= np.array([6, 8, 8, 8, 8] +[np.nan] * 11),
+    s2c_range_sorted=np.array([0.0, 0.14645, 0.5, 0.85355, 1] +[np.nan] * 11),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+
+    description= "A simple case"   
+)   
+
+ds_case2_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=0,
+    chi_stop=45,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array([0.0, 1.0, 2.0, 3.0, 4.0]),
+    d_mean_neg=np.array([np.nan, np.nan, np.nan, np.nan, np.nan]),
+    d_mean_avg= np.array([np.nan, np.nan, np.nan, np.nan, np.nan]),
+    s2c_range_sorted=np.array([0.0, 0.03015, 0.11698, 0.25, 0.41318]),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description= "Few chi values"   
+) 
+
+ds_case3_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=-180,
+    chi_stop=181,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array(
+         [ 9., 10., 11. ,12., 13., 14., 15., 16., 17. ,18.]+[np.nan]*27
+    ),
+    d_mean_neg=np.array(
+        [27. ,26., 25.,24., 23., 22. ,21, 20., 19., 18.]+[np.nan]*27
+    ),
+    d_mean_avg= np.array([18. ,18., 18., 18., 18., 18., 18., 18., 18., 18.]+[np.nan]*27),    
+    s2c_range_sorted=np.array(
+        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*27
+    ),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description= "Some nan values"   
+) 
+
+ds_case4_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=-90,
+    chi_stop=11,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array(
+         [ 9. ,10.]+[np.nan]*9
+    ),
+    d_mean_neg=np.array(
+        [9., 8., 7., 6., 5. ,4.,3., 2., 1., 0.]+[np.nan]*1
+    ),
+    d_mean_avg= np.array([18. ,18., 18., 18., 18., 18., 18., 18., 18., 18.]+[np.nan]*27),    
+    s2c_range_sorted=np.array(
+       [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000] +[np.nan]*1
+    ),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Few values in positive slope",
+
+)
+
+
+ds_case5_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=-10,
+    chi_stop=91,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array(
+         [ 1.  ,2. , 3. , 4. , 5. , 6. , 7.,  8. , 9., 10.]+[np.nan]*1
+    ),
+    d_mean_neg=np.array(
+        [1., 0.]+[np.nan]*9
+    ),
+    d_mean_avg= np.array([18. ,18., 18., 18., 18., 18., 18., 18., 18., 18.]+[np.nan]*27),    
+    s2c_range_sorted=np.array(
+       [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*1
+    ),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Few values in negative slope",
+
+)
+
+ds_case6_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=-30,
+    chi_stop=181,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array(
+         [ 3. , 4. , 5. , 6. , 7. , 8. , 9., 10., 11.,12.]+[np.nan]*12
+    ),
+    d_mean_neg=np.array(
+        [12., 11., 10. , 9., 17., 16., 15., 14., 13., 12.]+[np.nan]*12
+    ),
+    d_mean_avg= np.array([ 7.5 , 7.5,  7.5 , 7.5 ,12. , 12.,  12. , 12.,  12., 12. ]+[np.nan]*12),    
+    s2c_range_sorted=np.array(
+       [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*12
+    ),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Less values in negative slope"
+)
+
+ds_case7_exe =  Ds2cTestConfig(
+    delta_chi=22.5,
+    chi_start=-180,
+    chi_stop=180,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array(
+        [4., 5., 6.,7., 8.]+[np.nan]*11
+    ),
+    d_mean_neg=np.array(
+       [ 8. ,11. ,10.,  9.,  8.]+[np.nan]*11
+    ),
+    d_mean_avg= np.array( [6., 8., 8., 8., 8.]+[np.nan]*11),    
+    s2c_range_sorted=np.array(
+        [0.0000000, 0.1464466, 0.5000000, 0.8535534, 1.0000000] +[np.nan]*11
+    ),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Simple case",
+)
+
+
+ds_case8_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=-180,
+    chi_stop=181,
+    d_spacing_func=d_spacing_simu, 
+    d_mean_pos=np.array(
+       [25.25007189, 25.27466048 ,25.2832  ,  25.27466048, 25.25007189, 25.2124,
+ 25.16618858, 25.11701142, 25.0708    , 25.03312811]+[np.nan]*27
+    ),
+    d_mean_neg=np.array(
+      [25.25007189 ,25.2124  ,   25.16618858 ,25.11701142 ,25.0708   ,  25.03312811,
+ 25.00853952, 25.  ,       25.00853952 ,25.03312811]+[np.nan]*27
+    ),
+    d_mean_avg= np.array([25.25007189 ,25.24353024 ,25.22469429, 25.19583595, 25.16043595, 25.12276405,
+ 25.08736405, 25.05850571, 25.03966976, 25.03312811]+[np.nan]*27),    
+    s2c_range_sorted=np.array(
+         [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000] +[np.nan]*27
+    ),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Simple case",
+)
+
+ds_case9_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=0,
+    chi_stop=361,
+    d_spacing_func=d_spacing_simu, 
+    d_mean_pos=np.array(
+       [25.25007189, 25.27466048 ,25.2832   ,  25.27466048 ,25.25007189 ,25.2124,
+ 25.16618858, 25.11701142 ,25.0708  ,   25.03312811]+[np.nan]*27
+    ),
+    d_mean_neg=np.array([25.25007189, 25.2124  ,   25.16618858, 25.11701142 ,25.0708  ,   25.03312811,
+ 25.00853952, 25.    ,     25.00853952, 25.03312811]+[np.nan]*27
+    ),
+    d_mean_avg= np.array([25.25007189, 25.24353024 ,25.22469429, 25.19583595 ,25.16043595, 25.12276405,
+ 25.08736405 ,25.05850571, 25.03966976, 25.03312811]+[np.nan]*27),    
+    s2c_range_sorted=np.array(
+        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]  +[np.nan]*27
+    ),    
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="A more realistic case with chi ranging from 0 to 360",
+)
+
+ds_case10_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=0,
+    chi_stop=361,
+    d_spacing_func=d_spacing_simu_noise, 
+    d_mean_pos=np.array(
+       [26.26736461, 26.28663577, 26.28734205 ,26.27491604, 26.24311126, 26.23497842,
+ 26.17385737 ,26.12768893 ,26.0598127 , 26.07347215]+[np.nan]*27
+    ),
+    d_mean_neg=np.array([26.21146524 ,26.20441612 ,26.13792499, 26.15061959 ,26.10692267, 26.03331406,
+ 25.99338069, 26.00076722 ,26.01825283 ,26.07347215]+[np.nan]*27
+    ),
+    d_mean_avg= np.array([26.23941493, 26.24552595, 26.21263352, 26.21276782, 26.17501697 ,26.13414624,
+ 26.08361903 ,26.06422807 ,26.03903276 ,26.07347215]+[np.nan]*27),    
+    s2c_range_sorted=np.array(
+        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]  +[np.nan]*27
+    ),    
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="A more realistic case with chi ranging from 0 to 360 and noise added; noise with scale 0.03",
+)
+
+ds_case11_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=0,
+    chi_stop=45,
+    d_spacing_func=d_spacing_simu_noise, 
+    d_mean_pos=np.array(
+      [26.32298561, 26.24830245, 26.31529111, 26.23839737, 26.25085018]+[np.nan]*0),
+    d_mean_neg=np.array([np.nan, np.nan, np.nan, np.nan, np.nan]+[np.nan]*0),
+    d_mean_avg= np.array([26.29041594 ,26.2014127 , 26.17686609, 26.12468021 ,26.09337842, 26.02616748,
+ 26.00879509 ,26.00414205 ,26.02051482, 26.05042083]+[np.nan]*27),
+    s2c_range_sorted=np.array(
+        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759]  +[np.nan]*0
+    ),    
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Positive chi range between 0 and 45; noise with scale 0.03",
+)
+
+ds_case12_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=-90,
+    chi_stop=272,
+    d_spacing_func=d_spacing_simu_noise, 
+    d_mean_pos=np.array([26.29041594 ,26.28437378 ,26.28396722, 26.25950164 ,26.25025785, 26.24852267,
+ 26.19979675, 26.08874783 ,26.06281612, 25.99452146]+[np.nan]*27),
+    d_mean_neg=np.array([26.29041594, 26.2014127 , 26.17686609 ,26.12468021, 26.09337842, 26.02616748,
+ 26.00879509, 26.00414205, 26.02051482, 26.05042083]+[np.nan]*27),
+    d_mean_avg= np.array([26.29041594 ,26.24289324 ,26.23041665 ,26.19209092, 26.17181813 ,26.13734507,
+ 26.10429592, 26.04644494 ,26.04166547 ,26.02247114]+[np.nan]*27),
+    s2c_range_sorted=np.array(
+        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]  +[np.nan]*27
+    ),    
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Positive chi range between 0 and 45; noise with scale 0.03",
+)
+
+                                         
+test_cases = [ds_case1_exe, ds_case2_exe, ds_case3_exe, ds_case4_exe, ds_case5_exe, ds_case6_exe,
+              ds_case7_exe, ds_case8_exe, ds_case9_exe, ds_case10_exe, ds_case11_exe, ds_case12_exe]
+#test_cases =[ds_case12_exe]
 @pytest.mark.parametrize("case", test_cases)        
 def test_execute_with_various_cases(plugin_fixture, case):    
     plugin = plugin_fixture
-    chi = chi_gen(case.chi_start, case.chi_stop, case.delta_chi)    
     
-    print('\nIncoming data for d:\n' ,case.d_spacing_func(chi).reshape(-1, 1))
-    
-    #create the test dataset    
-    my_dataset = Dataset(
-        case.d_spacing_func(chi).reshape(-1, 1),
-        axis_ranges={0: chi, 1: np.array([0])},
-        axis_labels={0: 'chi', 1: '0: position'},
-        axis_units = {0: 'deg', 1: ''},
-        data_label = 'position / nm'
-    )
-    
-    # Define the expected result based on case
-    expected_d_spacing_pos = case.d_mean_pos
-    expected_d_spacing_neg = case.d_mean_neg
-    expected_d_spacing_avg = np.mean([case.d_mean_pos, case.d_mean_neg], axis=0)
-    
-     # Create the expected result array
-    expected_result = np.vstack([
-        expected_d_spacing_neg,
-        expected_d_spacing_pos,
-        expected_d_spacing_avg
-    ])        
-  
+    ds_in = case.create_simple_input_ds()
     # Calculation for test   
-    plugin._config["input_shape"] = my_dataset.shape
+    plugin._config["input_shape"] = ds_in.shape
+    expected_ds = case.create_output_ds()
     
-    print(30 * "\N{avocado}")
-    print('In the test function ...')
-    print(plugin._config["input_shape"])
-    print(case.d_spacing_func(chi).reshape(-1, 1).shape)
-    print(30 * "\N{avocado}")
+    result, _ = plugin.execute(ds_in)
 
-    
-    result, _ = plugin.execute(my_dataset)
+    npt.assert_allclose(result.array, expected_ds.array, rtol=5e-10, atol=1e-15, equal_nan=True, err_msg='Tolerance not matchend.', verbose=True)
+    npt.assert_allclose(result.axis_ranges[1], expected_ds.axis_ranges[1], rtol=1e-05, atol=1e-05, equal_nan=True, err_msg='Tolerance not matchend.', verbose=True)
+    npt.assert_array_equal(result.axis_ranges[0], expected_ds.axis_ranges[0], err_msg='Values are not eequal for axis_ranges[0]', verbose=True)
+    assert result.data_label == expected_ds.data_label
+    assert result.data_unit == expected_ds.data_unit
+    assert result.axis_labels[0] == expected_ds.axis_labels[0]
+    assert result.axis_labels[1] == expected_ds.axis_labels[1]
+    assert np.all(np.diff(result.axis_ranges[1][~np.isnan(result.axis_ranges[1])]) >= 0), "result.axis_ranges[1] is not in ascending order (ignoring NaNs)."
 
-    # Create a mask to exclude np.nan values in the result array
-    mask = ~np.isnan(result.array)
-          
-    # Compare the non-nan values in the result array with the expected values
-    for i in range(expected_result.shape[0]):
-        assert np.allclose(result.array[i, :expected_result.shape[1]][mask[i, :expected_result.shape[1]]],
-                           expected_result[i][mask[i, :expected_result.shape[1]]], atol=1e-8), f"Result row {i} does not match expected values"
+
+@pytest.mark.parametrize("invalid_input", [
+    [1, 2, 3],                   # List input
+    np.array([1, 2, 3]),          # Numpy array input
+    (1, 2, 3)                     # Tuple input
+])
+def test_execute_with_invalid_input(plugin_fixture, invalid_input):
+    plugin = plugin_fixture
+    with pytest.raises(TypeError, match="Input must be an instance of Dataset"):
+        plugin.execute(invalid_input)
+
+
+@pytest.fixture
+def base_execute_dataset():
+    return Dataset(np.random.default_rng(seed=42).random((6, 5)),
+        axis_labels={0:'chi', 1:'0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity'},
+        axis_units={0: 'deg', 1: ''},
+        axis_ranges={0:np.arange(6), 1:np.arange(5)},
+        metadata={},
+        data_unit='',
+        data_label='position / nm; area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts',       
+    )
+
+@pytest.mark.parametrize("missing_field, removal_key, expected_error_message", [
+    ("position", 1, 'Key containing "position" is missing. Check your dataset.'), 
+    ("chi", 0, "chi is missing. Check your dataset."),  
+   ])
+def test_execute_with_missing_field(plugin_fixture, base_execute_dataset, missing_field, removal_key, expected_error_message):
+    """Test the execute function with missing axis labels."""    
+    plugin = plugin_fixture
+    test_ds =  base_execute_dataset    
     
-    # Additional checks for shape and type
-    assert isinstance(result, Dataset), "Expected result to be a Dataset"
-    assert result.array.shape[0] == 3, f"Expected 3 rows, but got {result.array.shape[0]}"
-    assert result.array.shape[1] >= expected_result.shape[1], f"Expected at least {expected_result.shape[1]} columns, but got {result.array.shape[1]}"
-      
-    # Check axis ranges
-    expected_axis_range_0 = np.array([0, 1, 2])
-    assert np.array_equal(result.axis_ranges[0], expected_axis_range_0), f"Expected axis range 0 to be {expected_axis_range_0}, but got {result.axis_ranges[0]}"   
+    # Modify axis_labels by removing or adjusting the necessary field
+    if removal_key == 0:  # Removing 'chi'
+        test_ds.update_axis_label(0, 'dummy')
+    elif removal_key == 1:  # Modifying 'position'
+        test_ds.update_axis_label(1, '0: area; 1: FWHM; 2: background at peak; 3: total count intensity')
+        test_ds.data_label='area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts'
         
-    # Compare axis range 1 using sets to ignore preallocated values
-    tolerance = 1e-5  # Define your tolerance level
-    # Slice the result array to match the length of s2c_range
-    result_to_compare = result.axis_ranges[1][:len(case.s2c_range)]
-    # Perform the assertion
-    assert np.all(np.abs(case.s2c_range - result_to_compare) <= tolerance), \
-        f"Expected ordered axis range 1 to match within {tolerance} of {case.s2c_range}, but got {result_to_compare}"
+    # Check for the specific ValueError with the correct message
+    with pytest.raises(ValueError, match=expected_error_message):
+        plugin.execute(test_ds)
+
+
+def test_execute_with_missing_string(plugin_fixture):
+    plugin = plugin_fixture
+    with pytest.raises(ValueError, match="Dataset must have a data_label"):
+        plugin.execute(Dataset(np.array([1, 2, 3])))
 
         
 # Testing for various Dataset modifications for create_final_result_sin2chi_method
@@ -1838,11 +2136,13 @@ def base_dataset():
     return Dataset(
         np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=float), 
         axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]}, 
-        axis_labels={0: '0: d-, 1: d+', 1: LABELS_SIN2CHI}, 
+        axis_labels={0: 'chi', 1: '0: position'}, 
+        axis_units={0: 'deg', 1: ''},
         data_unit='nm', 
         data_label='0: position_neg, 1: position_pos'
     )
-
+    
+    
 @pytest.mark.parametrize("modifications, expected_array", [
     # No modifications
     ([], np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]])),

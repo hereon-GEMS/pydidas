@@ -142,7 +142,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         pass
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
-        
+        """
+        print('\n')
         print(30*"\N{hot pepper}")
         print('ds shape', ds.shape)
         print('Input shape again ', self._config["input_shape"])
@@ -152,14 +153,14 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(30*"\N{pineapple}")
         print(ds)
         print(30*"\N{pineapple}")
+        """
         
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
         
         #d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
-        print('d_spacing_combined shape', d_spacing_combined.shape)
-        
+                
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined)
         
         return d_output_sin2chi_method, kwargs
@@ -351,6 +352,15 @@ class DspacingSin2chiGrouping(ProcPlugin):
             except KeyError:
                 raise ValueError(f"Unit not found for parameter: {param}")
             result[index] = [param, unit]
+            
+        # Step 4: Append chi and its unit to the result
+        chi_label = ds.axis_labels[chi_key]
+        chi_unit = ds.axis_units[chi_key]
+        if result:
+            new_key = max(result.keys()) + 1
+        else:
+            new_key = 0
+        result[new_key] = [chi_label, chi_unit]
 
         return result        
             
@@ -392,7 +402,20 @@ class DspacingSin2chiGrouping(ProcPlugin):
         chi_units_allowed: List[str] = [UNITS_DEGREE]
 
         params_to_check = [LABELS_POSITION, LABELS_CHI]
+        
+        print('ds_units: ', ds_units)
+        
+        for _, val in ds_units.items():
+            label = val[0]  # First item in the value list is the label (e.g., 'position', 'chi')
+            unit = val[1]   # Second item is the unit (e.g., 'nm', 'deg')
 
+            if label in params_to_check:
+                if label == LABELS_POSITION and unit not in pos_units_allowed:
+                    raise ValueError(f"Unit {unit} not allowed for {label}.")
+                if label == LABELS_CHI and unit not in chi_units_allowed:
+                    raise ValueError(f"Unit {unit} not allowed for {label}.")
+
+        """
         for item, val in ds_units.items():
             if item in params_to_check:
                 if item == LABELS_POSITION:
@@ -400,9 +423,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
                         raise ValueError(f"Unit {val} not allowed for {item}.")
                 if item == LABELS_CHI:
                     if val not in chi_units_allowed:
-                        raise ValueError(f"Unit {val} not allowed for {item}.")
-
- 
+                        raise ValueError(f"Unit {unit} not allowed for {item}.")
+        """  
     
     def _get_param_unit_at_index(self, ds_units: Dict[int, Tuple[str, str]], pos_idx: int) -> Tuple[str, str]:
         """
@@ -1017,20 +1039,12 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_avg=d_spacing_avg.reshape(1,-1)
                 
         arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
-        print(30*"\N{strawberry}")
-        print('Resulting arr shape', arr.shape)
-        print(arr)
-        print(30*"\N{strawberry}")
-        
+                
         #Preallocation of shape for output array
-        #dummy_arr= np.full((3, int(np.ceil(self._config["input_shape"][0] / 2 + 1))), np.nan)
         dummy_arr= np.full((3, self._config["input_shape"][0]), np.nan)
         
         
-        # Filling of dummy array. All rows and all columns of real data. Rest remains np.nan.  
-        print('Dummy arr shape', dummy_arr.shape)
-       
-        
+        # Filling of dummy array. All rows and all columns of real data. Rest remains np.nan.      
         dummy_arr[:,0:arr.shape[1]] = arr
         
         #Preallocation of axis ranges, non occupied values remain 1                
@@ -1052,11 +1066,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         #        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit=d_spacing_combined.data_unit,
         #        data_label='d_spacing'
         #    )
-        
-        print(30*"\N{banana}")
-        print('Resulting arr shape', result.shape)
-        print(result)
-        print(30*"\N{banana}")
-        
+             
     
         return result

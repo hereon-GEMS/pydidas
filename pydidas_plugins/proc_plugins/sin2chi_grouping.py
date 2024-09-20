@@ -142,19 +142,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         pass
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
-        """
-        print('\n')
-        print(30*"\N{hot pepper}")
-        print('ds shape', ds.shape)
-        print('Input shape again ', self._config["input_shape"])
-        print(30*"\N{hot pepper}")
-        
-        
-        print(30*"\N{pineapple}")
-        print(ds)
-        print(30*"\N{pineapple}")
-        """
-        
+              
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
@@ -353,7 +341,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 raise ValueError(f"Unit not found for parameter: {param}")
             result[index] = [param, unit]
             
-        # Step 4: Append chi and its unit to the result
+        # Step 4: Append chi and its unit to the result as the highest key
         chi_label = ds.axis_labels[chi_key]
         chi_unit = ds.axis_units[chi_key]
         if result:
@@ -402,9 +390,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         chi_units_allowed: List[str] = [UNITS_DEGREE]
 
         params_to_check = [LABELS_POSITION, LABELS_CHI]
-        
-        print('ds_units: ', ds_units)
-        
+                
         for _, val in ds_units.items():
             label = val[0]  # First item in the value list is the label (e.g., 'position', 'chi')
             unit = val[1]   # Second item is the unit (e.g., 'nm', 'deg')
@@ -415,16 +401,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 if label == LABELS_CHI and unit not in chi_units_allowed:
                     raise ValueError(f"Unit {unit} not allowed for {label}.")
 
-        """
-        for item, val in ds_units.items():
-            if item in params_to_check:
-                if item == LABELS_POSITION:
-                    if val not in pos_units_allowed:
-                        raise ValueError(f"Unit {val} not allowed for {item}.")
-                if item == LABELS_CHI:
-                    if val not in chi_units_allowed:
-                        raise ValueError(f"Unit {unit} not allowed for {item}.")
-        """  
+       
     
     def _get_param_unit_at_index(self, ds_units: Dict[int, Tuple[str, str]], pos_idx: int) -> Tuple[str, str]:
         """
@@ -619,8 +596,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
             raise ValueError("Array is empty, slicing out of bounds.")
 
         if not d_spacing.ndim == 1:
-            print("d_spacing.ndim", d_spacing.ndim)
-            print(d_spacing)
             raise ValueError("Dimension mismatch.")
 
         return chi, d_spacing

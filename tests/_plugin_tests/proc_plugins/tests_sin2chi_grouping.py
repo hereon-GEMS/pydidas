@@ -2124,15 +2124,96 @@ def test_execute_with_missing_field(plugin_fixture, base_execute_dataset, missin
         test_ds.data_label = 'area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts'
     elif removal_key == 4:
         test_ds.update_axis_unit(0, 'dummy')
-        
-        
-    #print(test_ds)
-    #plugin.execute(test_ds)   
      
-             
-    # Check for the specific ValueError with the correct message
     with pytest.raises(ValueError, match=expected_error_message):
         plugin.execute(test_ds)
+
+@pytest.mark.parametrize("fit_label, data_label, expected_units_dict", [
+    ('0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity', 
+     'position / nm; area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts',
+     {0: ['position','nm'] , 1: ['area', '(cts * nm)'], 2:['FWHM', 'nm'], 3:['background at peak', 'cts'],
+      4:['total count intensity','cts'], 5:['chi', 'deg']}),
+    ('0:position; 1:area', 'position / nm; area / (cts * nm)', {0: ['position','nm'] , 1: ['area', '(cts * nm)'], 2:['chi', 'deg']}),
+    ('0:position', 'position / nm', {0: ['position','nm'] , 1: ['chi', 'deg']}),
+    ('1: area; 2: FWHM; 3: background at peak; 4: position', 
+     'area / (cts * nm); FWHM / nm;background at peak / cts; position / nm',
+     {1: ['area', '(cts * nm)'], 2:['FWHM', 'nm'], 3:['background at peak', 'cts'], 
+      4:['position', 'nm'],5:['chi', 'deg']}),
+])
+def test__extract_units_validation(plugin_fixture, base_execute_dataset, fit_label, data_label, expected_units_dict):
+    plugin = plugin_fixture
+    test_ds = base_execute_dataset
+    
+    #overwrite the axis_labels and data_label
+    test_ds.update_axis_label(1, fit_label)
+    test_ds.data_label = data_label
+    
+    # Test the function
+    result = plugin._extract_units(test_ds)
+    assert result == expected_units_dict   
+ 
+ 
+@pytest.mark.parametrize("fit_label, data_label, expected_error_message", [
+    ('0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity', 
+     'position / nmm; area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts',
+     'Unit nmm not allowed for position.'),
+    ('0:position; 1:area', 'position / nmm; area / (cts * nm)', 'Unit nmm not allowed for position.'),
+    ('0:position', 'position / nmm', 'Unit nmm not allowed for position.'),
+    ('1: area; 2: FWHM; 3: background at peak; 4: position', 
+     'area / (cts * nm); FWHM / nm;background at peak / cts; position / nmm', 'Unit nmm not allowed for position.'),
+    ('0:position', 'position / nm^-1', r'Unit nm\^\-1 not allowed for position.'),
+    ('0:position', 'position / A^-1', r'Unit A\^\-1 not allowed for position.'),    
+    ('0:position', 'position / 2th_deg', r'Unit 2th_deg not allowed for position.'), # currently not allowed, but for sin^psi relevant
+    ('0:position', 'position / 2th_rad', r'Unit 2th_rad not allowed for position.')
+])
+def test__chi_pos_unit_verification_error_position_unit(plugin_fixture, base_execute_dataset,
+                                           fit_label, data_label, expected_error_message):
+    plugin = plugin_fixture
+    test_ds = base_execute_dataset
+    #overwrite the axis_labels and data_label
+    test_ds.update_axis_label(1, fit_label)
+    test_ds.data_label = data_label
+    
+    with pytest.raises(ValueError, match=expected_error_message):
+        plugin._chi_pos_unit_verification(test_ds)
+        
+@pytest.mark.parametrize('fit_label, data_label',
+                         [
+                         ('1:position', 'position / nm'),
+                         ('1:position', 'position / A'),
+                         ])
+def test__chi_pos_unit_verification_valid_position_unit(plugin_fixture, base_execute_dataset, fit_label, data_label):
+    plugin = plugin_fixture
+    test_ds = base_execute_dataset 
+    test_ds.update_axis_label(1,fit_label)
+    test_ds.data_label=data_label
+    try:
+        plugin._chi_pos_unit_verification(test_ds)
+    except Exception as e:
+        pytest.fail(f"Function raised an unexpected exception: {e}")
+
+        
+def test__chi_pos_unit_verification_valid_chi_unit(plugin_fixture, base_execute_dataset):
+    plugin = plugin_fixture
+    test_ds = base_execute_dataset
+    try:
+        plugin._chi_pos_unit_verification(test_ds)
+    except Exception as e:
+        pytest.fail(f"Function raised an unexpected exception: {e}")
+    
+@pytest.mark.parametrize("chi_unit, expected_error_message", [
+    ('def', 'Unit def not allowed for chi.'),
+    ('rad', 'Unit rad not allowed for chi.'),
+    ('r_mm', 'Unit r_mm not allowed for chi.' ) 
+])
+def test__chi_pos_unit_verification_error_chi_unit(plugin_fixture, base_execute_dataset, chi_unit, expected_error_message):
+    plugin = plugin_fixture
+    test_ds = base_execute_dataset
+    test_ds.update_axis_unit(0, chi_unit)
+    
+    with pytest.raises(ValueError, match=expected_error_message):
+        plugin._chi_pos_unit_verification(test_ds)
+
 
         
 # Testing for various Dataset modifications for create_final_result_sin2chi_method
@@ -2146,7 +2227,6 @@ def base_dataset():
         data_unit='nm', 
         data_label='0: position_neg, 1: position_pos'
     )
-    
     
 @pytest.mark.parametrize("modifications, expected_array", [
     # No modifications

@@ -142,6 +142,12 @@ class DspacingSin2chiGrouping(ProcPlugin):
         pass
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
+        
+        print(30*"\N{hot pepper}") 
+        #self._chi_pos_unit_verification(ds)        
+        print(30*"\N{banana}") 
+        print(ds)
+        print(30*"\N{banana}")        
               
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)

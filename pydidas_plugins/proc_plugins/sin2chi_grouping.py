@@ -903,77 +903,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         )
 
         return d_spacing_combined
-    
-    def _pre_regression_calculation(self, d_spacing_combined: Dataset) -> Tuple[Dataset, Dataset]:
-        """
-        Prepares data for regression analysis based on d-spacing values.
 
-        This function processes a combined dataset of d-spacing values for both positive and negative slopes (d+ and d- respectively)
-        against sin^2(chi) values. It calculates the average and difference of d+ and d- for each sin^2(chi) value, preparing the
-        data for subsequent regression analysis. The average d-spacing is calculated as (d(+) + d(-))/2, and the difference is d(+) - d(-).
-        The function also transforms sin^2(chi) to sin(2*chi) for the difference calculation.
-
-        Parameters
-        ----------
-        d_spacing_combined : Dataset
-            A Pydidas Dataset object containing d-spacing values vs sin^2(chi) values. The dataset should have a shape of (2, N),
-            where d_spacing_combined[0, :] represents d(-) values and d_spacing_combined[1, :] represents d(+) values. Missing
-            values (np.nan) in either d(+) or d(-) are excluded from calculations.
-
-        Returns
-        -------
-        d_spacing_avg : Dataset
-            A Pydidas Dataset containing the average of (d(+) + d(-))/2 vs sin^2(chi). The dataset includes:
-            - axis_ranges[0]: sin^2(chi) values.
-            - axis_labels[0]: 'sin^2(chi)'.
-            - data_label: 'd_spacing_mean'.
-
-        d_spacing_diff : Dataset
-            A Pydidas Dataset containing the difference of d(+) - d(-) vs sin(2*chi). The dataset includes:
-            - axis_ranges[0]: Calculated sin(2*chi) values from the original sin^2(chi) values.
-            - axis_labels[0]: 'sin(2*chi)'.
-            - data_label: 'd_spacing_diff'.
-
-        Raises
-        ------
-        TypeError
-            If `d_spacing_combined` is not an instance of Dataset.
-
-        Notes
-        -----
-        The function assumes that the input dataset `d_spacing_combined` is correctly formatted and contains the necessary
-        axis labels and ranges. It is crucial for the dataset to have a shape of (2, N) where N is the number of sin^2(chi)
-        values. The calculation of sin(2*chi) from sin^2(chi) is based on the arcsin and sqrt functions for the transformation.
-
-        Examples
-        --------
-        >>> d_spacing_combined = Dataset(...)
-        >>> d_spacing_avg, d_spacing_diff = pre_regression_calculation(d_spacing_combined)
-        """
-        # Check if d_spacing_combined is an instance of Dataset
-        if not isinstance(d_spacing_combined, Dataset):
-            raise TypeError("Input d_spacing_combined must be an instance of Dataset.")
-
-        # This is the case where one part of the d_spacing pair is missing and not taken into account for the average
-        # d_spacing_avg= np.mean(d_spacing_combined, axis=0)
-        d_spacing_avg = d_spacing_combined.mean(axis=0)
-
-        # d-, d+
-        # d[1,1]-d[0,1]
-        # vs sin(2*chi)
-        # TODO: np.diff is not yet implemented as method of Dataset
-        # overriding the existing d_spacing_combined Dataset is faster than creating a new one.
-        d_spacing_diff = np.diff(d_spacing_combined, axis=0).squeeze()
-        # correcting the metadata
-        d_spacing_diff.data_label = "Difference of d(+) - d(-)"  # TODO: Is this there a better label? But this clear.
-        d_spacing_diff.axis_labels = {0: "sin(2*chi)"}  # or #TODO 'sin(2chi)' or 'sin_2chi'
-        # calculation of sin(2*chi) from sin^2(chi)
-        d_spacing_diff.axis_ranges = {
-            0: np.sin(2 * np.arcsin(np.sqrt(d_spacing_combined.axis_ranges[1])))
-        }
-
-        return d_spacing_avg, d_spacing_diff
-    
     
     def _create_final_result_sin2chi_method(self,d_spacing_combined: Dataset) -> Dataset:
         """

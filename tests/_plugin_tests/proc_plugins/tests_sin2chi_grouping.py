@@ -2214,6 +2214,18 @@ def test__chi_pos_unit_verification_error_chi_unit(plugin_fixture, base_execute_
     with pytest.raises(ValueError, match=expected_error_message):
         plugin._chi_pos_unit_verification(test_ds)
 
+@pytest.mark.parametrize("ds_units_dict, pos_index, expected_param_with_unit",[
+    ({0: ['position','nm'] , 1: ['area', '(cts * nm)'], 2:['chi', 'deg']}, 0, ('position', 'nm')),
+    ({0: ['position','A'] , 1: ['area', '(cts * nm)'], 2:['chi', 'deg']}, 0, ('position', 'A')),
+    ({1: ['position','nm']}, 1, ('position', 'nm')),
+])
+def test__get_param_unit_at_index_validation(plugin_fixture, ds_units_dict, pos_index, expected_param_with_unit):
+    plugin = plugin_fixture
+    
+    result = plugin._get_param_unit_at_index(ds_units_dict, pos_index)
+    
+    assert result == expected_param_with_unit
+
 
         
 # Testing for various Dataset modifications for create_final_result_sin2chi_method

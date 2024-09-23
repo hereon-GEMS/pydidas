@@ -535,8 +535,43 @@ def test__group_d_spacing_by_chi_result(plugin_fixture, case):
         d_spacing_neg.array.shape == case.d_mean_neg.shape
     ), f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
     
+
+
+
+@pytest.fixture
+def base_dataset_with_fit_labels_factory():
+    def _create_dataset(fit_labels):
+        y_range = np.arange(2, 7)
+        result_array = generate_spatial_fit_res(y_range=y_range, fit_labels=fit_labels, phase_shift=70)
+        chi = chi_gen(-175, 180, 10)
+        
+        return Dataset(result_array, 
+                axis_labels={0: "y", 1: "chi", 2: fit_labels},
+                axis_ranges={0: y_range, 1: chi, 2: np.arange(result_array.shape[-1])}
+                )
+    return _create_dataset
+
+@pytest.mark.parametrize("fit_label_input, expected_chi_pos_values",
+    [
+        ('0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity', (1, (2,0))),
+      ('0: position', (1, (2,0))),  
+      ('0: area; 1: FWHM; 2: background at peak; 3: total count intensity; 4: position', (1, (2,4)))                 
+  ])    
+def test__chi_pos_verification_success(plugin_fixture, base_dataset_with_fit_labels_factory, fit_label_input, expected_chi_pos_values):
+    plugin = plugin_fixture
+    test_ds = base_dataset_with_fit_labels_factory(fit_label_input)
     
-def test__chi_pos_verification_success(plugin_fixture):
+    print(test_ds.shape)
+    
+    (chi_pos_res, (pos_idx_res, pos_key_res)) = plugin._chi_pos_verification(test_ds)
+    
+    assert chi_pos_res == expected_chi_pos_values[0]
+    assert pos_idx_res == expected_chi_pos_values[1][0]
+    assert pos_key_res == expected_chi_pos_values[1][1]
+    assert (chi_pos_res, (pos_idx_res, pos_key_res)) == expected_chi_pos_values
+   
+    
+def test__chi_pos_verification_success_4d_array(plugin_fixture):
     plugin = plugin_fixture
     
     fit_labels = (
@@ -549,7 +584,6 @@ def test__chi_pos_verification_success(plugin_fixture):
 
     ds = Dataset(result_array_spatial, axis_labels=axis_labels)
     
-
     chi_key, (pos_key, pos_idx) = plugin._chi_pos_verification(ds)
     
     assert chi_key == 2

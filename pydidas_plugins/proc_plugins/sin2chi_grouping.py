@@ -146,8 +146,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         chi, d_spacing = self._ds_slicing(ds)
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
-        
-        #d_spacing_avg, d_spacing_diff = self._pre_regression_calculation(d_spacing_combined) 
                 
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(d_spacing_combined)
         

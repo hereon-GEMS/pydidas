@@ -2,6 +2,15 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v24.mm.dd
+=========
+
+Improvements
+------------
+- Replaced the default azimuthal integration range to (-180, 180) or (0, 360)
+  respectively instead of None to have more consistent ranges (pyFAI issue #2291)
+
+
 v24.09.19
 =========
 

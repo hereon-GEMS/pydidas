@@ -175,7 +175,7 @@ def check_git_installed():
         ) from _error
 
 
-def clone_git_repo(path: Path):
+def clone_git_repo(path: Path, verbose: bool = True):
     """
     Clone the pydidas git repository into the given directory.
 
@@ -183,12 +183,16 @@ def clone_git_repo(path: Path):
     ----------
     path : Path
         The path to put the cloned repository.
+    verbose : bool, optional
+        Flag whether to print the status messages. The default is True.
     """
+    if verbose:
+        print_status("Cloning git repository")
     _url = "https://github.com/hereon-GEMS/pydidas"
     subprocess.check_call(["git", "clone", _url, str(path)])
 
 
-def build_wheel(path: Path) -> str:
+def build_wheel(path: Path, verbose: bool = True) -> str:
     """
     Build the wheel from the downloaded git data.
 
@@ -196,12 +200,16 @@ def build_wheel(path: Path) -> str:
     ----------
     path : Path
         The path of the git repository.
+    verbose : bool, optional
+        Flag whether to print the status messages. The default is True.
 
     Returns
     -------
     str
         The path to the built wheel.
     """
+    if verbose:
+        print_status("Building wheel")
     _builder = build.ProjectBuilder(path)
     _metadata_dir = _builder.prepare("wheel", path.joinpath("build"))
     _wheel = _builder.build("wheel", path, metadata_directory=_metadata_dir)
@@ -209,7 +217,7 @@ def build_wheel(path: Path) -> str:
     return _wheel
 
 
-def install_wheel(wheel_filename: str):
+def install_wheel(wheel_filename: str, verbose: bool = True):
     """
     Install the wheel with the given filename.
 
@@ -217,7 +225,21 @@ def install_wheel(wheel_filename: str):
     ----------
     wheel_filename : str
         The name of the wheel file.
+    verbose : bool, optional
+        Flag whether to print the status messages. The default is True.
     """
+    subprocess.check_call(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--upgrade",
+            "pip",
+        ]
+    )
+    if verbose:
+        print_status("Installing wheel")
     subprocess.check_call(
         [
             sys.executable,
@@ -257,7 +279,7 @@ def get_location_of_installed_pydidas() -> Path:
     return Path(_results[0])
 
 
-def backup_local_version(path: Path, version: str):
+def backup_local_version(path: Path, version: str, verbose: bool = True):
     """
     Move the old pydidas files to a backup location in case the update fails.
 
@@ -267,7 +289,11 @@ def backup_local_version(path: Path, version: str):
         The installation path of the pydidas package.
     version : str
         The version string of the local version.
+    verbose : bool, optional
+        Flag whether to print the status messages. The default is True.
     """
+    if verbose:
+        print_status("Backing up old version")
     for _name in [
         "pydidas",
         "pydidas_plugins",
@@ -276,7 +302,7 @@ def backup_local_version(path: Path, version: str):
     ]:
         if path.joinpath(f"{_name}_pre_update").is_dir():
             shutil.rmtree(path.joinpath(f"{_name}_pre_update"))
-        shutil.move(
+        shutil.copytree(
             path.joinpath(_name),
             path.joinpath(f"{_name}_pre_update"),
         )
@@ -388,13 +414,9 @@ def run_update():
     try:
         _path = Path(sys.executable).parent.joinpath(".temp", "pydidas")
         _pydidas_location = get_location_of_installed_pydidas()
-        print_status("Backing up old version")
         backup_local_version(_pydidas_location, _local_version)
-        print_status("Cloning git repository")
         clone_git_repo(_path)
-        print_status("Creating wheel")
         _wheel = build_wheel(_path)
-        print_status("Installing wheel")
         install_wheel(_wheel)
         remove_pydidas_log_files(_local_version, verbose=False, confirm_finish=False)
         remove_pydidas_stored_gui_states(
@@ -406,6 +428,8 @@ def run_update():
         print_status(
             "An error occured during the update. Restoring previous version "
             f"{_local_version} of pydidas."
+            "\nPlease note that any problems with the pip update process may "
+            "have caused a broken environment."
         )
         print(traceback.format_exc())
     finally:

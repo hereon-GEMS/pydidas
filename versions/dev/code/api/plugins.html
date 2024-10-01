@@ -1554,17 +1554,18 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_native">
-<span class="sig-name descname"><span class="pre">get_azimuthal_range_native</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_native" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_azimuthal_range_native</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_native" title="Link to this definition">#</a></dt>
 <dd><p>Get the azimuthal range from the Parameters in native units.</p>
 <p>If use_azimuthal_range is True and both the lower and upper range
 limits are larger than zero, the tuple with both values is returned.
-Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
+Otherwise, the return is the full circle which encompasses (-180, 180)
+if the integration discontinuity is located at pi, and (0, 360) otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[None, tuple[float, float]]</p>
+<dd class="field-even"><p>tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>

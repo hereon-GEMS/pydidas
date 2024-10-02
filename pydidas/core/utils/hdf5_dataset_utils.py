@@ -46,7 +46,7 @@ import numpy as np
 
 from ..constants import HDF5_EXTENSIONS
 from ..dataset import Dataset
-from .file_utils import get_extension
+from .file_utils import CatchFileErrors, get_extension
 
 
 def get_hdf5_populated_dataset_keys(
@@ -307,7 +307,10 @@ def get_hdf5_metadata(
     if not isinstance(meta, (set, list, tuple)):
         raise TypeError("meta parameter must be of type str, set, list, tuple.")
     _results = {}
-    with h5py.File(_fname, "r") as _file:
+    with (
+        CatchFileErrors(_fname, error_suffix="as HDF5 file."),
+        h5py.File(_fname, "r") as _file,
+    ):
         if "dtype" in meta:
             _results["dtype"] = _file[_dset].dtype
         if "shape" in meta:

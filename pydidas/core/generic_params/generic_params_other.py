@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters which are are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -579,19 +579,6 @@ GENERIC_PARAMS_OTHER = {
             "the input data dimensionality is larger than the processing "
             "dimensionality. The default of -1 will always use the last data "
             "dimension."
-        ),
-    },
-    "_process_data_dim": {
-        "type": int,
-        "default": -1,
-        "name": "Process data dimension",
-        "choices": None,
-        "unit": "",
-        "allow_None": False,
-        "tooltip": (
-            "The modulated version of the process_data_dim parameter. This parameter "
-            "is used internally to ensure that the process_data_dim parameter is "
-            "always within the range of the input data dimensions."
         ),
     },
     ####################

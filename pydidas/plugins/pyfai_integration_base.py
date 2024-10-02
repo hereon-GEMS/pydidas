@@ -219,30 +219,34 @@ class pyFAIintegrationBase(ProcPlugin):
                 _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
         return _range
 
-    def get_azimuthal_range_native(self) -> Union[None, tuple[float, float]]:
+    def get_azimuthal_range_native(self) -> tuple[float, float]:
         """
         Get the azimuthal range from the Parameters in native units.
 
         If use_azimuthal_range is True and both the lower and upper range
         limits are larger than zero, the tuple with both values is returned.
-        Otherwise, the return is None which corresponds to pyFAI auto ranges.
+        Otherwise, the return is the full circle which encompasses (-180, 180)
+        if the integration discontinuity is located at pi, and (0, 360) otherwise.
 
         Returns
         -------
-        Union[None, tuple[float, float]]
+        tuple[float, float]
             The azimuthal range for the pyFAI integration.
         """
+        if self._ai is None:
+            _default = (-180, 180)
+        else:
+            _default = (-180, 180) if self._ai.chiDiscAtPi else (0, 360)
         if self.get_param_value("azi_use_range", False) == "Specify azimuthal range":
             self.modulate_and_store_azi_range()
             _low = self.get_param_value("azi_range_lower")
             _high = self.get_param_value("azi_range_upper")
-            if _low == _high:
-                return None
-            return (
-                self.get_param_value("azi_range_lower"),
-                self.get_param_value("azi_range_upper"),
-            )
-        return None
+            if _low < _high:
+                return (
+                    self.get_param_value("azi_range_lower"),
+                    self.get_param_value("azi_range_upper"),
+                )
+        return _default
 
     def _adjust_integration_discontinuity(self):
         """

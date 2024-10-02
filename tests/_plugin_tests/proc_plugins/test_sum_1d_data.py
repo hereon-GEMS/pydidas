@@ -67,12 +67,15 @@ class TestSum1dData(unittest.TestCase):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin._data = self.create_dataset()
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_slice()
-        self.assertEqual(_range.start, _low)
-        self.assertEqual(_range.stop, _high + 1)
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true.size, _high - _low + 1)
+        self.assertEqual(_mask_true[0], _low)
+        self.assertEqual(_mask_true[-1], _high)
 
     def test_get_slice__w_data(self):
         _low = 42
@@ -83,9 +86,10 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_low])
         plugin.set_param_value("upper_limit", self._x[_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_slice()
-        self.assertEqual(_range.start, _low)
-        self.assertEqual(_range.stop, _high + 1)
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true[0], _low)
+        self.assertEqual(_mask_true[-1], _high)
 
     def test_get_slice__w_empty_range(self):
         _low = 42
@@ -96,8 +100,9 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_high])
         plugin.set_param_value("upper_limit", self._x[_low])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_slice()
-        self.assertEqual(_range, slice(0, 0))
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true.size, 0)
 
     def test_get_slice__w_sinple_point_range(self):
         _low = 42
@@ -108,9 +113,10 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_high])
         plugin.set_param_value("upper_limit", self._x[_low])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_slice()
-        self.assertEqual(_range.start, _low)
-        self.assertEqual(_range.stop, _low + 1)
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true.size, 1)
+        self.assertEqual(_mask_true[0], _low)
 
     def test_execute__empty_selection(self):
         _low = 42

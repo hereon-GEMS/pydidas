@@ -75,13 +75,13 @@ class Sum1dData(ProcPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._config["mask"] = None
+        self._mask = None
 
     def pre_execute(self):
         """
         Reset the index range slices before starting a new processing run.
         """
-        self._config["mask"] = None
+        self._mask = None
 
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -126,19 +126,14 @@ class Sum1dData(ProcPlugin):
         np.ndarray
             The array mask which indices to use in the sum.
         """
-        if self._config["mask"] is not None:
-            return self._config["mask"]
-        self.set_param_value(
-            "_process_data_dim",
-            np.mod(self.get_param_value("process_data_dim"), self._data.ndim),
-        )
-        self._config["mask"] = np.zeros(
-            self._data.shape[self.get_param_value("_process_data_dim")], dtype=bool
-        )
+        if self._mask is not None:
+            return self._mask
+        _dim_to_sum = np.mod(self.get_param_value("process_data_dim"), self._data.ndim)
+        self.set_param_value("_process_data_dim", _dim_to_sum)
         if self.get_param_value("type_selection") == "Indices":
-            _x = np.arange(self._data.shape[self.get_param_value("_process_data_dim")])
+            _x = np.arange(self._data.shape[_dim_to_sum])
         else:
-            _x = self._data.axis_ranges[self.get_param_value("_process_data_dim")]
+            _x = self._data.axis_ranges[_dim_to_sum]
         _low = (
             self.get_param_value("lower_limit")
             if self.get_param_value("lower_limit") is not None
@@ -149,9 +144,14 @@ class Sum1dData(ProcPlugin):
             if self.get_param_value("upper_limit") is not None
             else _x[-1]
         )
-        _bounds = np.where((_x >= _low) & (_x <= _high))[0]
-        self._config["mask"][_bounds] = True
-        return self._config["mask"]
+        _sum_mask = np.where((_x >= _low) & (_x <= _high), 1, 0).astype(bool)
+        _slicer = (
+            [None] * _dim_to_sum
+            + [slice(None)]
+            + [None] * (self._data.ndim - _dim_to_sum - 1)
+        )
+        self._mask = np.ones(self._data.shape, dtype=bool) * _sum_mask[*_slicer]
+        return self._mask
 
     @calculate_result_shape_for_multi_input_dims
     def calculate_result_shape(self):

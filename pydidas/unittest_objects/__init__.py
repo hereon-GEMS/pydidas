@@ -30,6 +30,7 @@ __all__ = []
 
 
 # import __all__ items from modules:
+from .create_dataset import *
 from .create_dummy_plugins import *
 from .create_hdf5_io_file_ import *
 from .dummy_loader import *

@@ -593,6 +593,35 @@ GENERIC_PARAMS_OTHER = {
             "to be processed."
         ),
     },
+    "process_data_dims": {
+        "type": tuple,
+        "default": (0, 1),
+        "name": "Process data dimensions",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "subtype": int,
+        "tooltip": (
+            "This parameter determines which data dimensions should be processed if "
+            "the input data dimensionality is larger than the processing "
+            "dimensionality. The default of None will default to the full data "
+            "dimensions and raise an error if the input data has more dimensions "
+            "than expected for processing."
+        ),
+    },
+    "_process_data_dims": {
+        "type": tuple,
+        "default": None,
+        "name": "Process data dimensions",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "subtype": int,
+        "tooltip": (
+            "This internal Parameter can store the modulated data dimensions "
+            "to be processed."
+        ),
+    },
     ####################
     # User Configuration
     ####################

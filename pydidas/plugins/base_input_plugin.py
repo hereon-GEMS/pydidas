@@ -289,3 +289,6 @@ class InputPlugin(BasePlugin):
         """
         if "roi" not in kwargs and self.get_param_value("use_roi"):
             kwargs["roi"] = self._image_metadata.roi
+
+
+InputPlugin.register_as_base_class()

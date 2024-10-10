@@ -84,6 +84,17 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin = BaseFitPlugin()
         self.assertIsInstance(plugin, BasePlugin)
 
+    def test_is_basic_plugin__baseclass(self):
+        for _plugin in [BaseFitPlugin, BaseFitPlugin()]:
+            self.assertTrue(_plugin.is_basic_plugin())
+
+    def test_is_basic_plugin__subclass(self):
+        class TestPlugin(BaseFitPlugin):
+            pass
+
+        for _plugin in [TestPlugin, TestPlugin()]:
+            self.assertFalse(_plugin.is_basic_plugin())
+
     def test_pre_execute(self):
         _min_peak = 12.4
         _sigma = 0.42

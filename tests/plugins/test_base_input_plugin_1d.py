@@ -92,6 +92,17 @@ class TestBaseInputPlugin1d(unittest.TestCase):
 
     def tearDown(self): ...
 
+    def test_is_basic_plugin__baseclass(self):
+        for _plugin in [InputPlugin1d, InputPlugin1d()]:
+            self.assertTrue(_plugin.is_basic_plugin())
+
+    def test_is_basic_plugin__subclass(self):
+        class TestPlugin(InputPlugin1d):
+            pass
+
+        for _plugin in [TestPlugin, TestPlugin()]:
+            self.assertFalse(_plugin.is_basic_plugin())
+
     def test_create_base_plugin(self):
         plugin = TestInputPlugin1d()
         self.assertIsInstance(plugin, InputPlugin1d)
@@ -99,7 +110,6 @@ class TestBaseInputPlugin1d(unittest.TestCase):
     def test_class_atributes(self):
         plugin = create_plugin_class(INPUT_PLUGIN)
         for att in (
-            "basic_plugin",
             "plugin_type",
             "plugin_name",
             "default_params",

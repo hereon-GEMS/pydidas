@@ -9,7 +9,9 @@ Improvements
 ------------
 - Replaced the default azimuthal integration range to (-180, 180) or (0, 360)
   respectively instead of None to have more consistent ranges (pyFAI issue #2291)
-
+- Programmatic improvements:
+    - Removed the basic_plugin class attribute from Plugins and shifted the check
+      to the core code of the base plugins.
 
 v24.09.19
 =========

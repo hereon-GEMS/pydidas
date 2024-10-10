@@ -63,6 +63,18 @@ SECTOR_WIDTH_PARAM = Parameter(
     tooltip="The width of each azimuthal sector (in degree).",
 )
 
+_SECTOR_INT_PLUGIN_PARAMS = pyFAIintegrationBase.default_params.copy()
+_SECTOR_INT_PLUGIN_PARAMS.pop("azi_use_range")
+_SECTOR_INT_PLUGIN_PARAMS.pop("azi_range_lower")
+_SECTOR_INT_PLUGIN_PARAMS.pop("azi_range_upper")
+_SECTOR_INT_PLUGIN_PARAMS.pop("azi_npoint")
+_SECTOR_INT_PLUGIN_PARAMS.update(
+    get_generic_param_collection(
+        "azi_sector_centers",
+        "azi_sector_width",
+    )
+)
+
 
 class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
     """
@@ -77,21 +89,9 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
     """
 
     plugin_name = "pyFAI azimuthal sector integration"
-    basic_plugin = False
-    output_data_dim = 1
-    default_params = get_generic_param_collection(
-        "rad_npoint",
-        "rad_unit",
-        "rad_use_range",
-        "rad_range_lower",
-        "rad_range_upper",
-        "azi_unit",
-        "azi_sector_centers",
-        "azi_sector_width",
-        "int_method",
-        "correct_solid_angle",
-        "polarization_factor",
-    )
+
+    default_params = _SECTOR_INT_PLUGIN_PARAMS
+    output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

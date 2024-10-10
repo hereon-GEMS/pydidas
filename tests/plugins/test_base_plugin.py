@@ -65,6 +65,17 @@ class TestBasePlugin(unittest.TestCase):
         plugin = create_plugin_class(BASE_PLUGIN)
         self.assertIsInstance(plugin(), BasePlugin)
 
+    def test_is_basic_plugin__this_class(self):
+        for _plugin in [BasePlugin, BasePlugin()]:
+            with self.subTest(plugin=_plugin):
+                self.assertTrue(_plugin.is_basic_plugin())
+
+    def test_is_basic_plugin__sub_class(self):
+        _class = create_plugin_class(BASE_PLUGIN)
+        for _plugin in [_class, _class()]:
+            with self.subTest(plugin=_plugin):
+                self.assertFalse(_plugin.is_basic_plugin())
+
     def test_input_data_property__None(self):
         plugin = create_plugin_class(BASE_PLUGIN)()
         self.assertIsNone(plugin.input_data)
@@ -103,7 +114,6 @@ class TestBasePlugin(unittest.TestCase):
     def test_class_atributes(self):
         plugin = create_plugin_class(BASE_PLUGIN)
         for att in (
-            "basic_plugin",
             "plugin_type",
             "plugin_name",
             "default_params",

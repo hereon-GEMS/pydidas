@@ -30,7 +30,6 @@ __all__ = ["Sum2dData"]
 import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN
 from pydidas.plugins import ProcPlugin
 
 
@@ -43,8 +42,7 @@ class Sum2dData(ProcPlugin):
     """
 
     plugin_name = "Sum 2D data"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
+
     default_params = get_generic_param_collection(
         "type_selection",
         "lower_limit_ax0",
@@ -52,6 +50,7 @@ class Sum2dData(ProcPlugin):
         "lower_limit_ax1",
         "upper_limit_ax1",
     )
+
     input_data_dim = 2
     output_data_dim = 0
     output_data_label = "data sum (2d)"

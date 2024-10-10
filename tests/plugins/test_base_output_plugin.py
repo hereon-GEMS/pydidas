@@ -40,6 +40,17 @@ class TestBaseOutputPlugin(unittest.TestCase):
         plugin = create_plugin_class(OUTPUT_PLUGIN)
         self.assertIsInstance(plugin(), OutputPlugin)
 
+    def test_is_basic_plugin__this_class(self):
+        for _plugin in [OutputPlugin, OutputPlugin()]:
+            with self.subTest(plugin=_plugin):
+                self.assertTrue(_plugin.is_basic_plugin())
+
+    def test_is_basic_plugin__sub_class(self):
+        _class = create_plugin_class(OUTPUT_PLUGIN)
+        for _plugin in [_class, _class()]:
+            with self.subTest(plugin=_plugin):
+                self.assertFalse(_plugin.is_basic_plugin())
+
 
 if __name__ == "__main__":
     unittest.main()

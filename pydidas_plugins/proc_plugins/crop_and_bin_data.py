@@ -28,7 +28,7 @@ __all__ = ["CropAndBinImage"]
 
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
+from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.managers import ImageMetadataManager
 from pydidas.plugins import ProcPlugin
@@ -39,17 +39,17 @@ class CropAndBinImage(ProcPlugin):
     Crop and bin an image (i.e. 2d input data).
     """
 
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
-    basic_plugin = False
     plugin_name = "Crop and bin image"
-    output_data_label = "Image intensity"
-    output_data_unit = "counts"
-    input_data_dim = 2
-    output_data_dim = 2
+
     default_params = get_generic_param_collection(
         "use_roi", "roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh", "binning"
     )
+
+    input_data_dim = 2
+    output_data_dim = 2
+    output_data_label = "Image intensity"
+    output_data_unit = "counts"
 
     def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)

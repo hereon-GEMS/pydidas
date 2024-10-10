@@ -31,7 +31,7 @@ from typing import Union
 import numpy as np
 
 from pydidas.core import Dataset, ParameterCollection, get_generic_parameter
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
+from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
@@ -43,13 +43,13 @@ class MaskImage(ProcPlugin):
     """
 
     plugin_name = "Mask image"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
+
     default_params = ParameterCollection(
         get_generic_parameter("detector_mask_file"),
         get_generic_parameter("detector_mask_val"),
     )
+
     input_data_dim = 2
     output_data_dim = 2
     output_data_label = "Masked image"

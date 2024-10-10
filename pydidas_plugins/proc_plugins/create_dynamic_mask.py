@@ -36,7 +36,7 @@ import scipy.ndimage
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
+from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
@@ -58,9 +58,8 @@ class CreateDynamicMask(ProcPlugin):
     """
 
     plugin_name = "Create dynamic data mask"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
+
     default_params = get_generic_param_collection(
         "use_detector_mask",
         "mask_threshold_low",
@@ -68,6 +67,7 @@ class CreateDynamicMask(ProcPlugin):
         "mask_grow",
         "kernel_iterations",
     )
+
     input_data_dim = 2
     output_data_dim = 2
     output_data_label = "image"

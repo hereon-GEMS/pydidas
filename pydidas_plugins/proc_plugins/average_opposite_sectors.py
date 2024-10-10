@@ -31,7 +31,7 @@ __all__ = ["AverageOppositeSectors"]
 import numpy as np
 
 from pydidas.core import Dataset, UserConfigError
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
 
 
@@ -45,9 +45,8 @@ class AverageOppositeSectors(ProcPlugin):
     """
 
     plugin_name = "Average opposite sectors"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
+
     input_data_dim = 2
     output_data_dim = 2
     output_data_label = "Integrated data"

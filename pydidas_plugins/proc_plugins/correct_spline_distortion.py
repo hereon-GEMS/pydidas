@@ -88,9 +88,10 @@ class CorrectSplineDistortion(ProcPlugin):
     """
 
     plugin_name = "Correct spline distortion"
-    basic_plugin = False
     plugin_subtype = PROC_PLUGIN_IMAGE
+
     default_params = _SPLINE_PARAMS.copy()
+
     input_data_dim = 2
     output_data_dim = 2
     output_data_label = "Distortion-corrected image"

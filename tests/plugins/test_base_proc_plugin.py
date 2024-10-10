@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,22 +18,19 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
 
-import h5py
 import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core.utils import get_random_string
 from pydidas.plugins import ProcPlugin
 from pydidas.unittest_objects import create_plugin_class
 
@@ -47,21 +44,20 @@ class TestBaseProcPlugin(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self._temppath)
 
-    def create_image(self):
-        _fname = os.path.join(self._temppath, "image.npy")
-        np.save(_fname, self._data)
-        return _fname
-
-    def create_hdf5_image(self):
-        _fname = os.path.join(self._temppath, "image.h5")
-        _dset = get_random_string(4) + "/" + get_random_string(4) + "data"
-        with h5py.File(_fname, "w") as _f:
-            _f[_dset] = self._data[None]
-        return _fname, _dset
-
     def test_class(self):
         plugin = create_plugin_class(PROC_PLUGIN)()
         self.assertIsInstance(plugin, ProcPlugin)
+
+    def test_is_basic_plugin__baseclass(self):
+        for _plugin in [ProcPlugin, ProcPlugin()]:
+            with self.subTest(plugin=_plugin):
+                self.assertTrue(_plugin.is_basic_plugin())
+
+    def test_is_basic_plugin__subclass(self):
+        _class = create_plugin_class(PROC_PLUGIN)
+        for _plugin in [_class, _class()]:
+            with self.subTest(plugin=_plugin):
+                self.assertFalse(_plugin.is_basic_plugin())
 
 
 if __name__ == "__main__":

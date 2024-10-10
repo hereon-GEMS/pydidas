@@ -100,7 +100,6 @@ def create_plugin_class(plugin_type: int, number: int = 0) -> type:
         _cls = create_base_class(OutputPlugin)
     _name = get_random_string(10)
     _cls = type(_name, (_cls,), dict(_cls.__dict__))
-    _cls.basic_plugin = False
     _cls.plugin_name = f"Plugin {_name}"
     _cls.number = number
     _cls.__doc__ = get_random_string(600)

@@ -86,8 +86,6 @@ class BasePlugin(ObjectWithParameterCollection):
     all these attributes should be re-defined in individual plugins to
     prevent falling back to the base class attributes:
 
-    basic_plugin : bool
-        A keyword to mark basic plugin classes.
     plugin_type : int
         A key to discriminate between the different types of plugins
         (input, processing, output)
@@ -123,7 +121,6 @@ class BasePlugin(ObjectWithParameterCollection):
         users with too many options. The default is an empty list [].
     """
 
-    basic_plugin = True
     plugin_type = BASE_PLUGIN
     plugin_name = "Base plugin"
     default_params = ParameterCollection()
@@ -136,6 +133,32 @@ class BasePlugin(ObjectWithParameterCollection):
     new_dataset = False
     has_unique_parameter_config_widget = False
     advanced_parameters = []
+    base_classes = []
+
+    @classmethod
+    def register_as_base_class(cls):
+        """
+        Register a base class for the plugin.
+
+        Parameters
+        ----------
+        base_class : type
+            The base class to register.
+        """
+        if cls not in cls.base_classes:
+            cls.base_classes.append(cls)
+
+    @classmethod
+    def is_basic_plugin(cls) -> bool:
+        """
+        Get the basic plugin flag.
+
+        Returns
+        -------
+        bool
+            The basic plugin flag.
+        """
+        return issubclass(cls, BasePlugin) and cls in cls.base_classes
 
     @classmethod
     def get_class_description(cls) -> str:
@@ -700,3 +723,6 @@ class BasePlugin(ObjectWithParameterCollection):
                 ]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning
+
+
+BasePlugin.register_as_base_class()

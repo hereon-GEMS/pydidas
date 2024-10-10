@@ -30,7 +30,6 @@ __all__ = ["Sum1dData"]
 import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core.utils import (
     calculate_result_shape_for_multi_input_dims,
     process_1d_with_multi_input_dims,
@@ -55,16 +54,15 @@ class Sum1dData(ProcPlugin):
     """
 
     plugin_name = "Sum 1D data"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
         "process_data_dim",
         "type_selection",
         "lower_limit",
         "upper_limit",
     )
+
     input_data_dim = -1
-    output_data_dim = 0
+    output_data_dim = -1
     output_data_label = "data sum (1d)"
     output_data_unit = "a.u."
     new_dataset = True

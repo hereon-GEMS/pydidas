@@ -67,7 +67,6 @@ class pyFAIintegrationBase(ProcPlugin):
     """
 
     plugin_name = "PyFAI integration base"
-    basic_plugin = True
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
     default_params = get_generic_param_collection(
@@ -557,3 +556,6 @@ class pyFAIintegrationBase(ProcPlugin):
             _high = (4 * np.pi / _lambda) * np.sin(np.arctan(_high / _dist) / 2) * 1e-9
         self.set_param_value("rad_range_lower", _low)
         self.set_param_value("rad_range_upper", _high)
+
+
+pyFAIintegrationBase.register_as_base_class()

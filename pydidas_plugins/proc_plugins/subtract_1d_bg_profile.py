@@ -35,7 +35,7 @@ from typing import Union
 import numpy as np
 
 from pydidas.core import Dataset, Parameter, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
@@ -59,13 +59,13 @@ class Subtract1dBackgroundProfile(ProcPlugin):
     """
 
     plugin_name = "Subtract 1D background profile"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
+
     default_params = get_generic_param_collection(
         "process_data_dim", "threshold_low", "multiplicator"
     )
     default_params.add_param(_PARAM_PROFILE_FILE.copy())
+
     input_data_dim = 1
     output_data_dim = 1
     output_data_label = "Background-corrected data"

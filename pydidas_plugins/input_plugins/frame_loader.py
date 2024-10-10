@@ -29,7 +29,6 @@ __all__ = ["FrameLoader"]
 
 
 from pydidas.core import Dataset
-from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
 
@@ -48,10 +47,6 @@ class FrameLoader(InputPlugin):
     """
 
     plugin_name = "Single frame loader"
-    basic_plugin = False
-    plugin_type = INPUT_PLUGIN
-    input_data_dim = None
-    output_data_dim = 2
 
     def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """

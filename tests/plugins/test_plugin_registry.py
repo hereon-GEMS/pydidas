@@ -130,7 +130,6 @@ class TestPluginRegistry(unittest.TestCase):
             "from pydidas.plugins import BasePlugin, InputPlugin, "
             "ProcPlugin, OutputPlugin\n"
             f"\nclass {_name.upper()}({_plugin}):"
-            "\n    basic_plugin = False"
             f'\n    plugin_name = "{_name}"'
             "\n\n    def __init__(self, **kwargs: dict):"
             "\n        super().__init__(**kwargs)"

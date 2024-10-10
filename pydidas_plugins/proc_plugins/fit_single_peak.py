@@ -65,8 +65,7 @@ class FitSinglePeak(BaseFitPlugin):
     """
 
     plugin_name = "Fit single peak"
-    basic_plugin = False
-    num_peaks = 1
+
     default_params = BaseFitPlugin.default_params | get_generic_param_collection(
         "fit_peak_xlow", "fit_peak_xhigh", "fit_peak_xstart", "fit_peak_width"
     )
@@ -76,6 +75,8 @@ class FitSinglePeak(BaseFitPlugin):
         "fit_peak_xstart",
         "fit_peak_width",
     ]
+
+    num_peaks = 1
 
     def __init__(self, *args: tuple, **kwargs: dict):
         BaseFitPlugin.__init__(self, *args, **kwargs)

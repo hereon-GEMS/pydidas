@@ -31,7 +31,6 @@ __all__ = ["EigerScanSeriesLoader"]
 import os
 
 from pydidas.core import UserConfigError, get_generic_param_collection
-from pydidas.core.constants import INPUT_PLUGIN
 from pydidas_plugins.input_plugins.hdf5_file_series_loader import Hdf5fileSeriesLoader
 
 
@@ -70,8 +69,6 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
     """
 
     plugin_name = "Eiger scan series loader"
-    basic_plugin = False
-    plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection("eiger_dir", "eiger_filename_suffix")
     default_params.add_params(Hdf5fileSeriesLoader.default_params.copy())
 

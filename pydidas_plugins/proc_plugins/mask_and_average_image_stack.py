@@ -37,10 +37,42 @@ from pydidas.core import (
     Parameter,
     ParameterCollection,
     UserConfigError,
-    get_generic_parameter,
+    get_generic_param_collection,
 )
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
+from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.plugins import ProcPlugin
+
+
+_BG_PARAM = Parameter(
+    "background_value",
+    float,
+    None,
+    name="Background value",
+    tooltip="The value used for pixels that are masked in every image",
+    allow_None=True,
+)
+_ADC_MASK_PARAM = Parameter(
+    "adc_mask",
+    str,
+    "No mask",
+    name="ADC artifacts direction",
+    choices=[
+        "No mask",
+        "Mask Y-axis",
+        "Mask X-axis",
+        "Mask half Y-axis",
+        "Mask half X-axis",
+    ],
+    tooltip="Direction to mask ADC artifacts, originating from a hotspot",
+)
+_ADC_THRESH_PARAM = Parameter(
+    "adc_mask_threshold",
+    float,
+    None,
+    name="ADC artifacts threshold",
+    tooltip="Threshold needed to mask ADC artifacts from that point",
+    allow_None=True,
+)
 
 
 class MaskAndAverageImageStack(ProcPlugin):
@@ -62,46 +94,21 @@ class MaskAndAverageImageStack(ProcPlugin):
     """
 
     plugin_name = "Mask and average image stack"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
+
     default_params = ParameterCollection(
-        get_generic_parameter("mask_threshold_low"),
-        get_generic_parameter("mask_threshold_high"),
-        get_generic_parameter("mask_grow"),
-        get_generic_parameter("kernel_iterations"),
-        Parameter(
-            "background_value",
-            float,
-            None,
-            name="Background value",
-            tooltip="The value used for pixels that are masked in every image",
-            allow_None=True,
+        get_generic_param_collection(
+            "mask_threshold_low",
+            "mask_threshold_high",
+            "mask_grow",
+            "kernel_iterations",
         ),
-        Parameter(
-            "adc_mask",
-            str,
-            "No mask",
-            name="ADC artifacts direction",
-            choices=[
-                "No mask",
-                "Mask Y-axis",
-                "Mask X-axis",
-                "Mask half Y-axis",
-                "Mask half X-axis",
-            ],
-            tooltip="Direction to mask ADC artifacts, originating from a hotspot",
-        ),
-        Parameter(
-            "adc_mask_threshold",
-            float,
-            None,
-            name="ADC artifacts threshold",
-            tooltip="Threshold needed to mask ADC artifacts from that point",
-            allow_None=True,
-        ),
+        _BG_PARAM,
+        _ADC_MASK_PARAM,
+        _ADC_THRESH_PARAM,
     )
-    advanced_parameters = ("background_value", "adc_mask", "adc_mask_threshold")
+    advanced_parameters = ["background_value", "adc_mask", "adc_mask_threshold"]
+
     input_data_dim = 3
     output_data_dim = 2
     output_data_label = "Masked images"

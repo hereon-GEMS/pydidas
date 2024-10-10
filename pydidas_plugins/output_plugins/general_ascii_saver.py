@@ -36,7 +36,6 @@ from typing import Union
 import numpy as np
 
 from pydidas.core import Dataset, Parameter, UserConfigError
-from pydidas.core.constants import OUTPUT_PLUGIN
 from pydidas.plugins import OutputPlugin
 
 
@@ -60,10 +59,7 @@ class GeneralAsciiSaver(OutputPlugin):
     """
 
     plugin_name = "ASCII Saver with header"
-    basic_plugin = False
-    plugin_type = OUTPUT_PLUGIN
     input_data_dim = 1
-    output_data_dim = None
     generic_params = OutputPlugin.generic_params.copy()
     generic_params.add_param(
         Parameter(

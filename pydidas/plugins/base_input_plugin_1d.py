@@ -44,7 +44,8 @@ class InputPlugin1d(InputPlugin):
 
     plugin_type = INPUT_PLUGIN
     plugin_name = "Base input plugin 1d"
-    input_data_dim = 1
+    input_data_dim = None
+    output_data_dim = 1
     generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
         get_generic_parameter("use_roi"),

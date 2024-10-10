@@ -37,7 +37,7 @@ from pydidas.core import (
     get_generic_param_collection,
     get_generic_parameter,
 )
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
 
 
@@ -47,17 +47,12 @@ class ConvertToDSpacing(ProcPlugin):
 
     NOTE: this plugin must be used immediately after an integration plugin
     to assert that the input data is in the correct format.
-
-    WARNING: pydidas is not yet capable of displaying non-uniform data.
     """
 
     plugin_name = "Convert to d-spacing"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
+
     default_params = get_generic_param_collection("d_spacing_unit")
-    input_data_dim = -1
-    output_data_dim = -1
 
     def __init__(self, *args, **kwargs):
         self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())

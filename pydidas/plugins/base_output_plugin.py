@@ -41,6 +41,7 @@ class OutputPlugin(BasePlugin):
 
     plugin_type = OUTPUT_PLUGIN
     plugin_name = "Base output plugin"
+    output_data_dim = None
     generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
         get_generic_param_collection("directory_path", "enable_overwrite")

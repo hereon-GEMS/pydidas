@@ -29,7 +29,6 @@ __all__ = ["Hdf5fileSeriesLoader"]
 
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
@@ -64,8 +63,6 @@ class Hdf5fileSeriesLoader(InputPlugin):
     """
 
     plugin_name = "HDF5 file series loader"
-    basic_plugin = False
-    plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection(
         "hdf5_key",
         "hdf5_slicing_axis",
@@ -73,8 +70,6 @@ class Hdf5fileSeriesLoader(InputPlugin):
         "file_stepping",
         "_counted_images_per_file",
     )
-    input_data_dim = None
-    output_data_dim = 2
     advanced_parameters = InputPlugin.advanced_parameters.copy() + [
         "hdf5_slicing_axis",
         "images_per_file",

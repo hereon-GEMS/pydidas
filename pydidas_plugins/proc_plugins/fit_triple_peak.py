@@ -79,7 +79,8 @@ class FitTriplePeak(FitMultiPeak):
     """
 
     plugin_name = "Fit triple peak"
-    basic_plugin = False
+
     default_params = _DEFAULTS.copy()
     advanced_parameters = _ADVANCED.copy()
+
     num_peaks = 3

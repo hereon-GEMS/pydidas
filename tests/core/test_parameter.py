@@ -132,6 +132,13 @@ class TestParameter(unittest.TestCase):
         for item in ["12", None, [1, 2, 3]]:
             self.assertFalse(param._Parameter__typecheck(item))
 
+    def test_typecheck__list_of_int(self):
+        param = Parameter("Test0", list, [1, 2, 3], subtype=int)
+        _cases = [[True, [1, 3]], [False, [1, "3"]], [False, [1, 3.0]]]
+        for _exp, _val in _cases:
+            with self.subTest(input=_val):
+                self.assertEqual(param._Parameter__typecheck(_val), _exp)
+
     def test_typecheck__int_w_allow_none(self):
         param = Parameter("Test0", int, 12, allow_None=True)
         self.assertTrue(param._Parameter__typecheck(12))
@@ -272,6 +279,21 @@ class TestParameter(unittest.TestCase):
         self.assertEqual(obj.value, _val)
         self.assertEqual(type(obj.value), float)
 
+    def test_set_value__tuple_w_subtype(self):
+        _vals = ((1, 2, 3), (12, 24.0), (12, "42"))
+        for _val in _vals:
+            _ref = tuple([int(_v) for _v in _val])
+            with self.subTest(input=_val):
+                obj = Parameter("Test0", tuple, (1, 2), subtype=int)
+                obj.value = _val
+                self.assertEqual(obj.value, _ref)
+
+    def test_set_value__tuple_w_subtype_wrong_type(self):
+        _val = (1, 2, "3b")
+        obj = Parameter("Test0", tuple, (1, 2), subtype=int)
+        with self.assertRaises(ValueError):
+            obj.value = _val
+
     def test_restore_default(self):
         obj = Parameter("Test0", int, 12)
         obj.value = 24
@@ -402,6 +424,14 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, optional=True)
         _r = obj.__repr__()
         self.assertIsInstance(_r, str)
+
+    def test_convenience_type_conversion__None(self):
+        _cases = [None, "None", ""]
+        obj = Parameter("Test0", int, 12, allow_None=True)
+        for _case in _cases:
+            with self.subTest(input=_case):
+                _new_val = obj._Parameter__convenience_type_conversion(_case)
+                self.assertEqual(_new_val, None)
 
     def test_convenience_type_conversion_any(self):
         _val = 42

@@ -544,7 +544,7 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        labels : Union[Iterable, dict]
+        ranges : Union[Iterable, dict]
             The new axis ranges. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """

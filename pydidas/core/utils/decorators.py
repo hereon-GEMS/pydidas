@@ -38,6 +38,7 @@ from typing import Callable, Tuple
 import numpy as np
 
 from ..dataset import Dataset
+from ..exceptions import UserConfigError
 from .iterable_utils import (
     insert_item_in_tuple,
     remove_item_at_index_from_iterable,
@@ -115,6 +116,12 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
         _dim_to_process = np.mod(self.get_param_value("process_data_dim"), data.ndim)
         _results_shape = remove_item_at_index_from_iterable(data.shape, _dim_to_process)
         _indices = [np.arange(_s) for _s in _results_shape]
+        if np.prod(_results_shape) > 500:
+            raise UserConfigError(
+                "The requested operation includes too many function calls. "
+                "For performance reasons, the maximum number of function calls is "
+                "limited to 500. Please check your workflow."
+            )
         for _params in itertools.product(*_indices):
             _input_slices = insert_item_in_tuple(
                 _params, _dim_to_process, slice(0, data.shape[_dim_to_process])

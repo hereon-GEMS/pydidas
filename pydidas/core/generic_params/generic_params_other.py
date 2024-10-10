@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters which are are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -579,6 +579,47 @@ GENERIC_PARAMS_OTHER = {
             "the input data dimensionality is larger than the processing "
             "dimensionality. The default of -1 will always use the last data "
             "dimension."
+        ),
+    },
+    "_process_data_dim": {
+        "type": int,
+        "default": -1,
+        "name": "Process data dimension",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "This internal parameter can store the modulated data dimension "
+            "to be processed."
+        ),
+    },
+    "process_data_dims": {
+        "type": tuple,
+        "default": (0, 1),
+        "name": "Process data dimensions",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "subtype": int,
+        "tooltip": (
+            "This parameter determines which data dimensions should be processed if "
+            "the input data dimensionality is larger than the processing "
+            "dimensionality. The default of None will default to the full data "
+            "dimensions and raise an error if the input data has more dimensions "
+            "than expected for processing."
+        ),
+    },
+    "_process_data_dims": {
+        "type": tuple,
+        "default": None,
+        "name": "Process data dimensions",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "subtype": int,
+        "tooltip": (
+            "This internal Parameter can store the modulated data dimensions "
+            "to be processed."
         ),
     },
     ####################

@@ -217,6 +217,8 @@ class CatchFileErrors:
         Additional exception types to be handled.
     raise_file_read_error : bool, optional
         Flag to raise the FileReadError exception. The default is True.
+    error_suffix : str, optional
+        A suffix to be added to the error message. The default is an empty string.
     """
 
     def __init__(
@@ -224,6 +226,7 @@ class CatchFileErrors:
         filename: Union[Path, str],
         *additional_exceptions: tuple,
         raise_file_read_error=True,
+        error_suffix: str = "",
     ):
         self._exceptions = additional_exceptions + (
             ValueError,
@@ -233,6 +236,7 @@ class CatchFileErrors:
         self._filename = str(filename)
         self._raised_exception = False
         self._raise_file_read_error = raise_file_read_error
+        self._exception_msg_suffix = error_suffix
 
     def __enter__(self):
         """
@@ -256,7 +260,9 @@ class CatchFileErrors:
                 self._filename = "[...]" + self._filename[-50:]
             _ex_repr = ex_value.args[_index].replace('"', "`").replace("'", "`")
             self._exception_msg = (
-                ex_type.__name__ + ": " + _ex_repr + f"\n\nFilename: {self._filename}"
+                f"{ex_type.__name__}: "
+                + f"{_ex_repr} {self._exception_msg_suffix}"
+                + f"\n\nFilename: {self._filename}"
             )
             if self._raise_file_read_error:
                 raise FileReadError(self._exception_msg)

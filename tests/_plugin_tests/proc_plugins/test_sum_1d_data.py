@@ -29,9 +29,8 @@ import unittest
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.core import Dataset
 from pydidas.plugins import BasePlugin
-from pydidas.unittest_objects import LocalPluginCollection
+from pydidas.unittest_objects import LocalPluginCollection, create_dataset
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()
@@ -43,16 +42,9 @@ class TestSum1dData(unittest.TestCase):
         qs = QtCore.QSettings("Hereon", "pydidas")
         qs.remove("unittesting")
 
-    def setUp(self):
-        self._n = 120
-        self._data = np.arange(self._n)
+    def setUp(self): ...
 
     def tearDown(self): ...
-
-    def create_dataset(self):
-        self._x = 12 + 0.37 * np.arange(self._n)
-        _data = Dataset(self._data, axis_ranges=[self._x])
-        return _data
 
     def test_creation(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -67,50 +59,56 @@ class TestSum1dData(unittest.TestCase):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin._data = create_dataset(1, shape=(200,))
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_slice()
-        self.assertEqual(_range.start, _low)
-        self.assertEqual(_range.stop, _high + 1)
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true.size, _high - _low + 1)
+        self.assertEqual(_mask_true[0], _low)
+        self.assertEqual(_mask_true[-1], _high)
 
     def test_get_slice__w_data(self):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
-        data = self.create_dataset()
+        data = create_dataset(1, shape=(200,))
         plugin._data = data
-        plugin.set_param_value("lower_limit", self._x[_low])
-        plugin.set_param_value("upper_limit", self._x[_high])
+        plugin.set_param_value("lower_limit", data.axis_ranges[0][_low])
+        plugin.set_param_value("upper_limit", data.axis_ranges[0][_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_slice()
-        self.assertEqual(_range.start, _low)
-        self.assertEqual(_range.stop, _high + 1)
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true[0], _low)
+        self.assertEqual(_mask_true[-1], _high)
 
     def test_get_slice__w_empty_range(self):
-        _low = 42
+        _low = 90
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
-        data = self.create_dataset()
+        data = create_dataset(1, shape=(200,))
         plugin._data = data
-        plugin.set_param_value("lower_limit", self._x[_high])
-        plugin.set_param_value("upper_limit", self._x[_low])
+        plugin.set_param_value("lower_limit", data.axis_ranges[0][_low])
+        plugin.set_param_value("upper_limit", data.axis_ranges[0][_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_slice()
-        self.assertEqual(_range, slice(0, 0))
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true.size, 0)
 
     def test_get_slice__w_sinple_point_range(self):
         _low = 42
         _high = 42
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
-        data = self.create_dataset()
+        data = create_dataset(1, shape=(200,))
         plugin._data = data
-        plugin.set_param_value("lower_limit", self._x[_high])
-        plugin.set_param_value("upper_limit", self._x[_low])
+        plugin.set_param_value("lower_limit", data.axis_ranges[0][_low])
+        plugin.set_param_value("upper_limit", data.axis_ranges[0][_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_slice()
-        self.assertEqual(_range.start, _low)
-        self.assertEqual(_range.stop, _low + 1)
+        _mask = plugin._get_mask()
+        _mask_true = np.where(_mask)[0]
+        self.assertEqual(_mask_true.size, 1)
+        self.assertEqual(_mask_true[0], _low)
 
     def test_execute__empty_selection(self):
         _low = 42
@@ -119,7 +117,7 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        data = self.create_dataset()
+        data = create_dataset(1)
         _data, _ = plugin.execute(data)
         self.assertEqual(_data[0], 0)
 
@@ -130,9 +128,9 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        data = self.create_dataset()
+        data = create_dataset(1, shape=(200,))
         _data, _ = plugin.execute(data)
-        self.assertTrue(_data[0], self._data[_low])
+        self.assertTrue(_data[0], data[_low])
 
     def test_execute__range(self):
         _low = 42
@@ -141,9 +139,9 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        data = self.create_dataset()
+        data = create_dataset(1, shape=(200,))
         _data, _ = plugin.execute(data)
-        self.assertTrue(_data[0], np.sum(self._data[_low : _high + 1]))
+        self.assertEqual(_data[0], np.sum(data[_low : _high + 1]))
 
     def test_execute__None_lower_bounds(self):
         _low = None
@@ -152,9 +150,9 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        data = self.create_dataset()
+        data = create_dataset(1, shape=(200,))
         _data, _ = plugin.execute(data)
-        self.assertTrue(_data[0], np.sum(self._data[: _high + 1]))
+        self.assertEqual(_data[0], np.sum(data[: _high + 1]))
 
     def test_execute__None_upper_bounds(self):
         _low = 42
@@ -163,9 +161,35 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        data = self.create_dataset()
+        data = create_dataset(1, shape=(200,))
         _data, _ = plugin.execute(data)
-        self.assertTrue(_data[0], np.sum(self._data[_low:]))
+        self.assertEqual(_data[0], np.sum(data[_low:]))
+
+    def test_execute__multidim(self):
+        _low = 2
+        _high = 7
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = create_dataset(4)
+        for _dim in range(4):
+            with self.subTest(dim=_dim):
+                plugin._data = data
+                plugin.pre_execute()
+                plugin.set_param_value("process_data_dim", _dim)
+                _ref_arr = np.where(
+                    (_low <= np.arange(data.shape[_dim]))
+                    & (np.arange(data.shape[_dim]) <= _high),
+                    1,
+                    0,
+                ).astype(bool)
+                _slicer = [None] * _dim + [slice(None)] + [None] * (3 - _dim)
+                _ref_mask = np.ones(data.shape, dtype=bool) * _ref_arr[*_slicer]
+                _data, _ = plugin.execute(data)
+                self.assertTrue(
+                    np.all(_data == np.sum(data, axis=_dim, where=_ref_mask))
+                )
 
 
 if __name__ == "__main__":

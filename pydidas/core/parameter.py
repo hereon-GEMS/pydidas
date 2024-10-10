@@ -40,6 +40,10 @@ from numpy import asarray, ndarray
 from .hdf5_key import Hdf5key
 
 
+_ITERATORS = (list, set, tuple)
+_NUMBERS = [Integral, Real]
+
+
 def _get_base_class(cls: Any) -> Union[type, Real, Integral, None]:
     """
     Filter numerical classes and return the corresponding abstract base class.
@@ -253,6 +257,8 @@ class Parameter:
         """
         if self.__type is None:
             return True
+        if isinstance(val, _ITERATORS) and self.__meta["subtype"] in _NUMBERS:
+            return all(isinstance(item, self.__meta["subtype"]) for item in val)
         if isinstance(val, self.__type):
             return True
         if val is None and self.__meta["allow_None"]:
@@ -273,6 +279,7 @@ class Parameter:
             - str input of list/tuple of numbers to list/tuple of numbers
             - list to tuple
             - tuple to list
+            - "None" and "" to None
 
         Parameters
         ----------
@@ -284,21 +291,16 @@ class Parameter:
         value : object
             The value with the above-mentioned type conversions applied.
         """
+        if self.__meta["allow_None"] and value in ["None", "", None]:
+            return None
         if isinstance(value, str):
             if self.__type == Path:
                 value = Path(value)
             elif self.__type == Hdf5key:
                 value = Hdf5key(value)
-            elif self.__type in [list, set, tuple] and self.__meta["subtype"] in [
-                Real,
-                Integral,
-            ]:
-                value = [
-                    float(item) if self.__meta["subtype"] == Real else int(item)
-                    for item in value.strip("{[(}])").split(",")
-                    if len(item.strip()) > 0
-                ]
-        if self.__type in [Real, Integral] and not self.__meta["allow_None"]:
+            elif self.__type in _ITERATORS and self.__meta["subtype"] in _NUMBERS:
+                value = self.__get_as_numbers(value)
+        if self.__type in _NUMBERS and not self.__meta["allow_None"]:
             try:
                 value = float(value) if self.__type == Real else int(value)
             except ValueError:
@@ -307,9 +309,11 @@ class Parameter:
                 return value
         if (
             isinstance(value, Iterable)
-            and self.__type in [list, set, tuple]
+            and self.__type in _ITERATORS
             and not isinstance(value, str)
         ):
+            if self.__meta["subtype"] in _NUMBERS:
+                value = self.__get_as_numbers(value)
             return self.__type(value)
         if isinstance(value, Iterable) and self.__type == ndarray:
             return asarray(value)
@@ -513,10 +517,13 @@ class Parameter:
             )
         if not (self.__typecheck(val) or self.__meta["optional"] and (val is None)):
             _name = self.__meta["name"]
+            _subtype = (
+                f"[{self.__meta['subtype'].__name__}]" if self.__meta["subtype"] else ""
+            )
             raise ValueError(
                 f"Cannot set Parameter (object ID:{id(self)}, refkey: '{self.__refkey}'"
                 f", name: '{_name}') because it is of the wrong data type. (expected: "
-                f"{self.__type}, input type: {type(val)}"
+                f"{self.__type}{_subtype}, input type: {type(val)}"
             )
         self.__value = val
 
@@ -677,6 +684,36 @@ class Parameter:
             _repr += "optional, "
         _repr += f"default: {_default_val}{_unit})"
         return _repr
+
+    def __get_as_numbers(
+        self, value: Union[str, Iterable]
+    ) -> Union[list[Real, Integral], tuple[Real, Integral], set[Real, Integral]]:
+        """
+        Get the input as an iterable of numbers of the specified type.
+        Parameters
+        ----------
+        value : Union[str, Iterable]
+            The input object.
+
+        Returns
+        -------
+        Union[list[Real, Integral], tuple[Real, Integral], set[Real, Integral]]
+            The input as an iterable of numbers.
+        """
+        if self.__meta["subtype"] not in _NUMBERS:
+            raise TypeError("The subtype must be either Real or Integral.")
+        __converter = float if self.__meta["subtype"] == Real else int
+        if isinstance(value, str):
+            value = [
+                item
+                for item in value.strip("{[(}])").split(",")
+                if len(item.strip()) > 0
+            ]
+        try:
+            value = [__converter(item) for item in value]
+        except ValueError:
+            pass
+        return self.__type(value)
 
     def __copy__(self) -> Self:
         """

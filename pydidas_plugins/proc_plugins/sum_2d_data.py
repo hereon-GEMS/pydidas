@@ -38,8 +38,23 @@ class Sum2dData(ProcPlugin):
     """
     Sum up datapoints in a 2D dataset.
 
-    This plugin creates a single datapoint from the 2D input data. It is not
-    designed to handle higher-dimensional input data and accepts only 2D inputs.
+    This plugin creates a single datapoint from the 2D input data. Limits
+    can be given with the lower and upper limit parameters. The data can
+    be selected either by indices or by the data range. The type of selection
+    is determined by the `type_selection` parameter. `None` values in the
+    lower and upper limit parameters are used to ignore the limit. The upper
+    limit is included in the summation.
+
+    The plugin can handle higher-dimensional input data and will keep the
+    dimensions not processed by the plugin. For example, in a 3D dataset,
+    summing over axes 0 and 1 would yield a 1D dataset with the original
+    dimension 2 kept in place.
+
+    Note that the plugin sorts the dimensions to process. For example, if
+    the dimensions to process are given as `(2, 0)`, the plugin will process
+    the dimensions in the order `(0, 2)` and therefore the limit for
+    `axis 0` will be applied to dimension 0 and the limit for `axis 1`
+    will be applied to dimension 2 of the input dataset.
     """
 
     plugin_name = "Sum 2D data"

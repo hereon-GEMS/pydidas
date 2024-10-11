@@ -29,7 +29,7 @@ __all__ = ["Sum2dData"]
 
 import numpy as np
 
-from pydidas.core import Dataset, get_generic_param_collection
+from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.plugins import ProcPlugin
 
 
@@ -67,7 +67,7 @@ class Sum2dData(ProcPlugin):
         "lower_limit_ax1",
         "upper_limit_ax1",
     )
-    
+
     output_data_label = "data sum (2d)"
     output_data_unit = "a.u."
     new_dataset = True

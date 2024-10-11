@@ -50,7 +50,6 @@ class BaseFitPlugin(ProcPlugin):
     """
 
     plugin_name = "Base fit plugin"
-    basic_plugin = True
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
     default_params = get_generic_param_collection(
@@ -569,3 +568,6 @@ class BaseFitPlugin(ProcPlugin):
             The unique ParameterConfig widget
         """
         return FitPluginConfigWidget(self)
+
+
+BaseFitPlugin.register_as_base_class()

@@ -44,7 +44,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
     """
 
     plugin_name = "pyFAI radial integration"
-    basic_plugin = False
+
     output_data_dim = 1
 
     def __init__(self, *args, **kwargs):

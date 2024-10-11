@@ -35,9 +35,18 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
+
+
+_KERNEL_PARAM = Parameter(
+    "kernel_width",
+    int,
+    3,
+    name="Average num datapoints",
+    tooltip=("The width of the averaging kernel in data points."),
+)
 
 
 class RollingAverage1d(ProcPlugin):
@@ -50,21 +59,11 @@ class RollingAverage1d(ProcPlugin):
     """
 
     plugin_name = "Rolling average (1d)"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
+
     default_params = get_generic_param_collection("process_data_dim")
-    default_params.add_params(
-        Parameter(
-            "kernel_width",
-            int,
-            3,
-            name="Average num datapoints",
-            tooltip=("The width of the averaging kernel in data points."),
-        ),
-    )
-    input_data_dim = -1
-    output_data_dim = -1
+    default_params.add_params(_KERNEL_PARAM)
+
     output_data_label = "averaged data"
     output_data_unit = "a.u."
 

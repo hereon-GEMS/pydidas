@@ -30,7 +30,6 @@ __all__ = ["CenterOfMass1dData"]
 import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core.utils import (
     calculate_result_shape_for_multi_input_dims,
     process_1d_with_multi_input_dims,
@@ -44,9 +43,9 @@ class CenterOfMass1dData(ProcPlugin):
     """
 
     plugin_name = "Center of mass 1d data"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
+
     default_params = get_generic_param_collection("process_data_dim")
+
     input_data_dim = -1
     output_data_dim = 0
     output_data_label = "Center of mass (1d)"

@@ -68,3 +68,6 @@ class FitMultiPeak(BaseFitPlugin):
             (self.num_peaks, _dim1) if _dim1 > 1 else (self.num_peaks,)
         )
         self._config["single_result_shape"] = self._config["result_shape"]
+
+
+FitMultiPeak.register_as_base_class()

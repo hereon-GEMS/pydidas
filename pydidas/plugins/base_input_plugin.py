@@ -49,7 +49,8 @@ class InputPlugin(BasePlugin):
     plugin_name = "Base input plugin"
     output_data_label = "Image intensity"
     output_data_unit = "counts"
-    input_data_dim = 2
+    input_data_dim = None
+    output_data_dim = 2
     generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
         get_generic_parameter("use_roi"),
@@ -289,3 +290,6 @@ class InputPlugin(BasePlugin):
         """
         if "roi" not in kwargs and self.get_param_value("use_roi"):
             kwargs["roi"] = self._image_metadata.roi
+
+
+InputPlugin.register_as_base_class()

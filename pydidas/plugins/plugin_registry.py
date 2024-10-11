@@ -320,7 +320,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         ]
         if "pydidas.plugins.base_plugin.BasePlugin" not in _class_bases:
             return
-        if class_.basic_plugin is True:
+        if class_.is_basic_plugin() is True:
             self._plugin_basic_types[class_.__name__] = class_
             return
         if class_.__name__ not in self.plugins:
@@ -350,7 +350,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             raise KeyError(_message)
         self.plugins[class_.__name__] = class_
         self._plugin_types[class_.__name__] = (
-            -1 if class_.basic_plugin else class_.plugin_type
+            -1 if class_.is_basic_plugin() else class_.plugin_type
         )
         self._plugin_names[class_.plugin_name] = class_.__name__
 

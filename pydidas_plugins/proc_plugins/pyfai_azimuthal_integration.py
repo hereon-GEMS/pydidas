@@ -41,7 +41,6 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
     """
 
     plugin_name = "pyFAI azimuthal integration"
-    basic_plugin = False
     output_data_dim = 1
 
     def __init__(self, *args, **kwargs):

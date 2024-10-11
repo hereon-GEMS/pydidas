@@ -36,7 +36,6 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
 
@@ -62,10 +61,7 @@ class FrameLoaderAsStack(InputPlugin):
     """
 
     plugin_name = "Single frame *stack* loader"
-    basic_plugin = False
-    plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection("num_frames_to_use")
-    input_data_dim = None
     output_data_dim = 3
 
     def __init__(self, *args, **kwargs):

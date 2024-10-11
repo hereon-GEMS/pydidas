@@ -28,7 +28,6 @@ __all__ = ["AverageDataDimension"]
 
 
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN
 from pydidas.plugins import ProcPlugin
 
 
@@ -41,14 +40,8 @@ class AverageDataDimension(ProcPlugin):
     """
 
     plugin_name = "Average over data dimension"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
+
     default_params = get_generic_param_collection("process_data_dim")
-    input_data_dim = -1
-    output_data_dim = -1
-    output_data_label = ""
-    output_data_unit = ""
-    new_dataset = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -52,7 +52,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
     """
 
     plugin_name = "pyFAI 2D integration"
-    basic_plugin = False
+
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):

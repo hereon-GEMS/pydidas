@@ -34,7 +34,7 @@ import numpy as np
 from numpy.polynomial import Polynomial
 
 from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
 
@@ -104,12 +104,10 @@ class Remove1dPolynomialBackground(ProcPlugin):
     """
 
     plugin_name = "Remove 1D polynomial background"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
+
     default_params = DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG
-    input_data_dim = -1
-    output_data_dim = -1
+
     output_data_label = "Background-corrected data"
     output_data_unit = "a.u."
 

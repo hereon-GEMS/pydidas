@@ -117,6 +117,17 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         plugin = pyFAIintegrationBase(_param)
         self.assertEqual(plugin.get_param_value("rad_npoint"), _npoints)
 
+    def test_is_basic_plugin__baseclass(self):
+        for _plugin in [pyFAIintegrationBase, pyFAIintegrationBase()]:
+            self.assertTrue(_plugin.is_basic_plugin())
+
+    def test_is_basic_plugin__subclass(self):
+        class TestPlugin(pyFAIintegrationBase):
+            pass
+
+        for _plugin in [TestPlugin, TestPlugin()]:
+            self.assertFalse(_plugin.is_basic_plugin())
+
     def test_get_pyFAI_unit_from_param__plain(self):
         plugin = pyFAIintegrationBase(rad_unit="Q / nm^-1")
         self.assertEqual(plugin.get_pyFAI_unit_from_param("rad_unit"), "q_nm^-1")

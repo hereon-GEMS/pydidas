@@ -31,9 +31,33 @@ __all__ = ["RemoveOutliers"]
 import numpy as np
 
 from pydidas.core import Dataset, Parameter, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
+
+
+_KERNEL_PARAM = Parameter(
+    "kernel_width",
+    int,
+    2,
+    name="Kernel width",
+    tooltip=(
+        "The width of the search kernel (i.e. the maximum "
+        "width of outliers which can be detected)."
+    ),
+)
+_OUTLIER_THRESH_PARAM = Parameter(
+    "outlier_threshold",
+    float,
+    10,
+    name="Outlier threshold",
+    unit="a.u.",
+    tooltip=(
+        "The threshold for outliers. Any points which differ more than the "
+        "threshold from the background (i.e. the surrounding data values) "
+        "will be removed and replaced by average from the surroundings."
+    ),
+)
 
 
 class RemoveOutliers(ProcPlugin):
@@ -45,36 +69,11 @@ class RemoveOutliers(ProcPlugin):
     """
 
     plugin_name = "Remove Outliers"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_INTEGRATED
+
     default_params = get_generic_param_collection("process_data_dim")
-    default_params.add_params(
-        Parameter(
-            "kernel_width",
-            int,
-            2,
-            name="Kernel width",
-            tooltip=(
-                "The width of the search kernel (i.e. the maximum "
-                "width of outliers which can be detected)."
-            ),
-        ),
-        Parameter(
-            "outlier_threshold",
-            float,
-            10,
-            name="Outlier threshold",
-            unit="a.u.",
-            tooltip=(
-                "The threshold for outliers. Any points which differ more than the "
-                "threshold from the background (i.e. the surrounding data values) "
-                "will be removed and replaced by average from the surroundings."
-            ),
-        ),
-    )
-    input_data_dim = -1
-    output_data_dim = -1
+    default_params.add_params(_KERNEL_PARAM, _OUTLIER_THRESH_PARAM)
+
     output_data_label = "data without outliers"
     output_data_unit = "a.u."
 

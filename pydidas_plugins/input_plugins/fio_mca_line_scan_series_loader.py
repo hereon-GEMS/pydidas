@@ -41,7 +41,6 @@ from pydidas.core import (
     UserConfigError,
     get_generic_parameter,
 )
-from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import CatchFileErrors, copy_docstring
 from pydidas.plugins import InputPlugin, InputPlugin1d
 
@@ -141,11 +140,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     """
 
     plugin_name = "Fio MCA line scan series loader"
-    basic_plugin = False
-    plugin_type = INPUT_PLUGIN
     default_params = FIO_MCA_READER_DEFAULT_PARAMS.copy()
-    input_data_dim = None
-    output_data_dim = 1
 
     def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)

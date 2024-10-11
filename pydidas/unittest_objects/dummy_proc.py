@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ test workflows and Plugins without any file system operations.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,8 +32,7 @@ import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import Dataset, ParameterCollection
-from pydidas.core.constants import PROC_PLUGIN
+from pydidas.core import Dataset
 from pydidas.plugins import ProcPlugin
 
 
@@ -43,11 +42,6 @@ class DummyProc(ProcPlugin):
     """
 
     plugin_name = "Dummy processing Plugin"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
-    input_data_dim = -1
-    output_data_dim = -1
-    default_params = ParameterCollection()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

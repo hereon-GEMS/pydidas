@@ -32,8 +32,7 @@ import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import Dataset, ParameterCollection
-from pydidas.core.constants import PROC_PLUGIN
+from pydidas.core import Dataset
 from pydidas.plugins import ProcPlugin
 
 
@@ -43,11 +42,6 @@ class DummyProcNewDataset(ProcPlugin):
     """
 
     plugin_name = "Dummy processing Plugin with new Dataset"
-    basic_plugin = False
-    plugin_type = PROC_PLUGIN
-    input_data_dim = -1
-    output_data_dim = -1
-    default_params = ParameterCollection()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

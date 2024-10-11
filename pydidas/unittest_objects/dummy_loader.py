@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ test workflows and Plugins without any file system operations.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,6 @@ import numpy as np
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
 from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
-from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.plugins import InputPlugin
 
 
@@ -44,10 +43,7 @@ class DummyLoader(InputPlugin):
     """
 
     plugin_name = "Dummy loader Plugin"
-    basic_plugin = False
-    plugin_type = INPUT_PLUGIN
-    input_data_dim = -1
-    output_data_dim = 2
+
     default_params = ParameterCollection(
         Parameter(
             "image_height",

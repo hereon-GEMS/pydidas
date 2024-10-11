@@ -5,8 +5,11 @@
     SPDX-License-Identifier: CC-BY-4.0
 
 .. |dataset| replace:: :py:class:`Dataset <pydidas.core.Dataset>`
+.. |input_plugin| replace:: :py:class:`InputPlugin <pydidas.plugins.InputPlugin>`
 .. |input_plugins| replace:: :py:class:`InputPlugins <pydidas.plugins.InputPlugin>`
+.. |proc_plugin| replace:: :py:class:`ProcPlugin <pydidas.plugins.ProcPlugin>`
 .. |proc_plugins| replace:: :py:class:`ProcPlugins <pydidas.plugins.ProcPlugin>`
+.. |output_plugin| replace:: :py:class:`OutputPlugin <pydidas.plugins.OutputPlugin>`
 .. |output_plugins| replace:: :py:class:`OutputPlugins <pydidas.plugins.OutputPlugin>`
 .. |parameter| replace:: :py:class:`Parameter <pydidas.core.Parameter>`
 .. |pre_execute| replace:: :py:meth:`pre_execute <pydidas.plugins.BasePlugin.pre_execute>`
@@ -85,16 +88,13 @@ the plugin.
     * - class attribute
       - type
       - description
-    * - :py:data:`basic_plugin`
-      - bool
-      - A keyword to mark basic plugin classes. For all custom plugins, this must be
-        set to ``False``.
     * - :py:data:`plugin_type`
       - int
       - A key to discriminate between the different types of plugins (input,
         processing, output). Please use one of
         ``INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN`` which can be imported from
-        |constants|.
+        |constants|. Typically, this attribute should be set by inheriting from the
+        |input_plugin|, |proc_plugin|, or |output_plugin| classes.
     * - :py:data:`plugin_subtype`
       - int
       - Processing plugins are further differentiated into plugins for generic data,

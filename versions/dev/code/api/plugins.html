@@ -892,8 +892,6 @@ particular boundary.</p>
 all these attributes should be re-defined in individual plugins to
 prevent falling back to the base class attributes:</p>
 <dl class="simple">
-<dt>basic_plugin<span class="classifier">bool</span></dt><dd><p>A keyword to mark basic plugin classes.</p>
-</dd>
 <dt>plugin_type<span class="classifier">int</span></dt><dd><p>A key to discriminate between the different types of plugins
 (input, processing, output)</p>
 </dd>
@@ -1098,6 +1096,20 @@ operations to be applied.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.is_basic_plugin">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_basic_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.is_basic_plugin" title="Link to this definition">#</a></dt>
+<dd><p>Get the basic plugin flag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The basic plugin flag.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.output_data_dim_str">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_data_dim_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.output_data_dim_str" title="Link to this definition">#</a></dt>
 <dd><p>Get the output data dimensionality as string.</p>
@@ -1115,6 +1127,17 @@ operations to be applied.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.pre_execute">
 <span class="sig-name descname"><span class="pre">pre_execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin.pre_execute" title="Link to this definition">#</a></dt>
 <dd><p>Run the pre-execution code before processing individual datapoints.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.register_as_base_class">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_as_base_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin.register_as_base_class" title="Link to this definition">#</a></dt>
+<dd><p>Register a base class for the plugin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_class</strong> (<em>type</em>) – The base class to register.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1342,6 +1365,11 @@ used only for checks during live processing.</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.input_data_dim">
+<span class="sig-name descname"><span class="pre">input_data_dim</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pydidas.plugins.InputPlugin.input_data_dim" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.pre_execute">
 <span class="sig-name descname"><span class="pre">pre_execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin.pre_execute" title="Link to this definition">#</a></dt>
@@ -1399,6 +1427,11 @@ as defined in the ScanContext class.</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.input_data_dim">
+<span class="sig-name descname"><span class="pre">input_data_dim</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.input_data_dim" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.pre_execute">
 <span class="sig-name descname"><span class="pre">pre_execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.pre_execute" title="Link to this definition">#</a></dt>
@@ -1434,6 +1467,11 @@ label.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pydidas.plugins.OutputPlugin.output_data_dim">
+<span class="sig-name descname"><span class="pre">output_data_dim</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pydidas.plugins.OutputPlugin.output_data_dim" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.OutputPlugin.pre_execute">
@@ -1799,8 +1837,10 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_data"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_data_dim_str"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_data_dim_str</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_shape"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_shape</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.is_basic_plugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin.is_basic_plugin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.output_data_dim_str"><code class="docutils literal notranslate"><span class="pre">BasePlugin.output_data_dim_str</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">BasePlugin.pre_execute</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.register_as_base_class"><code class="docutils literal notranslate"><span class="pre">BasePlugin.register_as_base_class</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_data_label"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_data_label</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_shape"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_title"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_title</span></code></a></li>
@@ -1821,6 +1861,7 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.get_frame"><code class="docutils literal notranslate"><span class="pre">InputPlugin.get_frame</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.handle_multi_image"><code class="docutils literal notranslate"><span class="pre">InputPlugin.handle_multi_image</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.input_available"><code class="docutils literal notranslate"><span class="pre">InputPlugin.input_available</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.input_data_dim"><code class="docutils literal notranslate"><span class="pre">InputPlugin.input_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin.pre_execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.prepare_carryon_check"><code class="docutils literal notranslate"><span class="pre">InputPlugin.prepare_carryon_check</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.update_filename_string"><code class="docutils literal notranslate"><span class="pre">InputPlugin.update_filename_string</span></code></a></li>
@@ -1830,12 +1871,14 @@ will be used.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.calculate_result_shape"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.calculate_result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.get_raw_input_size"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.get_raw_input_size</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.input_data_dim"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.input_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.pre_execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.pre_execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.update_required_kwargs"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.update_required_kwargs</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin"><code class="docutils literal notranslate"><span class="pre">OutputPlugin</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin.get_output_filename"><code class="docutils literal notranslate"><span class="pre">OutputPlugin.get_output_filename</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin.output_data_dim"><code class="docutils literal notranslate"><span class="pre">OutputPlugin.output_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">OutputPlugin.pre_execute</span></code></a></li>
 </ul>
 </li>

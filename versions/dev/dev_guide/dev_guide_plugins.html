@@ -533,19 +533,15 @@ the plugin.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">basic_plugin</span></code></p></td>
-<td><p>bool</p></td>
-<td><p>A keyword to mark basic plugin classes. For all custom plugins, this must be
-set to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_type</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_type</span></code></p></td>
 <td><p>int</p></td>
 <td><p>A key to discriminate between the different types of plugins (input,
 processing, output). Please use one of
 <code class="docutils literal notranslate"><span class="pre">INPUT_PLUGIN,</span> <span class="pre">PROC_PLUGIN,</span> <span class="pre">OUTPUT_PLUGIN</span></code> which can be imported from
-<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydidas.core.constants</span></code>.</p></td>
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydidas.core.constants</span></code>. Typically, this attribute should be set by inheriting from the
+<a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugin</span></code></a>, <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcPlugin</span></code></a>, or <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutputPlugin</span></code></a> classes.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_subtype</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_subtype</span></code></p></td>
 <td><p>int</p></td>
 <td><p>Processing plugins are further differentiated into plugins for generic data,
 image data or for integrated data. This differentiation is just for plugin
@@ -554,40 +550,40 @@ for <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins
 <code class="docutils literal notranslate"><span class="pre">PROC_PLUGIN_IMAGE</span></code>, and <code class="docutils literal notranslate"><span class="pre">PROC_PLUGIN_INTEGRATED</span></code> constants can be imported
 from the <code class="xref py py-mod docutils literal notranslate"><span class="pre">pydidas.core.constants</span></code> module.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_name</span></code></p></td>
 <td><p>str</p></td>
 <td><p>The plugin name key in human-readable form for referencing the plugin. Usually,
 this should be similar to the class name but with inserted spaces and correct
 capitalization.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code></p></td>
 <td><p><a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a></p></td>
 <td><p>A ParameterCollection with the class parameters which are required to use the
 plugin. The default is an empty <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">input_data_dim</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">input_data_dim</span></code></p></td>
 <td><p>int</p></td>
 <td><p>The dimensionality of the input data. Use -1 for arbitrary dimensionality.
 The default is -1.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_dim</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_dim</span></code></p></td>
 <td><p>int</p></td>
 <td><p>The dimensionality of the output data. Use -1 for arbitrary dimensionality.
 The default is -1.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_label</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_label</span></code></p></td>
 <td><p>str</p></td>
 <td><p>The data label for the output <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The default is an empty string.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_unit</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_unit</span></code></p></td>
 <td><p>str</p></td>
 <td><p>The data unit of the output <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The default is an empty string.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">new_dataset</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">new_dataset</span></code></p></td>
 <td><p>bool</p></td>
 <td><p>Keyword that the Plugin creates a new <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The default is False.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">advanced_parameters</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">advanced_parameters</span></code></p></td>
 <td><p>list[str, …]</p></td>
 <td><p>A list with the keys of “advanced parameters”. These Parameters are hidden in
 the plugin’s Parameter configuration widget be default and can be accessed

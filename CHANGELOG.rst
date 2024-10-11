@@ -9,6 +9,14 @@ Improvements
 ------------
 - Replaced the default azimuthal integration range to (-180, 180) or (0, 360)
   respectively instead of None to have more consistent ranges (pyFAI issue #2291)
+- Updated Sum1dData plugin to use np.sum directly for improved performance.
+- Extended Sum2dData plugin to work on an arbitrary number of dimensions.
+
+Bugfixes
+--------
+- Fixed an issue when trying to read hdf5 metadata from non-hdf5 files.
+- Fixed in issue in Parameter where sub-type checking in tuple/set/list Parameters
+  was not enforced.
 
 
 v24.09.19

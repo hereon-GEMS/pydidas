@@ -33,18 +33,21 @@ from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core.utils import (
     calculate_result_shape_for_multi_input_dims,
-    process_1d_with_multi_input_dims,
 )
 from pydidas.plugins import ProcPlugin
 
 
 class Sum1dData(ProcPlugin):
     """
-    Sum up data points in a 1D dataset.
+    Sum up data points in one dimensions dataset.
 
     This plugin sums up the data values of the selected data points.
     Summation limits are defined using the 'lower_limit' and 'upper_limit'
-    parameters in the plugin.
+    parameters in the plugin. Data can be selected either by indices or by
+    the data range. The 'type_selection' parameter determines the selection.
+
+    Note that the value for the 'upper_limit' parameter is included in
+    the summation.
 
     Higher-dimensional datasets can also be processed. The 'process_data_dim'
     parameter determines which dimension to sum over. The other dimensions
@@ -59,6 +62,7 @@ class Sum1dData(ProcPlugin):
     plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
         "process_data_dim",
+        "_process_data_dim",
         "type_selection",
         "lower_limit",
         "upper_limit",
@@ -71,15 +75,14 @@ class Sum1dData(ProcPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._config["slice"] = None
+        self._mask = None
 
     def pre_execute(self):
         """
         Reset the index range slices before starting a new processing run.
         """
-        self._config["slice"] = None
+        self._mask = None
 
-    @process_1d_with_multi_input_dims
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Sum data.
@@ -99,69 +102,62 @@ class Sum1dData(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
-        _selection = self._data[self._get_slice()]
-        _sum = np.sum(_selection)
-        _new_data = Dataset(
-            [_sum],
-            axis_labels=["Data sum"],
-            axis_units=[""],
-            metadata=data.metadata,
-            data_label="data sum",
-            data_unit=data.data_unit,
+        _mask = self._get_mask()
+        _new_data = np.sum(
+            data, axis=self.get_param_value("_process_data_dim"), where=_mask
         )
+        if not isinstance(_new_data, Dataset):
+            _new_data = Dataset(
+                [_new_data],
+                axis_labels=["Data sum"],
+                axis_units=[""],
+                metadata=data.metadata,
+                data_label="data sum",
+                data_unit=data.data_unit,
+            )
         return _new_data, kwargs
 
-    def _get_slice(self) -> slice:
+    def _get_mask(self) -> np.ndarray[bool]:
         """
-        Get the indices for the selected data range.
+        Get the mask to be used in the sum for the selected data range.
 
         Returns
         -------
-        slice
-            The slice object to select the range from the input data.
+        np.ndarray
+            The array mask which indices to use in the sum.
         """
-        if self._config["slice"] is not None:
-            return self._config["slice"]
+        if self._mask is not None:
+            return self._mask
+        _dim_to_sum = np.mod(self.get_param_value("process_data_dim"), self._data.ndim)
+        self.set_param_value("_process_data_dim", _dim_to_sum)
         if self.get_param_value("type_selection") == "Indices":
-            _low = (
-                self.get_param_value("lower_limit")
-                if self.get_param_value("lower_limit") is not None
-                else 0
-            )
-            _high = (
-                self.get_param_value("upper_limit")
-                if self.get_param_value("upper_limit") is not None
-                else self._data.size
-            )
-            self._config["slice"] = slice(int(_low), int(_high) + 1)
+            _x = np.arange(self._data.shape[_dim_to_sum])
         else:
-            _x = self._data.axis_ranges[0]
-            assert isinstance(_x, np.ndarray), (
-                "The data does not have a correct range and using the data range "
-                "for selection is only available using the indices."
-            )
-            _low = (
-                self.get_param_value("lower_limit")
-                if self.get_param_value("lower_limit") is not None
-                else _x[0]
-            )
-            _high = (
-                self.get_param_value("upper_limit")
-                if self.get_param_value("upper_limit") is not None
-                else _x[-1]
-            )
-            _bounds = np.where((_x >= _low) & (_x <= _high))[0]
-            if _bounds.size == 0:
-                self._config["slice"] = slice(0, 0)
-            elif _bounds.size == 1:
-                self._config["slice"] = slice(_bounds[0], _bounds[0] + 1)
-            else:
-                self._config["slice"] = slice(_bounds[0], _bounds[-1] + 1)
-        return self._config["slice"]
+            _x = self._data.axis_ranges[_dim_to_sum]
+        _low = (
+            self.get_param_value("lower_limit")
+            if self.get_param_value("lower_limit") is not None
+            else _x[0]
+        )
+        _high = (
+            self.get_param_value("upper_limit")
+            if self.get_param_value("upper_limit") is not None
+            else _x[-1]
+        )
+        _sum_mask = np.where((_x >= _low) & (_x <= _high), 1, 0).astype(bool)
+        _slicer = (
+            [None] * _dim_to_sum
+            + [slice(None)]
+            + [None] * (self._data.ndim - _dim_to_sum - 1)
+        )
+        self._mask = np.ones(self._data.shape, dtype=bool) * _sum_mask[*_slicer]
+        return self._mask
 
     @calculate_result_shape_for_multi_input_dims
     def calculate_result_shape(self):
         """
         Calculate the shape of the Plugin results.
         """
-        self._config["result_shape"] = (1,)
+        _input_shape = list(self._config["input_shape"])
+        _input_shape.pop(self.get_param_value("process_data_dim"))
+        self._config["result_shape"] = _input_shape

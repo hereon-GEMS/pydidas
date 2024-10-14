@@ -20,6 +20,7 @@ Bugfixes
 - Fixed an issue when trying to read hdf5 metadata from non-hdf5 files.
 - Fixed in issue in Parameter where sub-type checking in tuple/set/list Parameters
   was not enforced.
+- Fixed an issue with PydidasPlot2D when cs_transform was disabled.
 
 
 v24.09.19

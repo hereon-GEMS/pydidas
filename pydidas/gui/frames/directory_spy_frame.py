@@ -39,7 +39,7 @@ from ...contexts import ScanContext
 from ...core import ParameterCollection
 from ...core.constants import HDF5_EXTENSIONS
 from ...core.utils import get_extension, pydidas_logger
-from ...multiprocessing import AppRunner, app_processor_without_tasks
+from ...multiprocessing import AppRunner
 from ...widgets.framework import BaseFrameWithApp
 from ...workflow import WorkflowResultsContext, WorkflowTree
 from .builders.directory_spy_frame_builder import DirectorySpyFrameBuilder
@@ -185,9 +185,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self._config["last_update"] = time.time()
         self.__set_proc_widget_enabled_for_running(True)
         logger.debug("Starting AppRunner")
-        self._runner = AppRunner(
-            self._app, n_workers=1, processor=app_processor_without_tasks
-        )
+        self._runner = AppRunner(self._app, n_workers=1)
         self._runner.sig_final_app_state.connect(self._set_app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
         self._runner.sig_results.connect(self.__check_for_plot_update)

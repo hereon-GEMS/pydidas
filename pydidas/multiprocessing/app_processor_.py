@@ -71,22 +71,27 @@ def app_processor(
         wait_for_output_queue : bool, optional
             Flag to wait for the output queue to be empty before shutting down the
             worker. The default is True.
-        logging_level : int, optional
-            The logger's logging level. The default is the pydidas default logging
-            level.
+        use_tasks : bool, optional
+            Flag that the app uses tasks insted of running continuously. The default
+            is True.
     """
-    _wait_for_output = kwargs.get("wait_for_output_queue", True)
     logger.setLevel(multiprocessing_config.get("logging_level", LOGGING_LEVEL))
+
+    _wait_for_output = kwargs.get("wait_for_output_queue", True)
+    _use_tasks = kwargs.get("use_tasks", True)
+
     _input_queue = multiprocessing_config.get("queue_input")
     _output_queue = multiprocessing_config.get("queue_output")
     _stop_queue = multiprocessing_config.get("queue_stop")
     _aborted_queue = multiprocessing_config.get("queue_aborted")
-    _use_tasks = multiprocessing_config.get("use_tasks", True)
-    _carry_on = True
+
     logger.debug("Started process")
+
     _app = app(app_params, slave_mode=True)
     _app._config = app_config
     _app.multiprocessing_pre_run()
+
+    _app_carryon = True
     while True:
         # check for stop signal
         try:
@@ -98,29 +103,39 @@ def app_processor(
         except queue.Empty:
             pass
         # run processing step
-        if _carry_on:
-            try:
-                _arg = _input_queue.get_nowait()
-            except queue.Empty:
-                time.sleep(0.005)
-                continue
-            if _arg is None:
-                logger.debug("Received queue empty signal in input queue.")
-                _output_queue.put([None, None])
-                break
-            logger.debug('Received item "%s" from queue' % _arg)
-            _app.multiprocessing_pre_cycle(_arg)
-        _carry_on = _app.multiprocessing_carryon()
-        if _carry_on:
-            logger.debug("Starting computation of item %s" % _arg)
-            _results = _app.multiprocessing_func(_arg)
-            _output_queue.put([_arg, _results])
-            logger.debug("Finished computation of item %s" % _arg)
+        if not _use_tasks:
+            _app.multiprocessing_pre_cycle(-1)
+            _app_carryon = _app.multiprocessing_carryon()
+            if _app_carryon:
+                _index, _results = _app.multiprocessing_func(-1)
+                _output_queue.put([_index, _results])
+        else:  # run with tasks
+            if _app_carryon:
+                try:
+                    _arg = _input_queue.get_nowait()
+                except queue.Empty:
+                    time.sleep(0.005)
+                    continue
+                if _arg is None:
+                    logger.debug("Received queue empty signal in input queue.")
+                    _output_queue.put([None, None])
+                    break
+                logger.debug('Received item "%s" from queue' % _arg)
+                _app.multiprocessing_pre_cycle(_arg)
+            _app_carryon = _app.multiprocessing_carryon()
+            if _app_carryon:
+                logger.debug("Starting computation of item %s" % _arg)
+                _results = _app.multiprocessing_func(_arg)
+                _output_queue.put([_arg, _results])
+                logger.debug("Finished computation of item %s" % _arg)
+        if not _app_carryon:
+            time.sleep(0.005)
     logger.debug("Worker finished with all tasks.")
-    _carry_on = False
+
+    _app_carryon = False
     while _wait_for_output and not _output_queue.empty():
-        if not _carry_on:
+        if not _app_carryon:
             logger.debug("Waiting for output queue to empty.")
-            _carry_on = True
-        time.sleep(0.05)
+            _app_carryon = True
+        time.sleep(0.02)
     logger.debug("Worker shutting down.")

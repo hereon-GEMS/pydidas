@@ -98,6 +98,11 @@ max-complexity = 12
 "qt_presets.py" = ["W605"]
 "file_extensions.py" = ["W605"]
 "numpy_parser.py" = ["W605"]
+"base_app.py" = ["E731"]
+"pydidas_plot2d_with_integration_regions.py" = ["C901"]
+"pydidas_gui.py" = ["F401"]
+"workflow_run_frame.py" = ["E722"]
+"app_processor_.py" = ["C901"]
 # For reading Eiger data, the hdf5plugin must be imported to allow
 # decompressing the data, but it is not actually used.
 "dectris_utils.py" = ["F401"]
@@ -105,8 +110,4 @@ max-complexity = 12
 "read_hdf5_slice.py" = ["F401"]
 "read_hdf5_dataset_.py" = ["F401"]
 "hdf5_io.py" = ["F401"]
-"base_app.py" = ["E731"]
-"pydidas_plot2d_with_integration_regions.py" = ["C901"]
-"pydidas_gui.py" = ["F401"]
-"workflow_run_frame.py" = ["E722"]
 

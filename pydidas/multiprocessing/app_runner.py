@@ -158,7 +158,10 @@ class AppRunner(WorkerController):
             self.__app.params.copy(),
             self.__app.get_config(),
         )
-        self._processor["kwargs"] = {"use_tasks": self._use_app_tasks}
+        self._processor["kwargs"] = {
+            "use_tasks": self._use_app_tasks,
+            "app_mp_config": self.__app._mp_config,
+        }
         self.add_tasks(self.__app.multiprocessing_get_tasks())
         self.finalize_tasks()
         self.sig_results.connect(self.__app.multiprocessing_store_results)

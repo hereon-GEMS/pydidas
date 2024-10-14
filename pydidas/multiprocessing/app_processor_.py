@@ -74,6 +74,9 @@ def app_processor(
         use_tasks : bool, optional
             Flag that the app uses tasks insted of running continuously. The default
             is True.
+        app_mp_config : dict, optional
+            Additional multiprocessing configuration or attributes for the
+            app. The default is None.
     """
     logger.setLevel(multiprocessing_config.get("logging_level", LOGGING_LEVEL))
 
@@ -89,6 +92,9 @@ def app_processor(
 
     _app = app(app_params, slave_mode=True)
     _app._config = app_config
+    _app_mp_config = kwargs.get("app_mp_config", None)
+    if _app_mp_config:
+        _app._mp_config = _app_mp_config
     _app.multiprocessing_pre_run()
 
     _app_carryon = True

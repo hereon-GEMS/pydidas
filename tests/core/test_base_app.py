@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,12 +18,13 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import multiprocessing as mp
 import os
 import shutil
 import tempfile
@@ -138,10 +139,23 @@ class TestBaseApp(unittest.TestCase):
         self.assertEqual(app.get_config(), {"run_prepared": False})
 
     def test_copy(self):
+        _mgr = mp.Manager()
         app = BaseApp()
+        _items = {
+            "dummy": 42,
+            "test_func": lambda x: x,
+            "some_kwargs": {"a": 1, "b": 2},
+        }
+        app._mp_config = {"lock": _mgr.Lock(), "shared_dict": _mgr.dict()}
+        for _key, _val in _items.items():
+            setattr(app, _key, _val)
         _copy = app.copy()
         self.assertNotEqual(app, _copy)
         self.assertIsInstance(_copy, BaseApp)
+        for _key in _items.keys():
+            self.assertTrue(hasattr(_copy, _key))
+        self.assertEqual(app._mp_config["lock"], _copy._mp_config["lock"])
+        self.assertEqual(app._mp_config["shared_dict"], _copy._mp_config["shared_dict"])
 
     def test_copy__as_slave(self):
         app = BaseApp()

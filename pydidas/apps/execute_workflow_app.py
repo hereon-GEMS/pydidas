@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for processing diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -367,8 +367,11 @@ class ExecuteWorkflowApp(BaseApp):
                     self._shared_arrays["flag"][_buffer_pos] = 1
                     break
             time.sleep(0.01)
-        for _node_id in self._config["result_shapes"]:
-            self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[_node_id].results
+        with self._config["shared_memory"]["lock"]:
+            for _node_id in self._config["result_shapes"]:
+                self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[
+                    _node_id
+                ].results
 
     def __store_result_metadata(self):
         """

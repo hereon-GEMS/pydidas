@@ -14,6 +14,8 @@ Improvements
 - Programmatic improvements:
     - Removed the basic_plugin class attribute from Plugins and shifted the check
       to the core code of the base plugins.
+    - Changed the internal handling of multiprocessing arguments (e.g. Queue objects)
+      for more streamlined code.
 
 Bugfixes
 --------

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,29 +40,20 @@ class _ProcThread(threading.Thread):
 
     def __init__(
         self,
-        input_queue,
-        output_queue,
-        stop_queue,
-        aborted_queue,
+        mp_config: dict,
         app,
         app_params,
         app_config,
     ):
         super().__init__()
-        self.input_queue = input_queue
-        self.output_queue = output_queue
-        self.stop_queue = stop_queue
-        self.aborted_queue = aborted_queue
+        self._mp_config = mp_config
         self.app = app
         self.app_params = app_params
         self.app_config = app_config
 
     def run(self):
         app_processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app,
             self.app_params,
             self.app_config,
@@ -82,31 +73,34 @@ class Test_app_processor(unittest.TestCase):
         cls._qtapp.quit()
 
     def setUp(self):
-        self.input_queue = mp.Queue()
-        self.output_queue = mp.Queue()
-        self.stop_queue = mp.Queue()
-        self.aborted_queue = mp.Queue()
+        self._mp_config = {
+            "queue_input": mp.Queue(),
+            "queue_output": mp.Queue(),
+            "queue_stop": mp.Queue(),
+            "queue_aborted": mp.Queue(),
+            "logging_level": 10,
+        }
         self.app = MpTestApp()
         self.n_test = self.app._config["max_index"]
         self.app.multiprocessing_pre_run()
 
     def tearDown(self):
-        self.input_queue.close()
-        self.output_queue.close()
-        self.stop_queue.close()
-        self.aborted_queue.close()
+        self._mp_config["queue_input"].close()
+        self._mp_config["queue_output"].close()
+        self._mp_config["queue_stop"].close()
+        self._mp_config["queue_aborted"].close()
 
     def put_ints_in_queue(self, finalize=True):
         for i in range(self.n_test):
-            self.input_queue.put(i)
+            self._mp_config["queue_input"].put(i)
         if finalize:
-            self.input_queue.put(None)
+            self._mp_config["queue_input"].put(None)
 
     def get_results(self):
         _tasks = []
         _results = []
         for i in range(self.n_test):
-            item = self.output_queue.get()
+            item = self._mp_config["queue_output"].get()
             _tasks.append(item[0])
             _results.append(item[1])
         return _tasks, _results
@@ -114,10 +108,7 @@ class Test_app_processor(unittest.TestCase):
     def test_run_plain(self):
         self.put_ints_in_queue()
         app_processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
             self.app._config,
@@ -126,33 +117,27 @@ class Test_app_processor(unittest.TestCase):
         time.sleep(0.1)
         _tasks, _results = self.get_results()
         self.assertEqual(_tasks, list(self.app.multiprocessing_get_tasks()))
-        _stopper = self.output_queue.get()
+        _stopper = self._mp_config["queue_output"].get()
         self.assertEqual(_stopper, [None, None])
 
     def test_run_with_empty_queue(self):
         _thread = _ProcThread(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
             self.app._config,
         )
         _thread.start()
         time.sleep(0.05)
-        self.input_queue.put(None)
+        self._mp_config["queue_input"].put(None)
         time.sleep(0.05)
-        _stopper = self.output_queue.get_nowait()
+        _stopper = self._mp_config["queue_output"].get_nowait()
         self.assertEqual(_stopper, [None, None])
 
     def test_stop_signal(self):
         self.put_ints_in_queue(finalize=False)
         _thread = _ProcThread(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
             self.app._config,
@@ -161,9 +146,9 @@ class Test_app_processor(unittest.TestCase):
         _tasks, _results = self.get_results()
         time.sleep(0.1)
         self.assertTrue(_thread.is_alive())
-        self.stop_queue.put(1)
+        self._mp_config["queue_stop"].put(1)
         time.sleep(0.1)
-        self.assertEqual(self.aborted_queue.get(), 1)
+        self.assertEqual(self._mp_config["queue_aborted"].get(), 1)
 
 
 if __name__ == "__main__":

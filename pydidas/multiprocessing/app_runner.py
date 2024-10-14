@@ -81,6 +81,7 @@ class AppRunner(WorkerController):
         self,
         app: BaseApp,
         n_workers: Union[None, int] = None,
+        #        use_app_tasks : bool = True,
         processor: type = app_processor,
     ):
         logger.debug("AppRunner: Starting AppRunner")
@@ -161,10 +162,7 @@ class AppRunner(WorkerController):
         """
         self.__app.multiprocessing_pre_run()
         self._processor["args"] = (
-            self._queues["send"],
-            self._queues["recv"],
-            self._queues["stop"],
-            self._queues["aborted"],
+            self._mp_kwargs,
             self.__app.__class__,
             self.__app.params.copy(),
             self.__app.get_config(),

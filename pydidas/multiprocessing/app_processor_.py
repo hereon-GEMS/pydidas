@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ multiprocessing calls to a pydidas Application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,7 +30,6 @@ __all__ = ["app_processor"]
 
 import queue
 import time
-from multiprocessing import Queue
 
 from ..core import ParameterCollection
 from ..core.utils import LOGGING_LEVEL, pydidas_logger
@@ -40,10 +39,7 @@ logger = pydidas_logger()
 
 
 def app_processor(
-    input_queue: Queue,
-    output_queue: Queue,
-    stop_queue: Queue,
-    aborted_queue: Queue,
+    multiprocessing_config: dict,
     app: type,
     app_params: ParameterCollection,
     app_config: dict,
@@ -58,16 +54,9 @@ def app_processor(
 
     Parameters
     ----------
-    input_queue : multiprocessing.Queue
-        The input queue which supplies the processor with indices to be
-        processed.
-    output_queue : multiprocessing.Queue
-        The queue for transmissing the results to the controlling thread.
-    stop_queue : multiprocessing.Queue
-        The queue for sending a termination signal to the worker.
-    aborted_queue : multiprocessing.Queue
-        The queue which is used by the processor to signal the calling
-        thread that it has aborted its cycle.
+    multiprocessing_config : dict
+        The multiprocessing configuration dictionary. It includes information
+        about the logging level as well as queue objects.
     app : type
         The Application class to be called in the process. The App must have a
         multiprocessing_func method.
@@ -87,7 +76,12 @@ def app_processor(
             level.
     """
     _wait_for_output = kwargs.get("wait_for_output_queue", True)
-    logger.setLevel(kwargs.get("logging_level", LOGGING_LEVEL))
+    logger.setLevel(multiprocessing_config.get("logging_level", LOGGING_LEVEL))
+    _input_queue = multiprocessing_config.get("queue_input")
+    _output_queue = multiprocessing_config.get("queue_output")
+    _stop_queue = multiprocessing_config.get("queue_stop")
+    _aborted_queue = multiprocessing_config.get("queue_aborted")
+    _use_tasks = multiprocessing_config.get("use_tasks", True)
     _carry_on = True
     logger.debug("Started process")
     _app = app(app_params, slave_mode=True)
@@ -96,9 +90,9 @@ def app_processor(
     while True:
         # check for stop signal
         try:
-            stop_queue.get_nowait()
+            _stop_queue.get_nowait()
             logger.debug("Received stop queue signal")
-            aborted_queue.put(1)
+            _aborted_queue.put(1)
             _wait_for_output = False
             break
         except queue.Empty:
@@ -106,13 +100,13 @@ def app_processor(
         # run processing step
         if _carry_on:
             try:
-                _arg = input_queue.get_nowait()
+                _arg = _input_queue.get_nowait()
             except queue.Empty:
                 time.sleep(0.005)
                 continue
             if _arg is None:
                 logger.debug("Received queue empty signal in input queue.")
-                output_queue.put([None, None])
+                _output_queue.put([None, None])
                 break
             logger.debug('Received item "%s" from queue' % _arg)
             _app.multiprocessing_pre_cycle(_arg)
@@ -120,11 +114,11 @@ def app_processor(
         if _carry_on:
             logger.debug("Starting computation of item %s" % _arg)
             _results = _app.multiprocessing_func(_arg)
-            output_queue.put([_arg, _results])
+            _output_queue.put([_arg, _results])
             logger.debug("Finished computation of item %s" % _arg)
     logger.debug("Worker finished with all tasks.")
     _carry_on = False
-    while _wait_for_output and not output_queue.empty():
+    while _wait_for_output and not _output_queue.empty():
         if not _carry_on:
             logger.debug("Waiting for output queue to empty.")
             _carry_on = True

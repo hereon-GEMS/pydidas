@@ -172,8 +172,8 @@ class TestWorkerController(unittest.TestCase):
         _args = (0, 0)
         wc = WorkerController()
         wc.change_function(local_test_func, *_args)
-        self.assertEqual(wc._processor["args"][4], local_test_func)
-        self.assertEqual(wc._processor["args"][5:], _args)
+        self.assertEqual(wc._processor["args"][0], local_test_func)
+        self.assertEqual(wc._processor["args"][2:], _args)
 
     def testcycle_pre_run(self):
         wc = WorkerController()
@@ -235,14 +235,14 @@ class TestWorkerController(unittest.TestCase):
         wc = WorkerController()
         wc._to_process = [1, 2, 3]
         wc._put_next_task_in_queue()
-        self.assertEqual(wc._queues["send"].qsize(), 1)
+        self.assertEqual(wc._queues["queue_input"].qsize(), 1)
 
     def test_get_and_emit_all_queue_items(self):
         _res1 = 3
         _res2 = [1, 1]
         wc = WorkerController()
-        wc._queues["recv"].put([0, _res1])
-        wc._queues["recv"].put([0, _res2])
+        wc._queues["queue_output"].put([0, _res1])
+        wc._queues["queue_output"].put([0, _res2])
         wc._progress_target = 2
         _spy = QtTest.QSignalSpy(wc.sig_results)
         time.sleep(0.005)
@@ -269,7 +269,7 @@ class TestWorkerController(unittest.TestCase):
         wc._workers = [1, 2, 3, 4]
         _nfinished = 3
         for i in range(_nfinished):
-            wc._queues["aborted"].put(1)
+            wc._queues["queue_aborted"].put(1)
         time.sleep(0.005)
         wc._check_if_workers_finished()
         self.assertEqual(wc._workers_done, _nfinished)
@@ -291,7 +291,7 @@ class TestWorkerController(unittest.TestCase):
         wc.flags["running"] = True
         wc._workers = [1, 2, 3, 4]
         for i in range(len(wc._workers)):
-            wc._queues["aborted"].put(1)
+            wc._queues["queue_aborted"].put(1)
         # assert: does not raise TimeoutError
         wc._wait_for_worker_finished_signals(0.2)
 

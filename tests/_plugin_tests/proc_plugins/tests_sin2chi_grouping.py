@@ -540,13 +540,15 @@ def test__group_d_spacing_by_chi_result(plugin_fixture, case):
 def test_chi_pos_verification_one_fit_parameter_position(plugin_fixture):
     """ This test fails currently because _chi_pos_verification() 
     cannot handle this one-parameter-output-case. There is an inconsistency how multiple fit parameters  vs one fit paraemter are stored in a Dataset."""
-    #TODO: Fix the test
+    #TODO: Fix the case for one firt parameter
+    #TODO: Documented in https://github.com/hereon-GEMS/pydidas/issues/68
     
     plugin = plugin_fixture
     
     test_ds = Dataset(np.random.default_rng(seed=42).random((5,1)), axis_labels={0:'chi'}, axis_ranges={0:np.arange(5)}, axis_units={0:'deg'}, data_label='position / A')
     
     result = plugin._chi_pos_verification(test_ds)
+    print(result)
     
     
 

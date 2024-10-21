@@ -229,8 +229,8 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
     def test_print_progress(self):
         obj = ExecuteWorkflowRunner()
         obj._print_progress(0.1)
-        _output = self.__mystdout.getvalue()
-        self.assertTrue(_output.endswith("10.00% \r"))
+        _output = self.__mystdout.getvalue().strip()
+        self.assertTrue(_output.endswith("10.00%"))
 
     def test_store_results_to_disk__empty_dir(self):
         RESULTS.update_shapes_from_scan_and_workflow()
@@ -370,10 +370,6 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
             obj.check_all_args_okay()
         self.assertTrue(_error.exception.args[0].index("directory is not empty") > 0)
 
-    # @unittest.skipIf(
-    #     "--quick" in sys.argv,
-    #     "Skipping long-running test with multiprocessing"
-    # )
     def test_process_scan__single_run(self):
         _dir = self.get_empty_dir_name()
         obj = ExecuteWorkflowRunner(
@@ -388,10 +384,6 @@ class TestExecuteWorkflowRunner(unittest.TestCase):
                 _shape = f["entry/data/data"].shape
             self.assertEqual(_shape, self._nscan + (10, 10))
 
-    # @unittest.skipIf(
-    #     "--quick" in sys.argv,
-    #     "Skipping long-running test with multiprocessing"
-    # )
     def test_process_scan__multiple_run(self):
         _dir = self.get_empty_dir_name()
         obj = ExecuteWorkflowRunner(

@@ -192,8 +192,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
     def _ensure_npt_azim_limit(self, chi: np.ndarray) -> None:
         """
-        Ensure the number of azimuthal angles is below a certain limit. 
-
+        Ensure the number of azimuthal angles is below a certain limit. The limit is given by NPT_AZIM_LIMIT.
+        The TOLERANCE_S2C_TOL works for all NPT_AZIM_LIMITs below 3000.
+        
         Parameters:
         chi (np.ndarray): The array of azimuthal angles.
 

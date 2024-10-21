@@ -665,12 +665,13 @@ class DspacingSin2chiGrouping(ProcPlugin):
             raise TypeError("Chi needs to be an np.ndarray.")
 
         s2c = np.sin(np.deg2rad(chi)) ** 2
-        arr = s2c
+        #arr = s2c
 
         # Create the similarity matrix
         #similarity_matrix = np.abs(arr - arr[:, np.newaxis]) < tolerance
         #TODO is this better? 
-        similarity_matrix = np.isclose(arr[:, np.newaxis], arr, atol=tolerance, rtol=1e-9)  #atol=tolerance
+        #similarity_matrix = np.isclose(arr[:, np.newaxis], arr, atol=tolerance, rtol=1e-9)  #atol=tolerance
+        similarity_matrix = np.abs(s2c[:, np.newaxis] - s2c[np.newaxis, :]) <= tolerance
 
         # Convert boolean matrix to sparse matrix
         sparse_matrix = csr_matrix(similarity_matrix.astype(int))

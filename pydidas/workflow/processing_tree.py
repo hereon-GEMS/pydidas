@@ -183,12 +183,7 @@ class ProcessingTree(GenericTree):
             and results items.
         """
         self.execute_process(arg, **kwargs)
-        _nodes = self.get_all_nodes_with_results()
-        _results = {}
-        for _node in _nodes:
-            if _node.results is not None:
-                _results[_node.node_id] = _node.results
-        return _results
+        return self.get_current_results()
 
     def execute_process(self, arg: object, **kwargs: dict):
         """
@@ -375,6 +370,21 @@ class ProcessingTree(GenericTree):
         else:
             self.clear()
         self._config["tree_changed"] = True
+
+    def get_current_results(self) -> dict:
+        """
+        Get the results of the current WorkflowTree.
+
+        Returns
+        -------
+        results : dict
+            A dictionary with the results of the current WorkflowTree.
+        """
+        _results = {}
+        for _node in self.get_all_nodes_with_results():
+            if _node.results is not None:
+                _results[_node.node_id] = _node.results
+        return _results
 
     def get_all_result_shapes(self, force_update: bool = False) -> dict:
         """

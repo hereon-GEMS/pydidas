@@ -16,6 +16,8 @@ Improvements
       to the core code of the base plugins.
     - Changed the internal handling of multiprocessing arguments (e.g. Queue objects)
       for more streamlined code.
+    - Added a multiprocessing Lock to worker process logging for consistent 
+      output formatting.
 
 Bugfixes
 --------
@@ -23,6 +25,8 @@ Bugfixes
 - Fixed in issue in Parameter where sub-type checking in tuple/set/list Parameters
   was not enforced.
 - Fixed an issue with PydidasPlot2D when cs_transform was disabled.
+- Fixed an issue with pickling unittest plugins loaded through the PluginRegistry.
+- Fixed an issue in the WorkflowNode which allowed accessing outdated results.
 
 
 v24.09.19

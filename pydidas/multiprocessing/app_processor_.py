@@ -87,14 +87,16 @@ def app_processor(
     _output_queue = multiprocessing_config.get("queue_output")
     _stop_queue = multiprocessing_config.get("queue_stop")
     _aborted_queue = multiprocessing_config.get("queue_aborted")
+    _io_lock = multiprocessing_config.get("lock")
 
-    logger.debug("Started process")
+    with _io_lock:
+        logger.debug("Started process")
 
     _app = app(app_params, slave_mode=True)
     _app._config = app_config
     _app_mp_manager = kwargs.get("app_mp_manager", None)
     if _app_mp_manager:
-        _app.mp_management = _app_mp_manager
+        _app.mp_manager = _app_mp_manager
     _app.multiprocessing_pre_run()
 
     _app_carryon = True
@@ -102,7 +104,8 @@ def app_processor(
         # check for stop signal
         try:
             _stop_queue.get_nowait()
-            logger.debug("Received stop queue signal")
+            with _io_lock:
+                logger.debug("Received stop queue signal")
             _aborted_queue.put(1)
             _wait_for_output = False
             break
@@ -123,25 +126,32 @@ def app_processor(
                     time.sleep(0.005)
                     continue
                 if _arg is None:
-                    logger.debug("Received queue empty signal in input queue.")
+                    with _io_lock:
+                        logger.debug("Received queue empty signal in input queue.")
                     _output_queue.put([None, None])
                     break
-                logger.debug('Received item "%s" from queue' % _arg)
+                with _io_lock:
+                    logger.debug('Received item "%s" from queue' % _arg)
                 _app.multiprocessing_pre_cycle(_arg)
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
-                logger.debug("Starting computation of item %s" % _arg)
+                with _io_lock:
+                    logger.debug("Starting computation of item %s" % _arg)
                 _results = _app.multiprocessing_func(_arg)
                 _output_queue.put([_arg, _results])
-                logger.debug("Finished computation of item %s" % _arg)
+                with _io_lock:
+                    logger.debug("Finished computation of item %s" % _arg)
         if not _app_carryon:
             time.sleep(0.005)
-    logger.debug("Worker finished with all tasks.")
+    with _io_lock:
+        logger.debug("Worker finished with all tasks.")
 
     _app_carryon = False
     while _wait_for_output and not _output_queue.empty():
         if not _app_carryon:
-            logger.debug("Waiting for output queue to empty.")
+            with _io_lock:
+                logger.debug("Waiting for output queue to empty.")
             _app_carryon = True
         time.sleep(0.02)
-    logger.debug("Worker shutting down.")
+    with _io_lock:
+        logger.debug("Worker shutting down.")

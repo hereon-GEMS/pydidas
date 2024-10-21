@@ -73,12 +73,14 @@ class Test_app_processor(unittest.TestCase):
         cls._qtapp.quit()
 
     def setUp(self):
+        self._lock_manager = mp.Manager()
         self._mp_config = {
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
             "queue_aborted": mp.Queue(),
             "logging_level": 10,
+            "lock": self._lock_manager.Lock(),
         }
 
     def tearDown(self):
@@ -86,6 +88,7 @@ class Test_app_processor(unittest.TestCase):
         self._mp_config["queue_output"].close()
         self._mp_config["queue_stop"].close()
         self._mp_config["queue_aborted"].close()
+        self._lock_manager.shutdown()
 
     def put_ints_in_queue(self, finalize=True):
         for i in range(self.app._config["max_index"]):

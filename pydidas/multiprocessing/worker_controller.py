@@ -96,6 +96,7 @@ class WorkerController(QtCore.QThread):
         self._write_lock = QtCore.QReadWriteLock()
         self._workers = []
         self._workers_done = 0
+        self._lock_manager = mp.Manager()
         self._queues = {
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
@@ -104,6 +105,7 @@ class WorkerController(QtCore.QThread):
         }
         self._mp_kwargs = {
             "logging_level": LOGGING_LEVEL,
+            "lock": self._lock_manager.Lock(),
             **self._queues,
         }
         self._processor = {
@@ -450,6 +452,7 @@ class WorkerController(QtCore.QThread):
             _worker.join()
         self._workers = []
         self.flags["active"] = False
+        self._lock_manager.shutdown()
         logger.debug("WorkerController: Joined all workers")
 
     def join_queues(self):
@@ -516,6 +519,7 @@ class WorkerController(QtCore.QThread):
         """
         logger.debug("WorkerController: Exiting thread")
         self.join_queues()
+        self._lock_manager.shutdown()
         if code is not None:
             super().exit(code)
         else:

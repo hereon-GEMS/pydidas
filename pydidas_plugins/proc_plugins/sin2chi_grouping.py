@@ -668,9 +668,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         #arr = s2c
 
         # Create the similarity matrix
-        #similarity_matrix = np.abs(arr - arr[:, np.newaxis]) < tolerance
-        #TODO is this better? 
-        #similarity_matrix = np.isclose(arr[:, np.newaxis], arr, atol=tolerance, rtol=1e-9)  #atol=tolerance
         similarity_matrix = np.abs(s2c[:, np.newaxis] - s2c[np.newaxis, :]) <= tolerance
 
         # Convert boolean matrix to sparse matrix

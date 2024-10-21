@@ -47,7 +47,7 @@ UNITS_NANOMETER = "nm"
 UNITS_ANGSTROM = "A"
 UNITS_DEGREE = "deg"
 
-TOLERANCE_S2C_TOL = 1e-6
+S2C_TOLERANCE = 1e-6
 NPT_AZIM_LIMIT = 3000 
 
 
@@ -193,7 +193,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def _ensure_npt_azim_limit(self, chi: np.ndarray) -> None:
         """
         Ensure the number of azimuthal angles is below a certain limit. The limit is given by NPT_AZIM_LIMIT.
-        The TOLERANCE_S2C_TOL works for all NPT_AZIM_LIMITs below 3000.
+        The S2C_TOLERANCE works for all NPT_AZIM_LIMITs below 3000.
         
         Parameters:
         chi (np.ndarray): The array of azimuthal angles.
@@ -621,7 +621,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return chi, d_spacing
     
-    def _idx_s2c_grouping(self, chi: np.ndarray, tolerance: float = TOLERANCE_S2C_TOL) -> Tuple[int, np.ndarray]:
+    def _idx_s2c_grouping(self, chi: np.ndarray, tolerance: float = S2C_TOLERANCE) -> Tuple[int, np.ndarray]:
         """
         Groups chi angles based on the similarity of their sin^2(chi) values within a specified tolerance.
 
@@ -679,7 +679,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return n_components, s2c_labels
     
-    def _group_d_spacing_by_chi(self, d_spacing: Dataset, chi: np.ndarray, tolerance: float = TOLERANCE_S2C_TOL) -> Tuple[Dataset, Dataset]:
+    def _group_d_spacing_by_chi(self, d_spacing: Dataset, chi: np.ndarray, tolerance: float = S2C_TOLERANCE) -> Tuple[Dataset, Dataset]:
         """
         Groups d-spacing values based on the chi angles and categorize them by the slope of their sin^2(chi) values.
 

@@ -157,6 +157,7 @@ class WorkflowNode(GenericNode):
 
         This method recursively calls the pre_execute methods of all (child) plugins.
         """
+        self.results = None
         self.plugin.pre_execute()
         for _child in self._children:
             _child.prepare_execution()

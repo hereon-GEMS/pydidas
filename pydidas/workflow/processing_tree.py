@@ -417,7 +417,7 @@ class ProcessingTree(GenericTree):
                 )
         return _shapes
 
-    def get_all_nodes_with_results(self) -> list:
+    def get_all_nodes_with_results(self) -> list[WorkflowNode]:
         """
         Get all tree nodes which have results associated with them.
 
@@ -426,8 +426,8 @@ class ProcessingTree(GenericTree):
 
         Returns
         -------
-        list
-            A list of all leaf nodes.
+        list[WorkflowNode]
+            A list of all nodes which are leaves or which have been flagged.
         """
         _nodes_w_results = [
             _node

@@ -555,7 +555,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
    
     
-    def _extract_and_verify_unit(data_label, pos_units_allowed):
+    def _extract_and_verify_unit(data_label):
+        
+         # position/pos contains the unit for d_spacing
+        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
+        
         # Ensure 'position' is in the data_label
         if 'position' not in data_label:
             raise ValueError("'position' not found in data_label.")
@@ -570,17 +574,19 @@ class DspacingSin2chiGrouping(ProcPlugin):
             return unit
         else:
             raise ValueError("No unit found in data_label.")
+    
 
-    
-    
     def _ds_slicing_1d(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
+        #TODO
+        # - update for self.conifg._chi_key to compare with previous dataset
+        # chi_units_allowed and pos_units_allowed as global parameter list? 
+        # how to transfer the unit to the resulting dataset later, structure is not the same for 1D and 2D
+        
+        
         self._ensure_dataset_instance(ds)
         
-        # Define chi and d_spacing here
-        axis_labels = ds.axis_labels
-
         # Collect indices where 'chi' is found
-        chi_indices = [key for key, value in axis_labels.items() if value == LABELS_CHI]
+        chi_indices = [key for key, value in ds.axis_labels.items() if value == LABELS_CHI]
 
         # Check for multiple 'chi'
         if len(chi_indices) > 1:
@@ -592,17 +598,15 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # Assuming there's exactly one 'chi', get the index
         self.config._chi_key= chi_indices[0]
-        
-        
-        # position/pos contains the unit for d_spacing
-        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
+
+    
         # Only chi in degree is allowed.
         chi_units_allowed: List[str] = [UNITS_DEGREE]
         
-        if not ds.axis_labels[self.config_.chi_key] in chi_units_allowed:
-            raise ValueError("Chi is missing. Check your dataset.")
+        if not ds.axis_units[self.config_.chi_key] in chi_units_allowed:
+            raise ValueError("Unit for 'chi' is not allowed. Check your dataset.")
         
-        self._extract_and_verify_unit(ds.data_label, pos_units_allowed)
+        self._extract_and_verify_unit(ds.data_label)
             
         
         chi= ds.axis_ranges[self.config._chi_key]

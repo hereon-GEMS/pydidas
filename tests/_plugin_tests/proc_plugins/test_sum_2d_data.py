@@ -124,7 +124,7 @@ class TestSum2dData(unittest.TestCase):
         plugin.set_param_value("type_selection", "Indices")
         data = create_dataset(2)
         _data, _ = plugin.execute(data)
-        self.assertTrue(_data[0], data[_low_y, _low_x])
+        self.assertEqual(_data[0], data[_low_y, _low_x])
 
     def test_execute__range(self):
         _low_y = 3
@@ -139,7 +139,7 @@ class TestSum2dData(unittest.TestCase):
         plugin.set_param_value("type_selection", "Indices")
         data = create_dataset(2)
         _data, _ = plugin.execute(data)
-        self.assertTrue(
+        self.assertEqual(
             _data[0], np.sum(data[_low_y : _high_y + 1, _low_x : _high_x + 1])
         )
 

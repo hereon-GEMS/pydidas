@@ -146,12 +146,21 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
         
         print(30*"\N{hot pepper}") 
+        print('Shape of dataset:', ds.shape)
+        print('Dimension of dataset:', ds.ndim)
         #self._chi_pos_unit_verification(ds)        
         print(30*"\N{banana}") 
         print(ds)
         print(30*"\N{banana}")        
-              
-        chi, d_spacing = self._ds_slicing(ds)
+        
+        
+        if ds.ndim == 2:     
+            chi, d_spacing = self._ds_slicing(ds)
+        elif ds.ndim == 1:
+            chi, d_spacing = self._ds_slicing_1d(ds)
+        else:
+            raise UserConfigError("Dataset has to be 1D or 2D.")
+        
         self._ensure_npt_azim_limit(chi)        
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
@@ -544,6 +553,63 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return d_spacing
     
+   
+    
+    def _extract_and_verify_unit(data_label, pos_units_allowed):
+        # Ensure 'position' is in the data_label
+        if 'position' not in data_label:
+            raise ValueError("'position' not found in data_label.")
+        
+        # Use regex to extract the unit after '/'
+        match = re.search(r'/\s*(\w+)', data_label)
+        if match:
+            unit = match.group(1)
+            # Compare with allowed units
+            if unit not in pos_units_allowed:
+                raise ValueError(f"Unit '{unit}' is not allowed.")
+            return unit
+        else:
+            raise ValueError("No unit found in data_label.")
+
+    
+    
+    def _ds_slicing_1d(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
+        self._ensure_dataset_instance(ds)
+        
+        # Define chi and d_spacing here
+        axis_labels = ds.axis_labels
+
+        # Collect indices where 'chi' is found
+        chi_indices = [key for key, value in axis_labels.items() if value == LABELS_CHI]
+
+        # Check for multiple 'chi'
+        if len(chi_indices) > 1:
+            raise KeyError('Multiple "chi" found. Check your dataset.')
+
+        # Check for absence of 'chi'
+        if not chi_indices:
+            raise ValueError("chi is missing. Check your dataset.")
+
+        # Assuming there's exactly one 'chi', get the index
+        self.config._chi_key= chi_indices[0]
+        
+        
+        # position/pos contains the unit for d_spacing
+        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
+        # Only chi in degree is allowed.
+        chi_units_allowed: List[str] = [UNITS_DEGREE]
+        
+        if not ds.axis_labels[self.config_.chi_key] in chi_units_allowed:
+            raise ValueError("Chi is missing. Check your dataset.")
+        
+        self._extract_and_verify_unit(ds.data_label, pos_units_allowed)
+            
+        
+        chi= ds.axis_ranges[self.config._chi_key]
+        
+        return chi, ds
+
+    
     def _ds_slicing(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
         """
         Extracts d-spacing values and associated chi values from a Dataset object for one scan position.
@@ -752,6 +818,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # Define the threshold for being "close to zero", i.e. where is the slope=0
         zero_threshold = 1e-4
+        #zero_threshold = 1e-6
 
         # Categorize the values of the first_derivative
     

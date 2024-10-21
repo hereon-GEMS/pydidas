@@ -150,10 +150,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         self.assertTrue(app.get_param_value("autosave_results"))
 
-    def test_multiprocessing_carryon(self):
-        app = ExecuteWorkflowApp()
-        self.assertTrue(app.multiprocessing_carryon())
-
     def test_store_context(self):
         app = ExecuteWorkflowApp()
         app._store_context()
@@ -188,10 +184,18 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.multiprocessing_post_run()
         # assert does not raise an Exception
 
-    def test_redefine_multiprocessing_carryon__not_live(self):
+    def test_multiprocessing_carryon__not_live(self):
         app = ExecuteWorkflowApp()
-        app._redefine_multiprocessing_carryon()
+        app.set_param_value("live_processing", False)
         self.assertTrue(app.multiprocessing_carryon())
+
+    def test_multiprocessing_carryon__live(self):
+        TREE.root.plugin.input_available = lambda x: x
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app.set_param_value("live_processing", True)
+        app._index = utils.get_random_string(8)
+        self.assertEqual(app.multiprocessing_carryon(), app._index)
 
     def test_multiprocessing_pre_run(self):
         app = ExecuteWorkflowApp()
@@ -205,7 +209,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.prepare_run()
         self.assertIsInstance(app._shared_arrays[1], np.ndarray)
         self.assertIsInstance(app._shared_arrays[2], np.ndarray)
-        self.assertTrue(app.multiprocessing_carryon())
 
     def test_prepare_run__master_not_live_w_autosave(self):
         app = ExecuteWorkflowApp()
@@ -233,7 +236,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertEqual(
             app._config["shared_memory"][2], app2._config["shared_memory"][2]
         )
-        self.assertTrue(app.multiprocessing_carryon())
 
     def test_prepare_run__master_live_no_autosave(self):
         app = ExecuteWorkflowApp()
@@ -243,7 +245,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app._index = 1
         self.assertIsInstance(app._shared_arrays[1], np.ndarray)
         self.assertIsInstance(app._shared_arrays[2], np.ndarray)
-        self.assertTrue(app.multiprocessing_carryon())
 
     def test_initialize_shared_memory(self):
         app = ExecuteWorkflowApp()
@@ -275,16 +276,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             else:
                 _target = (_n,) + app._config["result_shapes"][key]
             self.assertEqual(app._shared_arrays[key].shape, _target)
-
-    def test_redefine_multiprocessing_carryon__live(self):
-        TREE.root.plugin.input_available = lambda x: x
-        app = ExecuteWorkflowApp()
-        app.prepare_run()
-        app.set_param_value("live_processing", True)
-        app._redefine_multiprocessing_carryon()
-        app._index = utils.get_random_string(8)
-        self.assertEqual(app.multiprocessing_carryon(), app._index)
-        generate_tree()
 
     def test_multiprocessing_get_tasks__normal(self):
         app = ExecuteWorkflowApp()

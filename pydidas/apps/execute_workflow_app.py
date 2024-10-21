@@ -112,6 +112,7 @@ class ExecuteWorkflowApp(BaseApp):
         "_index",
         "_result_metadata",
         "_mp_tasks",
+        "_mp_manager_instance",
     ]
     sig_results_updated = QtCore.Signal()
 
@@ -169,6 +170,7 @@ class ExecuteWorkflowApp(BaseApp):
         if self.slave_mode:
             self._recreate_context()
         else:
+            self._prepare_mp_configuration()
             RESULTS.update_shapes_from_scan_and_workflow()
             RESULT_SAVER.set_active_savers_and_title([])
             self._store_context()
@@ -180,7 +182,6 @@ class ExecuteWorkflowApp(BaseApp):
                     self.get_param_value("autosave_format"),
                 )
         self.__initialize_arrays_from_shared_memory()
-        self._redefine_multiprocessing_carryon()
         TREE.prepare_execution()
         self._config["run_prepared"] = True
         if self.get_param_value("live_processing"):
@@ -195,6 +196,37 @@ class ExecuteWorkflowApp(BaseApp):
             SCAN.set_param_value(_key, _val)
         for _key, _val in self._config["exp_context"].items():
             EXP.set_param_value(_key, _val)
+
+    def _prepare_mp_configuration(self):
+        """
+        Prepare the multiprocessing configuration for the app.
+
+        The following items are used for inter-process app communication:
+
+        - A mp.Manager instance for shared state management
+        - A dictionary for the shapes of the results
+        - A dictionary for the metadata of the results
+        - An Event to signal that the shapes are available which allows
+          the master process to query the shapes dictionary and initialize
+          the shared memory arrays.
+        - An Event to signal that the shapes are set and the master process
+          has created the shared memory arrays. Workers can then resume
+          their work.
+        - A Lock to synchronize access to the shared memory arrays.
+        """
+        if self._mp_manager_instance is None:
+            self._mp_manager_instance = mp.Manager()
+        for _item, _type in [
+            ("shape_dict", self._mp_manager_instance.dict),
+            ("metadata_dict", self._mp_manager_instance.dict),
+            ("shapes_available", self._mp_manager_instance.Event),
+            ("shapes_set", self._mp_manager_instance.Event),
+            ("lock", self._mp_manager_instance.Lock),
+        ]:
+            if self.mp_manager.get(_item, None) is None:
+                self.mp_manager[_item] = _type()
+            if _type in [self._mp_manager_instance.Event, self._mp_manager_instance.dict]:
+                self.mp_manager[_item].clear()
 
     def _store_context(self):
         """
@@ -266,31 +298,6 @@ class ExecuteWorkflowApp(BaseApp):
             self._config["shared_memory"]["flag"].get_obj(), dtype=np.int32
         )
 
-    def _redefine_multiprocessing_carryon(self):
-        """
-        Redefine multiprocessing_carryon based on the the live_processing settings.
-
-        To speed up processing, this method will link the required function directly to
-        multiprocessing_carryon. If live_processing is used, this will be the
-        input_available check of the input plugin. If not, the return value will always
-        be True.
-        """
-        if self.get_param_value("live_processing"):
-            self.multiprocessing_carryon = self.__live_mp_carryon
-        else:
-            self.multiprocessing_carryon = lambda: True
-
-    def __live_mp_carryon(self) -> bool:
-        """
-        Check the state of the latest file to allow continuation of the processing.
-
-        Returns
-        -------
-        bool
-            Flag whether the input is available on the file system.
-        """
-        return TREE.root.plugin.input_available(self._index)
-
     def multiprocessing_get_tasks(self) -> np.ndarray:
         """
         Return all tasks required in multiprocessing.
@@ -320,15 +327,14 @@ class ExecuteWorkflowApp(BaseApp):
         By default, this Flag is always True. In the case of live processing,
         a check is done whether the current file exists.
 
-        Note: This method is a dummy which will be overwritten in the
-        prepare_run method depending on the settings for the live processing.
-
         Returns
         -------
         bool
             Flag whether the processing can carry on or needs to wait.
         """
-        return True
+        if not self.get_param_value("live_processing"):
+            return True
+        return TREE.root.plugin.input_available(self._index)
 
     def multiprocessing_func(self, index: int) -> Union[int, Tuple[int, dict]]:
         """
@@ -350,11 +356,43 @@ class ExecuteWorkflowApp(BaseApp):
                 TREE.execute_process(index)
         except FileReadError:
             return -1
+        # if not self.mp_manager["shapes_available"].is_set():
+        #     self._communicate_shapes_to_master()
         self.__write_results_to_shared_arrays()
         if self._config["result_metadata_set"]:
             return self._config["buffer_pos"]
         self.__store_result_metadata()
         return (self._config["buffer_pos"], self._result_metadata)
+
+    def _communicate_shapes_to_master(self):
+        """
+        Communicate the shapes of the results to the master process.
+        """
+        _shapes = TREE.get_all_result_shapes()
+        with self.mp_manager["shape_dict"]:
+            for _key, _shape in _shapes.items():
+                self.mp_manager["shape_dict"][_key] = _shape
+        self.mp_manager["shapes_available"].set()
+
+        for _node_id in self._config["result_shapes"]:
+            _res = TREE.nodes[_node_id].results
+            if isinstance(_res, Dataset):
+                self._result_metadata[_node_id] = {
+                    "axis_labels": _res.axis_labels,
+                    "axis_ranges": _res.axis_ranges,
+                    "axis_units": _res.axis_units,
+                    "data_unit": _res.data_unit,
+                    "data_label": _res.data_label,
+                }
+            else:
+                self._result_metadata[_node_id] = {
+                    "axis_labels": {i: None for i in range(_res.ndim)},
+                    "axis_ranges": {i: None for i in range(_res.ndim)},
+                    "axis_units": {i: None for i in range(_res.ndim)},
+                    "data_unit": "",
+                    "data_label": "",
+                }
+        self._config["result_metadata_set"] = True
 
     def __write_results_to_shared_arrays(self):
         """Write the results from the WorkflowTree execution to the shared array."""

@@ -61,7 +61,7 @@ class DummyProc(ProcPlugin):
         dict
             The state to set the state of the new object.
         """
-        from .dummy_getter_ import dummy_getter
+        from pydidas.unittest_objects.dummy_getter_ import dummy_getter
 
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 

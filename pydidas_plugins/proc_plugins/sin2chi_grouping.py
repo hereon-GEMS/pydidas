@@ -693,7 +693,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         chi : np.ndarray
             A 1D numpy array of chi angles in degrees.
         tolerance : float, optional
-            The tolerance level for grouping sin^2(chi) values. Defaults to 2e-4. This parameter ensures that all different groups are accurately identified
+            The tolerance level for grouping sin^2(chi) values. Defaults to 1e-6. This parameter ensures that all different groups are accurately identified
             with this tight tolerance.
 
         Returns

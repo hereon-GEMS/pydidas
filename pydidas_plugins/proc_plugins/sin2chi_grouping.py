@@ -48,6 +48,7 @@ UNITS_ANGSTROM = "A"
 UNITS_DEGREE = "deg"
 
 TOLERANCE_S2C_TOL = 1e-6
+NPT_AZIM_LIMIT = 3000 
 
 
 PARAMETER_KEEP_RESULTS = 'keep_results'
@@ -151,6 +152,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         print(30*"\N{banana}")        
               
         chi, d_spacing = self._ds_slicing(ds)
+        self._ensure_npt_azim_limit(chi)        
         d_spacing_pos, d_spacing_neg=self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
                 
@@ -188,6 +190,18 @@ class DspacingSin2chiGrouping(ProcPlugin):
             raise TypeError("Input must be an instance of Dataset.")
         
 
+    def _ensure_npt_azim_limit(self, chi: np.ndarray) -> None:
+        """
+        Ensure the number of azimuthal angles is below a certain limit. 
+
+        Parameters:
+        chi (np.ndarray): The array of azimuthal angles.
+
+        Raises:
+        UserConfigError: If the number of azimuthal angles exceeds the limit.
+        """
+        if chi.size > NPT_AZIM_LIMIT:
+            raise UserConfigError(f"Number of azimuthal angles exceeds the limit of {NPT_AZIM_LIMIT}.")
     
     def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:
         """
@@ -574,6 +588,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
 
         self._ensure_dataset_instance(ds)
+        
 
         # Identification of chi and position
         if self.config._chi_key is None or self.config._pos_key is None or self.config._pos_idx is None:
@@ -589,7 +604,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
           
 
         # select the chi values
-        chi = ds.axis_ranges[self.config._chi_key]
+        chi = ds.axis_ranges[self.config._chi_key]    
 
         # Extract d-spacing values
         d_spacing = self._extract_d_spacing(ds, self.config._pos_key, self.config._pos_idx)

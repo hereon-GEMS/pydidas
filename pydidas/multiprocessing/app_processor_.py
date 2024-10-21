@@ -74,7 +74,7 @@ def app_processor(
         use_tasks : bool, optional
             Flag that the app uses tasks insted of running continuously. The default
             is True.
-        app_mp_config : dict, optional
+        app_mp_manager : dict, optional
             Additional multiprocessing configuration or attributes for the
             app. The default is None.
     """
@@ -92,9 +92,9 @@ def app_processor(
 
     _app = app(app_params, slave_mode=True)
     _app._config = app_config
-    _app_mp_config = kwargs.get("app_mp_config", None)
-    if _app_mp_config:
-        _app._mp_config = _app_mp_config
+    _app_mp_manager = kwargs.get("app_mp_manager", None)
+    if _app_mp_manager:
+        _app.mp_management = _app_mp_manager
     _app.multiprocessing_pre_run()
 
     _app_carryon = True

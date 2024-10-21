@@ -160,7 +160,7 @@ class AppRunner(WorkerController):
         )
         self._processor["kwargs"] = {
             "use_tasks": self._use_app_tasks,
-            "app_mp_config": self.__app._mp_config,
+            "app_mp_manager": self.__app.mp_manager,
         }
         self.add_tasks(self.__app.multiprocessing_get_tasks())
         self.finalize_tasks()

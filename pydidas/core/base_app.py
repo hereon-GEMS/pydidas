@@ -64,7 +64,8 @@ class BaseApp(ObjectWithParameterCollection):
         self.update_params_from_init(*args, **kwargs)
         self.parse_args_and_set_params()
         self._config["run_prepared"] = False
-        self._mp_config = {}
+        self.mp_manager = {}
+        self._mp_manager_instance = None
 
     def parse_args_and_set_params(self):
         """
@@ -302,7 +303,7 @@ class BaseApp(ObjectWithParameterCollection):
                         ),
                     )
                     or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
-                    or _key in ["__METAOBJECT__", "_mp_config"]
+                    or _key in ["__METAOBJECT__", "mp_manager"]
                 )
             }
         )
@@ -310,6 +311,6 @@ class BaseApp(ObjectWithParameterCollection):
             _obj_copy.set_param_value(_key, _param.value)
         if slave_mode:
             _obj_copy.slave_mode = True
-        if hasattr(self, "_mp_config"):
-            _obj_copy._mp_config = {k: v for k, v in self._mp_config.items()}
+        if hasattr(self, "mp_manager"):
+            _obj_copy.mp_manager = {k: v for k, v in self.mp_manager.items()}
         return _obj_copy

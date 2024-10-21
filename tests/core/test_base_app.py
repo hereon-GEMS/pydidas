@@ -146,7 +146,7 @@ class TestBaseApp(unittest.TestCase):
             "test_func": lambda x: x,
             "some_kwargs": {"a": 1, "b": 2},
         }
-        app._mp_config = {"lock": _mgr.Lock(), "shared_dict": _mgr.dict()}
+        app.mp_manager = {"lock": _mgr.Lock(), "shared_dict": _mgr.dict()}
         for _key, _val in _items.items():
             setattr(app, _key, _val)
         _copy = app.copy()
@@ -154,8 +154,8 @@ class TestBaseApp(unittest.TestCase):
         self.assertIsInstance(_copy, BaseApp)
         for _key in _items.keys():
             self.assertTrue(hasattr(_copy, _key))
-        self.assertEqual(app._mp_config["lock"], _copy._mp_config["lock"])
-        self.assertEqual(app._mp_config["shared_dict"], _copy._mp_config["shared_dict"])
+        self.assertEqual(app.mp_manager["lock"], _copy.mp_manager["lock"])
+        self.assertEqual(app.mp_manager["shared_dict"], _copy.mp_manager["shared_dict"])
 
     def test_copy__as_slave(self):
         app = BaseApp()

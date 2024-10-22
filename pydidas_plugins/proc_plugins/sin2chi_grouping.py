@@ -581,35 +581,25 @@ class DspacingSin2chiGrouping(ProcPlugin):
         # - update for self.conifg._chi_key to compare with previous dataset
         # chi_units_allowed and pos_units_allowed as global parameter list? 
         # how to transfer the unit to the resulting dataset later, structure is not the same for 1D and 2D
-        
-        
+        chi_units_allowed: List[str] = [UNITS_DEGREE]
+
         self._ensure_dataset_instance(ds)
-        
-        # Collect indices where 'chi' is found
-        chi_indices = [key for key, value in ds.axis_labels.items() if value == LABELS_CHI]
+        self._extract_and_verify_unit(ds.data_label)
 
-        # Check for multiple 'chi'
-        if len(chi_indices) > 1:
-            raise KeyError('Multiple "chi" found. Check your dataset.')
-
-        # Check for absence of 'chi'
-        if not chi_indices:
-            raise ValueError("chi is missing. Check your dataset.")
+        if ds.axis_labels[0] not in [LABELS_CHI] or ds.axis_units[0] not in chi_units_allowed:
+            raise UserConfigError(
+                "The input dataset does not contain chi values in the axis and/or "
+                "the chi values are given in an unsupported unit. Supported units "
+                f"are [{', '.join(chi_units_allowed)}]."
+            )
 
         # Assuming there's exactly one 'chi', get the index
-        self.config._chi_key= chi_indices[0]
-
-    
-        # Only chi in degree is allowed.
-        chi_units_allowed: List[str] = [UNITS_DEGREE]
+        self.config._chi_key = 0
         
-        if not ds.axis_units[self.config_.chi_key] in chi_units_allowed:
-            raise ValueError("Unit for 'chi' is not allowed. Check your dataset.")
-        
-        self._extract_and_verify_unit(ds.data_label)
-            
-        
-        chi= ds.axis_ranges[self.config._chi_key]
+        chi = ds.axis_ranges[self.config._chi_key]
+        _label, _unit = ds.data_label.split("/")
+        ds.data_label = _label
+        ds.data_unit = _unit
         
         return chi, ds
 

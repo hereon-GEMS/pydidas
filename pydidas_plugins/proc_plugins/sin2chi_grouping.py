@@ -555,26 +555,28 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
    
     
-    def _extract_and_verify_unit(data_label):
+    def _extract_and_verify_unit(self, data_label):
         
          # position/pos contains the unit for d_spacing
         pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
         
         # Ensure 'position' is in the data_label
         if 'position' not in data_label:
-            raise ValueError("'position' not found in data_label.")
+            raise ValueError("Key 'position' not found in data_label.")
         
-        # Use regex to extract the unit after '/'
-        match = re.search(r'/\s*(\w+)', data_label)
-        if match:
-            unit = match.group(1)
-            # Compare with allowed units
-            if unit not in pos_units_allowed:
-                raise ValueError(f"Unit '{unit}' is not allowed.")
-            return unit
-        else:
-            raise ValueError("No unit found in data_label.")
+        parts = data_label.split('/')
+
+        if len(parts) != 2:
+            raise ValueError("Invalid data_label format. Expected 'position / unit'.")
+        
+        # Extract and strip the unit
+        unit = parts[1].strip()
+        
+        # Compare with allowed units
+        if unit not in pos_units_allowed:
+            raise ValueError(f"Unit '{unit}' is not allowed for key 'position.")
     
+        return unit
 
     def _ds_slicing_1d(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
         #TODO
@@ -584,7 +586,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         chi_units_allowed: List[str] = [UNITS_DEGREE]
 
         self._ensure_dataset_instance(ds)
-        self._extract_and_verify_unit(ds.data_label)
+              
+        pos_unit = self._extract_and_verify_unit(ds.data_label)
 
         if ds.axis_labels[0] not in [LABELS_CHI] or ds.axis_units[0] not in chi_units_allowed:
             raise UserConfigError(

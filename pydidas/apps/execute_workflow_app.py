@@ -141,6 +141,7 @@ class ExecuteWorkflowApp(BaseApp):
         self._result_metadata = {}
         self._mp_tasks = np.array(())
         self._index = None
+        self._waiting_for_shapes_to_be_set = False
 
     def multiprocessing_pre_run(self):
         """
@@ -279,13 +280,17 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Initialize the shared arrays from the buffer size and result shapes.
         """
+        if not self.mp_manager["shapes_available"].is_set():
+            raise UserConfigError(
+                "The shapes of the results are not yet available. "
+                "Please run the prepare_run method first."
+            )
         _n = self._config["buffer_n"]
         _share = self._config["shared_memory"]
-        self._config["shared_memory"]["lock"] = mp.Lock()
-        _share["flag"] = mp.Array("I", _n, lock=self._config["shared_memory"]["lock"])
-        for _key in self._config["result_shapes"]:
-            _num = int(_n * np.prod(self._config["result_shapes"][_key]))
-            _share[_key] = mp.Array("f", _num, lock=mp.Lock())
+        _share["flag"] = mp.Array("I", _n, lock=self.mp_manager["lock"])
+        for _node_id, _shape in self.mp_manager["shape_dict"].items():
+            _num = int(_n * np.prod(_shape))
+            _share[_node_id] = mp.Array("f", _num, lock=mp.Lock())
 
     def __initialize_arrays_from_shared_memory(self):
         """
@@ -330,11 +335,16 @@ class ExecuteWorkflowApp(BaseApp):
         By default, this Flag is always True. In the case of live processing,
         a check is done whether the current file exists.
 
+        This value is overwritten by the `_waiting_for_shapes_to_be_set` flag
+        if the shapes are not yet available.
+
         Returns
         -------
         bool
             Flag whether the processing can carry on or needs to wait.
         """
+        if self._waiting_for_shapes_to_be_set:
+            return False
         if not self.get_param_value("live_processing"):
             return True
         return TREE.root.plugin.input_available(self._index)
@@ -342,6 +352,11 @@ class ExecuteWorkflowApp(BaseApp):
     def multiprocessing_func(self, index: int) -> Union[int, Tuple[int, dict]]:
         """
         Perform key operation with parallel processing.
+
+        This method will execute the processing of the WorkflowTree for the
+        specified index. The results will be available in the WorkflowTree.
+        If the shapes are not yet available in the shared manager dictionary,
+        they will be published.
 
         Parameters
         ----------
@@ -353,14 +368,23 @@ class ExecuteWorkflowApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        try:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                TREE.execute_process(index)
-        except FileReadError:
-            return -1
-        if not self.mp_manager["shapes_available"].is_set():
-            self._publish_shapes_and_metadata_to_manager()
+        if not self._waiting_for_shapes_to_be_set:
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    TREE.execute_process(index)
+            except FileReadError:
+                return -1
+            with self.mp_manager["lock"]:
+                if not self.mp_manager["shapes_available"].is_set():
+                    self._publish_shapes_and_metadata_to_manager()
+        if not self.slave_mode:
+            self._create_shared_memory_arrays()
+        if self.slave_mode:
+            if not self.mp_manager["shapes_set"].is_set():
+                self._waiting_for_shapes_to_be_set = True
+                return -1
+
         self.__write_results_to_shared_arrays()
         if self._config["result_metadata_set"]:
             return self._config["buffer_pos"]
@@ -372,28 +396,33 @@ class ExecuteWorkflowApp(BaseApp):
         Publish the shapes and metadata to the multiprocessing manager dictionaries.
         """
         _results = TREE.get_current_results()
-        with self.mp_manager["lock"]:
-            for _node_id, _res in _results.items():
-                self.mp_manager["shape_dict"][_node_id] = _res.shape
-            if isinstance(_res, Dataset):
-                self.mp_manager["metadata_dict"][_node_id] = {
-                    "axis_labels": _res.axis_labels,
-                    "axis_ranges": _res.axis_ranges,
-                    "axis_units": _res.axis_units,
-                    "data_unit": _res.data_unit,
-                    "data_label": _res.data_label,
-                }
-            else:
-                self.mp_manager["metadata_dict"][_node_id] = {
-                    "axis_labels": {i: "" for i in range(_res.ndim)},
-                    "axis_ranges": {
-                        _i: np.arange(_length) for _i, _length in enumerate(_res.shape)
-                    },
-                    "axis_units": {i: "" for i in range(_res.ndim)},
-                    "data_unit": "",
-                    "data_label": "",
-                }
+        for _node_id, _res in _results.items():
+            self.mp_manager["shape_dict"][_node_id] = _res.shape
+        if isinstance(_res, Dataset):
+            self.mp_manager["metadata_dict"][_node_id] = {
+                "axis_labels": _res.axis_labels,
+                "axis_ranges": _res.axis_ranges,
+                "axis_units": _res.axis_units,
+                "data_unit": _res.data_unit,
+                "data_label": _res.data_label,
+            }
+        else:
+            self.mp_manager["metadata_dict"][_node_id] = {
+                "axis_labels": {i: "" for i in range(_res.ndim)},
+                "axis_ranges": {
+                    _i: np.arange(_length) for _i, _length in enumerate(_res.shape)
+                },
+                "axis_units": {i: "" for i in range(_res.ndim)},
+                "data_unit": "",
+                "data_label": "",
+            }
         self.mp_manager["shapes_available"].set()
+
+    def _create_shared_memory_arrays(self):
+        """
+        Create the necessary shared memory arrays for the results.
+        """
+        pass
 
     def __write_results_to_shared_arrays(self):
         """Write the results from the WorkflowTree execution to the shared array."""
@@ -497,3 +526,11 @@ class ExecuteWorkflowApp(BaseApp):
             }
         self._config["result_metadata_set"] = True
         RESULT_SAVER.push_frame_metadata_to_active_savers(metadata)
+
+    def deleteLater(self):
+        """
+        Delete the instance of the ExecuteWorkflowApp.
+        """
+        if not self.slave_mode:
+            self.mp_manager
+        super().deleteLater()

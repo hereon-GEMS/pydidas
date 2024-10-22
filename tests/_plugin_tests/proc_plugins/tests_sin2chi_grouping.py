@@ -536,21 +536,86 @@ def test__group_d_spacing_by_chi_result(plugin_fixture, case):
     ), f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
     
 
-
-def test_chi_pos_verification_one_fit_parameter_position(plugin_fixture):
-    """ This test fails currently because _chi_pos_verification() 
-    cannot handle this one-parameter-output-case. There is an inconsistency how multiple fit parameters  vs one fit paraemter are stored in a Dataset."""
-    #TODO: Fix the case for one firt parameter
-    #TODO: Documented in https://github.com/hereon-GEMS/pydidas/issues/68
+@pytest.fixture()
+def base_dataset_one_fit_parameter_factory():
+    return Dataset(np.random.default_rng(seed=42).random((5,)), axis_labels={0:'chi'}, 
+                   axis_ranges={0:np.arange(5)}, axis_units={0:'deg'}, data_label='position / A')    
     
+    
+def test__extract_and_verify_units_validation(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
+    test_ds= base_dataset_one_fit_parameter_factory
     
-    test_ds = Dataset(np.random.default_rng(seed=42).random((5,1)), axis_labels={0:'chi'}, axis_ranges={0:np.arange(5)}, axis_units={0:'deg'}, data_label='position / A')
+    plugin._extract_and_verify_units(test_ds)
     
-    result = plugin._chi_pos_verification(test_ds)
-    print(result)
+    assert test_ds.axis_units[0] == 'deg'
+    assert test_ds.data_label == 'position'
+    assert test_ds.data_unit == 'A'
+    assert test_ds.axis_labels[0] == 'chi'
     
     
+def test__extract_and_verify_units_chi_missing(plugin_fixture, base_dataset_one_fit_parameter_factory):
+    plugin = plugin_fixture
+    test_ds= base_dataset_one_fit_parameter_factory
+    test_ds.update_axis_label(0, 'delta')
+
+    # Check that UserConfigError is raised when 'chi' is missing
+    with pytest.raises(UserConfigError) as excinfo:
+        plugin._extract_and_verify_units(test_ds)
+    
+    assert "The input dataset does not contain chi values in the axis and/or" in str(excinfo.value)
+    
+def test__extract_and_verify_units_chi_unit_wrong(plugin_fixture, base_dataset_one_fit_parameter_factory):
+    plugin = plugin_fixture
+    test_ds= base_dataset_one_fit_parameter_factory
+    test_ds.update_axis_unit(0, 'rad')
+
+    # Check that UserConfigError is raised when 'chi' is missing
+    with pytest.raises(UserConfigError) as excinfo:
+        plugin._extract_and_verify_units(test_ds)
+    
+    assert "The input dataset does not contain chi values in the axis and/or" in str(excinfo.value)
+    
+def test__extract_and_verify_units_position_missing(plugin_fixture, base_dataset_one_fit_parameter_factory):
+    plugin = plugin_fixture
+    test_ds= base_dataset_one_fit_parameter_factory
+    test_ds.data_label='length / A'
+
+    # Check that UserConfigError is raised when 'chi' is missing
+    with pytest.raises(ValueError) as excinfo:
+        plugin._extract_and_verify_units(test_ds)
+    
+    assert "Key 'position' not found in data_label." in str(excinfo.value)    
+    
+    
+def test__extract_and_verify_units_position_unit_wrong(plugin_fixture, base_dataset_one_fit_parameter_factory):
+    plugin = plugin_fixture
+    test_ds = base_dataset_one_fit_parameter_factory
+    test_ds.data_label = 'position / m'  # Set an invalid unit for position
+
+    # Check that ValueError is raised when the unit for 'position' is not allowed
+    with pytest.raises(ValueError) as excinfo:
+        plugin._extract_and_verify_units(test_ds)
+    
+    assert "Unit 'm' is not allowed for key 'position." in str(excinfo.value)    
+    
+    
+    
+def test__ds_slicing_1d_validation(plugin_fixture, base_dataset_one_fit_parameter_factory):
+    plugin = plugin_fixture
+    test_ds = base_dataset_one_fit_parameter_factory
+    
+    chi, ds = plugin._ds_slicing_1d(test_ds)
+    
+    np.testing.assert_array_equal(chi, np.arange(5))
+    assert ds.shape == (5, )
+    assert ds.axis_labels[0] == 'chi'
+    assert ds.axis_units[0] == 'deg'
+    assert ds.data_label == 'position'
+    assert ds.data_unit == 'A'
+    assert len(ds.axis_labels) == 1
+    
+      
 
 @pytest.fixture
 def base_dataset_with_fit_labels_factory():

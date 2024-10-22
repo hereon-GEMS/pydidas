@@ -109,7 +109,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
         
     Steps:
-    1. A clustering algorithm groups chi values based on similar sin^2(chi) values. The tolerance level for similarity between sin^2(chi) values is set to 2e-4. Chi values with similar sin^2(chi) values are grouped.
+    1. A clustering algorithm groups chi values based on similar sin^2(chi) values. The tolerance level for similarity between sin^2(chi) values is set to 1e-6. Chi values with similar sin^2(chi) values are grouped.
     2. The algorithm separates the d-spacing values into groups based on the similarity of sin^2(chi) values
        and their slope sign (positive or negative).
     3. After grouping, d-spacing values are categorized by their group labels and the slope sign.
@@ -555,55 +555,50 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
    
     
-    def _extract_and_verify_unit(self, data_label):
+    def _extract_and_verify_unit(self, ds: Dataset) -> None:
         
-         # position/pos contains the unit for d_spacing
-        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
-        
-        # Ensure 'position' is in the data_label
-        if 'position' not in data_label:
-            raise ValueError("Key 'position' not found in data_label.")
-        
-        parts = data_label.split('/')
-
-        if len(parts) != 2:
-            raise ValueError("Invalid data_label format. Expected 'position / unit'.")
-        
-        # Extract and strip the unit
-        unit = parts[1].strip()
-        
-        # Compare with allowed units
-        if unit not in pos_units_allowed:
-            raise ValueError(f"Unit '{unit}' is not allowed for key 'position.")
-    
-        return unit
-
-    def _ds_slicing_1d(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
-        #TODO
-        # - update for self.conifg._chi_key to compare with previous dataset
-        # chi_units_allowed and pos_units_allowed as global parameter list? 
-        # how to transfer the unit to the resulting dataset later, structure is not the same for 1D and 2D
         chi_units_allowed: List[str] = [UNITS_DEGREE]
-
-        self._ensure_dataset_instance(ds)
-              
-        pos_unit = self._extract_and_verify_unit(ds.data_label)
-
+        
         if ds.axis_labels[0] not in [LABELS_CHI] or ds.axis_units[0] not in chi_units_allowed:
             raise UserConfigError(
                 "The input dataset does not contain chi values in the axis and/or "
                 "the chi values are given in an unsupported unit. Supported units "
                 f"are [{', '.join(chi_units_allowed)}]."
             )
+        
+         # position/pos contains the unit for d_spacing
+        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
+        
+        # Ensure 'position' is in the data_label
+        if 'position' not in ds.data_label:
+            raise ValueError("Key 'position' not found in data_label.")
+        
+        parts = ds.data_label.split('/')
 
+        if len(parts) != 2:
+            raise ValueError("Invalid data_label format. Expected 'position / unit'.")
+        
+        # Extract and strip the unit
+        pos_unit = parts[1].strip()
+        
+        # Compare with allowed units for position
+        if pos_unit not in pos_units_allowed:
+            raise ValueError(f"Unit '{pos_unit}' is not allowed for key 'position.")
+        
+        # Update the dataset with the verified unit
+        ds.data_label = parts[0].strip()
+        ds.data_unit = pos_unit
+    
+
+    def _ds_slicing_1d(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
+       
+        self._ensure_dataset_instance(ds)
+        self._extract_and_verify_unit(ds)
+        
         # Assuming there's exactly one 'chi', get the index
         self.config._chi_key = 0
-        
         chi = ds.axis_ranges[self.config._chi_key]
-        _label, _unit = ds.data_label.split("/")
-        ds.data_label = _label
-        ds.data_unit = _unit
-        
+
         return chi, ds
 
     

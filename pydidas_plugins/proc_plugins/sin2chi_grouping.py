@@ -809,8 +809,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         first_derivative = np.gradient(s2c, edge_order=2)
 
         # Define the threshold for being "close to zero", i.e. where is the slope=0
-        zero_threshold = 1e-4
-        #zero_threshold = 1e-6
+        zero_threshold = 1e-6
 
         # Categorize the values of the first_derivative
     

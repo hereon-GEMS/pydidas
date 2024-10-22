@@ -225,7 +225,10 @@ class ExecuteWorkflowApp(BaseApp):
         ]:
             if self.mp_manager.get(_item, None) is None:
                 self.mp_manager[_item] = _type()
-            if _type in [self._mp_manager_instance.Event, self._mp_manager_instance.dict]:
+            if _type in [
+                self._mp_manager_instance.Event,
+                self._mp_manager_instance.dict,
+            ]:
                 self.mp_manager[_item].clear()
 
     def _store_context(self):
@@ -356,28 +359,24 @@ class ExecuteWorkflowApp(BaseApp):
                 TREE.execute_process(index)
         except FileReadError:
             return -1
-        # if not self.mp_manager["shapes_available"].is_set():
-        #     self._communicate_shapes_to_master()
+        if not self.mp_manager["shapes_available"].is_set():
+            self._publish_shapes_and_metadata_to_manager()
         self.__write_results_to_shared_arrays()
         if self._config["result_metadata_set"]:
             return self._config["buffer_pos"]
         self.__store_result_metadata()
         return (self._config["buffer_pos"], self._result_metadata)
 
-    def _communicate_shapes_to_master(self):
+    def _publish_shapes_and_metadata_to_manager(self):
         """
-        Communicate the shapes of the results to the master process.
+        Publish the shapes and metadata to the multiprocessing manager dictionaries.
         """
-        _shapes = TREE.get_all_result_shapes()
-        with self.mp_manager["shape_dict"]:
-            for _key, _shape in _shapes.items():
-                self.mp_manager["shape_dict"][_key] = _shape
-        self.mp_manager["shapes_available"].set()
-
-        for _node_id in self._config["result_shapes"]:
-            _res = TREE.nodes[_node_id].results
+        _results = TREE.get_current_results()
+        with self.mp_manager["lock"]:
+            for _node_id, _res in _results.items():
+                self.mp_manager["shape_dict"][_node_id] = _res.shape
             if isinstance(_res, Dataset):
-                self._result_metadata[_node_id] = {
+                self.mp_manager["metadata_dict"][_node_id] = {
                     "axis_labels": _res.axis_labels,
                     "axis_ranges": _res.axis_ranges,
                     "axis_units": _res.axis_units,
@@ -385,14 +384,16 @@ class ExecuteWorkflowApp(BaseApp):
                     "data_label": _res.data_label,
                 }
             else:
-                self._result_metadata[_node_id] = {
-                    "axis_labels": {i: None for i in range(_res.ndim)},
-                    "axis_ranges": {i: None for i in range(_res.ndim)},
-                    "axis_units": {i: None for i in range(_res.ndim)},
+                self.mp_manager["metadata_dict"][_node_id] = {
+                    "axis_labels": {i: "" for i in range(_res.ndim)},
+                    "axis_ranges": {
+                        _i: np.arange(_length) for _i, _length in enumerate(_res.shape)
+                    },
+                    "axis_units": {i: "" for i in range(_res.ndim)},
                     "data_unit": "",
                     "data_label": "",
                 }
-        self._config["result_metadata_set"] = True
+        self.mp_manager["shapes_available"].set()
 
     def __write_results_to_shared_arrays(self):
         """Write the results from the WorkflowTree execution to the shared array."""

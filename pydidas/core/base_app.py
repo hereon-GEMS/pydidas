@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = ["BaseApp"]
 
 
+import multiprocessing as mp
 from copy import copy
 from pathlib import Path
 from typing import Self
@@ -77,6 +78,16 @@ class BaseApp(ObjectWithParameterCollection):
         for _key, _value in _cmdline_args.items():
             if _key in self.params and _value is not None:
                 self.params.set_value(_key, _value)
+
+    def deleteLater(self):
+        """
+        Overwrite the deleteLater method to ensure proper cleanup.
+
+        This method is called by the Qt event loop to delete the app instance.
+        """
+        if isinstance(self._mp_manager_instance, mp.Manager):
+            self._mp_manager_instance.shutdown()
+        super().deleteLater()
 
     def run(self):
         """

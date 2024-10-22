@@ -117,7 +117,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     5. Finally, the mean of positive and negative d-spacing values vs. sin^2(chi) is calculated for each group.
     
         
-    NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data.
+    NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data. The limit for azimuthal points is set to 3000.
 
     """
     plugin_name = "Group d-spacing according to sin^2(chi) method"
@@ -555,7 +555,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
    
     
-    def _extract_and_verify_unit(self, ds: Dataset) -> None:
+    def _extract_and_verify_units(self, ds: Dataset) -> None:
         
         chi_units_allowed: List[str] = [UNITS_DEGREE]
         
@@ -566,7 +566,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 f"are [{', '.join(chi_units_allowed)}]."
             )
         
-         # position/pos contains the unit for d_spacing
+        # position/pos contains the unit for d_spacing
         pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
         
         # Ensure 'position' is in the data_label
@@ -593,7 +593,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def _ds_slicing_1d(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
        
         self._ensure_dataset_instance(ds)
-        self._extract_and_verify_unit(ds)
+        self._extract_and_verify_units(ds)
         
         # Assuming there's exactly one 'chi', get the index
         self.config._chi_key = 0

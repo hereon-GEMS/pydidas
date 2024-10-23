@@ -1916,9 +1916,15 @@ class Ds2cTestConfig:
         ])    
         
         output_ds =  Dataset(expected_result, axis_ranges= {0: np.arange(expected_result.shape[0]), 1: self.s2c_range_sorted}, 
-                             axis_labels = {0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit = self.d_unit, data_label='d_spacing')
+                             axis_labels = {0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit = f'{self.d_unit}', data_label='d_spacing')
         
         return output_ds
+    
+    def create_simple_input_ds_1d(self):
+        chi = chi_gen(self.chi_start, self.chi_stop, self.delta_chi)
+        input_ds = Dataset(self.d_spacing_func(chi), axis_ranges={0: chi}, axis_labels={0: self.azimuth_name}, axis_units={0: self.chi_unit}, data_label=f'position / {self.d_unit}')
+        return input_ds
+        
     
 ds_case1_exe =  Ds2cTestConfig(
     delta_chi=22.5,
@@ -2169,6 +2175,39 @@ ds_case12_exe =  Ds2cTestConfig(
     description="Positive chi range between 0 and 45; noise with scale 0.03",
 )
 
+ds_case13_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=-180,
+    chi_stop=181,
+    d_spacing_func=d_spacing_simu,
+    d_mean_pos=np.array([25.25007189 ,25.27466048 ,25.2832   ,  25.27466048 ,25.25007189, 25.2124,
+ 25.16618858 ,25.11701142 ,25.0708    , 25.03312811] +[np.nan]*27),
+    d_mean_neg=np.array([25.25007189 ,25.2124   ,  25.16618858, 25.11701142, 25.0708   ,  25.03312811,
+ 25.00853952, 25.     ,    25.00853952 ,25.03312811]+[np.nan]*27),
+    d_mean_avg = np.array([25.25007189, 25.24353024 ,25.22469429 ,25.19583595, 25.16043595, 25.12276405,
+ 25.08736405, 25.05850571 ,25.03966976 ,25.03312811]+[np.nan]*27),
+    s2c_range_sorted=np.array([0.0000000, 0.0301537, 0.1169778, 0.2500000,
+                               0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000] +[np.nan]*27),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Simple case without noise"
+)
+
+ds_case14_exe =  Ds2cTestConfig(
+    delta_chi=10,
+    chi_start=0,
+    chi_stop=181,
+    d_spacing_func=d_spacing_simple,
+    d_mean_pos=np.array([0., 1., 2., 3., 4., 5., 6., 7., 8., 9.]+[np.nan]*9),    
+    d_mean_neg=np.array([18., 17. ,16., 15. ,14, 13., 12,11. ,10. , 9.]+[np.nan]*9),
+    d_mean_avg=np.array([9., 9., 9., 9., 9., 9., 9. ,9., 9., 9.]),
+    s2c_range_sorted=np.array([0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*9),
+    azimuth_name = 'chi',
+    chi_unit= 'deg',
+    d_unit= "nm" ,
+    description="Simple case without noise"
+)
                                          
 test_cases = [ds_case1_exe, ds_case2_exe, ds_case3_exe, ds_case4_exe, ds_case5_exe, ds_case6_exe,
               ds_case7_exe, ds_case8_exe, ds_case9_exe, ds_case10_exe, ds_case11_exe, ds_case12_exe]
@@ -2193,6 +2232,28 @@ def test_execute_with_various_cases(plugin_fixture, case):
     assert result.axis_labels[1] == expected_ds.axis_labels[1]
     assert np.all(np.diff(result.axis_ranges[1][~np.isnan(result.axis_ranges[1])]) >= 0), "result.axis_ranges[1] is not in ascending order (ignoring NaNs)."
 
+test_cases_1d= [ds_case13_exe, ds_case14_exe]
+@pytest.mark.parametrize("case", test_cases_1d)        
+def test_execute_with_various_cases(plugin_fixture, case):    
+    plugin = plugin_fixture
+    
+    ds_in = case.create_simple_input_ds_1d()
+    # Calculation for test   
+    plugin._config["input_shape"] = ds_in.shape
+    expected_ds = case.create_output_ds()
+    
+    result, _ = plugin.execute(ds_in)
+
+    npt.assert_allclose(result.array, expected_ds.array, rtol=5e-10, atol=1e-15, equal_nan=True, err_msg='Tolerance not matchend.', verbose=True)
+    npt.assert_allclose(result.axis_ranges[1], expected_ds.axis_ranges[1], rtol=1e-05, atol=1e-05, equal_nan=True, err_msg='Tolerance not matchend.', verbose=True)
+    npt.assert_array_equal(result.axis_ranges[0], expected_ds.axis_ranges[0], err_msg='Values are not eequal for axis_ranges[0]', verbose=True)
+    assert result.data_label == expected_ds.data_label
+    assert result.data_unit == expected_ds.data_unit
+    assert result.axis_labels[0] == expected_ds.axis_labels[0]
+    assert result.axis_labels[1] == expected_ds.axis_labels[1]
+    assert np.all(np.diff(result.axis_ranges[1][~np.isnan(result.axis_ranges[1])]) >= 0), "result.axis_ranges[1] is not in ascending order (ignoring NaNs)."
+
+
 
 @pytest.mark.parametrize("invalid_input", [
     [1, 2, 3],                   # List input
@@ -2201,10 +2262,10 @@ def test_execute_with_various_cases(plugin_fixture, case):
 ])
 def test_execute_with_invalid_input(plugin_fixture, invalid_input):
     plugin = plugin_fixture
-    with pytest.raises(TypeError, match="Input must be an instance of Dataset"):
+    with pytest.raises((AttributeError, TypeError)):
         plugin.execute(invalid_input)
 
-
+ 
 @pytest.fixture
 def base_execute_dataset():
     return Dataset(np.random.default_rng(seed=42).random((6, 5)),

@@ -145,9 +145,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
         
+        
+        
         print(30*"\N{hot pepper}") 
-        print('Shape of dataset:', ds.shape)
-        print('Dimension of dataset:', ds.ndim)
+        #print('Shape of dataset:', ds.shape)
+        #print('Dimension of dataset:', ds.ndim)
         #self._chi_pos_unit_verification(ds)        
         print(30*"\N{banana}") 
         print(ds)

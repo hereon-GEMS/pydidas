@@ -57,7 +57,7 @@ class BaseApp(ObjectWithParameterCollection):
 
     default_params = ParameterCollection()
     parse_func = lambda self: {}
-    attributes_not_to_copy_to_slave_app = []
+    attributes_not_to_copy_to_slave_app = ["_mp_manager_instance"]
 
     def __init__(self, *args: tuple, **kwargs: dict):
         self.slave_mode = kwargs.pop("slave_mode", False)

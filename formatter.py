@@ -470,9 +470,11 @@ if __name__ == "__main__":
     for _module in ["black", "isort", "flake8"]:
         if f"--{_module}" in sys.argv:
             run_module(_module)
-    for _module in ["ruff-check", "ruff-format", "reuse"]:
-        if f"--{_module}" in sys.argv or "--all" in sys.argv:
+    for _module in ["ruff-check", "ruff-format"]:
+        if f"--{_module}" in sys.argv or "--all" in sys.argv or "--ruff" in sys.argv:
             run_module(_module)
+    if "--reuse" in sys.argv or "--all" in sys.argv:
+        run_module("reuse")
     if "--copyright" in sys.argv or "--all" in sys.argv:
         CopyrightYearUpdater()
     if "--version" in sys.argv or "--all" in sys.argv:

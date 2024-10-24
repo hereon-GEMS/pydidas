@@ -67,13 +67,14 @@ class WorkerController(QtCore.QThread):
         The function to be called by the workers. If not specified at init, it must
         be set later for the workers to actually perform tasks.
     func_args : tuple, optional
-        The function arguments. The default is an empty tuple.
+         The function arguments. The default is an empty tuple.
     func_kwargs : dict, optional
         Kwywords passed to the function. The default is an empty dictionary.
     """
 
     sig_progress = QtCore.Signal(float)
     sig_results = QtCore.Signal(object, object)
+    sig_message_from_worker = QtCore.Signal(str)
 
     def __init__(
         self,
@@ -396,6 +397,11 @@ class WorkerController(QtCore.QThread):
         Get all items from the queue and emit them as signals.
         """
         while True:
+            try:
+                _message = self._queues["queue_signal"].get_nowait()
+                self.sig_message_from_worker.emit(_message)
+            except Empty:
+                pass
             try:
                 _task, _results = self._queues["queue_output"].get_nowait()
                 if _task is None and _results is None:

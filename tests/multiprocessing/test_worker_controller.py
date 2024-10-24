@@ -247,18 +247,24 @@ class TestWorkerController(unittest.TestCase):
         self._wc = WorkerController()
         self._wc._queues["queue_output"].put([0, _res1])
         self._wc._queues["queue_output"].put([0, _res2])
+        self._wc._queues["queue_signal"].put("::test::")
         self._wc._progress_target = 2
         _spy = QtTest.QSignalSpy(self._wc.sig_results)
+        _spy_signal = QtTest.QSignalSpy(self._wc.sig_message_from_worker)
         time.sleep(0.005)
         self._wc._get_and_emit_all_queue_items()
         if IS_QT6:
             self.assertEqual(_spy.count(), 2)
             self.assertEqual(_spy.at(0)[1], _res1)
             self.assertEqual(_spy.at(1)[1], _res2)
+            self.assertEqual(_spy_signal.count(), 1)
+            self.assertEqual(_spy_signal.at(0)[0], "::test::")
         else:
             self.assertEqual(len(_spy), 2)
             self.assertEqual(_spy[0][1], _res1)
             self.assertEqual(_spy[1][1], _res2)
+            self.assertEqual(len(_spy_signal), 1)
+            self.assertEqual(_spy_signal[0][0], "::test::")
 
     def test_check_if_workers_done__no_signal(self):
         self._wc = WorkerController(n_workers=2)

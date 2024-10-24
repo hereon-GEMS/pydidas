@@ -18,6 +18,8 @@ Improvements
       for more streamlined code.
     - Added a multiprocessing Lock to worker process logging for consistent 
       output formatting.
+    - Added a new signal to the BaseApp and app multiprocessing to prepare
+      ExecuteWorkflowApp update.
 
 Bugfixes
 --------

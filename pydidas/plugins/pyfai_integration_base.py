@@ -100,6 +100,20 @@ class pyFAIintegrationBase(ProcPlugin):
         self._mask = None
         self._config["custom_mask"] = False
 
+    @property
+    def result_shape(self) -> tuple[int, ...]:
+        """
+        Get the shape of the plugin result.
+
+        Returns
+        -------
+        tuple[int, ...]
+            The shape of the results with a value for each dimension. Unknown
+            dimensions are represented as -1 value.
+        """
+        self.calculate_result_shape()
+        return self._config["result_shape"]
+
     def pre_execute(self):
         """
         Check and load the mask and set up the AzimuthalIntegrator.

@@ -98,7 +98,7 @@ class WorkflowResults(QtCore.QObject):
         """
         self.clear_all_results()
         _dim = self._SCAN.get_param_value("scan_dim")
-        _results = self._TREE.get_all_result_shapes()
+        _results = self._TREE.get_all_result_shapes(force_update=True)
         for _node_id, _shape in _results.items():
             _plugin = self._TREE.nodes[_node_id].plugin
             self._config["node_labels"][_node_id] = _plugin.get_param_value("label")

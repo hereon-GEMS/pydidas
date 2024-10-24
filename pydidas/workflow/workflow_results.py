@@ -167,8 +167,8 @@ class WorkflowResults(QtCore.QObject):
                 else:
                     setattr(self.__composites[node_id], _key, _item)
                     self._config[_key + "s"][node_id] = _item
-
         self._config["metadata_complete"] = True
+        ResultSaver.push_frame_metadata_to_active_savers(_meta)
 
     def store_results(self, index: int, results: dict):
         """

@@ -82,6 +82,7 @@ class TestWorkflowResults(unittest.TestCase):
         self.set_up_scan()
         self.set_up_tree()
         RES.clear_all_results()
+        SAVER.set_active_savers_and_title([])
         self._tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):

@@ -102,6 +102,7 @@ class WorkerController(QtCore.QThread):
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
             "queue_aborted": mp.Queue(),
+            "queue_signal": mp.Queue(),
         }
         self._mp_kwargs = {
             "logging_level": LOGGING_LEVEL,

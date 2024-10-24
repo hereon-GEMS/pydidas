@@ -30,7 +30,7 @@ __all__ = ["BaseApp"]
 import multiprocessing as mp
 from copy import copy
 from pathlib import Path
-from typing import Self
+from typing import Optional, Self
 
 from qtpy import QtCore
 
@@ -88,6 +88,32 @@ class BaseApp(ObjectWithParameterCollection):
         if isinstance(self._mp_manager_instance, mp.Manager):
             self._mp_manager_instance.shutdown()
         super().deleteLater()
+
+    def must_send_signal_and_wait_for_response(self) -> Optional[str]:
+        """
+        Check whether the app must send a signal and wait for a response.
+
+        If a signal is required, the method returns the string of the signal to
+        send through the multiprocessing signal queue. If no signal is required,
+        the method returns None.
+
+        Returns
+        -------
+        str or None
+            The signal to send or None.
+        """
+        return None
+
+    def signal_processed_and_can_continue(self) -> bool:
+        """
+        Check whether the app's signal was processed and the app can continue.
+
+        Returns
+        -------
+        bool
+            Flag whether the app can continue processing.
+        """
+        return True
 
     def run(self):
         """
@@ -211,17 +237,17 @@ class BaseApp(ObjectWithParameterCollection):
             The state dictionary.
         """
         _cfg = self.get_config()
-        _newcfg = {}
+        _new_cfg = {}
         for _key, _item in self._config.items():
             if isinstance(_item, range):
-                _newcfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
+                _new_cfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, slice):
-                _newcfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
+                _new_cfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, Path):
-                _newcfg[_key] = str(_item)
+                _new_cfg[_key] = str(_item)
             if _key in ["scan_context", "exp_context"]:
-                _newcfg[_key] = "::None::"
-        _cfg.update(_newcfg)
+                _new_cfg[_key] = "::None::"
+        _cfg.update(_new_cfg)
         if "shared_memory" in _cfg and _cfg["shared_memory"] != {}:
             _cfg["shared_memory"] = "::restore::True"
         return {
@@ -240,7 +266,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         for _key, _val in state["params"].items():
             self.set_param_value(_key, _val)
-        _newcfg = {}
+        _new_cfg = {}
         for _key, _item in state["config"].items():
             if not isinstance(_item, str):
                 continue
@@ -250,12 +276,12 @@ class BaseApp(ObjectWithParameterCollection):
                 _stop = None if _stop == "None" else int(_stop)
                 _step = None if _step == "None" else int(_step)
             if _item.startswith("::range::"):
-                _newcfg[_key] = range(_start, _stop, _step)
+                _new_cfg[_key] = range(_start, _stop, _step)
             if _item.startswith("::slice::"):
-                _newcfg[_key] = slice(_start, _stop, _step)
+                _new_cfg[_key] = slice(_start, _stop, _step)
             if _item == "::None::":
-                _newcfg[_key] = None
-        self._config = state["config"] | _newcfg
+                _new_cfg[_key] = None
+        self._config = state["config"] | _new_cfg
         if self._config.get("shared_memory", False) == "::restore::True":
             self._config["shared_memory"] = {}
             self.initialize_shared_memory()

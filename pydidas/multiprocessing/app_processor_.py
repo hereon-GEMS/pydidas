@@ -72,7 +72,7 @@ def app_processor(
             Flag to wait for the output queue to be empty before shutting down the
             worker. The default is True.
         use_tasks : bool, optional
-            Flag that the app uses tasks insted of running continuously. The default
+            Flag that the app uses tasks instead of running continuously. The default
             is True.
         app_mp_manager : dict, optional
             Additional multiprocessing configuration or attributes for the
@@ -87,10 +87,14 @@ def app_processor(
     _output_queue = multiprocessing_config.get("queue_output")
     _stop_queue = multiprocessing_config.get("queue_stop")
     _aborted_queue = multiprocessing_config.get("queue_aborted")
+    _signal_queue = multiprocessing_config.get("queue_signal")
     _io_lock = multiprocessing_config.get("lock")
 
-    with _io_lock:
-        logger.debug("Started process")
+    def _debug_message(msg: str):
+        with _io_lock:
+            logger.debug(msg)
+
+    _debug_message("Started process")
 
     _app = app(app_params, slave_mode=True)
     _app._config = app_config
@@ -104,8 +108,7 @@ def app_processor(
         # check for stop signal
         try:
             _stop_queue.get_nowait()
-            with _io_lock:
-                logger.debug("Received stop queue signal")
+            _debug_message("Received stop queue signal")
             _aborted_queue.put(1)
             _wait_for_output = False
             break
@@ -126,32 +129,30 @@ def app_processor(
                     time.sleep(0.005)
                     continue
                 if _arg is None:
-                    with _io_lock:
-                        logger.debug("Received queue empty signal in input queue.")
+                    _debug_message("Received queue empty signal in input queue.")
                     _output_queue.put([None, None])
                     break
-                with _io_lock:
-                    logger.debug('Received item "%s" from queue' % _arg)
+                _debug_message('Received item "%s" from queue' % _arg)
                 _app.multiprocessing_pre_cycle(_arg)
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
-                with _io_lock:
-                    logger.debug("Starting computation of item %s" % _arg)
+                _debug_message("Starting computation of item %s" % _arg)
                 _results = _app.multiprocessing_func(_arg)
+                _signal = _app.must_send_signal_and_wait_for_response()
+                if _signal is not None:
+                    _signal_queue.put(_signal)
+                    while not _app.signal_processed_and_can_continue():
+                        time.sleep(0.005)
                 _output_queue.put([_arg, _results])
-                with _io_lock:
-                    logger.debug("Finished computation of item %s" % _arg)
+                _debug_message("Finished computation of item %s" % _arg)
         if not _app_carryon:
             time.sleep(0.005)
-    with _io_lock:
-        logger.debug("Worker finished with all tasks.")
+    _debug_message("Worker finished with all tasks.")
 
     _app_carryon = False
     while _wait_for_output and not _output_queue.empty():
         if not _app_carryon:
-            with _io_lock:
-                logger.debug("Waiting for output queue to empty.")
+            _debug_message("Waiting for output queue to empty.")
             _app_carryon = True
         time.sleep(0.02)
-    with _io_lock:
-        logger.debug("Worker shutting down.")
+    _debug_message("Worker shutting down.")

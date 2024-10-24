@@ -64,6 +64,7 @@ def processor(
     output_queue = multiprocessing_config.get("queue_output")
     stop_queue = multiprocessing_config.get("queue_stop")
     aborted_queue = multiprocessing_config.get("queue_aborted")
+
     while True:
         # check for stop signal
         try:

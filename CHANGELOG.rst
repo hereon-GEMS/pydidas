@@ -20,6 +20,8 @@ Bugfixes
 - Fixed an issue when trying to read hdf5 metadata from non-hdf5 files.
 - Fixed in issue in Parameter where sub-type checking in tuple/set/list Parameters
   was not enforced.
+- Fixed an issue when changing the shape of pyFAI integration results in plugins
+  between workflow runs.
 
 
 v24.09.19

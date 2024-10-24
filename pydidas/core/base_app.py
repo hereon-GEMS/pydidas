@@ -115,6 +115,20 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return True
 
+    def get_latest_results(self) -> Optional[object]:
+        """
+        Get the latest results from the app.
+
+        Note that the app must store results in the `latest_results` key
+        of the config dictionary to be able to retrieve them.
+
+        Returns
+        -------
+        object or None
+            The latest results or None.
+        """
+        return self._config.get("latest_results", None)
+
     def run(self):
         """
         Run the app serially without multiprocessing support.

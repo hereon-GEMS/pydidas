@@ -56,7 +56,6 @@ class TestLinkedObject:
 class TestBasePlugin(unittest.TestCase):
     def setUp(self):
         self._pluginpath = tempfile.mkdtemp()
-        self._class_names = []
 
     def tearDown(self):
         shutil.rmtree(self._pluginpath)

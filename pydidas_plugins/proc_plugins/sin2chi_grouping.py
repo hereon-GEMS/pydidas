@@ -184,8 +184,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
             )
             
         # currently an upper boundary for the expected shape of the result, affects only second dimension
-        self._config["result_shape"] = (3, _shape[0])  
-        #self._config["result_shape"] = (3, int(np.ceil(_shape[0] / 2 + 1)))         
+        self._config["result_shape"] = (3, _shape[0])        
         
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
         """

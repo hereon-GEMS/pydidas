@@ -145,7 +145,6 @@ class DspacingSin_2chi(ProcPlugin):
         #Overwriting the incoming dataset 
         ds[2,:] = delta_d_diff.data
         ds.data_label = "Difference of d(+) - d(-)" 
-        ds.data_unit=ds.data_unit
         ds.axis_labels = {0: '0: d-, 1: d+, 2: d(+)-d(-)', 1: LABELS_SIN_2CHI} 
         #TODO: needs adjustment for the low energy case
         ds.axis_ranges = {

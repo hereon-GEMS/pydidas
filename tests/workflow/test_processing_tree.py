@@ -230,6 +230,10 @@ class TestProcessingTree(unittest.TestCase):
         for _node in nodes[_depth]:
             self.assertTrue(_node.plugin._preexecuted)
 
+    def test_prepare_execution__empty_tree(self):
+        with self.assertRaises(UserConfigError):
+            self._curr_tree.prepare_execution()
+
     def test_create_and_add_node__wrong_plugin(self):
         with self.assertRaises(TypeError):
             self._curr_tree.create_and_add_node(12)

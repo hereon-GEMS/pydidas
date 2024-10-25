@@ -213,6 +213,8 @@ class ProcessingTree(GenericTree):
             Flag to force running the prepare_execution method. The default is
             False.
         """
+        if self.root is None:
+            raise UserConfigError("The ProcessingTree has no nodes.")
         if self._preexecuted and not self.tree_has_changed and not forced:
             return
         self.root.propagate_shapes_and_global_config()

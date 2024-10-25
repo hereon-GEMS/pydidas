@@ -29,6 +29,7 @@ Bugfixes
 - Fixed an issue with PydidasPlot2D when cs_transform was disabled.
 - Fixed an issue with pickling unittest plugins loaded through the PluginRegistry.
 - Fixed an issue in the WorkflowNode which allowed accessing outdated results.
+- Fixed an issue when preparing to run an empty Workflow.
 
 
 v24.09.19

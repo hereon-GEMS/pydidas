@@ -42,7 +42,7 @@ LABELS_DIM0=  '0: d-, 1: d+, 2: d_mean'
 UNITS_NANOMETER = "nm"
 UNITS_ANGSTROM = "A"
 
-
+PARAMETER_KEEP_RESULTS = 'keep_results'
 
 class DspacingSin_2chi(ProcPlugin):
     """
@@ -55,7 +55,14 @@ class DspacingSin_2chi(ProcPlugin):
     input_data_dim = 2
     output_data_dim = 2
     #TODO: to be decided
-    output_data_label = "to be decided"
+    output_data_label = "0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg"
+    new_dataset=True
+    
+    # modification of the keep_results parameter to ensure results are always stored
+    _generics = ProcPlugin.generic_params.copy()
+    _generics[PARAMETER_KEEP_RESULTS].value = True
+    _generics[PARAMETER_KEEP_RESULTS].choices = [True]
+    generic_params = _generics
     
     
     def pre_execute(self):

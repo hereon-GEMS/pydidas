@@ -38,6 +38,7 @@ from pydidas.plugins import ProcPlugin
 
 LABELS_SIN_2CHI = 'sin(2*chi)'
 LABELS_SIN2CHI = "sin^2(chi)"
+LABELS_DIM0=  '0: d-, 1: d+, 2: d_mean'
 UNITS_NANOMETER = "nm"
 UNITS_ANGSTROM = "A"
 
@@ -62,21 +63,22 @@ class DspacingSin_2chi(ProcPlugin):
 
     def execute(self, ds: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         
-        pass
+        print(30*"\N{banana}") 
+        print('Incoming ds: ', ds)
+        print(30*"\N{banana}")  
+        
+        d_output_sin_2chi_method = self._calculate_diff_d_spacing_vs_sin_2chi(ds)
+        
+        
+        return d_output_sin_2chi_method, kwargs
 
 
     def calculate_result_shape(self) -> None:
         _shape = self._config.get("input_shape", None)
-        self._config["result_shape"] = (3, _shape[0])  
+        print('_shape: ', _shape)
+        self._config["result_shape"] = (3, _shape[1])  
+        print(self._config)
         
-        
-    #Outline and some notes
-    # We need the result of the previous plugin  
-    # 3 rows, unknown number of column
-    # d-, d+, d_avg
-    # ensure d-, d+ are present and maybe deal with np.nan 
-
-
 
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
         """
@@ -101,13 +103,11 @@ class DspacingSin_2chi(ProcPlugin):
         Raises:
         UserConfigError: If the axis labels are not as expected.
         """
-        expected_label_dim0 = '0: d-, 1: d+, 2: d_mean'
-        if ds.axis_labels[0] != expected_label_dim0:
-            raise UserConfigError(f"Expected axis label '{expected_label_dim0}', but got '{ds.axis_labels[0]}'")
+        if ds.axis_labels[0] != LABELS_DIM0:
+            raise UserConfigError(f"Expected axis label '{LABELS_DIM0=}', but got '{ds.axis_labels[0]}'")
         
-        expected_label_dim1 = LABELS_SIN2CHI
-        if ds.axis_labels[1] != expected_label_dim1:
-            raise UserConfigError(f"Expected axis label '{expected_label_dim1}', but got '{ds.axis_labels[1]}'")
+        if ds.axis_labels[1] != LABELS_SIN2CHI:
+            raise UserConfigError(f"Expected axis label '{LABELS_SIN2CHI}', but got '{ds.axis_labels[1]}'")
           
             
     def _calculate_diff_d_spacing_vs_sin_2chi(self, ds: Dataset) -> Dataset:
@@ -123,13 +123,13 @@ class DspacingSin_2chi(ProcPlugin):
         
         self._ensure_dataset_instance(ds)
         self._ensure_axis_labels(ds)
-            
         if not ds.shape[0] == 3:
-            raise UserConfigError("Incoming dataset expected to have 3 rows, d-, d+, d_mean. Please verify your Dataset.")    
-               
+            raise UserConfigError(f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. Please verify your Dataset.")                   
         
-        print('\nDataset in new plugin: ', ds)
-        
+        if not ds.data_unit in [UNITS_NANOMETER, UNITS_ANGSTROM]:
+            raise UserConfigError(f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset.")
+    
+           
         
         #Two approaches:
         delta_d_direct = ds[1, :] - ds[0, :]
@@ -138,12 +138,7 @@ class DspacingSin_2chi(ProcPlugin):
         #This check is required due to np.nan values in the dataset
         if not np.allclose(delta_d_diff, delta_d_direct, rtol=1e-09, atol=1e-10, equal_nan=True):
             print(np.all(delta_d_diff == delta_d_direct))
-            raise UserConfigError("Difference of d(+) - d(-) calculated in two different ways. Please verify your Dataset.")   
-
-        
-        print('Shape delta_d_diff:' ,delta_d_diff.shape)
-        print('Shape of ds:', ds.shape)
-        print('Shape of delta_d_diff data:', delta_d_diff.data.shape)
+            raise UserConfigError("Difference of d(+) - d(-) calculated in two different ways. Please verify your Dataset.")  
         
         #Overwriting the incoming dataset 
         ds[2,:] = delta_d_diff.data
@@ -154,8 +149,5 @@ class DspacingSin_2chi(ProcPlugin):
         ds.axis_ranges = {
                 1: np.sin(2 * np.arcsin(np.sqrt(ds.axis_ranges[1])))
             }
-    
-        
-        print('Dataset new: ', ds)
         
         return ds

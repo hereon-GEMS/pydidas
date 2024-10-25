@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
- 
-
+A module for calculating the difference in d_spacing of both branches (d(+) - d(-)) vs sin(2*chi) values.
+This module expects the output from the DspacingSin2chiGrouping plugin. 
 """
 
 __author__ = "Gudrun Lotze"
@@ -26,6 +26,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 __all__ = ["DspacingSin_2chi"]
+
 
 import numpy as np
 

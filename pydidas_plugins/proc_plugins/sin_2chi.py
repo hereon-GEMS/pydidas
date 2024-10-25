@@ -47,9 +47,31 @@ PARAMETER_KEEP_RESULTS = 'keep_results'
 
 class DspacingSin_2chi(ProcPlugin):
     """
-    This plugin calculates the d-spacing from the sin(2*chi) values.
+    This plugin calculates the difference between both d-spacing branches of the psi-splitting method and the corresponding sin(2*chi) values.
+    
+    chi is the azimuthal angle of one diffraction image.
+    The difference in d-spacing is given by d(+) - d(-). sin(2*chi) is calculated directly from sin^2(chi).
+    
+    PLEASE NOTE:
+    Using chi instead of psi for the sin^2(psi) method is an approximation in the high-energy X-ray regime.
+    Psi is the angle between between the scattering vector q and the sample normal
+    The geometry of the experiment requires that the sample normal is parallel to the z-axis, i.e. the
+    incoming beam is parallel to the sample surface.
+    
+    This plugin expects position (d-spacing) in [nm, A].  The expected input data is the result of the DspacingSin2chiGrouping plugin.
+    Results will be stored.
+    
+    Input:
+    - Output of the DspacingSin2chiGrouping plugin, which groups d-spacing according to the sin^2(chi) method.
+    - The dataset should have three rows corresponding to d(-), d(+), and d_mean.
+    - The d-spacing units should be either nanometers (nm) or angstroms (A)
+    
+    Output:
+    - Difference of d-spacing branches (d(+), d(-))
+    - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
+    
     """
-    plugin_name = "D-spacing from sin(2*chi)"
+    plugin_name = "Difference in d-spacing vs sin(2*chi)"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_group = PROC_PLUGIN_INTEGRATED
@@ -122,7 +144,23 @@ class DspacingSin_2chi(ProcPlugin):
             
     def _calculate_diff_d_spacing_vs_sin_2chi(self, ds: Dataset) -> Dataset:
         """
-        My docstring
+        Calculate the difference between d-spacing branches (d(+) - d(-)) and the corresponding sin(2*chi) values.
+
+        This method processes the input dataset to compute the difference between the d-spacing branches
+        (d(+) - d(-)) and updates the dataset with the calculated values. The input dataset is expected to
+        have three rows corresponding to d(-), d(+), and d_mean, and the units should be either nanometers (nm)
+        or angstroms (A). The method ensures the input dataset is correctly formatted and labeled.
+
+        Parameters:
+        ds (Dataset): The input dataset containing d-spacing values and corresponding sin^2(chi) values.
+
+        Returns:
+        Dataset: The updated dataset with the calculated difference between d-spacing branches and the
+                corresponding sin(2*chi) values.
+
+        Raises:
+        UserConfigError: If the input dataset is not correctly formatted, labeled, or if the units are not
+                        in nanometers (nm) or angstroms (A).
         """
         # d-, d+
         # d[1,1]-d[0,1]

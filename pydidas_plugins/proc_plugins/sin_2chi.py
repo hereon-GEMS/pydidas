@@ -36,6 +36,12 @@ from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
 
 
+LABELS_SIN_2CHI = 'sin(2*chi)'
+LABELS_SIN2CHI = "sin^2(chi)"
+UNITS_NANOMETER = "nm"
+UNITS_ANGSTROM = "A"
+
+
 
 class DspacingSin_2chi(ProcPlugin):
     """
@@ -51,16 +57,105 @@ class DspacingSin_2chi(ProcPlugin):
     output_data_label = "to be decided"
     
     
-def pre_execute(self):
-    pass
+    def pre_execute(self):
+        pass
 
-def execute(self, ds: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(self, ds: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+        
+        pass
+
+
+    def calculate_result_shape(self) -> None:
+        _shape = self._config.get("input_shape", None)
+        self._config["result_shape"] = (3, _shape[0])  
+        
+        
+    #Outline and some notes
+    # We need the result of the previous plugin  
+    # 3 rows, unknown number of column
+    # d-, d+, d_avg
+    # ensure d-, d+ are present and maybe deal with np.nan 
+
+
+
+    def _ensure_dataset_instance(self, ds: Dataset) -> None:
+        """
+        Ensure the input is an instance of Dataset.
+
+        Parameters:
+        ds (Dataset): The input to check.
+
+        Raises:
+        TypeError: If ds is not an instance of Dataset.
+        """
+        if not isinstance(ds, Dataset):
+            raise TypeError("Input must be an instance of Dataset.")
+        
+    def _ensure_axis_labels(self, ds: Dataset) -> None:
+        """
+        Ensure the axis labels for dimension 0 and 1 are as expected.
+
+        Parameters:
+        ds (Dataset): The input to check.
+
+        Raises:
+        UserConfigError: If the axis labels are not as expected.
+        """
+        expected_label_dim0 = '0: d-, 1: d+, 2: d_mean'
+        if ds.axis_labels[0] != expected_label_dim0:
+            raise UserConfigError(f"Expected axis label '{expected_label_dim0}', but got '{ds.axis_labels[0]}'")
+        
+        expected_label_dim1 = LABELS_SIN2CHI
+        if ds.axis_labels[1] != expected_label_dim1:
+            raise UserConfigError(f"Expected axis label '{expected_label_dim1}', but got '{ds.axis_labels[1]}'")
+          
+            
+    def _calculate_diff_d_spacing_vs_sin_2chi(self, ds: Dataset) -> Dataset:
+        """
+        My docstring
+        """
+        # d-, d+
+        # d[1,1]-d[0,1]
+        # vs sin(2*chi)
+        #(d(+) - d(-) ) vs sin(2*psi)"
+        #currently: 
+        #(d(+) - d(-) ) vs sin(2*chi)"
+        
+        self._ensure_dataset_instance(ds)
+        self._ensure_axis_labels(ds)
+            
+        if not ds.shape[0] == 3:
+            raise UserConfigError("Incoming dataset expected to have 3 rows, d-, d+, d_mean. Please verify your Dataset.")    
+               
+        
+        print('\nDataset in new plugin: ', ds)
+        
+        
+        #Two approaches:
+        delta_d_direct = ds[1, :] - ds[0, :]
+        delta_d_diff =  np.diff(ds[:2, :], axis=0)
+        #if not np.all(delta_d_diff == delta_d_direct): 
+        #This check is required due to np.nan values in the dataset
+        if not np.allclose(delta_d_diff, delta_d_direct, rtol=1e-09, atol=1e-10, equal_nan=True):
+            print(np.all(delta_d_diff == delta_d_direct))
+            raise UserConfigError("Difference of d(+) - d(-) calculated in two different ways. Please verify your Dataset.")   
+
+        
+        print('Shape delta_d_diff:' ,delta_d_diff.shape)
+        print('Shape of ds:', ds.shape)
+        print('Shape of delta_d_diff data:', delta_d_diff.data.shape)
+        
+        #Overwriting the incoming dataset 
+        ds[2,:] = delta_d_diff.data
+        ds.data_label = "Difference of d(+) - d(-)" 
+        ds.data_unit=ds.data_unit
+        ds.axis_labels = {0: '0: d-, 1: d+, 2: d(+)-d(-)', 1: LABELS_SIN_2CHI} 
+        #TODO: needs adjustment for the low energy case
+        ds.axis_ranges = {
+                1: np.sin(2 * np.arcsin(np.sqrt(ds.axis_ranges[1])))
+            }
     
-    pass
-
-
-def calculate_result_shape(self) -> None:
-    _shape = self._config.get("input_shape", None)
-    self._config["result_shape"] = (3, _shape[0])  
         
+        print('Dataset new: ', ds)
         
+        return ds

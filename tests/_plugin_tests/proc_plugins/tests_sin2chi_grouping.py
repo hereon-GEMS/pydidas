@@ -91,7 +91,6 @@ def test_calulate_result_shape(plugin_fixture, input_shape, result_shape):
     assert all(isinstance(i, int) for i in plugin._config["result_shape"])
 
 
-
 @pytest.mark.parametrize(
     "input_shape",
     [
@@ -109,10 +108,6 @@ def test_calculate_result_shape_raises_error(plugin_fixture, input_shape):
     # Update the assertion to match the full error message
     assert "Cannot calculate the result shape for the" \
            f' "{plugin.plugin_name}" plugin because the input shape is unknown or invalid.' in str(e.value)
-
-
-
-#TODO: Add tests for the execute method
 
 
 

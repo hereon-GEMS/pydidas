@@ -533,25 +533,36 @@ def test__group_d_spacing_by_chi_result(plugin_fixture, case):
 
 @pytest.fixture()
 def base_dataset_one_fit_parameter_factory():
-    return Dataset(np.random.default_rng(seed=42).random((5,)), axis_labels={0:'chi'}, 
-                   axis_ranges={0:np.arange(5)}, axis_units={0:'deg'}, data_label='position / A')    
+    def factory(unit):
+        return Dataset(
+            np.random.default_rng(seed=42).random((5,)),
+            axis_labels={0: LABELS_CHI},
+            axis_ranges={0: np.arange(5)},
+            axis_units={0: UNITS_DEGREE},
+            data_label=f'{LABELS_POSITION} / {unit}'
+        )
+    return factory
     
-    
-def test__extract_and_verify_units_validation(plugin_fixture, base_dataset_one_fit_parameter_factory):
+@pytest.mark.parametrize("unit, expected_unit", [
+    (UNITS_ANGSTROM, UNITS_ANGSTROM),
+    (UNITS_NANOMETER, UNITS_NANOMETER)
+])    
+def test__extract_and_verify_units_validation(plugin_fixture, base_dataset_one_fit_parameter_factory,
+                                              unit, expected_unit):
     plugin = plugin_fixture
-    test_ds= base_dataset_one_fit_parameter_factory
+    test_ds = base_dataset_one_fit_parameter_factory(unit)
     
     plugin._extract_and_verify_units(test_ds)
     
     assert test_ds.axis_units[0] == UNITS_DEGREE
     assert test_ds.data_label == LABELS_POSITION
-    assert test_ds.data_unit == UNITS_ANGSTROM
+    assert test_ds.data_unit == expected_unit
     assert test_ds.axis_labels[0] == LABELS_CHI
     
     
 def test__extract_and_verify_units_chi_missing(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
-    test_ds= base_dataset_one_fit_parameter_factory
+    test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.update_axis_label(0, 'delta')
 
     # Check that UserConfigError is raised when 'chi' is missing
@@ -562,10 +573,10 @@ def test__extract_and_verify_units_chi_missing(plugin_fixture, base_dataset_one_
     
 def test__extract_and_verify_units_chi_unit_wrong(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
-    test_ds= base_dataset_one_fit_parameter_factory
+    test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.update_axis_unit(0, 'rad')
 
-    # Check that UserConfigError is raised when 'chi' is missing
+    # Check that UserConfigError is raised when unit of 'chi' is not allowes
     with pytest.raises(UserConfigError) as excinfo:
         plugin._extract_and_verify_units(test_ds)
     
@@ -573,32 +584,32 @@ def test__extract_and_verify_units_chi_unit_wrong(plugin_fixture, base_dataset_o
     
 def test__extract_and_verify_units_position_missing(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
-    test_ds= base_dataset_one_fit_parameter_factory
+    test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.data_label=f'length / {UNITS_ANGSTROM}'
 
-    # Check that UserConfigError is raised when 'chi' is missing
+    # Check that UserConfigError is raised when 'position' is missing
     with pytest.raises(ValueError) as excinfo:
         plugin._extract_and_verify_units(test_ds)
     
-    assert "Key 'position' not found in data_label." in str(excinfo.value)    
+    assert f"Key '{LABELS_POSITION}' not found in data_label." in str(excinfo.value)    
     
     
 def test__extract_and_verify_units_position_unit_wrong(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
-    test_ds = base_dataset_one_fit_parameter_factory
+    test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.data_label = f'{LABELS_POSITION} / m'  # Set an invalid unit for position
 
     # Check that ValueError is raised when the unit for 'position' is not allowed
     with pytest.raises(ValueError) as excinfo:
         plugin._extract_and_verify_units(test_ds)
     
-    assert "Unit 'm' is not allowed for key 'position." in str(excinfo.value)    
+    assert f"Unit 'm' is not allowed for key '{LABELS_POSITION}." in str(excinfo.value)    
     
     
     
 def test__ds_slicing_1d_validation(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
-    test_ds = base_dataset_one_fit_parameter_factory
+    test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     
     chi, ds = plugin._ds_slicing_1d(test_ds)
     
@@ -2404,8 +2415,8 @@ def base_dataset():
         np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=float), 
         axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]},
         axis_labels={0: '0: d-, 1: d+', 1: LABELS_SIN2CHI},
-        axis_units={0: 'deg', 1: ''},
-        data_unit='nm', 
+        axis_units={0: UNITS_DEGREE, 1: ''},
+        data_unit=UNITS_NANOMETER, 
         data_label='0: position_neg, 1: position_pos'
     )
     
@@ -2433,7 +2444,7 @@ def test__create_final_result_sin2chi_method(plugin_fixture, base_dataset, modif
         expected_array,
         axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]},
         axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI},
-        data_unit='nm',
+        data_unit=UNITS_NANOMETER,
         data_label='d_spacing'
     )
     
@@ -2461,8 +2472,8 @@ def data_values():
     ds = Dataset(
         data_val.copy(),
         axis_units={0: "um"},
-        data_label="position",
-        data_unit="nm",
+        data_label=LABELS_POSITION,
+        data_unit=UNITS_NANOMETER,
         axis_labels={0: "x"},
         axis_ranges={0: axis_val.copy()},
     )
@@ -2493,8 +2504,8 @@ def test_sort_explicit():
     ds = Dataset(
         np.array([3, 2, 1, 5, 4]),
         axis_units={0: "um"},
-        data_label="position",
-        data_unit="nm",
+        data_label=LABELS_POSITION,
+        data_unit=UNITS_NANOMETER,
         axis_labels={0: "x"},
         axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])},
     )
@@ -2529,8 +2540,8 @@ def test_numpy_indexing_with_list():
     ds = Dataset(
         np.array([3, 2, 1, 5, 4]),
         axis_units={0: "um"},
-        data_label="position",
-        data_unit="nm",
+        data_label=LABELS_POSITION,
+        data_unit=UNITS_NANOMETER,
         axis_labels={0: "x"},
         axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])},
     )
@@ -2548,8 +2559,8 @@ def test_numpy_indexing_with_ndarray():
     ds = Dataset(
         np.array([3, 2, 1, 5, 4]),
         axis_units={0: "um"},
-        data_label="position",
-        data_unit="nm",
+        data_label=LABELS_POSITION ,
+        data_unit=UNITS_NANOMETER,
         axis_labels={0: "x"},
         axis_ranges={0: np.array([0.5, 0.4, 0.3, 0.2, 0.1])},
     )

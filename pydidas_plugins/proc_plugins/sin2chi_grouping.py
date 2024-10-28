@@ -42,6 +42,7 @@ from pydidas.plugins import ProcPlugin
 LABELS_CHI = "chi"
 LABELS_SIN2CHI = "sin^2(chi)"
 LABELS_POSITION = "position"
+LABELS_DIM0=  '0: d-, 1: d+, 2: d_mean'
 
 UNITS_NANOMETER = "nm"
 UNITS_ANGSTROM = "A"
@@ -1041,7 +1042,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         # Create the final result Dataset, when dynamic array allocation is not implemented
         result=Dataset(dummy_arr, axis_ranges={0: np.arange(dummy_arr.shape[0]), 1: dummy_axis_ranges}, 
-                axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit=d_spacing_combined.data_unit,
+                axis_labels={0: LABELS_DIM0, 1: LABELS_SIN2CHI}, data_unit=d_spacing_combined.data_unit,
                 data_label='d_spacing'
             )
         

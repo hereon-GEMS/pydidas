@@ -571,8 +571,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
         
         # Ensure 'position' is in the data_label
-        if 'position' not in ds.data_label:
-            raise ValueError("Key 'position' not found in data_label.")
+        if LABELS_POSITION not in ds.data_label:
+            raise ValueError(f"Key '{LABELS_POSITION}' not found in data_label.")
         
         parts = ds.data_label.split('/')
 
@@ -584,7 +584,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         # Compare with allowed units for position
         if pos_unit not in pos_units_allowed:
-            raise ValueError(f"Unit '{pos_unit}' is not allowed for key 'position.")
+            raise ValueError(f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}.")
         
         # Update the dataset with the verified unit
         ds.data_label = parts[0].strip()

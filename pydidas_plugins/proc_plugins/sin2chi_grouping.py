@@ -1054,6 +1054,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
         return result
     
+    #TODO: Remove this function
     def _pre_regression_calculation(self, d_spacing_combined: Dataset) -> Tuple[Dataset, Dataset]:
         """
         Prepares data for regression analysis based on d-spacing values.

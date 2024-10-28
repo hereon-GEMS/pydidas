@@ -37,11 +37,11 @@ from pydidas.plugins import PluginCollection
 from pydidas.plugins import ProcPlugin
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 
-
 from pydidas.core import Dataset, UserConfigError
 
-from pydidas_plugins.proc_plugins.sin2chi_grouping import PARAMETER_KEEP_RESULTS, LABELS_SIN2CHI
-
+from pydidas_plugins.proc_plugins.sin2chi_grouping import ( PARAMETER_KEEP_RESULTS, 
+    LABELS_SIN2CHI, LABELS_CHI, LABELS_POSITION, UNITS_NANOMETER, UNITS_ANGSTROM, UNITS_DEGREE,
+    NPT_AZIM_LIMIT, S2C_TOLERANCE)
 
 @pytest.fixture
 def plugin_fixture():
@@ -124,7 +124,7 @@ def predefined_metric_calculation(metric_name, chi, x, y, d0, spatial_var, phase
     # Handle spatial variation by introducing a default or random x if none is provided
     if x is None and spatial_var:
         x = np.random.uniform(0, 1)  # A random x between 0 and 5
-    if metric_name == "position":
+    if metric_name == "LABELS_POSITION":
         return (
             0.2832 * np.sin(np.deg2rad(chi + phase_shift)) ** 2
             + d0
@@ -508,7 +508,7 @@ def test__group_d_spacing_by_chi_result(plugin_fixture, case):
     )
 
     (d_spacing_pos, d_spacing_neg) = plugin._group_d_spacing_by_chi(
-        d_spacing, chi, tolerance=1e-4
+        d_spacing, chi, tolerance=S2C_TOLERANCE
     )
 
     assert nan_allclose(d_spacing_pos.array, case.d_mean_pos, atol=1e-8)
@@ -543,10 +543,10 @@ def test__extract_and_verify_units_validation(plugin_fixture, base_dataset_one_f
     
     plugin._extract_and_verify_units(test_ds)
     
-    assert test_ds.axis_units[0] == 'deg'
-    assert test_ds.data_label == 'position'
-    assert test_ds.data_unit == 'A'
-    assert test_ds.axis_labels[0] == 'chi'
+    assert test_ds.axis_units[0] == UNITS_DEGREE
+    assert test_ds.data_label == LABELS_POSITION
+    assert test_ds.data_unit == UNITS_ANGSTROM
+    assert test_ds.axis_labels[0] == LABELS_CHI
     
     
 def test__extract_and_verify_units_chi_missing(plugin_fixture, base_dataset_one_fit_parameter_factory):
@@ -574,7 +574,7 @@ def test__extract_and_verify_units_chi_unit_wrong(plugin_fixture, base_dataset_o
 def test__extract_and_verify_units_position_missing(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
     test_ds= base_dataset_one_fit_parameter_factory
-    test_ds.data_label='length / A'
+    test_ds.data_label=f'length / {UNITS_ANGSTROM}'
 
     # Check that UserConfigError is raised when 'chi' is missing
     with pytest.raises(ValueError) as excinfo:
@@ -586,7 +586,7 @@ def test__extract_and_verify_units_position_missing(plugin_fixture, base_dataset
 def test__extract_and_verify_units_position_unit_wrong(plugin_fixture, base_dataset_one_fit_parameter_factory):
     plugin = plugin_fixture
     test_ds = base_dataset_one_fit_parameter_factory
-    test_ds.data_label = 'position / m'  # Set an invalid unit for position
+    test_ds.data_label = f'{LABELS_POSITION} / m'  # Set an invalid unit for position
 
     # Check that ValueError is raised when the unit for 'position' is not allowed
     with pytest.raises(ValueError) as excinfo:
@@ -604,10 +604,10 @@ def test__ds_slicing_1d_validation(plugin_fixture, base_dataset_one_fit_paramete
     
     np.testing.assert_array_equal(chi, np.arange(5))
     assert ds.shape == (5, )
-    assert ds.axis_labels[0] == 'chi'
-    assert ds.axis_units[0] == 'deg'
-    assert ds.data_label == 'position'
-    assert ds.data_unit == 'A'
+    assert ds.axis_labels[0] == LABELS_CHI
+    assert ds.axis_units[0] == UNITS_DEGREE
+    assert ds.data_label == LABELS_POSITION
+    assert ds.data_unit == UNITS_ANGSTROM
     assert len(ds.axis_labels) == 1
     
       

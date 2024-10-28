@@ -5,7 +5,7 @@
 
 
 # pydidas
-[![](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://doi.org/10.5281/zenodo.7568610)
+[![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://doi.org/10.5281/zenodo.7568610)
 
 
 pydidas (the Python DIffraction Data Analysis Suite) is a toolkit for

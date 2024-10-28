@@ -1897,9 +1897,9 @@ class Ds2cTestConfig:
     d_mean_pos: np.array
     d_mean_neg: np.array
     d_mean_avg: np.array
-    azimuth_name: str = 'chi'
-    chi_unit: str = 'deg'
-    d_unit: str = "nm"
+    azimuth_name: str = LABELS_CHI
+    chi_unit: str = UNITS_DEGREE
+    d_unit: str = UNITS_NANOMETER
     d_label: str = "d_spacing"
     description: str = ""
         
@@ -1941,9 +1941,9 @@ ds_case1_exe =  Ds2cTestConfig(
     d_mean_neg=np.array([8, 11, 10, 9, 8]  +[np.nan] * 11),
     d_mean_avg= np.array([6, 8, 8, 8, 8] +[np.nan] * 11),
     s2c_range_sorted=np.array([0.0, 0.14645, 0.5, 0.85355, 1] +[np.nan] * 11),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
 
     description= "A simple case"   
 )   
@@ -1957,9 +1957,9 @@ ds_case2_exe =  Ds2cTestConfig(
     d_mean_neg=np.array([np.nan, np.nan, np.nan, np.nan, np.nan]),
     d_mean_avg= np.array([np.nan, np.nan, np.nan, np.nan, np.nan]),
     s2c_range_sorted=np.array([0.0, 0.03015, 0.11698, 0.25, 0.41318]),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description= "Few chi values"   
 ) 
 
@@ -1978,9 +1978,9 @@ ds_case3_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
         [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*27
     ),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description= "Some nan values"   
 ) 
 
@@ -1999,9 +1999,9 @@ ds_case4_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000] +[np.nan]*1
     ),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Few values in positive slope",
 
 )
@@ -2022,9 +2022,9 @@ ds_case5_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*1
     ),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Few values in negative slope",
 
 )
@@ -2065,9 +2065,9 @@ ds_case7_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
         [0.0000000, 0.1464466, 0.5000000, 0.8535534, 1.0000000] +[np.nan]*11
     ),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Simple case",
 )
 
@@ -2090,9 +2090,9 @@ ds_case8_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
          [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000] +[np.nan]*27
     ),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Simple case",
 )
 
@@ -2136,9 +2136,9 @@ ds_case10_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
         [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]  +[np.nan]*27
     ),    
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="A more realistic case with chi ranging from 0 to 360 and noise added; noise with scale 0.03",
 )
 
@@ -2155,9 +2155,9 @@ ds_case11_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
         [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759]  +[np.nan]*0
     ),    
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Positive chi range between 0 and 45; noise with scale 0.03",
 )
 
@@ -2175,9 +2175,9 @@ ds_case12_exe =  Ds2cTestConfig(
     s2c_range_sorted=np.array(
         [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]  +[np.nan]*27
     ),    
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Positive chi range between 0 and 45; noise with scale 0.03",
 )
 
@@ -2194,9 +2194,9 @@ ds_case13_exe =  Ds2cTestConfig(
  25.08736405, 25.05850571 ,25.03966976 ,25.03312811]+[np.nan]*27),
     s2c_range_sorted=np.array([0.0000000, 0.0301537, 0.1169778, 0.2500000,
                                0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000] +[np.nan]*27),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Simple case without noise"
 )
 
@@ -2209,9 +2209,9 @@ ds_case14_exe =  Ds2cTestConfig(
     d_mean_neg=np.array([18., 17. ,16., 15. ,14, 13., 12,11. ,10. , 9.]+[np.nan]*9),
     d_mean_avg=np.array([9., 9., 9., 9., 9., 9., 9. ,9., 9., 9.]),
     s2c_range_sorted=np.array([0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*9),
-    azimuth_name = 'chi',
-    chi_unit= 'deg',
-    d_unit= "nm" ,
+    azimuth_name = LABELS_CHI,
+    chi_unit= UNITS_DEGREE,
+    d_unit= UNITS_NANOMETER ,
     description="Simple case without noise"
 )
                                          

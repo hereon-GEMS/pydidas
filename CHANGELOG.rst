@@ -11,6 +11,8 @@ Improvements
   respectively instead of None to have more consistent ranges (pyFAI issue #2291)
 - Updated Sum1dData plugin to use np.sum directly for improved performance.
 - Extended Sum2dData plugin to work on an arbitrary number of dimensions.
+- Added a calling option to add a `-screen <i>` command line option to force the 
+  GUI on the selected screen.
 - Programmatic improvements:
     - Removed the basic_plugin class attribute from Plugins and shifted the check
       to the core code of the base plugins.
@@ -30,6 +32,7 @@ Bugfixes
 - Fixed an issue with pickling unittest plugins loaded through the PluginRegistry.
 - Fixed an issue in the WorkflowNode which allowed accessing outdated results.
 - Fixed an issue when preparing to run an empty Workflow.
+- Fixed an issue when restoring the GUI to a different screen in multiscreen systems.
 
 
 v24.09.19

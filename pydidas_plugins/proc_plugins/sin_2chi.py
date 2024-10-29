@@ -179,13 +179,13 @@ class DspacingSin_2chi(ProcPlugin):
     
         #TODO: remove later   
         #Two approaches:
-        delta_d_direct = ds[1, :] - ds[0, :]
+        #delta_d_direct = ds[1, :] - ds[0, :]
         delta_d_diff =  np.diff(ds[:2, :], axis=0)
         #if not np.all(delta_d_diff == delta_d_direct): 
         #np.allclose is required due to np.nan values in the dataset
-        if not np.allclose(delta_d_diff, delta_d_direct, rtol=1e-09, atol=1e-10, equal_nan=True):
-            print(np.all(delta_d_diff == delta_d_direct))
-            raise UserConfigError("Difference of d(+) - d(-) calculated in two different ways. Please verify your Dataset.")  
+        #if not np.allclose(delta_d_diff, delta_d_direct, rtol=1e-09, atol=1e-10, equal_nan=True):
+        #    print(np.all(delta_d_diff == delta_d_direct))
+        #    raise UserConfigError("Difference of d(+) - d(-) calculated in two different ways. Please verify your Dataset.")  
         
         #Overwriting the incoming dataset 
         ds[2,:] = delta_d_diff.data

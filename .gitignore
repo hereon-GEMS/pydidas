@@ -3,6 +3,7 @@
 
 # local IDE metadata files
 .idea
+.vscode
 
 # local files from running pydidas
 .pylint.d

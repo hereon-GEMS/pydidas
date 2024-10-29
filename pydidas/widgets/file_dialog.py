@@ -299,12 +299,12 @@ class PydidasFileDialogWidget(
         self.setWindowTitle(kwargs.get("caption", "Select existing file"))
         self._set_name_filter()
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptOpen)
-        self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
+        self.setFileMode(QtWidgets.QFileDialog.ExistingFiles)
         self.setProxyModel(None)
         res = self.exec_()
         if res == 0:
             return None
-        _selection = self.selectedFiles()[0]
+        _selection = self.selectedFiles()
         self._store_current_directory()
         return _selection
 

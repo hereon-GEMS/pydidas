@@ -64,7 +64,7 @@ class ScanIo(GenericIoMeta):
             The Scan object to be updated. If None, the generic ScanContext is used.
             The default is None.
         """
-        _extension = get_extension(filename)
+        _extension = get_extension(filename[0])
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.import_from_file(filename, scan=scan)

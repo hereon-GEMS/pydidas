@@ -31,7 +31,8 @@ __all__ = ["ExecuteWorkflowApp"]
 import multiprocessing as mp
 import time
 import warnings
-from typing import Tuple, Union
+from multiprocessing.shared_memory import SharedMemory
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -114,7 +115,6 @@ class ExecuteWorkflowApp(BaseApp):
             "_index",
             "_result_metadata",
             "_mp_tasks",
-            "_waiting_for_shapes_to_be_set",
             "_metadata_is_set",
         ]
     )
@@ -125,36 +125,19 @@ class ExecuteWorkflowApp(BaseApp):
         self._config.update(
             {
                 "result_metadata_set": False,
-                "result_shapes": {},
                 "shared_memory": {},
                 "tree_str_rep": "[]",
-                "buffer_n": 0,
                 "run_prepared": False,
+                "latest_results": None,
+                "scan_context": {},
+                "exp_context": {},
             }
         )
         self._index = -1
+        self._locals = {"shared_memory_buffers": {}}
         if not self.slave_mode:
             self._prepare_mp_configuration()
         self.reset_runtime_vars()
-
-    def reset_runtime_vars(self):
-        """
-        Reset the runtime variables for a new run.
-        """
-        self._config["result_metadata_set"] = False
-        self._config["run_prepared"] = False
-        self._mp_tasks = np.array(())
-        self._index = None
-        self._mp_sync = {
-            "waiting_for_shapes_to_be_set": False,
-            "results_to_be_published": {},
-        }
-        self._mp_sync["waiting_for_shapes_to_be_set"] = False
-        self._shared_arrays = {}
-        if not self.slave_mode:
-            for _key, _val in self.mp_manager.items():
-                if _key.startswith("shape") or _key.startswith("metadata"):
-                    _val.clear()
 
     def _prepare_mp_configuration(self):
         """
@@ -175,13 +158,31 @@ class ExecuteWorkflowApp(BaseApp):
         """
         self._mp_manager_instance = mp.Manager()
         for _item, _type in [
-            ("shape_dict", self._mp_manager_instance.dict),
+            ("shapes_dict", self._mp_manager_instance.dict),
             ("metadata_dict", self._mp_manager_instance.dict),
             ("shapes_available", self._mp_manager_instance.Event),
             ("shapes_set", self._mp_manager_instance.Event),
             ("lock", self._mp_manager_instance.Lock),
         ]:
             self.mp_manager[_item] = _type()
+        self.mp_manager["master_pid"] = self._mp_manager_instance.Value(
+            "I", mp.current_process().pid
+        )
+        self.mp_manager["buffer_n"] = self._mp_manager_instance.Value("I", 0)
+
+    def reset_runtime_vars(self):
+        """
+        Reset the runtime variables for a new run.
+        """
+        self._config["result_metadata_set"] = False
+        self._config["run_prepared"] = False
+        self._mp_tasks = np.array(())
+        self._index = None
+        self._shared_arrays = {}
+        if not self.slave_mode:
+            for _key, _val in self.mp_manager.items():
+                if _key.startswith("shape") or _key.endswith("_dict"):
+                    _val.clear()
 
     def multiprocessing_pre_run(self):
         """
@@ -211,9 +212,10 @@ class ExecuteWorkflowApp(BaseApp):
         if self.slave_mode:
             self._recreate_context()
         else:
-            RESULTS.update_shapes_from_scan_and_workflow()
+            self._unlink_shared_memory_buffers()
             RESULT_SAVER.set_active_savers_and_title([])
             self._store_context()
+            RESULTS.prepare_new_results()
             if self.get_param_value("autosave_results"):
                 RESULTS.prepare_files_for_saving(
                     self.get_param_value("autosave_directory"),
@@ -234,6 +236,20 @@ class ExecuteWorkflowApp(BaseApp):
         for _key, _val in self._config["exp_context"].items():
             EXP.set_param_value(_key, _val)
 
+    def _unlink_shared_memory_buffers(self):
+        """
+        Unlink the shared memory buffers.
+
+        Note that only the master app should unlink the shared memory buffers.
+        """
+        if self.slave_mode:
+            return
+        _buffers = self._locals.get("shared_memory_buffers", {})
+        while _buffers:
+            _key, _buffer = _buffers.popitem()
+            _buffer.close()
+            _buffer.unlink()
+
     def _store_context(self):
         """
         Store the current context for slave app instances.
@@ -244,66 +260,6 @@ class ExecuteWorkflowApp(BaseApp):
         )
         self._config["exp_context"] = EXP.get_param_values_as_dict(
             filter_types_for_export=True
-        )
-
-    def initialize_shared_memory(self):
-        """
-        Initialize the shared arrays from the buffer size and result shapes.
-        """
-        if not self.mp_manager["shapes_available"].is_set():
-            raise UserConfigError(
-                "The shapes of the results are not yet available. "
-                "Please run the prepare_run method first."
-            )
-        self._check_size_of_results_and_buffer()
-        _n = self._config["buffer_n"]
-        self.mp_manager["arr_flag"] = mp.Array("I", _n, lock=self.mp_manager["lock"])
-        for _node_id, _shape in self.mp_manager["shape_dict"].items():
-            _num = int(_n * np.prod(_shape))
-            self.mp_manager[f"arr_{_node_id}"] = mp.Array("f", _num, lock=mp.Lock())
-        self.mp_manager["shapes_set"].set()
-
-    def _check_size_of_results_and_buffer(self):
-        """
-        Check the size of results and the buffer size.
-
-        Raises
-        ------
-        UserConfigError
-            If the buffer is too small to store a one dataset per MP worker.
-        """
-        _buffer = self.q_settings_get("global/shared_buffer_size", float)
-        _n_worker = self.q_settings_get("global/mp_n_workers", int)
-        _n_data = self.q_settings_get("global/shared_buffer_max_n", int)
-        _req_points_per_dataset = sum(
-            np.prod(_shape) for _shape in self.mp_manager["shape_dict"].values()
-        )
-        _req_mem_per_dataset = max(4 * _req_points_per_dataset / 2**20, 0.01)
-        _n_dataset_in_buffer = int(np.floor(_buffer / _req_mem_per_dataset))
-        if _n_dataset_in_buffer < _n_worker:
-            _min_buffer = _req_mem_per_dataset * _n_worker
-            raise UserConfigError(
-                "The defined buffer is too small. The required memory per diffraction "
-                f"image is {_req_mem_per_dataset:.3f} MB and {_n_worker} workers have "
-                f"been defined. The minimum buffer size must be {_min_buffer:.2f} MB. "
-                "\nPlease update the buffer size or change number of workers in the "
-                "global settings."
-            )
-        self._config["buffer_n"] = min(
-            _n_dataset_in_buffer, _n_data, self._mp_tasks.size
-        )
-
-    def __initialize_arrays_from_shared_memory(self):
-        """
-        Initialize the numpy arrays from the shared memory buffers.
-        """
-        for _key, _shape in self.mp_manager["shapes_dict"].items():
-            _arr_shape = (self._config["buffer_n"],) + _shape
-            self._shared_arrays[_key] = np.frombuffer(
-                self.mp_manager[f"arr_{_key}"].get_obj(), dtype=np.float32
-            ).reshape(_arr_shape)
-        self._shared_arrays["flag"] = np.frombuffer(
-            self.mp_manager["arr_flag"].get_obj(), dtype=np.int32
         )
 
     def multiprocessing_get_tasks(self) -> np.ndarray:
@@ -335,16 +291,11 @@ class ExecuteWorkflowApp(BaseApp):
         By default, this Flag is always True. In the case of live processing,
         a check is done whether the current file exists.
 
-        This value is overwritten by the `_waiting_for_shapes_to_be_set` flag
-        if the shapes are not yet available.
-
         Returns
         -------
         bool
             Flag whether the processing can carry on or needs to wait.
         """
-        if self._mp_sync["waiting_for_shapes_to_be_set"]:
-            return False
         if not self.get_param_value("live_processing"):
             return True
         return TREE.root.plugin.input_available(self._index)
@@ -368,24 +319,64 @@ class ExecuteWorkflowApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        if not self._mp_sync["waiting_for_shapes_to_be_set"]:
-            try:
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    TREE.execute_process(index)
-            except FileReadError:
-                return -1
-            with self.mp_manager["lock"]:
-                if not self.mp_manager["shapes_available"].is_set():
-                    self._publish_shapes_and_metadata_to_manager()
-        if not self.slave_mode:
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                TREE.execute_process(index)
+        except FileReadError:
+            return -1
+        with self.mp_manager["lock"]:
+            if not self.mp_manager["shapes_available"].is_set():
+                self._publish_shapes_and_metadata_to_manager()
+        if not self.mp_manager["shapes_set"].is_set():
+            if self.slave_mode:
+                self._config["latest_results"] = TREE.get_current_results()
+                return None
             self._create_shared_memory_arrays()
-        if self.slave_mode:
-            if not self.mp_manager["shapes_set"].is_set():
-                self._mp_sync["waiting_for_shapes_to_be_set"] = True
-                return -1
         self.__write_results_to_shared_arrays()
         return self._config["buffer_pos"]
+
+    def must_send_signal_and_wait_for_response(self) -> Optional[str]:
+        """
+        Check if a signal must be sent and wait for the response.
+
+        The ExecuteWorkflowApp sends a signal
+
+        Returns
+        -------
+        Optional[str]
+            The signal to be sent.
+        """
+        if not self.mp_manager["shapes_set"].is_set():
+            return "::shapes_not_set::"
+        return None
+
+    def get_latest_results(self) -> Optional[object]:
+        """
+        Return the latest results from the WorkflowTree.
+
+        Returns
+        -------
+        dict or None
+            The latest results from the WorkflowTree.
+        """
+        self.__write_results_to_shared_arrays()
+        return self._config["buffer_pos"]
+
+    @QtCore.Slot(str)
+    def received_signal_message(self, message: str):
+        """
+        Process the received signal message.
+
+        Parameters
+        ----------
+        message : str
+            The received message.
+        """
+        if self.mp_manager["shapes_set"].is_set():
+            return
+        if message == "::shapes_not_set::":
+            self._create_shared_memory_arrays()
 
     def _publish_shapes_and_metadata_to_manager(self):
         """
@@ -393,38 +384,126 @@ class ExecuteWorkflowApp(BaseApp):
         """
         _results = TREE.get_current_results()
         for _node_id, _res in _results.items():
-            self.mp_manager["shape_dict"][_node_id] = _res.shape
-        if isinstance(_res, Dataset):
-            self.mp_manager["metadata_dict"][_node_id] = {
-                "axis_labels": _res.axis_labels,
-                "axis_ranges": _res.axis_ranges,
-                "axis_units": _res.axis_units,
-                "data_unit": _res.data_unit,
-                "data_label": _res.data_label,
-            }
-        else:
-            self.mp_manager["metadata_dict"][_node_id] = {
-                "axis_labels": {i: "" for i in range(_res.ndim)},
-                "axis_ranges": {
-                    _i: np.arange(_length) for _i, _length in enumerate(_res.shape)
-                },
-                "axis_units": {i: "" for i in range(_res.ndim)},
-                "data_unit": "",
-                "data_label": "",
-            }
-        self.mp_manager["shapes_available"].set()
+            self.mp_manager["shapes_dict"][_node_id] = _res.shape
+            if isinstance(_res, Dataset):
+                self.mp_manager["metadata_dict"][_node_id] = {
+                    "axis_labels": _res.axis_labels,
+                    "axis_ranges": _res.axis_ranges,
+                    "axis_units": _res.axis_units,
+                    "data_unit": _res.data_unit,
+                    "data_label": _res.data_label,
+                }
+            else:
+                self.mp_manager["metadata_dict"][_node_id] = {
+                    "axis_labels": {i: "" for i in range(_res.ndim)},
+                    "axis_ranges": {
+                        _i: np.arange(_length) for _i, _length in enumerate(_res.shape)
+                    },
+                    "axis_units": {i: "" for i in range(_res.ndim)},
+                    "data_unit": "",
+                    "data_label": "",
+                }
+            self.mp_manager["shapes_available"].set()
 
     def _create_shared_memory_arrays(self):
         """
         Create the necessary shared memory arrays for the results.
         """
         self.initialize_shared_memory()
-        self.__initialize_arrays_from_shared_memory()
+        self._initialize_arrays_from_shared_memory()
+
+    def initialize_shared_memory(self):
+        """
+        Initialize the shared arrays from the buffer size and result shapes.
+        """
+        if not self.mp_manager["shapes_available"].is_set():
+            raise UserConfigError(
+                "The shapes of the results are not yet available. "
+                "Please run the prepare_run method first."
+            )
+        self._check_size_of_results_and_buffer()
+        _n = self.mp_manager["buffer_n"].value
+        _pid = self.mp_manager["master_pid"].value
+        _buffers = self._locals["shared_memory_buffers"] = {}
+        _buffers["flag"] = SharedMemory(name=f"flag_{_pid}", create=True, size=4 * _n)
+        for _node_id, _shape in self.mp_manager["shapes_dict"].items():
+            _num_bytes = int(4 * _n * np.prod(_shape))
+            _buffers[_node_id] = SharedMemory(
+                name=f"{_node_id}_{_pid}", create=True, size=_num_bytes
+            )
+        self.mp_manager["shapes_set"].set()
+
+    def _check_size_of_results_and_buffer(self):
+        """
+        Check the size of results and the buffer size.
+
+        Raises
+        ------
+        UserConfigError
+            If the buffer is too small to store a one dataset per MP worker.
+        """
+        _buffer = self.q_settings_get("global/shared_buffer_size", float)
+        _n_worker = self.q_settings_get("global/mp_n_workers", int)
+        _n_data = self.q_settings_get("global/shared_buffer_max_n", int)
+        _req_points_per_dataset = sum(
+            np.prod(_shape) for _shape in self.mp_manager["shapes_dict"].values()
+        )
+        _req_mem_per_dataset = max(4 * _req_points_per_dataset / 2**20, 0.01)
+        _n_dataset_in_buffer = int(np.floor(_buffer / _req_mem_per_dataset))
+        if _n_dataset_in_buffer < _n_worker:
+            _min_buffer = _req_mem_per_dataset * _n_worker
+            raise UserConfigError(
+                "The defined buffer is too small. The required memory per diffraction "
+                f"image is {_req_mem_per_dataset:.3f} MB and {_n_worker} workers have "
+                f"been defined. The minimum buffer size must be {_min_buffer:.2f} MB. "
+                "\nPlease update the buffer size or change number of workers in the "
+                "global settings."
+            )
+        self.mp_manager["buffer_n"].value = min(
+            _n_dataset_in_buffer, _n_data, self._mp_tasks.size
+        )
+
+    def _initialize_arrays_from_shared_memory(self):
+        """
+        Initialize the numpy arrays from the shared memory buffers.
+        """
+        _buffer_size = self.mp_manager["buffer_n"].value
+        for _key, _shape in self.mp_manager["shapes_dict"].items():
+            _shared_mem = self.__get_shared_memory(_key)
+            _arr_shape = (_buffer_size,) + _shape
+            self._shared_arrays[_key] = np.ndarray(
+                _arr_shape, dtype=np.float32, buffer=_shared_mem.buf
+            )
+        _shared_mem = self.__get_shared_memory("flag")
+        self._shared_arrays["flag"] = np.ndarray(
+            (_buffer_size,), dtype=np.int32, buffer=_shared_mem.buf
+        )
+
+    def __get_shared_memory(self, name: Union[str, int]) -> SharedMemory:
+        """
+        Get the SharedMemory object from the shared memory buffers.
+
+        Parameters
+        ----------
+        name : Union[str, int]
+            The name of the shared memory buffer.
+
+        Returns
+        -------
+        SharedMemory
+            The SharedMemory object.
+        """
+        _master_pid = self.mp_manager["master_pid"].value
+        if name in self._locals["shared_memory_buffers"]:
+            return self._locals["shared_memory_buffers"][name]
+        _mem_buffer = SharedMemory(name=f"{name}_{_master_pid}")
+        self._locals["shared_memory_buffers"][name] = _mem_buffer
+        return _mem_buffer
 
     def __write_results_to_shared_arrays(self):
         """Write the results from the WorkflowTree execution to the shared array."""
         if self._shared_arrays == dict():
-            self.__initialize_arrays_from_shared_memory()
+            self._initialize_arrays_from_shared_memory()
         while True:
             with self.mp_manager["lock"]:
                 _zeros = np.where(self._shared_arrays["flag"] == 0)[0]
@@ -456,7 +535,7 @@ class ExecuteWorkflowApp(BaseApp):
         if self.slave_mode:
             return
         if self._shared_arrays == dict():
-            self.__initialize_arrays_from_shared_memory()
+            self._initialize_arrays_from_shared_memory()
 
         # the ExecutiveWorkflowApp only uses the first argument of the variadict data:
         buffer_pos = data[0]
@@ -468,18 +547,18 @@ class ExecuteWorkflowApp(BaseApp):
             )
             return
         if not self._config["result_metadata_set"]:
-            _meta = {
-                _key: _value
-                for _key, _value in self.mp_manager["metadata_dict"].items()
-            }
-            RESULTS.update_frame_metadata(_meta)
-            RESULT_SAVER.push_frame_metadata_to_active_savers(_meta)
+            RESULTS.update_frame_metadata(
+                {
+                    _key: _value
+                    for _key, _value in self.mp_manager["metadata_dict"].items()
+                }
+            )
             self._config["result_metadata_set"] = True
-
-        _new_results = {_key: None for _key in self.mp_manager["shape_dict"]}
         with self.mp_manager["lock"]:
-            for _key in _new_results:
-                _new_results[_key] = self._shared_arrays[_key][buffer_pos]
+            _new_results = {
+                _key: self._shared_arrays[_key][buffer_pos]
+                for _key in self.mp_manager["shapes_dict"]
+            }
             self._shared_arrays["flag"][buffer_pos] = 0
         RESULTS.store_results(index, _new_results)
         if self.get_param_value("autosave_results"):
@@ -492,4 +571,5 @@ class ExecuteWorkflowApp(BaseApp):
         """
         if not self.slave_mode:
             self.mp_manager.shutdown()
+        self._unlink_shared_memory_buffers()
         super().deleteLater()

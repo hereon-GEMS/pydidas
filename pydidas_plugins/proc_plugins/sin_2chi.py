@@ -192,7 +192,6 @@ class DspacingSin_2chi(ProcPlugin):
         ds.data_label = "Difference of d(+) - d(-)" 
         ds.axis_labels = {0: '0: d-, 1: d+, 2: d(+)-d(-)', 1: LABELS_SIN_2CHI} 
         #TODO: needs adjustment for the low energy case in second dimension
-        #ds.axis_ranges = { 0:np.arange(3) , 1: np.sin(2 * np.arcsin(np.sqrt(ds.axis_ranges[1])))}
         ds.axis_ranges = { 0:np.arange(3) , 1: _calculate_sin_2chi_values(ds.axis_ranges[1])} 
         
         return ds

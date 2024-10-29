@@ -354,7 +354,7 @@ class BaseApp(ObjectWithParameterCollection):
                         ),
                     )
                     or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
-                    or _key in ["__METAOBJECT__", "mp_manager"]
+                    or _key in ["__METAOBJECT__", "mp_manager", "_locals"]
                 )
             }
         )

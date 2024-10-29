@@ -262,8 +262,6 @@ class BaseApp(ObjectWithParameterCollection):
             if _key in ["scan_context", "exp_context"]:
                 _new_cfg[_key] = "::None::"
         _cfg.update(_new_cfg)
-        if "shared_memory" in _cfg and _cfg["shared_memory"] != {}:
-            _cfg["shared_memory"] = "::restore::True"
         return {
             "params": self.get_param_values_as_dict(filter_types_for_export=True),
             "config": _cfg,
@@ -296,17 +294,6 @@ class BaseApp(ObjectWithParameterCollection):
             if _item == "::None::":
                 _new_cfg[_key] = None
         self._config = state["config"] | _new_cfg
-        if self._config.get("shared_memory", False) == "::restore::True":
-            self._config["shared_memory"] = {}
-            self.initialize_shared_memory()
-
-    def initialize_shared_memory(self):
-        """
-        Initialize the shared memory array for the master app.
-
-        Note: This method is not required for apps without a shared memory.
-        """
-        return
 
     def copy(self, slave_mode: bool = False) -> Self:
         """

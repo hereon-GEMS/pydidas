@@ -52,12 +52,8 @@ class TestApp(BaseApp):
             "item1": 1,
             "item2": slice(0, 5),
             "item3": "dummy",
-            "shared_memory": {"test": None},
             "carryon_counter": -1,
         }
-
-    def initialize_shared_memory(self):
-        self._config["shared_memory"] = {"test": True}
 
     def multiprocessing_get_tasks(self):
         return [1, 2, 3]
@@ -179,7 +175,6 @@ class TestBaseApp(unittest.TestCase):
         _state = app.export_state()
         self.assertEqual(_state["params"]["label"], _label)
         self.assertEqual(_state["params"]["active_node"], _node)
-        self.assertEqual(_state["config"]["shared_memory"], "::restore::True")
         self.assertEqual(_state["config"]["new_key"], True)
         self.assertEqual(_state["config"]["item1"], _item1)
         self.assertIsInstance(_state["config"]["item2"], str)
@@ -193,7 +188,6 @@ class TestBaseApp(unittest.TestCase):
                 "item1": 55,
                 "item2": "::slice::1::7::2",
                 "item3": "new_dummy",
-                "shared_memory": "::restore::True",
             },
         }
         app = TestApp()
@@ -203,7 +197,6 @@ class TestBaseApp(unittest.TestCase):
         for _key in ["item1", "item3"]:
             self.assertEqual(app._config[_key], _state["config"][_key])
         self.assertEqual(app._config["item2"], slice(1, 7, 2))
-        self.assertEqual(app._config["shared_memory"], {"test": True})
 
     def test_run(self):
         app = TestApp()

@@ -92,6 +92,31 @@ class WorkflowResults(QtCore.QObject):
         }
         self.clear_all_results()
 
+    def prepare_new_results(self):
+        """
+        Prepare the WorkflowResults for new results.
+        """
+        self.clear_all_results()
+        _dim = self._SCAN.get_param_value("scan_dim")
+        _result_ids = [
+            _node.node_id for _node in self._TREE.get_all_nodes_with_results()
+        ]
+        for _node_id in _result_ids:
+            _plugin = self._TREE.nodes[_node_id].plugin
+            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
+            self._config["data_labels"][_node_id] = _plugin.output_data_label
+            self._config["data_units"][_node_id] = _plugin.output_data_unit
+            self._config["plugin_names"][_node_id] = _plugin.plugin_name
+            self._config["result_titles"][_node_id] = _plugin.result_title
+        self._config["scan_ndim"] = self._SCAN.get_param_value("scan_dim")
+        self._config["scan_npoints"] = self._SCAN.n_points
+        self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
+        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
+        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
+        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
+        self._config["frozen_TREE"].update_from_tree(self._TREE)
+        self._config["frozen_TREE"].prepare_execution()
+
     def update_shapes_from_scan_and_workflow(self):
         """
         Update the shape of the results from the classes singletons' metadata.

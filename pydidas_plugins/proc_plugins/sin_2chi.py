@@ -177,15 +177,18 @@ class DspacingSin_2chi(ProcPlugin):
         if not ds.data_unit in [UNITS_NANOMETER, UNITS_ANGSTROM]:
             raise UserConfigError(f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset.")
     
+        if ds.shape[1] != ds.axis_ranges[1].shape[1]:
+            raise UserConfigError("The number of sin^2(chi) values must match the number of columns in the dataset.")
+    
         #TODO: remove later   
         #Two approaches:
-        #delta_d_direct = ds[1, :] - ds[0, :]
+        delta_d_direct = ds[1, :] - ds[0, :]
         delta_d_diff =  np.diff(ds[:2, :], axis=0)
         #if not np.all(delta_d_diff == delta_d_direct): 
         #np.allclose is required due to np.nan values in the dataset
-        #if not np.allclose(delta_d_diff, delta_d_direct, rtol=1e-09, atol=1e-10, equal_nan=True):
-        #    print(np.all(delta_d_diff == delta_d_direct))
-        #    raise UserConfigError("Difference of d(+) - d(-) calculated in two different ways. Please verify your Dataset.")  
+        if not np.allclose(delta_d_diff, delta_d_direct, rtol=1e-09, atol=1e-10, equal_nan=True):
+            print(np.all(delta_d_diff == delta_d_direct))
+            raise UserConfigError("Difference of d(+) - d(-) calculated in two different ways. Please verify your Dataset.")  
         
         #Overwriting the incoming dataset 
         ds[2,:] = delta_d_diff.data
@@ -209,4 +212,7 @@ class DspacingSin_2chi(ProcPlugin):
         if not isinstance(s2c_values, np.ndarray):
             raise UserConfigError("Input must be an instance of np.ndarray.")
         
+        if np.any(s2c_values < 0) or np.any(s2c_values > 1):
+            raise UserConfigError("Values in s2c_values must be between 0 and 1 inclusive.")    
+                 
         return np.sin(2 * np.arcsin(np.sqrt(s2c_values)))

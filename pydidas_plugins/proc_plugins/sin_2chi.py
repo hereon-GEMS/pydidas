@@ -136,7 +136,7 @@ class DspacingSin_2chi(ProcPlugin):
         UserConfigError: If the axis labels are not as expected.
         """
         if ds.axis_labels[0] != LABELS_DIM0:
-            raise UserConfigError(f"Expected axis label '{LABELS_DIM0=}', but got '{ds.axis_labels[0]}'")
+            raise UserConfigError(f"Expected axis label '{LABELS_DIM0}', but got '{ds.axis_labels[0]}'")
         
         if ds.axis_labels[1] != LABELS_SIN2CHI:
             raise UserConfigError(f"Expected axis label '{LABELS_SIN2CHI}', but got '{ds.axis_labels[1]}'")
@@ -182,7 +182,7 @@ class DspacingSin_2chi(ProcPlugin):
     
         delta_d_diff =  np.diff(ds[:2, :], axis=0)
       
-        #Overwriting the incoming dataset 
+        #Overwrite the incoming dataset 
         ds[2,:] = delta_d_diff.data
         ds.data_label = "Difference of d(+) - d(-)" 
         ds.axis_labels = {0: '0: d-, 1: d+, 2: d(+)-d(-)', 1: LABELS_SIN_2CHI} 

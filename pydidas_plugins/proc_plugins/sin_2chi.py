@@ -91,11 +91,7 @@ class DspacingSin_2chi(ProcPlugin):
         pass
 
     def execute(self, ds: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
-        
-        print(30*"\N{banana}") 
-        print('Incoming ds: ', ds)
-        print(30*"\N{banana}")  
-        
+      
         d_output_sin_2chi_method = self._calculate_diff_d_spacing_vs_sin_2chi(ds)
         
         

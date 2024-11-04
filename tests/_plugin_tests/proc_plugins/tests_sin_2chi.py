@@ -29,8 +29,6 @@ import pytest
 
 import numpy as np
 import numpy.testing as npt
-from typing import Callable
-from numbers import Real
 from dataclasses import dataclass
 
 from pydidas.plugins import PluginCollection
@@ -41,6 +39,13 @@ from pydidas.core import Dataset, UserConfigError
 
 from pydidas_plugins.proc_plugins.sin_2chi import (PARAMETER_KEEP_RESULTS, LABELS_SIN2CHI, LABELS_SIN_2CHI, LABELS_SIN2CHI,
                                                             LABELS_DIM0, UNITS_NANOMETER, UNITS_ANGSTROM)
+
+
+
+def test_plugin_inheritance():  
+    plugin_obj =  PluginCollection().get_plugin_by_name('DspacingSin_2chi')
+    assert issubclass(plugin_obj, ProcPlugin), "Plugin is not a subclass of ProcPlugin"
+    
 
 
 @pytest.fixture
@@ -63,7 +68,7 @@ def base_dataset_factory():
             axis_labels={0: LABELS_DIM0, 1: LABELS_SIN2CHI},
             axis_ranges = {
             0: np.arange(data_array.shape[0]),
-            1: np.full((1, data_array.shape[1]), np.sin(np.arctan(2))**2)
+            1: np.full((data_array.shape[1], ), np.sin(np.arctan(2))**2)
             },
             axis_units={0: '' , 1:''},
             data_label= 'd_spacing', 
@@ -90,10 +95,10 @@ def test_execute_validation_basic(plugin_fixture, base_dataset_factory, unit, ex
     assert result.axis_units[1] == ''
     assert np.all(result.axis_ranges[0] == dataset.axis_ranges[0])
     # See comment in base_dataset_factory for line below
-    assert np.all(result.axis_ranges[1] == np.full((1, result.shape[1]), np.sin(2*np.arctan(2))))
+    assert np.all(result.axis_ranges[1] == np.full((result.shape[1], ), np.sin(2*np.arctan(2))))
     assert np.all(result.data == np.array([[1]*5, [3]*5, [2]*5]))   
     assert result.shape == (3, 5)
-    assert result.shape[1] == result.axis_ranges[1].shape[1]
+    assert result.shape[1] == result.axis_ranges[1].shape[0]
     
 
         
@@ -152,8 +157,8 @@ case1 = DSpacingTest(
     d_neg=np.array([1, 2, 3, 5, 6]),
     d_pos=np.array([2, 3, 4, 4, 5]),
     d_mean=np.array([1.5, 2.5, 3.5, 4.5, 5.5]),
-    s2c_values=np.full((1,5), [0.5]),
-    s_2c_values_expected=np.full((1, 5), [1.0]),
+    s2c_values=np.full((5,), [0.5]),
+    s_2c_values_expected=np.full((5, ), [1.0]),
     d_diff_expected=np.array([1, 1, 1, -1, -1])
 )
 
@@ -161,8 +166,8 @@ case2= DSpacingTest(
     d_neg=np.array([1, np.nan, 3, np.nan, 6]),
     d_pos=np.array([np.nan, 3, np.nan, 4, 5]),
     d_mean=np.array([np.nan, np.nan, np.nan, np.nan, 5.5]),
-    s2c_values=np.full((1,5), np.pi/4),
-    s_2c_values_expected=np.full((1, 5), 8.21091684e-01),
+    s2c_values=np.full((5, ), np.pi/4),
+    s_2c_values_expected=np.full((5, ), 8.21091684e-01),
     d_diff_expected=np.array([np.nan, np.nan, np.nan, np.nan, -1]),
 )
 
@@ -170,8 +175,8 @@ case3 = DSpacingTest(
     d_neg = np.array([-5,-4,-3,-2,-1]),
     d_pos= np.array([-4,-3,-2,-1,0]),
     d_mean= np.array([-4.5,-3.5,-2.5,-1.5,-0.5]),
-    s2c_values=np.full((1,5), 0.5),
-    s_2c_values_expected=np.full((1, 5), [1.0]),
+    s2c_values=np.full((5, ), 0.5),
+    s_2c_values_expected=np.full((5, ), [1.0]),
     d_diff_expected=np.array([1, 1, 1, 1, 1])
 )
  
@@ -180,8 +185,8 @@ case4 = DSpacingTest(
     d_neg = np.array([-5,-4,-3,-2,-1]),
     d_pos= np.array([1,-5,-6,1,1]),
     d_mean= np.array([-2,-4.5, -4.5,-0.5,0]),
-    s2c_values=np.full((1,5), 0.5),
-    s_2c_values_expected=np.full((1, 5), [1.0]),
+    s2c_values=np.full((5, ), 0.5),
+    s_2c_values_expected=np.full((5, ), [1.0]),
     d_diff_expected=np.array([6, -1, -3, 3, 2])
 )   
     
@@ -202,8 +207,6 @@ def test_execute_validation(plugin_fixture, case):
     assert result.axis_labels[1] == LABELS_SIN_2CHI
     assert result.shape[0] ==3 
     assert result.shape[1] == ds.shape[1]
-    
-    
     
 
 def test__ensure_dataset_instance_valid_input(plugin_fixture):
@@ -265,6 +268,48 @@ def test__ensure_axis_labels_invalid_input(plugin_fixture, invalid_axis_labels_d
         plugin_fixture._ensure_axis_labels(ds)
     assert str(excinfo.value) == expected_error_message
     
+test_cases = [case1, case2, case3, case4]
+@pytest.mark.parametrize("case", test_cases)    
+def test__calculate_diff_d_spacing_vs_sin_2chi(plugin_fixture, case):
+    plugin = plugin_fixture
+    ds = case.create_input_ds()
+    
+    result = plugin._calculate_diff_d_spacing_vs_sin_2chi(ds)
+    
+    # Validate the results
+    np.testing.assert_array_almost_equal(result[2, :], case.d_diff_expected)
+    np.testing.assert_array_almost_equal(result.axis_ranges[1], case.s_2c_values_expected)
+    assert result.data_unit == UNITS_ANGSTROM
+    assert result.data_label == 'Difference of d(+) - d(-)'
+    assert result.axis_labels[0] == '0: d-, 1: d+, 2: d(+)-d(-)'
+    assert result.axis_labels[1] == LABELS_SIN_2CHI
+    assert result.shape[0] ==3 
+    assert result.shape[1] == ds.shape[1]
+    
+    
+@pytest.fixture
+def create_dataset():
+    def factory(data, axis_labels, axis_ranges, data_unit):
+        return Dataset(
+            data,
+            axis_labels=axis_labels,
+            axis_ranges=axis_ranges,
+            data_label='d_spacing',
+            data_unit=data_unit
+        )
+    return factory
+
+@pytest.mark.parametrize("data, axis_labels, axis_ranges, data_unit, expected_error_message", [
+    (np.array([[1, 2, 3], [4, 5, 6]]), {0: LABELS_DIM0, 1: LABELS_SIN2CHI}, {0: np.arange(2), 1: np.full((3,), 0.5)}, UNITS_NANOMETER, f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. Please verify your Dataset."),
+    (np.array([[1, 2, 3], [4, 5, 6], [2.5, 3.5, 4.5]]), {0: LABELS_DIM0, 1: LABELS_SIN2CHI}, {0: np.arange(3), 1: np.full((3,), 0.5)}, 'invalid_unit', f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset."),
+])
+def test_calculate_diff_d_spacing_vs_sin_2chi_invalid_input(plugin_fixture, create_dataset, data, axis_labels, axis_ranges, data_unit, expected_error_message):
+    print('Error message:', expected_error_message)
+    ds = create_dataset(data, axis_labels, axis_ranges, data_unit)
+    with pytest.raises(UserConfigError) as excinfo:
+        plugin_fixture._calculate_diff_d_spacing_vs_sin_2chi(ds)
+    assert str(excinfo.value) == expected_error_message
+    
     
 def test_DspacingSin_2chi_params(plugin_fixture):
     
@@ -281,6 +326,7 @@ def test_DspacingSin_2chi_params(plugin_fixture):
     
     assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value == True
     assert plugin.generic_params[PARAMETER_KEEP_RESULTS].choices == [True]
+    
     
     
     

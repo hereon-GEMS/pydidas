@@ -206,3 +206,81 @@ def test_execute_validation(plugin_fixture, case):
     
     
 
+def test__ensure_dataset_instance_valid_input(plugin_fixture):
+    
+    ds = Dataset(
+        np.array([[1, 2, 3], [4, 5, 6], [2.5, 3.5, 4.5]]),
+        axis_labels={0: LABELS_DIM0, 1: LABELS_SIN2CHI},
+        axis_ranges={0: np.arange(3), 1: np.arange(3)},
+        data_label='d_spacing',
+        data_unit=UNITS_NANOMETER
+    )
+    plugin_fixture._ensure_dataset_instance(ds) 
+    
+@pytest.mark.parametrize("invalid_input", [
+    [0, 0.25, 0.5, 1],  # list input
+    "0.25",              # string input
+    0.25,                # scalar input
+    None,                # NoneType input
+])
+def test__ensure_dataset_instance_invalid_input(plugin_fixture, invalid_input):
+    with pytest.raises(TypeError, match="Input must be an instance of Dataset."):
+        plugin_fixture._ensure_dataset_instance(invalid_input)
+
+@pytest.fixture
+def valid_ds():  
+    ds = Dataset(
+        np.array([[1, 2, 3], [4, 5, 6], [2.5, 3.5, 4.5]]),
+        axis_labels={0: LABELS_DIM0, 1: LABELS_SIN2CHI},
+        axis_ranges={0: np.arange(3), 1: np.arange(3)},
+        data_label='d_spacing',
+        data_unit=UNITS_NANOMETER
+    )
+    return ds
+         
+
+def test__ensure_axis_labels_valid_input(plugin_fixture, valid_ds):
+    plugin_fixture._ensure_axis_labels(valid_ds)
+    
+
+@pytest.fixture
+def invalid_axis_labels_dataset():
+    def factory(axis_labels):
+        return Dataset(
+            np.array([[1, 2, 3], [4, 5, 6], [2.5, 3.5, 4.5]]),
+            axis_labels=axis_labels,
+            axis_ranges={0: np.arange(3), 1: np.arange(3)},
+            data_label='d_spacing',
+            data_unit=UNITS_NANOMETER
+        )
+    return factory
+
+@pytest.mark.parametrize("axis_labels, expected_error_message", [
+    ({0: '0: d-', 1: LABELS_SIN2CHI}, f"Expected axis label '{LABELS_DIM0}', but got '0: d-'"),
+    ({0: LABELS_DIM0, 1: 'sin2chi'}, f"Expected axis label '{LABELS_SIN2CHI}', but got 'sin2chi'")
+])
+def test__ensure_axis_labels_invalid_input(plugin_fixture, invalid_axis_labels_dataset, axis_labels, expected_error_message):
+    ds = invalid_axis_labels_dataset(axis_labels)
+    with pytest.raises(UserConfigError) as excinfo:
+        plugin_fixture._ensure_axis_labels(ds)
+    assert str(excinfo.value) == expected_error_message
+    
+    
+def test_DspacingSin_2chi_params(plugin_fixture):
+    
+    plugin = plugin_fixture
+    
+    assert plugin.plugin_name == 'Difference in d-spacing vs sin(2*chi)'
+    assert plugin.plugin_type == PROC_PLUGIN
+    assert plugin.basic_plugin == False
+    assert plugin.plugin_group == PROC_PLUGIN_INTEGRATED
+    assert plugin.input_data_dim == 2
+    assert plugin.output_data_dim == 2
+    assert plugin.output_data_label == '0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg'
+    assert plugin.new_dataset == True   
+    
+    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value == True
+    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].choices == [True]
+    
+    
+    

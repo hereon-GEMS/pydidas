@@ -1018,9 +1018,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         # Filling of dummy array. All rows and all columns of real data. Rest remains np.nan.      
         dummy_arr[:,0:arr.shape[1]] = arr
         
-        #Preallocation of axis ranges, non occupied values remain 1                
-        #dummy_axis_ranges= np.ones(int(np.ceil(self._config["input_shape"][0] / 2 + 1)))
-        #dummy_axis_ranges= np.ones(self._config["input_shape"][0])
+    
         #Preallocation of axis range, non occupied values remain np.nan (#TODO: Check again if 1 is not better than np.nan)
         dummy_axis_ranges= np.full(self._config["input_shape"][0], np.nan)
 

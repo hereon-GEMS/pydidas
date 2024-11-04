@@ -2271,6 +2271,15 @@ def test_execute_with_invalid_input(plugin_fixture, invalid_input):
     with pytest.raises((AttributeError, TypeError)):
         plugin.execute(invalid_input)
 
+@pytest.mark.parametrize("data, expected_error_message", [
+    (np.array(1), "Dataset has to be 1D or 2D."),  # ndim = 0
+    (np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]), "Dataset has to be 1D or 2D.")  # ndim = 3
+])
+def test_execute_invalid_ndim(plugin_fixture, data, expected_error_message):
+    ds = Dataset(data)
+    with pytest.raises(UserConfigError, match=expected_error_message):
+        plugin_fixture.execute(ds)
+
  
 @pytest.fixture
 def base_execute_dataset():

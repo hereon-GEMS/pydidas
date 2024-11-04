@@ -29,6 +29,7 @@ __all__ = ["DspacingSin_2chi"]
 
 
 import numpy as np
+from typing import Dict, Any, Tuple
 
 from pydidas.core import Dataset, UserConfigError
 
@@ -87,10 +88,10 @@ class DspacingSin_2chi(ProcPlugin):
     generic_params = _generics
     
     
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         pass
 
-    def execute(self, ds: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(self, ds: Dataset, **kwargs: Dict[str, Any]) -> Tuple[Dataset, dict]:
       
         d_output_sin_2chi_method = self._calculate_diff_d_spacing_vs_sin_2chi(ds)
         
@@ -172,16 +173,15 @@ class DspacingSin_2chi(ProcPlugin):
         if not ds.data_unit in [UNITS_NANOMETER, UNITS_ANGSTROM]:
             raise UserConfigError(f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset.")
     
-
     
-        delta_d_diff =  np.diff(ds[:2, :], axis=0)
-      
+        delta_d_diff: Dataset =  np.diff(ds[:2, :], axis=0)
+              
         #Overwrite the incoming dataset 
         ds[2,:] = delta_d_diff.data
-        ds.data_label = "Difference of d(+) - d(-)" 
-        ds.axis_labels = {0: '0: d-, 1: d+, 2: d(+)-d(-)', 1: LABELS_SIN_2CHI} 
+        ds.data_label: str = "Difference of d(+) - d(-)" 
+        ds.axis_labels: Dict[int, str] = {0: '0: d-, 1: d+, 2: d(+)-d(-)', 1: LABELS_SIN_2CHI} 
         #TODO: needs adjustment for the low energy case in second dimension
-        ds.axis_ranges = { 0:np.arange(3) , 1: self._calculate_sin_2chi_values(ds.axis_ranges[1])} 
+        ds.axis_ranges: Dict[int, np.ndarray] = { 0:np.arange(3) , 1: self._calculate_sin_2chi_values(ds.axis_ranges[1])} 
         
         return ds
     

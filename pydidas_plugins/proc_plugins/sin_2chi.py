@@ -31,7 +31,6 @@ __all__ = ["DspacingSin_2chi"]
 import numpy as np
 
 from pydidas.core import Dataset, UserConfigError
-from typing import List, Tuple, Dict
 
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
@@ -177,7 +176,7 @@ class DspacingSin_2chi(ProcPlugin):
         if not ds.data_unit in [UNITS_NANOMETER, UNITS_ANGSTROM]:
             raise UserConfigError(f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset.")
     
-        if ds.shape[1] != ds.axis_ranges[1].shape[1]:
+        if ds.shape[1] != ds.axis_ranges[1].shape[0]:
             raise UserConfigError("The number of sin^2(chi) values must match the number of columns in the dataset.")
     
         delta_d_diff =  np.diff(ds[:2, :], axis=0)

@@ -32,7 +32,7 @@ import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import Dataset
+from pydidas.core import Dataset, Parameter, ParameterCollection
 from pydidas.plugins import ProcPlugin
 
 
@@ -42,13 +42,22 @@ class DummyProcNewDataset(ProcPlugin):
     """
 
     plugin_name = "Dummy processing Plugin with new Dataset"
+    default_params = ParameterCollection(
+        Parameter(
+            "_output_shape",
+            tuple,
+            (1,),
+            dtype=tuple,
+            subtype=int,
+            tooltip="The shape of the output data.",
+        )
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._preexecuted = False
         self._executed = False
-        self._given_output_shape = kwargs.get("output_shape", (1,))
-        self._config["result_shape"] = self._given_output_shape
+        self.set_param_value("_output_shape", kwargs.get("output_shape", (1,)))
 
     def __reduce__(self):
         """
@@ -91,7 +100,7 @@ class DummyProcNewDataset(ProcPlugin):
             dict keys for rerference.
         """
         self._executed = True
-        _data = np.zeros(self._given_output_shape) + np.mean(data)
+        _data = np.zeros(self.get_param_value("_output_shape")) + np.mean(data)
         return _data, kwargs
 
     def pre_execute(self):
@@ -105,4 +114,4 @@ class DummyProcNewDataset(ProcPlugin):
         """
         Set the result shape based on the given output_shapae.
         """
-        self._config["result_shape"] = self._given_output_shape
+        self._config["result_shape"] = self.get_param_value("_output_shape")

@@ -87,9 +87,6 @@ class DspacingSin_2chi(ProcPlugin):
     _generics[PARAMETER_KEEP_RESULTS].choices = [True]
     generic_params = _generics
     
-    
-    def pre_execute(self) -> None:
-        pass
 
     def execute(self, ds: Dataset, **kwargs: Dict[str, Any]) -> Tuple[Dataset, dict]:
       

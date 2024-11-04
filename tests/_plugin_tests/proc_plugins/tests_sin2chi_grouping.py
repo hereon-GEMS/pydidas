@@ -621,6 +621,18 @@ def test__ds_slicing_1d_validation(plugin_fixture, base_dataset_one_fit_paramete
     assert ds.data_unit == UNITS_ANGSTROM
     assert len(ds.axis_labels) == 1
     
+
+@pytest.mark.parametrize("chi, should_raise_error", [
+    (np.arange(3000), False),  # Valid case, exactly at the limit
+    (np.arange(2999), False),  # Valid case, below the limit
+    (np.arange(3001), True),   # Invalid case, above the limit
+])
+def test__ensure_npt_azim_limit(plugin_fixture, chi, should_raise_error):
+    if should_raise_error:
+        with pytest.raises(UserConfigError, match=f"Number of azimuthal angles exceeds the limit of {NPT_AZIM_LIMIT}."):
+            plugin_fixture._ensure_npt_azim_limit(chi)
+    else:
+        plugin_fixture._ensure_npt_azim_limit(chi)  # Should not raise an error
       
 
 @pytest.fixture

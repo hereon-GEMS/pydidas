@@ -140,9 +140,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
     def __init__(self):
         super().__init__()
         self.config = DictViaAttrs(self._config)
-            
-    def pre_execute(self):
-        pass
 
     def execute(self, ds: Dataset, **kwargs: dict)  -> tuple[Dataset, dict]:
         

@@ -320,12 +320,10 @@ class Scan(ObjectWithParameterCollection):
         int
             The total number of images.
         """
-        return np.prod(
-            [
-                self.get_param_value(f"scan_dim{_i}_n_points")
-                for _i in range(self.get_param_value("scan_dim"))
-            ]
+        _n = np.prod(
+            [self.get_param_value(f"scan_dim{_i}_n_points") for _i in range(self.ndim)]
         )
+        return int(_n)
 
     @property
     def ndim(self) -> int:

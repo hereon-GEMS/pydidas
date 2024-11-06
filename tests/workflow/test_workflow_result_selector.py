@@ -50,11 +50,9 @@ SAVER = WorkflowResultIoMeta
 class TestWorkflowResultSelector(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        ScanContext._reset_instance()
-        WorkflowResultsContext._reset_instance()
-        global SCAN, RES
-        SCAN = ScanContext()
-        RES = WorkflowResultsContext()
+        TREE.clear()
+        SCAN.restore_all_defaults(True)
+        RES.clear_all_results()
         for _cls in (DummyLoader, DummyProc, DummyProcNewDataset):
             PLUGINS.check_and_register_class(_cls)
 
@@ -67,7 +65,6 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.set_up_scan()
         self.set_up_tree()
         RES.clear_all_results()
-
         self._tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -104,7 +101,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         TREE.prepare_execution()
 
     def populate_WorkflowResults(self):
-        RES.update_shapes_from_scan_and_workflow()
+        RES.prepare_new_results()
         _results = {
             1: Dataset(
                 np.random.random(self._result1_shape),
@@ -129,10 +126,10 @@ class TestWorkflowResultSelector(unittest.TestCase):
             ),
         }
         RES.store_results(0, _results)
-        RES._WorkflowResults__composites[1][:] = (
+        RES._composites[1][:] = (
             np.random.random(self._scan_n + self._result1_shape) + 0.0001
         )
-        RES._WorkflowResults__composites[2][:] = (
+        RES._composites[2][:] = (
             np.random.random(self._scan_n + self._result2_shape) + 0.0001
         )
 

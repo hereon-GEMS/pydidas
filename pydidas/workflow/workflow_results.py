@@ -92,115 +92,114 @@ class WorkflowResults(QtCore.QObject):
         }
         self.clear_all_results()
 
-    def prepare_new_results(self):
-        """
-        Prepare the WorkflowResults for new results.
-        """
-        self.clear_all_results()
-        _dim = self._SCAN.get_param_value("scan_dim")
-        _result_ids = [
-            _node.node_id for _node in self._TREE.get_all_nodes_with_results()
-        ]
-        for _node_id in _result_ids:
-            _plugin = self._TREE.nodes[_node_id].plugin
-            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
-            self._config["data_labels"][_node_id] = _plugin.output_data_label
-            self._config["data_units"][_node_id] = _plugin.output_data_unit
-            self._config["plugin_names"][_node_id] = _plugin.plugin_name
-            self._config["result_titles"][_node_id] = _plugin.result_title
-        self._config["scan_ndim"] = self._SCAN.get_param_value("scan_dim")
-        self._config["scan_npoints"] = self._SCAN.n_points
-        self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
-        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
-        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
-        self._config["frozen_TREE"].update_from_tree(self._TREE)
-        self._config["frozen_TREE"].prepare_execution()
-
-    def update_shapes_from_scan_and_workflow(self):
-        """
-        Update the shape of the results from the classes singletons' metadata.
-        """
-        self.clear_all_results()
-        _dim = self._SCAN.get_param_value("scan_dim")
-        _results = self._TREE.get_all_result_shapes()
-        for _node_id, _shape in _results.items():
-            _plugin = self._TREE.nodes[_node_id].plugin
-            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
-            self._config["data_labels"][_node_id] = _plugin.output_data_label
-            self._config["data_units"][_node_id] = _plugin.output_data_unit
-            self._config["plugin_names"][_node_id] = _plugin.plugin_name
-            self._config["result_titles"][_node_id] = _plugin.result_title
-            self._config["shapes"][_node_id] = self._SCAN.shape + _shape
-            _dset = Dataset(np.empty(self._SCAN.shape + _shape, dtype=np.float32))
-            _dset[:] = np.nan
-            for index in range(_dim):
-                _label, _unit, _range = self._SCAN.get_metadata_for_dim(index)
-                _dset.update_axis_label(index, _label)
-                _dset.update_axis_unit(index, _unit)
-                _dset.update_axis_range(index, _range)
-            self.__composites[_node_id] = _dset
-
-        self._config["scan_ndim"] = self._SCAN.get_param_value("scan_dim")
-        self._config["scan_npoints"] = self._SCAN.n_points
-        self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
-        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
-        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
-        self._config["frozen_TREE"].update_from_tree(self._TREE)
-        self._config["frozen_TREE"].prepare_execution()
-
     def clear_all_results(self):
         """
         Clear all internally stored results and reset the instance attributes.
         """
-        self.__composites = {}
+        self._composites = {}
         self.__source_hash = -1
         for _key in (
             "shapes",
             "plugin_names",
             "result_titles",
             "node_labels",
-            "data_labels",
-            "data_units",
+            "plugin_res_metadata",
         ):
             self._config[_key] = {}
-        for _key in ("metadata_complete", "exported"):
+        for _key in ("metadata_complete", "composites_created", "shapes_set"):
             self._config[_key] = False
 
-    def update_frame_metadata(self, metadata: dict):
+    def prepare_new_results(self):
         """
-        Manually supply metadata for the non-scan dimensions of the results
-        and update the stored metadata.
+        Prepare the WorkflowResults for new results.
+        """
+        self.clear_all_results()
+        for _node in self._TREE.get_all_nodes_with_results():
+            _node_id = _node.node_id
+            _plugin = self._TREE.nodes[_node_id].plugin
+            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
+            self._config["plugin_names"][_node_id] = _plugin.plugin_name
+            self._config["result_titles"][_node_id] = _plugin.result_title
+            self._config["plugin_res_metadata"][_node_id] = {}
+        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE), hash(self._EXP)))
+        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
+        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
+        self._config["frozen_TREE"].update_from_tree(self._TREE)
+        self._config["frozen_TREE"].prepare_execution()
+
+    def store_frame_shapes(self, shapes: dict):
+        """
+        Store the shapes of the results in the WorkflowResults.
 
         Parameters
         ----------
-        metadata : dict
+        shapes : dict
+            The shapes in form of a dictionary with nodeID keys and shape
+            values.
+        """
+        if shapes.keys() != self._config["plugin_res_metadata"].keys():
+            raise UserConfigError(
+                "The provided node IDs of the shapes do not match the node IDs "
+                "given during the preparation of the WorkflowResults."
+            )
+        _shapes = {
+            _key: self._config["frozen_SCAN"].shape + tuple(_shape)
+            for _key, _shape in shapes.items()
+        }
+        self._config["shapes"] = _shapes
+        self._config["shapes_set"] = True
+
+    def store_frame_metadata(self, metadata: dict[int, dict]):
+        """
+        Store the metadata for plugin results.
+
+        Parameters
+        ----------
+        metadata : dict[int, dict]
             The metadata in form of a dictionary with nodeID keys and dict
-            items containing the axis_units, -_labels, and -_scales keys with
+            items containing the axis_units, -_labels, and -_ranges keys with
             the associated data.
         """
+        _scan_metadata = [
+            self._config["frozen_SCAN"].get_metadata_for_dim(i)
+            for i in range(self._config["frozen_SCAN"].ndim)
+        ]
+        _scan_ax_labels = [_item[0] for _item in _scan_metadata]
+        _scan_ax_units = [_item[1] for _item in _scan_metadata]
+        _scan_ax_ranges = [_item[2] for _item in _scan_metadata]
         for node_id, _meta in metadata.items():
-            _dim_offset = self._config["scan_ndim"]
-            for _key, _item in _meta.items():
-                if isinstance(_item, dict):
-                    _update_method = getattr(
-                        self.__composites[node_id], f"update_{_key[:-1]}"
-                    )
-                    for _dim, _val in _item.items():
-                        _update_method(_dim + _dim_offset, _val)
-                else:
-                    setattr(self.__composites[node_id], _key, _item)
-                    self._config[_key + "s"][node_id] = _item
+            _curr_metadata = self._config["plugin_res_metadata"].get(node_id, {})
+            _curr_metadata["axis_labels"] = dict(
+                enumerate(_scan_ax_labels + list(_meta["axis_labels"].values()))
+            )
+            _curr_metadata["axis_units"] = dict(
+                enumerate(_scan_ax_units + list(_meta["axis_units"].values()))
+            )
+            _curr_metadata["axis_ranges"] = dict(
+                enumerate(_scan_ax_ranges + list(_meta["axis_ranges"].values()))
+            )
+            _curr_metadata["data_label"] = _meta.get("data_label", "")
+            _curr_metadata["data_unit"] = _meta.get("data_unit", "")
+            self._config["plugin_res_metadata"][node_id] = _curr_metadata
+            if node_id not in self._config["shapes"]:
+                self._config["shapes"][node_id] = self._config[
+                    "frozen_SCAN"
+                ].shape + tuple(
+                    [_range.size for _range in _meta["axis_ranges"].values()]
+                )
+            if node_id in self._composites:
+                self._composites[node_id].axis_labels = _curr_metadata["axis_labels"]
+                self._composites[node_id].axis_units = _curr_metadata["axis_units"]
+                self._composites[node_id].axis_ranges = _curr_metadata["axis_ranges"]
+                self._composites[node_id].data_label = _curr_metadata["data_label"]
+                self._composites[node_id].data_unit = _curr_metadata["data_unit"]
+        self._config["shapes_set"] = True
         self._config["metadata_complete"] = True
-        ResultSaver.push_frame_metadata_to_active_savers(_meta)
+        ResultSaver.push_metadata_to_active_savers(_meta, self._config["frozen_SCAN"])
 
-    def store_results(self, index: int, results: dict):
+    def store_results(self, index: int, results: dict[int, Dataset]):
         """
         Store results from one scan point in the WorkflowResults.
-
-        Note: If write_to_disk is enabled, please be advised that this may
-        slow down the WorkflowResults
 
         Parameters
         ----------
@@ -211,36 +210,33 @@ class WorkflowResults(QtCore.QObject):
             <node_id: array>.
         """
         if not self._config["metadata_complete"]:
-            self.__update_composite_metadata(results)
+            self.store_frame_metadata(
+                {_node_id: _data.property_dict for _node_id, _data in results.items()}
+            )
+        if not self._config["composites_created"]:
+            self._create_composites()
         _scan_index = self._SCAN.get_index_position_in_scan(index)
         for _key, _val in results.items():
-            self.__composites[_key][_scan_index] = _val
+            self._composites[_key][_scan_index] = _val
         self.new_results.emit()
 
-    def __update_composite_metadata(self, results: dict):
+    def _create_composites(self):
         """
-        Update the metadata of the composites with the
-
-        Parameters
-        ----------
-        results : dict
-            The results for a single processing step.
+        Create the composite datasets for all node results.
         """
-        for node_id, result in results.items():
-            if not isinstance(result, Dataset):
-                continue
-            _dim_offset = self._config["scan_ndim"]
-            for _dim in range(result.ndim):
-                self.__composites[node_id].update_axis_label(
-                    _dim + _dim_offset, result.axis_labels[_dim]
-                )
-                self.__composites[node_id].update_axis_unit(
-                    _dim + _dim_offset, result.axis_units[_dim]
-                )
-                self.__composites[node_id].update_axis_range(
-                    _dim + _dim_offset, result.axis_ranges[_dim]
-                )
-        self._config["metadata_complete"] = True
+        if not self._config["shapes_set"]:
+            raise UserConfigError(
+                "The shapes of the results have not been set. Please set the shapes "
+                "before storing results."
+            )
+        self._composites = {
+            _key: Dataset(
+                np.empty(_shape, dtype=np.float32),
+                **self._config["plugin_res_metadata"].get(_key, {}),
+            )
+            for _key, _shape in self._config["shapes"].items()
+        }
+        self._config["composites_created"] = True
 
     @property
     def shapes(self) -> dict:
@@ -277,7 +273,7 @@ class WorkflowResults(QtCore.QObject):
         dict
             A dictionary with entries of the form <node_id: label>
         """
-        return self._config["data_labels"].copy()
+        return {_key: _item.data_label for _key, _item in self._composites.items()}
 
     @property
     def data_units(self) -> dict:
@@ -290,7 +286,7 @@ class WorkflowResults(QtCore.QObject):
         dict
             A dictionary with entries of the form <node_id: label>
         """
-        return self._config["data_units"].copy()
+        return {_key: _item.data_unit for _key, _item in self._composites.items()}
 
     @property
     def ndims(self) -> dict:
@@ -300,9 +296,9 @@ class WorkflowResults(QtCore.QObject):
         Returns
         -------
         dict
-            A dictionary with entries of the form <node_id: n_dim>
+            A dictionary with entries of the form <node_id: ndim>
         """
-        return {_key: _item.ndim for _key, _item in self.__composites.items()}
+        return {_key: _item.ndim for _key, _item in self._composites.items()}
 
     @property
     def frozen_tree(self) -> WorkflowTree:
@@ -350,7 +346,7 @@ class WorkflowResults(QtCore.QObject):
         int
             The hash value of the combined input data.
         """
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
+        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE), hash(self._EXP)))
         return self.__source_hash
 
     @property
@@ -381,7 +377,11 @@ class WorkflowResults(QtCore.QObject):
             The dictionary with the ranges with dimension keys and ranges
             values.
         """
-        return self.__composites[node_id].axis_ranges.copy()
+        if node_id not in self._config["plugin_res_metadata"]:
+            raise UserConfigError(
+                "The selected node ID does not have any results associated with it."
+            )
+        return self._config["plugin_res_metadata"].get(node_id).get("axis_ranges")
 
     def get_results(self, node_id: int) -> Dataset:
         """
@@ -394,17 +394,25 @@ class WorkflowResults(QtCore.QObject):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The combined results of all frames for a specific node.
         """
-        return self.__composites[node_id]
+        if node_id not in self._composites:
+            raise UserConfigError(
+                f"The selected node ID `{node_id}`does not have any results "
+                "associated with it."
+            )
+        return self._composites[node_id]
 
     def get_results_for_flattened_scan(
         self, node_id: int, squeeze: bool = False
     ) -> Dataset:
         """
-        Get the combined results for the requested node_id with all scan
-        dimensions flatted into a timeline
+        Get the results for the requested node_id with all scan dimensions flatted.
+
+        This method will essentially flatten all scan dimensions into a timeline for
+        convenience. The squeeze Parameter can be used to remove all dimensions of
+        length 1 from the data.
 
         Parameters
         ----------
@@ -417,14 +425,14 @@ class WorkflowResults(QtCore.QObject):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The combined results of all frames for a specific node.
         """
-        _data = self.__composites[node_id].copy()
+        _data = self._composites[node_id].copy()
         _data.flatten_dims(
-            *range(self._config["scan_ndim"]),
+            *range(self._config["frozen_SCAN"].ndim),
             new_dim_label="Chronological scan points",
-            new_dim_range=np.arange(self._config["scan_npoints"]),
+            new_dim_range=np.arange(self._config["frozen_SCAN"].n_points),
         )
         if squeeze:
             return _data.squeeze()
@@ -433,72 +441,53 @@ class WorkflowResults(QtCore.QObject):
     def get_result_subset(
         self,
         node_id: int,
-        slices: tuple,
+        *slices: tuple[Union[int, slice]],
         flattened_scan_dim: bool = False,
         squeeze: bool = False,
     ) -> Dataset:
         """
-        Get a slices subset of a node_id result.
+        Get a sliced subset of a node_id result.
+
+        Note that numpy's slicing always squeezes dimensions with a length of 1 if
+        they are given as integers, or slices. Iterable objects keep a
+        dimension of length 1.
 
         Parameters
         ----------
         node_id : int
             The node ID for which results should be returned.
-        slices : tuple
+        *slices : tuple[Union[int, slice]]
             The tuple used for slicing/indexing the np.ndarray.
         flattened_scan_dim : bool, optional
             Keyword to process flattened Scan dimensions. If True, the Scan
             is assumed to be 1-d only and the first slice item will be used
             for the Scan whereas the remaining slice items will be used for
             the resulting data. The default is False.
-        squeeze : bool
-            Keyword to squeeze dimensions of length 0 or 1. The default is False.
+        squeeze : bool, optional
+            Keyword to toggle squeezing of data dimensions of the final dataset.
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The subset of the results.
         """
-        _data = self.__composites[node_id].copy()
-
-        def __dim_index(i):
-            return (
-                len(slices)
-                - (i + 1)
-                + flattened_scan_dim * (self._config["scan_ndim"] - 1)
-            )
-
-        for _dim, _slice in enumerate(slices[flattened_scan_dim:][::-1]):
-            if isinstance(_slice, slice):
-                _slice = np.r_[_slice]
-            if (
-                isinstance(_slice, int)
-                or (isinstance(_slice, np.ndarray) and _slice.size == 1)
-            ) and ";" in _data.axis_labels[__dim_index(_dim)]:
-                try:
-                    _label = _data.axis_labels[__dim_index(_dim)].split(";")[_slice[0]]
-                    _label = _label if ":" not in _label else _label.split(":")[1]
-                    _data.update_axis_label(__dim_index(_dim), _label)
-                    _data.data_label = _label
-                except IndexError:
-                    pass
-            _data = np.take(_data, _slice, __dim_index(_dim))
-
         if flattened_scan_dim:
-            _data.flatten_dims(
-                *range(self._config["scan_ndim"]),
-                new_dim_label="Chronological scan points",
-                new_dim_range=np.arange(self._config["scan_npoints"]),
-            )
-            _data = _data[slices[0]]
-
+            _data = self.get_results_for_flattened_scan(node_id)
+        else:
+            _data = self._composites[node_id].copy()
+        if set(type(_slice) for _slice in slices).issubset({int, slice}):
+            _data = _data[slices]
+        else:
+            for _index, _slice in enumerate(slices[::-1]):
+                _dim = len(slices) - _index - 1
+                _data = _data.take(_slice, axis=_dim)
         if squeeze:
             return _data.squeeze()
         return _data
 
     def get_result_metadata(
         self, node_id: int, use_scan_timeline: bool = False
-    ) -> dict:
+    ) -> dict[str, object]:
         """
         Get the stored metadata for the results of the specified node.
 
@@ -511,38 +500,31 @@ class WorkflowResults(QtCore.QObject):
 
         Returns
         -------
-        dict
-            A dictionary with the metadata stored using the "axis_labels",
-            "axis_ranges", "axis_units" and "metadata" keys.
+        dict[str, object]
+            A dictionary with the metadata stored in the Dataset plus the shape
+            and `node_label`.
         """
-        if node_id not in self.__composites:
+        if node_id not in self._composites:
             raise UserConfigError(
                 "The selected node ID does not have any results associated with it."
             )
+        _metadata = self._composites[node_id].property_dict
+        _metadata["node_label"] = self._config["node_labels"].get(node_id, "")
         if not use_scan_timeline:
-            return {
-                "axis_labels": self.__composites[node_id].axis_labels,
-                "axis_units": self.__composites[node_id].axis_units,
-                "axis_ranges": self.__composites[node_id].axis_ranges,
-                "metadata": self.__composites[node_id].metadata,
-                "shape": self.__composites[node_id].shape,
-                "node_label": self._config["node_labels"].get(node_id, ""),
-            }
-        _info = {}
-        for _key in ["axis_labels", "axis_units", "axis_ranges"]:
-            _values = list(getattr(self.__composites[node_id], _key).values())
-            _info[_key] = _values[self._config["scan_ndim"] :]
-        _info["axis_labels"].insert(0, "Chronological scan points")
-        _info["axis_units"].insert(0, "")
-        _info["axis_ranges"].insert(0, np.arange(self._config["scan_npoints"]))
-        return {
-            _key: dict(zip(np.arange(len(_info[_key])), _info[_key]))
-            for _key in ["axis_labels", "axis_units", "axis_ranges"]
-        } | {
-            "metadata": self.__composites[node_id].metadata,
-            "shape": tuple(_arr.size for _arr in _info["axis_ranges"]),
-            "node_label": self._config["node_labels"].get(node_id, ""),
-        }
+            _metadata["shape"] = self._composites[node_id].shape
+            return _metadata
+        _scan_ndim = self._config["frozen_SCAN"].ndim
+        _metadata["shape"] = (self._config["frozen_SCAN"].n_points,) + self._composites[
+            node_id
+        ].shape[_scan_ndim:]
+        for _key, _entry in [
+            ["axis_labels", "Chronological scan points"],
+            ["axis_units", ""],
+            ["axis_ranges", np.arange(self._config["frozen_SCAN"].n_points)],
+        ]:
+            _entries = [_entry] + list(_metadata[_key].values())[_scan_ndim:]
+            _metadata[_key] = dict(enumerate(_entries))
+        return _metadata
 
     def save_results_to_disk(
         self,
@@ -580,9 +562,9 @@ class WorkflowResults(QtCore.QObject):
             save_dir, ",".join(save_formats), overwrite, single_node=node_id
         )
         if node_id is None:
-            _res = self.__composites
+            _res = self._composites
         else:
-            _res = {node_id: self.__composites[node_id]}
+            _res = {node_id: self._composites[node_id]}
         ResultSaver.export_full_data_to_active_savers(
             _res, scan_context=self._config["frozen_SCAN"]
         )
@@ -620,28 +602,28 @@ class WorkflowResults(QtCore.QObject):
             If the directory exists and is not empty and overwrite is not
             enabled.
         """
+        if not self._config["shapes_set"] or not self._config["metadata_complete"]:
+            raise UserConfigError(
+                "The shapes and metadata have not been set. Cannot save results yet."
+            )
+        save_dir = Path(save_dir) if isinstance(save_dir, str) else save_dir
         save_formats = [s.strip() for s in re.split("&|/|,", save_formats)]
-        _name = self._config["scan_title"]
+        _name = self._config["frozen_SCAN"].get_param_value("scan_title")
         ResultSaver.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
-            _keys = list(self.shapes.keys())
+            _keys = list(self._composites.keys())
         else:
             _keys = [single_node]
         _node_info = {
             _id: {
                 "shape": self._config["shapes"][_id],
                 "node_label": self._config["node_labels"][_id],
-                "data_label": self._config["data_labels"][_id],
-                "data_unit": self._config["data_units"][_id],
                 "plugin_name": self._config["plugin_names"][_id],
             }
             for _id in _keys
         }
-        _labels = {_id: _node_info[_id]["node_label"] for _id in _node_info}
-        _names = ResultSaver.get_filenames_from_active_savers(_labels)
-        _exist_check = [
-            os.path.exists(os.path.join(save_dir, _name)) for _name in _names
-        ]
+        _names = ResultSaver.get_filenames_from_active_savers(self.node_labels)
+        _exist_check = [save_dir.joinpath(_name).is_file() for _name in _names]
         if True in _exist_check and not overwrite:
             raise UserConfigError(
                 f'The specified directory "{save_dir}" exists and is not empty. Please '
@@ -675,7 +657,7 @@ class WorkflowResults(QtCore.QObject):
             from the nodes. The default is True.
         """
         _new_choices = ["No selection"] if add_no_selection_entry else []
-        _new_choices.extend(list(self._config["result_titles"].values()))
+        _new_choices.extend(list(self.result_titles.values()))
         param.update_value_and_choices(_new_choices[0], _new_choices)
 
     def get_node_result_metadata_string(
@@ -703,17 +685,8 @@ class WorkflowResults(QtCore.QObject):
         str :
             The formatted string with a representation of all the metadata.
         """
-        _scandim = self._config["scan_ndim"]
         _metadata = self.get_result_metadata(node_id, use_scan_timeline)
-        if use_scan_timeline:
-            _ax_points = list(self.shapes[node_id])[_scandim:]
-            _ax_points.insert(0, self._config["scan_npoints"])
-            _ax_types = ["(scan)"] + ["(data)"] * (self.ndims[node_id] - _scandim)
-        else:
-            _ax_points = list(self.shapes[node_id])
-            _ax_types = ["scan"] * _scandim + ["(data)"] * (
-                self.ndims[node_id] - _scandim
-            )
+        _nscan = 1 if use_scan_timeline else self._config["frozen_SCAN"].ndim
         _print_info = {
             "axis_labels": list(_metadata["axis_labels"].values()),
             "axis_units": list(_metadata["axis_units"].values()),
@@ -721,22 +694,25 @@ class WorkflowResults(QtCore.QObject):
                 utils.get_range_as_formatted_string(_range)
                 for _range in _metadata["axis_ranges"].values()
             ),
-            "axis_types": _ax_types,
-            "axis_points": _ax_points,
+            "axis_types": (
+                ["(scan)"] * _nscan + ["(data)"] * (self.ndims[node_id] - _nscan)
+            ),
+            "axis_points": list(_metadata["shape"]),
         }
         if squeeze_results:
             _squeezed_dims = np.where(np.asarray(_print_info["axis_points"]) == 1)[0]
-            for _key in _print_info:
-                _print_info[_key] = list(np.delete(_print_info[_key], _squeezed_dims))
-        _data_label = self._config["data_labels"][node_id] + (
-            f" / {self._config['data_units'][node_id]}"
-            if len(self._config["data_units"][node_id]) > 0
-            else ""
-        )
+            _print_info = {
+                _key: [
+                    _item
+                    for _index, _item in enumerate(_print_info[_key])
+                    if _index not in _squeezed_dims
+                ]
+                for _key in _print_info
+            }
         _node_info = (
             self._config["plugin_names"][node_id]
             + ":\n\n"
-            + f"Data: {_data_label}\n\n"
+            + f"Data: {self._composites[node_id].data_description}\n\n"
             + "".join(
                 (
                     f"Axis #{_dim:02d} {_print_info['axis_types'][_dim]}:\n"
@@ -748,8 +724,8 @@ class WorkflowResults(QtCore.QObject):
                 for _dim, _ in enumerate(_print_info["axis_labels"])
             )
         )
-        if self.__composites[node_id].size == 1:
-            _val = np.atleast_1d(self.__composites[node_id].squeeze())[0]
+        if self._composites[node_id].size == 1:
+            _val = np.atleast_1d(self._composites[node_id].squeeze())[0]
             _node_info += f"Data zero-dimensional\n  Value: {_val:.6f}"
         return _node_info
 
@@ -763,42 +739,20 @@ class WorkflowResults(QtCore.QObject):
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()
-        _data, _node_info, _scan, _exp, _tree = ResultSaver.import_data_from_directory(
-            directory
-        )
-        self._config.update(
-            {
-                "shapes": {_key: _item.shape for _key, _item in _data.items()},
-                "node_labels": {
-                    _id: _item["node_label"] for _id, _item in _node_info.items()
-                },
-                "data_labels": {
-                    _id: _dataset.data_label for _id, _dataset in _data.items()
-                },
-                "data_units": {
-                    _id: _dataset.data_unit for _id, _dataset in _data.items()
-                },
-                "plugin_names": {
-                    _id: _item["plugin_name"] for _id, _item in _node_info.items()
-                },
-                "result_titles": {
-                    _id: _item["result_title"] for _id, _item in _node_info.items()
-                },
-                "metadata_complete": True,
+        _import = ResultSaver.import_data_from_directory(directory)
+        _data, _node_info, _scan, _exp, _tree = _import[:]
+        for _key in ["shape", "node_label", "plugin_name", "result_title"]:
+            self._config[f"{_key}s"] = {
+                _id: _item[_key] for _id, _item in _node_info.items()
             }
-        )
-        self.__composites = _data
+        self._composites = _data
         if _data != {}:
             self._SCAN.update_from_scan(_scan)
             self._EXP.update_from_diffraction_exp(_exp)
             self._TREE.update_from_tree(_tree)
-        self._config["scan_ndim"] = self._SCAN.get_param_value("scan_dim")
-        self._config["scan_npoints"] = self._SCAN.n_points
-        self._config["scan_title"] = self._SCAN.get_param_value("scan_title")
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
-        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
-        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
-        self._config["frozen_TREE"].update_from_tree(self._TREE)
+            self._config["frozen_SCAN"].update_from_scan(self._SCAN)
+            self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
+            self._config["frozen_TREE"].update_from_tree(self._TREE)
 
 
 WorkflowResultsContext = SingletonFactory(WorkflowResults)

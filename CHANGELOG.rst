@@ -36,6 +36,8 @@ Bugfixes
 - Fixed an issue in the WorkflowNode which allowed accessing outdated results.
 - Fixed an issue when preparing to run an empty Workflow.
 - Fixed an issue when restoring the GUI to a different screen in multiscreen systems.
+- Fixed an issue with inspecting detailed results for fit plugins when the first 
+  fit point had an invalid result (e.g. peak intensity too low).
 
 
 v24.09.19

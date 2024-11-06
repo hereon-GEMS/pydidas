@@ -531,7 +531,7 @@ class BaseFitPlugin(ProcPlugin):
         """
         if len(bg_params) == 0:
             return {
-                "n_plots": 1,
+                "n_plots": 3,
                 "plot_titles": {0: "data"},
                 "plot_ylabels": {0: "intensity / a.u."},
                 "metadata": "",
@@ -543,7 +543,7 @@ class BaseFitPlugin(ProcPlugin):
         if len(bg_params) == 2:
             _bg += self._data_x * bg_params[1]
         return {
-            "n_plots": 2,
+            "n_plots": 3,
             "plot_titles": {0: "data and background", 1: "background-corrected data"},
             "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
             "metadata": "",

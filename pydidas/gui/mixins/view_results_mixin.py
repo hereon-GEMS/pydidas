@@ -176,7 +176,7 @@ class ViewResultsMixin:
         _node = self._config["active_node"]
         _data = self._RESULTS.get_result_subset(
             _node,
-            self._config["data_slices"],
+            *self._config["data_slices"],
             flattened_scan_dim=self._config["data_use_timeline"],
             squeeze=True,
         )

@@ -84,7 +84,7 @@ class TestBaseInputPlugin1d(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        ScanContext._reset_instance()
+        SCAN.restore_all_defaults(True)
         shutil.rmtree(cls._testpath)
 
     def setUp(self):

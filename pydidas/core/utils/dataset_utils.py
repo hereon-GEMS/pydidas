@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = [
     "FLATTEN_DIM_DEFAULTS",
     "METADATA_KEYS",
+    "get_default_property_dict",
     "dataset_default_attribute",
     "update_dataset_properties_from_kwargs",
     "get_number_of_entries",
@@ -92,6 +93,31 @@ def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset
     if not set(kwargs.keys()).issubset(set(METADATA_KEYS)):
         warnings.warn("Unknown keys in the input dictionary. Please check the inputs.")
     return obj
+
+
+def get_default_property_dict(shape: tuple[int], full_properties: bool = False) -> dict:
+    """
+    Get the default metadata property dictionary for a Dataset.
+
+    Parameters
+    ----------
+    shape : tuple[int]
+        The shape of the Dataset.
+    full_properties : bool, optional
+        Flag to get the full metadata dictionary. If False, the keys for
+        `metadata` and `_get_item_key` are omitted. The default is False.
+
+    Returns
+    -------
+    dict
+        The default metadata dictionary.
+    """
+    _meta = {}
+    for _key in METADATA_KEYS:
+        if not full_properties and _key in ["metadata", "_get_item_key"]:
+            continue
+        _meta[_key] = dataset_default_attribute(_key, shape)
+    return _meta
 
 
 def dataset_default_attribute(key: str, shape: tuple[int]) -> Union[str, dict]:

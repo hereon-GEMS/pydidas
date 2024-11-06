@@ -27,8 +27,6 @@ __status__ = "Production"
 import multiprocessing as mp
 import shutil
 import tempfile
-import threading
-import time
 import unittest
 from numbers import Integral
 from pathlib import Path
@@ -54,40 +52,6 @@ SCAN = ScanContext()
 TREE = WorkflowTree()
 RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
-
-
-class TestLock(threading.Thread):
-    def __init__(self, memory_addresses, n_buffer, array_shapes):
-        super().__init__()
-        self._mem = memory_addresses
-        self._n_buffer = n_buffer
-        self._shapes = array_shapes
-        self._shared_arrays = {}
-        for _key, _shape in array_shapes.items():
-            _share = memory_addresses[_key]
-            _arr_shape = (n_buffer,) + _shape
-            self._shared_arrays[_key] = np.frombuffer(
-                _share.get_obj(), dtype=np.float32
-            ).reshape(_arr_shape)
-        self._shared_arrays["flag"] = np.frombuffer(
-            memory_addresses["flag"].get_obj(), dtype=np.int32
-        )
-
-    def run(self):
-        self._mem["flag"].acquire()
-        self._shared_arrays["flag"][:] = 1
-        self._mem["flag"].release()
-        time.sleep(0.1)
-        self._mem["flag"].acquire()
-        self._shared_arrays["flag"][:] = 0
-        self._mem["flag"].release()
-
-
-def generate_tree():
-    TREE.clear()
-    TREE.create_and_add_node(unittest_objects.DummyLoader())
-    TREE.create_and_add_node(unittest_objects.DummyProc())
-    TREE.create_and_add_node(unittest_objects.DummyProc(), parent=TREE.root)
 
 
 class TestExecuteWorkflowApp(unittest.TestCase):
@@ -119,7 +83,10 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def setUp(self):
         RESULT_SAVER.set_active_savers_and_title([])
         RESULTS.clear_all_results()
-        generate_tree()
+        TREE.clear()
+        TREE.create_and_add_node(unittest_objects.DummyLoader())
+        TREE.create_and_add_node(unittest_objects.DummyProc())
+        TREE.create_and_add_node(unittest_objects.DummyProc(), parent=TREE.root)
         self.reset_scan_params()
 
     def tearDown(self):
@@ -604,7 +571,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         _spy_result = _spy.count() if IS_QT6 else len(_spy)
         self.assertEqual(_spy_result, 1)
         self.assertTrue(master._config["result_metadata_set"])
-        self.assertTrue(RESULTS._composites[1][SCAN.get_index_of_frame(0)].std() > 0)
+        self.assertTrue(
+            np.all(RESULTS._composites[1][SCAN.get_index_position_in_scan(0)] > 0)
+        )
 
     def test_multiprocessing_store_results__autosave(self):
         master, _ = self.get_master_and_slave_app()
@@ -671,4 +640,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    print(
+        "\n\nWarning: Calling test_execute_workflow_app.py as main is very slow. "
+        "Please consider calling it with unittest discover option instead: \n"
+        "python -m unittest discover .\\tests\\apps\\test_execute_workflow_app.py\n\n"
+    )
     unittest.main()

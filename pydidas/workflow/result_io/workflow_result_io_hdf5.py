@@ -275,7 +275,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
-    def update_metadata(cls, metadata: dict):
+    def update_metadata(cls, metadata: dict[int, Union[Dataset, dict]]):
         """
         Update the frame metadata with a separately supplied metadata
         dictionary.
@@ -285,9 +285,6 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         metadata : dict
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
-        scan : Union[Scan, None], optional
-            The Scan (context) instance. If None, this will default to the
-            generic ScanContext. The default is None.
         """
         for _id, _metadata in metadata.items():
             if isinstance(_metadata, Dataset):

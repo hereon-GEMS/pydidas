@@ -45,6 +45,7 @@ from ..core import (
     UserConfigError,
     get_generic_param_collection,
 )
+from ..core.utils.dataset_utils import get_default_property_dict
 from ..workflow import WorkflowResultsContext, WorkflowTree
 from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
@@ -131,6 +132,7 @@ class ExecuteWorkflowApp(BaseApp):
                 "latest_results": None,
                 "scan_context": {},
                 "exp_context": {},
+                "export_files_prepared": False,
             }
         )
         self._index = -1
@@ -217,10 +219,7 @@ class ExecuteWorkflowApp(BaseApp):
             self._store_context()
             RESULTS.prepare_new_results()
             if self.get_param_value("autosave_results"):
-                RESULTS.prepare_files_for_saving(
-                    self.get_param_value("autosave_directory"),
-                    self.get_param_value("autosave_format"),
-                )
+                self._config["export_files_prepared"] = False
         TREE.prepare_execution()
         self._config["run_prepared"] = True
         if self.get_param_value("live_processing"):
@@ -344,24 +343,14 @@ class ExecuteWorkflowApp(BaseApp):
         for _node_id, _res in _results.items():
             self.mp_manager["shapes_dict"][_node_id] = _res.shape
             if isinstance(_res, Dataset):
-                self.mp_manager["metadata_dict"][_node_id] = {
-                    "axis_labels": _res.axis_labels,
-                    "axis_ranges": _res.axis_ranges,
-                    "axis_units": _res.axis_units,
-                    "data_unit": _res.data_unit,
-                    "data_label": _res.data_label,
-                }
+                self.mp_manager["metadata_dict"][_node_id] = _res.property_dict
+                self.mp_manager["metadata_dict"][_node_id].pop("metadata")
             else:
-                self.mp_manager["metadata_dict"][_node_id] = {
-                    "axis_labels": {i: "" for i in range(_res.ndim)},
-                    "axis_ranges": {
-                        _i: np.arange(_length) for _i, _length in enumerate(_res.shape)
-                    },
-                    "axis_units": {i: "" for i in range(_res.ndim)},
-                    "data_unit": "",
-                    "data_label": "",
-                }
+                self.mp_manager["metadata_dict"][_node_id] = get_default_property_dict(
+                    _res.shape
+                )
             self.mp_manager["shapes_available"].set()
+            RESULTS.store_frame_metadata(dict(self.mp_manager["metadata_dict"]))
 
     def _create_shared_memory(self):
         """
@@ -557,16 +546,27 @@ class ExecuteWorkflowApp(BaseApp):
             )
             return
         if not self._config["result_metadata_set"]:
-            RESULTS.update_frame_metadata(dict(self.mp_manager["metadata_dict"]))
+            RESULTS.store_frame_metadata(dict(self.mp_manager["metadata_dict"]))
             self._config["result_metadata_set"] = True
         with self.mp_manager["lock"]:
             _new_results = {
-                _key: self._shared_arrays[_key][buffer_pos]
-                for _key in self.mp_manager["shapes_dict"]
+                _key: _arr[buffer_pos]
+                for _key, _arr in self._shared_arrays.items()
+                if _key != "flag"
             }
             self._shared_arrays["flag"][buffer_pos] = 0
         RESULTS.store_results(index, _new_results)
         if self.get_param_value("autosave_results"):
+            if not self._config["export_files_prepared"]:
+                RESULTS.prepare_files_for_saving(
+                    self.get_param_value("autosave_directory"),
+                    self.get_param_value("autosave_format"),
+                )
+                _new_results = {
+                    _key: Dataset(_val, **self.mp_manager["metadata_dict"][_key])
+                    for _key, _val in _new_results.items()
+                }
+                self._config["export_files_prepared"] = True
             RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
         self.sig_results_updated.emit()
 

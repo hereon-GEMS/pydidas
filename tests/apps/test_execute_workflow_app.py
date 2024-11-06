@@ -33,10 +33,11 @@ import unittest
 from numbers import Integral
 from pathlib import Path
 
+import h5py
 import numpy as np
-from qtpy import QtWidgets
+from qtpy import QtTest, QtWidgets
 
-from pydidas import unittest_objects
+from pydidas import IS_QT6, unittest_objects
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
@@ -97,6 +98,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             _ = PydidasQApplication([])
         RESULTS.clear_all_results()
         TREE.clear()
+        SCAN.restore_all_defaults(True)
         cls._path = Path(tempfile.mkdtemp())
         cls.generate_scan(cls)
         cls.q_settings = PydidasQsettings()
@@ -116,6 +118,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def setUp(self):
         RESULT_SAVER.set_active_savers_and_title([])
+        RESULTS.clear_all_results()
         generate_tree()
         self.reset_scan_params()
 
@@ -135,6 +138,13 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             SCAN.set_param_value(f"scan_dim{i}_n_points", self._nscan[i - 1])
             SCAN.set_param_value(f"scan_dim{i}_delta", self._scandelta[i - 1])
             SCAN.set_param_value(f"scan_dim{i}_offset", self._scanoffset[i - 1])
+
+    def get_master_and_slave_app(self) -> tuple[ExecuteWorkflowApp, ExecuteWorkflowApp]:
+        master = ExecuteWorkflowApp()
+        master.prepare_run()
+        slave = master.copy(slave_mode=True)
+        slave.prepare_run()
+        return master, slave
 
     def test_creation(self):
         app = ExecuteWorkflowApp()
@@ -206,7 +216,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             self.assertEqual(app._config["exp_context"][_key], _val)
 
     def test_recreate_context__WorkflowTree(self):
-        generate_tree()
         _tree_rep = TREE.export_to_string()
         app = ExecuteWorkflowApp()
         app._config["tree_str_rep"] = TREE.export_to_string()
@@ -267,7 +276,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertEqual(len(master._locals["shared_memory_buffers"]), 2)
 
     def test_prepare_run__slave_mode(self):
-        generate_tree()
         master_app = ExecuteWorkflowApp()
         master_app.prepare_run()
         app = master_app.copy(slave_mode=True)
@@ -275,13 +283,11 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertTrue(app._config["run_prepared"])
 
     def test_prepare_run__master_mode(self):
-        generate_tree()
         app = ExecuteWorkflowApp()
         app.prepare_run()
         self.assertTrue(app._config["run_prepared"])
 
     def test_prepare_run__master_not_live_no_autosave(self):
-        generate_tree()
         app = ExecuteWorkflowApp()
         app.set_param_value("autosave_results", False)
         app.set_param_value("live_processing", False)
@@ -289,13 +295,13 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertTrue(app._config["run_prepared"])
 
     def test_prepare_run__master_not_live_w_autosave(self):
-        generate_tree()
         app = ExecuteWorkflowApp()
+        app._config["export_files_prepared"] = True
         app.set_param_value("autosave_results", True)
         app.set_param_value("autosave_directory", self._path.joinpath("test"))
         app.set_param_value("live_processing", False)
         app.prepare_run()
-        self.assertTrue(self._path.joinpath("test").is_dir())
+        self.assertFalse(app._config["export_files_prepared"])
 
     def test_prepare_run__master_live_no_autosave(self):
         app = ExecuteWorkflowApp()
@@ -383,6 +389,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         TREE.execute_process(0)
         app._publish_shapes_and_metadata_to_manager()
         self.assertTrue(app.mp_manager["shapes_available"].is_set())
+        self.assertTrue(RESULTS._config["shapes_set"])
         for _key, _res in TREE.get_current_results().items():
             self.assertEqual(app.mp_manager["shapes_dict"][_key], _res.shape)
             self.assertEqual(
@@ -406,13 +413,13 @@ class TestExecuteWorkflowApp(unittest.TestCase):
                 )
 
     def test_publish_shapes_and_metadata_to_manager__with_ndarray(self):
-        generate_tree()
         TREE.delete_node_by_id(2)
         TREE.execute_process(0)
         TREE.nodes[1].results = TREE.nodes[1].results.array
         app = ExecuteWorkflowApp()
         app.prepare_run()
         app._publish_shapes_and_metadata_to_manager()
+        self.assertTrue(RESULTS._config["shapes_set"])
         self.assertTrue(app.mp_manager["shapes_available"].is_set())
         for _key, _res in TREE.get_current_results().items():
             self.assertEqual(app.mp_manager["shapes_dict"][_key], _res.shape)
@@ -479,7 +486,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             )
 
     def test_initialize_arrays_from_shared_memory(self):
-        generate_tree()
         master = ExecuteWorkflowApp()
         master.prepare_run()
         master.mp_manager["shapes_dict"] = {1: (10, 10), 2: (10, 10)}
@@ -511,7 +517,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertIsInstance(_res, mp.shared_memory.SharedMemory)
 
     def test_write_results_to_shared_arrays__arrays_not_created(self):
-        generate_tree()
         TREE.execute_process(0)
         app = ExecuteWorkflowApp()
         app.prepare_run()
@@ -523,7 +528,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             self.assertTrue(np.allclose(_data, app._shared_arrays[_key][0]))
 
     def test_write_results_to_shared_arrays__arrays_created(self):
-        generate_tree()
         TREE.execute_process(0)
         app = ExecuteWorkflowApp()
         app.prepare_run()
@@ -547,7 +551,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertIsNone(_sig)
 
     def test_get_latest_results__shapes_not_set(self):
-        generate_tree()
         master = ExecuteWorkflowApp()
         master.prepare_run()
         app = master.copy(slave_mode=True)
@@ -555,7 +558,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertIsNone(app.get_latest_results())
 
     def test_get_latest_results__shapes_set(self):
-        generate_tree()
         master = ExecuteWorkflowApp()
         master.prepare_run()
         _ = master.multiprocessing_func(0)
@@ -567,7 +569,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             self.assertTrue(np.allclose(_data, app._shared_arrays[_key][_index]))
 
     def test_received_signal_message__shapes_not_set(self):
-        generate_tree()
         master = ExecuteWorkflowApp()
         master.prepare_run()
         app = master.copy(slave_mode=True)
@@ -579,126 +580,94 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         for _key in master.mp_manager["shapes_dict"]:
             self.assertIsInstance(master._shared_arrays[_key], np.ndarray)
 
-    # def test_multiprocessing_store_results(self):
-    #     generate_tree()
-    #     app = ExecuteWorkflowApp()
-    #     _spy = QtTest.QSignalSpy(app.sig_results_updated)
-    #     app.prepare_run()
-    #     _index = app.multiprocessing_func(0)
-    #     app.multiprocessing_store_results(0, _index)
-    #     _spy_result = _spy.count() if IS_QT6 else len(_spy)
-    #     self.assert
-    #
-    #     app.mp_manager["shapes_dict"] = {1: (10, 10), 2: (10, 10)}
-    #     TREE.execute_process(0)
-    #     app._ExecuteWorkflowApp__store_results(_index)
-    #     self.assertTrue(app.mp_manager["shapes_set"].is_set())
-    #     self.assertTrue(app.mp_manager["shapes_available"].is_set())
-    #     for _key, _data in TREE.get_current_results().items():
-    #         self.assertTrue(np.allclose(_data, app._shared_arrays[_key][_index]))
-    #
-    #
+    def test_multiprocessing_store_results_as_slave(self):
+        master, app = self.get_master_and_slave_app()
+        _spy = QtTest.QSignalSpy(app.sig_results_updated)
+        _index = app.multiprocessing_func(0)
+        app.multiprocessing_store_results(0, _index)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 0)
 
-    # def test_multiprocessing_store_results__plain(self):
-    #     _index = 12
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     app._config["result_metadata_set"] = True
-    #     _pos = app.multiprocessing_func(_index)
-    #     self.assertEqual(app._shared_arrays["flag"][0], 1)
-    #     app.multiprocessing_store_results(_index, _pos)
-    #     self.assertEqual(app._shared_arrays["flag"][0], 0)
-    #
-    # def test_multiprocessing_store_results__slave(self):
-    #     _index = 12
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     app.slave_mode = True
-    #     app._config["result_metadata_set"] = True
-    #     _pos = app.multiprocessing_func(_index)
-    #     app.multiprocessing_store_results(_index, _pos)
-    #     self.assertEqual(app._shared_arrays["flag"][0], 1)
-    #
-    # def test_multiprocessing_store_results__with_metadata(self):
-    #     _index = 12
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     _res = app.multiprocessing_func(_index)
-    #     app._config["result_metadata_set"] = False
-    #     self.assertEqual(app._shared_arrays["flag"][0], 1)
-    #     app.multiprocessing_store_results(_index, _res)
-    #     self.assertEqual(app._shared_arrays["flag"][0], 0)
-    #
-    # def test_multiprocessing_store_results__with_autosave(self):
-    #     _index = 12
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     app.set_param_value("autosave_results", True)
-    #     _pos = app.multiprocessing_func(_index)
-    #     self.assertEqual(app._shared_arrays["flag"][0], 1)
-    #     app.multiprocessing_store_results(_index, _pos)
-    #     self.assertEqual(app._shared_arrays["flag"][0], 0)
-    #
-    # def test_store_result_metadata__with_dataset(self):
-    #     _index = 12
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     app._config["result_metadata_set"] = False
-    #     TREE.execute_process(_index)
-    #     app._ExecuteWorkflowApp__store_result_metadata()
-    #     self.assertTrue(app._config["result_metadata_set"])
-    #
-    # def test_store_result_metadata__with_ndarray(self):
-    #     _index = 12
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     app._config["result_metadata_set"] = False
-    #     TREE.execute_process(_index)
-    #     for _node_id in app._config["result_shapes"]:
-    #         TREE.nodes[_node_id].results = np.ones((10, 10))
-    #     app._ExecuteWorkflowApp__store_result_metadata()
-    #     self.assertTrue(app._config["result_metadata_set"])
-    #
-    # def test_write_results_to_shared_arrays__lock_test(self):
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     TREE.execute_process(0)
-    #     _locker = TestLock(
-    #         app._config["shared_memory"],
-    #         app._config["buffer_n"],
-    #         app._config["result_shapes"],
-    #     )
-    #     _locker.start()
-    #     app._ExecuteWorkflowApp__write_results_to_shared_arrays()
-    #
-    # def test_store_frame_metadata(self):
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     TREE.execute_process(0)
-    #     app._config["result_metadata_set"] = False
-    #     _metadata = {}
-    #     for _id in app._config["result_shapes"]:
-    #         _res = TREE.nodes[_id].results
-    #         _metadata[_id] = {
-    #             "axis_labels": _res.axis_labels,
-    #             "axis_units": _res.axis_units,
-    #             "axis_ranges": _res.axis_ranges,
-    #         }
-    #     app._store_frame_metadata(_metadata)
-    #     self.assertTrue(app._config["result_metadata_set"])
-    #
-    # def test_run__single_processing(self):
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     app.run()
-    #     # assert does not raise Exception
-    #
-    # def test_run__multiple_runs(self):
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     app.run()
-    #     app.run()
-    #     # assert does not raise Exception
+    def test_multiprocessing_store_results__processing_error(self):
+        master, _ = self.get_master_and_slave_app()
+        _spy = QtTest.QSignalSpy(master.sig_results_updated)
+        _index = master.multiprocessing_func(0)
+        master.multiprocessing_store_results(0, -1)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 0)
+
+    def test_multiprocessing_store_results(self):
+        master, _ = self.get_master_and_slave_app()
+        _spy = QtTest.QSignalSpy(master.sig_results_updated)
+        _index = master.multiprocessing_func(0)
+        master.multiprocessing_store_results(0, _index)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 1)
+        self.assertTrue(master._config["result_metadata_set"])
+        self.assertTrue(RESULTS._composites[1][SCAN.get_index_of_frame(0)].std() > 0)
+
+    def test_multiprocessing_store_results__autosave(self):
+        master, _ = self.get_master_and_slave_app()
+        master.set_param_value("autosave_results", True)
+        master.set_param_value("autosave_directory", self._path.joinpath("test"))
+        _index = master.multiprocessing_func(0)
+        master.multiprocessing_store_results(0, _index)
+        _node_id = 1
+        _fname = self._path.joinpath("test", f"node_{_node_id:02d}.h5")
+        self.assertTrue(master._config["export_files_prepared"])
+        with h5py.File(_fname, "r") as _f:
+            _data = _f["entry/data/data"][SCAN.get_index_position_in_scan(0)]
+            self.assertTrue(np.all(_data > 0))
+
+    def test_multiprocessing_store_results__repetitive(self):
+        master, _ = self.get_master_and_slave_app()
+        _spy = QtTest.QSignalSpy(master.sig_results_updated)
+        _i_dim = SCAN.ndim - 1
+        for _i in range(SCAN.shape[_i_dim]):
+            _index = master.multiprocessing_func(_i)
+            master.multiprocessing_store_results(_i, _index)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, SCAN.shape[_i_dim])
+        _slices = (0,) * _i_dim + (
+            slice(
+                None,
+            ),
+        )
+        self.assertTrue(np.all(RESULTS._composites[1][_slices] > 0))
+
+    def test_multiprocessing_store_results__w_master_and_slave(self):
+        master, app = self.get_master_and_slave_app()
+        _spy = QtTest.QSignalSpy(master.sig_results_updated)
+        _i_dim = SCAN.ndim - 1
+        for _i in range(SCAN.shape[_i_dim]):
+            _index = app.multiprocessing_func(_i)
+            if _index is None:
+                master._create_shared_memory()
+                _index = app.get_latest_results()
+            master.multiprocessing_store_results(_i, _index)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, SCAN.shape[_i_dim])
+        _slices = (0,) * _i_dim + (
+            slice(
+                None,
+            ),
+        )
+        self.assertTrue(np.all(RESULTS._composites[1][_slices] > 0))
+
+    def test_run(self):
+        app = ExecuteWorkflowApp()
+        SCAN.set_param_value("scan_dim", 2)
+        app.run()
+        _res = RESULTS.get_results(1)
+        self.assertTrue(np.all(_res > 0))
+
+    def test_run__repetitive(self):
+        app = ExecuteWorkflowApp()
+        SCAN.set_param_value("scan_dim", 2)
+        app.run()
+        app.run()
+        _res = RESULTS.get_results(1)
+        self.assertTrue(np.all(_res > 0))
 
 
 if __name__ == "__main__":

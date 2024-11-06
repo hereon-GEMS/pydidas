@@ -13,6 +13,8 @@ Improvements
 - Extended Sum2dData plugin to work on an arbitrary number of dimensions.
 - Added a calling option to add a `-screen <i>` command line option to force the 
   GUI on the selected screen.
+- ExecuteWorkflowApp now works with dynamic plugin shapes, i.e. the plugin result
+  shapes can be dynamically modified during runtime.
 - Programmatic improvements:
     - Removed the basic_plugin class attribute from Plugins and shifted the check
       to the core code of the base plugins.
@@ -22,6 +24,7 @@ Improvements
       output formatting.
     - Added a new signal to the BaseApp and app multiprocessing to prepare
       ExecuteWorkflowApp update.
+    - Updated WorkflowResults contexts to accept dynamic result shapes.
 
 Bugfixes
 --------

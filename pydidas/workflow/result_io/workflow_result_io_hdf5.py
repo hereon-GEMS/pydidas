@@ -333,7 +333,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _tree = ProcessingTree()
         _scan = Scan()
         _exp = DiffractionExperiment()
-        _data = import_data(filename)
+        _data = import_data(filename, auto_squeeze=False)
         with h5py.File(filename, "r") as _file:
             try:
                 for _key, _param in _exp.params.items():

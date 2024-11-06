@@ -55,7 +55,7 @@ class DummyProcNewDataset(ProcPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._preexecuted = False
+        self._pre_executed = False
         self._executed = False
         self.set_param_value("_output_shape", kwargs.get("output_shape", (1,)))
 
@@ -108,7 +108,7 @@ class DummyProcNewDataset(ProcPlugin):
         Run the pre-execution routine and store a variable that this method
         has been called.
         """
-        self._preexecuted = True
+        self._pre_executed = True
 
     def calculate_result_shape(self):
         """

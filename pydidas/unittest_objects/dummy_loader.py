@@ -64,7 +64,7 @@ class DummyLoader(InputPlugin):
 
     def __init__(self, *args: tuple, **kwargs: dict):
         InputPlugin.__init__(self, *args, **kwargs)
-        self._preexecuted = False
+        self._pre_executed = False
         self._config["input_available"] = 12
 
     def __reduce__(self):
@@ -82,7 +82,7 @@ class DummyLoader(InputPlugin):
         """
         from pydidas.unittest_objects.dummy_getter_ import dummy_getter
 
-        return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
+        return dummy_getter, (self.__class__.__name__,), self.__getstate__()
 
     def prepare_carryon_check(self):
         """
@@ -128,7 +128,7 @@ class DummyLoader(InputPlugin):
         Check if input is available for the given index.
 
         A config setting can be used to determine the cut-off point up to which
-        input is avaible and the method returns True.
+        input is available and the method returns True.
 
         Parameters
         ----------
@@ -149,7 +149,7 @@ class DummyLoader(InputPlugin):
         Run the pre-execution routine and store a variable that this method
         has been called.
         """
-        self._preexecuted = True
+        self._pre_executed = True
 
     def execute(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """

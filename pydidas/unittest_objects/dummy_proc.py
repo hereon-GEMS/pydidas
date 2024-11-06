@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DummyProc"]
 
+from typing import Union
 
 import numpy as np
 
@@ -45,7 +46,7 @@ class DummyProc(ProcPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._preexecuted = False
+        self._pre_executed = False
         self._executed = False
 
     def __reduce__(self):
@@ -63,9 +64,11 @@ class DummyProc(ProcPlugin):
         """
         from pydidas.unittest_objects.dummy_getter_ import dummy_getter
 
-        return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
+        return dummy_getter, (self.__class__.__name__,), self.__getstate__()
 
-    def execute(self, data: np.ndarray, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+    ) -> tuple[Dataset, dict]:
         """
         Execute the actual computations.
 
@@ -86,11 +89,12 @@ class DummyProc(ProcPlugin):
             The updated data
         kwargs : dict
             The update input kwargs. This method will add the offset to the
-            dict keys for rerference.
+            dict keys for reference.
         """
         self._executed = True
         _offset = kwargs.get("offset", np.random.random())
-        _data = Dataset(data, **data.property_dict) + _offset
+        _meta = {} if not isinstance(data, Dataset) else data.property_dict
+        _data = Dataset(data, **_meta) + _offset
         if self.node_id is not None:
             kwargs.update({f"offset_{self.node_id:02d}": _offset})
         else:
@@ -102,4 +106,4 @@ class DummyProc(ProcPlugin):
         Run the pre-execution routine and store a variable that this method
         has been called.
         """
-        self._preexecuted = True
+        self._pre_executed = True

@@ -41,22 +41,22 @@ class TestDummyProc(unittest.TestCase):
     def test_init(self):
         plugin = DummyProc()
         self.assertIsInstance(plugin, DummyProc)
-        self.assertFalse(plugin._preexecuted)
+        self.assertFalse(plugin._pre_executed)
         self.assertFalse(plugin._executed)
 
     def test_pre_execute(self):
         plugin = DummyProc()
         plugin.pre_execute()
-        self.assertTrue(plugin._preexecuted)
+        self.assertTrue(plugin._pre_executed)
 
     def test_execute(self):
         _shape = (12, 12)
         _offset = np.random.random()
         plugin = DummyProc()
         _data = np.random.random(_shape)
-        _newdata, _kws = plugin.execute(_data, offset=_offset)
-        self.assertIsInstance(_newdata, Dataset)
-        self.assertTrue(np.allclose(_data + _offset, _newdata))
+        _new_data, _kws = plugin.execute(_data, offset=_offset)
+        self.assertIsInstance(_new_data, Dataset)
+        self.assertTrue(np.allclose(_data + _offset, _new_data))
 
     def test_pickle_unpickle(self):
         plugin = DummyProc()

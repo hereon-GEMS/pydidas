@@ -40,7 +40,7 @@ class TestDummyLoader(unittest.TestCase):
     def test_init(self):
         plugin = DummyLoader()
         self.assertIsInstance(plugin, DummyLoader)
-        self.assertFalse(plugin._preexecuted)
+        self.assertFalse(plugin._pre_executed)
 
     def test_get_first_file_size(self):
         plugin = DummyLoader()
@@ -64,7 +64,7 @@ class TestDummyLoader(unittest.TestCase):
     def test_pre_execute(self):
         plugin = DummyLoader()
         plugin.pre_execute()
-        self.assertTrue(plugin._preexecuted)
+        self.assertTrue(plugin._pre_executed)
 
     def test_execute(self):
         _shape = (134, 54)

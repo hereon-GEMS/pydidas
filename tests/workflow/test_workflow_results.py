@@ -852,6 +852,13 @@ class TestWorkflowResults(unittest.TestCase):
                 self.assertTrue(
                     np.allclose(res._composites[_id].axis_ranges[_dim], _ref)
                 )
+            self.assertIn(_id, res._config["plugin_res_metadata"])
+            _stored_metadata = res._config["plugin_res_metadata"][_id]
+            self.assertIsInstance(_stored_metadata, dict)
+            self.assertEqual(
+                set(_stored_metadata.keys()),
+                {"axis_labels", "axis_units", "axis_ranges", "data_unit", "data_label"},
+            )
 
 
 if __name__ == "__main__":

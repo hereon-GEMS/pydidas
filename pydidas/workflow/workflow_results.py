@@ -753,6 +753,9 @@ class WorkflowResults(QtCore.QObject):
             self._config["frozen_SCAN"].update_from_scan(self._SCAN)
             self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
             self._config["frozen_TREE"].update_from_tree(self._TREE)
+            for _id, _array in _data.items():
+                self._config["plugin_res_metadata"][_id] = _array.property_dict
+                self._config["plugin_res_metadata"][_id].pop("metadata")
 
 
 WorkflowResultsContext = SingletonFactory(WorkflowResults)

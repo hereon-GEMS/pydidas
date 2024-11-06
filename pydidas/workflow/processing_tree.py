@@ -53,7 +53,7 @@ class ProcessingTree(GenericTree):
 
     def __init__(self, **kwargs: dict):
         super().__init__(**kwargs)
-        self._preexecuted = False
+        self._pre_executed = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
 
     @property
@@ -215,11 +215,11 @@ class ProcessingTree(GenericTree):
         """
         if self.root is None:
             raise UserConfigError("The ProcessingTree has no nodes.")
-        if self._preexecuted and not self.tree_has_changed and not forced:
+        if self._pre_executed and not self.tree_has_changed and not forced:
             return
         self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
-        self._preexecuted = True
+        self._pre_executed = True
         self.reset_tree_changed_flag()
 
     def execute_single_plugin(

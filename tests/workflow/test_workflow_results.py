@@ -266,10 +266,6 @@ class TestWorkflowResults(unittest.TestCase):
             1: SCAN.shape + self._input_shape,
             2: SCAN.shape + self._new_shape,
         }
-        print(SCAN.shape)
-        print(_full_shapes)
-        print(res._config["shapes"])
-        print(res._SCAN.shape)
         self.assertEqual(res._config["shapes"], _full_shapes)
         self.assertTrue(res._config["shapes_set"])
 

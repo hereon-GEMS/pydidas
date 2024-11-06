@@ -187,7 +187,7 @@ class TestWorkflowNode(unittest.TestCase):
         obj.prepare_execution()
         for _d in range(_depth + 1):
             for _node in nodes[_d]:
-                self.assertTrue(_node.plugin._preexecuted)
+                self.assertTrue(_node.plugin._pre_executed)
 
     def test_confirm_plugin_existance_and_type__no_plugin(self):
         with self.assertRaises(KeyError):

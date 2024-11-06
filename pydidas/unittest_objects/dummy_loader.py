@@ -177,7 +177,14 @@ class DummyLoader(InputPlugin):
         _data = np.random.random((_height, _width))
         _data[_data == 0] = 0.0001
         kwargs.update(dict(index=index))
-        return Dataset(_data), kwargs
+        return Dataset(
+            _data,
+            axis_labels=["ax0", "ax 1"],
+            axis_units=["u 0", "unit #1"],
+            axis_ranges=[0.5 * np.arange(_height) - 2, 1.4 * np.arange(_width)],
+            data_label="Dummy data",
+            data_unit="data U",
+        ), kwargs
 
     def calculate_result_shape(self):
         """

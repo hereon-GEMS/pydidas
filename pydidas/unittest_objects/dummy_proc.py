@@ -90,7 +90,7 @@ class DummyProc(ProcPlugin):
         """
         self._executed = True
         _offset = kwargs.get("offset", np.random.random())
-        _data = Dataset(data) + _offset
+        _data = Dataset(data, **data.property_dict) + _offset
         if self.node_id is not None:
             kwargs.update({f"offset_{self.node_id:02d}": _offset})
         else:

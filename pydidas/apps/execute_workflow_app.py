@@ -32,7 +32,7 @@ import multiprocessing as mp
 import time
 import warnings
 from multiprocessing.shared_memory import SharedMemory
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -114,9 +114,7 @@ class ExecuteWorkflowApp(BaseApp):
         + [
             "_shared_arrays",
             "_index",
-            "_result_metadata",
             "_mp_tasks",
-            "_metadata_is_set",
         ]
     )
     sig_results_updated = QtCore.Signal()
@@ -299,7 +297,20 @@ class ExecuteWorkflowApp(BaseApp):
             return True
         return TREE.root.plugin.input_available(self._index)
 
-    def multiprocessing_func(self, index: int) -> Union[int, Tuple[int, dict]]:
+    def signal_processed_and_can_continue(self) -> bool:
+        """
+        Check if the processing can continue.
+
+        This implementation waits for the shapes to be set before continuing.
+
+        Returns
+        -------
+        bool
+            Flag whether the processing can continue.
+        """
+        return self.mp_manager["shapes_set"].is_set()
+
+    def multiprocessing_func(self, index: int) -> Union[None, int]:
         """
         Perform key operation with parallel processing.
 
@@ -468,9 +479,9 @@ class ExecuteWorkflowApp(BaseApp):
                     self._config["buffer_pos"] = _buffer_pos
                     self._shared_arrays["flag"][_buffer_pos] = 1
                     break
-            time.sleep(0.01)
+            time.sleep(0.005)
         with self.mp_manager["lock"]:
-            for _node_id in self.mp_manager["shapes_dict"]:
+            for _node_id in self.mp_manager["shapes_dict"].keys():
                 self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[
                     _node_id
                 ].results

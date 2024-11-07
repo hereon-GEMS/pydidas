@@ -25,8 +25,10 @@ __status__ = "Production"
 
 
 import multiprocessing as mp
+import queue
 import shutil
 import tempfile
+import time
 import unittest
 from numbers import Integral
 from pathlib import Path
@@ -35,11 +37,13 @@ import h5py
 import numpy as np
 from qtpy import QtTest, QtWidgets
 
-from pydidas import IS_QT6, unittest_objects
+from pydidas import IS_QT6, LOGGING_LEVEL, unittest_objects
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import PydidasQsettings, UserConfigError, get_generic_parameter, utils
+from pydidas.core.utils import get_random_string
+from pydidas.multiprocessing import app_processor
 from pydidas.plugins import PluginCollection
 from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
@@ -295,6 +299,16 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.set_param_value("live_processing", True)
         app._index = utils.get_random_string(8)
         self.assertEqual(app.multiprocessing_carryon(), app._index)
+
+    def signal_processed_and_can_continue__as_master(self):
+        app = ExecuteWorkflowApp()
+        app.mp_manager["shapes_set"].set()
+        self.assertTrue(app.signal_processed_and_can_continue())
+
+    def signal_processed_and_can_continue__as_slave(self):
+        master, app = self.get_master_and_slave_app()
+        master.mp_manager["shapes_set"].set()
+        self.assertTrue(app.signal_processed_and_can_continue())
 
     def test_multiprocessing_func__as_master(self):
         _index = 12
@@ -637,6 +651,80 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.run()
         _res = RESULTS.get_results(1)
         self.assertTrue(np.all(_res > 0))
+
+    def test_copy__to_slave(self):
+        master = ExecuteWorkflowApp()
+        for _key in ExecuteWorkflowApp.attributes_not_to_copy_to_slave_app:
+            setattr(master, _key, get_random_string(8))
+        master._locals = {1: 1, 2: 2}
+        master.mp_manager["shapes_available"].set()
+        _copy = master.copy(slave_mode=True)
+        for _key in ExecuteWorkflowApp.attributes_not_to_copy_to_slave_app:
+            if isinstance(getattr(master, _key), np.ndarray) and isinstance(
+                getattr(_copy, _key), np.ndarray
+            ):
+                self.assertTrue(
+                    np.allclose(getattr(master, _key), getattr(_copy, _key))
+                )
+            elif isinstance(getattr(master, _key), np.ndarray) != isinstance(
+                getattr(_copy, _key), np.ndarray
+            ):
+                pass
+            else:
+                self.assertNotEqual(getattr(master, _key), getattr(_copy, _key))
+        self.assertEqual(_copy._locals, {"shared_memory_buffers": {}})
+        for _key in master.mp_manager:
+            self.assertEqual(master.mp_manager[_key], _copy.mp_manager[_key])
+
+    def test__run_in_processor_with_slave_worker(self):
+        master = ExecuteWorkflowApp()
+        master.prepare_run()
+        _lock_manager = mp.Manager()
+        _queues = {
+            "queue_input": mp.Queue(),
+            "queue_output": mp.Queue(),
+            "queue_stop": mp.Queue(),
+            "queue_aborted": mp.Queue(),
+            "queue_signal": mp.Queue(),
+        }
+        _mp_kwargs = {
+            "logging_level": LOGGING_LEVEL,
+            "lock": _lock_manager.Lock(),
+            **_queues,
+        }
+        _proc = mp.Process(
+            target=app_processor,
+            args=(
+                _mp_kwargs,
+                ExecuteWorkflowApp,
+                master.params.copy(),
+                master.get_config(),
+            ),
+            kwargs={"use_tasks": True, "app_mp_manager": master.mp_manager},
+            name=f"pydidas_{mp.current_process().pid}_worker",
+        )
+        for _i in range(SCAN.shape[-1]):
+            _queues["queue_input"].put(_i)
+        _proc.start()
+        time.sleep(0.05)
+        with self.assertRaises(queue.Empty):
+            _res = _queues["queue_output"].get_nowait()
+        _signal = _queues["queue_signal"].get()
+        self.assertEqual(_signal, "::shapes_not_set::")
+        master._create_shared_memory()
+        time.sleep(0.05)
+        for _i in range(SCAN.shape[-1]):
+            _latest = _queues["queue_output"].get_nowait()
+            master.multiprocessing_store_results(*_latest)
+            self.assertEqual(_latest[0], _i)
+            self.assertIsInstance(_latest[1], Integral)
+            time.sleep(0.05)
+        for _node in TREE.get_all_nodes_with_results():
+            _id = _node.node_id
+            _res = RESULTS.get_results(_id)
+            self.assertTrue(np.all(_res[((0,) * (SCAN.ndim - 1)) + (slice(None),)] > 0))
+        _queues["queue_stop"].put(1)
+        time.sleep(0.05)
 
 
 if __name__ == "__main__":

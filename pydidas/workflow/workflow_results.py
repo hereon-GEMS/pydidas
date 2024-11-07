@@ -231,7 +231,7 @@ class WorkflowResults(QtCore.QObject):
             )
         self._composites = {
             _key: Dataset(
-                np.empty(_shape, dtype=np.float32),
+                np.full(_shape, np.nan, dtype=np.float32),
                 **self._config["plugin_res_metadata"].get(_key, {}),
             )
             for _key, _shape in self._config["shapes"].items()

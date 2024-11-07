@@ -38,6 +38,10 @@ from .object_with_parameter_collection import ObjectWithParameterCollection
 from .parameter_collection import ParameterCollection
 
 
+_TYPES_NOT_TO_COPY = (QtCore.SignalInstance, QtCore.QMetaObject, ParameterCollection)
+_KEYS_NOT_TO_COPY = ["__METAOBJECT__", "mp_manager", "_locals", "params", "slave_mode"]
+
+
 class BaseApp(ObjectWithParameterCollection):
     """
     The BaseApp is the base class for all pydidas applications.
@@ -326,29 +330,20 @@ class BaseApp(ObjectWithParameterCollection):
         BaseApp
             The copy of the app.
         """
-        _obj_copy = type(self)()
+        _obj_copy = type(self)(slave_mode=slave_mode)
         _obj_copy.__dict__.update(
             {
                 _key: copy(_value)
                 for _key, _value in self.__dict__.items()
                 if not (
-                    isinstance(
-                        _value,
-                        (
-                            QtCore.SignalInstance,
-                            QtCore.QMetaObject,
-                            ParameterCollection,
-                        ),
-                    )
+                    isinstance(_value, _TYPES_NOT_TO_COPY)
+                    or _key in _KEYS_NOT_TO_COPY
                     or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
-                    or _key in ["__METAOBJECT__", "mp_manager", "_locals"]
                 )
             }
         )
         for _key, _param in self.params.items():
             _obj_copy.set_param_value(_key, _param.value)
-        if slave_mode:
-            _obj_copy.slave_mode = True
         if hasattr(self, "mp_manager"):
             _obj_copy.mp_manager = {k: v for k, v in self.mp_manager.items()}
         return _obj_copy

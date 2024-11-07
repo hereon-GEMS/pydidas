@@ -162,6 +162,7 @@ class TestBaseApp(unittest.TestCase):
         self.assertNotEqual(app, _copy)
         self.assertTrue(hasattr(_copy, "non_slave_att"))
         self.assertFalse(hasattr(_copy, "slave_att"))
+        self.assertTrue(_copy.slave_mode)
 
     def test_export_state(self):
         _label = "the new label value"

@@ -142,7 +142,7 @@ def app_processor(
                 if _signal is not None:
                     _signal_queue.put(_signal)
                     while not _app.signal_processed_and_can_continue():
-                        time.sleep(0.01)
+                        time.sleep(0.005)
                     if _results is None:
                         _results = _app.get_latest_results()
                 _output_queue.put([_arg, _results])

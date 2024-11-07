@@ -178,6 +178,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self._runner.sig_results.connect(self.__check_for_plot_update)
         self._runner.finished.connect(self._apprunner_finished)
         self._runner.sig_final_app_state.connect(self._set_app)
+        self._runner.sig_message_from_worker.connect(self.__process_messages)
         QtWidgets.QApplication.instance().aboutToQuit.connect(
             self._runner.send_stop_signal
         )
@@ -224,6 +225,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self._runner.sig_final_app_state.disconnect()
         self._runner.sig_progress.disconnect()
         self._runner.sig_results.disconnect()
+        self._runner.sig_message_from_worker.disconnect()
         self._runner.deleteLater()
         self._runner = None
         logger.debug("WorkflowRunFrame: AppRunner successfully shut down.")
@@ -248,6 +250,18 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
             self._config["plot_last_update"] = time.time()
             self.update_plot()
+
+    @QtCore.Slot(str)
+    def __process_messages(self, message: str):
+        """
+        Process messages from the AppRunner and pass them to the app instance.
+
+        Parameters
+        ----------
+        message : str
+            The message to be processed.
+        """
+        self._app.received_signal_message(message)
 
     def _finish_processing(self):
         """

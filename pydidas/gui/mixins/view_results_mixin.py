@@ -103,7 +103,6 @@ class ViewResultsMixin:
         """
         _hash = self._RESULTS.source_hash
         if _hash != self._config["source_hash"]:
-            self._RESULTS.update_shapes_from_scan_and_workflow()
             self._config["source_hash"] = self._RESULTS.source_hash
             self._clear_selected_results_entries()
             self._clear_plot()

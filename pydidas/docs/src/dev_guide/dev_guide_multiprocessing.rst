@@ -36,10 +36,10 @@ Communication with workers
 
 Communication with the workers is handles by four queues:
 
-- **send** queue to send tasks to the workers.
-- **reveiver** queue to receive results from the workers.
-- **stop** queue to send stop signals to the workers.
-- **finished** queue for the workers to signal they have completed all tasks.
+- **input queue** queue to send tasks to the workers.
+- **output queue** queue to receive results from the workers.
+- **stop queue** queue to send stop signals to the workers.
+- **finished queue** queue for the workers to signal they have completed all tasks.
 
 The user does not have to interact with the queues itself, this is handled by 
 the :py:class:`WorkerController <pydidas.multiprocessing.WorkerController>`.
@@ -241,7 +241,6 @@ thread alive and allow the submission of new tasks.
 
 
     if __name__ == "__main__":
-        # run_worker_controller()
         run_worker_controller_with_restart()
 
 
@@ -250,6 +249,9 @@ AppRunner
 
 The :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` is the specialized
 subclass to work with pydidas :py:class:`Apps <pydidas.core.BaseApp>`.
+
+In addition to the four queues listed above, it has a 5th queue for passing (string)
+messages from the worker to the main event loop.
 
 A sequence diagram of the communication with the :py:class:`AppRunner 
 <pydidas.multiprocessing.AppRunner>` is given below.

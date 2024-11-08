@@ -172,7 +172,8 @@ class MpTestAppWoTasks(BaseApp):
         image : np.ndarray
             The image data.
         """
-        self._composite.insert_image(image, index - self._config["min_index"])
+        _i = (index - self._config["min_index"]) % self._config["max_index"]
+        self._composite.insert_image(image, _i)
 
     def multiprocessing_post_run(self):
         """

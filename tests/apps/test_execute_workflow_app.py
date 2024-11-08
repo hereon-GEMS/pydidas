@@ -684,7 +684,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
-            "queue_aborted": mp.Queue(),
+            "queue_finished": mp.Queue(),
             "queue_signal": mp.Queue(),
         }
         _mp_kwargs = {

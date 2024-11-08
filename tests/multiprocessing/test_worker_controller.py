@@ -170,7 +170,7 @@ class TestWorkerController(unittest.TestCase):
         self._wc = WorkerController()
         self._wc.suspend()
         self._wc.restart()
-        self.assertEqual(self._wc.flags["running"], True)
+        self.assertEqual(self._wc.flags["must_restart"], True)
 
     def test_change_function(self):
         _args = (0, 0)
@@ -279,7 +279,7 @@ class TestWorkerController(unittest.TestCase):
         self._wc._workers = [1, 2, 3, 4]
         _nfinished = 3
         for i in range(_nfinished):
-            self._wc._queues["queue_aborted"].put(1)
+            self._wc._queues["queue_finished"].put(1)
         time.sleep(0.005)
         self._wc._check_if_workers_finished()
         self.assertEqual(self._wc._workers_done, _nfinished)
@@ -301,7 +301,7 @@ class TestWorkerController(unittest.TestCase):
         self._wc.flags["running"] = True
         self._wc._workers = [1, 2, 3, 4]
         for i in range(len(self._wc._workers)):
-            self._wc._queues["queue_aborted"].put(1)
+            self._wc._queues["queue_finished"].put(1)
         # assert: does not raise TimeoutError
         self._wc._wait_for_worker_finished_signals(0.2)
 

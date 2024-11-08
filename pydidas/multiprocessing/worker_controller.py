@@ -89,6 +89,7 @@ class WorkerController(QtCore.QThread):
             "thread_alive": True,
             "active": False,
             "stop_after_run": False,
+            "must_restart": False,
         }
         if n_workers is None:
             n_workers = PydidasQsettings().value("global/mp_n_workers", int)
@@ -102,7 +103,7 @@ class WorkerController(QtCore.QThread):
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
-            "queue_aborted": mp.Queue(),
+            "queue_finished": mp.Queue(),
             "queue_signal": mp.Queue(),
         }
         self._mp_kwargs = {
@@ -213,7 +214,7 @@ class WorkerController(QtCore.QThread):
         """
         _t0 = time.time()
         while self.flags["active"]:
-            time.sleep(0.05)
+            time.sleep(0.005)
             if time.time() - _t0 >= timeout:
                 logger.debug("WorkerController: Process finish timeout")
                 break
@@ -260,7 +261,10 @@ class WorkerController(QtCore.QThread):
         This method allow the event loop to run and to submit tasks via the
         queue to the workers.
         """
-        self.flags["running"] = True
+        self._progress_target = len(self._to_process)
+        self._progress_done = 0
+        self._workers_done = 0
+        self.flags["must_restart"] = True
 
     def add_task(self, task: object):
         """
@@ -349,8 +353,12 @@ class WorkerController(QtCore.QThread):
             if self.flags["active"]:
                 logger.debug("WorkerController: Starting post run")
                 self.cycle_post_run()
-            time.sleep(0.001)
+            time.sleep(0.005)
+            if self.flags["must_restart"]:
+                self.flags["must_restart"] = False
+                self.flags["running"] = True
         _app.unregister_thread(self)
+        self.join_queues()
         logger.debug("WorkerController: Finished worker_controller loop")
 
     def cycle_pre_run(self):
@@ -422,7 +430,7 @@ class WorkerController(QtCore.QThread):
             return
         try:
             for _worker in self._workers:
-                self._queues["queue_aborted"].get_nowait()
+                self._queues["queue_finished"].get_nowait()
                 self._workers_done += 1
                 logger.debug("WorkerController: Worker aborted processing.")
         except Empty:
@@ -443,7 +451,6 @@ class WorkerController(QtCore.QThread):
         """
         logger.debug("WorkerController: Calling join on workers")
         self.join_workers()
-        self.join_queues()
         if self.flags["stop_after_run"]:
             self.flags["thread_alive"] = False
         self._wait_for_worker_finished_signals(timeout)
@@ -457,6 +464,11 @@ class WorkerController(QtCore.QThread):
             self._queues["queue_stop"].put(1)
         for _worker in self._workers:
             _worker.join()
+        while True:
+            try:
+                self._queues["queue_finished"].get_nowait()
+            except Empty:
+                break
         self._workers = []
         self.flags["active"] = False
         self._lock_manager.shutdown()

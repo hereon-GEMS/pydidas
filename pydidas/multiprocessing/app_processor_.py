@@ -30,12 +30,30 @@ __all__ = ["app_processor"]
 
 import queue
 import time
+from typing import Union
 
-from ..core import ParameterCollection
+from ..core import BaseApp, ParameterCollection
 from ..core.utils import LOGGING_LEVEL, pydidas_logger
 
 
 logger = pydidas_logger()
+
+
+def _run_taskless_cycle(app: BaseApp, output_queue: queue.Queue) -> bool:
+    app.multiprocessing_pre_cycle(-1)
+    _app_carryon = app.multiprocessing_carryon()
+    if _app_carryon:
+        _index, _results = app.multiprocessing_func(-1)
+        output_queue.put([_index, _results])
+    return _app_carryon
+
+
+def _wait_for_app_response(app: BaseApp, results: Union[None, object]):
+    while not app.signal_processed_and_can_continue():
+        time.sleep(0.005)
+    if results is None:
+        results = app.get_latest_results()
+    return results
 
 
 def app_processor(
@@ -86,7 +104,7 @@ def app_processor(
     _input_queue = multiprocessing_config.get("queue_input")
     _output_queue = multiprocessing_config.get("queue_output")
     _stop_queue = multiprocessing_config.get("queue_stop")
-    _aborted_queue = multiprocessing_config.get("queue_aborted")
+    _finished_queue = multiprocessing_config.get("queue_finished")
     _signal_queue = multiprocessing_config.get("queue_signal")
     _io_lock = multiprocessing_config.get("lock")
 
@@ -109,19 +127,12 @@ def app_processor(
         try:
             _stop_queue.get_nowait()
             _debug_message("Received stop queue signal")
-            _aborted_queue.put(1)
             _wait_for_output = False
             break
         except queue.Empty:
             pass
         # run processing step
-        if not _use_tasks:
-            _app.multiprocessing_pre_cycle(-1)
-            _app_carryon = _app.multiprocessing_carryon()
-            if _app_carryon:
-                _index, _results = _app.multiprocessing_func(-1)
-                _output_queue.put([_index, _results])
-        else:  # run with tasks
+        if _use_tasks:
             if _app_carryon:
                 try:
                     _arg = _input_queue.get_nowait()
@@ -141,12 +152,11 @@ def app_processor(
                 _signal = _app.must_send_signal_and_wait_for_response()
                 if _signal is not None:
                     _signal_queue.put(_signal)
-                    while not _app.signal_processed_and_can_continue():
-                        time.sleep(0.005)
-                    if _results is None:
-                        _results = _app.get_latest_results()
+                    _results = _wait_for_app_response(_app, _results)
                 _output_queue.put([_arg, _results])
                 _debug_message("Finished computation of item %s" % _arg)
+        else:
+            _app_carryon = _run_taskless_cycle(_app, _output_queue)
         if not _app_carryon:
             time.sleep(0.005)
     _debug_message("Worker finished with all tasks.")
@@ -156,5 +166,6 @@ def app_processor(
         if not _app_carryon:
             _debug_message("Waiting for output queue to empty.")
             _app_carryon = True
-        time.sleep(0.02)
+        time.sleep(0.005)
     _debug_message("Worker shutting down.")
+    _finished_queue.put(1)

@@ -63,7 +63,8 @@ class BaseFitPlugin(ProcPlugin):
         "fit_min_peak_height",
     )
     input_data_dim = -1
-    output_data_dim = 0
+    output_data_dim = -1
+    num_peaks = 1
     new_dataset = True
     advanced_parameters = ["fit_sigma_threshold", "fit_min_peak_height"]
     has_unique_parameter_config_widget = True
@@ -81,20 +82,6 @@ class BaseFitPlugin(ProcPlugin):
             "settings_updated_from_data": False,
             "data_x_hash": -1,
         }
-
-    @property
-    def result_shape(self) -> tuple[int, ...]:
-        """
-        Get the shape of the plugin result.
-
-        Returns
-        -------
-        tuple[int, ...]
-            The shape of the results with a value for each dimension. Unknown
-            dimensions are represented as -1 value.
-        """
-        self.calculate_result_shape()
-        return self._config["result_shape"]
 
     @property
     def detailed_results(self):
@@ -120,6 +107,10 @@ class BaseFitPlugin(ProcPlugin):
         self._config["bounds_low"] = self._fitter.param_bounds_low.copy()
         self._config["bounds_high"] = self._fitter.param_bounds_high.copy()
         self._config["param_labels"] = self._fitter.param_labels.copy()
+        self._config["result_shape"] = (
+            # self.num_peaks,
+            self.get_param_value("fit_output").count(";") + 1,
+        )
         _bg_order = self.get_param_value("fit_bg_order")
         self.output_data_label = self.get_param_value("fit_output")
         self.output_data_unit = ""
@@ -187,8 +178,7 @@ class BaseFitPlugin(ProcPlugin):
 
     def create_result_dataset(self, valid: bool = True):
         """
-        Create a new Dataset from the original data and the data fit including
-        all the old metadata.
+        Create new Dataset for detailed results from the original data and the fit.
 
         Note that this method does not update the new metadata with the fit
         parameters. The new dataset includes a second dimensions with entries
@@ -212,7 +202,7 @@ class BaseFitPlugin(ProcPlugin):
             _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
             _area = self._fitter.area(_fit_pvals)
             if _residual > self._config["sigma_threshold"]:
-                _new_data = np.full(self._config["single_result_shape"], np.nan)
+                _new_data = np.full(self._config["result_shape"], np.nan)
             else:
                 _new_data = []
                 if "position" in _output:
@@ -233,12 +223,12 @@ class BaseFitPlugin(ProcPlugin):
                         _new_data.append(_area / _dx)
                 if "no output" in _output:
                     _new_data.append(
-                        np.full(self._config["single_result_shape"], np.nan)
+                        np.full(self._config["result_shape"], np.nan)
                     )
                 _new_data = np.atleast_1d(np.asarray(_new_data).squeeze().T)
         else:
             _residual = np.nan
-            _new_data = np.full(self._config["single_result_shape"], np.nan)
+            _new_data = np.full(self._config["result_shape"], np.nan)
 
         _axis_label = [
             "; ".join(
@@ -269,12 +259,6 @@ class BaseFitPlugin(ProcPlugin):
         -------
         bool
             Flag whether all centers are in the input x range.
-        """
-        raise NotImplementedError
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
         """
         raise NotImplementedError
 

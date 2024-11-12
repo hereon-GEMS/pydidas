@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["FitFuncBase"]
 
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Union
 
 import numpy as np
 from numpy import amin, ndarray
@@ -53,13 +53,13 @@ class FitFuncBase(metaclass=FitFuncMeta):
     center_param_index = 2
 
     @staticmethod
-    def func(c: Tuple[float], x: ndarray) -> ndarray:
+    def func(c: tuple[float], x: ndarray) -> ndarray:
         """
         Get the function values. The default is simply a 1:1 mapping.
 
         Parameters
         ----------
-        c : Tuple[float]
+        c : tuple[float]
             The fit parameters.
         x : ndarray
             The input x data points.
@@ -72,7 +72,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return x
 
     @classmethod
-    def profile(cls, c: Tuple[float], x: ndarray) -> ndarray:
+    def profile(cls, c: tuple[float], x: ndarray) -> ndarray:
         """
         Calculate the profile for the given peak fit function.
 
@@ -81,7 +81,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
         Parameters
         ----------
-        c : Tuple[float]
+        c : tuple[float]
             The tuple with the fit parameters.
             c[0] : amplitude
             c[1] : gamma/sigma
@@ -103,7 +103,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
     @classmethod
     def guess_fit_start_params(
         cls, x: ndarray, y: ndarray, **kwargs: Dict
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Guess the start params for the fit for the given x and y values.
 
@@ -119,7 +119,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
         Returns
         -------
-        List[float]
+        list[float]
             The list with the starting fit parameters.
         """
         bg_order = kwargs.get("bg_order", None)
@@ -130,7 +130,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
     @classmethod
     def calculate_background_params(
         cls, x: ndarray, y: ndarray, bg_order: Union[None, int]
-    ) -> Tuple[ndarray, Tuple[float, float]]:
+    ) -> tuple[ndarray, tuple[float, float]]:
         """
         Calculate the parameters for the background and remove it from the values.
 
@@ -166,7 +166,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
     @classmethod
     def guess_peak_start_params(
         cls, x: ndarray, y: ndarray, index: Union[None, int], **kwargs
-    ) -> List:
+    ) -> list:
         """
         Guess the start params for the fit for the given x and y values.
 
@@ -255,31 +255,31 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
     @classmethod
     def sort_fitted_peaks_by_position(
-        cls, c: Union[ndarray, List[float]]
-    ) -> List[float]:
+        cls, c: Union[ndarray, list[float]]
+    ) -> list[float]:
         """
         Sort the peaks by their center's position.
 
         Parameters
         ----------
-        c : Union[ndarray, List[float]]
+        c : Union[ndarray, list[float]]
             The fitted parameters.
 
         Returns
         -------
-        List[float]
+        list[float]
             The sorted fitted parameters.
         """
         return list(c)
 
     @staticmethod
-    def calculate_background(c: Union[Tuple, List], x: ndarray) -> ndarray:
+    def calculate_background(c: Union[tuple, list], x: ndarray) -> ndarray:
         """
         Calculate the background defined by the input parameters c.
 
         Parameters
         ----------
-        c : Union[Tuple, List]
+        c : Union[tuple, list]
             The parameters for the background.
         x : ndarray
             The x point values.
@@ -319,7 +319,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return cls.profile(c, x) - data
 
     @staticmethod
-    def area(c: Tuple) -> float:
+    def area(c: tuple) -> float:
         """
         Get the peak area based on the values of the parameters.
 
@@ -338,7 +338,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return c[0]
 
     @classmethod
-    def fwhm(cls, c: Tuple[float]):
+    def fwhm(cls, c: tuple[float]):
         """
         Get the FWHM of the fit from the values of the parameters.
 
@@ -346,7 +346,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
         Parameters
         ----------
-        c : Tuple[float]
+        c : tuple[float]
             The tuple with the function parameters.
 
         Returns
@@ -359,13 +359,13 @@ class FitFuncBase(metaclass=FitFuncMeta):
         )
 
     @classmethod
-    def center(cls, c: Tuple[float]) -> float:
+    def center(cls, c: tuple[float]) -> float:
         """
         Get the center position of the fit.
 
         Parameters
         ----------
-        c : Tuple[float]
+        c : tuple[float]
             The tuple with the function parameters.
 
         Returns
@@ -376,13 +376,50 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return c[cls.num_peak_params - 1]
 
     @classmethod
-    def background_at_peak(cls, c: Tuple[float]) -> Union[float, ndarray]:
+    def position(cls, c: tuple[float]) -> Union[float, tuple[float]]:
+        """
+        Get the peak position of the fit.
+
+        Parameters
+        ----------
+        c : tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        Union[float, tuple[float]]
+            The position of the peak or of all fitted peaks.
+        """
+        return cls.center(c)
+
+    @classmethod
+    def background(cls, c: tuple[float]) -> Union[float, ndarray]:
+        """
+        Get the background level at the peak position.
+
+        This is a wrapper for the background_at_peak method.
+
+        Parameters
+        ----------
+        c : tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        Union[float, ndarray]
+            The background at the peak center. For single peaks, the value is returned
+            as float. For multiple peaks, it is returned as ndarray.
+        """
+        return cls.background_at_peak(c)
+
+    @classmethod
+    def background_at_peak(cls, c: tuple[float]) -> Union[float, ndarray]:
         """
         Get the background level at the peak position.
 
         Parameters
         ----------
-        c : Tuple[float]
+        c : tuple[float]
             The tuple with the function parameters.
 
         Returns
@@ -398,5 +435,5 @@ class FitFuncBase(metaclass=FitFuncMeta):
         )
         _bgs = cls.calculate_background(c[_n_peak_params:], _centers)
         if _bgs.size == 1:
-            return _bgs[0]
+            return np.atleast_1d(_bgs.squeeze())[0]
         return _bgs

@@ -15,6 +15,8 @@ Improvements
   GUI on the selected screen.
 - ExecuteWorkflowApp now works with dynamic plugin shapes, i.e. the plugin result
   shapes can be dynamically modified during runtime.
+- Updated the classmethods of FitFuncBase to include attributes which correspond 
+  to the fit result output labels.
 - Programmatic improvements:
     - Removed the basic_plugin class attribute from Plugins and shifted the check
       to the core code of the base plugins.

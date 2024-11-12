@@ -96,18 +96,13 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
     def test_pre_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
         plugin.pre_execute()
-        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
-
-    def test_pre_execute__simple(self):
-        plugin = self.create_plugin()
-        plugin.pre_execute()
-        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
+        self.assertIn("dataset", plugin._standard_kwargs.keys())
+        self.assertIn("binning", plugin._standard_kwargs.keys())
 
     def test_pre_execute__no_images_per_file_set(self):
         plugin = self.create_plugin()
         plugin.set_param_value("images_per_file", -1)
         plugin.pre_execute()
-        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
         self.assertEqual(
             plugin.get_param_value("_counted_images_per_file"), self._n_per_file
         )

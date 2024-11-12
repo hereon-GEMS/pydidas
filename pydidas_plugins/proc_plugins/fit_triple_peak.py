@@ -30,20 +30,20 @@ __all__ = ["FitTriplePeak"]
 from pydidas.core import get_generic_param_collection
 from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.generic_params import fit_multi_peak_params
-from pydidas.plugins import FitMultiPeak
+from pydidas.plugins import BaseFitPlugin
 
 
 _3PEAK_PARAMS = fit_multi_peak_params(3)
 _FUNC_CHOICES = FitFuncMeta.get_fitter_names_with_num_peaks(3)
-_DEFAULTS = FitMultiPeak.default_params.copy() | get_generic_param_collection(
+_DEFAULTS = BaseFitPlugin.default_params.copy() | get_generic_param_collection(
     *_3PEAK_PARAMS
 )
 _DEFAULTS["fit_func"].update_value_and_choices(_FUNC_CHOICES[0], _FUNC_CHOICES)
 
-_ADVANCED = FitMultiPeak.advanced_parameters + _3PEAK_PARAMS
+_ADVANCED = BaseFitPlugin.advanced_parameters + _3PEAK_PARAMS
 
 
-class FitTriplePeak(FitMultiPeak):
+class FitTriplePeak(BaseFitPlugin):
     """
     Fit three (potentially overlapping) peaks to the input data.
 

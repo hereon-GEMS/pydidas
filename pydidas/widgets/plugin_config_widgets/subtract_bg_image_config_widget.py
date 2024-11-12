@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ SubtractBackgroundImage plugin to modify its Parameters.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,6 +33,7 @@ from pathlib import Path
 from typing import NewType
 
 from qtpy import QtCore
+from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Hdf5key
 from pydidas.core.constants import HDF5_EXTENSIONS
@@ -54,10 +55,11 @@ class SubtractBackgroundImageConfigWidget(ParameterEditCanvas, CreateWidgetsMixI
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         self.plugin = plugin
         for param in self.plugin.params.values():
-            self.create_param_widget(
-                param,
-                linebreak=param.dtype in [Hdf5key, Path] or param.refkey == "label",
-            )
+            if param.refkey not in self.plugin.advanced_parameters:
+                self.create_param_widget(
+                    param,
+                    linebreak=param.dtype in [Hdf5key, Path] or param.refkey == "label",
+                )
         self.param_composite_widgets["bg_file"].io_edited.connect(
             self._toggle_hdf5_plugin_visibility
         )
@@ -67,6 +69,37 @@ class SubtractBackgroundImageConfigWidget(ParameterEditCanvas, CreateWidgetsMixI
         )
         self.toggle_param_widget_visibility("bg_hdf5_key", _start_vis)
         self.toggle_param_widget_visibility("bg_hdf5_frame", _start_vis)
+        self.__advanced_hidden = True
+        self.create_button(
+            "but_toggle_advanced_params",
+            "Display advanced Parameters",
+            clicked=self.__toggle_advanced_params,
+            icon="qt-std::SP_TitleBarUnshadeButton",
+        )
+        for _key in self.plugin.advanced_parameters:
+            _param = self.plugin.get_param(_key)
+            self.create_param_widget(_param, visible=False)
+
+    @QtCore.Slot()
+    def __toggle_advanced_params(self):
+        """
+        Toggle the visiblity of the advanced Parameters.
+        """
+        self.__advanced_hidden = not self.__advanced_hidden
+        for _key in self.plugin.advanced_parameters:
+            self.toggle_param_widget_visibility(_key, not self.__advanced_hidden)
+        self._widgets["but_toggle_advanced_params"].setText(
+            "Display advanced Parameters"
+            if self.__advanced_hidden
+            else "Hide advanced Parameters"
+        )
+        self._widgets["but_toggle_advanced_params"].setIcon(
+            self.style().standardIcon(
+                QStyle.SP_TitleBarUnshadeButton
+                if self.__advanced_hidden
+                else QStyle.SP_TitleBarShadeButton
+            )
+        )
 
     @QtCore.Slot(str)
     def _toggle_hdf5_plugin_visibility(self, new_file: str):

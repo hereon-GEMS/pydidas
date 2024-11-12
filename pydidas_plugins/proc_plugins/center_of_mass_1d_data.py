@@ -31,7 +31,6 @@ import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.utils import (
-    calculate_result_shape_for_multi_input_dims,
     process_1d_with_multi_input_dims,
 )
 from pydidas.plugins import ProcPlugin
@@ -83,10 +82,3 @@ class CenterOfMass1dData(ProcPlugin):
             axis_unit=data.data_unit,
         )
         return _new_data, kwargs
-
-    @calculate_result_shape_for_multi_input_dims
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
-        """
-        self._config["result_shape"] = (1,)

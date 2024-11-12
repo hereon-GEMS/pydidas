@@ -27,10 +27,9 @@ __status__ = "Production"
 __all__ = ["CropAndBinImage"]
 
 
-from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
+from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
-from pydidas.managers import ImageMetadataManager
 from pydidas.plugins import ProcPlugin
 
 
@@ -51,25 +50,6 @@ class CropAndBinImage(ProcPlugin):
     output_data_label = "Image intensity"
     output_data_unit = "counts"
 
-    def __init__(self, *args: tuple, **kwargs: dict):
-        super().__init__(*args, **kwargs)
-        _params = self.get_params(
-            "use_roi", "roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh", "binning"
-        )
-        self._image_metadata = ImageMetadataManager(*_params)
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        if self._config["input_shape"] is None:
-            raise UserConfigError(
-                "No input shape has been given for the *CropAndBinData* plugin."
-            )
-        self._image_metadata.store_image_data(self._config["input_shape"], int, 1)
-        self._image_metadata.update_final_image()
-        self._config["result_shape"] = self._image_metadata.final_shape
-
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Apply the given cropping and binning to the input data.
@@ -88,7 +68,7 @@ class CropAndBinImage(ProcPlugin):
         kwargs : dict
             The updated input keyword arguments.
         """
-        _roi = self._image_metadata.roi
+        _roi = self._get_own_roi()
         _binning = self.get_param_value("binning")
         if _roi is not None:
             data = data[_roi]

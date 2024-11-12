@@ -37,7 +37,6 @@ import scipy.ndimage
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
-from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
 
@@ -126,9 +125,6 @@ class CreateDynamicMask(ProcPlugin):
                     f"Cannot load detector mask: No file with the name \n{_mask_file}"
                     "\nexists."
                 )
-        if self._mask is not None and len(self._legacy_image_ops) > 0:
-            _roi, _bin = self.get_single_ops_from_legacy()
-            self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
 
     def execute(
         self, data: Union[Dataset, np.ndarray], **kwargs: dict

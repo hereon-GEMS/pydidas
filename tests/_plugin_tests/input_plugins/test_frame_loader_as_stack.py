@@ -87,11 +87,6 @@ class TestFrameLoaderAsStack(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoaderAsStack")()
         self.assertIsInstance(plugin, BasePlugin)
 
-    def test_pre_execute__simple(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoaderAsStack")()
-        plugin.pre_execute()
-        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
-
     def test_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoaderAsStack")()
         with self.assertRaises(UserConfigError):

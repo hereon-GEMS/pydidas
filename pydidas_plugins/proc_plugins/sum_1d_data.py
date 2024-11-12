@@ -30,9 +30,6 @@ __all__ = ["Sum1dData"]
 import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.utils import (
-    calculate_result_shape_for_multi_input_dims,
-)
 from pydidas.plugins import ProcPlugin
 
 
@@ -150,12 +147,3 @@ class Sum1dData(ProcPlugin):
         )
         self._mask = np.ones(self._data.shape, dtype=bool) * _sum_mask[*_slicer]
         return self._mask
-
-    @calculate_result_shape_for_multi_input_dims
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
-        """
-        _input_shape = list(self._config["input_shape"])
-        _input_shape.pop(self.get_param_value("process_data_dim"))
-        self._config["result_shape"] = _input_shape

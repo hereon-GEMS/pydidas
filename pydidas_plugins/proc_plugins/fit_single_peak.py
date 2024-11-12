@@ -29,7 +29,6 @@ __all__ = ["FitSinglePeak"]
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.fitting import FitFuncMeta
-from pydidas.core.utils import calculate_result_shape_for_multi_input_dims
 from pydidas.plugins import BaseFitPlugin
 
 
@@ -81,23 +80,3 @@ class FitSinglePeak(BaseFitPlugin):
     def __init__(self, *args: tuple, **kwargs: dict):
         BaseFitPlugin.__init__(self, *args, **kwargs)
         self.params["fit_func"].choices = FitFuncMeta.get_fitter_names_with_num_peaks(1)
-
-    def check_center_positions(self) -> bool:
-        """
-        Check the fitted center position.
-
-        Returns
-        -------
-        bool
-            Flag whether all centers are in the input x range.
-        """
-        return self._data_x[0] <= self._fit_params["center"] <= self._data_x[-1]
-
-    @calculate_result_shape_for_multi_input_dims
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
-        """
-        _output = self.get_param_value("fit_output")
-        self._config["result_shape"] = (len(_output.split(";")),)
-        self._config["single_result_shape"] = self._config["result_shape"]

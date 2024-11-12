@@ -29,14 +29,12 @@ import pickle
 import shutil
 import tempfile
 import unittest
-from functools import partial
-from unittest import mock
 
 import h5py
 import numpy as np
 
 from pydidas.contexts import ScanContext
-from pydidas.core import Dataset, Parameter, get_generic_parameter
+from pydidas.core import Dataset, Parameter
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.data_io import import_data
@@ -171,27 +169,6 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin.get_filename = lambda index: self._fname
         plugin.prepare_carryon_check()
         self.assertEqual(plugin._config["file_size"], os.stat(self._fname).st_size)
-
-    def test_setup_image_metadata_manager__with_different_hdf5_key(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        _class.default_params.add_param(get_generic_parameter("hdf5_key"))
-        _class.update_filename_string = mock.MagicMock()
-        plugin = _class()
-        with h5py.File(self._fname, "w") as f:
-            f["other_entry/dataset/_data"] = np.ones((15,) + self._datashape)
-        plugin.set_param_value("hdf5_key", "other_entry/dataset/_data")
-        plugin.update_filename_string = partial(dummy_update_filename_string, plugin)
-        plugin._image_metadata.update(filename=self._fname)
-        plugin.calculate_result_shape()
-        self.assertEqual(plugin.result_shape, self._datashape)
-
-    def test_calculate_result_shape(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        plugin = _class()
-        plugin._image_metadata.filename = self._fname
-        plugin.update_filename_string = partial(dummy_update_filename_string, plugin)
-        plugin.calculate_result_shape()
-        self.assertEqual(self._datashape, plugin.result_shape)
 
     def test_pickle(self):
         plugin = InputPlugin()

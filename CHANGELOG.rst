@@ -27,6 +27,7 @@ Improvements
     - Added a new signal to the BaseApp and app multiprocessing to prepare
       ExecuteWorkflowApp update.
     - Updated WorkflowResults contexts to accept dynamic result shapes.
+    - Removed redundant code from plugins (because of changes in shape handling).
 
 Bugfixes
 --------

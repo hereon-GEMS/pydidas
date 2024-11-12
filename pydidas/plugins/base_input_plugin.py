@@ -33,7 +33,6 @@ import numpy as np
 from ..contexts import ScanContext
 from ..core import Dataset, UserConfigError, get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
-from ..managers import ImageMetadataManager
 from .base_plugin import BasePlugin
 
 
@@ -78,35 +77,6 @@ class InputPlugin(BasePlugin):
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
-        self.__setup_image_metadata_manager()
-        self._original_input_shape = None
-
-    def __setup_image_metadata_manager(self):
-        """
-        Set up the ImageMetadataManager to determine the shape of the final
-        image.
-
-        The shape of the final image is required to determine the shape of
-        the processed data in the WorkflowTree.
-        """
-        _metadata_params = self.get_params(
-            "use_roi", "roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh", "binning"
-        )
-        if "hdf5_key" in self.params:
-            _metadata_params.append(self.get_param("hdf5_key"))
-        self._image_metadata = ImageMetadataManager(*_metadata_params)
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        self.update_filename_string()
-        self._image_metadata.update(filename=self.get_filename(0))
-        self._config["result_shape"] = self._image_metadata.final_shape
-        self._original_input_shape = (
-            self._image_metadata.raw_size_y,
-            self._image_metadata.raw_size_x,
-        )
 
     def prepare_carryon_check(self):
         """
@@ -157,9 +127,6 @@ class InputPlugin(BasePlugin):
         Run generic pre-execution routines.
         """
         self.update_filename_string()
-        self._image_metadata.update(filename=self.get_filename(0))
-        if self._original_input_shape is None:
-            self.calculate_result_shape()
         self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
         self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
         self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
@@ -223,7 +190,6 @@ class InputPlugin(BasePlugin):
             raise UserConfigError(
                 "Calling plugin execution without prior pre-execution is not allowed."
             )
-        self.update_required_kwargs(kwargs)
         if self._config["n_multi"] == 1:
             _data, kwargs = self.get_frame(index, **kwargs)
             _data.data_label = self.output_data_label
@@ -252,9 +218,11 @@ class InputPlugin(BasePlugin):
         _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
         _handling = self._SCAN.get_param_value("scan_multi_image_handling")
         _factor = self._config["n_multi"] if _handling == "Average" else 1
-        _data = Dataset(np.zeros(self._original_input_shape, dtype=np.float32))
+        _data = None
         for _frame_index in _frames:
             _tmp_data, kwargs = self.get_frame(_frame_index, **kwargs)
+            if _data is None:
+                _data = Dataset(np.zeros(_tmp_data.shape, dtype=np.float32))
             if _handling == "Maximum":
                 np.maximum(_data, _tmp_data, out=_data)
             else:
@@ -283,13 +251,6 @@ class InputPlugin(BasePlugin):
             The image data frame.
         """
         raise NotImplementedError
-
-    def update_required_kwargs(self, kwargs: dict):
-        """
-        Update the kwargs dict in place.
-        """
-        if "roi" not in kwargs and self.get_param_value("use_roi"):
-            kwargs["roi"] = self._image_metadata.roi
 
 
 InputPlugin.register_as_base_class()

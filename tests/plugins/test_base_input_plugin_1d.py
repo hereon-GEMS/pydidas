@@ -169,11 +169,6 @@ class TestBaseInputPlugin1d(unittest.TestCase):
         plugin.prepare_carryon_check()
         self.assertEqual(plugin._config["file_size"], os.stat(self._fname).st_size)
 
-    def test_calculate_result_shape(self):
-        plugin = TestInputPlugin1d()
-        plugin.calculate_result_shape()
-        self.assertEqual(self._datashape, plugin.result_shape)
-
     def test_pickle(self):
         plugin = InputPlugin1d()
         _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}

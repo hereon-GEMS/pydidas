@@ -55,6 +55,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         RES.clear_all_results()
         for _cls in (DummyLoader, DummyProc, DummyProcNewDataset):
             PLUGINS.check_and_register_class(_cls)
+        PLUGINS.verify_is_initialized()
 
     @classmethod
     def tearDownClass(cls):
@@ -101,6 +102,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         TREE.prepare_execution()
 
     def populate_WorkflowResults(self):
+        RES._config["frozen_TREE"].update_from_tree(TREE)
         RES.prepare_new_results()
         _results = {
             1: Dataset(
@@ -420,6 +422,8 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertEqual(_delta, [1] * RES.ndims[_node])
 
     def test_update_selection__with_use_scan_timeline(self):
+        TREE.prepare_execution()
+        TREE.execute_process(0)
         self.populate_WorkflowResults()
         _node = 1
         obj = WorkflowResultsSelector()
@@ -433,12 +437,12 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertTrue(np.allclose(obj.selection[0], np.arange(1, SCAN.n_points)))
         self.assertTrue(
             np.allclose(
-                obj.selection[1], np.arange(1, TREE.nodes[_node].plugin.result_shape[0])
+                obj.selection[1], np.arange(1, TREE.nodes[_node].result_shape[0])
             )
         )
         self.assertTrue(
             np.allclose(
-                obj.selection[2], np.arange(1, TREE.nodes[_node].plugin.result_shape[1])
+                obj.selection[2], np.arange(1, TREE.nodes[_node].result_shape[1])
             )
         )
 

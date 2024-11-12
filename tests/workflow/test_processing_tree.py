@@ -36,11 +36,12 @@ import numpy as np
 from pydidas import unittest_objects
 from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import PluginCollection
-from pydidas.workflow import GenericNode, ProcessingTree, WorkflowNode
+from pydidas.workflow import GenericNode, ProcessingTree, WorkflowNode, WorkflowTree
 
 
 COLL = PluginCollection()
 _PLUGIN_PATHS = COLL.registered_paths
+TREE = WorkflowTree()
 
 
 class TestProcessingTree(unittest.TestCase):
@@ -54,6 +55,12 @@ class TestProcessingTree(unittest.TestCase):
     def setUp(self):
         self._curr_tree = ProcessingTree()
         self._tmpdir = Path(tempfile.mkdtemp())
+        TREE.clear()
+        TREE.create_and_add_node(self.get_dummy_loader_plugin())
+        TREE.create_and_add_node(self.get_dummy_proc_plugin(), node_id=7)
+        TREE.create_and_add_node(
+            self.get_dummy_proc_plugin(), parent=TREE.root, node_id=91
+        )
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
@@ -112,15 +119,13 @@ class TestProcessingTree(unittest.TestCase):
 
     def test_get_all_result_shapes__single_node(self):
         self._curr_tree.create_and_add_node(self.get_dummy_loader_plugin())
+        self._curr_tree.execute_process(0)
         _shapes = self._curr_tree.get_all_result_shapes()
-        _dummy = self.get_dummy_loader_plugin()
-        _dummy.calculate_result_shape()
-        self.assertEqual(_shapes[0], _dummy.result_shape)
+        self.assertEqual(_shapes[0], self._curr_tree.root.result_shape)
 
     def test_get_all_result_shapes__tree(self):
         _dummy = self.get_dummy_loader_plugin()
-        _dummy.calculate_result_shape()
-        _shape = _dummy.result_shape
+        _shape = _dummy.execute(0)[0].shape
 
         self._curr_tree.create_and_add_node(self.get_dummy_loader_plugin())
         self._curr_tree.create_and_add_node(
@@ -130,18 +135,20 @@ class TestProcessingTree(unittest.TestCase):
             self.get_dummy_proc_plugin(), parent=self._curr_tree.root, node_id=3
         )
         self._curr_tree.prepare_execution()
+        self._curr_tree.execute_process(0)
         _shapes = self._curr_tree.get_all_result_shapes()
         self.assertEqual(_shapes[2], _shape)
         self.assertEqual(_shapes[3], _shape)
 
     def test_get_all_result_shapes__tree_with_keep_results(self):
         _dummy = self.get_dummy_loader_plugin()
-        _dummy.calculate_result_shape()
-        _shape = _dummy.result_shape
+        _shape = _dummy.execute(0)[0].shape
         self._curr_tree.create_and_add_node(self.get_dummy_loader_plugin())
         self._curr_tree.create_and_add_node(self.get_dummy_proc_plugin())
         self._curr_tree.create_and_add_node(self.get_dummy_proc_plugin())
         self._curr_tree.nodes[1].plugin.set_param_value("keep_results", True)
+        self._curr_tree.prepare_execution()
+        self._curr_tree.execute_process(0)
         _shapes = self._curr_tree.get_all_result_shapes()
         self.assertEqual(list(_shapes.keys()), [1, 2])
         self.assertEqual(_shapes[1], _shape)
@@ -333,15 +340,19 @@ class TestProcessingTree(unittest.TestCase):
         self._curr_tree.create_and_add_node(self.get_dummy_loader_plugin())
         self._curr_tree.create_and_add_node(self.get_dummy_proc_plugin())
         self._curr_tree.create_and_add_node(self.get_dummy_proc_plugin())
+        _node_ids = self._curr_tree.node_ids
         _str = self._curr_tree.export_to_string()
         self.assertIsInstance(_str, str)
+        self.assertEqual(self._curr_tree.node_ids, _node_ids)
 
     def test_restore_from_list_of_nodes(self):
         tree = ProcessingTree()
         _nodes, _index = self.create_node_tree()
         tree.set_root(_nodes[0][0])
         _dump = [node.dump() for node in tree.nodes.values()]
+        _context_node_ids = TREE.node_ids
         self._curr_tree.restore_from_list_of_nodes(_dump)
+        self.assertEqual(TREE.node_ids, _context_node_ids)
         for _id, _node in tree.nodes.items():
             self.assertTrue(_id in self._curr_tree.nodes.keys())
             self.assertIsInstance(
@@ -374,12 +385,25 @@ class TestProcessingTree(unittest.TestCase):
         _new_tree.create_and_add_node(self.get_dummy_loader_plugin())
         _new_tree.create_and_add_node(self.get_dummy_proc_plugin())
         _new_tree.create_and_add_node(self.get_dummy_proc_plugin(), node_id=42)
+        _new_tree_nodes = _new_tree.node_ids
         self._curr_tree.update_from_tree(_new_tree)
+        self.assertEqual(_new_tree.node_ids, _new_tree_nodes)
         for _id, _node in self._curr_tree.nodes.items():
             self.assertEqual(set(self._curr_tree.node_ids), set(_new_tree.node_ids))
             self.assertIsInstance(
                 self._curr_tree.nodes[_id].plugin, _new_tree.nodes[_id].plugin.__class__
             )
+
+    def test_update_from_tree__copy(self):
+        _nodes, _index = self.create_node_tree()
+        _new_tree = self._curr_tree.copy()
+        self._curr_tree.set_root(_nodes[0][0])
+        self._curr_tree.delete_node_by_id(4)
+        _new_node_ids = self._curr_tree.node_ids
+        self.assertNotEqual(_new_tree.node_ids, self._curr_tree.node_ids)
+        _new_tree.update_from_tree(self._curr_tree)
+        self.assertEqual(_new_tree.node_ids, _new_node_ids)
+        self.assertEqual(self._curr_tree.node_ids, _new_node_ids)
 
     def test_restore_from_string__empty(self):
         with self.assertRaises(UserConfigError):
@@ -397,44 +421,32 @@ class TestProcessingTree(unittest.TestCase):
         for _key in ["shapes", "labels", "names", "data_labels", "result_titles"]:
             self.assertIn(_key, _meta)
 
-    def test_get_complete_plugin_metadata__populated_tree(self):
+    def test_get_complete_plugin_metadata__populated_tree__no_results(self):
         _nodes, _index = self.create_node_tree(width=1, depth=3)
         self._curr_tree.set_root(_nodes[0][0])
         _meta = self._curr_tree.get_complete_plugin_metadata()
-        self.assertEqual(_meta["shapes"].keys(), self._curr_tree.nodes.keys())
+        self.assertEqual(list(_meta["shapes"].keys()), [])
+
+    def test_get_complete_plugin_metadata__populated_tree__w_single_result(self):
+        _nodes, _index = self.create_node_tree(width=1, depth=3)
+        self._curr_tree.set_root(_nodes[0][0])
+        self._curr_tree.prepare_execution()
+        self._curr_tree.execute_process(0)
+        _meta = self._curr_tree.get_complete_plugin_metadata()
+        self.assertEqual(list(_meta["shapes"].keys()), [3])
+        self.assertEqual(self._curr_tree.nodes[3].result_shape, _meta["shapes"][3])
+
+    def test_get_complete_plugin_metadata__populated_tree__w_results(self):
+        _nodes, _index = self.create_node_tree(width=1, depth=3)
+        self._curr_tree.set_root(_nodes[0][0])
+        self._curr_tree.prepare_execution()
+        self._curr_tree.execute_process(0, force_store_results=True)
+        _meta = self._curr_tree.get_complete_plugin_metadata()
+        self.assertEqual(
+            list(_meta["shapes"].keys()), list(self._curr_tree.nodes.keys())
+        )
         for _key, _node in self._curr_tree.nodes.items():
             self.assertEqual(_node.result_shape, _meta["shapes"][_key])
-
-    def test_get_complete_plugin_metadata__changed_tree_w_o_update(self):
-        _shape = (123, 456)
-        self._curr_tree.create_and_add_node(self.get_dummy_loader_plugin())
-        self._curr_tree.create_and_add_node(self.get_dummy_proc_plugin())
-        self._curr_tree.create_and_add_node(
-            unittest_objects.DummyProcNewDataset(output_shape=_shape),
-            parent=self._curr_tree.root,
-        )
-        _ = self._curr_tree.get_complete_plugin_metadata()
-        _meta_new = self._curr_tree.get_complete_plugin_metadata()
-        self.assertEqual(_shape, _meta_new["shapes"][2])
-
-    def test_get_complete_plugin_metadata__changed_tree_w_force_update(self):
-        _shape = (123, 456)
-        _nodes, _index = self.create_node_tree(width=1, depth=3)
-        self._curr_tree.set_root(_nodes[0][0])
-        _meta = self._curr_tree.get_complete_plugin_metadata()
-        self._curr_tree.nodes[1]._result_shape = _shape
-        _meta_new = self._curr_tree.get_complete_plugin_metadata(force_update=True)
-        self.assertEqual(_meta_new["shapes"][1], _meta["shapes"][1])
-
-    def test_get_complete_plugin_metadata__changed_tree_w_tree_changed_flag(self):
-        _shape = (123, 456)
-        _nodes, _index = self.create_node_tree(width=1, depth=3)
-        self._curr_tree.set_root(_nodes[0][0])
-        _meta = self._curr_tree.get_complete_plugin_metadata()
-        self._curr_tree.nodes[1]._result_shape = _shape
-        self._curr_tree._config["tree_changed"] = True
-        _meta_new = self._curr_tree.get_complete_plugin_metadata()
-        self.assertEqual(_meta_new["shapes"][1], _meta["shapes"][1])
 
     def test_hash__empty_tree(self):
         self.assertIsInstance(hash(self._curr_tree), int)

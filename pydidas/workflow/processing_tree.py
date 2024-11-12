@@ -217,7 +217,6 @@ class ProcessingTree(GenericTree):
             raise UserConfigError("The ProcessingTree has no nodes.")
         if self._pre_executed and not self.tree_has_changed and not forced:
             return
-        self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
         self._pre_executed = True
         self.reset_tree_changed_flag()
@@ -252,7 +251,6 @@ class ProcessingTree(GenericTree):
         """
         if node_id not in self.nodes:
             raise KeyError(f'The node ID "{node_id}" is not in use.')
-        self.root.propagate_shapes_and_global_config()
         self.nodes[node_id].prepare_execution()
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
@@ -388,15 +386,9 @@ class ProcessingTree(GenericTree):
                 _results[_node.node_id] = _node.results
         return _results
 
-    def get_all_result_shapes(self, force_update: bool = False) -> dict:
+    def get_all_result_shapes(self) -> dict:
         """
         Get the shapes of all leaves in form of a dictionary.
-
-        Parameters
-        ----------
-        force_update : bool, optional
-            Keyword to enforce a new calculation of the result shapes. The
-            default is False.
 
         Raises
         ------
@@ -412,14 +404,18 @@ class ProcessingTree(GenericTree):
         if self.root is None:
             raise UserConfigError("The ProcessingTree has no nodes.")
         _nodes_w_results = self.get_all_nodes_with_results()
-        _shapes = [_node.result_shape for _node in _nodes_w_results]
-        if None in _shapes or self.tree_has_changed or force_update:
-            self.root.propagate_shapes_and_global_config()
+        _shapes = [
+            _node.result_shape
+            for _node in _nodes_w_results
+            if _node.result_shape is not None
+        ]
+        if None in _shapes or self.tree_has_changed:
             self.reset_tree_changed_flag()
         _shapes = {
             _node.node_id: _node.result_shape
             for _node in _nodes_w_results
             if _node.plugin.output_data_dim is not None
+            and _node.result_shape is not None
         }
         for _id, _shape in _shapes.items():
             if -1 in _shape:
@@ -448,15 +444,12 @@ class ProcessingTree(GenericTree):
         ]
         return _nodes_w_results
 
-    def get_complete_plugin_metadata(self, force_update: bool = False) -> dict:
+    def get_complete_plugin_metadata(self) -> dict:
         """
         Get the metadata (e.g. shapes, labels, names) for all of the tree's plugins.
 
-        Parameters
-        ----------
-        force_update : bool, optional
-            Keyword to enforce a new calculation of the result shapes. The
-            default is False.
+        Note that the shapes are only available after running the plugin chain at
+        least once. Otherwise, the shapes will be set to None.
 
         Returns
         -------
@@ -473,11 +466,10 @@ class ProcessingTree(GenericTree):
         if self.root is None:
             return _meta
         _shapes = [_node.result_shape for _node in self.nodes.values()]
-        if None in _shapes or self.tree_has_changed or force_update:
-            self.root.propagate_shapes_and_global_config()
+        if None in _shapes or self.tree_has_changed:
             self.reset_tree_changed_flag()
         for _node_id, _node in self.nodes.items():
-            if _node.plugin.output_data_dim is None:
+            if _node.plugin.output_data_dim is None or _node.result_shape is None:
                 continue
             _label = _node.plugin.get_param_value("label")
             _plugin_name = _node.plugin.__class__.plugin_name

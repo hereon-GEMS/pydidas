@@ -41,6 +41,7 @@ Bugfixes
 - Fixed an issue when restoring the GUI to a different screen in multiscreen systems.
 - Fixed an issue with inspecting detailed results for fit plugins when the first 
   fit point had an invalid result (e.g. peak intensity too low).
+- Fixed an issue when copying a ProcessingTree which had no nodes.
 
 
 v24.09.19

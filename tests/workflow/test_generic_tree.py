@@ -439,6 +439,8 @@ class TestGenericTree(unittest.TestCase):
         _nodes, _n_nodes = self.create_node_tree(depth=_depth, width=_width)
         tree.register_node(_nodes[0][0])
         _copy = tree.copy()
+        for _key in ["root", "nodes", "_starthash", "node_ids", "_config"]:
+            self.assertIn(_key, _copy.__dict__.keys())
         for _node in tree.nodes.values():
             self.assertFalse(_node in _copy.nodes.values())
 
@@ -448,6 +450,8 @@ class TestGenericTree(unittest.TestCase):
         _copy = tree.copy()
         self.assertIsInstance(_copy, GenericTree)
         self.assertEqual(tree.dummy, _copy.dummy)
+        for _key in ["root", "nodes", "_starthash", "node_ids", "_config"]:
+            self.assertIn(_key, _copy.__dict__.keys())
 
     def test_hash___empty_tree(self):
         tree = GenericTree()

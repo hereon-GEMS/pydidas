@@ -185,12 +185,3 @@ class DummyLoader(InputPlugin):
             data_label="Dummy data",
             data_unit="data U",
         ), kwargs
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        self._config["result_shape"] = (
-            self.get_param_value("image_height"),
-            self.get_param_value("image_width"),
-        )

@@ -97,10 +97,10 @@ class DummyProcNewDataset(ProcPlugin):
             The updated data
         kwargs : dict
             The update input kwargs. This method will add the offset to the
-            dict keys for rerference.
+            dict keys for reference.
         """
         self._executed = True
-        _data = np.zeros(self.get_param_value("_output_shape")) + np.mean(data)
+        _data = Dataset(np.zeros(self.get_param_value("_output_shape")) + np.mean(data))
         return _data, kwargs
 
     def pre_execute(self):

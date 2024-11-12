@@ -24,11 +24,7 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = [
-    "copy_docstring",
-    "process_1d_with_multi_input_dims",
-    "calculate_result_shape_for_multi_input_dims",
-]
+__all__ = ["copy_docstring", "process_1d_with_multi_input_dims"]
 
 
 import functools
@@ -41,8 +37,8 @@ from ..dataset import Dataset
 from ..exceptions import UserConfigError
 from .iterable_utils import (
     insert_item_in_tuple,
+    insert_items_in_tuple,
     remove_item_at_index_from_iterable,
-    replace_item_in_iterable,
 )
 
 
@@ -123,39 +119,20 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
                 "limited to 500. Please check your workflow."
             )
         for _params in itertools.product(*_indices):
-            _input_slices = insert_item_in_tuple(
-                _params, _dim_to_process, slice(0, data.shape[_dim_to_process])
-            )
-            _input = data[_input_slices]
+            _input = data[insert_item_in_tuple(_params, _dim_to_process, slice(None))]
             _single_result, _new_kws = method(self, _input, **kwargs)
-
-            _point = insert_item_in_tuple(_params, _dim_to_process, None)
-            _detail_identifier = data.get_description_of_point(_point)
-            if _process_details:
-                _details[_detail_identifier] = self._details.pop(None)
-
-            _output_slices = insert_item_in_tuple(
-                _params, _dim_to_process, slice(0, _single_result.size)
-            )
             if _results is None:
-                _results_shape = insert_item_in_tuple(
-                    _results_shape, _dim_to_process, _single_result.size
-                )
-                _results = Dataset(
-                    np.zeros(_results_shape),
-                    data_unit=_single_result.data_unit,
-                    data_label=_single_result.data_label,
-                )
-                for _prop in ["axis_labels", "axis_units", "axis_ranges"]:
-                    _value = replace_item_in_iterable(
-                        tuple(getattr(data, _prop).values()),
-                        _dim_to_process,
-                        getattr(_single_result, _prop).get(0),
-                    )
-                    setattr(_results, _prop, _value)
+                _results = _create_result_dataset(_dim_to_process, data, _single_result)
+            if _process_details:
+                _point = insert_item_in_tuple(_params, _dim_to_process, None)
+                _detail_identifier = data.get_description_of_point(_point)
+                _details[_detail_identifier] = self._details.pop(None)
+            _output_slices = insert_items_in_tuple(
+                _params, _dim_to_process, *(_single_result.ndim * (slice(None),))
+            )
             _results[_output_slices] = _single_result
-        if _results.shape[_dim_to_process] == 1:
-            _results = _results.squeeze(_dim_to_process)
+        # if _results.shape[_dim_to_process] == 1:
+        #     _results = _results.squeeze(_dim_to_process)
         if _process_details:
             self._details = _details
         return _results, _new_kws
@@ -164,36 +141,43 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
     return _implementation
 
 
-def calculate_result_shape_for_multi_input_dims(method: Callable) -> Callable:
+def _create_result_dataset(
+    dim_to_process: int, input: Dataset, result: Dataset
+) -> Dataset:
     """
-    Decorator to update the result shape for multiple input dimensions.
+    Create a result dataset.
+
+    Parameters
+    ----------
+    dim_to_process : int
+        The dimension to process
+    input : Dataset
+        The input data.
+    result : Dataset
+        The result data.
+
+    Returns
+    -------
+    Dataset
+        The result dataset.
     """
-
-    @functools.wraps(method)
-    def _implementation(self):
-        """
-        Calculate_result_shape for multi-dimensional input.
-
-        This decorator updates the original calculate_result_shape method
-        in the pydidas Plugin.
-        """
-        method(self)
-        if self._config["input_shape"] is None:
-            return
-        _input_ndim = len(self._config["input_shape"])
-        if _input_ndim <= 1:
-            return
-        _dim_to_process = np.mod(self.get_param_value("process_data_dim"), _input_ndim)
-        _shape = list(self._config["input_shape"])
-        del _shape[_dim_to_process]
-        if self._config["result_shape"] == (1,):
-            self._config["result_shape"] = tuple(_shape)
-        else:
-            self._config["result_shape"] = tuple(
-                _shape[:_dim_to_process]
-                + list(self._config["result_shape"])
-                + _shape[_dim_to_process:]
-            )
-
-    _implementation.__doc__ = method.__doc__
-    return _implementation
+    _results_shape = insert_items_in_tuple(
+        remove_item_at_index_from_iterable(input.shape, dim_to_process),
+        dim_to_process,
+        *result.shape,
+    )
+    _results = Dataset(
+        np.zeros(_results_shape),
+        data_unit=result.data_unit,
+        data_label=result.data_label,
+        metadata=result.metadata,
+    )
+    for _prop in ["axis_labels", "axis_units", "axis_ranges"]:
+        _val = list(getattr(input, _prop).values())
+        _val = (
+            _val[:dim_to_process]
+            + list(getattr(result, _prop).values())
+            + _val[dim_to_process + 1 :]
+        )
+        setattr(_results, _prop, _val)
+    return _results

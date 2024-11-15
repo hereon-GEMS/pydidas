@@ -169,3 +169,4 @@ def app_processor(
         time.sleep(0.005)
     _debug_message("Worker shutting down.")
     _finished_queue.put(1)
+    _app.deleteLater()

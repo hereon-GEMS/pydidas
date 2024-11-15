@@ -32,6 +32,7 @@ import multiprocessing as mp
 import time
 import warnings
 from multiprocessing.shared_memory import SharedMemory
+from numbers import Integral
 from typing import Optional, Union
 
 import numpy as np
@@ -235,17 +236,25 @@ class ExecuteWorkflowApp(BaseApp):
 
     def _unlink_shared_memory_buffers(self):
         """
-        Unlink the shared memory buffers.
+        Close (and unlink) the shared memory buffers.
 
         Note that only the master app should unlink the shared memory buffers.
         """
-        if self.slave_mode:
-            return
-        _buffers = self._locals.get("shared_memory_buffers", {})
+        _buffers = self._locals.get("shared_emory_buffers", {})
+        print("\n\nLocal buffers ", _buffers)
+        print("in ", self)
         while _buffers:
             _key, _buffer = _buffers.popitem()
             _buffer.close()
-            _buffer.unlink()
+            print(
+                f"\nclosed buffer {_key} as {'slave' if self.slave_mode else 'master'}"
+                "\nfrom ", self
+            )
+            print("new buffer: ", _buffer)
+            time.sleep(0.001)
+            if not self.slave_mode:
+                print("Unlinking buffer", _buffer.name, _buffer)
+                _buffer.unlink()
 
     def _store_context(self):
         """
@@ -422,11 +431,12 @@ class ExecuteWorkflowApp(BaseApp):
         _n = self.mp_manager["buffer_n"].value
         _pid = self.mp_manager["master_pid"].value
         _buffers = self._locals["shared_memory_buffers"] = {}
-        _buffers["flag"] = SharedMemory(name=f"flag_{_pid}", create=True, size=4 * _n)
+        print("initializing shared memory in ", self)
+        _buffers["share_in_use_flag"] = SharedMemory(name=f"share_in_use_flag_{_pid}", create=True, size=4 * _n)
         for _node_id, _shape in self.mp_manager["shapes_dict"].items():
             _num_bytes = int(4 * _n * np.prod(_shape))
             _buffers[_node_id] = SharedMemory(
-                name=f"{_node_id}_{_pid}", create=True, size=_num_bytes
+                name=f"share_node{_node_id:03d}_{_pid}", create=True, size=_num_bytes
             )
         self.mp_manager["shapes_set"].set()
 
@@ -434,15 +444,16 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Initialize the numpy arrays from the shared memory buffers.
         """
+        print("iniializ arrays from shared memory in ", self)as
         _buffer_size = self.mp_manager["buffer_n"].value
         for _key, _shape in self.mp_manager["shapes_dict"].items():
-            _shared_mem = self.__get_shared_memory(_key)
+            _shared_mem = self.__get_shared_memory(f"node_{_key:03d}")
             _arr_shape = (_buffer_size,) + _shape
             self._shared_arrays[_key] = np.ndarray(
                 _arr_shape, dtype=np.float32, buffer=_shared_mem.buf
             )
-        _shared_mem = self.__get_shared_memory("flag")
-        self._shared_arrays["flag"] = np.ndarray(
+        _shared_mem = self.__get_shared_memory("in_use_flag")
+        self._shared_arrays["share_in_use_flag"] = np.ndarray(
             (_buffer_size,), dtype=np.int32, buffer=_shared_mem.buf
         )
 
@@ -461,11 +472,10 @@ class ExecuteWorkflowApp(BaseApp):
             The SharedMemory object.
         """
         _master_pid = self.mp_manager["master_pid"].value
-        if name in self._locals["shared_memory_buffers"]:
-            return self._locals["shared_memory_buffers"][name]
-        _mem_buffer = SharedMemory(name=f"{name}_{_master_pid}")
-        self._locals["shared_memory_buffers"][name] = _mem_buffer
-        return _mem_buffer
+        if name not in self._locals["shared_memory_buffers"]:
+            _mem_buffer = SharedMemory(name=f"share_{name}_{_master_pid}")
+            self._locals["shared_memory_buffers"][name] = _mem_buffer
+        return self._locals["shared_memory_buffers"][name]
 
     def __write_results_to_shared_arrays(self):
         """Write the results from the WorkflowTree execution to the shared array."""
@@ -473,11 +483,11 @@ class ExecuteWorkflowApp(BaseApp):
             self._initialize_arrays_from_shared_memory()
         while True:
             with self.mp_manager["lock"]:
-                _zeros = np.where(self._shared_arrays["flag"] == 0)[0]
+                _zeros = np.where(self._shared_arrays["share_in_use_flag"] == 0)[0]
                 if _zeros.size > 0:
                     _buffer_pos = _zeros[0]
                     self._config["buffer_pos"] = _buffer_pos
-                    self._shared_arrays["flag"][_buffer_pos] = 1
+                    self._shared_arrays["share_in_use_flag"][_buffer_pos] = 1
                     break
             time.sleep(0.005)
         with self.mp_manager["lock"]:
@@ -563,9 +573,9 @@ class ExecuteWorkflowApp(BaseApp):
             _new_results = {
                 _key: _arr[buffer_pos]
                 for _key, _arr in self._shared_arrays.items()
-                if _key != "flag"
+                if _key != "share_in_use_flag"
             }
-            self._shared_arrays["flag"][buffer_pos] = 0
+            self._shared_arrays["share_in_use_flag"][buffer_pos] = 0
         RESULTS.store_results(index, _new_results)
         if self.get_param_value("autosave_results"):
             if not self._config["export_files_prepared"]:

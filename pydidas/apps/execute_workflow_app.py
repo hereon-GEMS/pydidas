@@ -46,6 +46,7 @@ from ..core import (
     UserConfigError,
     get_generic_param_collection,
 )
+from ..core.utils import pydidas_logger
 from ..core.utils.dataset_utils import get_default_property_dict
 from ..workflow import WorkflowResultsContext, WorkflowTree
 from ..workflow.result_io import WorkflowResultIoMeta
@@ -57,6 +58,8 @@ SCAN = ScanContext()
 EXP = DiffractionExperimentContext()
 RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
+
+logger = pydidas_logger()
 
 
 class ExecuteWorkflowApp(BaseApp):
@@ -111,16 +114,17 @@ class ExecuteWorkflowApp(BaseApp):
     )
     parse_func = execute_workflow_app_parser
     attributes_not_to_copy_to_slave_app = (
-        BaseApp.attributes_not_to_copy_to_slave_app
-        + [
-            "_shared_arrays",
-            "_index",
-            "_mp_tasks",
-        ]
+            BaseApp.attributes_not_to_copy_to_slave_app
+            + [
+                "_shared_arrays",
+                "_index",
+                "_mp_tasks",
+            ]
     )
     sig_results_updated = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
+        self.print_debug = kwargs.pop("print_debug", False)
         BaseApp.__init__(self, *args, **kwargs)
         self._config.update(
             {
@@ -240,21 +244,19 @@ class ExecuteWorkflowApp(BaseApp):
 
         Note that only the master app should unlink the shared memory buffers.
         """
-        _buffers = self._locals.get("shared_emory_buffers", {})
-        print("\n\nLocal buffers ", _buffers)
-        print("in ", self)
+        _buffers = self._locals.get("shared_memory_buffers", {})
         while _buffers:
             _key, _buffer = _buffers.popitem()
             _buffer.close()
-            print(
-                f"\nclosed buffer {_key} as {'slave' if self.slave_mode else 'master'}"
-                "\nfrom ", self
-            )
-            print("new buffer: ", _buffer)
-            time.sleep(0.001)
             if not self.slave_mode:
-                print("Unlinking buffer", _buffer.name, _buffer)
-                _buffer.unlink()
+                try:
+                    _buffer.unlink()
+                except FileNotFoundError:
+                    logger.error(
+                        "Error while unlinking shared memory buffers from app: %s %s "
+                        %(_buffer, self)
+                    )
+                    pass
 
     def _store_context(self):
         """
@@ -431,12 +433,11 @@ class ExecuteWorkflowApp(BaseApp):
         _n = self.mp_manager["buffer_n"].value
         _pid = self.mp_manager["master_pid"].value
         _buffers = self._locals["shared_memory_buffers"] = {}
-        print("initializing shared memory in ", self)
-        _buffers["share_in_use_flag"] = SharedMemory(name=f"share_in_use_flag_{_pid}", create=True, size=4 * _n)
+        _buffers["in_use_flag"] = SharedMemory(name=f"share_in_use_flag_{_pid}", create=True, size=4 * _n)
         for _node_id, _shape in self.mp_manager["shapes_dict"].items():
             _num_bytes = int(4 * _n * np.prod(_shape))
-            _buffers[_node_id] = SharedMemory(
-                name=f"share_node{_node_id:03d}_{_pid}", create=True, size=_num_bytes
+            _buffers[f"node_{_node_id:03d}"] = SharedMemory(
+                name=f"share_node_{_node_id:03d}_{_pid}", create=True, size=_num_bytes
             )
         self.mp_manager["shapes_set"].set()
 
@@ -444,7 +445,6 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Initialize the numpy arrays from the shared memory buffers.
         """
-        print("iniializ arrays from shared memory in ", self)as
         _buffer_size = self.mp_manager["buffer_n"].value
         for _key, _shape in self.mp_manager["shapes_dict"].items():
             _shared_mem = self.__get_shared_memory(f"node_{_key:03d}")
@@ -453,7 +453,7 @@ class ExecuteWorkflowApp(BaseApp):
                 _arr_shape, dtype=np.float32, buffer=_shared_mem.buf
             )
         _shared_mem = self.__get_shared_memory("in_use_flag")
-        self._shared_arrays["share_in_use_flag"] = np.ndarray(
+        self._shared_arrays["in_use_flag"] = np.ndarray(
             (_buffer_size,), dtype=np.int32, buffer=_shared_mem.buf
         )
 
@@ -483,11 +483,11 @@ class ExecuteWorkflowApp(BaseApp):
             self._initialize_arrays_from_shared_memory()
         while True:
             with self.mp_manager["lock"]:
-                _zeros = np.where(self._shared_arrays["share_in_use_flag"] == 0)[0]
+                _zeros = np.where(self._shared_arrays["in_use_flag"] == 0)[0]
                 if _zeros.size > 0:
                     _buffer_pos = _zeros[0]
                     self._config["buffer_pos"] = _buffer_pos
-                    self._shared_arrays["share_in_use_flag"][_buffer_pos] = 1
+                    self._shared_arrays["in_use_flag"][_buffer_pos] = 1
                     break
             time.sleep(0.005)
         with self.mp_manager["lock"]:
@@ -573,9 +573,9 @@ class ExecuteWorkflowApp(BaseApp):
             _new_results = {
                 _key: _arr[buffer_pos]
                 for _key, _arr in self._shared_arrays.items()
-                if _key != "share_in_use_flag"
+                if _key != "in_use_flag"
             }
-            self._shared_arrays["share_in_use_flag"][buffer_pos] = 0
+            self._shared_arrays["in_use_flag"][buffer_pos] = 0
         RESULTS.store_results(index, _new_results)
         if self.get_param_value("autosave_results"):
             if not self._config["export_files_prepared"]:
@@ -596,6 +596,14 @@ class ExecuteWorkflowApp(BaseApp):
         Delete the instance of the ExecuteWorkflowApp.
         """
         if not self.slave_mode:
-            self.mp_manager.shutdown()
+            self._mp_manager_instance.shutdown()
         self._unlink_shared_memory_buffers()
         super().deleteLater()
+
+    def __del__(self):
+        """
+        Delete the ExecuteWorkflowApp.
+        """
+        if not self.slave_mode:
+            self._mp_manager_instance.shutdown()
+        self._unlink_shared_memory_buffers()

@@ -89,7 +89,7 @@ class BaseApp(ObjectWithParameterCollection):
 
         This method is called by the Qt event loop to delete the app instance.
         """
-        if isinstance(self._mp_manager_instance, mp.Manager):
+        if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
             self._mp_manager_instance.shutdown()
         super().deleteLater()
 
@@ -157,6 +157,13 @@ class BaseApp(ObjectWithParameterCollection):
         need to re-implement it when they explicitly need it.
         """
         self._config["run_prepared"] = True
+
+
+    def prepare_run(self):
+        """
+        Prepare running the app. This is a wrapper for multiprocessing_pre_run.
+        """
+        self.multiprocessing_pre_run()
 
     def multiprocessing_post_run(self):
         """

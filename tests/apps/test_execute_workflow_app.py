@@ -98,7 +98,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def tearDown(self):
         ExecuteWorkflowApp.parse_func = execute_workflow_app_parser
         for _app in self._apps:
-            _app._unlink_shared_memory_buffers()
+            _app.close_shared_arrays_and_memory()
         for _share in self._shares:
             _share.close()
             _share.unlink()
@@ -235,38 +235,38 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         for _key, _val in _exp_copy.items():
             self.assertEqual(EXP.get_param_value(_key), _val)
 
-    def test_unlink_shared_memory_buffers__empty(self):
+    def test_close_shared_arrays_and_memory__empty(self):
         app = self.get_exec_workflow_app()
-        app._unlink_shared_memory_buffers()
+        app.close_shared_arrays_and_memory()
         self.assertEqual(app._locals.get("shared_memory_buffers"), {})
 
-    def test_unlink_shared_memory_buffers(self):
+    def test_close_shared_arrays_and_memory(self):
         app = self.get_exec_workflow_app()
         for _key in (1, 2):
             app._locals["shared_memory_buffers"][_key] = mp.shared_memory.SharedMemory(
                 create=True, size=100, name=f"test_{_key}"
             )
         self.assertEqual(len(app._locals["shared_memory_buffers"]), 2)
-        app._unlink_shared_memory_buffers()
+        app.close_shared_arrays_and_memory()
         self.assertEqual(app._locals.get("shared_memory_buffers"), {})
 
-    def test_unlink_shared_memory_buffers__slave(self):
+    def test_close_shared_arrays_and_memory__slave(self):
         master = self.get_exec_workflow_app()
         for _key in (1, 2):
             _share = mp.shared_memory.SharedMemory(
-                    create=True, size=100, name=f"test_{_key}"
-                )
+                create=True, size=100, name=f"test_{_key}"
+            )
             master._locals["shared_memory_buffers"][_key] = _share
         app = master.copy(slave_mode=True)
         self._apps.append(app)
-        app._unlink_shared_memory_buffers()
+        app.close_shared_arrays_and_memory()
         self.assertEqual(app._locals.get("shared_memory_buffers"), {})
         self.assertEqual(len(master._locals["shared_memory_buffers"]), 2)
 
     def test_prepare_run__slave_mode(self):
         master, app = self.get_master_and_slave_app()
         self.assertTrue(app._config["run_prepared"])
-    
+
     def test_prepare_run__master_mode(self):
         app = self.get_exec_workflow_app()
         self.assertTrue(app._config["run_prepared"])
@@ -322,7 +322,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         master, app = self.get_master_and_slave_app()
         master.mp_manager["shapes_set"].set()
         self.assertTrue(app.signal_processed_and_can_continue())
-    
+
     def test_multiprocessing_func__as_master(self):
         _index = 12
         app = self.get_exec_workflow_app()
@@ -398,7 +398,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
                         app.mp_manager["metadata_dict"][_key]["axis_ranges"][_dim],
                     )
                 )
-    
+
     def test_publish_shapes_and_metadata_to_manager__with_ndarray(self):
         TREE.delete_node_by_id(2)
         TREE.execute_process(0)
@@ -426,7 +426,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
                 self.assertIsInstance(
                     app.mp_manager["metadata_dict"][_key]["data_label"], str
                 )
-    
+
     def test_create_shared_memory__not_set(self):
         app = self.get_exec_workflow_app()
         with self.assertRaises(UserConfigError):
@@ -455,7 +455,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.mp_manager["shapes_dict"] = {1: (10, 10), 2: (10, 10)}
         app._check_size_of_results_and_buffer()
         self.assertTrue(app.mp_manager["buffer_n"].value > 0)
-    
+
     def test_initialize_shared_memory(self):
         app = self.get_exec_workflow_app()
         app.mp_manager["buffer_n"].value = 10
@@ -500,7 +500,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def test_get_shared_memory__new(self):
         app = self.get_exec_workflow_app()
         _share = mp.shared_memory.SharedMemory(
-            create=True, size=100, name=f"share_node_001_{app.mp_manager['master_pid'].value}"
+            create=True,
+            size=100,
+            name=f"share_node_001_{app.mp_manager['master_pid'].value}",
         )
         _res = app._ExecuteWorkflowApp__get_shared_memory("node_001")
         self.assertIsInstance(_res, mp.shared_memory.SharedMemory)
@@ -534,11 +536,11 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.mp_manager["shapes_set"].set()
         _sig = app.must_send_signal_and_wait_for_response()
         self.assertIsNone(_sig)
-    
+
     def test_get_latest_results__shapes_not_set(self):
         master, app = self.get_master_and_slave_app()
         self.assertIsNone(app.get_latest_results())
-    
+
     def test_get_latest_results__shapes_set(self):
         master, app = self.get_master_and_slave_app()
         _ = master.multiprocessing_func(0)
@@ -646,7 +648,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.run()
         _res = RESULTS.get_results(1)
         self.assertTrue(np.all(_res > 0))
-    
+
     def test_copy__to_slave(self):
         master = self.get_exec_workflow_app()
         for _key in ExecuteWorkflowApp.attributes_not_to_copy_to_slave_app:
@@ -676,7 +678,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test__run_in_processor_with_slave_worker(self):
         logging.basicConfig(level=logging.DEBUG)
-        master = self.get_exec_workflow_app(print_debug=True)
+        self._master = self.get_exec_workflow_app(print_debug=True)
         _lock_manager = mp.Manager()
         _queues = {
             "queue_input": mp.Queue(),
@@ -695,10 +697,14 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             args=(
                 _mp_kwargs,
                 ExecuteWorkflowApp,
-                master.params.copy(),
-                master.get_config(),
+                self._master.params.copy(),
+                self._master.get_config(),
             ),
-            kwargs={"use_tasks": True, "app_mp_manager": master.mp_manager, "print_debug": True},
+            kwargs={
+                "use_tasks": True,
+                "app_mp_manager": self._master.mp_manager,
+                "print_debug": True,
+            },
             name=f"pydidas_{mp.current_process().pid}_worker",
         )
         for _i in range(SCAN.shape[-1]):
@@ -709,11 +715,11 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             _res = _queues["queue_output"].get_nowait()
         _signal = _queues["queue_signal"].get()
         self.assertEqual(_signal, "::shapes_not_set::")
-        master._create_shared_memory()
+        self._master._create_shared_memory()
         time.sleep(0.05)
         for _i in range(SCAN.shape[-1]):
             _latest = _queues["queue_output"].get_nowait()
-            master.multiprocessing_store_results(*_latest)
+            self._master.multiprocessing_store_results(*_latest)
             self.assertEqual(_latest[0], _i)
             self.assertIsInstance(_latest[1], Integral)
             time.sleep(0.05)
@@ -727,6 +733,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test__repeated_run_in_processor_with_slave_worker(self):
         self.test__run_in_processor_with_slave_worker()
+        _ = self._apps.pop()
+        self._master.deleteLater()
+        self._master = None
         self.test__run_in_processor_with_slave_worker()
 
 

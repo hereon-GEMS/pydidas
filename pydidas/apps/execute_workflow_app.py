@@ -32,7 +32,6 @@ import multiprocessing as mp
 import time
 import warnings
 from multiprocessing.shared_memory import SharedMemory
-from numbers import Integral
 from typing import Optional, Union
 
 import numpy as np
@@ -114,12 +113,12 @@ class ExecuteWorkflowApp(BaseApp):
     )
     parse_func = execute_workflow_app_parser
     attributes_not_to_copy_to_slave_app = (
-            BaseApp.attributes_not_to_copy_to_slave_app
-            + [
-                "_shared_arrays",
-                "_index",
-                "_mp_tasks",
-            ]
+        BaseApp.attributes_not_to_copy_to_slave_app
+        + [
+            "_shared_arrays",
+            "_index",
+            "_mp_tasks",
+        ]
     )
     sig_results_updated = QtCore.Signal()
 
@@ -217,7 +216,7 @@ class ExecuteWorkflowApp(BaseApp):
         if self.slave_mode:
             self._recreate_context()
         else:
-            self._unlink_shared_memory_buffers()
+            self.close_shared_arrays_and_memory()
             RESULT_SAVER.set_active_savers_and_title([])
             self._store_context()
             RESULTS.prepare_new_results()
@@ -238,13 +237,14 @@ class ExecuteWorkflowApp(BaseApp):
         for _key, _val in self._config["exp_context"].items():
             EXP.set_param_value(_key, _val)
 
-    def _unlink_shared_memory_buffers(self):
+    def close_shared_arrays_and_memory(self):
         """
         Close (and unlink) the shared memory buffers.
 
         Note that only the master app should unlink the shared memory buffers.
         """
         _buffers = self._locals.get("shared_memory_buffers", {})
+        self._shared_arrays = {}
         while _buffers:
             _key, _buffer = _buffers.popitem()
             _buffer.close()
@@ -254,7 +254,7 @@ class ExecuteWorkflowApp(BaseApp):
                 except FileNotFoundError:
                     logger.error(
                         "Error while unlinking shared memory buffers from app: %s %s "
-                        %(_buffer, self)
+                        % (_buffer, self)
                     )
                     pass
 
@@ -357,6 +357,15 @@ class ExecuteWorkflowApp(BaseApp):
         self.__write_results_to_shared_arrays()
         return self._config["buffer_pos"]
 
+    @QtCore.Slot()
+    def multiprocessing_post_run(self):
+        """
+        Perform operations after running the main parallel processing function.
+
+        This implementation will close the arrays and unlink the shared memory buffers.
+        """
+        self.close_shared_arrays_and_memory()
+
     def _publish_shapes_and_metadata_to_manager(self):
         """
         Publish the shapes and metadata to the multiprocessing manager dictionaries.
@@ -433,7 +442,9 @@ class ExecuteWorkflowApp(BaseApp):
         _n = self.mp_manager["buffer_n"].value
         _pid = self.mp_manager["master_pid"].value
         _buffers = self._locals["shared_memory_buffers"] = {}
-        _buffers["in_use_flag"] = SharedMemory(name=f"share_in_use_flag_{_pid}", create=True, size=4 * _n)
+        _buffers["in_use_flag"] = SharedMemory(
+            name=f"share_in_use_flag_{_pid}", create=True, size=4 * _n
+        )
         for _node_id, _shape in self.mp_manager["shapes_dict"].items():
             _num_bytes = int(4 * _n * np.prod(_shape))
             _buffers[f"node_{_node_id:03d}"] = SharedMemory(
@@ -595,9 +606,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Delete the instance of the ExecuteWorkflowApp.
         """
-        if not self.slave_mode:
-            self._mp_manager_instance.shutdown()
-        self._unlink_shared_memory_buffers()
+        self.__del__()
         super().deleteLater()
 
     def __del__(self):
@@ -605,5 +614,6 @@ class ExecuteWorkflowApp(BaseApp):
         Delete the ExecuteWorkflowApp.
         """
         if not self.slave_mode:
-            self._mp_manager_instance.shutdown()
-        self._unlink_shared_memory_buffers()
+            if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
+                self._mp_manager_instance.shutdown()
+        self.close_shared_arrays_and_memory()

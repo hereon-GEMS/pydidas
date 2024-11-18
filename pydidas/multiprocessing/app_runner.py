@@ -72,6 +72,7 @@ class AppRunner(WorkerController):
     """
 
     sig_final_app_state = QtCore.Signal(object)
+    sig_post_run_called = QtCore.Signal()
 
     def __init__(
         self,
@@ -84,6 +85,7 @@ class AppRunner(WorkerController):
         if not app._config["run_prepared"]:
             app.multiprocessing_pre_run()
         self.sig_results.connect(app.multiprocessing_store_results)
+        self.sig_post_run_called.connect(app.multiprocessing_post_run)
         self.__app = app.copy(slave_mode=True)
         self.__check_app_is_set()
         self._use_app_tasks = use_app_tasks
@@ -180,6 +182,7 @@ class AppRunner(WorkerController):
         WorkerController.cycle_post_run(self, timeout)
         self.__app.multiprocessing_post_run()
         self.sig_final_app_state.emit(self.__app.copy())
+        self.sig_post_run_called.emit()
         logger.debug("AppRunner: Finished cycle post run")
 
     @QtCore.Slot(float)

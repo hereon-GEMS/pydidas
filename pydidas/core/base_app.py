@@ -158,13 +158,13 @@ class BaseApp(ObjectWithParameterCollection):
         """
         self._config["run_prepared"] = True
 
-
     def prepare_run(self):
         """
         Prepare running the app. This is a wrapper for multiprocessing_pre_run.
         """
         self.multiprocessing_pre_run()
 
+    @QtCore.Slot()
     def multiprocessing_post_run(self):
         """
         Perform operations after running main parallel processing function.

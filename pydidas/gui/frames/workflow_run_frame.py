@@ -225,6 +225,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self._runner.sig_final_app_state.disconnect()
         self._runner.sig_progress.disconnect()
         self._runner.sig_results.disconnect()
+        self._runner.sig_post_run_called.disconnect()
         self._runner.sig_message_from_worker.disconnect()
         self._runner.deleteLater()
         self._runner = None

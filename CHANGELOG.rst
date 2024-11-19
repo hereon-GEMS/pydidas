@@ -28,6 +28,7 @@ Improvements
       ExecuteWorkflowApp update.
     - Updated WorkflowResults contexts to accept dynamic result shapes.
     - Removed redundant code from plugins (because of changes in shape handling).
+    - Switched to using ruff instead of black, flake8 and isort in github actions.
 
 Bugfixes
 --------

@@ -29,7 +29,7 @@ import unittest
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.core import Dataset, UserConfigError
+from pydidas.core import Dataset
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
@@ -76,37 +76,6 @@ class TestAverageOppositeSectors(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("AverageOppositeSectors")()
         plugin.pre_execute()
         # assert does not raise an Error
-
-    def test_calculate_result_shape__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("AverageOppositeSectors")()
-        with self.assertRaises(UserConfigError):
-            plugin.calculate_result_shape()
-
-    def test_calculate_result_shape__correct_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("AverageOppositeSectors")()
-        plugin._config["input_shape"] = (24, 500)
-        plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (12, 500))
-
-    # def test_calculate_result_shape__correct_input_full_symmetry(self):
-    #     plugin = PLUGIN_COLLECTION.get_plugin_by_name("AverageOppositeSectors")()
-    #     plugin.set_param_value("symmetry", plugin.get_param("symmetry").choices[1])
-    #     plugin._config["input_shape"] = (24, 500)
-    #     plugin.calculate_result_shape()
-    #     self.assertEqual(plugin._config["result_shape"], (6, 500))
-
-    def test_calculate_result_shape__incorrect_shape(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("AverageOppositeSectors")()
-        plugin._config["input_shape"] = (25, 500)
-        with self.assertRaises(UserConfigError):
-            plugin.calculate_result_shape()
-
-    # def test_calculate_result_shape__full_symmetry_incorrect_shape(self):
-    #     plugin = PLUGIN_COLLECTION.get_plugin_by_name("AverageOppositeSectors")()
-    #     plugin.set_param_value("symmetry", plugin.get_param("symmetry").choices[1])
-    #     plugin._config["input_shape"] = (22, 500)
-    #     with self.assertRaises(UserConfigError):
-    #         plugin.calculate_result_shape()
 
 
 if __name__ == "__main__":

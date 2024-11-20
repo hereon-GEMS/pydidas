@@ -267,7 +267,6 @@ class BasePlugin(ObjectWithParameterCollection):
             if _kw in self.params.keys():
                 self.set_param_value(_kw, _item)
         self._config = {"test_mode": False, "input_data": None}
-
         self.node_id = None
         self._roi_data_dim = None
 

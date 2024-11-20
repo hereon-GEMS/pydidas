@@ -211,12 +211,3 @@ class ExtractAzimuthalSectors(ProcPlugin):
                 )
             self._factors[_index] = _factors
         self._config["settings_updated_from_data"] = True
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
-        """
-        _sectors = self.get_param_value("centers")
-        _n_out = len(_sectors.split(";"))
-        _n_data = self.input_shape[1]
-        self._config["result_shape"] = (_n_out, _n_data)

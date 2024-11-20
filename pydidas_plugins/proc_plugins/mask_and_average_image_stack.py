@@ -245,19 +245,3 @@ class MaskAndAverageImageStack(ProcPlugin):
 
         new_data = Dataset(_final_image, **data_kwargs)
         return new_data, kwargs
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the results based on the Plugin processing and
-        the input data shape.
-
-        This method only updates the shape and stores it internally. Use the
-        "result_shape" property to access the Plugin's result_shape. The
-        generic implementation assumes the output shape to be equal to the
-        input shape.
-        """
-        _shape = self._config.get("input_shape", None)
-        if _shape is None:
-            self._config["result_shape"] = (-1,) * self.output_data_dim
-        else:
-            self._config["result_shape"] = _shape[1:]

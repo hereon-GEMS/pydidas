@@ -260,16 +260,3 @@ class Sum2dData(ProcPlugin):
         _high_lim = self.get_param_value(f"upper_limit_ax{axis}")
         _high = _high_lim if _high_lim is not None else default_high
         return (_low, _high)
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
-        """
-        _proc_dims = self._get_proc_dims(input_ndim=len(self._config["input_shape"]))
-        self._config["result_shape"] = tuple(
-            [
-                _n
-                for _dim, _n in enumerate(self._config["input_shape"])
-                if _dim not in _proc_dims
-            ]
-        )

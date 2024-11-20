@@ -117,17 +117,3 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             **self._dataset_info,
         )
         return _dataset, kwargs
-
-    def calculate_result_shape(self):
-        """
-        Get the shape of the integrated dataset to set up the CRS / LUT.
-
-        Returns
-        -------
-        tuple
-            The new shape: A tuple of two integers is returned.
-        """
-        self._config["result_shape"] = (
-            self.get_param_value("azi_npoint"),
-            self.get_param_value("rad_npoint"),
-        )

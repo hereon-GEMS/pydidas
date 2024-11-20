@@ -102,14 +102,3 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         )
         _dataset = Dataset(_newdata[1], axis_ranges=[_newdata[0]], **self._dataset_info)
         return _dataset, kwargs
-
-    def calculate_result_shape(self):
-        """
-        Get the shape of the integrated dataset to set up the CRS / LUT.
-
-        Returns
-        -------
-        tuple
-            The new shape. This is a tuple with a single integer value.
-        """
-        self._config["result_shape"] = (self.get_param_value("azi_npoint"),)

@@ -54,7 +54,7 @@ def get_remote_version() -> str:
         The string for the remote version.
     """
     _url = (
-        "https://raw.GitHubusercontent.com/"
+        "https://raw.githubusercontent.com/"
         "hereon-GEMS/pydidas/master/pydidas/version.py"
     )
     _lines = requests.get(_url, timeout=5).text.split("\n")
@@ -145,53 +145,6 @@ def print_status(status: str):
     print("=" * 80 + "\n")
 
 
-#
-# def check_git_installed():
-#     """
-#     Check if git is installed and accessible.
-#
-#     Raises
-#     ------
-#     FileNotFoundError
-#         If git is not installed.
-#     """
-#     try:
-#         subprocess.check_call(["git", "--version"])
-#     except FileNotFoundError as _error:
-#         _local_git_path = Path(sys.executable).parent.joinpath(".git", "cmd")
-#         if _local_git_path.is_dir():
-#             os.environ["PATH"] = ";".join([os.environ["PATH"], str(_local_git_path)])
-#             return
-#         raise FileNotFoundError(
-#             "\n"
-#             + "=" * 80
-#             + "\n=== "
-#             + "No git installation found. Git is necessary to run the pydidas update. "
-#             + "\n=== "
-#             + "Please install git or download an updated pydidas wheel "
-#             + "\n=== "
-#             + "or distribution directly.\n"
-#             + "=" * 80
-#         ) from _error
-#
-#
-# def clone_git_repo(path: Path, verbose: bool = True):
-#     """
-#     Clone the pydidas git repository into the given directory.
-#
-#     Parameters
-#     ----------
-#     path : Path
-#         The path to put the cloned repository.
-#     verbose : bool, optional
-#         Flag whether to print the status messages. The default is True.
-#     """
-#     if verbose:
-#         print_status("Cloning git repository")
-#     _url = "https://GitHub.com/hereon-GEMS/pydidas"
-#     subprocess.check_call(["git", "clone", _url, str(path)])
-
-
 def download_wheel(version: str, path: Path) -> Path:
     """
     Download the wheel file from the GitHub repository.
@@ -211,7 +164,7 @@ def download_wheel(version: str, path: Path) -> Path:
     _wheel_version = ".".join(str(int(_item)) for _item in version.split("."))
     _wheel_filename = f"pydidas-{_wheel_version}-py3-none-any.whl"
     _url = (
-        f"https://GitHub.com/hereon-GEMS/pydidas/releases/download/v{version}/"
+        f"https://github.com/hereon-GEMS/pydidas/releases/download/v{version}/"
         + _wheel_filename
     )
     _response = requests.get(_url, stream=True)
@@ -220,31 +173,6 @@ def download_wheel(version: str, path: Path) -> Path:
         for _chunk in _response.iter_content(chunk_size=8192):
             _file.write(_chunk)
     return path.joinpath(_wheel_filename)
-
-
-# def build_wheel(path: Path, verbose: bool = True) -> str:
-#     """
-#     Build the wheel from the downloaded git data.
-#
-#     Parameters
-#     ----------
-#     path : Path
-#         The path of the git repository.
-#     verbose : bool, optional
-#         Flag whether to print the status messages. The default is True.
-#
-#     Returns
-#     -------
-#     str
-#         The path to the built wheel.
-#     """
-#     if verbose:
-#         print_status("Building wheel")
-#     _builder = build.ProjectBuilder(path)
-#     _metadata_dir = _builder.prepare("wheel", path.joinpath("build"))
-#     _wheel = _builder.build("wheel", path, metadata_directory=_metadata_dir)
-#     del _builder
-#     return _wheel
 
 
 def install_wheel(wheel_filepath: Path, verbose: bool = True):

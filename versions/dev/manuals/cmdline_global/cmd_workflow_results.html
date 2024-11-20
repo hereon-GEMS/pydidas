@@ -600,7 +600,7 @@ the results:</p>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -662,8 +662,10 @@ single dimension renamed to <em>timeline</em>:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">WorkflowResults.</span></span><span class="sig-name descname"><span class="pre">get_results_for_flattened_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
-<dd><p>Get the combined results for the requested node_id with all scan
-dimensions flatted into a timeline</p>
+<dd><p>Get the results for the requested node_id with all scan dimensions flatted.</p>
+<p>This method will essentially flatten all scan dimensions into a timeline for
+convenience. The squeeze Parameter can be used to remove all dimensions of
+length 1 from the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -677,7 +679,7 @@ False.</p></li>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -733,25 +735,28 @@ False.</p></li>
 well:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">WorkflowResults.</span></span><span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
-<dd><p>Get a slices subset of a node_id result.</p>
+<span class="sig-prename descclassname"><span class="pre">WorkflowResults.</span></span><span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
+<dd><p>Get a sliced subset of a node_id result.</p>
+<p>Note that numpy’s slicing always squeezes dimensions with a length of 1 if
+they are given as integers, or slices. Iterable objects keep a
+dimension of length 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
+<li><p><strong>*slices</strong> (<em>tuple</em><em>[</em><em>Union</em><em>[</em><em>int</em><em>, </em><em>slice</em><em>]</em><em>]</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
 <li><p><strong>flattened_scan_dim</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to process flattened Scan dimensions. If True, the Scan
 is assumed to be 1-d only and the first slice item will be used
 for the Scan whereas the remaining slice items will be used for
 the resulting data. The default is False.</p></li>
-<li><p><strong>squeeze</strong> (<em>bool</em>) – Keyword to squeeze dimensions of length 0 or 1. The default is False.</p></li>
+<li><p><strong>squeeze</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle squeezing of data dimensions of the final dataset.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The subset of the results.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>

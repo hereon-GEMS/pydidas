@@ -537,6 +537,13 @@ attributes marked in the classes slave_mode attribute.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.BaseApp.deleteLater">
+<span class="sig-name descname"><span class="pre">deleteLater</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.BaseApp.deleteLater" title="Link to this definition">#</a></dt>
+<dd><p>Overwrite the deleteLater method to ensure proper cleanup.</p>
+<p>This method is called by the Qt event loop to delete the app instance.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.export_state">
 <span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.export_state" title="Link to this definition">#</a></dt>
 <dd><p>Get the sanitized app Parameters and configuration for export.</p>
@@ -565,6 +572,22 @@ attributes marked in the classes slave_mode attribute.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.BaseApp.get_latest_results">
+<span class="sig-name descname"><span class="pre">get_latest_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.get_latest_results" title="Link to this definition">#</a></dt>
+<dd><p>Get the latest results from the app.</p>
+<p>Note that the app must store results in the <cite>latest_results</cite> key
+of the config dictionary to be able to retrieve them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The latest results or None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>object or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.import_state">
 <span class="sig-name descname"><span class="pre">import_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.BaseApp.import_state" title="Link to this definition">#</a></dt>
 <dd><p>Import a stored state including Parameters and configuration.</p>
@@ -573,13 +596,6 @@ attributes marked in the classes slave_mode attribute.</p>
 <dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – The stored state.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.core.BaseApp.initialize_shared_memory">
-<span class="sig-name descname"><span class="pre">initialize_shared_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.BaseApp.initialize_shared_memory" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the shared memory array for the master app.</p>
-<p>Note: This method is not required for apps without a shared memory.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -664,15 +680,52 @@ need to re-implement it when they explicitly need it.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.BaseApp.must_send_signal_and_wait_for_response">
+<span class="sig-name descname"><span class="pre">must_send_signal_and_wait_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.must_send_signal_and_wait_for_response" title="Link to this definition">#</a></dt>
+<dd><p>Check whether the app must send a signal and wait for a response.</p>
+<p>If a signal is required, the method returns the string of the signal to
+send through the multiprocessing signal queue. If no signal is required,
+the method returns None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The signal to send or None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.parse_args_and_set_params">
 <span class="sig-name descname"><span class="pre">parse_args_and_set_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.BaseApp.parse_args_and_set_params" title="Link to this definition">#</a></dt>
 <dd><p>Parse the command line arguments and update the corresponding Parameter values.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.BaseApp.prepare_run">
+<span class="sig-name descname"><span class="pre">prepare_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.BaseApp.prepare_run" title="Link to this definition">#</a></dt>
+<dd><p>Prepare running the app. This is a wrapper for multiprocessing_pre_run.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.BaseApp.run" title="Link to this definition">#</a></dt>
 <dd><p>Run the app serially without multiprocessing support.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.BaseApp.signal_processed_and_can_continue">
+<span class="sig-name descname"><span class="pre">signal_processed_and_can_continue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.signal_processed_and_can_continue" title="Link to this definition">#</a></dt>
+<dd><p>Check whether the app’s signal was processed and the app can continue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag whether the app can continue processing.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -759,6 +812,13 @@ attributes marked in the classes slave_mode attribute.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">deleteLater</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Overwrite the deleteLater method to ensure proper cleanup.</p>
+<p>This method is called by the Qt event loop to delete the app instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span></dt>
 <dd><p>Get the sanitized app Parameters and configuration for export.</p>
 <dl class="field-list simple">
@@ -795,6 +855,22 @@ attributes marked in the classes slave_mode attribute.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection">ParameterCollection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_latest_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span></dt>
+<dd><p>Get the latest results from the app.</p>
+<p>Note that the app must store results in the <cite>latest_results</cite> key
+of the config dictionary to be able to retrieve them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The latest results or None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>object or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -904,13 +980,6 @@ keys.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">initialize_shared_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Initialize the shared memory array for the master app.</p>
-<p>Note: This method is not required for apps without a shared memory.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">multiprocessing_carryon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span></dt>
 <dd><p>Wait for specific tasks to give the clear signal.</p>
 <p>This method is called in the parallel multiprocessing process
@@ -990,6 +1059,23 @@ need to re-implement it when they explicitly need it.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">must_send_signal_and_wait_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span></dt>
+<dd><p>Check whether the app must send a signal and wait for a response.</p>
+<p>If a signal is required, the method returns the string of the signal to
+send through the multiprocessing signal queue. If no signal is required,
+the method returns None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The signal to send or None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">param_keys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em></dt>
@@ -1022,6 +1108,12 @@ need to re-implement it when they explicitly need it.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">parse_args_and_set_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Parse the command line arguments and update the corresponding Parameter values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">prepare_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Prepare running the app. This is a wrapper for multiprocessing_pre_run.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1134,6 +1226,20 @@ the Parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">signal_processed_and_can_continue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span></dt>
+<dd><p>Check whether the app’s signal was processed and the app can continue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag whether the app can continue processing.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">update_param_values_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Update the Parameter values corresponding to the given keys.</p>
 <dl class="field-list simple">
@@ -1211,10 +1317,11 @@ the Parameter.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-name-with-own-methods-only">BaseApp with own methods only</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp"><code class="docutils literal notranslate"><span class="pre">BaseApp</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.copy"><code class="docutils literal notranslate"><span class="pre">BaseApp.copy</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.deleteLater"><code class="docutils literal notranslate"><span class="pre">BaseApp.deleteLater</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.export_state"><code class="docutils literal notranslate"><span class="pre">BaseApp.export_state</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.get_config"><code class="docutils literal notranslate"><span class="pre">BaseApp.get_config</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.get_latest_results"><code class="docutils literal notranslate"><span class="pre">BaseApp.get_latest_results</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.import_state"><code class="docutils literal notranslate"><span class="pre">BaseApp.import_state</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.initialize_shared_memory"><code class="docutils literal notranslate"><span class="pre">BaseApp.initialize_shared_memory</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.multiprocessing_carryon"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_carryon</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.multiprocessing_func"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_func</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.multiprocessing_get_tasks"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_get_tasks</span></code></a></li>
@@ -1222,8 +1329,11 @@ the Parameter.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.multiprocessing_pre_cycle"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_pre_cycle</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.multiprocessing_pre_run"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_pre_run</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.multiprocessing_store_results"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_store_results</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.must_send_signal_and_wait_for_response"><code class="docutils literal notranslate"><span class="pre">BaseApp.must_send_signal_and_wait_for_response</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.parse_args_and_set_params"><code class="docutils literal notranslate"><span class="pre">BaseApp.parse_args_and_set_params</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.prepare_run"><code class="docutils literal notranslate"><span class="pre">BaseApp.prepare_run</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.run"><code class="docutils literal notranslate"><span class="pre">BaseApp.run</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.signal_processed_and_can_continue"><code class="docutils literal notranslate"><span class="pre">BaseApp.signal_processed_and_can_continue</span></code></a></li>
 </ul>
 </li>
 </ul>

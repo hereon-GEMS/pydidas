@@ -597,6 +597,13 @@ attributes marked in the classes slave_mode attribute.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.deleteLater">
+<span class="sig-name descname"><span class="pre">deleteLater</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.deleteLater" title="Link to this definition">#</a></dt>
+<dd><p>Overwrite the deleteLater method to ensure proper cleanup.</p>
+<p>This method is called by the Qt event loop to delete the app instance.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.export_image">
 <span class="sig-name descname"><span class="pre">export_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.export_image" title="Link to this definition">#</a></dt>
 <dd><p>Export the composite image to a file.</p>
@@ -656,6 +663,22 @@ Supported file types for export are all generic datatypes with exporters for
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="../core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection">ParameterCollection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.get_latest_results">
+<span class="sig-name descname"><span class="pre">get_latest_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.get_latest_results" title="Link to this definition">#</a></dt>
+<dd><p>Get the latest results from the app.</p>
+<p>Note that the app must store results in the <cite>latest_results</cite> key
+of the config dictionary to be able to retrieve them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The latest results or None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>object or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -764,13 +787,6 @@ keys.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.initialize_shared_memory">
-<span class="sig-name descname"><span class="pre">initialize_shared_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.initialize_shared_memory" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the shared memory array for the master app.</p>
-<p>Note: This method is not required for apps without a shared memory.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.multiprocessing_carryon">
 <span class="sig-name descname"><span class="pre">multiprocessing_carryon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_carryon" title="Link to this definition">#</a></dt>
 <dd><p>Get the flag value whether to carry on processing.</p>
@@ -842,6 +858,23 @@ a check is done whether the current file exists.</p>
 <li><p><strong>index</strong> (<em>int</em>) – The index in the composite image.</p></li>
 <li><p><strong>image</strong> (<em>np.ndarray</em>) – The image data.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.must_send_signal_and_wait_for_response">
+<span class="sig-name descname"><span class="pre">must_send_signal_and_wait_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.must_send_signal_and_wait_for_response" title="Link to this definition">#</a></dt>
+<dd><p>Check whether the app must send a signal and wait for a response.</p>
+<p>If a signal is required, the method returns the string of the signal to
+send through the multiprocessing signal queue. If no signal is required,
+the method returns None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The signal to send or None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1035,6 +1068,20 @@ the Parameter.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.signal_processed_and_can_continue">
+<span class="sig-name descname"><span class="pre">signal_processed_and_can_continue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.signal_processed_and_can_continue" title="Link to this definition">#</a></dt>
+<dd><p>Check whether the app’s signal was processed and the app can continue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag whether the app can continue processing.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.update_param_values_from_kwargs">
 <span class="sig-name descname"><span class="pre">update_param_values_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.update_param_values_from_kwargs" title="Link to this definition">#</a></dt>
 <dd><p>Update the Parameter values corresponding to the given keys.</p>
@@ -1118,17 +1165,18 @@ the Parameter.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.composite"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.composite</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.copy"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.copy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.deepcopy"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.deepcopy</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.deleteLater"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.deleteLater</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.export_image"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.export_image</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.export_state"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.export_state</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_config"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_default_params_copy"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_default_params_copy</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_latest_results"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_latest_results</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_param"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_param</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_param_keys"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_param_keys</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_param_value"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_param_value</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_param_values_as_dict"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_param_values_as_dict</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_params"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_params</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.import_state"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.import_state</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.initialize_shared_memory"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.initialize_shared_memory</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_carryon"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.multiprocessing_carryon</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_func"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.multiprocessing_func</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_get_tasks"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.multiprocessing_get_tasks</span></code></a></li>
@@ -1136,6 +1184,7 @@ the Parameter.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_pre_cycle"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.multiprocessing_pre_cycle</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_pre_run"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.multiprocessing_pre_run</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_store_results"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.multiprocessing_store_results</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.must_send_signal_and_wait_for_response"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.must_send_signal_and_wait_for_response</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.param_keys"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.param_keys</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.param_values"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.param_values</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.parse_args_and_set_params"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.parse_args_and_set_params</span></code></a></li>
@@ -1150,6 +1199,7 @@ the Parameter.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.set_param_value"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.set_param_value</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.set_param_values"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.set_param_values</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.set_param_values_from_dict"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.set_param_values_from_dict</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.signal_processed_and_can_continue"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.signal_processed_and_can_continue</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.update_param_values_from_kwargs"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.update_param_values_from_kwargs</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.update_params_from_init"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.update_params_from_init</span></code></a></li>
 </ul>

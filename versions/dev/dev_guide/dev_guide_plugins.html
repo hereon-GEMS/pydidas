@@ -670,7 +670,7 @@ plugin in the workflow) to set the input shape.</p>
 </li>
 <li><dl class="simple">
 <dt><code class="xref py py-data docutils literal notranslate"><span class="pre">result_shape</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">tuple</span></code>):</dt><dd><p>The shape of the output data. This property will be updated by the
-<a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.calculate_result_shape" title="pydidas.plugins.BasePlugin.calculate_result_shape"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_result_shape</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_result_shape</span></code>
 method either based on the plugin configuration or on the input data.</p>
 </dd>
 </dl>
@@ -717,14 +717,14 @@ calculating intermediate results.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.calculate_result_shape" title="pydidas.plugins.BasePlugin.calculate_result_shape"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_result_shape</span></code></a>:</dt><dd><p>This method calculates the shape of the output data. Plugins can implement their
+<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_result_shape</span></code>:</dt><dd><p>This method calculates the shape of the output data. Plugins can implement their
 own logic to calculate the output shape based. The default implementation
 returns the input shape.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.apply_legacy_image_ops_to_data" title="pydidas.plugins.BasePlugin.apply_legacy_image_ops_to_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_legacy_image_ops_to_data</span></code></a>:</dt><dd><p>This method allows to apply legacy image operations to the method’s input data.
+<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_legacy_image_ops_to_data</span></code>:</dt><dd><p>This method allows to apply legacy image operations to the method’s input data.
 This method will know all binning and cropping operations from the plugin’s
 ancestors and will calculate a single binning and cropping operation and apply
 it to the calling argument data <code class="xref py py-data docutils literal notranslate"><span class="pre">np.ndarray</span></code>. This is useful to

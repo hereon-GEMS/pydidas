@@ -6,8 +6,8 @@
 
 .. _define_diffraction_exp_frame:
 
-DefineDiffractionExpFrame
-=========================
+Define diffraction experiment
+=============================
 
 .. contents::
     :depth: 2

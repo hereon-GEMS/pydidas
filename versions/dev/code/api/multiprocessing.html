@@ -465,7 +465,7 @@ document.write(`
 applications in parallel procesing.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">AppRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app:</span> <span class="pre">~pydidas.core.base_app.BaseApp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_workers:</span> <span class="pre">None</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor:</span> <span class="pre">type</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">app_processor&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">AppRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_app_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner" title="Link to this definition">#</a></dt>
 <dd><p>The AppRunner is a subclassed WorkerController for running pydidas applications.</p>
 <p>The App runner requires a BaseApp (or subclass) instance with a
 defined method layout as defined in the BaseApp.</p>
@@ -484,11 +484,7 @@ been performed if it needs to be used in another context.</p>
 <li><p><strong>app</strong> (<a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><em>pydidas.core.BaseApp</em></a>) – The instance of the application to be run.</p></li>
 <li><p><strong>n_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of spawned worker processes. The default is None which will
 use the globally defined pydidas setting for the number of workers.</p></li>
-<li><p><strong>processor</strong> (<em>Union</em><em>[</em><em>pydidas.multiprocessing.app_processor</em><em>,</em>) – pydidas.multiprocessing.app_processor_without_tasks]
-The processor to be used. The generic ‘app_processor’ requires input
-tasks whereas the ‘app_processor_without_tasks’ can run indefinite
-without any defined tasks. The app itself is responsible for managing
-tasks on the fly. The default is app_processor.</p></li>
+<li><p><strong>use_app_tasks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to toggle if the app works with tasks. The default is True.</p></li>
 </ul>
 </dd>
 </dl>
@@ -539,15 +535,10 @@ starting the workers.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.AppRunner.get_app">
 <span class="sig-name descname"><span class="pre">get_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span><a class="headerlink" href="#pydidas.multiprocessing.AppRunner.get_app" title="Link to this definition">#</a></dt>
-<dd><p>Get the reference to the interally stored app.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This method will only provide a copy of the app and keep the internal
-instance for further use.</p>
-</div>
+<dd><p>Get a copy of the internally stored app.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The application instance.</p>
+<dd class="field-odd"><p>A copy of the application instance.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp">pydidas.core.BaseApp</a></p>
@@ -573,7 +564,7 @@ instance for further use.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">WorkerController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">WorkerController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController" title="Link to this definition">#</a></dt>
 <dd><p>The WorkerController is a QThread for spawing and controlling workers.</p>
 <p>The WorkerControllers workers are used to perform computations in parallel.</p>
 <p>A function with defined args and kwargs can be called in separate
@@ -584,7 +575,7 @@ between function calls.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_workers</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – The number of spawned worker processes. The default is None which will
 use the globally defined pydidas setting for the number of workers.</p></li>
-<li><p><strong>function</strong> (<em>type</em><em>, </em><em>optional</em>) – The function to be called by the workers. If not specified at init, it must
+<li><p><strong>function</strong> (<em>Callable</em><em>, </em><em>optional</em>) – The function to be called by the workers. If not specified at init, it must
 be set later for the workers to actually perform tasks.</p></li>
 <li><p><strong>func_args</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The function arguments. The default is an empty tuple.</p></li>
 <li><p><strong>func_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Kwywords passed to the function. The default is an empty dictionary.</p></li>
@@ -626,7 +617,7 @@ disable updating the task target number.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.change_function">
-<span class="sig-name descname"><span class="pre">change_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.change_function" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">change_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.change_function" title="Link to this definition">#</a></dt>
 <dd><p>Change the function called by the workers.</p>
 <p>This method stops any active processing and resets the queue. Then,
 the function is changed and new workers are spawned. To run the new
@@ -634,9 +625,9 @@ function, new tasks must be submitted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<em>object</em>) – The function to be called by the workers.</p></li>
+<li><p><strong>func</strong> (<em>Callable</em>) – The function to be called by the workers.</p></li>
 <li><p><strong>*args</strong> (<em>tuple</em>) – Any additional arguments which need to be passed to the function. The first
-function argument will always the the task.</p></li>
+function argument will always be the task.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments which need to be passed to the function.</p></li>
 </ul>
 </dd>
@@ -786,7 +777,7 @@ using the :py:meth`WorkerController.restart` method.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.app_processor">
-<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">app_processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.app_processor" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">app_processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiprocessing_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.app_processor" title="Link to this definition">#</a></dt>
 <dd><p>Start a loop to process function calls on individual frames.</p>
 <p>This function starts a while loop to call the supplied function with
 indices supplied by the queue. Results will be written to the output
@@ -794,12 +785,8 @@ queue in a format [input_arg, results]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_queue</strong> (<em>multiprocessing.Queue</em>) – The input queue which supplies the processor with indices to be
-processed.</p></li>
-<li><p><strong>output_queue</strong> (<em>multiprocessing.Queue</em>) – The queue for transmissing the results to the controlling thread.</p></li>
-<li><p><strong>stop_queue</strong> (<em>multiprocessing.Queue</em>) – The queue for sending a termination signal to the worker.</p></li>
-<li><p><strong>aborted_queue</strong> (<em>multiprocessing.Queue</em>) – The queue which is used by the processor to signal the calling
-thread that it has aborted its cycle.</p></li>
+<li><p><strong>multiprocessing_config</strong> (<em>dict</em>) – The multiprocessing configuration dictionary. It includes information
+about the logging level as well as queue objects.</p></li>
 <li><p><strong>app</strong> (<em>type</em>) – The Application class to be called in the process. The App must have a
 multiprocessing_func method.</p></li>
 <li><p><strong>app_params</strong> (<a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><em>ParameterCollection</em></a>) – The App ParameterCollection used for creating the app.</p></li>
@@ -810,45 +797,11 @@ dictionary.</p></li>
 <dt>wait_for_output_queue<span class="classifier">bool, optional</span></dt><dd><p>Flag to wait for the output queue to be empty before shutting down the
 worker. The default is True.</p>
 </dd>
-<dt>logging_level<span class="classifier">int, optional</span></dt><dd><p>The logger’s logging level. The default is the pydidas default logging
-level.</p>
+<dt>use_tasks<span class="classifier">bool, optional</span></dt><dd><p>Flag that the app uses tasks instead of running continuously. The default
+is True.</p>
 </dd>
-</dl>
-</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pydidas.multiprocessing.app_processor_without_tasks">
-<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">app_processor_without_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.app_processor_without_tasks" title="Link to this definition">#</a></dt>
-<dd><p>Start a loop to process function calls on individual frames.</p>
-<p>This function starts a while loop to call the supplied function without
-actually using the input queue (but the input queue is kept for
-compatibility). Results will be written to the output
-queue in a format [item, results]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input_queue</strong> (<em>multiprocessing.Queue</em>) – The input queue which supplies the processor with indices to be
-processed.</p></li>
-<li><p><strong>output_queue</strong> (<em>multiprocessing.Queue</em>) – The queue for transmissing the results to the controlling thread.</p></li>
-<li><p><strong>stop_queue</strong> (<em>multiprocessing.Queue</em>) – The queue for sending a termination signal to the worker.</p></li>
-<li><p><strong>aborted_queue</strong> (<em>multiprocessing.Queue</em>) – The queue which is used by the processor to signal the calling
-thread that it has aborted its cycle.</p></li>
-<li><p><strong>app</strong> (<a class="reference internal" href="core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><em>BaseApp</em></a>) – The Application class to be called in the process. The App must have a
-multiprocessing_func method.</p></li>
-<li><p><strong>app_params</strong> (<a class="reference internal" href="core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><em>ParameterCollection</em></a>) – The App ParameterCollection used for creating the app.</p></li>
-<li><p><strong>app_config</strong> (<em>dict</em>) – The dictionary which is used for overwriting the app._config
-dictionary.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Supported keyword arguments are:</p>
-<dl class="simple">
-<dt>wait_for_output_queue<span class="classifier">bool, optional</span></dt><dd><p>Flag to wait for the output queue to be empty before shutting down the
-worker. The default is True.</p>
-</dd>
-<dt>logging_level<span class="classifier">int, optional</span></dt><dd><p>The logger’s logging level. The default is the pydidas default logging
-level.</p>
+<dt>app_mp_manager<span class="classifier">dict, optional</span></dt><dd><p>Additional multiprocessing configuration or attributes for the
+app. The default is None.</p>
 </dd>
 </dl>
 </p></li>
@@ -859,7 +812,7 @@ level.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.processor">
-<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aborted_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.processor" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocessing_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.processor" title="Link to this definition">#</a></dt>
 <dd><p>Start a loop to process function calls on individual frames.</p>
 <p>This function starts a while loop to call the supplied function with
 indices supplied by the queue. Results will be written to the output
@@ -867,15 +820,11 @@ queue in a format [input_arg, results]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_queue</strong> (<em>multiprocessing.Queue</em>) – The input queue which supplies the processor with indices to be
-processed.</p></li>
-<li><p><strong>output_queue</strong> (<em>multiprocessing.Queue</em>) – The queue for transmissing the results to the controlling thread.</p></li>
-<li><p><strong>stop_queue</strong> (<em>multiprocessing.Queue</em>) – The queue for sending a termination signal to the worker.</p></li>
-<li><p><strong>aborted_queue</strong> (<em>multiprocessing.Queue</em>) – The queue which is used by the processor to signal the calling
-thread that it has aborted its cycle.</p></li>
-<li><p><strong>function</strong> (<em>type</em>) – The function to be called in the process. The function must accept
+<li><p><strong>function</strong> (<em>Callable</em>) – The function to be called in the process. The function must accept
 the first argument from the queue and all additional arguments and
 keyword arguments from the calling arguments of processor.</p></li>
+<li><p><strong>multiprocessing_config</strong> (<em>dict</em>) – The multiprocessing configuration dictionary. It includes information
+about the logging level as well as queue objects</p></li>
 <li><p><strong>*func_args</strong> (<em>tuple</em>) – The function calling arguments save the first.</p></li>
 <li><p><strong>**func_kwargs</strong> (<em>dict</em>) – The keyword arguments for the function.</p></li>
 </ul>
@@ -962,7 +911,6 @@ keyword arguments from the calling arguments of processor.</p></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor"><code class="docutils literal notranslate"><span class="pre">app_processor</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.app_processor_without_tasks"><code class="docutils literal notranslate"><span class="pre">app_processor_without_tasks</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.processor"><code class="docutils literal notranslate"><span class="pre">processor</span></code></a></li>
 </ul>
   </nav></div>

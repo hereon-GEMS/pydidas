@@ -556,7 +556,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f2ed2f69cd0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f310df688d0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -593,7 +593,7 @@ from the data. The default is True.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.get_result_metadata">
-<span class="sig-name descname"><span class="pre">get_result_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_scan_timeline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.get_result_metadata" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_result_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_scan_timeline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">object</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.get_result_metadata" title="Link to this definition">#</a></dt>
 <dd><p>Get the stored metadata for the results of the specified node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -603,11 +603,11 @@ from the data. The default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary with the metadata stored using the “axis_labels”,
-“axis_ranges”, “axis_units” and “metadata” keys.</p>
+<dd class="field-even"><p>A dictionary with the metadata stored in the Dataset plus the shape
+and <cite>node_label</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>dict[str, object]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -632,25 +632,28 @@ values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.get_result_subset">
-<span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.get_result_subset" title="Link to this definition">#</a></dt>
-<dd><p>Get a slices subset of a node_id result.</p>
+<span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.get_result_subset" title="Link to this definition">#</a></dt>
+<dd><p>Get a sliced subset of a node_id result.</p>
+<p>Note that numpy’s slicing always squeezes dimensions with a length of 1 if
+they are given as integers, or slices. Iterable objects keep a
+dimension of length 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
+<li><p><strong>*slices</strong> (<em>tuple</em><em>[</em><em>Union</em><em>[</em><em>int</em><em>, </em><em>slice</em><em>]</em><em>]</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
 <li><p><strong>flattened_scan_dim</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to process flattened Scan dimensions. If True, the Scan
 is assumed to be 1-d only and the first slice item will be used
 for the Scan whereas the remaining slice items will be used for
 the resulting data. The default is False.</p></li>
-<li><p><strong>squeeze</strong> (<em>bool</em>) – Keyword to squeeze dimensions of length 0 or 1. The default is False.</p></li>
+<li><p><strong>squeeze</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle squeezing of data dimensions of the final dataset.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The subset of the results.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -667,7 +670,7 @@ the resulting data. The default is False.</p></li>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -675,8 +678,10 @@ the resulting data. The default is False.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.get_results_for_flattened_scan">
 <span class="sig-name descname"><span class="pre">get_results_for_flattened_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.get_results_for_flattened_scan" title="Link to this definition">#</a></dt>
-<dd><p>Get the combined results for the requested node_id with all scan
-dimensions flatted into a timeline</p>
+<dd><p>Get the results for the requested node_id with all scan dimensions flatted.</p>
+<p>This method will essentially flatten all scan dimensions into a timeline for
+convenience. The squeeze Parameter can be used to remove all dimensions of
+length 1 from the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -690,7 +695,7 @@ False.</p></li>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -712,7 +717,7 @@ False.</p></li>
 <dd><p>Return the number of dimensions of the results in form of a dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A dictionary with entries of the form &lt;node_id: n_dim&gt;</p>
+<dd class="field-odd"><p>A dictionary with entries of the form &lt;node_id: ndim&gt;</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict</p>
@@ -757,6 +762,12 @@ selected. The default is None.</p></li>
     enabled.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.prepare_new_results">
+<span class="sig-name descname"><span class="pre">prepare_new_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.prepare_new_results" title="Link to this definition">#</a></dt>
+<dd><p>Prepare the WorkflowResults for new results.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -828,11 +839,34 @@ to all nodes. The default is None.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.store_frame_metadata">
+<span class="sig-name descname"><span class="pre">store_frame_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.store_frame_metadata" title="Link to this definition">#</a></dt>
+<dd><p>Store the metadata for plugin results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metadata</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>dict</em><em>]</em>) – The metadata in form of a dictionary with nodeID keys and dict
+items containing the axis_units, -_labels, and -_ranges keys with
+the associated data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.store_frame_shapes">
+<span class="sig-name descname"><span class="pre">store_frame_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.store_frame_shapes" title="Link to this definition">#</a></dt>
+<dd><p>Store the shapes of the results in the WorkflowResults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shapes</strong> (<em>dict</em>) – The shapes in form of a dictionary with nodeID keys and shape
+values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.store_results">
-<span class="sig-name descname"><span class="pre">store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.store_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.store_results" title="Link to this definition">#</a></dt>
 <dd><p>Store results from one scan point in the WorkflowResults.</p>
-<p>Note: If write_to_disk is enabled, please be advised that this may
-slow down the WorkflowResults</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -840,20 +874,6 @@ slow down the WorkflowResults</p>
 <li><p><strong>results</strong> (<em>dict</em>) – The results as dictionary with entries of the type
 &lt;node_id: array&gt;.</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.update_frame_metadata">
-<span class="sig-name descname"><span class="pre">update_frame_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.update_frame_metadata" title="Link to this definition">#</a></dt>
-<dd><p>Manually supply metadata for the non-scan dimensions of the results
-and update the stored metadata.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>metadata</strong> (<em>dict</em>) – The metadata in form of a dictionary with nodeID keys and dict
-items containing the axis_units, -_labels, and -_scales keys with
-the associated data.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -873,12 +893,6 @@ from the nodes. The default is True.</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.update_shapes_from_scan_and_workflow">
-<span class="sig-name descname"><span class="pre">update_shapes_from_scan_and_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.update_shapes_from_scan_and_workflow" title="Link to this definition">#</a></dt>
-<dd><p>Update the shape of the results from the classes singletons’ metadata.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1599,56 +1613,50 @@ be a single value or an array.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.get_all_nodes_with_results">
-<span class="sig-name descname"><span class="pre">get_all_nodes_with_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_all_nodes_with_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_all_nodes_with_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.workflow.WorkflowNode" title="pydidas.workflow.workflow_node.WorkflowNode"><span class="pre">WorkflowNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_all_nodes_with_results" title="Link to this definition">#</a></dt>
 <dd><p>Get all tree nodes which have results associated with them.</p>
 <p>These are all leaf nodes in addition to all nodes which have been flagged
 with the “keep data” flag.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A list of all leaf nodes.</p>
+<dd class="field-odd"><p>A list of all nodes which are leaves or which have been flagged.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list</p>
+<dd class="field-even"><p>list[<a class="reference internal" href="#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode">WorkflowNode</a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.get_all_result_shapes">
-<span class="sig-name descname"><span class="pre">get_all_result_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_all_result_shapes" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_all_result_shapes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_all_result_shapes" title="Link to this definition">#</a></dt>
 <dd><p>Get the shapes of all leaves in form of a dictionary.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>force_update</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to enforce a new calculation of the result shapes. The
-default is False.</p>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If the ProcessingTree has no nodes.</p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="../core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If the ProcessingTree has no nodes.</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>shapes</strong> – A dict with entries of type {node_id: shape} with
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>shapes</strong> – A dict with entries of type {node_id: shape} with
 node_ids of type int and shapes of type tuple.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.get_complete_plugin_metadata">
-<span class="sig-name descname"><span class="pre">get_complete_plugin_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_complete_plugin_metadata" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_complete_plugin_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_complete_plugin_metadata" title="Link to this definition">#</a></dt>
 <dd><p>Get the metadata (e.g. shapes, labels, names) for all of the tree’s plugins.</p>
+<p>Note that the shapes are only available after running the plugin chain at
+least once. Otherwise, the shapes will be set to None.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>force_update</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to enforce a new calculation of the result shapes. The
-default is False.</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The dictionary with the metadata.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The dictionary with the metadata.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1664,6 +1672,20 @@ default is False.</p>
 <li><p><em>list</em> – List with the IDs of nodes with inconsistent data</p></li>
 </ul>
 </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.get_current_results">
+<span class="sig-name descname"><span class="pre">get_current_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_current_results" title="Link to this definition">#</a></dt>
+<dd><p>Get the results of the current WorkflowTree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> – A dictionary with the results of the current WorkflowTree.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1816,8 +1838,8 @@ the child layer of the node.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>results</strong> (<em>tuple</em>) – The result of the plugin.execute method.</p></li>
-<li><p><strong>kws</strong> (<em>dict</em>) – Any keywords required for calling the next plugin.</p></li>
+<li><p><strong>results</strong> (<em>Dataset</em>) – The result of the plugin.execute method.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Any keywords required for calling the next plugin.</p></li>
 </ul>
 </p>
 </dd>
@@ -1865,18 +1887,6 @@ node_id.setter in the WorkflowNode.</p>
 <p>This method recursively calls the pre_execute methods of all (child) plugins.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.workflow.WorkflowNode.propagate_shapes_and_global_config">
-<span class="sig-name descname"><span class="pre">propagate_shapes_and_global_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowNode.propagate_shapes_and_global_config" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the Plugin’s result shape results and push it to the node’s children.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.workflow.WorkflowNode.propagate_to_children">
-<span class="sig-name descname"><span class="pre">propagate_to_children</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowNode.propagate_to_children" title="Link to this definition">#</a></dt>
-<dd><p>Propagate the global binning and ROI to the children.</p>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowNode.result_shape">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_shape</span></span><a class="headerlink" href="#pydidas.workflow.WorkflowNode.result_shape" title="Link to this definition">#</a></dt>
@@ -1890,12 +1900,6 @@ calculated. Else, returns None.</p>
 <dd class="field-even"><p>Union[tuple, None]</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.workflow.WorkflowNode.update_plugin_result_data_shape">
-<span class="sig-name descname"><span class="pre">update_plugin_result_data_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowNode.update_plugin_result_data_shape" title="Link to this definition">#</a></dt>
-<dd><p>Update the result shape from the Plugin’s input shape and legacy operations.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1987,7 +1991,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f2ed2f69cd0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f310df688d0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -2024,7 +2028,7 @@ from the data. The default is True.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.get_result_metadata">
-<span class="sig-name descname"><span class="pre">get_result_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_scan_timeline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.get_result_metadata" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_result_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_scan_timeline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">object</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.get_result_metadata" title="Link to this definition">#</a></dt>
 <dd><p>Get the stored metadata for the results of the specified node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2034,11 +2038,11 @@ from the data. The default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary with the metadata stored using the “axis_labels”,
-“axis_ranges”, “axis_units” and “metadata” keys.</p>
+<dd class="field-even"><p>A dictionary with the metadata stored in the Dataset plus the shape
+and <cite>node_label</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>dict[str, object]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2063,25 +2067,28 @@ values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.get_result_subset">
-<span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.get_result_subset" title="Link to this definition">#</a></dt>
-<dd><p>Get a slices subset of a node_id result.</p>
+<span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.get_result_subset" title="Link to this definition">#</a></dt>
+<dd><p>Get a sliced subset of a node_id result.</p>
+<p>Note that numpy’s slicing always squeezes dimensions with a length of 1 if
+they are given as integers, or slices. Iterable objects keep a
+dimension of length 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
+<li><p><strong>*slices</strong> (<em>tuple</em><em>[</em><em>Union</em><em>[</em><em>int</em><em>, </em><em>slice</em><em>]</em><em>]</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
 <li><p><strong>flattened_scan_dim</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to process flattened Scan dimensions. If True, the Scan
 is assumed to be 1-d only and the first slice item will be used
 for the Scan whereas the remaining slice items will be used for
 the resulting data. The default is False.</p></li>
-<li><p><strong>squeeze</strong> (<em>bool</em>) – Keyword to squeeze dimensions of length 0 or 1. The default is False.</p></li>
+<li><p><strong>squeeze</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle squeezing of data dimensions of the final dataset.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The subset of the results.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2098,7 +2105,7 @@ the resulting data. The default is False.</p></li>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2106,8 +2113,10 @@ the resulting data. The default is False.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.get_results_for_flattened_scan">
 <span class="sig-name descname"><span class="pre">get_results_for_flattened_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.get_results_for_flattened_scan" title="Link to this definition">#</a></dt>
-<dd><p>Get the combined results for the requested node_id with all scan
-dimensions flatted into a timeline</p>
+<dd><p>Get the results for the requested node_id with all scan dimensions flatted.</p>
+<p>This method will essentially flatten all scan dimensions into a timeline for
+convenience. The squeeze Parameter can be used to remove all dimensions of
+length 1 from the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2121,7 +2130,7 @@ False.</p></li>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2143,7 +2152,7 @@ False.</p></li>
 <dd><p>Return the number of dimensions of the results in form of a dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A dictionary with entries of the form &lt;node_id: n_dim&gt;</p>
+<dd class="field-odd"><p>A dictionary with entries of the form &lt;node_id: ndim&gt;</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict</p>
@@ -2188,6 +2197,12 @@ selected. The default is None.</p></li>
     enabled.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.prepare_new_results">
+<span class="sig-name descname"><span class="pre">prepare_new_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.prepare_new_results" title="Link to this definition">#</a></dt>
+<dd><p>Prepare the WorkflowResults for new results.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -2259,11 +2274,34 @@ to all nodes. The default is None.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.store_frame_metadata">
+<span class="sig-name descname"><span class="pre">store_frame_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.store_frame_metadata" title="Link to this definition">#</a></dt>
+<dd><p>Store the metadata for plugin results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metadata</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>dict</em><em>]</em>) – The metadata in form of a dictionary with nodeID keys and dict
+items containing the axis_units, -_labels, and -_ranges keys with
+the associated data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.store_frame_shapes">
+<span class="sig-name descname"><span class="pre">store_frame_shapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.store_frame_shapes" title="Link to this definition">#</a></dt>
+<dd><p>Store the shapes of the results in the WorkflowResults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shapes</strong> (<em>dict</em>) – The shapes in form of a dictionary with nodeID keys and shape
+values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.store_results">
-<span class="sig-name descname"><span class="pre">store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.store_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.store_results" title="Link to this definition">#</a></dt>
 <dd><p>Store results from one scan point in the WorkflowResults.</p>
-<p>Note: If write_to_disk is enabled, please be advised that this may
-slow down the WorkflowResults</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2271,20 +2309,6 @@ slow down the WorkflowResults</p>
 <li><p><strong>results</strong> (<em>dict</em>) – The results as dictionary with entries of the type
 &lt;node_id: array&gt;.</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.update_frame_metadata">
-<span class="sig-name descname"><span class="pre">update_frame_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.update_frame_metadata" title="Link to this definition">#</a></dt>
-<dd><p>Manually supply metadata for the non-scan dimensions of the results
-and update the stored metadata.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>metadata</strong> (<em>dict</em>) – The metadata in form of a dictionary with nodeID keys and dict
-items containing the axis_units, -_labels, and -_scales keys with
-the associated data.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2304,12 +2328,6 @@ from the nodes. The default is True.</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.update_shapes_from_scan_and_workflow">
-<span class="sig-name descname"><span class="pre">update_shapes_from_scan_and_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.update_shapes_from_scan_and_workflow" title="Link to this definition">#</a></dt>
-<dd><p>Update the shape of the results from the classes singletons’ metadata.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2468,14 +2486,15 @@ processing has been started and the old information is no longer valid.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.ndims"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.ndims</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.node_labels"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.node_labels</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.prepare_files_for_saving"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.prepare_files_for_saving</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.prepare_new_results"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.prepare_new_results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.result_titles"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.result_titles</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.save_results_to_disk"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.save_results_to_disk</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.shapes"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.shapes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.source_hash"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.source_hash</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.store_frame_metadata"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.store_frame_metadata</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.store_frame_shapes"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.store_frame_shapes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.store_results"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.store_results</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.update_frame_metadata"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.update_frame_metadata</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.update_param_choices_from_labels"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.update_param_choices_from_labels</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.WorkflowResults.update_shapes_from_scan_and_workflow"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.update_shapes_from_scan_and_workflow</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode"><code class="docutils literal notranslate"><span class="pre">GenericNode</span></code></a><ul class="nav section-nav flex-column">
@@ -2536,6 +2555,7 @@ processing has been started and the old information is no longer valid.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.ProcessingTree.get_all_result_shapes"><code class="docutils literal notranslate"><span class="pre">ProcessingTree.get_all_result_shapes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.ProcessingTree.get_complete_plugin_metadata"><code class="docutils literal notranslate"><span class="pre">ProcessingTree.get_complete_plugin_metadata</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.ProcessingTree.get_consistent_and_inconsistent_nodes"><code class="docutils literal notranslate"><span class="pre">ProcessingTree.get_consistent_and_inconsistent_nodes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.ProcessingTree.get_current_results"><code class="docutils literal notranslate"><span class="pre">ProcessingTree.get_current_results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.ProcessingTree.import_from_file"><code class="docutils literal notranslate"><span class="pre">ProcessingTree.import_from_file</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.ProcessingTree.prepare_execution"><code class="docutils literal notranslate"><span class="pre">ProcessingTree.prepare_execution</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.ProcessingTree.replace_node_plugin"><code class="docutils literal notranslate"><span class="pre">ProcessingTree.replace_node_plugin</span></code></a></li>
@@ -2552,10 +2572,7 @@ processing has been started and the old information is no longer valid.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowNode.execute_plugin_chain"><code class="docutils literal notranslate"><span class="pre">WorkflowNode.execute_plugin_chain</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowNode.node_id"><code class="docutils literal notranslate"><span class="pre">WorkflowNode.node_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowNode.prepare_execution"><code class="docutils literal notranslate"><span class="pre">WorkflowNode.prepare_execution</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowNode.propagate_shapes_and_global_config"><code class="docutils literal notranslate"><span class="pre">WorkflowNode.propagate_shapes_and_global_config</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowNode.propagate_to_children"><code class="docutils literal notranslate"><span class="pre">WorkflowNode.propagate_to_children</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowNode.result_shape"><code class="docutils literal notranslate"><span class="pre">WorkflowNode.result_shape</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowNode.update_plugin_result_data_shape"><code class="docutils literal notranslate"><span class="pre">WorkflowNode.update_plugin_result_data_shape</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults"><code class="docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a><ul class="nav section-nav flex-column">
@@ -2575,14 +2592,15 @@ processing has been started and the old information is no longer valid.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.ndims"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.ndims</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.node_labels"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.node_labels</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.prepare_files_for_saving"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.prepare_files_for_saving</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.prepare_new_results"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.prepare_new_results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.result_titles"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.result_titles</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.save_results_to_disk"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.save_results_to_disk</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.shapes"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.shapes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.source_hash"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.source_hash</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.store_frame_metadata"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.store_frame_metadata</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.store_frame_shapes"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.store_frame_shapes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.store_results"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.store_results</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.update_frame_metadata"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.update_frame_metadata</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.update_param_choices_from_labels"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.update_param_choices_from_labels</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.update_shapes_from_scan_and_workflow"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.update_shapes_from_scan_and_workflow</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResultsSelector"><code class="docutils literal notranslate"><span class="pre">WorkflowResultsSelector</span></code></a><ul class="nav section-nav flex-column">

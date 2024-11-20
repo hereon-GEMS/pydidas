@@ -691,16 +691,10 @@ PluginCollection singleton which holds all registered plugins and allows to
 get new instances of these plugins.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">BaseFitPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">BaseFitPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin" title="Link to this definition">#</a></dt>
 <dd><p>Fit a single peak to the input data.</p>
 <p>This plugin allows to fit the input data with any function defined in the
 pydidas.core.fitting package.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.calculate_result_shape">
-<span class="sig-name descname"><span class="pre">calculate_result_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.calculate_result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the shape of the Plugin results.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.check_center_positions">
 <span class="sig-name descname"><span class="pre">check_center_positions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.check_center_positions" title="Link to this definition">#</a></dt>
@@ -765,9 +759,8 @@ the actual data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.create_result_dataset">
-<span class="sig-name descname"><span class="pre">create_result_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.create_result_dataset" title="Link to this definition">#</a></dt>
-<dd><p>Create a new Dataset from the original data and the data fit including
-all the old metadata.</p>
+<span class="sig-name descname"><span class="pre">create_result_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.create_result_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Create new Dataset for detailed results from the original data and the fit.</p>
 <p>Note that this method does not update the new metadata with the fit
 parameters. The new dataset includes a second dimensions with entries
 for the raw data, the data fit and the residual.</p>
@@ -786,7 +779,7 @@ for the raw data, the data fit and the residual.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.detailed_results">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detailed_results</span></span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.detailed_results" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detailed_results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.detailed_results" title="Link to this definition">#</a></dt>
 <dd><p>Get the detailed results for the FitSinglePeak plugin.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -822,6 +815,20 @@ metadata.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.fit_outputs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_outputs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.fit_outputs" title="Link to this definition">#</a></dt>
+<dd><p>Get the selected outputs for the fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list with the selected outputs.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.get_parameter_config_widget">
 <span class="sig-name descname"><span class="pre">get_parameter_config_widget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QWidget</span></span></span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.get_parameter_config_widget" title="Link to this definition">#</a></dt>
@@ -849,21 +856,6 @@ metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a>) – The input data.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.result_shape">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Get the shape of the plugin result.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The shape of the results with a value for each dimension. Unknown
-dimensions are represented as -1 value.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple[int, …]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -926,34 +918,6 @@ through the associated button for “advances parameters” not to overwhelm
 users with too many options. The default is an empty list [].</p>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.apply_legacy_image_ops_to_data">
-<span class="sig-name descname"><span class="pre">apply_legacy_image_ops_to_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.apply_legacy_image_ops_to_data" title="Link to this definition">#</a></dt>
-<dd><p>Apply the legacy image operations to a new data frame.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> (<em>np.ndarray</em>) – The input data frame.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>new_data</strong> – The updated data frame with ROI and binning applied.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.calculate_result_shape">
-<span class="sig-name descname"><span class="pre">calculate_result_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin.calculate_result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the shape of the results based on the Plugin processing and
-the input data shape.</p>
-<p>This method only updates the shape and stores it internally. Use the
-“result_shape” property to access the Plugin’s result_shape. The
-generic implementation assumes the output shape to be equal to the
-input shape.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.copy" title="Link to this definition">#</a></dt>
@@ -1036,23 +1000,6 @@ non-standard items, e.g. sliders or interactive capability.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.get_single_ops_from_legacy">
-<span class="sig-name descname"><span class="pre">get_single_ops_from_legacy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">slice</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.get_single_ops_from_legacy" title="Link to this definition">#</a></dt>
-<dd><p>Get the parameters for a single ROI and binning operation.</p>
-<p>This method combines all legacy operations on the data into one set of
-operations to be applied.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>roi</strong> (<em>tuple[slice, …]</em>) – The ROI which needs to be applied to the original image.</p></li>
-<li><p><strong>binning</strong> (<em>int</em>) – The binning factor which needs to be applied to the original image.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.input_data">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">input_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.input_data" title="Link to this definition">#</a></dt>
@@ -1077,20 +1024,6 @@ operations to be applied.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.input_shape">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">input_shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.input_shape" title="Link to this definition">#</a></dt>
-<dd><p>Get the shape of the Plugin’s input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The shape of the plugin’s input.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[tuple, None]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1156,28 +1089,6 @@ output_data_label and output_data_unit.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.result_shape">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Get the shape of the plugin result.</p>
-<p>Note that this property will always perform an update of the value
-before returning a result.</p>
-<p>Any plugin that knows the shape of its results will return the value
-as a tuple with one entry for every dimension.
-If a Plugin knows the dimensionality of its results but not the size
-of each dimension, a -1 is returned for each unknown dimension.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The shape of the results with a value for each dimension. Unknown
-dimensions are represented as -1 value. If no result shape has been
-calculated yet, return None.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[tuple, None]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.result_title">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.result_title" title="Link to this definition">#</a></dt>
 <dd><p>Get the formatted title of the plugin’s results.</p>
@@ -1205,53 +1116,12 @@ calculated yet, return None.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.update_legacy_image_ops_with_this_plugin">
-<span class="sig-name descname"><span class="pre">update_legacy_image_ops_with_this_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin.update_legacy_image_ops_with_this_plugin" title="Link to this definition">#</a></dt>
-<dd><p>Update the legacy image operations list with any ROI and binning
-operations performed in this plugin.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pydidas.plugins.FitMultiPeak">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">FitMultiPeak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.FitMultiPeak" title="Link to this definition">#</a></dt>
-<dd><p>Fit multiple peaks to the input data.</p>
-<p>This plugin allows to fit the input data with any function defined in the
-pydidas.core.fitting package.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.FitMultiPeak.calculate_result_shape">
-<span class="sig-name descname"><span class="pre">calculate_result_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.FitMultiPeak.calculate_result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the shape of the Plugin results.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.FitMultiPeak.check_center_positions">
-<span class="sig-name descname"><span class="pre">check_center_positions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.plugins.FitMultiPeak.check_center_positions" title="Link to this definition">#</a></dt>
-<dd><p>Check the fitted center positions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Flag whether all centers are in the input x range.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">InputPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class for input plugins.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.calculate_result_shape">
-<span class="sig-name descname"><span class="pre">calculate_result_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin.calculate_result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the shape of the Plugin’s results.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.InputPlugin.execute" title="Link to this definition">#</a></dt>
@@ -1392,24 +1262,12 @@ processing.</p>
 as defined in the ScanContext class.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.update_required_kwargs">
-<span class="sig-name descname"><span class="pre">update_required_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin.update_required_kwargs" title="Link to this definition">#</a></dt>
-<dd><p>Update the kwargs dict in place.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">InputPlugin1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class for input plugins.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.calculate_result_shape">
-<span class="sig-name descname"><span class="pre">calculate_result_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.calculate_result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the shape of the Plugin’s results.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.get_raw_input_size">
 <span class="sig-name descname"><span class="pre">get_raw_input_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.get_raw_input_size" title="Link to this definition">#</a></dt>
@@ -1436,12 +1294,6 @@ as defined in the ScanContext class.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.pre_execute">
 <span class="sig-name descname"><span class="pre">pre_execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.pre_execute" title="Link to this definition">#</a></dt>
 <dd><p>Run generic pre-execution routines.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.update_required_kwargs">
-<span class="sig-name descname"><span class="pre">update_required_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.update_required_kwargs" title="Link to this definition">#</a></dt>
-<dd><p>Update the kwargs dict in place.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1509,22 +1361,6 @@ label.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">pyFAIintegrationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase" title="Link to this definition">#</a></dt>
 <dd><p>Provide basic functionality for the concrete integration plugins.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.calculate_result_shape">
-<span class="sig-name descname"><span class="pre">calculate_result_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.calculate_result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Get the shape of the integrated dataset to set up the CRS / LUT.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The new shape. For 1-dimensional integration, a single integer is
-returned. For 2-dimensional integrations a tuple of two integers
-is returned.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[int, tuple[int, int]]</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.check_and_set_custom_mask">
 <span class="sig-name descname"><span class="pre">check_and_set_custom_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.check_and_set_custom_mask" title="Link to this definition">#</a></dt>
@@ -1742,21 +1578,6 @@ will be used.</p>
 <dd><p>Check and load the mask and set up the AzimuthalIntegrator.</p>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.result_shape">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.result_shape" title="Link to this definition">#</a></dt>
-<dd><p>Get the shape of the plugin result.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The shape of the results with a value for each dimension. Unknown
-dimensions are represented as -1 value.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple[int, …]</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -1825,7 +1646,6 @@ dimensions are represented as -1 value.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.calculate_result_shape"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.calculate_result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.check_center_positions"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.check_center_positions</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.check_min_peak_height"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.check_min_peak_height</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.create_detailed_results"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.create_detailed_results</span></code></a></li>
@@ -1833,43 +1653,31 @@ dimensions are represented as -1 value.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.create_result_dataset"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.create_result_dataset</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.detailed_results"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.detailed_results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.execute"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.execute</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.fit_outputs"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.fit_outputs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.get_parameter_config_widget"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.get_parameter_config_widget</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.pre_execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.prepare_input_data"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.prepare_input_data</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.result_shape"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BaseFitPlugin.update_fit_param_bounds"><code class="docutils literal notranslate"><span class="pre">BaseFitPlugin.update_fit_param_bounds</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.apply_legacy_image_ops_to_data"><code class="docutils literal notranslate"><span class="pre">BasePlugin.apply_legacy_image_ops_to_data</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.calculate_result_shape"><code class="docutils literal notranslate"><span class="pre">BasePlugin.calculate_result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.copy"><code class="docutils literal notranslate"><span class="pre">BasePlugin.copy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.execute"><code class="docutils literal notranslate"><span class="pre">BasePlugin.execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_class_description"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_class_description</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_class_description_as_dict"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_class_description_as_dict</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_parameter_config_widget"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_parameter_config_widget</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_single_ops_from_legacy"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_single_ops_from_legacy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_data"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_data_dim_str"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_data_dim_str</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_shape"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.is_basic_plugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin.is_basic_plugin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.output_data_dim_str"><code class="docutils literal notranslate"><span class="pre">BasePlugin.output_data_dim_str</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">BasePlugin.pre_execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.register_as_base_class"><code class="docutils literal notranslate"><span class="pre">BasePlugin.register_as_base_class</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_data_label"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_data_label</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_shape"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_title"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_title</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.store_input_data_copy"><code class="docutils literal notranslate"><span class="pre">BasePlugin.store_input_data_copy</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.update_legacy_image_ops_with_this_plugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin.update_legacy_image_ops_with_this_plugin</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.FitMultiPeak"><code class="docutils literal notranslate"><span class="pre">FitMultiPeak</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.FitMultiPeak.calculate_result_shape"><code class="docutils literal notranslate"><span class="pre">FitMultiPeak.calculate_result_shape</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.FitMultiPeak.check_center_positions"><code class="docutils literal notranslate"><span class="pre">FitMultiPeak.check_center_positions</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin"><code class="docutils literal notranslate"><span class="pre">InputPlugin</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.calculate_result_shape"><code class="docutils literal notranslate"><span class="pre">InputPlugin.calculate_result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin.execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.get_filename"><code class="docutils literal notranslate"><span class="pre">InputPlugin.get_filename</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.get_first_file_size"><code class="docutils literal notranslate"><span class="pre">InputPlugin.get_first_file_size</span></code></a></li>
@@ -1880,15 +1688,12 @@ dimensions are represented as -1 value.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin.pre_execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.prepare_carryon_check"><code class="docutils literal notranslate"><span class="pre">InputPlugin.prepare_carryon_check</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.update_filename_string"><code class="docutils literal notranslate"><span class="pre">InputPlugin.update_filename_string</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.update_required_kwargs"><code class="docutils literal notranslate"><span class="pre">InputPlugin.update_required_kwargs</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.calculate_result_shape"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.calculate_result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.get_raw_input_size"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.get_raw_input_size</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.input_data_dim"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.input_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.pre_execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.pre_execute</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.update_required_kwargs"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.update_required_kwargs</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin"><code class="docutils literal notranslate"><span class="pre">OutputPlugin</span></code></a><ul class="nav section-nav flex-column">
@@ -1900,7 +1705,6 @@ dimensions are represented as -1 value.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.ProcPlugin"><code class="docutils literal notranslate"><span class="pre">ProcPlugin</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_getter"><code class="docutils literal notranslate"><span class="pre">plugin_getter</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.calculate_result_shape"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.calculate_result_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.check_and_set_custom_mask"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.check_and_set_custom_mask</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.convert_radial_range_values"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.convert_radial_range_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.execute"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.execute</span></code></a></li>
@@ -1917,7 +1721,6 @@ dimensions are represented as -1 value.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.load_and_set_mask"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.load_and_set_mask</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.modulate_and_store_azi_range"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.modulate_and_store_azi_range</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.pre_execute"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.pre_execute</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.result_shape"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.result_shape</span></code></a></li>
 </ul>
 </li>
 </ul>

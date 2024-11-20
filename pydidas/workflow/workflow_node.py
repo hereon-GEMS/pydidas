@@ -151,16 +151,29 @@ class WorkflowNode(GenericNode):
             _parent_out == _plugin_in or _parent_out == -1 or _plugin_in == -1
         )
 
-    def prepare_execution(self):
+    def prepare_execution(self, **kwargs: dict):
         """
         Prepare the execution of the plugin chain.
 
         This method recursively calls the pre_execute methods of all (child) plugins.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Any keyword arguments which need to be passed to the plugin.
+            Supported keywords are:
+
+            test : bool, optional
+                Flag to indicate that the plugin should be executed in test mode.
+                This flag will prevent the plugin from storing any data to the
+                file system.
         """
+        _test_mode = kwargs.get("test", False)
         self.results = None
+        self.plugin.test_mode = _test_mode
         self.plugin.pre_execute()
         for _child in self._children:
-            _child.prepare_execution()
+            _child.prepare_execution(**kwargs)
 
     def execute_plugin(self, arg: Union[Dataset, int], **kwargs: dict):
         """

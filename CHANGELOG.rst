@@ -17,6 +17,8 @@ Improvements
   shapes can be dynamically modified during runtime.
 - Updated the classmethods of FitFuncBase to include attributes which correspond 
   to the fit result output labels.
+- Added a test mode flag to the WorkflowTree to prevent the creation of directories
+  in output plugins when testing workflows.
 - Programmatic improvements:
     - Removed the basic_plugin class attribute from Plugins and shifted the check
       to the core code of the base plugins.

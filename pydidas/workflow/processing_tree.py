@@ -196,10 +196,10 @@ class ProcessingTree(GenericTree):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
-        self.prepare_execution()
+        self.prepare_execution(**kwargs)
         self.root.execute_plugin_chain(arg, global_index=arg, **kwargs)
 
-    def prepare_execution(self, forced: bool = False):
+    def prepare_execution(self, **kwargs: dict):
         """
         Prepare the execution of the ProcessingTree.
 
@@ -209,15 +209,23 @@ class ProcessingTree(GenericTree):
 
         Parameters
         ----------
-        forced : bool, optional
-            Flag to force running the prepare_execution method. The default is
-            False.
+        **kwargs : dict, optional
+            Optional keyword arguments. Supported keywords are:
+
+            forced : bool, optional
+                Flag to force running the prepare_execution method. The default
+                is False.
+            test : bool, optional
+                Flag to run the prepare_execution method in test mode. The default
+                is False.
         """
+        _forced = kwargs.get("forced", False)
+        _test_mode = kwargs.get("test", False)
         if self.root is None:
             raise UserConfigError("The ProcessingTree has no nodes.")
-        if self._pre_executed and not self.tree_has_changed and not forced:
+        if self._pre_executed and not self.tree_has_changed and not _forced:
             return
-        self.root.prepare_execution()
+        self.root.prepare_execution(test=_test_mode)
         self._pre_executed = True
         self.reset_tree_changed_flag()
 

@@ -109,9 +109,3 @@ class DummyProcNewDataset(ProcPlugin):
         has been called.
         """
         self._pre_executed = True
-
-    def calculate_result_shape(self):
-        """
-        Set the result shape based on the given output_shapae.
-        """
-        self._config["result_shape"] = self.get_param_value("_output_shape")

@@ -192,10 +192,6 @@ there are no setter methods defined for these properties.**
     The shape of the input data. This property also has a setter method and will
     usually be called by the parent plugin (i.e. the plugin which precedes the current
     plugin in the workflow) to set the input shape.
- - :py:data:`result_shape` (type: :py:data:`tuple`):
-    The shape of the output data. This property will be updated by the
-    :py:meth:`calculate_result_shape <pydidas.plugins.BasePlugin.calculate_result_shape>`
-    method either based on the plugin configuration or on the input data.
 
 :ref:`(go back to top of the page) <developer_guide_to_plugins>`
 
@@ -224,18 +220,6 @@ is described as well to know when to overload these methods.
     This method stores a copy of the input data and input kwargs in the plugin. This
     might be required, for example, to use the input data later, for example when
     calculating intermediate results.
- - :py:meth:`calculate_result_shape <pydidas.plugins.BasePlugin.calculate_result_shape>`:
-    This method calculates the shape of the output data. Plugins can implement their
-    own logic to calculate the output shape based. The default implementation
-    returns the input shape.
- - :py:meth:`apply_legacy_image_ops_to_data <pydidas.plugins.BasePlugin.apply_legacy_image_ops_to_data>`:
-    This method allows to apply legacy image operations to the method's input data.
-    This method will know all binning and cropping operations from the plugin's
-    ancestors and will calculate a single binning and cropping operation and apply
-    it to the calling argument data :py:data:`np.ndarray`. This is useful to
-    synchronize, for example, the shape of correction data like flat fields with the
-    input data shape without needing to know about cropping or binning or raw data
-    explicitly.
 
 :ref:`(go back to top of the page) <developer_guide_to_plugins>`
 

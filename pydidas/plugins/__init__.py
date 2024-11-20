@@ -46,7 +46,6 @@ from .plugin_getter_ import *
 
 # The base plugins with references to widgets must be imported last:
 from .base_fit_plugin import *
-from .base_multi_peak_fit_plugin import *
 from .pyfai_integration_base import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -65,11 +64,6 @@ from . import base_input_plugin_1d
 
 __all__.extend(base_input_plugin_1d.__all__)
 del base_input_plugin_1d
-
-from . import base_multi_peak_fit_plugin
-
-__all__.extend(base_multi_peak_fit_plugin.__all__)
-del base_multi_peak_fit_plugin
 
 from . import base_output_plugin
 

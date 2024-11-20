@@ -185,6 +185,18 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         )
         print(_txt, end="\r", flush=True)
 
+    @QtCore.Slot(str)
+    def _process_messages(self, message: str):
+        """
+        Process messages from the AppRunner and pass them to the app instance.
+
+        Parameters
+        ----------
+        message : str
+            The message to be processed.
+        """
+        self._app.received_signal_message(message)
+
     @QtCore.Slot()
     def _store_results_to_disk(self):
         """
@@ -274,13 +286,14 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         """
         Execute the given workflow in an AppRunner with a QEventLoop.
         """
-        _app = ExecuteWorkflowApp()
+        self._app = ExecuteWorkflowApp()
 
         try:
-            runner = AppRunner(_app)
-            runner.sig_results.connect(_app.multiprocessing_store_results)
+            runner = AppRunner(self._app)
+            runner.sig_results.connect(self._app.multiprocessing_store_results)
             if self.parsed_args["verbose"]:
                 runner.sig_progress.connect(self._print_progress)
+            runner.sig_message_from_worker.connect(self._process_messages)
             runner.finished.connect(self._store_results_to_disk)
             runner.start()
             if self.parsed_args["verbose"]:

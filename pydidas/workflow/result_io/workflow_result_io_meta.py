@@ -159,11 +159,11 @@ class WorkflowResultIoMeta(GenericIoMeta):
             )
 
     @classmethod
-    def push_frame_metadata_to_active_savers(
+    def push_metadata_to_active_savers(
         cls, metadata: dict, scan: Union[Scan, None] = None
     ):
         """
-        Push the frame metadata to all active savers.
+        Push the metadata to all active savers.
 
         This method is required if the ExecuteWorkflowApp is used with the
         AppRunner because the metadata cannot be transferred through the
@@ -180,7 +180,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
-            _saver.update_frame_metadata(metadata, scan)
+            _saver.update_metadata(metadata, scan)
 
     @classmethod
     def export_frame_to_active_savers(

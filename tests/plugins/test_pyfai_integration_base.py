@@ -545,13 +545,6 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             plugin.get_param_value("rad_range_upper"), self._test_vals_high["q"]
         )
 
-    def test_calculate_result_shape(self):
-        _range = (1234, 789)
-        plugin = pyFAIintegrationBase(rad_npoint=_range[0], azi_npoint=_range[1])
-        plugin.output_data_dim = 1
-        with self.assertRaises(NotImplementedError):
-            plugin.calculate_result_shape()
-
     def test_load_and_set_mask__correct(self):
         _maskfilename, _mask = self.create_mask()
         plugin = pyFAIintegrationBase()

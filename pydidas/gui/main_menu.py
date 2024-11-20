@@ -503,9 +503,12 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         dict
             The state of the main window required to restore the look.
         """
+        _relative_geometry = list(self.geometry().getRect())
+        _relative_geometry[0] -= self.screen().geometry().x()
+        _relative_geometry[1] -= self.screen().geometry().y()
         _app = QtWidgets.QApplication.instance()
         _state = {
-            "geometry": self.geometry().getRect(),
+            "geometry": tuple(_relative_geometry),
             "maximized": self.isMaximized(),
             "screen": _app.screens().index(self.window().windowHandle().screen()),
             "frame_index": self.centralWidget().currentIndex(),
@@ -587,6 +590,8 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The stored state of the main window.
         """
         _app = QtWidgets.QApplication.instance()
+        if _app.screen_to_use is not None:
+            state["screen"] = _app.screen_to_use
         _screens = _app.screens()
         _screen_no = state.get("screen", 0)
         _target_screen = _screens[_screen_no if _screen_no < len(_screens) else 0]
@@ -595,13 +600,14 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             state["geometry"][2] = _target_screen_geo.width() - state["geometry"][0]
         if state["geometry"][1] + state["geometry"][3] > _target_screen_geo.height():
             state["geometry"][3] = _target_screen_geo.height() - state["geometry"][1]
-        self.setGeometry(*state["geometry"])
+        state["geometry"][0] += _target_screen_geo.x()
+        state["geometry"][1] += _target_screen_geo.y()
         if state["maximized"]:
             self.setWindowState(QtCore.Qt.WindowMaximized)
         _frame_index = state["frame_index"]
         if _frame_index >= 0:
             self.centralWidget().setCurrentIndex(_frame_index)
-        self.setScreen(_target_screen)
+        self.setGeometry(*state["geometry"])
 
     def restore_frame_states(self, state: dict):
         """

@@ -53,7 +53,7 @@ class ProcessingTree(GenericTree):
 
     def __init__(self, **kwargs: dict):
         super().__init__(**kwargs)
-        self._preexecuted = False
+        self._pre_executed = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
 
     @property
@@ -183,12 +183,7 @@ class ProcessingTree(GenericTree):
             and results items.
         """
         self.execute_process(arg, **kwargs)
-        _nodes = self.get_all_nodes_with_results()
-        _results = {}
-        for _node in _nodes:
-            if _node.results is not None:
-                _results[_node.node_id] = _node.results
-        return _results
+        return self.get_current_results()
 
     def execute_process(self, arg: object, **kwargs: dict):
         """
@@ -218,11 +213,12 @@ class ProcessingTree(GenericTree):
             Flag to force running the prepare_execution method. The default is
             False.
         """
-        if self._preexecuted and not self.tree_has_changed and not forced:
+        if self.root is None:
+            raise UserConfigError("The ProcessingTree has no nodes.")
+        if self._pre_executed and not self.tree_has_changed and not forced:
             return
-        self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
-        self._preexecuted = True
+        self._pre_executed = True
         self.reset_tree_changed_flag()
 
     def execute_single_plugin(
@@ -255,7 +251,6 @@ class ProcessingTree(GenericTree):
         """
         if node_id not in self.nodes:
             raise KeyError(f'The node ID "{node_id}" is not in use.')
-        self.root.propagate_shapes_and_global_config()
         self.nodes[node_id].prepare_execution()
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
@@ -376,15 +371,24 @@ class ProcessingTree(GenericTree):
             self.clear()
         self._config["tree_changed"] = True
 
-    def get_all_result_shapes(self, force_update: bool = False) -> dict:
+    def get_current_results(self) -> dict:
+        """
+        Get the results of the current WorkflowTree.
+
+        Returns
+        -------
+        results : dict
+            A dictionary with the results of the current WorkflowTree.
+        """
+        _results = {}
+        for _node in self.get_all_nodes_with_results():
+            if _node.results is not None:
+                _results[_node.node_id] = _node.results
+        return _results
+
+    def get_all_result_shapes(self) -> dict:
         """
         Get the shapes of all leaves in form of a dictionary.
-
-        Parameters
-        ----------
-        force_update : bool, optional
-            Keyword to enforce a new calculation of the result shapes. The
-            default is False.
 
         Raises
         ------
@@ -400,14 +404,18 @@ class ProcessingTree(GenericTree):
         if self.root is None:
             raise UserConfigError("The ProcessingTree has no nodes.")
         _nodes_w_results = self.get_all_nodes_with_results()
-        _shapes = [_node.result_shape for _node in _nodes_w_results]
-        if None in _shapes or self.tree_has_changed or force_update:
-            self.root.propagate_shapes_and_global_config()
+        _shapes = [
+            _node.result_shape
+            for _node in _nodes_w_results
+            if _node.result_shape is not None
+        ]
+        if None in _shapes or self.tree_has_changed:
             self.reset_tree_changed_flag()
         _shapes = {
             _node.node_id: _node.result_shape
             for _node in _nodes_w_results
             if _node.plugin.output_data_dim is not None
+            and _node.result_shape is not None
         }
         for _id, _shape in _shapes.items():
             if -1 in _shape:
@@ -417,7 +425,7 @@ class ProcessingTree(GenericTree):
                 )
         return _shapes
 
-    def get_all_nodes_with_results(self) -> list:
+    def get_all_nodes_with_results(self) -> list[WorkflowNode]:
         """
         Get all tree nodes which have results associated with them.
 
@@ -426,8 +434,8 @@ class ProcessingTree(GenericTree):
 
         Returns
         -------
-        list
-            A list of all leaf nodes.
+        list[WorkflowNode]
+            A list of all nodes which are leaves or which have been flagged.
         """
         _nodes_w_results = [
             _node
@@ -436,15 +444,12 @@ class ProcessingTree(GenericTree):
         ]
         return _nodes_w_results
 
-    def get_complete_plugin_metadata(self, force_update: bool = False) -> dict:
+    def get_complete_plugin_metadata(self) -> dict:
         """
         Get the metadata (e.g. shapes, labels, names) for all of the tree's plugins.
 
-        Parameters
-        ----------
-        force_update : bool, optional
-            Keyword to enforce a new calculation of the result shapes. The
-            default is False.
+        Note that the shapes are only available after running the plugin chain at
+        least once. Otherwise, the shapes will be set to None.
 
         Returns
         -------
@@ -461,11 +466,10 @@ class ProcessingTree(GenericTree):
         if self.root is None:
             return _meta
         _shapes = [_node.result_shape for _node in self.nodes.values()]
-        if None in _shapes or self.tree_has_changed or force_update:
-            self.root.propagate_shapes_and_global_config()
+        if None in _shapes or self.tree_has_changed:
             self.reset_tree_changed_flag()
         for _node_id, _node in self.nodes.items():
-            if _node.plugin.output_data_dim is None:
+            if _node.plugin.output_data_dim is None or _node.result_shape is None:
                 continue
             _label = _node.plugin.get_param_value("label")
             _plugin_name = _node.plugin.__class__.plugin_name

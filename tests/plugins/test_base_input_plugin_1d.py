@@ -84,7 +84,7 @@ class TestBaseInputPlugin1d(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        ScanContext._reset_instance()
+        SCAN.restore_all_defaults(True)
         shutil.rmtree(cls._testpath)
 
     def setUp(self):
@@ -168,11 +168,6 @@ class TestBaseInputPlugin1d(unittest.TestCase):
         plugin.get_filename = lambda index: self._fname
         plugin.prepare_carryon_check()
         self.assertEqual(plugin._config["file_size"], os.stat(self._fname).st_size)
-
-    def test_calculate_result_shape(self):
-        plugin = TestInputPlugin1d()
-        plugin.calculate_result_shape()
-        self.assertEqual(self._datashape, plugin.result_shape)
 
     def test_pickle(self):
         plugin = InputPlugin1d()

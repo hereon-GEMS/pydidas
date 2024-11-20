@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,21 +20,26 @@ Module with the BaseApp class from which all Pydidas apps should inherit.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseApp"]
 
 
+import multiprocessing as mp
 from copy import copy
 from pathlib import Path
-from typing import Self
+from typing import Optional, Self
 
 from qtpy import QtCore
 
 from .object_with_parameter_collection import ObjectWithParameterCollection
 from .parameter_collection import ParameterCollection
+
+
+_TYPES_NOT_TO_COPY = (QtCore.SignalInstance, QtCore.QMetaObject, ParameterCollection)
+_KEYS_NOT_TO_COPY = ["__METAOBJECT__", "mp_manager", "_locals", "params", "slave_mode"]
 
 
 class BaseApp(ObjectWithParameterCollection):
@@ -56,7 +61,7 @@ class BaseApp(ObjectWithParameterCollection):
 
     default_params = ParameterCollection()
     parse_func = lambda self: {}
-    attributes_not_to_copy_to_slave_app = []
+    attributes_not_to_copy_to_slave_app = ["_mp_manager_instance"]
 
     def __init__(self, *args: tuple, **kwargs: dict):
         self.slave_mode = kwargs.pop("slave_mode", False)
@@ -64,6 +69,8 @@ class BaseApp(ObjectWithParameterCollection):
         self.update_params_from_init(*args, **kwargs)
         self.parse_args_and_set_params()
         self._config["run_prepared"] = False
+        self.mp_manager = {}
+        self._mp_manager_instance = None
 
     def parse_args_and_set_params(self):
         """
@@ -75,6 +82,56 @@ class BaseApp(ObjectWithParameterCollection):
         for _key, _value in _cmdline_args.items():
             if _key in self.params and _value is not None:
                 self.params.set_value(_key, _value)
+
+    def deleteLater(self):
+        """
+        Overwrite the deleteLater method to ensure proper cleanup.
+
+        This method is called by the Qt event loop to delete the app instance.
+        """
+        if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
+            self._mp_manager_instance.shutdown()
+        super().deleteLater()
+
+    def must_send_signal_and_wait_for_response(self) -> Optional[str]:
+        """
+        Check whether the app must send a signal and wait for a response.
+
+        If a signal is required, the method returns the string of the signal to
+        send through the multiprocessing signal queue. If no signal is required,
+        the method returns None.
+
+        Returns
+        -------
+        str or None
+            The signal to send or None.
+        """
+        return None
+
+    def signal_processed_and_can_continue(self) -> bool:
+        """
+        Check whether the app's signal was processed and the app can continue.
+
+        Returns
+        -------
+        bool
+            Flag whether the app can continue processing.
+        """
+        return True
+
+    def get_latest_results(self) -> Optional[object]:
+        """
+        Get the latest results from the app.
+
+        Note that the app must store results in the `latest_results` key
+        of the config dictionary to be able to retrieve them.
+
+        Returns
+        -------
+        object or None
+            The latest results or None.
+        """
+        return self._config.get("latest_results", None)
 
     def run(self):
         """
@@ -101,6 +158,13 @@ class BaseApp(ObjectWithParameterCollection):
         """
         self._config["run_prepared"] = True
 
+    def prepare_run(self):
+        """
+        Prepare running the app. This is a wrapper for multiprocessing_pre_run.
+        """
+        self.multiprocessing_pre_run()
+
+    @QtCore.Slot()
     def multiprocessing_post_run(self):
         """
         Perform operations after running main parallel processing function.
@@ -198,19 +262,17 @@ class BaseApp(ObjectWithParameterCollection):
             The state dictionary.
         """
         _cfg = self.get_config()
-        _newcfg = {}
+        _new_cfg = {}
         for _key, _item in self._config.items():
             if isinstance(_item, range):
-                _newcfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
+                _new_cfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, slice):
-                _newcfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
+                _new_cfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, Path):
-                _newcfg[_key] = str(_item)
+                _new_cfg[_key] = str(_item)
             if _key in ["scan_context", "exp_context"]:
-                _newcfg[_key] = "::None::"
-        _cfg.update(_newcfg)
-        if "shared_memory" in _cfg and _cfg["shared_memory"] != {}:
-            _cfg["shared_memory"] = "::restore::True"
+                _new_cfg[_key] = "::None::"
+        _cfg.update(_new_cfg)
         return {
             "params": self.get_param_values_as_dict(filter_types_for_export=True),
             "config": _cfg,
@@ -227,7 +289,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         for _key, _val in state["params"].items():
             self.set_param_value(_key, _val)
-        _newcfg = {}
+        _new_cfg = {}
         for _key, _item in state["config"].items():
             if not isinstance(_item, str):
                 continue
@@ -237,23 +299,12 @@ class BaseApp(ObjectWithParameterCollection):
                 _stop = None if _stop == "None" else int(_stop)
                 _step = None if _step == "None" else int(_step)
             if _item.startswith("::range::"):
-                _newcfg[_key] = range(_start, _stop, _step)
+                _new_cfg[_key] = range(_start, _stop, _step)
             if _item.startswith("::slice::"):
-                _newcfg[_key] = slice(_start, _stop, _step)
+                _new_cfg[_key] = slice(_start, _stop, _step)
             if _item == "::None::":
-                _newcfg[_key] = None
-        self._config = state["config"] | _newcfg
-        if self._config.get("shared_memory", False) == "::restore::True":
-            self._config["shared_memory"] = {}
-            self.initialize_shared_memory()
-
-    def initialize_shared_memory(self):
-        """
-        Initialize the shared memory array for the master app.
-
-        Note: This method is not required for apps without a shared memory.
-        """
-        return
+                _new_cfg[_key] = None
+        self._config = state["config"] | _new_cfg
 
     def copy(self, slave_mode: bool = False) -> Self:
         """
@@ -286,27 +337,20 @@ class BaseApp(ObjectWithParameterCollection):
         BaseApp
             The copy of the app.
         """
-        _obj_copy = type(self)()
+        _obj_copy = type(self)(slave_mode=slave_mode)
         _obj_copy.__dict__.update(
             {
                 _key: copy(_value)
                 for _key, _value in self.__dict__.items()
                 if not (
-                    isinstance(
-                        _value,
-                        (
-                            QtCore.SignalInstance,
-                            QtCore.QMetaObject,
-                            ParameterCollection,
-                        ),
-                    )
+                    isinstance(_value, _TYPES_NOT_TO_COPY)
+                    or _key in _KEYS_NOT_TO_COPY
                     or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
-                    or _key in ["__METAOBJECT__"]
                 )
             }
         )
         for _key, _param in self.params.items():
             _obj_copy.set_param_value(_key, _param.value)
-        if slave_mode:
-            _obj_copy.slave_mode = True
+        if hasattr(self, "mp_manager"):
+            _obj_copy.mp_manager = {k: v for k, v in self.mp_manager.items()}
         return _obj_copy

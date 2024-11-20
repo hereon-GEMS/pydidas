@@ -154,7 +154,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         InputPlugin1d.pre_execute(self)
         self._check_files_per_directory()
         self._determine_header_size()
-        self._determine_roi()
+        self._config["roi"] = self._get_own_roi()
         self._config["energy_scale"] = None
 
     def update_filename_string(self):
@@ -215,17 +215,6 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             _n_header += 1
         self._config["header_lines"] = _n_header
         self._config["data_lines"] = _lines_total - _n_header
-
-    def _determine_roi(self):
-        """
-        Determine the ROI based on the ROI Parameters.
-        """
-        if self.get_param_value("use_roi"):
-            self._config["roi"] = slice(
-                self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
-            )
-        else:
-            self._config["roi"] = None
 
     def get_frame(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """

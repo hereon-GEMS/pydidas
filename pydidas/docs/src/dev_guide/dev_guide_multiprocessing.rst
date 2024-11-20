@@ -36,10 +36,10 @@ Communication with workers
 
 Communication with the workers is handles by four queues:
 
-- **send** queue to send tasks to the workers.
-- **reveiver** queue to receive results from the workers.
-- **stop** queue to send stop signals to the workers.
-- **finished** queue for the workers to signal they have completed all tasks.
+- **input queue** queue to send tasks to the workers.
+- **output queue** queue to receive results from the workers.
+- **stop queue** queue to send stop signals to the workers.
+- **finished queue** queue for the workers to signal they have completed all tasks.
 
 The user does not have to interact with the queues itself, this is handled by 
 the :py:class:`WorkerController <pydidas.multiprocessing.WorkerController>`.
@@ -153,7 +153,7 @@ or saved as file.
         results = sorted(result_spy)
         print(results)
     
-        print("WorkerController is alive: ", worker_controller.is_alive())
+        print("WorkerController is alive: ", worker_controller.isRunning())
 
 
     if __name__ == "__main__":
@@ -241,7 +241,6 @@ thread alive and allow the submission of new tasks.
 
 
     if __name__ == "__main__":
-        # run_worker_controller()
         run_worker_controller_with_restart()
 
 
@@ -250,6 +249,9 @@ AppRunner
 
 The :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` is the specialized
 subclass to work with pydidas :py:class:`Apps <pydidas.core.BaseApp>`.
+
+In addition to the four queues listed above, it has a 5th queue for passing (string)
+messages from the worker to the main event loop.
 
 A sequence diagram of the communication with the :py:class:`AppRunner 
 <pydidas.multiprocessing.AppRunner>` is given below.
@@ -284,7 +286,7 @@ signals:
       - This signal emits the relative progress once a result has been received
         from a worker. The values are in the range [0, 1].
     * - sig_results
-      - (int, object)
+      - (object, object)
       - The task number and results are emitted as a signal once they have been
         received from the workers.
     * - finished
@@ -330,6 +332,7 @@ QCoreApplication is started and a test object is used to receive the
     from qtpy import QtCore
 
     import pydidas
+    import pydidas_qtcore
 
 
     class TestApp(pydidas.core.BaseApp):
@@ -345,8 +348,8 @@ QCoreApplication is started and a test object is used to receive the
         def multiprocessing_func(self, index):
             return 3 * index + 5
 
-        @QtCore.Slot(int, object)
-        def multiprocessing_store_results(self, index, *args):
+        @QtCore.Slot(object, object)
+        def multiprocessing_store_results(self, index, *args: tuple):
             self.results[index] = args[0]
 
 
@@ -361,35 +364,39 @@ QCoreApplication is started and a test object is used to receive the
         def store_app(self, app):
             self.app = app
 
-        @QtCore.Slot(int, object)
+        @QtCore.Slot(object, object)
         def store_results(self, index, *results):
-            self.results.append([index, results[0]])
+            self.results.append([int(index), int(results[0])])
 
 
     def run_app_runner():
-        app = QtCore.QCoreApplication([])
+        app = pydidas_qtcore.PydidasQApplication([])
 
         tester = TestObject()
         test_app = TestApp()
-        app_runner = pydidas.multiprocessing.AppRunner(test_app)
+        test_app_copy = test_app.copy()
 
+        app_runner = pydidas.multiprocessing.AppRunner(test_app)
         app_runner.sig_final_app_state.connect(tester.store_app)
         app_runner.sig_results.connect(tester.store_results)
         app_runner.finished.connect(app.exit)
 
-        timer = QtCore.QTimer()
-        timer.singleShot(10, app_runner.start)
+        app_runner.start()
         app.exec_()
 
         print("Raw results as received from the signal:")
         print("Results: ", tester.results)
-        print("\nThe test app does not have any stored results because it was not connected:")
+        print(
+            "\nThe test app also has stored all results because it was connected by "
+            "default through the AppRunner:"
+        )
         print("test_app.results: ", test_app.results)
-        print("\nThe final app has all the results stored internally in the correct order:")
-        print("final_app.results:", tester.app.results)
+        print(
+            "\nThe app's copy does not have any results stored and only the array "
+            "initialized with zeros:"
+        )
+        print("final_app.results:", test_app_copy.results)
 
 
     if __name__ == "__main__":
         run_app_runner()
-
-

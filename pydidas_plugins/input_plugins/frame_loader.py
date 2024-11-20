@@ -68,6 +68,7 @@ class FrameLoader(InputPlugin):
             The updated calling keyword arguments.
         """
         _fname = self.get_filename(frame_index)
+        kwargs["roi"] = self._get_own_roi()
         _data = import_data(_fname, **kwargs)
         _data.axis_units = ["pixel", "pixel"]
         _data.axis_labels = ["detector y", "detector x"]

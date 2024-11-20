@@ -123,8 +123,13 @@ class Hdf5fileSeriesLoader(InputPlugin):
         _hdf_index = frame_index % self.get_param_value("_counted_images_per_file")
         kwargs = kwargs | self._standard_kwargs
         kwargs["indices"] = self._index_func(_hdf_index)
+
         _data = import_data(
-            _fname, forced_dimension=2, import_pydidas_metadata=False, **kwargs
+            _fname,
+            forced_dimension=2,
+            import_pydidas_metadata=False,
+            roi=self._get_own_roi(),
+            **kwargs,
         )
         _data.axis_units = ["pixel", "pixel"]
         _data.axis_labels = ["detector y", "detector x"]

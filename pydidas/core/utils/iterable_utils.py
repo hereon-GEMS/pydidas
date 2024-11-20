@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,11 +20,17 @@ Functions to flatten nested iterables of various depths.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["flatten", "flatten_all", "insert_item_in_tuple", "replace_item_in_iterable"]
+__all__ = [
+    "flatten",
+    "flatten_all",
+    "insert_item_in_tuple",
+    "insert_items_in_tuple",
+    "replace_item_in_iterable",
+]
 
 
 import itertools
@@ -99,7 +105,7 @@ def insert_item_in_tuple(obj: tuple, index: int, item: object) -> tuple:
     obj : tuple
         The original tuple
     index : int
-        The index for the new item
+        The index for the new item.
     item : object
         The new item to be inserted.
 
@@ -111,6 +117,28 @@ def insert_item_in_tuple(obj: tuple, index: int, item: object) -> tuple:
     _new = list(obj)
     _new.insert(index, item)
     return tuple(_new)
+
+
+def insert_items_in_tuple(obj: tuple, index: int, *items: tuple[object]) -> tuple:
+    """
+    Insert iterable items into a tuple.
+
+    Parameters
+    ----------
+    obj : tuple
+        The original tuple
+    index : int
+        The index for the new item.
+    item : object
+        The new item to be inserted.
+
+    Returns
+    -------
+    tuple
+        The updated tuple.
+    """
+    _new = list(obj)
+    return tuple(_new[:index] + list(items) + _new[index:])
 
 
 def replace_item_in_iterable(obj: Iterable, index: int, item: object) -> Iterable:

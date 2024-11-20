@@ -30,20 +30,20 @@ __all__ = ["FitDoublePeak"]
 from pydidas.core import get_generic_param_collection
 from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.generic_params import fit_multi_peak_params
-from pydidas.plugins import FitMultiPeak
+from pydidas.plugins import BaseFitPlugin
 
 
 _2PEAK_PARAMS = fit_multi_peak_params(2)
 _FUNC_CHOICES = FitFuncMeta.get_fitter_names_with_num_peaks(2)
-_DEFAULTS = FitMultiPeak.default_params.copy() | get_generic_param_collection(
+_DEFAULTS = BaseFitPlugin.default_params.copy() | get_generic_param_collection(
     *_2PEAK_PARAMS
 )
 _DEFAULTS["fit_func"].update_value_and_choices(_FUNC_CHOICES[0], _FUNC_CHOICES)
 
-_ADVANCED = FitMultiPeak.advanced_parameters + _2PEAK_PARAMS
+_ADVANCED = BaseFitPlugin.advanced_parameters + _2PEAK_PARAMS
 
 
-class FitDoublePeak(FitMultiPeak):
+class FitDoublePeak(BaseFitPlugin):
     """
     Fit two (potentially overlapping) peaks to the input data.
 

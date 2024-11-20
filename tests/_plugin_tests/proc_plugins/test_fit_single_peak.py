@@ -67,12 +67,10 @@ class TestFitSinglePeak(unittest.TestCase):
         _high = 37
         self._rangen = np.where((self._x >= _low) & (self._x <= _high))[0].size
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
-        plugin._config["input_shape"] = (150,)
         plugin.set_param_value("fit_func", func)
         plugin.set_param_value("fit_lower_limit", _low)
         plugin.set_param_value("fit_upper_limit", _high)
         plugin.set_param_value("fit_output", "position")
-        plugin.calculate_result_shape()
         return plugin
 
     def create_gauss_plugin_with_dummy_fit(self):
@@ -91,8 +89,33 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin._data.metadata = plugin._data.metadata | self._dummy_metadata
         return plugin
 
+    def create_multidim_input_data(self, data_dim: int):
+        match data_dim:
+            case 0:
+                _indices = [2, 0, 1]
+            case 1:
+                _indices = [0, 2, 1]
+            case 2:
+                _indices = [0, 1, 2]
+        _data = Dataset(
+            np.rollaxis(np.tile(self._data.array, (5, 4, 1)), 2, data_dim),
+            axis_labels=[("a", "b", "data")[i] for i in _indices],
+            axis_ranges=[
+                [
+                    np.array((0, 2, 4, 7, 10)),
+                    np.array((1, 5, 9, 14)),
+                    np.arange(self._data.size) / 2,
+                ][i]
+                for i in _indices
+            ],
+            axis_units=[("u0", "u1", "u2")[i] for i in _indices],
+        )
+        return _data
+
     def assert_fit_results_okay(self, fit_result_data, params, bg_order):
-        self.assertEqual(fit_result_data.shape, (1,))
+        self.assertEqual(
+            fit_result_data.shape, (len(fit_result_data.data_label.split(";")),)
+        )
         self.assertTrue("fit_params" in fit_result_data.metadata)
         self.assertTrue("fit_func" in fit_result_data.metadata)
         self.assertTrue("fit_residual_std" in fit_result_data.metadata)
@@ -159,7 +182,7 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_create_result_dataset__peak_pos_and_area(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
         plugin.set_param_value("fit_output", "position; area")
-        plugin.calculate_result_shape()
+        plugin.pre_execute()
         _new_data = plugin.create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -180,7 +203,7 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_create_result_dataset__peak_pos_and_area_and_fwhm(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
         plugin.set_param_value("fit_output", "position; area; FWHM")
-        plugin.calculate_result_shape()
+        plugin.pre_execute()
         _new_data = plugin.create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -199,7 +222,6 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_execute__gaussian_no_output(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_output", "no output")
-        plugin.calculate_result_shape()
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assertEqual(_data.shape, (1,))
@@ -292,35 +314,33 @@ class TestFitSinglePeak(unittest.TestCase):
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 1)
 
-    def test_calculate_result_shape__area(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_output", "area")
-        plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (1,))
+    def test_execute__1d_output_w_multidim(self):
+        for _dim in range(3):
+            with self.subTest(process_data_dim=_dim):
+                _data = self.create_multidim_input_data(_dim)
+                plugin = self.create_generic_plugin()
+                plugin.set_param_value("fit_output", "position")
+                plugin.set_param_value("process_data_dim", _dim)
+                plugin.pre_execute()
+                _new_data, _kwargs = plugin.execute(_data)
+                _slice = [0] * _dim + [slice(None)] + [0] * (2 - _dim)
+                self.assert_fit_results_okay(
+                    _new_data[*_slice], _kwargs["fit_params"], None
+                )
 
-    def test_calculate_result_shape__position(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_output", "position")
-        plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (1,))
-
-    def test_calculate_result_shape__fwhm(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_output", "FWHM")
-        plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (1,))
-
-    def test_calculate_result_shape__area_and_pos(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_output", "position; area")
-        plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (2,))
-
-    def test_calculate_result_shape__area_pos_and_std(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_output", "position; area; FWHM")
-        plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (3,))
+    def test_execute__2d_output_w_multidim(self):
+        for _dim in range(3):
+            with self.subTest(process_data_dim=_dim):
+                _data = self.create_multidim_input_data(_dim)
+                plugin = self.create_generic_plugin()
+                plugin.set_param_value("fit_output", "position; area; FWHM")
+                plugin.set_param_value("process_data_dim", _dim)
+                plugin.pre_execute()
+                _new_data, _kwargs = plugin.execute(_data)
+                _slice = [0] * _dim + [slice(None)] + [0] * (2 - _dim)
+                self.assert_fit_results_okay(
+                    _new_data[*_slice], _kwargs["fit_params"], None
+                )
 
     def test_detailed_results(self):
         plugin = self.create_generic_plugin()

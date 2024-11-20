@@ -33,7 +33,6 @@ import copy
 from numbers import Integral
 from typing import Self, Union
 
-import numpy as np
 from qtpy import QtCore
 
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
@@ -45,8 +44,6 @@ from pydidas.core import (
     get_generic_param_collection,
 )
 from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
-from pydidas.core.utils import rebin2d
-from pydidas.data_io.utils import RoiSliceManager
 from pydidas.managers import ImageMetadataManager
 
 
@@ -270,9 +267,7 @@ class BasePlugin(ObjectWithParameterCollection):
             if _kw in self.params.keys():
                 self.set_param_value(_kw, _item)
         self._config = {"input_shape": None, "result_shape": None, "input_data": None}
-        self._legacy_image_ops_meta = {"num": 0, "included": False}
-        self._legacy_image_ops = []
-        self._original_input_shape = None
+
         self.node_id = None
         self._roi_data_dim = None
 
@@ -471,134 +466,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["input_data"] = copy.deepcopy(data)
         self._config["input_kwargs"] = copy.deepcopy(kwargs)
 
-    @property
-    def input_shape(self) -> Union[tuple, None]:
-        """
-        Get the shape of the Plugin's input.
-
-        Returns
-        -------
-        Union[tuple, None]
-            The shape of the plugin's input.
-        """
-        return self._config["input_shape"]
-
-    @input_shape.setter
-    def input_shape(self, new_shape: tuple[int, ...]):
-        """
-        Set the shape of the Plugin's input.
-
-        Parameters
-        ----------
-        new_shape : tuple
-            The new shape of the Plugin's input data. The dimensionality of
-            new_shape must match the defined input_data_dim.
-
-        Returns
-        -------
-        Union[tuple[int, ...], None]
-            The shape of the plugin's input.
-        """
-        if not isinstance(new_shape, tuple):
-            raise UserConfigError(
-                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
-                f"\nThe new shape must be a tuple, but received {new_shape} which is "
-                f"of type {type(new_shape)}."
-            )
-        if self.input_data_dim is None:
-            raise UserConfigError(
-                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
-                "\nThe plugin is an input plugin and cannot accept any input. This is "
-                "due to an incorrect and inconsistent workflow tree. Please check the "
-                "full workflow."
-            )
-        if 0 < self.input_data_dim != len(new_shape):
-            raise UserConfigError(
-                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
-                f"\nThe new shape must be a tuple of length {self.input_data_dim} but "
-                f"received a tuple of length {len(new_shape)}."
-            )
-        self._config["input_shape"] = new_shape
-
-    @property
-    def result_shape(self) -> Union[tuple, None]:
-        """
-        Get the shape of the plugin result.
-
-        Note that this property will always perform an update of the value
-        before returning a result.
-
-        Any plugin that knows the shape of its results will return the value
-        as a tuple with one entry for every dimension.
-        If a Plugin knows the dimensionality of its results but not the size
-        of each dimension, a -1 is returned for each unknown dimension.
-
-        Returns
-        -------
-        Union[tuple, None]
-            The shape of the results with a value for each dimension. Unknown
-            dimensions are represented as -1 value. If no result shape has been
-            calculated yet, return None.
-        """
-        return self._config["result_shape"]
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the results based on the Plugin processing and
-        the input data shape.
-
-        This method only updates the shape and stores it internally. Use the
-        "result_shape" property to access the Plugin's result_shape. The
-        generic implementation assumes the output shape to be equal to the
-        input shape.
-        """
-        if self.output_data_dim == -1:
-            self._config["result_shape"] = self._config["input_shape"]
-            return
-        _shape = self._config.get("input_shape", None)
-        if _shape is None:
-            self._config["result_shape"] = (-1,) * self.output_data_dim
-        else:
-            self._config["result_shape"] = _shape
-
-    def apply_legacy_image_ops_to_data(self, data: np.ndarray) -> np.ndarray:
-        """
-        Apply the legacy image operations to a new data frame.
-
-        Parameters
-        ----------
-        data : np.ndarray
-            The input data frame.
-
-        Returns
-        -------
-        new_data : np.ndarray
-            The updated data frame with ROI and binning applied.
-        """
-        self.update_legacy_image_ops_with_this_plugin()
-        _roi, _binning = self.get_single_ops_from_legacy()
-        _new_data = rebin2d(data[_roi], _binning)
-        return _new_data
-
-    def update_legacy_image_ops_with_this_plugin(self):
-        """
-        Update the legacy image operations list with any ROI and binning
-        operations performed in this plugin.
-        """
-        _num = self._legacy_image_ops_meta["num"]
-        if self._legacy_image_ops_meta["included"] and _num > 0:
-            self._legacy_image_ops = self._legacy_image_ops[:-_num]
-            self._legacy_image_ops_meta["num"] = 0
-        if self.get_param_value("use_roi", False):
-            self._legacy_image_ops.append(["roi", self._get_own_roi()])
-            self._legacy_image_ops_meta["num"] += 1
-        _bin = self.get_param_value("binning", 1)
-        if _bin != 1:
-            self._legacy_image_ops.append(["binning", _bin])
-            self._legacy_image_ops_meta["num"] += 1
-        self._legacy_image_ops_meta["included"] = True
-
-    def _get_own_roi(self) -> Union[tuple[slice, slice], None]:
+    def _get_own_roi(self) -> Union[slice, tuple[slice, slice], None]:
         """
         Get the ROI defined within the plugin.
 
@@ -608,121 +476,34 @@ class BasePlugin(ObjectWithParameterCollection):
 
         Returns
         -------
-        Union[tuple[slice. slice], None]
-            The tuple with two slice objects which define the image ROI.
+        Union[tuple[slice, slice], None]
+            The tuple with one or two slice objects
+            (depending on the data dimensionality) which define the image ROI
+            or None if the Plugin does not define a ROI.
         """
+        if "use_roi" not in self.params.keys():
+            return None
+        if not self.get_param_value("use_roi"):
+            return None
         _roi_data_dim = (
             self._roi_data_dim
             if self._roi_data_dim is not None
             else self.output_data_dim
         )
         if _roi_data_dim == 1:
-            _roi_bounds = (
-                self.get_param_value("roi_xlow"),
-                self.get_param_value("roi_xhigh"),
+            return slice(
+                self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
             )
-            _dim = 1
         elif _roi_data_dim == 2:
-            _roi_bounds = (
-                self.get_param_value("roi_ylow"),
-                self.get_param_value("roi_yhigh"),
-                self.get_param_value("roi_xlow"),
-                self.get_param_value("roi_xhigh"),
+            return slice(
+                self.get_param_value("roi_ylow"), self.get_param_value("roi_yhigh")
+            ), slice(
+                self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
             )
-            _dim = 2
-        else:
-            raise UserConfigError(
-                "The Plugin does not have the correct data dimensionality to define a "
-                "ROI."
-            )
-        _roi = RoiSliceManager(roi=_roi_bounds, input_shape=self.input_shape, dim=_dim)
-        return _roi.roi
-
-    def get_single_ops_from_legacy(self) -> tuple[tuple[slice, ...], int]:
-        """
-        Get the parameters for a single ROI and binning operation.
-
-        This method combines all legacy operations on the data into one set of
-        operations to be applied.
-
-        Returns
-        -------
-        roi : tuple[slice, ...]
-            The ROI which needs to be applied to the original image.
-        binning : int
-            The binning factor which needs to be applied to the original image.
-        """
-        if self.input_data_dim == 1:
-            return self.__get_legacy_op_for_1d_input()
-        else:
-            return self.__get_legacy_op_for_2d_input()
-
-    def __get_legacy_op_for_1d_input(self) -> tuple[slice, int]:
-        """
-        Get a single operation that converts the raw input to the input shape.
-
-        Returns
-        -------
-        roi : tuple[slice, slice]
-            The ROI which needs to be applied to the original image.
-        binning : int
-            The binning factor which needs to be applied to the original image.
-        """
-        _roi = RoiSliceManager(
-            roi=(0, self._original_input_shape[0]),
-            input_shape=self._original_input_shape,
-            dim=1,
+        raise UserConfigError(
+            "The Plugin does not have the correct data dimensionality to define a "
+            "ROI."
         )
-        _binning = 1
-        _all_ops = self._legacy_image_ops[:]
-        while len(_all_ops) > 0:
-            _op_name, _op = _all_ops.pop(0)
-            if _op_name == "binning":
-                _x = int(_roi.roi[1].stop - _roi.roi[1].start)
-                _dx = int(((_x // _binning) % _op) * _binning)
-                _tmproi = (0, _x - _dx)
-                _roi.apply_second_roi(_tmproi)
-                _binning *= _op
-            if _op_name == "roi":
-                _roi_unbinned = [
-                    _binning * _r for _r in RoiSliceManager(roi=_op, dim=1).roi_coords
-                ]
-                _roi.apply_second_roi(_roi_unbinned)
-        return _roi.roi, _binning
-
-    def __get_legacy_op_for_2d_input(self) -> tuple[tuple[slice, ...], int]:
-        """
-        Get a single operation that converts the raw input to the input shape.
-
-        Returns
-        -------
-        roi : tuple[slice, ...]
-            The ROI which needs to be applied to the original image.
-        binning : int
-            The binning factor which needs to be applied to the original image.
-        """
-        _roi = RoiSliceManager(
-            roi=(0, self._original_input_shape[0], 0, self._original_input_shape[1]),
-            input_shape=self._original_input_shape,
-        )
-        _binning = 1
-        _all_ops = self._legacy_image_ops[:]
-        while len(_all_ops) > 0:
-            _op_name, _op = _all_ops.pop(0)
-            if _op_name == "binning":
-                _y = int(_roi.roi[0].stop - _roi.roi[0].start)
-                _x = int(_roi.roi[1].stop - _roi.roi[1].start)
-                _dy = int(((_y // _binning) % _op) * _binning)
-                _dx = int(((_x // _binning) % _op) * _binning)
-                _tmproi = (0, _y - _dy, 0, _x - _dx)
-                _roi.apply_second_roi(_tmproi)
-                _binning *= _op
-            if _op_name == "roi":
-                _roi_unbinned = [
-                    _binning * _r for _r in RoiSliceManager(roi=_op).roi_coords
-                ]
-                _roi.apply_second_roi(_roi_unbinned)
-        return _roi.roi, _binning
 
 
 BasePlugin.register_as_base_class()

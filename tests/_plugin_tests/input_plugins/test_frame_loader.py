@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -85,11 +85,6 @@ class TestFrameLoader(unittest.TestCase):
     def test_creation(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
         self.assertIsInstance(plugin, BasePlugin)
-
-    def test_pre_execute__simple(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        plugin.pre_execute()
-        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
 
     def test_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()

@@ -47,7 +47,7 @@ from ..core.constants import (
     pyFAI_METHOD,
     pyFAI_UNITS,
 )
-from ..core.utils import pydidas_logger, rebin2d
+from ..core.utils import pydidas_logger
 from ..data_io import import_data
 from ..widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
 from .base_proc_plugin import ProcPlugin
@@ -100,20 +100,6 @@ class pyFAIintegrationBase(ProcPlugin):
         self._mask = None
         self._config["custom_mask"] = False
 
-    @property
-    def result_shape(self) -> tuple[int, ...]:
-        """
-        Get the shape of the plugin result.
-
-        Returns
-        -------
-        tuple[int, ...]
-            The shape of the results with a value for each dimension. Unknown
-            dimensions are represented as -1 value.
-        """
-        self.calculate_result_shape()
-        return self._config["result_shape"]
-
     def pre_execute(self):
         """
         Check and load the mask and set up the AzimuthalIntegrator.
@@ -156,9 +142,6 @@ class pyFAIintegrationBase(ProcPlugin):
                     "\nexists."
                 )
             self._check_mask_shape()
-        if self._mask is not None and len(self._legacy_image_ops) > 0:
-            _roi, _bin = self.get_single_ops_from_legacy()
-            self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
 
     def _prepare_pyfai_method(self):
         """
@@ -178,21 +161,6 @@ class pyFAIintegrationBase(ProcPlugin):
             _device = _index % _n_device
             _method = _method + ((_platform.id, _device),)
             self._config["method"] = _method
-
-    def calculate_result_shape(self):
-        """
-        Get the shape of the integrated dataset to set up the CRS / LUT.
-
-        Returns
-        -------
-        Union[int, tuple[int, int]]
-            The new shape. For 1-dimensional integration, a single integer is
-            returned. For 2-dimensional integrations a tuple of two integers
-            is returned.
-        """
-        raise NotImplementedError(
-            "Must be implemented by the concrete pyFAI integration plugin"
-        )
 
     def get_azimuthal_range_in_rad(self) -> Union[None, tuple[float, float]]:
         """

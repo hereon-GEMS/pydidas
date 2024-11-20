@@ -119,14 +119,6 @@ def get_pydidas_context_config_entries(
         ["entry/pydidas_config", "workflow", {"data": tree.export_to_string()}]
     )
     _dsets.append(["entry/pydidas_config", "pydidas_version", {"data": VERSION}])
-    for _dim in range(scan.ndim):
-        _label = scan.get_param_value(f"scan_dim{_dim}_label")
-        _unit = scan.get_param_value(f"scan_dim{_dim}_unit")
-        _dsets.append(
-            [f"entry/data/axis_{_dim}", "range", {"data": scan.get_range_for_dim(_dim)}]
-        )
-        _dsets.append([f"entry/data/axis_{_dim}", "label", {"data": _label}])
-        _dsets.append([f"entry/data/axis_{_dim}", "unit", {"data": _unit}])
     return _dsets
 
 
@@ -217,8 +209,6 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             ["entry", "node_id", {"data": node_id}],
             ["entry", "node_label", {"data": _node_attribute("node_label")}],
             ["entry", "plugin_name", {"data": _node_attribute("plugin_name")}],
-            ["entry", "data_label", {"data": _node_attribute("data_label")}],
-            ["entry", "data_unit", {"data": _node_attribute("data_unit")}],
             ["entry/data", "data", {"shape": _node_attribute("shape")}],
         ]
         _dsets.extend(get_detector_metadata_entries(scan, exp))
@@ -254,7 +244,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _scan = ScanContext() if scan_context is None else scan_context
         _indices = _scan.get_index_position_in_scan(index)
         if not cls._metadata_written:
-            cls.write_metadata_to_files(frame_result_dict, _scan)
+            cls.update_metadata(frame_result_dict)
         for _node_id, _data in frame_result_dict.items():
             _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
             with h5py.File(_fname, "r+") as _file:
@@ -277,62 +267,15 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
         """
-        _scan = ScanContext() if scan_context is None else scan_context
-
         if not cls._metadata_written:
-            _indices = _scan.get_index_position_in_scan(0)
-            cls.write_metadata_to_files(
-                {_id: _data[_indices] for _id, _data in full_data.items()}, _scan
-            )
+            cls.update_metadata(full_data)
         for _node_id, _data in full_data.items():
             _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
             with h5py.File(_fname, "r+") as _file:
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
-    def write_metadata_to_files(cls, frame_result_dict: dict, scan: Scan):
-        """
-        Write the metadata from the WorkflowTree to the individual files
-        for each node.
-
-        Parameters
-        ----------
-        frame_result_dict : dict
-            The result dictionary with nodeID keys and result values.
-        scan : Scan
-            The scan (context).
-        """
-        for _node_id, _data in frame_result_dict.items():
-            cls.update_node_metadata(_node_id, _data, scan)
-        cls._metadata_written = True
-
-    @classmethod
-    def update_node_metadata(cls, index: int, data: Dataset, scan: Scan):
-        """
-        Update the metadata for a single node.
-
-        Parameters
-        ----------
-        index : int
-            The nodeID.
-        data : pydidas.core.Dataset
-            The processed Dataset.
-        scan : Scan
-            The scan (context).
-        """
-        _ndim = scan.get_param_value("scan_dim")
-        with h5py.File(
-            os.path.join(cls._save_dir, cls._filenames[index]), "r+"
-        ) as _file:
-            for _dim in range(data.ndim):
-                _group = _file["entry/data"]
-                _axisgroup = _group.create_group(f"axis_{_dim + _ndim}")
-                for _key in ["label", "unit", "range"]:
-                    _dict = getattr(data, f"axis_{_key}s")
-                    create_hdf5_dataset(_axisgroup, None, _key, data=_dict[_dim])
-
-    @classmethod
-    def update_frame_metadata(cls, metadata: dict, scan: Union[Scan, None] = None):
+    def update_metadata(cls, metadata: dict[int, Union[Dataset, dict]]):
         """
         Update the frame metadata with a separately supplied metadata
         dictionary.
@@ -342,20 +285,16 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         metadata : dict
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
-        scan : Union[Scan, None], optional
-            The Scan (context) instance. If None, this will default to the
-            generic ScanContext. The default is None.
         """
-        _scan = ScanContext() if scan is None else scan
-        _ndim = _scan.get_param_value("scan_dim")
         for _id, _metadata in metadata.items():
+            if isinstance(_metadata, Dataset):
+                _metadata = _metadata.property_dict
             with h5py.File(
                 os.path.join(cls._save_dir, cls._filenames[_id]), "r+"
             ) as _file:
-                _ndim_frame = len(_metadata["axis_labels"])
-                for _dim in range(_ndim_frame):
+                for _dim in range(len(_metadata["axis_labels"])):
                     _group = _file["entry/data"]
-                    _axisgroup = _group.create_group(f"axis_{_dim + _ndim}")
+                    _axisgroup = _group.create_group(f"axis_{_dim}")
                     for _key in ["label", "unit", "range"]:
                         _val = _metadata[f"axis_{_key}s"][_dim]
                         _val = "None" if _val is None else _val
@@ -391,7 +330,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _tree = ProcessingTree()
         _scan = Scan()
         _exp = DiffractionExperiment()
-        _data = import_data(filename)
+        _data = import_data(filename, auto_squeeze=False)
         with h5py.File(filename, "r") as _file:
             try:
                 for _key, _param in _exp.params.items():

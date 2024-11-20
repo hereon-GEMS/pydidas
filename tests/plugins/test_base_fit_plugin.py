@@ -106,16 +106,18 @@ class TestBaseFitPlugin(unittest.TestCase):
         self.assertEqual(plugin._config["sigma_threshold"], _sigma)
         self.assertEqual(plugin._config["min_peak_height"], _min_peak)
         self.assertEqual(plugin._config["param_labels"], Gaussian.param_labels)
-        self.assertEqual(plugin._config["bounds_low"], Gaussian.param_bounds_low)
-        self.assertEqual(plugin._config["bounds_high"], Gaussian.param_bounds_high)
+        self.assertEqual(plugin._config["param_bounds_low"], Gaussian.param_bounds_low)
+        self.assertEqual(
+            plugin._config["param_bounds_high"], Gaussian.param_bounds_high
+        )
 
     def test_pre_execute__bg_order_0(self):
         plugin = BaseFitPlugin()
         plugin.set_param_value("fit_bg_order", 0)
         plugin.pre_execute()
         self.assertTrue("background_p0" in plugin._config["param_labels"])
-        self.assertEqual(len(plugin._config["bounds_low"]), 4)
-        self.assertEqual(len(plugin._config["bounds_high"]), 4)
+        self.assertEqual(len(plugin._config["param_bounds_low"]), 4)
+        self.assertEqual(len(plugin._config["param_bounds_high"]), 4)
 
     def test_pre_execute__bg_order_1(self):
         plugin = BaseFitPlugin()
@@ -123,8 +125,8 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin.pre_execute()
         self.assertTrue("background_p0" in plugin._config["param_labels"])
         self.assertTrue("background_p1" in plugin._config["param_labels"])
-        self.assertEqual(len(plugin._config["bounds_low"]), 5)
-        self.assertEqual(len(plugin._config["bounds_high"]), 5)
+        self.assertEqual(len(plugin._config["param_bounds_low"]), 5)
+        self.assertEqual(len(plugin._config["param_bounds_high"]), 5)
 
     def test_prepare_input_data(self):
         plugin = BaseFitPlugin()
@@ -146,19 +148,19 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin = BaseFitPlugin()
         plugin.pre_execute()
         plugin.prepare_input_data(self._data)
-        self.assertEqual(plugin._config["bounds_low"][2], np.amin(self._x))
-        self.assertEqual(plugin._config["bounds_high"][2], np.amax(self._x))
+        self.assertEqual(plugin._config["param_bounds_low"][2], np.amin(self._x))
+        self.assertEqual(plugin._config["param_bounds_high"][2], np.amax(self._x))
 
     def test_update_peak_bounds_from_data__bounds_already_set(self):
         _low = self._x[4]
         _high = self._x[-7]
         plugin = BaseFitPlugin()
         plugin.pre_execute()
-        plugin._config["bounds_low"][2] = _low
-        plugin._config["bounds_high"][2] = _high
+        plugin._config["param_bounds_low"][2] = _low
+        plugin._config["param_bounds_high"][2] = _high
         plugin.prepare_input_data(self._data)
-        self.assertEqual(plugin._config["bounds_low"][2], _low)
-        self.assertEqual(plugin._config["bounds_high"][2], _high)
+        self.assertEqual(plugin._config["param_bounds_low"][2], _low)
+        self.assertEqual(plugin._config["param_bounds_high"][2], _high)
 
     def test_update_fit_param_bounds(self):
         _low = self._x[12]
@@ -170,8 +172,8 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin.set_param_value("fit_peak_xlow", _low)
         plugin.set_param_value("fit_peak_xhigh", _high)
         plugin.pre_execute()
-        self.assertEqual(plugin._config["bounds_low"][2], _low)
-        self.assertEqual(plugin._config["bounds_high"][2], _high)
+        self.assertEqual(plugin._config["param_bounds_low"][2], _low)
+        self.assertEqual(plugin._config["param_bounds_high"][2], _high)
 
     def test_create_fit_start_param_dict(self):
         _center = 12

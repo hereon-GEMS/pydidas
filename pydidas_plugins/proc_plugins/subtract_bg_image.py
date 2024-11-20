@@ -35,7 +35,6 @@ import numpy as np
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
-from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
 from pydidas.widgets.plugin_config_widgets import SubtractBackgroundImageConfigWidget
@@ -57,9 +56,26 @@ class SubtractBackgroundImage(ProcPlugin):
     plugin_subtype = PROC_PLUGIN_IMAGE
 
     default_params = get_generic_param_collection(
-        "bg_file", "bg_hdf5_key", "bg_hdf5_frame", "threshold_low", "multiplicator"
+        "bg_file",
+        "bg_hdf5_key",
+        "bg_hdf5_frame",
+        "threshold_low",
+        "multiplicator",
+        "use_roi",
+        "roi_xlow",
+        "roi_xhigh",
+        "roi_ylow",
+        "roi_yhigh",
+        "binning",
     )
-
+    advanced_parameters = [
+        "use_roi",
+        "roi_xlow",
+        "roi_xhigh",
+        "roi_ylow",
+        "roi_yhigh",
+        "binning",
+    ]
     input_data_dim = 2
     output_data_dim = 2
     output_data_label = "Background corrected image"
@@ -90,6 +106,8 @@ class SubtractBackgroundImage(ProcPlugin):
             dataset=self.get_param_value("bg_hdf5_key"),
             frame=self.get_param_value("bg_hdf5_frame"),
             indices=[0],
+            binning=self.get_param_value("binning"),
+            roi=self._get_own_roi(),
         )
         if self.get_param_value("multiplicator") != 1.0:
             self._bg_image *= self.get_param_value("multiplicator")
@@ -118,8 +136,11 @@ class SubtractBackgroundImage(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         if data.shape != self._bg_image.shape:
-            _roi, _binning = self.get_single_ops_from_legacy()
-            self._bg_image = rebin2d(self._bg_image[_roi], _binning)
+            raise UserConfigError(
+                "The background image and the data have different shapes. Please check "
+                "the input data and the background image.\n"
+                f"Input data: {data.shape}\nBackground image: {self._bg_image.shape}"
+            )
         _corrected_data = data - self._bg_image
         if self._thresh is not None:
             _corrected_data[_corrected_data < self._thresh] = self._thresh

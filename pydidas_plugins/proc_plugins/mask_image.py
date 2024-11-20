@@ -30,9 +30,13 @@ from typing import Union
 
 import numpy as np
 
-from pydidas.core import Dataset, ParameterCollection, get_generic_parameter
+from pydidas.core import (
+    Dataset,
+    ParameterCollection,
+    UserConfigError,
+    get_generic_parameter,
+)
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
-from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
 
@@ -89,8 +93,10 @@ class MaskImage(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         if data.shape != self._mask.shape:
-            _roi, _binning = self.get_single_ops_from_legacy()
-            self._mask = np.where(rebin2d(self._mask[_roi], _binning) > 0, 1, 0)
+            raise UserConfigError(
+                "The mask and the data have different shapes. Please check the input "
+                "data and the mask."
+            )
         new_data = Dataset(
             np.where(self._mask, self._maskval, data),
             **(data.property_dict if hasattr(data, "property_dict") else {}),

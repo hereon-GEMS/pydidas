@@ -67,30 +67,29 @@ class AppRunner(WorkerController):
     n_workers : int, optional
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
-    processor : Union[pydidas.multiprocessing.app_processor,
-                      pydidas.multiprocessing.app_processor_without_tasks]
-        The processor to be used. The generic 'app_processor' requires input
-        tasks whereas the 'app_processor_without_tasks' can run indefinite
-        without any defined tasks. The app itself is responsible for managing
-        tasks on the fly. The default is app_processor.
+    use_app_tasks : bool, optional
+        Flag to toggle if the app works with tasks. The default is True.
     """
 
     sig_final_app_state = QtCore.Signal(object)
+    sig_post_run_called = QtCore.Signal()
 
     def __init__(
         self,
         app: BaseApp,
         n_workers: Union[None, int] = None,
-        processor: type = app_processor,
+        use_app_tasks: bool = True,
     ):
         logger.debug("AppRunner: Starting AppRunner")
         WorkerController.__init__(self, n_workers=n_workers)
         if not app._config["run_prepared"]:
             app.multiprocessing_pre_run()
         self.sig_results.connect(app.multiprocessing_store_results)
+        self.sig_post_run_called.connect(app.multiprocessing_post_run)
         self.__app = app.copy(slave_mode=True)
         self.__check_app_is_set()
-        self._processor["func"] = processor
+        self._use_app_tasks = use_app_tasks
+        self._processor["func"] = app_processor
 
     def call_app_method(self, method_name: str, *args: tuple, **kwargs: dict) -> object:
         """
@@ -137,17 +136,12 @@ class AppRunner(WorkerController):
 
     def get_app(self) -> BaseApp:
         """
-        Get the reference to the interally stored app.
-
-        Note
-        ----
-        This method will only provide a copy of the app and keep the internal
-        instance for further use.
+        Get a copy of the internally stored app.
 
         Returns
         -------
         pydidas.core.BaseApp
-            The application instance.
+            A copy of the application instance.
         """
         return self.__app.copy()
 
@@ -161,14 +155,15 @@ class AppRunner(WorkerController):
         """
         self.__app.multiprocessing_pre_run()
         self._processor["args"] = (
-            self._queues["send"],
-            self._queues["recv"],
-            self._queues["stop"],
-            self._queues["aborted"],
+            self._mp_kwargs,
             self.__app.__class__,
             self.__app.params.copy(),
             self.__app.get_config(),
         )
+        self._processor["kwargs"] = {
+            "use_tasks": self._use_app_tasks,
+            "app_mp_manager": self.__app.mp_manager,
+        }
         self.add_tasks(self.__app.multiprocessing_get_tasks())
         self.finalize_tasks()
         self.sig_results.connect(self.__app.multiprocessing_store_results)
@@ -187,6 +182,7 @@ class AppRunner(WorkerController):
         WorkerController.cycle_post_run(self, timeout)
         self.__app.multiprocessing_post_run()
         self.sig_final_app_state.emit(self.__app.copy())
+        self.sig_post_run_called.emit()
         logger.debug("AppRunner: Finished cycle post run")
 
     @QtCore.Slot(float)

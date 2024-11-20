@@ -340,6 +340,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         Handle the setting of the CS transform.
         """
+        if not self._config["cs_transform"]:
+            return
         self.enable_cs_transform()
         if self.cs_transform.isEnabled():
             self.changeCanvasToDataAction._actionTriggered()

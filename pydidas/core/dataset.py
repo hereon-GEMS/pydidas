@@ -332,7 +332,11 @@ class Dataset(ndarray):
         dict
             A dictionary with copies of all properties.
         """
-        return {_key: deepcopy(_val) for _key, _val in self._meta.items()}
+        return {
+            _key: deepcopy(_val)
+            for _key, _val in self._meta.items()
+            if not _key.startswith("_")
+        }
 
     @property
     def data_unit(self) -> str:

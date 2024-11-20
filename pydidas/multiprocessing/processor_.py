@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ multiprocessing function calls.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,15 +30,12 @@ __all__ = ["processor"]
 
 import queue
 import time
-from multiprocessing import Queue
+from typing import Callable
 
 
 def processor(
-    input_queue: Queue,
-    output_queue: Queue,
-    stop_queue: Queue,
-    aborted_queue: Queue,
-    function: type,
+    function: Callable,
+    multiprocessing_config: dict,
     *func_args: tuple,
     **func_kwargs: dict,
 ):
@@ -51,30 +48,28 @@ def processor(
 
     Parameters
     ----------
-    input_queue : multiprocessing.Queue
-        The input queue which supplies the processor with indices to be
-        processed.
-    output_queue : multiprocessing.Queue
-        The queue for transmissing the results to the controlling thread.
-    stop_queue : multiprocessing.Queue
-        The queue for sending a termination signal to the worker.
-    aborted_queue : multiprocessing.Queue
-        The queue which is used by the processor to signal the calling
-        thread that it has aborted its cycle.
-    function : type
+    function : Callable
         The function to be called in the process. The function must accept
         the first argument from the queue and all additional arguments and
         keyword arguments from the calling arguments of processor.
+    multiprocessing_config : dict
+        The multiprocessing configuration dictionary. It includes information
+        about the logging level as well as queue objects
     *func_args : tuple
         The function calling arguments save the first.
     **func_kwargs : dict
         The keyword arguments for the function.
     """
+    input_queue = multiprocessing_config.get("queue_input")
+    output_queue = multiprocessing_config.get("queue_output")
+    stop_queue = multiprocessing_config.get("queue_stop")
+    _finished_queue = multiprocessing_config.get("queue_finished")
+
     while True:
         # check for stop signal
         try:
             stop_queue.get_nowait()
-            aborted_queue.put(1)
+            _finished_queue.put(1)
             break
         except queue.Empty:
             pass
@@ -87,11 +82,11 @@ def processor(
             try:
                 _results = function(_arg1, *func_args, **func_kwargs)
             except Exception as ex:
-                print(f"Exception occured during function call to: {function}: {ex}")
+                print(f"Exception occurred during function call to: {function}: {ex}")
                 # For some arcane reason, sleep time required to stop queues from
                 # becoming corrupted.
                 time.sleep(0.02)
-                aborted_queue.put(1)
+                _finished_queue.put(1)
                 break
             output_queue.put([_arg1, _results])
         except queue.Empty:

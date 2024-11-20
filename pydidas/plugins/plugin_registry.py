@@ -40,7 +40,7 @@ from qtpy import QtCore
 
 from ..core import PydidasQsettingsMixin, UserConfigError
 from ..core.utils import find_valid_python_files
-from . import GENERIC_PLUGIN_PATH
+from . import GENERIC_PLUGIN_PATH, BasePlugin
 
 
 class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
@@ -135,6 +135,8 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             return
         if self._config["use_generic_plugins"]:
             self.find_and_register_plugins(GENERIC_PLUGIN_PATH)
+            for _cls in BasePlugin.base_classes:
+                self.check_and_register_class(_cls)
         self.find_and_register_plugins(*self._get_user_plugin_paths())
         self._config["initialized"] = True
         if self._config["must_emit_signal"]:

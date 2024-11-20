@@ -29,7 +29,7 @@ __all__ = ["WorkflowNode"]
 
 
 from copy import deepcopy
-from numbers import Integral
+from numbers import Integral, Real
 from typing import Self, Union
 
 from ..core import Dataset
@@ -157,6 +157,7 @@ class WorkflowNode(GenericNode):
 
         This method recursively calls the pre_execute methods of all (child) plugins.
         """
+        self.results = None
         self.plugin.pre_execute()
         for _child in self._children:
             _child.prepare_execution()
@@ -174,17 +175,18 @@ class WorkflowNode(GenericNode):
 
         Returns
         -------
-        results : tuple
+        results : Dataset
             The result of the plugin.execute method.
-        kws : dict
+        kwargs : dict
             Any keywords required for calling the next plugin.
         """
         with TimerSaveRuntime() as _runtime:
             if kwargs.get("store_input_data", False):
                 self.plugin.store_input_data_copy(arg, **kwargs)
-            _results = self.plugin.execute(arg, **kwargs)
+            _results, kwargs = self.plugin.execute(arg, **kwargs)
+        self._store_results_if_required(_results, kwargs)
         self.runtime = _runtime()
-        return _results
+        return _results, kwargs
 
     def execute_plugin_chain(self, arg: Union[Dataset, int], **kwargs: dict):
         """
@@ -206,13 +208,7 @@ class WorkflowNode(GenericNode):
             if kwargs.get("store_input_data", False):
                 self.plugin.store_input_data_copy(arg, **kwargs)
             res, reskws = self.plugin.execute(arg, **kwargs)
-        if (
-            self.is_leaf
-            or self.plugin.get_param_value("keep_results")
-            or kwargs.get("force_store_results", False)
-        ) and self.plugin.output_data_dim is not None:
-            self.results = deepcopy(res)
-            self.result_kws = self._get_deep_copy_of_kwargs(reskws)
+        self._store_results_if_required(res, reskws)
         self.runtime = _runtime()
         for _child in self._children:
             if len(self._children) > 1:
@@ -221,6 +217,25 @@ class WorkflowNode(GenericNode):
                 _child.execute_plugin_chain(
                     res, **self._get_deep_copy_of_kwargs(reskws)
                 )
+
+    def _store_results_if_required(self, results: Dataset, reskws: dict):
+        """
+        Store the results of the plugin if required.
+
+        Parameters
+        ----------
+        results : Dataset
+            The result of the plugin execution.
+        reskws : dict
+            The keyword arguments as returned from the plugin execution
+        """
+        if (
+            self.is_leaf
+            or self.plugin.get_param_value("keep_results")
+            or reskws.get("force_store_results", False)
+        ) and self.plugin.output_data_dim is not None:
+            self.results = deepcopy(results)
+            self.result_kws = self._get_deep_copy_of_kwargs(reskws)
 
     @staticmethod
     def _get_deep_copy_of_kwargs(kwargs: dict) -> dict:
@@ -269,31 +284,6 @@ class WorkflowNode(GenericNode):
             ],
         }
 
-    def propagate_shapes_and_global_config(self):
-        """
-        Calculate the Plugin's result shape results and push it to the node's children.
-        """
-        self.update_plugin_result_data_shape()
-        self.propagate_to_children()
-
-    def update_plugin_result_data_shape(self):
-        """
-        Update the result shape from the Plugin's input shape and legacy operations.
-        """
-        self.plugin.update_legacy_image_ops_with_this_plugin()
-        self.plugin.calculate_result_shape()
-
-    def propagate_to_children(self):
-        """
-        Propagate the global binning and ROI to the children.
-        """
-        for _child in self._children:
-            _child.plugin.input_shape = self.plugin.result_shape
-            if not self.plugin.new_dataset:
-                _child.plugin._legacy_image_ops = self.plugin._legacy_image_ops[:]
-                _child.plugin._original_input_shape = self.plugin._original_input_shape
-            _child.propagate_shapes_and_global_config()
-
     @property
     def result_shape(self):
         """
@@ -305,7 +295,11 @@ class WorkflowNode(GenericNode):
             Returns the shape of the Plugin's results, if it has been
             calculated. Else, returns None.
         """
-        return self.plugin.result_shape
+        if isinstance(self.results, Dataset):
+            return self.results.shape
+        if isinstance(self.results, Real):
+            return (1,)
+        return None
 
     def __hash__(self) -> int:
         """

@@ -32,7 +32,7 @@ import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import Dataset
+from pydidas.core import Dataset, Parameter, ParameterCollection
 from pydidas.plugins import ProcPlugin
 
 
@@ -42,13 +42,22 @@ class DummyProcNewDataset(ProcPlugin):
     """
 
     plugin_name = "Dummy processing Plugin with new Dataset"
+    default_params = ParameterCollection(
+        Parameter(
+            "_output_shape",
+            tuple,
+            (1,),
+            dtype=tuple,
+            subtype=int,
+            tooltip="The shape of the output data.",
+        )
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._preexecuted = False
+        self._pre_executed = False
         self._executed = False
-        self._given_output_shape = kwargs.get("output_shape", (1,))
-        self._config["result_shape"] = self._given_output_shape
+        self.set_param_value("_output_shape", kwargs.get("output_shape", (1,)))
 
     def __reduce__(self):
         """
@@ -88,10 +97,10 @@ class DummyProcNewDataset(ProcPlugin):
             The updated data
         kwargs : dict
             The update input kwargs. This method will add the offset to the
-            dict keys for rerference.
+            dict keys for reference.
         """
         self._executed = True
-        _data = np.zeros(self._given_output_shape) + np.mean(data)
+        _data = Dataset(np.zeros(self.get_param_value("_output_shape")) + np.mean(data))
         return _data, kwargs
 
     def pre_execute(self):
@@ -99,10 +108,10 @@ class DummyProcNewDataset(ProcPlugin):
         Run the pre-execution routine and store a variable that this method
         has been called.
         """
-        self._preexecuted = True
+        self._pre_executed = True
 
     def calculate_result_shape(self):
         """
         Set the result shape based on the given output_shapae.
         """
-        self._config["result_shape"] = self._given_output_shape
+        self._config["result_shape"] = self.get_param_value("_output_shape")

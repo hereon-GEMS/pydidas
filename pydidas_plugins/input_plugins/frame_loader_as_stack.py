@@ -20,7 +20,7 @@ Module with the FrameLoader Plugin which can be used to load files with
 single images in each, e.g. tiff files or numpy files.
 """
 
-__author__ = "Nonni Heere"
+__author__ = "Nonni Heere, Malte Storm"
 __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
@@ -68,21 +68,6 @@ class FrameLoaderAsStack(InputPlugin):
         super().__init__(*args, **kwargs)
         self._roi_data_dim = 2
 
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        self.update_filename_string()
-        self._image_metadata.update(filename=self.get_filename(0))
-        self._config["result_shape"] = (
-            self.get_param_value("num_frames_to_use"),
-            *self._image_metadata.final_shape,
-        )
-        self._original_input_shape = (
-            self._image_metadata.raw_size_y,
-            self._image_metadata.raw_size_x,
-        )
-
     def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Load a frame stack and pass it on.
@@ -106,6 +91,7 @@ class FrameLoaderAsStack(InputPlugin):
         if num_frames_to_use < 1:
             raise UserConfigError("Frame count must be at least 1.")
         _stack = None
+        kwargs["roi"] = self._get_own_roi()
         for i in range(num_frames_to_use):
             _fname = self.get_filename(frame_index + i)
             try:

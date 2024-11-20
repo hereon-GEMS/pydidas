@@ -35,7 +35,9 @@ from typing import NewType, Union
 import h5py
 
 from pydidas import VERSION
+from pydidas.contexts import DiffractionExperiment, Scan
 from pydidas.core import Dataset, UserConfigError
+from pydidas.workflow import ProcessingTree
 
 
 WorkflowTree = NewType("WorkflowTree", type)
@@ -44,9 +46,9 @@ WorkflowTree = NewType("WorkflowTree", type)
 def create_hdf5_results_file(
     filename: Union[Path, str],
     data: Dataset,
-    scan_params: dict,
-    diffraction_exp_params: dict,
-    workflow: WorkflowTree,
+    scan: Union[Scan, dict],
+    diffraction_exp: Union[DiffractionExperiment, dict],
+    workflow: Union[WorkflowTree, str],
     **kwargs: dict,
 ):
     """
@@ -58,12 +60,15 @@ def create_hdf5_results_file(
         The output filename.
     data : Dataset
         The data to be written.
-    scan_params : dict
-        The scan parameter keys and values (in exportable types).
-    diffraction_exp_params : dict
-        The diffraction experiment parameter keys and values (in exportable types).
-    workflow : WorkflowTree
-        The WorkflowTree instance.
+    scan : Union[Scan, dict]
+        The Scan or its parameter. The Scan can be either passed as instance or
+         its Parameter keys and values as dict (in exportable types).
+    diffraction_exp : Union[DiffractionExperiment, dict]
+        The DiffractionExperiment or its parameter. The DiffractionExperiment
+        can be either passed as instance or its Parameter keys and values as dict
+        (in exportable types).
+    workflow : Union[WorkflowTree, str]
+        The WorkflowTree instance or its string representation.
     **kwargs : dict
         Any optional kwargs passed to the function. Supported arguments are
 
@@ -74,6 +79,14 @@ def create_hdf5_results_file(
         plugin_name : str
             The name of the pydidas plugin which `writes` this data.
     """
+    if isinstance(scan, Scan):
+        scan = scan.get_param_values_as_dict(filter_types_for_export=True)
+    if isinstance(diffraction_exp, DiffractionExperiment):
+        diffraction_exp = diffraction_exp.get_param_values_as_dict(
+            filter_types_for_export=True
+        )
+    if isinstance(workflow, ProcessingTree):
+        workflow = workflow.export_to_string()
     _dataset = kwargs.get("dataset", "entry/data/data")
     _root_group_name = os.path.dirname(os.path.dirname(_dataset))
     if _root_group_name == "":
@@ -88,15 +101,15 @@ def create_hdf5_results_file(
         _config_group = _root.create_group("pydidas_config")
         _scan_group = _root.create_group("pydidas_config/scan")
         _diff_exp_group = _root.create_group("pydidas_config/diffraction_exp")
-        _root.create_dataset("node_id", data=kwargs.get("node_id", 6))
+        _root.create_dataset("node_id", data=kwargs.get("node_id", -1))
         _root.create_dataset("node_label", data=kwargs.get("node_label", ""))
         _root.create_dataset("plugin_name", data=kwargs.get("plugin_name", ""))
         _root.create_dataset("scan_title", data=kwargs.get("scan_title", ""))
-        for _key, _value in scan_params.items():
+        for _key, _value in scan.items():
             _scan_group.create_dataset(_key, data=_value)
-        for _key, _value in diffraction_exp_params.items():
+        for _key, _value in diffraction_exp.items():
             _diff_exp_group.create_dataset(_key, data=_value)
-        _config_group.create_dataset("workflow", data=workflow.export_to_string())
+        _config_group.create_dataset("workflow", data=workflow)
         _config_group.create_dataset("pydidas_version", data=VERSION)
 
 

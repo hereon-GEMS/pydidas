@@ -63,23 +63,12 @@ class InputPlugin1d(InputPlugin):
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
-        self._original_input_shape = None
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        _n = self.get_raw_input_size()
-        self._config["result_shape"] = (_n,)
-        self._original_input_shape = (_n,)
 
     def pre_execute(self):
         """
         Run generic pre-execution routines.
         """
         self.update_filename_string()
-        if self._original_input_shape is None:
-            self.calculate_result_shape()
         self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
         self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
         self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
@@ -99,18 +88,6 @@ class InputPlugin1d(InputPlugin):
             The raw input size in data points.
         """
         raise NotImplementedError
-
-    def update_required_kwargs(self, kwargs: dict):
-        """
-        Update the kwargs dict in place.
-        """
-        if "roi" not in kwargs and self.get_param_value("use_roi"):
-            kwargs["ndim"] = 1
-            kwargs["roi"] = [
-                slice(
-                    self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
-                )
-            ]
 
 
 InputPlugin1d.register_as_base_class()

@@ -33,6 +33,7 @@ __all__ = []
 from .composite_creator_frame import *
 from .data_browsing_frame import *
 from .define_diffraction_exp_frame import *
+from .default_frames import *
 from .define_scan_frame import *
 from .directory_spy_frame import *
 from .home_frame import *
@@ -66,6 +67,11 @@ from . import define_scan_frame
 
 __all__.extend(define_scan_frame.__all__)
 del define_scan_frame
+
+from . import default_frames
+
+__all__.extend(default_frames.__all__)
+del default_frames
 
 from . import directory_spy_frame
 

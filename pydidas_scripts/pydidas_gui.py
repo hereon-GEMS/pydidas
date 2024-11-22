@@ -31,4 +31,4 @@ import pydidas
 
 
 if __name__ == "__main__":
-    pydidas.gui.start_pydidas_gui()
+    pydidas.gui.start_pydidas_gui(use_default_frames=True)

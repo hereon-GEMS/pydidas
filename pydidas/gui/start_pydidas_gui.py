@@ -37,23 +37,8 @@ from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
 from ..core import UserConfigError
 from ..widgets.framework import BaseFrame
-from . import MainWindow, frames
-
-
-_DEFAULT_FRAMES = (
-    frames.HomeFrame,
-    frames.DataBrowsingFrame,
-    frames.PyfaiCalibFrame,
-    frames.ImageMathFrame,
-    frames.QuickIntegrationFrame,
-    frames.DefineDiffractionExpFrame,
-    frames.DefineScanFrame,
-    frames.WorkflowEditFrame,
-    frames.WorkflowTestFrame,
-    frames.WorkflowRunFrame,
-    frames.ViewResultsFrame,
-    frames.UtilitiesFrame,
-)
+from . import MainWindow
+from .frames import DEFAULT_FRAMES
 
 
 def start_pydidas_gui(
@@ -79,7 +64,7 @@ def start_pydidas_gui(
 
     _prepare_interpreter()
     if use_default_frames:
-        frames = _DEFAULT_FRAMES + frames
+        frames = DEFAULT_FRAMES + frames
     _check_frames(frames)
 
     _splash = PydidasSplashScreen()

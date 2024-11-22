@@ -196,18 +196,3 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         _axranges = [self._config["sector_centers"], _results[0][0]]
         _dataset = Dataset(_newdata, axis_ranges=_axranges, **self._dataset_info)
         return _dataset, kwargs
-
-    def calculate_result_shape(self):
-        """
-        Get the shape of the integrated dataset to set up the CRS / LUT.
-
-        Returns
-        -------
-        tuple
-            The new shape. This is a tuple with a single integer value.
-        """
-        self._eval_sectors()
-        self._config["result_shape"] = (
-            len(self._config["sector_centers"]),
-            self.get_param_value("rad_npoint"),
-        )

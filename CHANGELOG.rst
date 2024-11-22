@@ -17,6 +17,8 @@ Improvements
   shapes can be dynamically modified during runtime.
 - Updated the classmethods of FitFuncBase to include attributes which correspond 
   to the fit result output labels.
+- Added a test mode flag to the WorkflowTree to prevent the creation of directories
+  in output plugins when testing workflows.
 - Programmatic improvements:
     - Removed the basic_plugin class attribute from Plugins and shifted the check
       to the core code of the base plugins.
@@ -43,6 +45,7 @@ Bugfixes
 - Fixed an issue with inspecting detailed results for fit plugins when the first 
   fit point had an invalid result (e.g. peak intensity too low).
 - Fixed an issue when copying a ProcessingTree which had no nodes.
+- Fixed an issue when entering `None` for path parameters.
 
 
 v24.09.19

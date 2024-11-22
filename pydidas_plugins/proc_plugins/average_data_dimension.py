@@ -43,9 +43,6 @@ class AverageDataDimension(ProcPlugin):
 
     default_params = get_generic_param_collection("process_data_dim")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Average over the given data dimension.
@@ -65,12 +62,3 @@ class AverageDataDimension(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         return data.mean(axis=self.get_param_value("process_data_dim")), kwargs
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
-        """
-        _dim = self.get_param_value("process_data_dim")
-        _input_shape = list(self._config["input_shape"])
-        _ = _input_shape.pop(_dim)
-        self._config["result_shape"] = tuple(_input_shape)

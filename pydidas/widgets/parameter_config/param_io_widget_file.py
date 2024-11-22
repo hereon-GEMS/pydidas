@@ -32,6 +32,7 @@ import os
 from pathlib import Path
 from typing import Union
 
+from numpy import nan
 from qtpy import QtCore
 
 from ...data_io import IoMaster
@@ -108,7 +109,11 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             The text converted to a Path to update the Parameter value.
         """
         text = self._io_lineedit.text()
-        return Path(self.get_value_from_text(text))
+        _value = self.get_value_from_text(text)
+        if _value in [None, True, False, nan]:
+            _value = "."
+            self._io_lineedit.setText(".")
+        return Path(_value)
 
     def set_value(self, value: Union[str, Path]):
         """

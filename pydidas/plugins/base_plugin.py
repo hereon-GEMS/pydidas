@@ -266,7 +266,7 @@ class BasePlugin(ObjectWithParameterCollection):
         for _kw, _item in kwargs.items():
             if _kw in self.params.keys():
                 self.set_param_value(_kw, _item)
-        self._config = {"input_shape": None, "result_shape": None, "input_data": None}
+        self._config = {"test_mode": False, "input_data": None}
 
         self.node_id = None
         self._roi_data_dim = None
@@ -407,6 +407,28 @@ class BasePlugin(ObjectWithParameterCollection):
         raise NotImplementedError(
             "Generic plugins do not have a unique parameter config widget."
         )
+
+    @property
+    def test_mode(self) -> bool:
+        """
+        Get the test mode flag.
+        Returns
+        -------
+        bool
+            The test mode flag.
+        """
+        return self._config["test_mode"]
+
+    @test_mode.setter
+    def test_mode(self, value: bool):
+        """
+        Set the test mode flag.
+        Parameters
+        ----------
+        value : bool
+            The new test mode flag.
+        """
+        self._config["test_mode"] = bool(value)
 
     @property
     def input_data(self) -> Union[int, Dataset]:

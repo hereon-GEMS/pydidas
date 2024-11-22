@@ -17,7 +17,7 @@
 
 """
 The pydidas_updater_script allows to automatically download the latest version of
-pydidas from github and replace the available version.
+pydidas from GitHub and replace the available version.
 """
 
 __author__ = "Malte Storm"
@@ -36,7 +36,6 @@ import sys
 import traceback
 from pathlib import Path
 
-import build
 import requests
 
 from pydidas_scripts.remove_local_files import (
@@ -47,7 +46,7 @@ from pydidas_scripts.remove_local_files import (
 
 def get_remote_version() -> str:
     """
-    Get the remove pydidas version number available on github.
+    Get the remove pydidas version number available on GitHub.
 
     Returns
     -------
@@ -106,7 +105,7 @@ def check_update_necessary_and_wanted(local_version: str, remote_version: str) -
     local_version : str
         The locally installed version number.
     remote_version : str
-        The remote (github) version number.
+        The remote (GitHub) version number.
 
     Returns
     -------
@@ -146,84 +145,43 @@ def print_status(status: str):
     print("=" * 80 + "\n")
 
 
-def check_git_installed():
+def download_wheel(version: str, path: Path) -> Path:
     """
-    Check if git is installed and accessible.
-
-    Raises
-    ------
-    FileNotFoundError
-        If git is not installed.
-    """
-    try:
-        subprocess.check_call(["git", "--version"])
-    except FileNotFoundError as _error:
-        _local_git_path = Path(sys.executable).parent.joinpath(".git", "cmd")
-        if _local_git_path.is_dir():
-            os.environ["PATH"] = ";".join([os.environ["PATH"], str(_local_git_path)])
-            return
-        raise FileNotFoundError(
-            "\n"
-            + "=" * 80
-            + "\n=== "
-            + "No git installation found. Git is necessary to run the pydidas update. "
-            + "\n=== "
-            + "Please install git or download an updated pydidas wheel "
-            + "\n=== "
-            + "or distribution directly.\n"
-            + "=" * 80
-        ) from _error
-
-
-def clone_git_repo(path: Path, verbose: bool = True):
-    """
-    Clone the pydidas git repository into the given directory.
+    Download the wheel file from the GitHub repository.
 
     Parameters
     ----------
+    version : str
+        The version string of the remote pydidas version.
     path : Path
-        The path to put the cloned repository.
-    verbose : bool, optional
-        Flag whether to print the status messages. The default is True.
-    """
-    if verbose:
-        print_status("Cloning git repository")
-    _url = "https://github.com/hereon-GEMS/pydidas"
-    subprocess.check_call(["git", "clone", _url, str(path)])
-
-
-def build_wheel(path: Path, verbose: bool = True) -> str:
-    """
-    Build the wheel from the downloaded git data.
-
-    Parameters
-    ----------
-    path : Path
-        The path of the git repository.
-    verbose : bool, optional
-        Flag whether to print the status messages. The default is True.
+        The path to download the wheel file.
 
     Returns
     -------
-    str
-        The path to the built wheel.
+    Path
+        The full path to the downloaded wheel file.
     """
-    if verbose:
-        print_status("Building wheel")
-    _builder = build.ProjectBuilder(path)
-    _metadata_dir = _builder.prepare("wheel", path.joinpath("build"))
-    _wheel = _builder.build("wheel", path, metadata_directory=_metadata_dir)
-    del _builder
-    return _wheel
+    _wheel_version = ".".join(str(int(_item)) for _item in version.split("."))
+    _wheel_filename = f"pydidas-{_wheel_version}-py3-none-any.whl"
+    _url = (
+        f"https://github.com/hereon-GEMS/pydidas/releases/download/v{version}/"
+        + _wheel_filename
+    )
+    _response = requests.get(_url, stream=True)
+    _response.raise_for_status()
+    with open(path.joinpath(_wheel_filename), "wb") as _file:
+        for _chunk in _response.iter_content(chunk_size=8192):
+            _file.write(_chunk)
+    return path.joinpath(_wheel_filename)
 
 
-def install_wheel(wheel_filename: str, verbose: bool = True):
+def install_wheel(wheel_filepath: Path, verbose: bool = True):
     """
     Install the wheel with the given filename.
 
     Parameters
     ----------
-    wheel_filename : str
+    wheel_filepath: Path
         The name of the wheel file.
     verbose : bool, optional
         Flag whether to print the status messages. The default is True.
@@ -246,10 +204,19 @@ def install_wheel(wheel_filename: str, verbose: bool = True):
             "-m",
             "pip",
             "install",
-            wheel_filename,
+            str(wheel_filepath),
             "--no-warn-script-location",
         ]
     )
+
+
+def remove_outdated_documentation():
+    """
+    Remove the outdated documentation files.
+    """
+    _path = get_location_of_installed_pydidas().joinpath("pydidas", "sphinx")
+    if _path.is_dir():
+        shutil.rmtree(_path)
 
 
 def get_location_of_installed_pydidas() -> Path:
@@ -258,7 +225,7 @@ def get_location_of_installed_pydidas() -> Path:
 
     Returns
     -------
-    str
+    Path
         pydidas's parent path.
     """
     _results = []
@@ -274,7 +241,7 @@ def get_location_of_installed_pydidas() -> Path:
         raise NameError(
             "Found more than one referenced pydidas versions. Please update pydidas "
             "manually in the correct location, remove the duplicate paths from "
-            "sys.path or delete the duplicate pyckages."
+            "sys.path or delete the duplicate packages."
         )
     return Path(_results[0])
 
@@ -402,31 +369,32 @@ def remove_pydidas_backup(path: Path, version: str):
 
 def run_update():
     """
-    Run the full updating pipeling.
+    Run the full updating pipeline.
     """
     _local_version = get_local_version()
     _remote_version = get_remote_version()
     _should_update = check_update_necessary_and_wanted(_local_version, _remote_version)
     if not _should_update:
         return
-    check_git_installed()
     _success = False
+    _path = Path(sys.executable).parent.joinpath(".temp", "pydidas")
+    _pydidas_location = get_location_of_installed_pydidas()
     try:
-        _path = Path(sys.executable).parent.joinpath(".temp", "pydidas")
-        _pydidas_location = get_location_of_installed_pydidas()
+        os.makedirs(_path)
         backup_local_version(_pydidas_location, _local_version)
-        clone_git_repo(_path)
-        _wheel = build_wheel(_path)
+        remove_outdated_documentation()
+        _wheel = download_wheel(_remote_version, _path)
         install_wheel(_wheel)
         remove_pydidas_log_files(_local_version, verbose=False, confirm_finish=False)
         remove_pydidas_stored_gui_states(
             _local_version, verbose=False, confirm_finish=False
         )
+        remove_outdated_documentation()
         _success = True
     except Exception:
         restore_pre_update_files(_pydidas_location, _local_version, _remote_version)
         print_status(
-            "An error occured during the update. Restoring previous version "
+            "An error occurred during the update. Restoring previous version "
             f"{_local_version} of pydidas."
             "\nPlease note that any problems with the pip update process may "
             "have caused a broken environment."

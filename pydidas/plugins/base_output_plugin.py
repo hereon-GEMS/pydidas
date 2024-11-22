@@ -56,11 +56,14 @@ class OutputPlugin(BasePlugin):
         _overwrite = self.get_param_value("enable_overwrite")
         if self._path.is_dir() and len(os.listdir(self._path)) > 0 and (not _overwrite):
             raise UserConfigError(
-                f"The given output path {self._path} is not empty and overwriting "
+                f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
+                "is invalid:\n"
+                f"The given output path `{self._path}` (which resolves to "
+                f"`{str(self._path.absolute())}` is not empty and overwriting "
                 "was not enabled. Please check the path or enable overwriting of "
                 "existing files."
             )
-        if not os.path.exists(self._path):
+        if not os.path.exists(self._path) and not self.test_mode:
             os.makedirs(self._path)
 
     def get_output_filename(self, extension: str = "txt") -> str:

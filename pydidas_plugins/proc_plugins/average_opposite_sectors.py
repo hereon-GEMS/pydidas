@@ -118,18 +118,3 @@ class AverageOppositeSectors(ProcPlugin):
                 "for chi."
             )
         self._config["symmetry_check"] = True
-
-    def calculate_result_shape(self):
-        """Calculate the result's shape based on the input data shape."""
-        _shape = self._config.get("input_shape", None)
-        if _shape is None:
-            raise UserConfigError(
-                "Cannot calculate the output shape for the 'Average opposite sectors' "
-                "plugin because the input shape is unknown."
-            )
-        if np.mod(_shape[0], 2) != 0:
-            raise UserConfigError(
-                "The input shape is invalid for the 'Average opposite sectors' "
-                f"plugin. The number of input points {_shape[0]} is not divisible by 2."
-            )
-        self._config["result_shape"] = (_shape[0] // 2, _shape[1])

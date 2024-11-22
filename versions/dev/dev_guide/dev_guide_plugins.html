@@ -668,13 +668,6 @@ plugin in the workflow) to set the input shape.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="simple">
-<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">result_shape</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">tuple</span></code>):</dt><dd><p>The shape of the output data. This property will be updated by the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_result_shape</span></code>
-method either based on the plugin configuration or on the input data.</p>
-</dd>
-</dl>
-</li>
 </ul>
 </div></blockquote>
 <p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
@@ -713,24 +706,6 @@ set to <code class="xref py py-data docutils literal notranslate"><span class="p
 <dt><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.store_input_data_copy" title="pydidas.plugins.BasePlugin.store_input_data_copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">store_input_data_copy</span></code></a>:</dt><dd><p>This method stores a copy of the input data and input kwargs in the plugin. This
 might be required, for example, to use the input data later, for example when
 calculating intermediate results.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_result_shape</span></code>:</dt><dd><p>This method calculates the shape of the output data. Plugins can implement their
-own logic to calculate the output shape based. The default implementation
-returns the input shape.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_legacy_image_ops_to_data</span></code>:</dt><dd><p>This method allows to apply legacy image operations to the method’s input data.
-This method will know all binning and cropping operations from the plugin’s
-ancestors and will calculate a single binning and cropping operation and apply
-it to the calling argument data <code class="xref py py-data docutils literal notranslate"><span class="pre">np.ndarray</span></code>. This is useful to
-synchronize, for example, the shape of correction data like flat fields with the
-input data shape without needing to know about cropping or binning or raw data
-explicitly.</p>
 </dd>
 </dl>
 </li>

@@ -556,7 +556,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f310df688d0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f535bdae010&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1703,15 +1703,25 @@ least once. Otherwise, the shapes will be set to None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.prepare_execution">
-<span class="sig-name descname"><span class="pre">prepare_execution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forced</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.prepare_execution" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">prepare_execution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.prepare_execution" title="Link to this definition">#</a></dt>
 <dd><p>Prepare the execution of the ProcessingTree.</p>
 <p>This method calls all the nodes’ prepare_execution methods.
 If the tree has not changed, it will skip this method unless the forced
 keyword is set to True.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>forced</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to force running the prepare_execution method. The default is
-False.</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Optional keyword arguments. Supported keywords are:
+forced : bool, optional</p>
+<blockquote>
+<div><p>Flag to force running the prepare_execution method. The default
+is False.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>test<span class="classifier">bool, optional</span></dt><dd><p>Flag to run the prepare_execution method in test mode. The default
+is False.</p>
+</dd>
+</dl>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1882,9 +1892,22 @@ node_id.setter in the WorkflowNode.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowNode.prepare_execution">
-<span class="sig-name descname"><span class="pre">prepare_execution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowNode.prepare_execution" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">prepare_execution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowNode.prepare_execution" title="Link to this definition">#</a></dt>
 <dd><p>Prepare the execution of the plugin chain.</p>
 <p>This method recursively calls the pre_execute methods of all (child) plugins.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Any keyword arguments which need to be passed to the plugin.
+Supported keywords are:
+test : bool, optional</p>
+<blockquote>
+<div><p>Flag to indicate that the plugin should be executed in test mode.
+This flag will prevent the plugin from storing any data to the
+file system.</p>
+</div></blockquote>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1991,7 +2014,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f310df688d0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f535bdae010&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>

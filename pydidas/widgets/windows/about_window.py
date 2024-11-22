@@ -84,7 +84,7 @@ class AboutWindow(PydidasWindow):
         self.create_label(
             "label_input",
             PYDIDAS_INFO,
-            font_metric_height_factor=14,
+            font_metric_height_factor=16,
             font_metric_width_factor=FONT_METRIC_WIDE_CONFIG_WIDTH,
             gridPos=(1, 0, 2, 1),
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
@@ -108,7 +108,7 @@ class AboutWindow(PydidasWindow):
             gridPos=(-1, 2, 1, 1),
             layout_kwargs={"alignment": ALIGN_BOTTOM_RIGHT},
         )
-        self.resize(QtCore.QSize(_font_height * 35, _font_height * 18))
+        self.resize(QtCore.QSize(_font_height * 35, _font_height * 20))
 
     def connect_signals(self):
         """

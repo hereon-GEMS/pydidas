@@ -50,4 +50,4 @@ FABIO_EXTENSIONS = ["edf", "mccd", "mar3450", "f2d", "cbf", "msk"]
 
 YAML_EXTENSIONS = ["yaml", "yml"]
 
-FILENAME_DELIMITERS = "\.|_|-| "
+FILENAME_DELIMITERS = r"\.|_|-| "

@@ -80,7 +80,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._config["active_node"] = -1
         self._config["active_ranges"] = {}
         self._config["param_hash"] = -1
-        self._re_pattern = re.compile("^(\\s*(-?\\d*\\.?\\d*:?){1,3},?)*?$")
+        self._re_pattern = re.compile(r"^(\s*(-?\d*\.?\d*:?){1,3},?)*?$")
 
     def reset(self):
         """

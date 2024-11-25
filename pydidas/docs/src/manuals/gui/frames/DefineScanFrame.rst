@@ -38,6 +38,24 @@ The Scan settings can be imported from file. Clicking the corresponding
 button will open a selection dialogue to pick the file with the stored settings.
 File extensions will be pre-selected based on the available importers. 
 
+Import scan axes from fio files
+^^^^^^^^^^^^^^^^^^^^
+
+.. image:: images/scan/import_fio.png
+    :align: left
+
+The Scan axes names, positions and number of steps can be imported from fio file(s). 
+
+If a single file is selected, scan dimentionality will be set to 1, 
+and Scan dimension 0 will be updated according to a line containing 'ascan'.
+
+If multiple files are selected, scan dimentionality will be set to 2.  
+Scan dimension 0 will be the "slow" axis, scan dimension 1 will be the "fast" axis.
+For the fast axis, the line with 'ascan' in the first file will be used to determine 
+the scan axis parameters. Then, the positions of the slow axis motor are determined from files.
+
+
+
 Reset Parameters
 ^^^^^^^^^^^^^^^^
 

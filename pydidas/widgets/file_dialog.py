@@ -296,10 +296,15 @@ class PydidasFileDialogWidget(
             The full file path, if selected, or None.
         """
         self._calling_kwargs = kwargs
+        _select_multiple = kwargs.get("select_multiple", False)
         self.setWindowTitle(kwargs.get("caption", "Select existing file"))
         self._set_name_filter()
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptOpen)
-        self.setFileMode(QtWidgets.QFileDialog.ExistingFiles)
+        self.setFileMode(
+            QtWidgets.QFileDialog.ExistingFiles
+            if _select_multiple else
+            QtWidgets.QFileDialog.ExistingFile
+            )
         self.setProxyModel(None)
         res = self.exec_()
         if res == 0:

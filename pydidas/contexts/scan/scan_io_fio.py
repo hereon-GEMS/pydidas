@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanIoYaml class which is used to import and export
-ScanContext metadata from a YAML file.
+Module with the ScanIoFio class which is used to importscan axes from fio file(s).
 """
 
 __author__ = "Malte Storm"
@@ -44,37 +43,21 @@ SCAN = ScanContext()
 
 class ScanIoFio(ScanIoBase):
     """
-    YAML importer/exporter for Scan objects.
+    FIO importer/exporter for Scan objects.
     """
 
     extensions = ['fio']
     format_name = "FIO"
-
-    @classmethod
-    def export_to_file(cls, filename: str, **kwargs: dict):
-        """
-        Write the ScanTree to a file.
-
-        Parameters
-        ----------
-        filename : str
-            The filename of the file to be written.
-        """
-        _scan = kwargs.get("scan", SCAN)
-        cls.check_for_existing_file(filename, **kwargs)
-        tmp_params = _scan.get_param_values_as_dict(filter_types_for_export=True)
-        with open(filename, "w") as stream:
-            yaml.safe_dump(tmp_params, stream)
     
     @classmethod
-    def import_from_file(cls, filename: str, scan: Union[Scan, None] = None):
+    def import_from_file(cls, filename: list[str], scan: Union[Scan, None] = None):
         """
-        Restore the ScanContext from a FIO file.
+        Extract scan axes from FIO file(s) and update ScanContext.
 
         Parameters
         ----------
-        filename : str
-            The filename of the file to be written.
+        filename : list[str]
+            List of files to extract scan axes from.
         scan : Union[None, pydidas.contexts.scan.Scan], optional
             The Scan instance to be updated. If None, the ScanContext instance is used.
             The default is None.
@@ -83,7 +66,7 @@ class ScanIoFio(ScanIoBase):
         with open(filename[0], "r") as stream: 
             try:
                 for item in stream.read().split("\n"):
-                    if ("scan") in item:
+                    if ("ascan") in item:
                         scan_motor_name = item.split(' ')[1]
                         len_scan = int(item.split(' ')[4])
                         str_scan_pars =  [float(i) for i in item.split(' ')[2:]]
@@ -98,46 +81,52 @@ class ScanIoFio(ScanIoBase):
             except yaml.YAMLError as yerr:
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
-            
-        try:
-            _scan.set_param_value("scan_dim",2)
-            num_motors = 0
-            with open(filename[0], "r") as stream:
-                for item in stream.read().split("\n"):
-                    if "=" in item:
-                        if 'nan' not in item:            
-                            varnum = item.split(' = ')
-                            varnum[1] = float(varnum[1])
-                            num_motors +=1
-            arr_motor_names = ["" for x in range(num_motors)]
-            arr_motor_pos = np.ones((num_motors,len(filename)))
-            i_scan = 0
-            for f in filename:
-                str_r = open(f).read()
-                i_arr_motors = 0
-                for item in str_r.split("\n"):
-                    if "=" in item:
-                        if 'nan' not in item:
-                            varnum = item.split(' = ')
-                            varnum[1] = float(varnum[1])
-                            arr_motor_names[i_arr_motors] =      tuple(varnum)[0]
-                            arr_motor_pos[i_arr_motors,i_scan] = tuple(varnum)[1]
-                            i_arr_motors+=1                
-                i_scan+=1
-            motors_moved_ind_arr = np.unique(np.where(np.diff(arr_motor_pos,axis=1)!=0)[0],\
-                             return_counts=True)
-            motors_moved_ind = motors_moved_ind_arr[0][np.argsort(motors_moved_ind_arr[1][:2])]
-            
-            scan_motor_index = arr_motor_names.index(scan_motor_name)
-            motor_moved_scans_ind = np.setdiff1d(motors_moved_ind,[scan_motor_index])[0]
-            scsp = arr_motor_pos[motor_moved_scans_ind]
-            _scan.set_param_value("scan_dim1_delta",(scsp[-1]-scsp[0])/(len(scsp)-1))
-            _scan.set_param_value("scan_dim1_n_points",len(scsp))
-            _scan.set_param_value("scan_dim1_offset",scsp[0]) 
-            _scan.set_param_value("scan_dim1_label",str(arr_motor_names[motor_moved_scans_ind]))
-        except:
-            pass
-
+        if (len(filename)>1):    
+            try:
+                _scan.set_param_value("scan_dim",2)
+                _scan.set_param_value("scan_dim1_delta",step_scan)
+                _scan.set_param_value("scan_dim1_n_points",len_scan)
+                _scan.set_param_value("scan_dim1_offset",start_scan) 
+                _scan.set_param_value("scan_dim1_label",scan_motor_name)
+                num_motors = 0
+                with open(filename[0], "r") as stream:
+                    for item in stream.read().split("\n"):
+                        if "=" in item:
+                            if 'nan' not in item:            
+                                varnum = item.split(' = ')
+                                varnum[1] = float(varnum[1])
+                                num_motors +=1
+                arr_motor_names = ["" for x in range(num_motors)]
+                arr_motor_pos = np.ones((num_motors,len(filename)))
+                i_scan = 0
+                for f in filename:
+                    str_r = open(f).read()
+                    i_arr_motors = 0
+                    for item in str_r.split("\n"):
+                        if "=" in item:
+                            if 'nan' not in item:
+                                varnum = item.split(' = ')
+                                varnum[1] = float(varnum[1])
+                                arr_motor_names[i_arr_motors] =      tuple(varnum)[0]
+                                arr_motor_pos[i_arr_motors,i_scan] = tuple(varnum)[1]
+                                i_arr_motors+=1                
+                    i_scan+=1
+                motors_moved_ind_arr = np.unique(np.where(np.diff(arr_motor_pos,axis=1)!=0)[0],\
+                                return_counts=True)
+                motors_moved_ind = motors_moved_ind_arr[0][np.argsort(motors_moved_ind_arr[1][:2])]
+                
+                scan_motor_index = arr_motor_names.index(scan_motor_name)
+                motor_moved_scans_ind = np.setdiff1d(motors_moved_ind,[scan_motor_index])[0]
+                scsp = arr_motor_pos[motor_moved_scans_ind]
+                _scan.set_param_value("scan_dim0_delta",(scsp[-1]-scsp[0])/(len(scsp)-1))
+                _scan.set_param_value("scan_dim0_n_points",len(scsp))
+                _scan.set_param_value("scan_dim0_offset",scsp[0]) 
+                _scan.set_param_value("scan_dim0_label",str(arr_motor_names[motor_moved_scans_ind]))
+            except yaml.YAMLError as yerr:
+                cls.imported_params = {}
+                raise yaml.YAMLError from yerr
+             
+        SCAN = scan 
         # assert isinstance(cls.imported_params, dict)
         # cls._verify_all_entries_present()
         # cls._write_to_scan_settings(scan=_scan)

@@ -103,6 +103,12 @@ class DefineScanFrameBuilder:
             parent_widget="config_header",
         )
         frame.create_button(
+            "but_fio_load",
+            "Import scan axes from fio files",
+            icon="qt-std::SP_DirIcon",
+            parent_widget="config_header",
+        )
+        frame.create_button(
             "but_reset",
             "Reset all scan settings",
             icon="qt-std::SP_BrowserReload",

@@ -89,6 +89,7 @@ class DefineScanFrame(BaseFrame):
         Connect all required signals and slots.
         """
         self._widgets["but_save"].clicked.connect(self.export_to_file)
+        self._widgets["but_fio_load"].clicked.connect(self.load_fio_files)
         self._widgets["but_load"].clicked.connect(self.load_from_file)
         self._widgets["but_reset"].clicked.connect(self.reset_entries)
         self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_info_window)
@@ -159,7 +160,22 @@ class DefineScanFrame(BaseFrame):
             SCAN.import_from_file(_fname)
             for param in SCAN.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
-
+    @QtCore.Slot()
+    def load_fio_files(self):
+        """
+        
+        This method will open a QFileDialog to select the file to be read.
+        """
+        _fname = self._io_dialog.get_existing_filename(
+            caption="Import fio files",
+            formats=ScanIo.get_string_of_formats(),
+            qsettings_ref="DefineScanFrame__import",
+            select_multiple=True
+        )
+        if _fname is not None:
+            SCAN.import_from_file(_fname)
+            for param in SCAN.params.values():
+                self.param_widgets[param.refkey].set_value(param.value)
     @QtCore.Slot()
     def export_to_file(self):
         """

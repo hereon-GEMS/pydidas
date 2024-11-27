@@ -163,7 +163,6 @@ class DefineScanFrame(BaseFrame):
     @QtCore.Slot()
     def load_fio_files(self):
         """
-        
         This method will open a QFileDialog to select the file to be read.
         """
         _fname = self._io_dialog.get_existing_filename(

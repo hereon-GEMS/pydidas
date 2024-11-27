@@ -31,12 +31,13 @@ from typing import Union
 
 import yaml
 import numpy as np
+from typing import Self
 
 from pydidas.core.constants import YAML_EXTENSIONS
 from pydidas.contexts.scan import Scan
 from pydidas.contexts.scan.scan_context import ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
-
+from pydidas.core import UserConfigError
 
 SCAN = ScanContext()
 
@@ -48,9 +49,11 @@ class ScanIoFio(ScanIoBase):
 
     extensions = ['fio']
     format_name = "FIO"
+    def __init__(self):
+        return
     
     @classmethod
-    def import_from_file(cls, filename: list[str], scan: Union[Scan, None] = None):
+    def import_from_file_old(cls, filename: list[str], scan: Union[Scan, None] = None):
         """
         Extract scan axes from FIO file(s) and update ScanContext.
 
@@ -78,6 +81,8 @@ class ScanIoFio(ScanIoBase):
                         _scan.set_param_value("scan_dim0_n_points",len_scan)
                         _scan.set_param_value("scan_dim0_offset",start_scan) 
                         _scan.set_param_value("scan_dim0_label",scan_motor_name) 
+                        return
+                raise UserConfigError("No scan command found.")
             except yaml.YAMLError as yerr:
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
@@ -130,3 +135,60 @@ class ScanIoFio(ScanIoBase):
         # assert isinstance(cls.imported_params, dict)
         # cls._verify_all_entries_present()
         # cls._write_to_scan_settings(scan=_scan)
+
+    @classmethod    
+    def import_from_file(cls, filename: list[str], scan: Union[Scan, None] = None):
+        scan = SCAN if scan is None else scan
+        if len(filename)==1:
+            cls.import_single_fio(filename, scan)
+        else:
+            cls.import_multiple_fio(filename, scan)
+    
+    @classmethod
+    def import_single_fio(cls,filename: list[str], scan: Union[Scan, None] = None):
+        _scan = SCAN if scan is None else scan
+        with open(filename[0], "r") as stream: 
+            file_lines = stream.read().split("\n")
+            try:
+                for item in file_lines:
+                    if ("ascan") in item:
+                        scan_motor_name = item.split(' ')[1]
+                        len_scan = int(item.split(' ')[4])
+                        str_scan_pars =  [float(i) for i in item.split(' ')[2:]]
+                        start_scan = str_scan_pars[0]
+                        end_scan = str_scan_pars[1]
+                        step_scan = (str_scan_pars[1]-str_scan_pars[0])/(str_scan_pars[2])
+                        # scan_pos = numpy.linspace(start_scan,end_scan,int(str_scan_pars[2])+1)
+                        _scan.set_param_value("scan_dim0_delta",step_scan)
+                        _scan.set_param_value("scan_dim0_n_points",len_scan)
+                        _scan.set_param_value("scan_dim0_offset",start_scan) 
+                        _scan.set_param_value("scan_dim0_label",scan_motor_name) 
+                        return
+                    if ("dscan") in item:
+                        scan_motor_name = item.split(' ')[1]
+                        len_scan = int(item.split(' ')[4])
+                        str_scan_pars =  [float(i) for i in item.split(' ')[2:]]
+                        step_scan = (str_scan_pars[1]-str_scan_pars[0])/(str_scan_pars[2])
+                        flag=0
+                        # _scan.set_param_value("scan_dim0_offset",float(file_lines[-3].split(' ')[1]))
+                        for i_end in [1,2,3,4,5]:
+                            if flag==0:    
+                                try:
+                                    for i_line in [1,2,3,4,5]:
+                                        if flag==0:
+                                            end_scan = float(file_lines[-i_end].split(' ')[i_line])
+                                        flag=1
+                                except:
+                                    pass
+                        start_scan = end_scan-step_scan*(len_scan)
+                        
+                        scan_pos = np.linspace(start_scan,end_scan,int(str_scan_pars[2])+1)
+                        _scan.set_param_value("scan_dim0_delta",step_scan)
+                        _scan.set_param_value("scan_dim0_n_points",len_scan)
+                        _scan.set_param_value("scan_dim0_offset",start_scan) 
+                        _scan.set_param_value("scan_dim0_label",scan_motor_name) 
+                        return
+                raise UserConfigError("No scan command found.")
+            except yaml.YAMLError as yerr:
+                cls.imported_params = {}
+                raise yaml.YAMLError from yerr

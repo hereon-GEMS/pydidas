@@ -29,10 +29,9 @@ import string
 import unittest
 
 import numpy as np
-from qtpy import QtWidgets
-
 from pydidas.widgets.framework import BaseFrame, PydidasFrameStack
 from pydidas_qtcore import PydidasQApplication
+from qtpy import QtWidgets
 
 
 class TestWidget(BaseFrame):

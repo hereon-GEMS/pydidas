@@ -35,8 +35,6 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from qtpy import QtTest, QtWidgets
-
 from pydidas import IS_QT6, LOGGING_LEVEL, unittest_objects
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
@@ -48,6 +46,7 @@ from pydidas.plugins import PluginCollection
 from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas_qtcore import PydidasQApplication
+from qtpy import QtTest, QtWidgets
 
 
 COLL = PluginCollection()

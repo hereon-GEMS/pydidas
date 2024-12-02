@@ -30,7 +30,6 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-
 from pydidas.core import FileReadError
 from pydidas.core.constants import NUMPY_EXTENSIONS
 from pydidas.data_io.implementations.numpy_io import NumpyIo

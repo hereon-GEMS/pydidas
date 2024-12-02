@@ -33,13 +33,12 @@ from pathlib import Path
 
 import numpy as np
 import skimage
-from qtpy import QtCore
-
 from pydidas.contexts import ScanContext
 from pydidas.core import Parameter, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
+from qtpy import QtCore
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()

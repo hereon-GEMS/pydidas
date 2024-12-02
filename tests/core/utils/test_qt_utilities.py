@@ -26,9 +26,8 @@ __status__ = "Production"
 
 import unittest
 
-from qtpy import QtWidgets
-
 from pydidas.core.utils import update_child_qobject
+from qtpy import QtWidgets
 
 
 class Test_Qt_Utilities(unittest.TestCase):

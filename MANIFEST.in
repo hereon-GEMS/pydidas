@@ -7,17 +7,16 @@ global-exclude *.pyc
 global-exclude *.pyo
 global-exclude .git
 
-recursive-include pydidas *.py
-recursive-include pydidas_plugins *.py
+recursive-include src *.py
 recursive-include pydidas_scripts *.py
-recursive-include pydidas_qtcore *.py
-recursive-include pydidas/docs *.png
-recursive-include pydidas/docs *.rst
-recursive-include pydidas/resources *.png
-recursive-include pydidas/resources *.svg
+recursive-include src/pydidas/docs *.png
+recursive-include src/pydidas/docs *.rst
+recursive-include src/pydidas/resources *.png
+recursive-include src/pydidas/resources *.svg
 
 recursive-exclude tests *
-recursive-exclude pydidas/docs/build *
+recursive-exclude src/pydidas/docs/build *
+recursive-exclude src/pydidas/sphinx *
 
 include MANIFEST.in
 include README.md

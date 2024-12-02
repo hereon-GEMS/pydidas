@@ -32,7 +32,6 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-
 from pydidas.core import UserConfigError, get_generic_parameter
 from pydidas.managers import ImageMetadataManager
 

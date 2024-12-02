@@ -32,8 +32,6 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from qtpy import QtWidgets
-
 from pydidas import unittest_objects
 from pydidas.contexts import DiffractionExperiment
 from pydidas.contexts.diff_exp import DiffractionExperimentContext
@@ -54,6 +52,7 @@ from pydidas.workflow import (
 )
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas_qtcore import PydidasQApplication
+from qtpy import QtWidgets
 
 
 SAVER = WorkflowResultIoMeta

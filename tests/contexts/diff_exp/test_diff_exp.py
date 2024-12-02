@@ -30,7 +30,6 @@ from numbers import Real
 
 import numpy as np
 import pyFAI
-
 from pydidas.contexts.diff_exp import (
     DiffractionExperiment,
     DiffractionExperimentContext,

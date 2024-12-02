@@ -29,7 +29,6 @@ import tempfile
 import unittest
 
 import numpy as np
-
 from pydidas.data_io import IoMaster
 from pydidas.data_io.implementations import IoBase
 

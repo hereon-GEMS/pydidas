@@ -33,8 +33,6 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from qtpy import QtTest
-
 from pydidas import IS_QT6
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (
@@ -45,6 +43,7 @@ from pydidas.core import (
     get_generic_parameter,
 )
 from pydidas.managers import CompositeImageManager
+from qtpy import QtTest
 
 
 class TestCompositeCreatorApp(unittest.TestCase):

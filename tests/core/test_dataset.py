@@ -29,7 +29,6 @@ import unittest
 from numbers import Real
 
 import numpy as np
-
 from pydidas.core import Dataset, PydidasConfigError, UserConfigError
 from pydidas.core.utils import rebin2d
 from pydidas.core.utils.dataset_utils import get_corresponding_dims

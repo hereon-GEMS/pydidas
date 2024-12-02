@@ -30,11 +30,10 @@ import threading
 import time
 import unittest
 
-from qtpy import QtWidgets
-
 from pydidas.multiprocessing import app_processor
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 from pydidas.unittest_objects.mp_test_app_wo_tasks import MpTestAppWoTasks
+from qtpy import QtWidgets
 
 
 class _ProcThread(threading.Thread):

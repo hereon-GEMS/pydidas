@@ -28,14 +28,13 @@ import os
 import unittest
 from pathlib import Path
 
-from qtpy import QtCore
-
 from pydidas.core.utils import (
     DOC_HOME_ADDRESS,
     DOC_HOME_FILENAME,
     DOC_HOME_QURL,
     DOC_SOURCE_DIRECTORY,
 )
+from qtpy import QtCore
 
 
 class TestGetDocQUrl(unittest.TestCase):
@@ -49,7 +48,7 @@ class TestGetDocQUrl(unittest.TestCase):
 
     def test_DOC_HOME_FILENAME(self):
         _fname = Path(DOC_HOME_FILENAME)
-        self.assertEqual(_fname.parents[3].name, "pydidas")
+        self.assertEqual(_fname.parents[2].name, "pydidas")
 
     def test_DOC_HOME_ADDRESS(self):
         _address = DOC_HOME_ADDRESS

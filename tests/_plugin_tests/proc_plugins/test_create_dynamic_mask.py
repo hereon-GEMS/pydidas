@@ -31,12 +31,11 @@ import unittest
 
 import numpy as np
 import scipy.ndimage
-from qtpy import QtCore
-
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import UserConfigError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
+from qtpy import QtCore
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()

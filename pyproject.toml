@@ -36,8 +36,8 @@ version = { attr = "pydidas.version.VERSION" }
 dependencies = { file = ["requirements.txt"]}
 optional-dependencies.dev = { file = ["requirements_dev.txt"]}
 
-[tool.setuptools]
-packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [project.scripts]
 pydidas-clear-settings = "pydidas_scripts.clear_local_settings:clear_local_settings"

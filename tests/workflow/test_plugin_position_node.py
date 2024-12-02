@@ -27,7 +27,6 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
-
 from pydidas.workflow import GenericNode, PluginPositionNode
 
 

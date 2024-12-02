@@ -27,10 +27,9 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
-from scipy.special import voigt_profile
-
 from pydidas.core import Dataset
 from pydidas.core.fitting.voigt import Voigt
+from scipy.special import voigt_profile
 
 
 class TestVoigt(unittest.TestCase):

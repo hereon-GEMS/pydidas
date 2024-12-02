@@ -31,6 +31,7 @@ Improvements
     - Updated WorkflowResults contexts to accept dynamic result shapes.
     - Removed redundant code from plugins (because of changes in shape handling).
     - Switched to using ruff instead of black, flake8 and isort in github actions.
+	- Moved the pydidas, pydidas_qtcore and pydidas_plugins folders to src.
 - Improved the formatting when displaying Plugin information.
 
 

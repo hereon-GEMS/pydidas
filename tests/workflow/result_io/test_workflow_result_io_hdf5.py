@@ -33,7 +33,6 @@ from numbers import Integral, Real
 
 import h5py
 import numpy as np
-
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_random_string, read_and_decode_hdf5_dataset

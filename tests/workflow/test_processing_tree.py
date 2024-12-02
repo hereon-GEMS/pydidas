@@ -32,7 +32,6 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-
 from pydidas import unittest_objects
 from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import PluginCollection

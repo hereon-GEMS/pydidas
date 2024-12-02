@@ -28,12 +28,11 @@ import itertools
 import unittest
 
 import numpy as np
-from qtpy import QtCore
-
 from pydidas.core import Dataset
 from pydidas.core.fitting.gaussian import Gaussian
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
+from qtpy import QtCore
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()

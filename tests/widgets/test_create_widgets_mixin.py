@@ -28,12 +28,11 @@ import random
 import string
 import unittest
 
-from qtpy import QtWidgets
-
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.factory.create_widgets_mixin import CreateWidgetsMixIn
 from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
 from pydidas_qtcore import PydidasQApplication
+from qtpy import QtWidgets
 
 
 class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):

@@ -34,7 +34,6 @@ import unittest
 
 import h5py
 import numpy as np
-
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.apps.parsers import directory_spy_app_parser
 from pydidas.core import FileReadError, UserConfigError, get_generic_parameter

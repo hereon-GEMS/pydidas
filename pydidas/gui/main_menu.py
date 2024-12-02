@@ -531,6 +531,8 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The filename to be used to restore the state. This kwarg will only be used
             if the state kwarg is set to "manual".
         """
+        if state.upper() == "NONE":
+            return
         if state.upper() == "SAVED":
             filename = utils.get_standard_state_full_filename(self.STATE_FILENAME)
         elif state.upper() == "EXIT":

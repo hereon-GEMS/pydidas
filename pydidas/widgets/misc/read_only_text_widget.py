@@ -27,8 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ReadOnlyTextWidget"]
 
-
-from typing import Union
+from typing import Optional, Union
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -62,10 +61,27 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         PydidasWidgetMixin.__init__(self, **kwargs)
         if hasattr(self._qtapp, "sig_font_size_changed"):
             self._qtapp.sig_font_size_changed.connect(self.reprint)
-        self.__text = ""
+        self._current_content = ""
         self.__title = None
+        self.__block_format_header = QtGui.QTextBlockFormat()
+        self.__block_format_header.setIndent(0)
+        self.__block_format_section = QtGui.QTextBlockFormat()
+        self.__block_format_section.setIndent(1)
+        self.__block_format_subsection = QtGui.QTextBlockFormat()
+        self.__block_format_subsection.setIndent(2)
+        self.__char_format_normal = QtGui.QTextCharFormat()
+        self.__char_format_normal.setFontWeight(QtGui.QFont.Normal)
+        self.__char_format_bold = QtGui.QTextCharFormat()
+        self.__char_format_bold.setFontWeight(QtGui.QFont.Bold)
+        self.setLineWrapMode(QtWidgets.QTextEdit.FixedColumnWidth)
+        self.setLineWrapColumnOrWidth(80)
+        self.setWordWrapMode(QtGui.QTextOption.WordWrap)
 
-    def setText(self, text: str, title: str = ""):
+    def setText(
+        self,
+        text: str,
+        title: str = "",
+    ):
         """
         Set the widget's text.
 
@@ -77,17 +93,12 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
             The title. If None, no title will be printed. The default is None.
         """
         QtWidgets.QTextEdit.setText(self, "")
-        self.__add_title(title)
-        self.__text = text
-        if isinstance(text, list):
-            for _weight, _txt in text:
-                self.setFontWeight(_weight)
-                self.append(_txt)
-        else:
-            self.append(text)
+        self._add_title(title)
+        self._current_content = text
+        self.append(self._current_content)
         self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
-    def __add_title(self, title: str):
+    def _add_title(self, title: str):
         """
         Add the title to the box, if given.
 
@@ -101,49 +112,52 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
             return
         self.setFontPointSize(self._qtapp.font_size + 3)
         self.setFontWeight(QtGui.QFont.Bold)
-        self.append(f"{title}")
+        self.append(f"{title}\n")
         self.setFontPointSize(self._qtapp.font_size + 1)
         self.setFontWeight(QtGui.QFont.Normal)
 
-    def set_text_from_dict(
+    def set_text_from_list(
         self,
-        text_dict: dict,
-        title: str = "",
-        one_line_entries: bool = False,
-        indent: int = 4,
+        text_list: list[str, str],
+        title: Optional[str] = None,
     ):
         """
-        Set the widget's text.
+        Set the widget's text from a list of entries.
 
-        This widget accepts both a single text entry and a list of entries
-        for the text. A list of entries will be converted to a single text
-        according to a <key: entry> scheme.
+        Each entry in the list is a tuple with the first element being the
+        `type` of the entry (header, section, subsection) and the second
+        element being the value. The type will determine the formatting of
+        the entry.
 
         Parameters
         ----------
-        text_dict : dict
-            The dictionnary of the text to be displayed. The dictionary will
-            be processed with keys as item titles and values as corresponding
-            items.
+        text_list: list[str, str]
+            The list of the type keys and /text entries to be displayed.
+            The list will be processed with type keys used for formatting
+            the entries.
         title : str, optional
             The title. If None, no title will be printed. The default is None.
-        one_line_entries : bool, optional
-            Flag to force printing of keys and entries in one line instead
-            of two lines with an indent. The default is False.
-        indent : int, optional
-            The indent depth for list entries. The default is 4.
         """
-        self.__text = []
-        for _key, _value in text_dict.items():
-            if one_line_entries:
-                self.__text.append([QtGui.QFont.Normal, f"{_key}: {_value}"])
-            else:
-                _items = _value.split("\n")
-                self.__text.append([QtGui.QFont.Bold, f"\n{_key}:"])
-                for item in _items:
-                    _indent = " " * indent if item[:indent] != " " * indent else ""
-                    self.__text.append([QtGui.QFont.Normal, _indent + item])
-        self.setText(self.__text, title=title)
+        self._current_content = text_list
+        QtWidgets.QTextEdit.setText(self, "")
+        if title is not None:
+            self._add_title(title)
+        cursor = self.textCursor()
+
+        for _type, _value in text_list:
+            if _type == "header":
+                cursor.setBlockFormat(self.__block_format_header)
+                cursor.setCharFormat(self.__char_format_bold)
+                cursor.insertText(f"\n{_value}:\n")
+            elif _type == "section":
+                cursor.setBlockFormat(self.__block_format_section)
+                cursor.setCharFormat(self.__char_format_normal)
+                self.setFontWeight(QtGui.QFont.Normal)
+                cursor.insertText(f"{_value}\n")
+            elif _type == "subsection":
+                cursor.setBlockFormat(self.__block_format_subsection)
+                cursor.setCharFormat(self.__char_format_normal)
+                cursor.insertText(f"{_value}\n")
 
     @QtCore.Slot()
     def reprint(self):
@@ -151,4 +165,7 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         Reprint the latest text with the updated font settings.
         """
         self.setFontPointSize(self._qtapp.font_size + 1)
-        self.setText(self.__text, title=self.__title)
+        if isinstance(self._current_content, list):
+            self.set_text_from_list(self._current_content, title=self.__title)
+        else:
+            self.setText(self._curent_content, title=self.__title)

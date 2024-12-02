@@ -38,6 +38,9 @@ __all__ = [
     "format_input_to_multiline_str",
     "get_random_string",
     "get_simplified_array_representation",
+    "get_param_description_from_docstring",
+    "strip_param_description_from_docstring",
+    "get_formatted_blocks_from_docstring",
 ]
 
 
@@ -535,3 +538,85 @@ def get_random_string(length: int, use_digits: bool = False) -> str:
     """
     _chars = _string_.ascii_letters + (_string_.digits if use_digits else "")
     return "".join(random.choice(_chars) for _ in range(length))
+
+
+def get_param_description_from_docstring(docstring: str) -> dict[str, str]:
+    """
+    Get the parameter descriptions from a docstring.
+
+    Parameters
+    ----------
+    docstring : str
+        The input docstring.
+
+    Returns
+    -------
+    dict[str, str]
+        The dictionary with the parameter descriptions.
+    """
+    _param_docstrings = {}
+    if docstring.find("Parameters") > 0:
+        _param_str = (
+            docstring[docstring.find("Parameters") + 10 :].strip("\n -").split("\n")
+        )
+        while len(_param_str) > 0:
+            if not _param_str[0].startswith(8 * " "):
+                _key = _param_str.pop(0).strip()
+                _param_docstrings[_key] = ""
+            else:
+                _param_docstrings[_key] += " " + _param_str.pop(0).strip()
+    return _param_docstrings
+
+
+def strip_param_description_from_docstring(docstring: str) -> str:
+    """
+    Strip the parameter description from a docstring.
+
+    Parameters
+    ----------
+    docstring : str
+        The input docstring.
+
+    Returns
+    -------
+    str
+        The stripped docstring.
+    """
+    if docstring.find("Parameters") > 0:
+        docstring = docstring[: docstring.find("Parameters")]
+    return docstring
+
+
+def get_formatted_blocks_from_docstring(docstring: str) -> list[str]:
+    """
+    Get formatted blocks from a docstring.
+
+    This function will split the input docstring into blocks of text and strip
+    leading and trailing whitespaces while retaining the linebreaks.
+
+    Parameters
+    ----------
+    docstring : str
+        The input docstring.
+
+    Returns
+    -------
+    list[str]
+        The list with the formatted blocks.
+    """
+    _blocks = []
+    for _i, _doc_section in enumerate(docstring.split("\n\n")):
+        _formatted_section = ""
+        for _line in _doc_section.strip().split("\n"):
+            if _line.startswith(8 * " "):
+                if not _formatted_section.endswith("\n"):
+                    _formatted_section += "\n"
+                _formatted_section += f"    {_line.strip()}\n"
+            else:
+                _formatted_section += f"{_line.strip()} "
+        _formatted_section = _formatted_section.strip()
+        if _i > 0:
+            _formatted_section = "\n" + _formatted_section
+        if _formatted_section != "\n":
+            _blocks.append(_formatted_section)
+    return _blocks

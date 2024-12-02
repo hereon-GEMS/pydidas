@@ -167,6 +167,7 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
         self.doubleClicked.connect(
             partial(self.__send_signal_for_selected_item, self.sig_add_plugin_to_tree)
         )
+        self.selectionModel().currentChanged.connect(self.__current_selection_changed)
         self.__create_menu()
 
     @QtCore.Slot()
@@ -296,6 +297,22 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
         """
         index = self.selectedIndexes()[0]
         self.__send_signal_for_selected_item(signal, index)
+
+    @QtCore.Slot(QtCore.QModelIndex, QtCore.QModelIndex)
+    def __current_selection_changed(
+        self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex
+    ):
+        """
+        Update the context menu based on the current selection.
+
+        Parameters
+        ----------
+        current : QtCore.QModelIndex
+            The current index.
+        previous : QtCore.QModelIndex
+            The previous index.
+        """
+        self.__send_signal_for_selected_item(self.sig_plugin_preselected, current)
 
     @QtCore.Slot()
     def __send_signal_for_selected_item(self, signal: QtCore.Signal, index: int):

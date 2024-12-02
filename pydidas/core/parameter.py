@@ -630,6 +630,28 @@ class Parameter:
         """
         return self.__refkey, self.value_for_export
 
+    def get_type_and_default_str(self, check_optional: bool = False) -> str:
+        """
+        Get a string representation of the type and default value.
+
+        Parameters
+        ----------
+        check_optional : bool, optional
+            A flag to print whether the Parameter is optional. The default is False.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
+        _type = f"{self.__type.__name__}" if self.__type is not None else "None"
+        _unit = "" if self.__meta["unit"] == "" else f" {self.__meta['unit']}"
+        _default_val = str(self.default) if len(str(self.default)) >= 0 else '""'
+        _repr = f"(type: {_type}, "
+        if check_optional and self.__meta["optional"]:
+            _repr += "optional, "
+        return _repr + f"default: {_default_val}{_unit})"
+
     def __str__(self) -> str:
         """
         Get a short string representation of the parameter.
@@ -671,19 +693,11 @@ class Parameter:
         str
             The string representation.
         """
-        _type = f"{self.__type.__name__}" if self.__type is not None else "None"
         _unit = "" if self.__meta["unit"] == "" else f" {self.__meta['unit']}"
-        _val = str(self.value)
-        if len(_val) == 0:
-            _val = '""'
-        _default_val = str(self.__meta["default"])
-        if len(_default_val) == 0:
-            _default_val = '""'
-        _repr = f"{self.__refkey}: {_val}{_unit} (type: {_type}, "
-        if check_optional and self.__meta["optional"]:
-            _repr += "optional, "
-        _repr += f"default: {_default_val}{_unit})"
-        return _repr
+        _val = str(self.value) if len(str(self.value)) > 0 else '""'
+        return f"{self.__refkey}: {_val}{_unit} " + self.get_type_and_default_str(
+            check_optional
+        )
 
     def __get_as_numbers(
         self, value: Union[str, Iterable]

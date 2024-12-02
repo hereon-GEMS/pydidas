@@ -46,18 +46,18 @@ class FrameLoaderAsStack(InputPlugin):
 
     This plugin can be used to apply a rolling average on input data.
 
-    NOTE: The FrameStackLoader Plugin is used to load a series of data frames into a
-    single 3D Dataset for further special analysis. Note that this plugin should
-    only be used if the next processing step is to apply individual masks or to
-    average / sum the frames.
+    NOTE: The FrameStackLoader Plugin is used to load a series of data
+    frames into a single 3D Dataset for further special analysis. Note
+    that this plugin should only be used if the next processing step is
+    to apply individual masks or to average / sum the frames.
 
     This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.
-    Filesystem checks can be disabled using the live_processing keyword but
-    are enabled by default.
+    Filesystem checks can be disabled using the live_processing keyword
+    but are enabled by default.
 
-    A region of interest and image binning can be supplied to apply directly
-    to the raw image.
+    A region of interest and image binning can be supplied to apply
+    directly to the raw image.
     """
 
     plugin_name = "Single frame *stack* loader"

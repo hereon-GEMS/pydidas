@@ -55,7 +55,7 @@ class FitSinglePeak(BaseFitPlugin):
     (of the data maximum) above the background to attempt a fit.
 
     The quality of the fit is measured in the normalized standard deviation of the
-    fit from the data
+    fit from the data:
         Std(data - fit) / Mean(data)
     Fits which differ by more than the threshold defined in the
     *Fit sigma rejection threshold* will be handled as failed and will return NaN

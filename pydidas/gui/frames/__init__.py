@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ pydidas's functionality from within a graphical user interface.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,6 +33,7 @@ __all__ = []
 from .composite_creator_frame import *
 from .data_browsing_frame import *
 from .define_diffraction_exp_frame import *
+from .default_frames import *
 from .define_scan_frame import *
 from .directory_spy_frame import *
 from .home_frame import *
@@ -66,6 +67,11 @@ from . import define_scan_frame
 
 __all__.extend(define_scan_frame.__all__)
 del define_scan_frame
+
+from . import default_frames
+
+__all__.extend(default_frames.__all__)
+del default_frames
 
 from . import directory_spy_frame
 

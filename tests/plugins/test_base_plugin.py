@@ -100,11 +100,11 @@ class TestBasePlugin(unittest.TestCase):
         _text = plugin.get_class_description()
         self.assertIsInstance(_text, str)
 
-    def test_get_class_description_as_dict(self):
+    def test_get_class_description_as_list(self):
         plugin = create_plugin_class(BASE_PLUGIN)
-        _doc = plugin.get_class_description_as_dict()
-        self.assertIsInstance(_doc, dict)
-        for _key, _value in _doc.items():
+        _doc = plugin.get_class_description_as_list()
+        self.assertIsInstance(_doc, list)
+        for _key, _value in _doc:
             self.assertIsInstance(_key, str)
             self.assertIsInstance(_value, str)
 

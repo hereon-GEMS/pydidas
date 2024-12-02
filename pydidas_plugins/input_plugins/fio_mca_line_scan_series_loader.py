@@ -109,6 +109,9 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     This plugin is designed to allow loading .fio files written by DESY's
     SPOCK for a number of line scans.
 
+    Please note that each instrument might have different data defined in the
+    fio file format and not all data might be readable.
+
     Parameters
     ----------
     directory_path : Union[str, pathlib.Path]

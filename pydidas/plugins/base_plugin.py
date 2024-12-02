@@ -44,6 +44,11 @@ from pydidas.core import (
     get_generic_param_collection,
 )
 from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
+from pydidas.core.utils import (
+    get_formatted_blocks_from_docstring,
+    get_param_description_from_docstring,
+    strip_param_description_from_docstring,
+)
 from pydidas.managers import ImageMetadataManager
 
 
@@ -192,34 +197,66 @@ class BasePlugin(ObjectWithParameterCollection):
         return _desc
 
     @classmethod
-    def get_class_description_as_dict(cls) -> dict:
+    def get_class_description_as_list(cls) -> list:
         """
-        Get a description of the plugin as a dictionary of entries.
+        Get a description of the plugin as a list of keys and entries.
 
         This method can generate a description of the plugin with name,
         plugin type, class name and Parameters and the docstring.
-        The return is a dictionary of entries.
+        The return is a list of entries with keys and entries. Keys determine
+        the formatting of the entry and can be "header", "section" or "subsection".
 
         Returns
         -------
         dict
             The description of the plugin.
         """
+        _description = [
+            ["header", "Name"],
+            ["section", cls.plugin_name],
+            ["header", "Plugin description"],
+        ]
         _doc = (
             cls.__doc__.strip() if cls.__doc__ is not None else "No docstring available"
         )
-        return {
-            "Name": cls.plugin_name,
-            "Plugin description": _doc,
-            "Parameters": "\n".join(
-                [str(param) for param in cls.generic_params.values()]
-                + [str(param) for param in cls.default_params.values()]
-            ),
-            "Class name": cls.__name__,
-            "Plugin type": ptype[cls.plugin_type],
-            "Input data dimension": cls.input_data_dim_str(),
-            "Output data dimension": cls.output_data_dim_str(),
+        for _block in get_formatted_blocks_from_docstring(
+            strip_param_description_from_docstring(_doc)
+        ):
+            _description.append(["section", _block])
+
+        _description.append(["header", "Parameters"])
+        _param_docstrings = get_param_description_from_docstring(_doc)
+        _param_doc_keys = {
+            _k.split(":")[0].strip(): _k for _k in _param_docstrings.keys()
         }
+        for _param in list(cls.generic_params.values()) + list(
+            cls.default_params.values()
+        ):
+            if _param.refkey.startswith("_"):
+                continue
+            _description.append(["section", f"{_param.name}:"])
+            if _param.refkey in _param_doc_keys:
+                _description.append(
+                    ["subsection", _param_docstrings[_param_doc_keys[_param.refkey]]]
+                )
+                _description.append(["subsection", _param.get_type_and_default_str()])
+            else:
+                _description.append(["subsection", _param.tooltip])
+            _description.append(
+                ["subsection", f"[Parameter reference key: {_param.refkey}]"]
+            )
+
+        _description += [
+            ["header", "Class name"],
+            ["section", cls.__name__],
+            ["header", "Plugin type"],
+            ["section", ptype[cls.plugin_type]],
+            ["header", "Input data dimension"],
+            ["section", cls.input_data_dim_str()],
+            ["header", "Output data dimension"],
+            ["section", cls.output_data_dim_str()],
+        ]
+        return _description
 
     @classmethod
     def input_data_dim_str(cls) -> str:

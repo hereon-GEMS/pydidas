@@ -964,12 +964,13 @@ The return is a formatted string.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.get_class_description_as_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_class_description_as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.get_class_description_as_dict" title="Link to this definition">#</a></dt>
-<dd><p>Get a description of the plugin as a dictionary of entries.</p>
+<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.get_class_description_as_list">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_class_description_as_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.get_class_description_as_list" title="Link to this definition">#</a></dt>
+<dd><p>Get a description of the plugin as a list of keys and entries.</p>
 <p>This method can generate a description of the plugin with name,
 plugin type, class name and Parameters and the docstring.
-The return is a dictionary of entries.</p>
+The return is a list of entries with keys and entries. Keys determine
+the formatting of the entry and can be “header”, “section” or “subsection”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The description of the plugin.</p>
@@ -1672,7 +1673,7 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.copy"><code class="docutils literal notranslate"><span class="pre">BasePlugin.copy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.execute"><code class="docutils literal notranslate"><span class="pre">BasePlugin.execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_class_description"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_class_description</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_class_description_as_dict"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_class_description_as_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_class_description_as_list"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_class_description_as_list</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_parameter_config_widget"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_parameter_config_widget</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_data"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.input_data_dim_str"><code class="docutils literal notranslate"><span class="pre">BasePlugin.input_data_dim_str</span></code></a></li>

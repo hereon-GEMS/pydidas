@@ -564,22 +564,20 @@ at creation.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_dict">
-<span class="sig-name descname"><span class="pre">set_text_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_line_entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_dict" title="Link to this definition">#</a></dt>
-<dd><p>Set the widget’s text.</p>
-<p>This widget accepts both a single text entry and a list of entries
-for the text. A list of entries will be converted to a single text
-according to a &lt;key: entry&gt; scheme.</p>
+<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list">
+<span class="sig-name descname"><span class="pre">set_text_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list" title="Link to this definition">#</a></dt>
+<dd><p>Set the widget’s text from a list of entries.</p>
+<p>Each entry in the list is a tuple with the first element being the
+<cite>type</cite> of the entry (header, section, subsection) and the second
+element being the value. The type will determine the formatting of
+the entry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text_dict</strong> (<em>dict</em>) – The dictionnary of the text to be displayed. The dictionary will
-be processed with keys as item titles and values as corresponding
-items.</p></li>
+<li><p><strong>text_list</strong> (<em>list</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – The list of the type keys and /text entries to be displayed.
+The list will be processed with type keys used for formatting
+the entries.</p></li>
 <li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – The title. If None, no title will be printed. The default is None.</p></li>
-<li><p><strong>one_line_entries</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to force printing of keys and entries in one line instead
-of two lines with an indent. The default is False.</p></li>
-<li><p><strong>indent</strong> (<em>int</em><em>, </em><em>optional</em>) – The indent depth for list entries. The default is 4.</p></li>
 </ul>
 </dd>
 </dl>
@@ -730,7 +728,7 @@ by this widget.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.reprint"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.reprint</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.setText"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.setText</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_dict"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.set_text_from_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.set_text_from_list</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.SelectImageFrameWidget"><code class="docutils literal notranslate"><span class="pre">SelectImageFrameWidget</span></code></a><ul class="nav section-nav flex-column">

@@ -112,8 +112,8 @@ class ExecuteWorkflowApp(BaseApp):
         "autosave_results", "autosave_directory", "autosave_format", "live_processing"
     )
     parse_func = execute_workflow_app_parser
-    attributes_not_to_copy_to_slave_app = (
-        BaseApp.attributes_not_to_copy_to_slave_app
+    attributes_not_to_copy_to_app_clone = (
+        BaseApp.attributes_not_to_copy_to_app_clone
         + [
             "_shared_arrays",
             "_index",
@@ -139,7 +139,7 @@ class ExecuteWorkflowApp(BaseApp):
         )
         self._index = -1
         self._locals = {"shared_memory_buffers": {}}
-        if not self.slave_mode:
+        if not self.clone_mode:
             self._prepare_mp_configuration()
         self.reset_runtime_vars()
 
@@ -183,7 +183,7 @@ class ExecuteWorkflowApp(BaseApp):
         self._mp_tasks = np.array(())
         self._index = None
         self._shared_arrays = {}
-        if not self.slave_mode:
+        if not self.clone_mode:
             for _key, _val in self.mp_manager.items():
                 if _key.startswith("shape") or _key.endswith("_dict"):
                     _val.clear()
@@ -198,7 +198,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Prepare running the workflow execution.
 
-        For the main App (i.e. running not in slave_mode), this involves the
+        For the main App (i.e. running not in clone_mode), this involves the
         following steps:
 
             1. Get the shape of all results from the WorkflowTree and store
@@ -208,12 +208,12 @@ class ExecuteWorkflowApp(BaseApp):
                requirements are okay.
             4. Initialize the shared memory arrays.
 
-        Both the slaved and the main applications then initialize local numpy
+        Both the cloned and the main applications then initialize local numpy
         arrays from the shared memory.
         """
         self.reset_runtime_vars()
         self._mp_tasks = np.arange(SCAN.n_points)
-        if self.slave_mode:
+        if self.clone_mode:
             self._recreate_context()
         else:
             self.close_shared_arrays_and_memory()
@@ -229,7 +229,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def _recreate_context(self):
         """
-        Recreate the required context from the config for slave apps.
+        Recreate the required context from the config for app clones.
         """
         TREE.restore_from_string(self._config["tree_str_rep"])
         for _key, _val in self._config["scan_context"].items():
@@ -248,7 +248,7 @@ class ExecuteWorkflowApp(BaseApp):
         while _buffers:
             _key, _buffer = _buffers.popitem()
             _buffer.close()
-            if not self.slave_mode:
+            if not self.clone_mode:
                 try:
                     _buffer.unlink()
                 except FileNotFoundError:
@@ -260,7 +260,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def _store_context(self):
         """
-        Store the current context for slave app instances.
+        Store the current context for app clone instances.
         """
         self._config["tree_str_rep"] = TREE.export_to_string()
         self._config["scan_context"] = SCAN.get_param_values_as_dict(
@@ -350,7 +350,7 @@ class ExecuteWorkflowApp(BaseApp):
             if not self.mp_manager["shapes_available"].is_set():
                 self._publish_shapes_and_metadata_to_manager()
         if not self.mp_manager["shapes_set"].is_set():
-            if self.slave_mode:
+            if self.clone_mode:
                 self._config["latest_results"] = TREE.get_current_results()
                 return None
             self._create_shared_memory()
@@ -564,7 +564,7 @@ class ExecuteWorkflowApp(BaseApp):
             The results from multiprocessing_func. This can be either a tuple
             with (buffer_pos, metadata) or the integer buffer_pos.
         """
-        if self.slave_mode:
+        if self.clone_mode:
             return
         if self._shared_arrays == dict():
             self._initialize_arrays_from_shared_memory()
@@ -613,7 +613,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Delete the ExecuteWorkflowApp.
         """
-        if not self.slave_mode:
+        if not self.clone_mode:
             if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
                 self._mp_manager_instance.shutdown()
         self.close_shared_arrays_and_memory()

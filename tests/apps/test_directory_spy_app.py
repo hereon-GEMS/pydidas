@@ -445,15 +445,15 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.assertIsInstance(app._shared_array, np.ndarray)
         self.assertEqual(app._shared_array.shape, (10000, 10000))
 
-    def test_prepare_run__slave(self):
+    def test_prepare_run__as_clone(self):
         app = self.create_default_app()
         app.prepare_run()
-        slave_app = app.copy(slave_mode=True)
-        slave_app.prepare_run()
+        app_clone = app.copy(clone_mode=True)
+        app_clone.prepare_run()
         for _key in ["flag", "width", "height", "array"]:
             self.assertEqual(
                 app._config["shared_memory"][_key],
-                slave_app._config["shared_memory"][_key],
+                app_clone._config["shared_memory"][_key],
             )
 
     def test_multiprocessing_pre_run(self):

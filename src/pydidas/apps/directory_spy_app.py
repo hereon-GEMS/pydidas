@@ -131,7 +131,7 @@ class DirectorySpyApp(BaseApp):
         "bg_hdf5_frame",
     )
     parse_func = directory_spy_app_parser
-    attributes_not_to_copy_to_slave_app = [
+    attributes_not_to_copy_to_app_clone = [
         "_shared_array",
         "_index",
         "multiprocessing_carryon",
@@ -170,7 +170,7 @@ class DirectorySpyApp(BaseApp):
         """
         Prepare running the directory spy app.
 
-        For the main App (i.e. running not in slave_mode), this involves the
+        For the main App (i.e. running not in clone_mode), this involves the
         following steps:
 
             1. Get the shape of all results from the WorkflowTree and store
@@ -180,7 +180,7 @@ class DirectorySpyApp(BaseApp):
                requirements are okay.
             4. Initialize the shared memory arrays.
 
-        Both the slaved and the main applications then initialize local numpy
+        Both the cloned and the main applications then initialize local numpy
         arrays from the shared memory.
         """
         self._det_mask = self._get_detector_mask()
@@ -188,7 +188,7 @@ class DirectorySpyApp(BaseApp):
         self.reset_runtime_vars()
         if self.get_param_value("use_bg_file"):
             self._load_bg_file()
-        if not self.slave_mode:
+        if not self.clone_mode:
             self.initialize_shared_memory()
         self.__initialize_array_from_shared_memory()
         if not self.get_param_value("scan_for_all"):

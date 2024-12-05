@@ -113,7 +113,7 @@ class CompositeCreatorApp(BaseApp):
 
     default_params = COMPOSITE_CREATOR_DEFAULT_PARAMS
     parse_func = composite_creator_app_parser
-    attributes_not_to_copy_to_slave_app = ["_composite", "_det_mask", "_bg_image"]
+    attributes_not_to_copy_to_app_clone = ["_composite", "_det_mask", "_bg_image"]
     mp_func_results = QtCore.Signal(object)
     updated_composite = QtCore.Signal()
 
@@ -195,7 +195,7 @@ class CompositeCreatorApp(BaseApp):
         self.__verify_number_of_images_fits_composite()
         if self.get_param_value("use_bg_file"):
             self._check_and_set_bg_file()
-        if self.slave_mode:
+        if self.clone_mode:
             self._composite = None
             return
         self.__update_composite_image_params()
@@ -459,7 +459,7 @@ class CompositeCreatorApp(BaseApp):
         """
         Perform operations after running main parallel processing function.
         """
-        if self.get_param_value("use_thresholds") and not self.slave_mode:
+        if self.get_param_value("use_thresholds") and not self.clone_mode:
             self.apply_thresholds()
 
     @copy_docstring(CompositeImageManager)
@@ -493,7 +493,7 @@ class CompositeCreatorApp(BaseApp):
         image : np.ndarray
             The image data.
         """
-        if self.slave_mode:
+        if self.clone_mode:
             return
         if self.get_param_value("use_bg_file"):
             image = image - self._bg_image

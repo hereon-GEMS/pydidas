@@ -50,7 +50,7 @@ class RandomImageGeneratorApp(pydidas.core.BaseApp):
         Parameter("num_images", int, 50),
         Parameter("image_shape", tuple, (100, 100)),
     )
-    attributes_not_to_copy_to_slave_app = [
+    attributes_not_to_copy_to_app_clone = [
         "shared_array",
         "shared_index_in_use",
         "_tasks",
@@ -71,9 +71,9 @@ class RandomImageGeneratorApp(pydidas.core.BaseApp):
         Perform operations prior to running main parallel processing function.
         """
         self._tasks = np.arange(self.get_param_value("num_images"))
-        # only the master must initialize the shared memory, the slaves are passed
+        # only the master must initialize the shared memory, the clones are passed
         # the reference:
-        if not self.slave_mode:
+        if not self.clone_mode:
             self.initialize_shared_memory()
         # create the shared arrays:
         self.shared_index_in_use = np.frombuffer(
@@ -148,14 +148,14 @@ class RandomImageGeneratorApp(pydidas.core.BaseApp):
 app = RandomImageGeneratorApp()
 app.multiprocessing_pre_run()
 
-app_slave = app.copy(slave_mode=True)
-app_slave.multiprocessing_pre_run()
+app_clone = app.copy(clone_mode=True)
+app_clone.multiprocessing_pre_run()
 
 index = 10
-buffer_index = app_slave.multiprocessing_func(index)
+buffer_index = app_clone.multiprocessing_func(index)
 app.shared_index_in_use
 app.shared_array[buffer_index, 0, 0:5]
-app_slave.shared_array[buffer_index, 0, 0:5]
+app_clone.shared_array[buffer_index, 0, 0:5]
 
 app.multiprocessing_store_results(index, buffer_index)
 app.results[index, 0, 0:5]

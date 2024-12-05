@@ -114,7 +114,7 @@ def app_processor(
 
     _debug_message("Started process")
 
-    _app = app(app_params, slave_mode=True)
+    _app = app(app_params, clone_mode=True)
     _app._config = app_config
     _app_mp_manager = kwargs.get("app_mp_manager", None)
     if _app_mp_manager:

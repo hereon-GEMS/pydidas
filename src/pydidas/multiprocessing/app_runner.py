@@ -86,7 +86,7 @@ class AppRunner(WorkerController):
             app.multiprocessing_pre_run()
         self.sig_results.connect(app.multiprocessing_store_results)
         self.sig_post_run_called.connect(app.multiprocessing_post_run)
-        self.__app = app.copy(slave_mode=True)
+        self.__app = app.copy(clone_mode=True)
         self.__check_app_is_set()
         self._use_app_tasks = use_app_tasks
         self._processor["func"] = app_processor

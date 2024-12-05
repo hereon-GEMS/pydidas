@@ -39,7 +39,7 @@ from .parameter_collection import ParameterCollection
 
 
 _TYPES_NOT_TO_COPY = (QtCore.SignalInstance, QtCore.QMetaObject, ParameterCollection)
-_KEYS_NOT_TO_COPY = ["__METAOBJECT__", "mp_manager", "_locals", "params", "slave_mode"]
+_KEYS_NOT_TO_COPY = ["__METAOBJECT__", "mp_manager", "_locals", "params", "clone_mode"]
 
 
 class BaseApp(ObjectWithParameterCollection):
@@ -61,10 +61,10 @@ class BaseApp(ObjectWithParameterCollection):
 
     default_params = ParameterCollection()
     parse_func = lambda self: {}
-    attributes_not_to_copy_to_slave_app = ["_mp_manager_instance"]
+    attributes_not_to_copy_to_app_clone = ["_mp_manager_instance"]
 
     def __init__(self, *args: tuple, **kwargs: dict):
-        self.slave_mode = kwargs.pop("slave_mode", False)
+        self.clone_mode = kwargs.pop("clone_mode", False)
         ObjectWithParameterCollection.__init__(self)
         self.update_params_from_init(*args, **kwargs)
         self.parse_args_and_set_params()
@@ -306,38 +306,38 @@ class BaseApp(ObjectWithParameterCollection):
                 _new_cfg[_key] = None
         self._config = state["config"] | _new_cfg
 
-    def copy(self, slave_mode: bool = False) -> Self:
+    def copy(self, clone_mode: bool = False) -> Self:
         """
         Get a copy of the App.
 
         Parameters
         ----------
-        slave_mode : bool, optional
-            Keyword to toggle creation of a slave app which does not include
-            attributes marked in the classes slave_mode attribute.
+        clone_mode : bool, optional
+            Keyword to toggle creation of an app clone which does not include
+            attributes marked in the classes clone_mode attribute.
 
         Returns
         -------
         App : BaseApp
             A copy of the App instance.
         """
-        return self.__copy__(slave_mode)
+        return self.__copy__(clone_mode)
 
-    def __copy__(self, slave_mode: bool = False) -> Self:
+    def __copy__(self, clone_mode: bool = False) -> Self:
         """
         Reimplement the generic copy method.
 
         Parameters
         ----------
-        slave_mode : bool, optional
-            Flag to signal the copy shall be a slave. The default is False.
+        clone_mode : bool, optional
+            Flag to signal the copy shall be a clone. The default is False.
 
         Returns
         -------
         BaseApp
             The copy of the app.
         """
-        _obj_copy = type(self)(slave_mode=slave_mode)
+        _obj_copy = type(self)(clone_mode=clone_mode)
         _obj_copy.__dict__.update(
             {
                 _key: copy(_value)
@@ -345,7 +345,7 @@ class BaseApp(ObjectWithParameterCollection):
                 if not (
                     isinstance(_value, _TYPES_NOT_TO_COPY)
                     or _key in _KEYS_NOT_TO_COPY
-                    or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
+                    or (clone_mode and _key in self.attributes_not_to_copy_to_app_clone)
                 )
             }
         )

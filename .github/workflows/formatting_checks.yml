@@ -7,7 +7,7 @@
 # to verify that all files are corretly formatted.
 
 
-name: formatting checks
+name: Check formatting, linting, and copyrights
 
 on:
   pull_request:

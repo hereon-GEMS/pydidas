@@ -98,7 +98,6 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 and _key not in self.plugin.advanced_parameters
             ):
                 self.create_param_widget(_param)
-                self._params_already_added.append(_key)
 
         self.__advanced_hidden = True
         self.create_button(

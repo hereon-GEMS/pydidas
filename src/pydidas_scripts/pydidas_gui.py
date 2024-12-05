@@ -30,5 +30,12 @@ __all__ = []
 import pydidas
 
 
-if __name__ == "__main__":
+def open_gui():
+    """
+    Open the pydidas GUI.
+    """
     pydidas.gui.start_pydidas_gui(use_default_frames=True)
+
+
+if __name__ == "__main__":
+    open_gui()

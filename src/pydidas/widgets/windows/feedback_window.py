@@ -68,7 +68,9 @@ class FeedbackWindow(PydidasWindow):
         """
         Create all widgets for the frame and place them in the layout.
         """
-        _font_width, _font_height = QtWidgets.QApplication.instance().font_metrics
+        _metrics = QtWidgets.QApplication.instance().font_metrics
+        _font_width = int(_metrics[0])
+        _font_height = int(_metrics[1])
 
         self.create_label(
             "label_title",
@@ -158,10 +160,10 @@ class FeedbackWindow(PydidasWindow):
         char_height : float
             The average metrics height of a char.
         """
-        self.setFixedWidth(char_width * FONT_METRIC_PARAM_EDIT_WIDTH + 20)
+        self.setFixedWidth(int(char_width * FONT_METRIC_PARAM_EDIT_WIDTH + 20))
         apply_qt_properties(
             self._widgets["details"],
-            fixedWidth=char_width * FONT_METRIC_PARAM_EDIT_WIDTH,
+            fixedWidth=int(char_width * FONT_METRIC_PARAM_EDIT_WIDTH),
             fixedHeight=char_height * 15,
         )
         self.adjustSize()

@@ -261,7 +261,6 @@ class ImageMathFrameBuilder:
             fontsize_offset=1,
             parent_widget="left_container",
         )
-        # cls._frame.create_spacer(None, parent_widget="left_container", fixedHeight=10)
 
     @classmethod
     def _create_ufunc_widgets(cls):

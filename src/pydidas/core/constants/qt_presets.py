@@ -72,22 +72,22 @@ QT_COMBO_BOX_SIZE_POLICY = QtWidgets.QComboBox.AdjustToMinimumContentsLengthWith
 
 QT_REG_EXP_FLOAT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
-        r"-?\\d*\.?\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
+        r"-?\d*\.?\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
     )
 )
 
 QT_REG_EXP_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
-        r"-?\\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
+        r"-?\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
     )
 )
 
 QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
-    QtCore.QRegularExpression(r"((-?\\d*:?){1,3},?)*")
+    QtCore.QRegularExpression(r"((-?\d*:?){1,3},?)*")
 )
 
 QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
-    QtCore.QRegularExpression(r"((-?\\d*\\.?\\d*:?){1,3},?)*")
+    QtCore.QRegularExpression(r"((-?\d*\.?\d*:?){1,3},?)*")
 )
 
 QT_REG_EXP_RGB_VALIDATOR = QtGui.QRegularExpressionValidator(

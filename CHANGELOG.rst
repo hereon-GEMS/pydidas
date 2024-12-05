@@ -50,6 +50,7 @@ Bugfixes
   fit point had an invalid result (e.g. peak intensity too low).
 - Fixed an issue when copying a ProcessingTree which had no nodes.
 - Fixed an issue when entering `None` for path parameters.
+- Fixed an issue with formatting of regex strings in the qr_presets
 
 
 v24.09.19

@@ -33,12 +33,17 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 
 from ...contexts import ScanContext, ScanIo
+from ...core import constants, utils
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame
 from ...widgets.windows import ScanDimensionInformationWindow
 from ...workflow import WorkflowTree
-from .builders import DefineScanFrameBuilder
+from .builders.define_scan_frame_builder import (
+    build_header_config,
+    build_scan_dim_groups,
+    column_width_factor,
+)
 
 
 SCAN = ScanContext()
@@ -82,7 +87,24 @@ class DefineScanFrame(BaseFrame):
         """
         Populate the frame with widgets.
         """
-        DefineScanFrameBuilder.build_frame(self)
+        utils.apply_qt_properties(
+            self.layout(),
+            horizontalSpacing=25,
+            alignment=constants.ALIGN_TOP_LEFT,
+        )
+        for _name, _args, _kwargs in build_header_config():
+            _method = getattr(self, _name)
+            if "widget" in _kwargs:
+                _kwargs["widget"] = self._widgets[_kwargs["widget"]]
+            _method(*_args, **_kwargs)
+        for _name, _args, _kwargs in build_scan_dim_groups(
+            self._widgets["main"].layout().rowCount()
+        ):
+            _method = getattr(self, _name)
+            _method(*_args, **_kwargs)
+            # print(_args[0], self._widgets[_args[0]].geometry())
+        for _name in ["scan_base_directory", "scan_name_pattern"]:
+            self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
 
     def connect_signals(self):
         """
@@ -138,8 +160,8 @@ class DefineScanFrame(BaseFrame):
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
             if i in DIM_LABELS[_dim].keys():
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
-        _total_width = DefineScanFrameBuilder.width_factor(_dim in [3, 4])
-        self._widgets["master"].font_metric_width_factor = _total_width
+        _total_width = column_width_factor(_dim in [3, 4])
+        self._widgets["main"].font_metric_width_factor = _total_width
         self._widgets["config_B"].setVisible(_dim in [3, 4])
         self._widgets["config_area"].force_width_from_size_hint()
 

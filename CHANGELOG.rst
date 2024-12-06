@@ -33,6 +33,8 @@ Improvements
     - Switched to using ruff instead of black, flake8 and isort in github actions.
 	- Moved the pydidas, pydidas_qtcore and pydidas_plugins folders to src.
 	- Renamed `slaves` to `clones`
+	- Changed the builder of the DefineScanFrame to use functions instead of an 
+	  abstract class.
 - Improved the formatting when displaying Plugin information.
 
 

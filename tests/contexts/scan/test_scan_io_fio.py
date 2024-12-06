@@ -26,7 +26,7 @@ __status__ = "Production"
 
 import os
 
-import pytest
+import pytest, tempfile
 
 
 
@@ -52,15 +52,6 @@ def test_import_from_file__validation(create_scan_io_fio):
     assert SCAN.get_param_value("scan_dim0_label")=='cube1_x'
     assert SCAN.get_param_value("scan_dim0_n_points")==34
 
-def test_import_from_file__corrupt_file(create_scan_io_fio):
-    scaniofio, SCAN = create_scan_io_fio
-    _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    filenames = [_test_dir+r'\_data\test_single_fio.fio']
-    _tmppath = tempfile.mkdtemp()
-    with pytest.raises(UserConfigError):
-        scaniofio.import_from_file(filenames, scan=SCAN)
-    assert scaniofio.imported_params == {}
-    
 
 def test_import_from_files__validation(create_scan_io_fio):
     scaniofio, SCAN = create_scan_io_fio
@@ -80,6 +71,20 @@ def test_import_from_files__validation(create_scan_io_fio):
     assert SCAN.get_param_value("scan_dim1_label")=='cube1_x'
     assert SCAN.get_param_value("scan_dim1_n_points")==34
     
+def test_import_from_file__corrupt_file(create_scan_io_fio):
+    scaniofio, SCAN = create_scan_io_fio
+    # _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    # filenames = [_test_dir+r'\_data\test_single_fio.fio']
+    _tmppath = tempfile.mkdtemp()
+    _tmpfile = tempfile.mkstemp(dir=_tmppath)
+    print(_tmpfile)
+    with pytest.raises(UserConfigError):
+        scaniofio.import_from_file([_tmpfile[1]], scan=SCAN)
+    assert scaniofio.imported_params == {}
+    os.close(_tmpfile[0])
+    os.remove(_tmpfile[1])
+    
+    os.rmdir(_tmppath)
 
 pytest.main()
 

@@ -49,7 +49,7 @@ Instance attributes
     * - instance attribute
       - description
     * - :py:data:`app_clone`
-      - A boolean flag to toggle whether the current app instance is a master
+      - A boolean flag to toggle whether the current app instance is a manager
         or clone.
     * - :py:data:`_config`
       - The :py:data:`_config` dictionary should be used to store all app
@@ -106,11 +106,11 @@ return values and calling parameters, please refer to the class documentation:
       - This method takes the task index and the function results and stores
         them in whichever way the app defined. It is separated from the
         processing to separate it in parallel processing and only store the
-        results in the master process. **This method must be defined in a
+        results in the main process. **This method must be defined in a
         custom app.**
     * - :py:data:`initialize_shared_memory`
       - This method is used to create shared memory objects to be shared between
-        master and app clones or it initialize it again. Details must be defined
+        manager and app clones or it initialize it again. Details must be defined
         by the app which wishes to use it.
     * - :py:data:`export_state`
       - This method returns a dictionary with the app state in a serializable
@@ -268,7 +268,7 @@ As example, let us extend the RandomImageGeneratorApp to a fully functional app.
 The app will create a random noisy image of the given shape as its core
 function.
 It will utilize a shared memory array to store results to demonstrate how
-master and app clones interact in multiprocessing.
+manager and app clones interact in multiprocessing.
 Just for demonstration purposes, it will wait for 50 ms for every 5th index
 and fail every 2nd carryon check. These methods will also print some info for
 demonstration:
@@ -322,7 +322,7 @@ demonstration:
             Perform operations prior to running main parallel processing function.
             """
             self._tasks = np.arange(self.get_param_value("num_images"))
-            # only the master must initialize the shared memory, the clones are passed
+            # only the manager must initialize the shared memory, the clones are passed
             # the reference:
             if not self.clone_mode:
                 self.initialize_shared_memory()
@@ -438,7 +438,7 @@ clone mode). This will allow the two apps to use the joint shared memory:
     >>> app.shared_index_in_use
     array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     >>> # now, the data from the clone is stored in the shared array and
-    >>> # also accessible by the master app:
+    >>> # also accessible by the manager app:
     >>> app.shared_array[buffer_index, 0, 0:5]
     array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],
       dtype=float32)

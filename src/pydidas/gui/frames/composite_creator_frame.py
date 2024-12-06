@@ -47,7 +47,7 @@ from ...core.utils import (
     get_hdf5_populated_dataset_keys,
     pydidas_logger,
 )
-from ...data_io import IoMaster
+from ...data_io import IoManager
 from ...multiprocessing import AppRunner
 from ...widgets import dialogues
 from ...widgets.framework import BaseFrameWithApp
@@ -348,7 +348,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self,
             "Name of file",
             None,
-            IoMaster.get_string_of_formats("export"),
+            IoManager.get_string_of_formats("export"),
         )[0]
         if fname not in [None, ""]:
             _cmap = self._widgets["plot_window"].getActiveImage().getColormap()

@@ -71,7 +71,7 @@ class RandomImageGeneratorApp(pydidas.core.BaseApp):
         Perform operations prior to running main parallel processing function.
         """
         self._tasks = np.arange(self.get_param_value("num_images"))
-        # only the master must initialize the shared memory, the clones are passed
+        # only the main app must initialize the shared memory, the clones are passed
         # the reference:
         if not self.clone_mode:
             self.initialize_shared_memory()

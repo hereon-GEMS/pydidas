@@ -37,11 +37,11 @@ from numpy import amax, amin, ndarray
 
 from ...core import Dataset, FileReadError
 from ...core.utils import rebin
-from ..io_master import IoMaster
+from ..io_manager import IoManager
 from ..utils import RoiSliceManager
 
 
-class IoBase(metaclass=IoMaster):
+class IoBase(metaclass=IoManager):
     """
     Base class for Metaclass-based importer/exporters.
     """

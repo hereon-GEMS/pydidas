@@ -17,7 +17,7 @@
 
 """
 The import_export module includes wrappers to facilitate the import and export
-of data using the pydidas.data_io.IoMaster metaclass.
+of data using the pydidas.data_io.IoManager metaclass.
 """
 
 __author__ = "Malte Storm"
@@ -34,12 +34,12 @@ from typing import Union
 from numpy import ndarray
 
 from ..core import Dataset
-from .io_master import IoMaster
+from .io_manager import IoManager
 
 
 def export_data(filename: Union[str, Path], data: ndarray, **kwargs: dict):
     """
-    Export data to a file using the pydidas.data_io.IoMaster metaclass.
+    Export data to a file using the pydidas.data_io.IoManager metaclass.
 
     Parameters
     ----------
@@ -52,12 +52,12 @@ def export_data(filename: Union[str, Path], data: ndarray, **kwargs: dict):
         and the supported keywords vary depending on the selected file
         extension.
     """
-    IoMaster.export_to_file(filename, data, **kwargs)
+    IoManager.export_to_file(filename, data, **kwargs)
 
 
 def import_data(filename: Union[str, Path], **kwargs: dict) -> Dataset:
     """
-    Import data from a file using the pydidas.data_io.IoMaster metaclass.
+    Import data from a file using the pydidas.data_io.IoManager metaclass.
 
     Parameters
     ----------
@@ -68,5 +68,5 @@ def import_data(filename: Union[str, Path], **kwargs: dict) -> Dataset:
         and the supported keywords vary depending on the selected file
         extension.
     """
-    _data = IoMaster.import_from_file(filename, **kwargs)
+    _data = IoManager.import_from_file(filename, **kwargs)
     return _data

@@ -36,7 +36,7 @@ from qtpy import QtCore, QtWidgets
 from ...core import Parameter, ParameterCollection
 from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from ...core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
-from ...data_io import IoMaster
+from ...data_io import IoManager
 from ..dialogues import critical_warning
 from ..framework import PydidasWindow
 
@@ -96,7 +96,7 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
             linebreak=True,
             parent_widget="config_canvas",
         )
-        _supported_formats = IoMaster.get_string_of_formats("export")
+        _supported_formats = IoManager.get_string_of_formats("export")
         self.param_widgets["output_filename"]._file_selection = _supported_formats
 
         self.create_button(

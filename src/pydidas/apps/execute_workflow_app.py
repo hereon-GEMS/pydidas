@@ -153,9 +153,9 @@ class ExecuteWorkflowApp(BaseApp):
         - A dictionary for the shapes of the results
         - A dictionary for the metadata of the results
         - An Event to signal that the shapes are available which allows
-          the master process to query the shapes dictionary and initialize
+          the main process to query the shapes dictionary and initialize
           the shared memory arrays.
-        - An Event to signal that the shapes are set and the master process
+        - An Event to signal that the shapes are set and the main process
           has created the shared memory arrays. Workers can then resume
           their work.
         - A Lock to synchronize access to the shared memory arrays.
@@ -169,7 +169,7 @@ class ExecuteWorkflowApp(BaseApp):
             ("lock", self._mp_manager_instance.Lock),
         ]:
             self.mp_manager[_item] = _type()
-        self.mp_manager["master_pid"] = self._mp_manager_instance.Value(
+        self.mp_manager["main_pid"] = self._mp_manager_instance.Value(
             "I", mp.current_process().pid
         )
         self.mp_manager["buffer_n"] = self._mp_manager_instance.Value("I", 0)
@@ -241,7 +241,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Close (and unlink) the shared memory buffers.
 
-        Note that only the master app should unlink the shared memory buffers.
+        Note that only the manager app should unlink the shared memory buffers.
         """
         _buffers = self._locals.get("shared_memory_buffers", {})
         self._shared_arrays = {}
@@ -440,7 +440,7 @@ class ExecuteWorkflowApp(BaseApp):
         Initialize the shared arrays from the buffer size and result shapes.
         """
         _n = self.mp_manager["buffer_n"].value
-        _pid = self.mp_manager["master_pid"].value
+        _pid = self.mp_manager["main_pid"].value
         _buffers = self._locals["shared_memory_buffers"] = {}
         _buffers["in_use_flag"] = SharedMemory(
             name=f"share_in_use_flag_{_pid}", create=True, size=4 * _n
@@ -482,9 +482,9 @@ class ExecuteWorkflowApp(BaseApp):
         SharedMemory
             The SharedMemory object.
         """
-        _master_pid = self.mp_manager["master_pid"].value
+        _main_pid = self.mp_manager["main_pid"].value
         if name not in self._locals["shared_memory_buffers"]:
-            _mem_buffer = SharedMemory(name=f"share_{name}_{_master_pid}")
+            _mem_buffer = SharedMemory(name=f"share_{name}_{_main_pid}")
             self._locals["shared_memory_buffers"][name] = _mem_buffer
         return self._locals["shared_memory_buffers"][name]
 

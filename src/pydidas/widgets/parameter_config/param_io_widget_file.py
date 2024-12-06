@@ -35,7 +35,7 @@ from typing import Union
 from numpy import nan
 from qtpy import QtCore
 
-from ...data_io import IoMaster
+from ...data_io import IoManager
 from ..dialogues import critical_warning
 from ..file_dialog import PydidasFileDialog
 from .param_io_widget_with_button import ParamIoWidgetWithButton
@@ -80,7 +80,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
                 self.io_dialog_call = self.io_dialog.get_existing_filename
         self._io_dialog_config = {
             "reference": id(self),
-            "formats": "All files (*.*);;" + IoMaster.get_string_of_formats(),
+            "formats": "All files (*.*);;" + IoManager.get_string_of_formats(),
             "qsettings_ref": kwargs.get("persistent_qsettings_ref"),
         }
 

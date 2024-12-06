@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the IOmaster metaclass which stores references for all IO classes
+Module with the IoManager metaclass which stores references for all IO classes
 and allows to get the importers/exporters based on the file extension.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["IoMaster"]
+__all__ = ["IoManager"]
 
 
 from pathlib import Path
@@ -37,7 +37,7 @@ from ..core import Dataset, UserConfigError
 from ..core.utils import get_extension
 
 
-class IoMaster(type):
+class IoManager(type):
     """
     Metaclass to manage imports and exporters for different file types.
     """
@@ -64,7 +64,7 @@ class IoMaster(type):
         type
             The new class.
         """
-        _new_class = super(IoMaster, cls).__new__(cls, clsname, bases, attrs)
+        _new_class = super(IoManager, cls).__new__(cls, clsname, bases, attrs)
         cls.register_class(_new_class)
         return _new_class
 

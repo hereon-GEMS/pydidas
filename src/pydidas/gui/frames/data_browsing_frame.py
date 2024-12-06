@@ -43,7 +43,7 @@ from ...core import Dataset
 from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
 from ...core.exceptions import FileReadError
 from ...core.utils import CatchFileErrors, get_extension
-from ...data_io import IoMaster, import_data
+from ...data_io import IoManager, import_data
 from ...widgets.framework import BaseFrame
 from ...widgets.windows import Hdf5BrowserWindow
 from .builders import DataBrowsingFrameBuilder
@@ -65,7 +65,7 @@ class DataBrowsingFrame(BaseFrame):
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
         self.__qtapp = PydidasQApplication.instance()
-        self.__supported_extensions = set(IoMaster.registry_import.keys())
+        self.__supported_extensions = set(IoManager.registry_import.keys())
         self.__current_filename = None
         self.__open_file = None
         self.__hdf5node = Hdf5Node()

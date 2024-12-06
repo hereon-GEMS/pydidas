@@ -40,7 +40,7 @@ from ...core import (
     constants,
     get_generic_param_collection,
 )
-from ...data_io import IoMaster, export_data, import_data
+from ...data_io import IoManager, export_data, import_data
 from ...gui.frames.builders import ImageMathFrameBuilder
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame
@@ -398,7 +398,7 @@ class ImageMathFrame(BaseFrame):
             return
         _fname = self.__export_dialog.get_saving_filename(
             caption="Export image",
-            formats=IoMaster.get_string_of_formats("export"),
+            formats=IoManager.get_string_of_formats("export"),
             default_extension="tiff",
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="ImageMathFrame__export",

@@ -36,7 +36,7 @@ from qtpy import QtCore, QtWidgets
 from ...core import Parameter, UserConfigError, get_generic_param_collection
 from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
 from ...core.utils import ShowBusyMouse, get_extension, get_hdf5_metadata
-from ...data_io import IoMaster, export_data, import_data
+from ...data_io import IoManager, export_data, import_data
 from ...managers import FilelistManager
 from .. import dialogues
 from ..framework import PydidasWindow
@@ -249,7 +249,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         Process the file series.
         """
-        if not IoMaster.is_extension_registered(
+        if not IoManager.is_extension_registered(
             self.get_param_value("output_fname").suffix
         ):
             raise UserConfigError(

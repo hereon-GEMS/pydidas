@@ -44,7 +44,7 @@ from silx.gui.plot.actions import PlotAction
 
 from ...core import PydidasQsettingsMixin, UserConfigError
 from ...core.utils import calculate_histogram_limits
-from ...data_io import IoMaster, import_data
+from ...data_io import IoManager, import_data
 from ...resources import icons
 from ..file_dialog import PydidasFileDialog
 
@@ -264,7 +264,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         """
         _filename = self._dialog.get_existing_filename(
             caption=self._dialog_kwargs["caption"],
-            formats=IoMaster.get_string_of_formats(),
+            formats=IoManager.get_string_of_formats(),
             qsettings_ref=self._dialog_kwargs["qsettings_ref"],
         )
         if _filename is not None:

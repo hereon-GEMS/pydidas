@@ -28,7 +28,7 @@ import unittest
 
 import numpy as np
 from pydidas.core import UserConfigError, utils
-from pydidas.data_io import IoMaster
+from pydidas.data_io import IoManager
 
 
 class Tester:
@@ -46,112 +46,112 @@ class Tester:
         return np.zeros((10, 10))
 
 
-class TestIoMaster(unittest.TestCase):
+class TestIoManager(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._stored_exts_import = IoMaster.registry_import.copy()
-        cls._stored_exts_export = IoMaster.registry_export.copy()
+        cls._stored_exts_import = IoManager.registry_import.copy()
+        cls._stored_exts_export = IoManager.registry_export.copy()
 
     @classmethod
     def tearDownClass(cls):
-        IoMaster.registry_import = cls._stored_exts_import
-        IoMaster.registry_export = cls._stored_exts_export
+        IoManager.registry_import = cls._stored_exts_import
+        IoManager.registry_export = cls._stored_exts_export
 
     def setUp(self):
-        IoMaster.clear_registry()
+        IoManager.clear_registry()
 
     def tearDown(self): ...
 
     def test_register_class__plain(self):
-        IoMaster.register_class(Tester)
+        IoManager.register_class(Tester)
         for _ext in Tester.extensions_export:
-            self.assertEqual(IoMaster.registry_export[_ext], Tester)
+            self.assertEqual(IoManager.registry_export[_ext], Tester)
         for _ext in Tester.extensions_import:
-            self.assertEqual(IoMaster.registry_import[_ext], Tester)
+            self.assertEqual(IoManager.registry_import[_ext], Tester)
 
     def test_register_class__add_class_and_verify_entries_not_deleted(self):
-        IoMaster.registry_import = {".no_ext": None}
-        IoMaster.register_class(Tester)
-        self.assertIsNone(IoMaster.registry_import[".no_ext"])
+        IoManager.registry_import = {".no_ext": None}
+        IoManager.register_class(Tester)
+        self.assertIsNone(IoManager.registry_import[".no_ext"])
 
     def test_register_class__add_class_and_overwrite_old_entry_import(self):
-        IoMaster.registry_import = {"test": None}
-        IoMaster.register_class(Tester, update_registry=True)
-        self.assertEqual(IoMaster.registry_import["test"], Tester)
+        IoManager.registry_import = {"test": None}
+        IoManager.register_class(Tester, update_registry=True)
+        self.assertEqual(IoManager.registry_import["test"], Tester)
 
     def test_register_class__add_class_and_overwrite_old_entry_export(self):
-        IoMaster.registry_export = {"test": None}
-        IoMaster.register_class(Tester, update_registry=True)
-        self.assertEqual(IoMaster.registry_import["test"], Tester)
+        IoManager.registry_export = {"test": None}
+        IoManager.register_class(Tester, update_registry=True)
+        self.assertEqual(IoManager.registry_import["test"], Tester)
 
     def test_register_class__add_and_keep_old_entry_import(self):
-        IoMaster.registry_import = {"test": None}
+        IoManager.registry_import = {"test": None}
         with self.assertRaises(KeyError):
-            IoMaster.register_class(Tester, update_registry=False)
+            IoManager.register_class(Tester, update_registry=False)
 
     def test_register_class__add_and_keep_old_entry_export(self):
-        IoMaster.registry_export = {"test": None}
+        IoManager.registry_export = {"test": None}
         with self.assertRaises(KeyError):
-            IoMaster.register_class(Tester, update_registry=False)
+            IoManager.register_class(Tester, update_registry=False)
 
     def test_clear_registry(self):
-        IoMaster.register_class(Tester)
-        IoMaster.clear_registry()
-        self.assertEqual(IoMaster.registry_import, {})
-        self.assertEqual(IoMaster.registry_export, {})
+        IoManager.register_class(Tester)
+        IoManager.clear_registry()
+        self.assertEqual(IoManager.registry_import, {})
+        self.assertEqual(IoManager.registry_export, {})
 
     def test_is_extension_registered__True(self):
-        IoMaster.register_class(Tester)
+        IoManager.register_class(Tester)
         for _mode in ["import", "export"]:
             with self.subTest():
                 self.assertTrue(
-                    IoMaster.is_extension_registered(f"{_mode}", mode=_mode)
+                    IoManager.is_extension_registered(f"{_mode}", mode=_mode)
                 )
 
     def test_is_extension_registered__False(self):
-        IoMaster.register_class(Tester)
+        IoManager.register_class(Tester)
         for _mode in ["import", "export"]:
             with self.subTest():
-                self.assertFalse(IoMaster.is_extension_registered("false", mode=_mode))
+                self.assertFalse(IoManager.is_extension_registered("false", mode=_mode))
 
     def test_get_registry__import(self):
         _reg = dict(a=1, b=12, c=None)
-        IoMaster.registry_import = _reg
-        self.assertEqual(_reg, IoMaster._get_registry("import"))
+        IoManager.registry_import = _reg
+        self.assertEqual(_reg, IoManager._get_registry("import"))
 
     def test_get_registry__export(self):
         _reg = dict(a=1, b=12, c=None)
-        IoMaster.registry_export = _reg
-        self.assertEqual(_reg, IoMaster._get_registry("export"))
+        IoManager.registry_export = _reg
+        self.assertEqual(_reg, IoManager._get_registry("export"))
 
     def test_get_registry__wrong_key(self):
         with self.assertRaises(ValueError):
-            IoMaster._get_registry("other")
+            IoManager._get_registry("other")
 
     def test_verify_extension_is_registered__okay(self):
-        IoMaster.register_class(Tester)
+        IoManager.register_class(Tester)
         for _mode in ["import", "export"]:
             with self.subTest():
-                IoMaster.verify_extension_is_registered(f"{_mode}", mode=_mode)
+                IoManager.verify_extension_is_registered(f"{_mode}", mode=_mode)
             # assert does not raise Exception
 
     def test_verify_extension_is_registered_import_error(self):
         for _mode in ["import", "export"]:
             with self.subTest():
                 with self.assertRaises(UserConfigError):
-                    IoMaster.verify_extension_is_registered("something", mode=_mode)
+                    IoManager.verify_extension_is_registered("something", mode=_mode)
 
     def test_get_string_of_formats__empty(self):
         for _mode in ["import", "export"]:
             with self.subTest():
-                _str = IoMaster.get_string_of_formats(mode=_mode)
+                _str = IoManager.get_string_of_formats(mode=_mode)
                 self.assertEqual("All supported files ()", _str)
 
     def test_get_string_of_formats__plain(self):
-        IoMaster.register_class(Tester)
+        IoManager.register_class(Tester)
         for _mode in ["import", "export"]:
             with self.subTest():
-                _str = IoMaster.get_string_of_formats(mode=_mode)
+                _str = IoManager.get_string_of_formats(mode=_mode)
                 for _ext in getattr(Tester, f"extensions_{_mode}"):
                     self.assertIn(f"*.{_ext}", _str)
 
@@ -159,8 +159,8 @@ class TestIoMaster(unittest.TestCase):
         _fname = utils.get_random_string(24) + ".test"
         _data = np.random.random((10, 10))
         _kws = dict(test_kw=True)
-        IoMaster.register_class(Tester)
-        IoMaster.export_to_file(_fname, _data, **_kws)
+        IoManager.register_class(Tester)
+        IoManager.export_to_file(_fname, _data, **_kws)
         self.assertEqual(Tester._exported[0], _fname)
         self.assertTrue(np.allclose(Tester._exported[1], _data))
         self.assertEqual(Tester._exported[2], _kws)
@@ -168,16 +168,16 @@ class TestIoMaster(unittest.TestCase):
     def test_import_from_file(self):
         _fname = utils.get_random_string(24) + ".test"
         _kws = dict(test_kw=True)
-        IoMaster.register_class(Tester)
-        IoMaster.import_from_file(_fname, **_kws)
+        IoManager.register_class(Tester)
+        IoManager.import_from_file(_fname, **_kws)
         self.assertEqual(Tester._imported[0], _fname)
         self.assertEqual(Tester._imported[1], _kws)
 
     def test_import_from_file__w_forced_dim(self):
         _fname = utils.get_random_string(24) + ".test"
-        IoMaster.register_class(Tester)
+        IoManager.register_class(Tester)
         with self.assertRaises(UserConfigError):
-            IoMaster.import_from_file(_fname, forced_dimension=5)
+            IoManager.import_from_file(_fname, forced_dimension=5)
 
 
 if __name__ == "__main__":

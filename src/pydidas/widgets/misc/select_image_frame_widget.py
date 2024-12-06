@@ -36,7 +36,7 @@ from qtpy import QtCore
 from ...core import Parameter, UserConfigError
 from ...core.constants import POLICY_EXP_FIX
 from ...core.utils import get_hdf5_populated_dataset_keys, is_hdf5_filename
-from ...data_io import IoMaster
+from ...data_io import IoManager
 from ...widgets.dialogues import Hdf5DatasetSelectionPopup
 from ..file_dialog import PydidasFileDialog
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
@@ -106,7 +106,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         """
         _fname = self.__import_dialog.get_existing_filename(
             caption="Import image",
-            formats=IoMaster.get_string_of_formats(),
+            formats=IoManager.get_string_of_formats(),
             qsettings_ref=self.__import_qref,
         )
         if _fname is not None:

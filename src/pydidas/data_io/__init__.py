@@ -35,7 +35,7 @@ from . import utils
 # import __all__ items from modules:
 
 from .import_export import *
-from .io_master import *
+from .io_manager import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -44,7 +44,7 @@ from . import import_export
 __all__.extend(import_export.__all__)
 del import_export
 
-from . import io_master
+from . import io_manager
 
-__all__.extend(io_master.__all__)
-del io_master
+__all__.extend(io_manager.__all__)
+del io_manager

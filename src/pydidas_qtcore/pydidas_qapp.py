@@ -119,6 +119,7 @@ class PydidasQApplication(QApplication):
     sig_mpl_font_setting_error = QtCore.Signal(str)
     sig_status_message = QtCore.Signal(str)
     sig_updated_user_config = QtCore.Signal(str, str)
+    sig_gui_exception_occurred = QtCore.Signal()
     _instance = None
 
     @staticmethod

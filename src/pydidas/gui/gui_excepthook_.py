@@ -33,6 +33,8 @@ import time
 import traceback
 from io import StringIO
 
+from pydidas_qtcore import PydidasQApplication
+
 from ..core import FileReadError, UserConfigError
 from ..core.utils import get_logging_dir
 from ..widgets.dialogues import ErrorMessageBox, PydidasExceptionMessageBox
@@ -77,5 +79,8 @@ def gui_excepthook(exc_type, exception, trace):
     _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
     with open(_logfile, "a+") as _file:
         _file.write("\n\n" + _msg)
+
+    _app = PydidasQApplication.instance()
+    _app.sig_gui_exception_occurred.emit()
 
     _ = ErrorMessageBox(text=_msg).exec_()

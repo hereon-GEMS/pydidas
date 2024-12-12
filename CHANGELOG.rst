@@ -53,6 +53,8 @@ Bugfixes
 - Fixed an issue when copying a ProcessingTree which had no nodes.
 - Fixed an issue when entering `None` for path parameters.
 - Fixed an issue with formatting of regex strings in the qr_presets
+- Fixed an issue where the SplashScreen would still show when an exception was 
+  raised during GUI initialization.
 
 
 v24.09.19

@@ -65,11 +65,11 @@ def start_pydidas_gui(
     if use_default_frames:
         frames = DEFAULT_FRAMES + frames
     _check_frames(frames)
-
     _splash = PydidasSplashScreen()
     try:
         _splash.show_aligned_message("Starting QApplication")
         _app = _get_pydidas_qapplication()
+        _app.sig_gui_exception_occurred.connect(_splash.close)
         _splash.show_aligned_message("Creating objects")
         _gui = MainWindow()
         for frame in frames:
@@ -91,7 +91,6 @@ def start_pydidas_gui(
         _ = _app.exec_()
     except Exception:
         _splash.close()
-        raise
     _app.deleteLater()
 
 
@@ -145,6 +144,6 @@ def _get_pydidas_qapplication() -> PydidasQApplication:
         The PydidasQApplication instance.
     """
     _app = QApplication.instance()
-    if _app is None:
+    if not isinstance(_app, PydidasQApplication):
         _app = PydidasQApplication([])
     return _app

@@ -167,3 +167,17 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         """
         copy_text_to_system_clipbord(self._text)
         QtGui.QDesktopServices.openUrl(PYDIDAS_FEEDBACK_URL)
+
+    def exec(self):
+        """
+        Execute the dialogue box.
+        """
+        self.show()
+        self.activateWindow()
+        return QtWidgets.QDialog.exec(self)
+
+    def exec_(self):
+        """
+        Execute the dialogue box.
+        """
+        return self.exec()

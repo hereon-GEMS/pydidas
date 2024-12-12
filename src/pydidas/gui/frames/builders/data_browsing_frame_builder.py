@@ -25,14 +25,12 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["DataBrowsingFrameBuilder"]
+__all__ = ["create_splitter", "get_widget_creation_information"]
 
 
 from qtpy import QtGui, QtWidgets
 
-# from ....widgets.silx_plot import PydidasDataViewerFrame
 from ....core.constants import POLICY_EXP_EXP
-from ....widgets.framework import BaseFrame
 from ....widgets.selection import (
     DirectoryExplorer,
     Hdf5DatasetSelector,
@@ -41,89 +39,131 @@ from ....widgets.selection import (
 from ....widgets.silx_plot.silx_data_viewer import SilxDataViewer
 
 
-class DataBrowsingFrameBuilder:
+def get_widget_creation_information() -> list[list[str, tuple, dict]]:
     """
-    Class to populate the DataBrowsingFrame with widgets.
+    Get the widget creation information for the DataBrowsingFrame.
+
+    Returns
+    -------
+    list[list[str, tuple, dict]]
+        The widget creation information. Each list entry includes all the
+        necessary information to create a single widget in the form of a
+        list with the following entries:
+
+        - The widget creation method name.
+        - The arguments for the widget creation method.
+        - The keyword arguments for the widget creation method.
     """
+    return [
+        ["create_label", (None, "Data browser"), {"fontsize_offset": 4, "bold": True}],
+        [
+            "create_empty_widget",
+            ("browser",),
+            {"sizePolicy": POLICY_EXP_EXP, "minimumWidth": 200},
+        ],
+        [
+            "create_any_widget",
+            ("explorer", DirectoryExplorer),
+            {"gridPos": (0, 0, 1, 1), "parent_widget": "browser"},
+        ],
+        [
+            "create_spacer",
+            ("explorer_spacer",),
+            {"gridPos": (0, -1, 1, 1), "parent_widget": "browser", "fixedWidth": 5},
+        ],
+        [
+            "create_empty_widget",
+            ("viewer_and_filename",),
+            {"parent_widget": None, "sizePolicy": POLICY_EXP_EXP},
+        ],
+        [
+            "create_spacer",
+            ("spacer",),
+            {
+                "gridPos": (0, 0, 1, 1),
+                "parent_widget": "viewer_and_filename",
+                "fixedWidth": 5,
+            },
+        ],
+        [
+            "create_label",
+            ("filename_label", "Filename:"),
+            {
+                "parent_widget": "viewer_and_filename",
+                "gridPos": (0, 1, 1, 1),
+                "font_metric_width_factor": 12,
+            },
+        ],
+        [
+            "create_lineedit",
+            ("filename",),
+            {
+                "gridPos": (0, 2, 1, 1),
+                "parent_widget": "viewer_and_filename",
+                "readOnly": True,
+                "sizePolicy": POLICY_EXP_EXP,
+            },
+        ],
+        [
+            "create_any_widget",
+            ("hdf5_dataset_selector", Hdf5DatasetSelector),
+            {
+                "gridPos": (-1, 1, 1, 2),
+                "parent_widget": "viewer_and_filename",
+                "visible": False,
+            },
+        ],
+        [
+            "create_any_widget",
+            ("raw_metadata_selector", RawMetadataSelector),
+            {
+                "gridPos": (-1, 1, 1, 2),
+                "parent_widget": "viewer_and_filename",
+                "visible": False,
+            },
+        ],
+        [
+            "add_any_widget",
+            ("viewer", SilxDataViewer()),
+            {"gridPos": (-1, 1, 1, 2), "parent_widget": "viewer_and_filename"},
+        ],
+    ]
 
-    @classmethod
-    def build_frame(cls, frame: BaseFrame):
-        """
-        Build the frame and create all required widgets.
-        """
-        frame.create_label(None, "Data browser", fontsize_offset=4, bold=True)
 
-        frame.create_empty_widget("browser", sizePolicy=POLICY_EXP_EXP)
-        frame.create_any_widget(
-            "explorer",
-            DirectoryExplorer,
-            gridPos=(0, 0, 1, 1),
-            parent_widget="browser",
-        )
-        frame.create_spacer(
-            "explorer_spacer",
-            gridPos=(0, -1, 1, 1),
-            parent_widget="browser",
-            fixedWidth=5,
-        )
-        frame.create_empty_widget(
-            "viewer_and_filename", parent_widget=None, sizePolicy=POLICY_EXP_EXP
-        )
-        frame.create_spacer(
-            "spacer",
-            gridPos=(0, 0, 1, 1),
-            parent_widget="viewer_and_filename",
-            fixedWidth=5,
-        )
-        frame.create_label(
-            "filename_label",
-            "Filename:",
-            parent_widget="viewer_and_filename",
-            gridPos=(0, 1, 1, 1),
-            font_metric_width_factor=12,
-        )
-        frame.create_lineedit(
-            "filename",
-            gridPos=(0, 2, 1, 1),
-            parent_widget="viewer_and_filename",
-            readOnly=True,
-            sizePolicy=POLICY_EXP_EXP,
-        )
-        frame.create_any_widget(
-            "hdf5_dataset_selector",
-            Hdf5DatasetSelector,
-            gridPos=(-1, 1, 1, 2),
-            parent_widget="viewer_and_filename",
-            visible=False,
-        )
-        frame.create_any_widget(
-            "raw_metadata_selector",
-            RawMetadataSelector,
-            gridPos=(-1, 1, 1, 2),
-            parent_widget="viewer_and_filename",
-            visible=False,
-        )
-        frame.add_any_widget(
-            "viewer",
-            SilxDataViewer(),
-            gridPos=(-1, 1, 1, 2),
-            parent_widget="viewer_and_filename",
-        )
+def create_splitter(
+    filesystem_browser: QtWidgets.QWidget,
+    data_viewer: QtWidgets.QWidget,
+    frame_width: int,
+) -> QtWidgets.QSplitter:
+    """
+    Create a splitter widget for the frame.
 
-        frame._widgets["splitter"] = QtWidgets.QSplitter()
-        frame._widgets["splitter"].setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
-        frame._widgets["splitter"].setStretchFactor(0, 10)
-        frame._widgets["splitter"].setStretchFactor(1, 50)
-        frame._widgets["splitter"].addWidget(frame._widgets["browser"])
-        frame._widgets["splitter"].addWidget(frame._widgets["viewer_and_filename"])
-        frame._widgets["splitter"].setSizes(
-            [int(0.4 * frame.width()), int(0.6 * frame.width())]
-        )
-        frame.layout().addWidget(frame._widgets["splitter"])
+    Parameters
+    ----------
+    filesystem_browser : QtWidgets.QWidget
+        The filesystem browser widget.
+    data_viewer : QtWidgets.QWidget
+        The data viewer widget.
+    frame_width : int
+        The width of the frame.
 
-        for handle in frame.findChildren(QtWidgets.QSplitterHandle):
-            palette = handle.palette()
-            palette.setColor(QtGui.QPalette.ColorRole.Window, QtGui.QColor("#797979"))
-            handle.setPalette(palette)
+    Returns
+    -------
+    QtWidgets.QSplitter
+        The splitter widget.
+    """
+    _splitter = QtWidgets.QSplitter()
+    _splitter.setSizePolicy(*POLICY_EXP_EXP)
+    _splitter.addWidget(filesystem_browser)
+    _splitter.addWidget(data_viewer)
+    _splitter.setSizes([int(0.4 * frame_width), int(0.6 * frame_width)])
+    _splitter.setStretchFactor(0, 10)
+    _splitter.setStretchFactor(1, 50)
+    _splitter.setCollapsible(0, False)
+    _splitter.setCollapsible(1, False)
+
+    for handle in _splitter.findChildren(QtWidgets.QSplitterHandle):
+        palette = handle.palette()
+        palette.setColor(QtGui.QPalette.ColorRole.Window, QtGui.QColor("#797979"))
+        handle.setPalette(palette)
+    return _splitter

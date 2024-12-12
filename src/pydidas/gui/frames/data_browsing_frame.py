@@ -46,7 +46,10 @@ from ...core.utils import CatchFileErrors, get_extension
 from ...data_io import IoManager, import_data
 from ...widgets.framework import BaseFrame
 from ...widgets.windows import Hdf5BrowserWindow
-from .builders import DataBrowsingFrameBuilder
+from .builders.data_browsing_frame_builder import (
+    create_splitter,
+    get_widget_creation_information,
+)
 
 
 class DataBrowsingFrame(BaseFrame):
@@ -94,7 +97,17 @@ class DataBrowsingFrame(BaseFrame):
         """
         Build the frame and populate it with widgets.
         """
-        DataBrowsingFrameBuilder.build_frame(self)
+        for _method, _args, _kwargs in get_widget_creation_information():
+            _widget_creation_method = getattr(self, _method)
+            _widget_creation_method(*_args, **_kwargs)
+        self.add_any_widget(
+            "splitter",
+            create_splitter(
+                self._widgets["browser"],
+                self._widgets["viewer_and_filename"],
+                self.width(),
+            ),
+        )
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int):

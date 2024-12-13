@@ -55,6 +55,8 @@ Bugfixes
 - Fixed an issue with formatting of regex strings in the qr_presets
 - Fixed an issue where the SplashScreen would still show when an exception was 
   raised during GUI initialization.
+- Fixed an issue when the font family is not supportted by matplotlib where the
+  user notification would not be correctly formatted.
 
 
 v24.09.19

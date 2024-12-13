@@ -106,6 +106,46 @@ class PydidasQApplication(QApplication):
 
     The PydidasQApplication also handles font changes and scaling of the GUI based on
     font metrics.
+
+    The following signals are available:
+
+        - sig_exit_pydidas:
+            Signal to exit the pydidas application. This signal can be used
+            by all objects to start a graceful shutdown.
+        - sig_new_fontsize: float
+            Signal which emits the new font size. This signal allows all
+            widgets to update their own font size.
+        - sig_font_size_changed:
+            Signal that the font size has changed. This signal can be used
+            to trigger a redraw of all widgets.
+        - sig_new_font_family: str
+            Signal which emits the new font family. This signal allows all
+            widgets to update their own font family.
+        - sig_font_family_changed:
+            Signal that the font family has changed. This signal can be used
+            to trigger a redraw of all widgets.
+        - sig_new_font_metrics: (float, float)
+            Signal which emits the new font metrics. This signal allows all
+            widgets to update their geometry based on the new font metrics.
+        - sig_font_metrics_changed:
+            Signal that the font metrics have changed. This signal can be used
+            by widgets to update their geometry.
+        - sig_mpl_font_change:
+            Signal that the matplotlib font has changed. This signal can be used
+            to trigger a redraw of all matplotlib plots.
+        - sig_mpl_font_setting_error: str
+            Signal that the matplotlib font setting has failed. This signal can
+            be used to inform the user that the chosen font is not supported by
+            matplotlib.
+        - sig_status_message: str
+            Signal to set a status message. This signal can be used by central
+            widgets to store or print status information.
+        - sig_updated_user_config: (str, str)
+            Signal that the user configuration has been updated. This signal emits
+            the key and value of the updated configuration.
+        - sig_gui_exception_occurred:
+            Signal that an exception has occurred in the GUI. This signal can be
+            used to inform other widgets about the exception.
     """
 
     sig_exit_pydidas = QtCore.Signal()
@@ -271,11 +311,11 @@ class PydidasQApplication(QApplication):
         _font = self.font()
         _font.setFamily(font_family)
         self.setFont(_font)
-        self._update_matplotlib_font_family()
         self._update_font_metrics()
         self.sig_new_font_family.emit(font_family)
         self.sig_font_family_changed.emit()
         self.sig_font_size_changed.emit()
+        self._update_matplotlib_font_family()
 
     def reset_font_to_standard(self):
         """

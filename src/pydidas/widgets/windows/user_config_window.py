@@ -556,7 +556,7 @@ class _UserConfigWindow(PydidasWindow):
         error : str
             The error description.
         """
-        _ = PydidasExceptionMessageBox(text=error).exec_()
+        _ = PydidasExceptionMessageBox(text=error, title="Warning").exec_()
 
 
 UserConfigWindow = SingletonFactory(_UserConfigWindow)

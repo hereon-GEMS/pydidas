@@ -36,6 +36,8 @@ Improvements
 	- Changed the builder of the DefineScanFrame to use functions instead of an 
 	  abstract class.
 - Improved the formatting when displaying Plugin information.
+- Improved the behaviour of the logging and status widget and added options to
+  hide and show it.
 
 
 Bugfixes

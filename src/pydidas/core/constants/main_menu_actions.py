@@ -134,4 +134,9 @@ MAIN_MENU_MENU_ACTIONS = {
         "status_tip": "Open the feedback dialog.",
         "icon": "mdi::comment-quote-outline",
     },
+    "toggle_logging_dockable": {
+        "label": "Hide logging widget",
+        "status_tip": "Hide the 'logging and information' status widget.",
+        "icon": "mdi::eye-remove-outline",
+    },
 }

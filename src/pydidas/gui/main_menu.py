@@ -35,6 +35,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import yaml
+from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore, QtGui, QtWidgets
 
 from ..contexts import GLOBAL_CONTEXTS
@@ -49,7 +50,7 @@ from ..resources import icons
 from ..version import VERSION
 from ..widgets import PydidasFileDialog, get_pyqt_icon_from_str
 from ..widgets.dialogues import AcknowledgeBox, QuestionBox, critical_warning
-from ..widgets.framework import PydidasFrameStack
+from ..widgets.framework import PydidasFrameStack, PydidasStatusWidget
 from ..widgets.windows import (
     AboutWindow,
     ExportEigerPixelmaskWindow,
@@ -98,12 +99,14 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         sys.excepthook = gui_excepthook
 
+        self._qtapp = PydidasQApplication.instance()
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
         self.__window_counter = 0
 
         self._setup_main_window_widget(geometry)
+        self._create_logging_info_widget()
         self._add_config_windows()
         self._io_dialog = PydidasFileDialog()
         self._create_menu()
@@ -111,9 +114,34 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self._open_help)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        _app = QtWidgets.QApplication.instance()
-        _app.aboutToQuit.connect(self.centralWidget().reset)
-        self.sig_close_main_window.connect(_app.send_gui_close_signal)
+        self._qtapp.aboutToQuit.connect(self.centralWidget().reset)
+        self.sig_close_main_window.connect(self._qtapp.send_gui_close_signal)
+
+    def _create_logging_info_widget(self):
+        """
+        Create the PydidasStatusWidget for logging and status messages.
+        """
+        _app = PydidasQApplication.instance()
+
+        self._info_widget = PydidasStatusWidget()
+        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self._info_widget)
+        self._qtapp.sig_new_font_metrics.connect(self._resize_default_dock_area)
+        self._resize_default_dock_area(*self._qtapp.font_metrics)
+        self._info_widget.visibilityChanged.connect(self._update_info_widget_action)
+
+    @QtCore.Slot(float, float)
+    def _resize_default_dock_area(self, width: float, height: float):
+        """
+        Resize the info widget based on the font metrics.
+
+        Parameters
+        ----------
+        width : float
+            The new width.
+        height : float
+            The new height.
+        """
+        self.resizeDocks([self._info_widget], [int(5 * height)], QtCore.Qt.Vertical)
 
     def _setup_main_window_widget(self, geometry: Union[QtCore.QRect, list, tuple]):
         """
@@ -184,6 +212,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._actions["restore_exit_state"].triggered.connect(self._action_restore_exit)
         self._actions["import_state"].triggered.connect(self._action_import_state)
         self._actions["exit"].triggered.connect(self.close)
+        self._actions["toggle_logging_dockable"].triggered.connect(
+            self._action_toggle_info_widget
+        )
         self._actions["open_settings"].triggered.connect(
             partial(self.show_window, "global_settings")
         )
@@ -248,6 +279,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _options_menu = _menu.addMenu("&Options")
         _options_menu.addAction(self._actions["open_user_config"])
         _options_menu.addAction(self._actions["open_settings"])
+
+        _window_menu = _menu.addMenu("&Window")
+        _window_menu.addAction(self._actions["toggle_logging_dockable"])
 
         _help_menu = _menu.addMenu("&Help")
         _help_menu.addAction(self._actions["open_documentation_browser"])
@@ -334,6 +368,33 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             self.restore_gui_state(state="manual", filename=_fname)
 
     @QtCore.Slot()
+    def _action_toggle_info_widget(self):
+        """
+        Toggle the visibility of the info widget.
+        """
+        _should_be_visible = not self._info_widget.isVisible()
+        self._info_widget.setVisible(_should_be_visible)
+        self._update_info_widget_action(_should_be_visible)
+
+    @QtCore.Slot(bool)
+    def _update_info_widget_action(self, visible: bool):
+        """
+        Update the action for toggling the info widget.
+
+        Parameters
+        ----------
+        visible : bool
+            The visibility state of the info widget.
+        """
+        _key = "Hide" if visible else "Show"
+        _icon = "mdi::eye-remove-outline" if visible else "mdi::eye-plus-outline"
+        self._actions["toggle_logging_dockable"].setText(f"{_key} logging widget")
+        self._actions["toggle_logging_dockable"].setStatusTip(
+            f"{_key} the 'logging and information' status widget."
+        )
+        self._actions["toggle_logging_dockable"].setIcon(get_pyqt_icon_from_str(_icon))
+
+    @QtCore.Slot()
     def check_for_updates(self, force_check: bool = False, auto_check: bool = False):
         """
         Check if the pydidas version is up-to-date and show a dialog if not.
@@ -400,9 +461,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The status message.
         """
         self.statusBar().showMessage(text)
-        if text[-1] != "\n":
-            text += "\n"
-        self.__info_widget.add_status(text)
+        self._info_widget.add_status(text)
 
     @QtCore.Slot(str)
     def show_window(self, name: str):

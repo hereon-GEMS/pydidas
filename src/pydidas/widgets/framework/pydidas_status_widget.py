@@ -28,24 +28,43 @@ __status__ = "Production"
 __all__ = ["PydidasStatusWidget"]
 
 
+from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore, QtGui, QtWidgets
+
+from pydidas.widgets.misc import ReadOnlyTextWidget
 
 from ...core import SingletonFactory
 from ...core.utils import get_time_string
 
 
-class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
+class _PydidasStatusWidget(QtWidgets.QDockWidget):
     """
-    The PydidasStatusWidget is a subclassed QPlainTextEdit with an additional method
-    to append text.
+    The PydidasStatusWidget is used for managing global status messages.
     """
 
-    def __init__(self, **kwargs: dict):
-        QtWidgets.QPlainTextEdit.__init__(self, kwargs.get("parent", None))
-        self.setReadOnly(True)
-        self.setMinimumHeight(50)
+    def __init__(self):
+        QtWidgets.QDockWidget.__init__(self, "Logging and information")
+        self._text_edit = ReadOnlyTextWidget(parent=None)
+        self._text_edit.setMinimumHeight(50)
+        self._text_edit.resize(500, 50)
+        self.setWidget(self._text_edit)
+        self.setFeatures(
+            QtWidgets.QDockWidget.DockWidgetMovable
+            | QtWidgets.QDockWidget.DockWidgetFloatable
+            | QtWidgets.QDockWidget.DockWidgetClosable
+        )
+        self.setAllowedAreas(
+            QtCore.Qt.LeftDockWidgetArea
+            | QtCore.Qt.RightDockWidgetArea
+            | QtCore.Qt.BottomDockWidgetArea
+        )
+        self.setBaseSize(500, 50)
         self.resize(500, 50)
-        QtWidgets.QApplication.instance().sig_status_message.connect(self.add_status)
+
+        _qt_app = PydidasQApplication.instance()
+
+        _qt_app.sig_status_message.connect(self.add_status)
+        # _qt_app.sig_font_size_changed.connect(self.reprint)
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -73,11 +92,13 @@ class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
         """
         if text[-1] != "\n":
             text = text + "\n"
-        _cursor = self.textCursor()
+        _cursor = self._text_edit.textCursor()
         _cursor.movePosition(QtGui.QTextCursor.Start, QtGui.QTextCursor.MoveAnchor, 1)
-        self.setTextCursor(_cursor)
-        self.insertPlainText(f"{get_time_string()}: {text}")
-        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
+        self._text_edit.setTextCursor(_cursor)
+        self._text_edit.insertPlainText(f"{get_time_string()}: {text}")
+        self._text_edit.verticalScrollBar().triggerAction(
+            QtWidgets.QScrollBar.SliderToMinimum
+        )
 
 
 PydidasStatusWidget = SingletonFactory(_PydidasStatusWidget)

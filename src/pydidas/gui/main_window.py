@@ -34,7 +34,7 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 
 from ..core import PydidasGuiError, UserConfigError
-from ..widgets.framework import FontScalingToolbar, PydidasStatusWidget
+from ..widgets.framework import FontScalingToolbar
 from . import utils
 from .frames import DefineDiffractionExpFrame, DefineScanFrame, WorkflowEditFrame
 from .main_menu import MainMenu
@@ -69,21 +69,6 @@ class MainWindow(MainMenu):
             "toolbars_created": False,
             "toolbar_visibility": {"": True},
         }
-        self.__create_logging_info_box()
-
-    def __create_logging_info_box(self):
-        """
-        Create the PydidasStatusWidget for logging and status messages.
-        """
-        self.__info_widget = PydidasStatusWidget()
-        _dock_widget = QtWidgets.QDockWidget("Logging and information")
-        _dock_widget.setWidget(self.__info_widget)
-        _dock_widget.setFeatures(
-            QtWidgets.QDockWidget.DockWidgetMovable
-            | QtWidgets.QDockWidget.DockWidgetFloatable
-        )
-        _dock_widget.setBaseSize(500, 50)
-        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
 
     def show(self):
         """
@@ -329,19 +314,3 @@ class MainWindow(MainMenu):
         self.__configuration["toolbar_visibility"] = state["toolbar_visibility"]
         self._update_toolbar_visibility()
         MainMenu.restore_main_window_state(self, state)
-
-    @QtCore.Slot(str)
-    def update_status(self, text):
-        """
-        Get a text message and show it in the global status widget.
-
-        This slot can be used by any QObject to send an update which will be
-        added to the global list of status messages.
-
-        Parameters
-        ----------
-        text : str
-            The status message.
-        """
-        self.statusBar().showMessage(text)
-        self.__info_widget.add_status(text if text[-1] == "\n" else text + "\n")

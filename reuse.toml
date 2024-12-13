@@ -117,3 +117,16 @@ path = "src/pydidas/resources/mdi_icons/trash-can-outline.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = ""
 SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "src/pydidas/resources/mdi_icons/eye-plus-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "GreenTurtwig"
+SPDX-License-Identifier = "Apache-2.0"
+
+
+[[annotations]]
+path = "src/pydidas/resources/mdi_icons/eye-remove-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Colton Wiscombe"
+SPDX-License-Identifier = "Apache-2.0"

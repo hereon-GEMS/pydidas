@@ -62,7 +62,7 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         if hasattr(self._qtapp, "sig_font_size_changed"):
             self._qtapp.sig_font_size_changed.connect(self.reprint)
         self._current_content = ""
-        self.__title = None
+        self.__title = ""
         self.__block_format_header = QtGui.QTextBlockFormat()
         self.__block_format_header.setIndent(0)
         self.__block_format_section = QtGui.QTextBlockFormat()
@@ -168,4 +168,4 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         if isinstance(self._current_content, list):
             self.set_text_from_list(self._current_content, title=self.__title)
         else:
-            self.setText(self._curent_content, title=self.__title)
+            self.setText(self._current_content, title=self.__title)

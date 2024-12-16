@@ -44,27 +44,22 @@ from pydidas_scripts.remove_local_files import (
 )
 
 
-def get_remote_version() -> str:
+def get_latest_release_tag() -> str:
     """
-    Get the remove pydidas version number available on GitHub.
+    Get the latest release version of pydidas from GitHub.
 
     Returns
     -------
     str :
-        The string for the remote version.
+        The string for the latest release version.
     """
-    _url = (
-        "https://raw.githubusercontent.com/"
-        "hereon-GEMS/pydidas/master/pydidas/version.py"
-    )
-    _lines = requests.get(_url, timeout=5).text.split("\n")
-    for _line in _lines:
-        if _line.startswith("__version__ ="):
-            return _line.split('"')[1]
-    raise ValueError(
-        "Could not determine the remote version number. Please check your "
-        "internet connection status."
-    )
+    _url = "https://api.github.com/repos/hereon-GEMS/pydidas/releases/latest"
+    _response = requests.get(_url, timeout=5)
+    _response.raise_for_status()
+    _tag = _response.json()["tag_name"]
+    if _tag.startswith("v"):
+        return _tag[1:]
+    return _tag
 
 
 def get_local_version() -> str:
@@ -113,13 +108,9 @@ def check_update_necessary_and_wanted(local_version: str, remote_version: str) -
         Flag whether the update is necessary and wanted by the user.
     """
     if local_version >= remote_version:
-        print(
-            "\n",
-            "=" * 45,
-            "\n"
+        print_status(
             f" === The local version {local_version} is up to date"
             "\n === with the remote repository.\n === No update required.\n",
-            "=" * 45,
         )
         input("Press <Enter> to continue.")
         return False
@@ -372,7 +363,7 @@ def run_update():
     Run the full updating pipeline.
     """
     _local_version = get_local_version()
-    _remote_version = get_remote_version()
+    _remote_version = get_latest_release_tag()
     _should_update = check_update_necessary_and_wanted(_local_version, _remote_version)
     if not _should_update:
         return

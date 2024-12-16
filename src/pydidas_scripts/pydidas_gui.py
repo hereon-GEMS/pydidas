@@ -37,5 +37,15 @@ def open_gui():
     pydidas.gui.start_pydidas_gui(use_default_frames=True)
 
 
+def run_gui():
+    """
+    Alias for open_gui().
+
+    This alias is provided for compatibility with scripted calls using the
+    old 'run_gui' function name.
+    """
+    open_gui()
+
+
 if __name__ == "__main__":
     open_gui()

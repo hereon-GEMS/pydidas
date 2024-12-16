@@ -413,39 +413,25 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             and not force_check
         ):
             return
-        _remote_v = utils.get_remote_version()
+        _remote_v = utils.get_latest_release_tag()
         _ack_version = self.q_settings_get(
             "user/update_version_acknowledged", default=""
         )
-        _text = (
-            (
-                "A new version of pydidas is available.\n\n"
-                f"    Locally installed version: {VERSION}\n"
-                f"    Latest release: {_remote_v}.\n\n"
-            )
-            if _remote_v > VERSION
-            else (
-                f"The locally installed version of pydidas (version {VERSION}) \n"
-                "is the latest available version. No actions required."
-            )
-        )
-        if auto_check and _remote_v > VERSION and _remote_v not in ["-1", _ack_version]:
-            _text += "Please update pydidas to benefit from the latest improvements."
-        if (
-            auto_check and _remote_v > VERSION and _remote_v not in ["-1", _ack_version]
-        ) or not auto_check:
-            _ack = AcknowledgeBox(
-                show_checkbox=auto_check,
-                text=_text,
-                text_preformatted=True,
-                title=(
-                    "Pydidas update available"
-                    if _remote_v > VERSION
-                    else "Pydidas version information"
-                ),
-            ).exec_()
-            if _ack:
-                self.q_settings_set("user/update_version_acknowledged", _remote_v)
+        _text = utils.get_update_check_text(_remote_v, _ack_version, auto_check)
+        if auto_check and (_remote_v <= VERSION or _remote_v in ["-1", _ack_version]):
+            return
+        _ack = AcknowledgeBox(
+            show_checkbox=auto_check,
+            text=_text,
+            text_preformatted=True,
+            title=(
+                "Pydidas update available"
+                if _remote_v > VERSION
+                else "Pydidas version information"
+            ),
+        ).exec_()
+        if _ack:
+            self.q_settings_set("user/update_version_acknowledged", _remote_v)
 
     @QtCore.Slot(str)
     def update_status(self, text: str):

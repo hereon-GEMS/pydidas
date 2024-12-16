@@ -29,7 +29,8 @@ __all__ = [
     "get_standard_state_full_filename",
     "clear_local_log_files",
     "open_doc_in_browser",
-    "get_remote_version",
+    "get_latest_release_tag",
+    "get_update_check_text",
     "restore_global_objects",
 ]
 
@@ -39,6 +40,7 @@ from pathlib import Path
 import requests
 from qtpy import QtCore, QtGui
 
+from ... import VERSION
 from ...contexts import GLOBAL_CONTEXTS
 from ...core import UserConfigError, utils
 from ...core.constants import PYDIDAS_CONFIG_PATHS, PYDIDAS_STANDARD_CONFIG_PATH
@@ -102,26 +104,56 @@ def open_doc_in_browser():
     _ = QtGui.QDesktopServices.openUrl(utils.DOC_HOME_QURL)
 
 
-def get_remote_version() -> str:
+def get_latest_release_tag() -> str:
     """
-    Get the remove pydidas version number available on github.
+    Get the latest release version of pydidas from GitHub.
 
     Returns
     -------
     str :
-        The string for the remote version.
+        The string for the latest release version.
     """
-    _url = (
-        "https://raw.githubusercontent.com/"
-        "hereon-GEMS/pydidas/master/pydidas/version.py"
-    )
+    _url = "https://api.github.com/repos/hereon-GEMS/pydidas/releases/latest"
     try:
-        _lines = requests.get(_url, timeout=0.5).text.split("\n")
-        for _line in _lines:
-            if _line.startswith("__version__ ="):
-                return _line.split('"')[1]
+        _response = requests.get(_url, timeout=5)
+        _response.raise_for_status()
     except requests.RequestException:
         return "-1"
+    _tag = _response.json()["tag_name"]
+    if _tag.startswith("v"):
+        return _tag[1:]
+    return _tag
+
+
+def get_update_check_text(
+    remote_version: str, acknowledged_update: str, auto_check: bool
+) -> str:
+    """
+    Get the text with the result of the update check for the user.
+
+    Parameters
+    __________
+    remote_version : str
+        The latest released version of pydidas.
+    acknowledged_update : str
+        The latest remote version for which the update has been acknowledged.
+    auto_check : bool
+        Flag to set the information if the update check was performed automatically.
+    """
+    if remote_version > VERSION:
+        _text = (
+            "A new version of pydidas is available.\n\n"
+            f"    Locally installed version: {VERSION}\n"
+            f"    Latest release: {remote_version}.\n\n"
+        )
+        if auto_check and remote_version not in ["-1", acknowledged_update]:
+            _text += "Please update pydidas to benefit from the latest improvements."
+    else:
+        _text = (
+            f"The locally installed version of pydidas (version {VERSION}) \n"
+            "is the latest available version. No actions required."
+        )
+    return _text
 
 
 def restore_global_objects(state: dict):

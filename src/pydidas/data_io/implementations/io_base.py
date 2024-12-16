@@ -35,10 +35,10 @@ from typing import Union
 
 from numpy import amax, amin, ndarray
 
-from ...core import Dataset, FileReadError
-from ...core.utils import rebin
-from ..io_manager import IoManager
-from ..utils import RoiSliceManager
+from pydidas.core import Dataset, FileReadError
+from pydidas.core.utils import rebin
+from pydidas.data_io.io_manager import IoManager
+from pydidas.data_io.utils import RoiSliceManager
 
 
 class IoBase(metaclass=IoManager):

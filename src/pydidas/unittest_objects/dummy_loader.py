@@ -30,8 +30,6 @@ __all__ = ["DummyLoader"]
 
 import numpy as np
 
-# because these Plugins will be loaded directly by importlib, absolute imports
-# are required:
 from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin
 

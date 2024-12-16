@@ -28,11 +28,11 @@ __status__ = "Production"
 __all__ = ["column_width_factor", "build_header_config", "build_scan_dim_groups"]
 
 
-from ....contexts import ScanContext
-from ....core import constants
-from ....widgets import ScrollArea
-from ....widgets.factory import SquareButton
-from ....widgets.utilities import get_pyqt_icon_from_str
+from pydidas.contexts import ScanContext
+from pydidas.core import constants
+from pydidas.widgets import ScrollArea
+from pydidas.widgets.factory import SquareButton
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 SCAN_SETTINGS = ScanContext()

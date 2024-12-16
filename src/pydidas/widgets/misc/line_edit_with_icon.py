@@ -30,8 +30,8 @@ __all__ = ["LineEditWithIcon"]
 
 from qtpy import QtWidgets
 
-from ...core.utils import apply_qt_properties
-from ..utilities import get_pyqt_icon_from_str
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 class LineEditWithIcon(QtWidgets.QLineEdit):

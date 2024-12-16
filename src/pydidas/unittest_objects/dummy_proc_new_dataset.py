@@ -30,8 +30,6 @@ __all__ = ["DummyProcNewDataset"]
 
 import numpy as np
 
-# because these Plugins will be loaded directly by importlib, absolute imports
-# are required:
 from pydidas.core import Dataset, Parameter, ParameterCollection
 from pydidas.plugins import ProcPlugin
 
@@ -72,7 +70,7 @@ class DummyProcNewDataset(ProcPlugin):
         dict
             The state to set the state of the new object.
         """
-        from .dummy_getter_ import dummy_getter
+        from pydidas.unittest_objects.dummy_getter_ import dummy_getter
 
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 

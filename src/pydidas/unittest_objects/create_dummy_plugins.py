@@ -33,8 +33,6 @@ import inspect
 
 from qtpy import QtCore
 
-# because these Plugins will be loaded directly by importlib, absolute imports
-# are required:
 from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import BasePlugin, InputPlugin, OutputPlugin, ProcPlugin

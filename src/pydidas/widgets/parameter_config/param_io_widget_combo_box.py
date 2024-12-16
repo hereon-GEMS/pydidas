@@ -32,11 +32,16 @@ from collections.abc import Iterable
 
 from qtpy import QtCore
 
-from ...core import Parameter
-from ...core.utils import convert_special_chars_to_unicode, convert_unicode_to_ascii
-from ..factory import PydidasComboBox
-from ..utilities import get_max_pixel_width_of_entries
-from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
+from pydidas.core import Parameter
+from pydidas.core.utils import (
+    convert_special_chars_to_unicode,
+    convert_unicode_to_ascii,
+)
+from pydidas.widgets.factory import PydidasComboBox
+from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+    BaseParamIoWidgetMixIn,
+)
+from pydidas.widgets.utilities import get_max_pixel_width_of_entries
 
 
 class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):

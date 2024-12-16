@@ -38,21 +38,21 @@ from typing import Literal, Union
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...apps import CompositeCreatorApp
-from ...core import Parameter, UserConfigError, get_generic_parameter
-from ...core.constants import HDF5_EXTENSIONS
-from ...core.utils import (
+from pydidas.apps import CompositeCreatorApp
+from pydidas.core import Parameter, UserConfigError, get_generic_parameter
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import (
     LOGGING_LEVEL,
     get_extension,
     get_hdf5_populated_dataset_keys,
     pydidas_logger,
 )
-from ...data_io import IoManager
-from ...multiprocessing import AppRunner
-from ...widgets import dialogues
-from ...widgets.framework import BaseFrameWithApp
-from ..mixins import SilxPlotWindowMixIn
-from .builders import CompositeCreatorFrameBuilder
+from pydidas.data_io import IoManager
+from pydidas.gui.frames.builders import CompositeCreatorFrameBuilder
+from pydidas.gui.mixins import SilxPlotWindowMixIn
+from pydidas.multiprocessing import AppRunner
+from pydidas.widgets import dialogues
+from pydidas.widgets.framework import BaseFrameWithApp
 
 
 logger = pydidas_logger(LOGGING_LEVEL)

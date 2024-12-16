@@ -29,6 +29,8 @@ __all__ = ["PyFAIazimuthalSectorIntegration"]
 
 
 import numpy as np
+from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import (
     Dataset,
@@ -37,7 +39,6 @@ from pydidas.core import (
     get_generic_param_collection,
 )
 from pydidas.plugins import pyFAIintegrationBase
-from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
 
 EXP = DiffractionExperimentContext()

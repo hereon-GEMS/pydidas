@@ -30,12 +30,12 @@ __all__ = ["ScanIoBase"]
 
 from typing import Optional
 
-from ...core import UserConfigError
-from ...core.generic_params import SCAN_GENERIC_PARAM_NAMES
-from ...core.io_registry import GenericIoBase
-from .scan import Scan
-from .scan_context import ScanContext
-from .scan_io import ScanIo
+from pydidas.contexts.scan.scan import Scan
+from pydidas.contexts.scan.scan_context import ScanContext
+from pydidas.contexts.scan.scan_io import ScanIo
+from pydidas.core import UserConfigError
+from pydidas.core.generic_params import SCAN_GENERIC_PARAM_NAMES
+from pydidas.core.io_registry import GenericIoBase
 
 
 SCAN = ScanContext()

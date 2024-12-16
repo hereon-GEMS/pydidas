@@ -30,13 +30,13 @@ __all__ = ["CompositeCreatorFrameBuilder"]
 
 from qtpy import QtWidgets
 
-from ....core.constants import (
+from pydidas.core.constants import (
     FONT_METRIC_PARAM_EDIT_WIDTH,
     POLICY_EXP_EXP,
     POLICY_FIX_EXP,
 )
-from ....widgets import ScrollArea, silx_plot
-from ....widgets.framework import BaseFrame
+from pydidas.widgets import ScrollArea, silx_plot
+from pydidas.widgets.framework import BaseFrame
 
 
 _KEYS_TO_INSERT_LINES = [

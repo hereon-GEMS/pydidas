@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 import numpy as np
+
 from pydidas.core.constants import JPG_EXTENSIONS
 from pydidas.data_io.implementations.jpeg_io import JpegIo
 

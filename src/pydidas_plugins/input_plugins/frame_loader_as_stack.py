@@ -29,6 +29,7 @@ __all__ = ["FrameLoaderAsStack"]
 
 
 import numpy as np
+
 from pydidas.core import (
     Dataset,
     FileReadError,

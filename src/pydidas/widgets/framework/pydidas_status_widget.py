@@ -28,13 +28,12 @@ __status__ = "Production"
 __all__ = ["PydidasStatusWidget"]
 
 
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore, QtGui, QtWidgets
 
+from pydidas.core import SingletonFactory
+from pydidas.core.utils import get_time_string
 from pydidas.widgets.misc import ReadOnlyTextWidget
-
-from ...core import SingletonFactory
-from ...core.utils import get_time_string
+from pydidas_qtcore import PydidasQApplication
 
 
 class _PydidasStatusWidget(QtWidgets.QDockWidget):

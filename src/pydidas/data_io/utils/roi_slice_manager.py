@@ -34,7 +34,7 @@ from typing import Union
 
 from numpy import mod
 
-from ...core.utils import flatten_all
+from pydidas.core.utils import flatten_all
 
 
 def error_msg(roi: object, exception: Exception = "") -> str:

@@ -38,8 +38,8 @@ from typing import Union
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
-from ..core import PydidasGuiError
-from ..resources import icons
+from pydidas.core import PydidasGuiError
+from pydidas.resources import icons
 
 
 def delete_all_items_in_layout(layout: QtWidgets.QLayout):

@@ -31,6 +31,7 @@ import unittest
 from numbers import Integral, Real
 
 import numpy as np
+
 from pydidas.contexts.scan import Scan, ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
 from pydidas.core import UserConfigError

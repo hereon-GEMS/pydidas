@@ -26,8 +26,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ProcPlugin"]
 
-from ..core.constants import PROC_PLUGIN, PROC_PLUGIN_GENERIC
-from .base_plugin import BasePlugin
+
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_GENERIC
+from pydidas.plugins.base_plugin import BasePlugin
 
 
 class ProcPlugin(BasePlugin):

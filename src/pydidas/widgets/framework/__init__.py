@@ -29,8 +29,8 @@ __all__ = []
 
 
 # import __all__ items from modules:
-from .base_frame import *
-from .base_frame_with_app import *
+from pydidas.widgets.framework.base_frame import *
+from pydidas.widgets.framework.base_frame_with_app import *
 from .font_scaling_toolbar import *
 from .pydidas_status_widget import *
 from .pydidas_frame_stack import *

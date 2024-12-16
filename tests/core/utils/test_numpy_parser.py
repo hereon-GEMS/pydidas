@@ -29,6 +29,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+
 from pydidas.core import UserConfigError
 from pydidas.core.constants import NUMPY_DTYPES
 from pydidas.core.utils.numpy_parser import NumpyParser

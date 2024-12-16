@@ -33,13 +33,13 @@ import re
 import numpy as np
 from qtpy import QtCore
 
-from ..core import (
+from pydidas.core import (
     ObjectWithParameterCollection,
     Parameter,
     UserConfigError,
     get_generic_param_collection,
 )
-from .workflow_results import WorkflowResultsContext
+from pydidas.workflow.workflow_results import WorkflowResultsContext
 
 
 class WorkflowResultsSelector(ObjectWithParameterCollection):

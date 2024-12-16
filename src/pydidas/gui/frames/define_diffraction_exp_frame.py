@@ -38,13 +38,16 @@ from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
-from ...core import get_generic_param_collection
-from ...widgets import PydidasFileDialog
-from ...widgets.dialogues import critical_warning
-from ...widgets.framework import BaseFrame
-from ...widgets.windows import ConvertFit2dGeometryWindow, ManuallySetBeamcenterWindow
-from .builders import DefineDiffractionExpFrameBuilder
+from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
+from pydidas.core import get_generic_param_collection
+from pydidas.gui.frames.builders import DefineDiffractionExpFrameBuilder
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.dialogues import critical_warning
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.windows import (
+    ConvertFit2dGeometryWindow,
+    ManuallySetBeamcenterWindow,
+)
 
 
 EXP = DiffractionExperimentContext()

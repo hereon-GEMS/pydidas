@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 import yaml
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_io_yaml import DiffractionExperimentIoYaml

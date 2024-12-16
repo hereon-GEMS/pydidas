@@ -29,9 +29,9 @@ __all__ = ["EmptyWidget"]
 
 from qtpy.QtWidgets import QGridLayout, QWidget
 
-from ...core.constants import ALIGN_TOP_LEFT
-from ...core.utils import apply_qt_properties
-from .pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.core.constants import ALIGN_TOP_LEFT
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
 class EmptyWidget(PydidasWidgetMixin, QWidget):

@@ -33,12 +33,12 @@ import numpy as np
 from qtpy import QtWidgets
 from scipy.optimize import least_squares
 
-from ..core import Dataset, UserConfigError, get_generic_param_collection
-from ..core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
-from ..core.fitting import FitFuncMeta
-from ..core.utils import process_1d_with_multi_input_dims
-from ..widgets.plugin_config_widgets import FitPluginConfigWidget
-from .base_proc_plugin import ProcPlugin
+from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.fitting import FitFuncMeta
+from pydidas.core.utils import process_1d_with_multi_input_dims
+from pydidas.plugins.base_proc_plugin import ProcPlugin
+from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
 
 
 class BaseFitPlugin(ProcPlugin):

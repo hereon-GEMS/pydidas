@@ -27,9 +27,10 @@ __status__ = "Production"
 import sys
 import unittest
 
+from qtpy import QtCore, QtWidgets
+
 from pydidas.widgets.framework import PydidasStatusWidget
 from pydidas_qtcore import PydidasQApplication
-from qtpy import QtCore, QtWidgets
 
 
 class TestPydidasStatusWidget(unittest.TestCase):

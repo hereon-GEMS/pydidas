@@ -26,14 +26,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["InputPlugin"]
 
+
 import os
 
 import numpy as np
 
-from ..contexts import ScanContext
-from ..core import Dataset, UserConfigError, get_generic_parameter
-from ..core.constants import INPUT_PLUGIN
-from .base_plugin import BasePlugin
+from pydidas.contexts import ScanContext
+from pydidas.core import Dataset, UserConfigError, get_generic_parameter
+from pydidas.core.constants import INPUT_PLUGIN
+from pydidas.plugins.base_plugin import BasePlugin
 
 
 SCAN = ScanContext()

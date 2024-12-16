@@ -32,12 +32,14 @@ from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import get_generic_param_collection
-from ...core.constants.file_extensions import BINARY_EXTENSIONS
-from ...core.constants.numpy_names import NUMPY_HUMAN_READABLE_DATATYPES
-from ...core.utils import get_extension
-from ..utilities import get_pyqt_icon_from_str
-from ..widget_with_parameter_collection import WidgetWithParameterCollection
+from pydidas.core import get_generic_param_collection
+from pydidas.core.constants.file_extensions import BINARY_EXTENSIONS
+from pydidas.core.constants.numpy_names import NUMPY_HUMAN_READABLE_DATATYPES
+from pydidas.core.utils import get_extension
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
+from pydidas.widgets.widget_with_parameter_collection import (
+    WidgetWithParameterCollection,
+)
 
 
 class RawMetadataSelector(WidgetWithParameterCollection):

@@ -32,15 +32,15 @@ import time
 
 from qtpy import QtCore, QtWidgets
 
-from ...apps import ExecuteWorkflowApp
-from ...core import UserConfigError, get_generic_param_collection
-from ...core.utils import ShowBusyMouse, pydidas_logger
-from ...multiprocessing import AppRunner
-from ...widgets.dialogues import WarningBox
-from ...widgets.framework import BaseFrameWithApp
-from ...workflow import WorkflowTree
-from ..mixins import ViewResultsMixin
-from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
+from pydidas.apps import ExecuteWorkflowApp
+from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core.utils import ShowBusyMouse, pydidas_logger
+from pydidas.gui.frames.builders import WorkflowRunFrameBuilder
+from pydidas.gui.mixins import ViewResultsMixin
+from pydidas.multiprocessing import AppRunner
+from pydidas.widgets.dialogues import WarningBox
+from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.workflow import WorkflowTree
 
 
 TREE = WorkflowTree()

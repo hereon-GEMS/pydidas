@@ -29,9 +29,9 @@ __all__ = ["SquareButton"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import MINIMUN_WIDGET_DIMENSIONS
-from ..utilities import get_pyqt_icon_from_str
-from .pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.core.constants import MINIMUN_WIDGET_DIMENSIONS
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):

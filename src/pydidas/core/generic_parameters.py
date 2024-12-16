@@ -33,10 +33,10 @@ __all__ = ["get_generic_parameter", "get_generic_param_collection"]
 from collections.abc import Iterable
 from pathlib import Path
 
-from .generic_params import GENERIC_PARAMS_METADATA
-from .hdf5_key import Hdf5key
-from .parameter import Parameter
-from .parameter_collection import ParameterCollection
+from pydidas.core.generic_params import GENERIC_PARAMS_METADATA
+from pydidas.core.hdf5_key import Hdf5key
+from pydidas.core.parameter import Parameter
+from pydidas.core.parameter_collection import ParameterCollection
 
 
 def get_generic_parameter(refkey: str) -> Parameter:

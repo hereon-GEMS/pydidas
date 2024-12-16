@@ -35,17 +35,17 @@ from typing import Union
 
 import h5py
 
-from ... import VERSION
-from ...contexts import DiffractionExperimentContext, ScanContext
-from ...contexts.diff_exp import DiffractionExperiment
-from ...contexts.scan import Scan
-from ...core import Dataset, UserConfigError
-from ...core.constants import HDF5_EXTENSIONS
-from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
-from ...data_io import import_data
-from ..processing_tree import ProcessingTree
-from ..workflow_tree import WorkflowTree
-from .workflow_result_io_base import WorkflowResultIoBase
+from pydidas import VERSION
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.contexts.scan import Scan
+from pydidas.core import Dataset, UserConfigError
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
+from pydidas.data_io import import_data
+from pydidas.workflow.processing_tree import ProcessingTree
+from pydidas.workflow.result_io.workflow_result_io_base import WorkflowResultIoBase
+from pydidas.workflow.workflow_tree import WorkflowTree
 
 
 def get_detector_metadata_entries(

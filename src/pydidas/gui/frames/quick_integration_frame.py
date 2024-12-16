@@ -35,20 +35,20 @@ from typing import Union
 import numpy as np
 from qtpy import QtCore
 
-from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
-from ...contexts.diff_exp import DiffractionExperiment
-from ...core import get_generic_param_collection
-from ...core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
-from ...core.utils import ShowBusyMouse
-from ...data_io import import_data
-from ...plugins import PluginCollection, pyFAIintegrationBase
-from ...widgets import PydidasFileDialog
-from ...widgets.controllers import (
+from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
+from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.core import get_generic_param_collection
+from pydidas.core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
+from pydidas.core.utils import ShowBusyMouse
+from pydidas.data_io import import_data
+from pydidas.gui.frames.builders import QuickIntegrationFrameBuilder
+from pydidas.plugins import PluginCollection, pyFAIintegrationBase
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.controllers import (
     ManuallySetBeamcenterController,
     ManuallySetIntegrationRoiController,
 )
-from ...widgets.framework import BaseFrame
-from .builders import QuickIntegrationFrameBuilder
+from pydidas.widgets.framework import BaseFrame
 
 
 COLL = PluginCollection()

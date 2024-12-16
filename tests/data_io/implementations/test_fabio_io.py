@@ -31,6 +31,7 @@ from pathlib import Path
 
 import fabio
 import numpy as np
+
 from pydidas.core import FileReadError
 from pydidas.data_io.implementations.fabio_io import FabioIo
 

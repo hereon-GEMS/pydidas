@@ -32,14 +32,14 @@ from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import UserConfigError
-from ...core.constants import FONT_METRIC_CONSOLE_WIDTH
-from ...core.utils import ShowBusyMouse, get_fixed_length_str
-from ...plugins import BasePlugin
-from ..factory import CreateWidgetsMixIn
-from ..framework import PydidasWindow
-from ..misc import ReadOnlyTextWidget
-from ..silx_plot import PydidasPlotStack
+from pydidas.core import UserConfigError
+from pydidas.core.constants import FONT_METRIC_CONSOLE_WIDTH
+from pydidas.core.utils import ShowBusyMouse, get_fixed_length_str
+from pydidas.plugins import BasePlugin
+from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.misc import ReadOnlyTextWidget
+from pydidas.widgets.silx_plot import PydidasPlotStack
 
 
 class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):

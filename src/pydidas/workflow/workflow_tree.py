@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["WorkflowTree"]
 
 
-from ..core import SingletonFactory
-from .processing_tree import ProcessingTree
+from pydidas.core import SingletonFactory
+from pydidas.workflow.processing_tree import ProcessingTree
 
 
 WorkflowTree = SingletonFactory(ProcessingTree)

@@ -34,13 +34,13 @@ import pathlib
 from numpy import nan, ndarray
 from qtpy import QtCore, QtGui
 
-from ...core import Hdf5key, Parameter, UserConfigError
-from ...core.constants import (
+from pydidas.core import Hdf5key, Parameter, UserConfigError
+from pydidas.core.constants import (
     GENERIC_STANDARD_WIDGET_WIDTH,
     QT_REG_EXP_FLOAT_VALIDATOR,
     QT_REG_EXP_INT_VALIDATOR,
 )
-from ...core.utils import NumpyParser
+from pydidas.core.utils import NumpyParser
 
 
 LOCAL_SETTINGS = QtCore.QLocale(QtCore.QLocale.C)

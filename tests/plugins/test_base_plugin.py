@@ -31,6 +31,7 @@ import tempfile
 import unittest
 
 import numpy as np
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import Parameter, get_generic_parameter, utils

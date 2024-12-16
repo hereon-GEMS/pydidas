@@ -33,13 +33,13 @@ from typing import Union
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core import constants
-from ...core.utils import apply_qt_properties
-from ...plugins import PluginCollection
-from ...plugins.plugin_registry import PluginRegistry
-from ...workflow import WorkflowTree
-from ..factory import CreateWidgetsMixIn, EmptyWidget
-from ..misc import LineEditWithIcon
+from pydidas.core import constants
+from pydidas.core.utils import apply_qt_properties
+from pydidas.plugins import PluginCollection
+from pydidas.plugins.plugin_registry import PluginRegistry
+from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
+from pydidas.widgets.misc import LineEditWithIcon
+from pydidas.workflow import WorkflowTree
 
 
 PLUGIN_COLLECTION = PluginCollection()

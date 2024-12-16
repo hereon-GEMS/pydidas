@@ -29,6 +29,7 @@ import tempfile
 import unittest
 
 import numpy as np
+
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.plugins import ProcPlugin
 from pydidas.unittest_objects import create_plugin_class

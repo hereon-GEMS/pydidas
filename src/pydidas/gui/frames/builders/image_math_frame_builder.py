@@ -32,10 +32,10 @@ from typing import Union
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ....core import constants
-from ....widgets import ScrollArea, misc
-from ....widgets.framework import BaseFrame
-from ....widgets.silx_plot import PydidasPlot2D
+from pydidas.core import constants
+from pydidas.widgets import ScrollArea, misc
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.silx_plot import PydidasPlot2D
 
 
 UFUNCS = ["absolute", "exp", "fmax", "fmin", "log", "log2", "log10", "power", "sqrt"]

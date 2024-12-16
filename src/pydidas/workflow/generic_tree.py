@@ -35,9 +35,9 @@ from typing import Self, Union
 
 from qtpy import QtCore
 
-from ..core import UserConfigError
-from ..core.utils import get_random_string
-from .generic_node import GenericNode
+from pydidas.core import UserConfigError
+from pydidas.core.utils import get_random_string
+from pydidas.workflow.generic_node import GenericNode
 
 
 class GenericTree:

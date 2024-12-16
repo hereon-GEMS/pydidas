@@ -27,6 +27,7 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+
 from pydidas.core import PydidasQsettings, UserConfigError
 from pydidas.core.utils import (
     calculate_histogram_limits,

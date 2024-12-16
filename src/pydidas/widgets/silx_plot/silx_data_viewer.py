@@ -27,11 +27,11 @@ __status__ = "Production"
 __all__ = ["SilxDataViewer"]
 
 
-from pydidas_qtcore import PydidasQApplication
 from silx.gui.data.DataViewerFrame import DataViewerFrame
 from silx.gui.data.DataViews import PLOT2D_MODE, _ImageView, _StackView
 
-from ._data_views import _PydidasPlot2dView
+from pydidas.widgets.silx_plot._data_views import _PydidasPlot2dView
+from pydidas_qtcore import PydidasQApplication
 
 
 class SilxDataViewer(DataViewerFrame):

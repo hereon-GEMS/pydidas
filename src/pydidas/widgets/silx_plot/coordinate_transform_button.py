@@ -33,10 +33,10 @@ from typing import Literal
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot.PlotToolButtons import PlotToolButton
 
-from ...contexts import DiffractionExperimentContext
-from ...core import UserConfigError
-from ...core.constants import ASCII_TO_UNI
-from ...resources import icons
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.core import UserConfigError
+from pydidas.core.constants import ASCII_TO_UNI
+from pydidas.resources import icons
 
 
 THETA = ASCII_TO_UNI["theta"]

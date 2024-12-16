@@ -33,20 +33,28 @@ from pathlib import Path
 
 from qtpy import QtCore
 
-from ...core import Hdf5key, Parameter, UserConfigError
-from ...core.constants import (
+from pydidas.core import Hdf5key, Parameter, UserConfigError
+from pydidas.core.constants import (
     PARAM_WIDGET_EDIT_WIDTH,
     PARAM_WIDGET_TEXT_WIDTH,
     PARAM_WIDGET_UNIT_WIDTH,
     POLICY_EXP_FIX,
 )
-from ...core.utils import convert_special_chars_to_unicode
-from ..factory import EmptyWidget, PydidasLabel
-from .param_io_widget_checkbox import ParamIoWidgetCheckBox
-from .param_io_widget_combo_box import ParamIoWidgetComboBox
-from .param_io_widget_file import ParamIoWidgetFile
-from .param_io_widget_hdf5key import ParamIoWidgetHdf5Key
-from .param_io_widget_lineedit import ParamIoWidgetLineEdit
+from pydidas.core.utils import convert_special_chars_to_unicode
+from pydidas.widgets.factory import EmptyWidget, PydidasLabel
+from pydidas.widgets.parameter_config.param_io_widget_checkbox import (
+    ParamIoWidgetCheckBox,
+)
+from pydidas.widgets.parameter_config.param_io_widget_combo_box import (
+    ParamIoWidgetComboBox,
+)
+from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
+from pydidas.widgets.parameter_config.param_io_widget_hdf5key import (
+    ParamIoWidgetHdf5Key,
+)
+from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
+    ParamIoWidgetLineEdit,
+)
 
 
 class ParameterWidget(EmptyWidget):

@@ -32,10 +32,10 @@ from copy import deepcopy
 from numbers import Integral, Real
 from typing import Self, Union
 
-from ..core import Dataset
-from ..core.utils import LOGGING_LEVEL, TimerSaveRuntime, pydidas_logger
-from ..plugins import BasePlugin
-from .generic_node import GenericNode
+from pydidas.core import Dataset
+from pydidas.core.utils import LOGGING_LEVEL, TimerSaveRuntime, pydidas_logger
+from pydidas.plugins import BasePlugin
+from pydidas.workflow.generic_node import GenericNode
 
 
 logger = pydidas_logger()

@@ -32,15 +32,15 @@ from functools import partial
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core.constants import (
+from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_CONSOLE_WIDTH,
     FONT_METRIC_SMALL_BUTTON_WIDTH,
     FONT_METRIC_WIDE_BUTTON_WIDTH,
 )
-from ...resources import logos
-from ...version import VERSION
-from ..framework import PydidasWindow
+from pydidas.resources import logos
+from pydidas.version import VERSION
+from pydidas.widgets.framework import PydidasWindow
 
 
 _FULL_WIDTH = FONT_METRIC_CONSOLE_WIDTH + FONT_METRIC_WIDE_BUTTON_WIDTH

@@ -32,10 +32,10 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import SingletonFactory, get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, QSETTINGS_GLOBAL_KEYS
-from ...plugins import PluginCollection
-from ..framework import PydidasWindow
+from pydidas.core import SingletonFactory, get_generic_param_collection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, QSETTINGS_GLOBAL_KEYS
+from pydidas.plugins import PluginCollection
+from pydidas.widgets.framework import PydidasWindow
 
 
 PLUGINS = PluginCollection()

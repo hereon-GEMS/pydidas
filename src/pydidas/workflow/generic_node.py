@@ -33,7 +33,7 @@ from typing import List, Self, Union
 
 from qtpy import QtCore
 
-from ..core import UserConfigError
+from pydidas.core import UserConfigError
 
 
 class GenericNode:

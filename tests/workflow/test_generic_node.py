@@ -29,6 +29,7 @@ import unittest
 from unittest import mock
 
 import numpy as np
+
 from pydidas.core import UserConfigError
 from pydidas.workflow import GenericNode
 

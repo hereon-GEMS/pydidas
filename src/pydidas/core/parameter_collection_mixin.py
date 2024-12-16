@@ -33,9 +33,9 @@ from typing import Union
 
 from numpy import mod
 
-from .exceptions import UserConfigError
-from .parameter import Parameter
-from .parameter_collection import ParameterCollection
+from pydidas.core.exceptions import UserConfigError
+from pydidas.core.parameter import Parameter
+from pydidas.core.parameter_collection import ParameterCollection
 
 
 class ParameterCollectionMixIn:

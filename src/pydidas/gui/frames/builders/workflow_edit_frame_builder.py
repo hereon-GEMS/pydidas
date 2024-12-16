@@ -30,13 +30,13 @@ __all__ = ["WorkflowEditFrameBuilder"]
 
 from qtpy.QtWidgets import QAbstractScrollArea
 
-from ....core import constants
-from ....core.constants import FONT_METRIC_HALF_CONSOLE_WIDTH
-from ....core.utils import update_size_policy
-from ....widgets import ScrollArea
-from ....widgets.framework import BaseFrame
-from ....widgets.parameter_config import EditPluginParametersWidget
-from ....widgets.workflow_edit import PluginCollectionBrowser, WorkflowTreeCanvas
+from pydidas.core import constants
+from pydidas.core.constants import FONT_METRIC_HALF_CONSOLE_WIDTH
+from pydidas.core.utils import update_size_policy
+from pydidas.widgets import ScrollArea
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.parameter_config import EditPluginParametersWidget
+from pydidas.widgets.workflow_edit import PluginCollectionBrowser, WorkflowTreeCanvas
 
 
 class WorkflowEditFrameBuilder:

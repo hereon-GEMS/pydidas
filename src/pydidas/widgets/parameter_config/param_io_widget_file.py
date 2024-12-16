@@ -35,10 +35,12 @@ from typing import Union
 from numpy import nan
 from qtpy import QtCore
 
-from ...data_io import IoManager
-from ..dialogues import critical_warning
-from ..file_dialog import PydidasFileDialog
-from .param_io_widget_with_button import ParamIoWidgetWithButton
+from pydidas.data_io import IoManager
+from pydidas.widgets.dialogues import critical_warning
+from pydidas.widgets.file_dialog import PydidasFileDialog
+from pydidas.widgets.parameter_config.param_io_widget_with_button import (
+    ParamIoWidgetWithButton,
+)
 
 
 class ParamIoWidgetFile(ParamIoWidgetWithButton):

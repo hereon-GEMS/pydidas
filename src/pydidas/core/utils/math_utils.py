@@ -44,7 +44,7 @@ import numpy as np
 from numpy import cos, sin
 from scipy.optimize import leastsq
 
-from ..exceptions import UserConfigError
+from pydidas.core.exceptions import UserConfigError
 
 
 def rot_matrix_rx(theta: float) -> np.ndarray:

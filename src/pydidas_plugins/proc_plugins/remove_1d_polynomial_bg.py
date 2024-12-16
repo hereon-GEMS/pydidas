@@ -32,6 +32,7 @@ from typing import Union
 
 import numpy as np
 from numpy.polynomial import Polynomial
+
 from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
 from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims

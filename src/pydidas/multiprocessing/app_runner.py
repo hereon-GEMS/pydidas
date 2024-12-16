@@ -32,10 +32,10 @@ from typing import Union
 
 from qtpy import QtCore
 
-from ..core import BaseApp
-from ..core.utils import LOGGING_LEVEL, pydidas_logger
-from .app_processor_ import app_processor
-from .worker_controller import WorkerController
+from pydidas.core import BaseApp
+from pydidas.core.utils import LOGGING_LEVEL, pydidas_logger
+from pydidas.multiprocessing.app_processor_ import app_processor
+from pydidas.multiprocessing.worker_controller import WorkerController
 
 
 logger = pydidas_logger()

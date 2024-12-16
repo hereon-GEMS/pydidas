@@ -31,10 +31,11 @@ import tempfile
 import unittest
 
 import pyFAI
+from pyFAI.geometry import Geometry
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_io_poni import DiffractionExperimentIoPoni
-from pyFAI.geometry import Geometry
 
 
 EXP = DiffractionExperimentContext()

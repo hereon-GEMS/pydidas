@@ -39,8 +39,8 @@ import numpy as np
 from numpy import ndarray
 from numpy.typing import ArrayLike, DTypeLike
 
-from .exceptions import UserConfigError
-from .utils.dataset_utils import (
+from pydidas.core.exceptions import UserConfigError
+from pydidas.core.utils.dataset_utils import (
     FLATTEN_DIM_DEFAULTS,
     METADATA_KEYS,
     convert_ranges_and_check_length,
@@ -303,7 +303,7 @@ class Dataset(ndarray):
         Dataset
             The re-binned Dataset.
         """
-        from .utils.rebin_ import get_cropping_slices, rebin
+        from pydidas.core.utils.rebin_ import get_cropping_slices, rebin
 
         if binning == 1:
             return self.copy()

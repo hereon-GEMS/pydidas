@@ -31,6 +31,7 @@ import unittest
 
 import h5py
 import numpy as np
+
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, FileReadError, Parameter, UserConfigError
 from pydidas.core.utils import get_random_string

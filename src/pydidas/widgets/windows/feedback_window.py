@@ -30,10 +30,10 @@ __all__ = ["FeedbackWindow"]
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core import Parameter, ParameterCollection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYDIDAS_FEEDBACK_URL
-from ...core.utils import apply_qt_properties, copy_text_to_system_clipbord
-from ..framework import PydidasWindow
+from pydidas.core import Parameter, ParameterCollection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYDIDAS_FEEDBACK_URL
+from pydidas.core.utils import apply_qt_properties, copy_text_to_system_clipbord
+from pydidas.widgets.framework import PydidasWindow
 
 
 INFO_TEXT = (

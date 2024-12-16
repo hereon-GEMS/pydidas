@@ -32,18 +32,18 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import ScanContext, ScanIo
-from ...core import constants, utils
-from ...plugins import PluginCollection
-from ...widgets import PydidasFileDialog
-from ...widgets.framework import BaseFrame
-from ...widgets.windows import ScanDimensionInformationWindow
-from ...workflow import WorkflowTree
-from .builders.define_scan_frame_builder import (
+from pydidas.contexts import ScanContext, ScanIo
+from pydidas.core import constants, utils
+from pydidas.gui.frames.builders.define_scan_frame_builder import (
     build_header_config,
     build_scan_dim_groups,
     column_width_factor,
 )
+from pydidas.plugins import PluginCollection
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.windows import ScanDimensionInformationWindow
+from pydidas.workflow import WorkflowTree
 
 
 SCAN = ScanContext()

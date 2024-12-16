@@ -34,10 +34,10 @@ from typing import Union
 import h5py
 from numpy import ndarray, squeeze
 
-from ...core import Dataset, UserConfigError
-from ...core.constants import HDF5_EXTENSIONS
-from ...core.utils import CatchFileErrors
-from .io_base import IoBase
+from pydidas.core import Dataset, UserConfigError
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import CatchFileErrors
+from pydidas.data_io.implementations.io_base import IoBase
 
 
 def _create_slice_object(entry: object):

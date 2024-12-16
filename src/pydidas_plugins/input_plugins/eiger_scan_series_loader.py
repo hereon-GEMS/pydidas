@@ -30,8 +30,9 @@ __all__ = ["EigerScanSeriesLoader"]
 
 import os
 
-from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas_plugins.input_plugins.hdf5_file_series_loader import Hdf5fileSeriesLoader
+
+from pydidas.core import UserConfigError, get_generic_param_collection
 
 
 class EigerScanSeriesLoader(Hdf5fileSeriesLoader):

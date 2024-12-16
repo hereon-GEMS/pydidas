@@ -29,6 +29,7 @@ __all__ = ["ConvertToDSpacing"]
 
 
 import numpy as np
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import (
     Dataset,

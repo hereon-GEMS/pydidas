@@ -27,11 +27,11 @@ __status__ = "Production"
 __all__ = ["InputPlugin1d"]
 
 
-from ..contexts import ScanContext
-from ..core import get_generic_parameter
-from ..core.constants import INPUT_PLUGIN
-from .base_input_plugin import InputPlugin
-from .base_plugin import BasePlugin
+from pydidas.contexts import ScanContext
+from pydidas.core import get_generic_parameter
+from pydidas.core.constants import INPUT_PLUGIN
+from pydidas.plugins.base_input_plugin import InputPlugin
+from pydidas.plugins.base_plugin import BasePlugin
 
 
 SCAN = ScanContext()

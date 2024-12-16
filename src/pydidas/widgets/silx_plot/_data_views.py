@@ -39,7 +39,7 @@ from silx.gui.data.DataViews import (
 )
 from silx.gui.utils import blockSignals
 
-from .pydidas_plot2d import PydidasPlot2D
+from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
 class PydidasImageDataView(CompositeDataView):

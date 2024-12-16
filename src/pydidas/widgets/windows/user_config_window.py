@@ -32,12 +32,11 @@ from functools import partial
 from typing import Union
 
 from numpy import ceil, floor
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from ...core import SingletonFactory, get_generic_param_collection
-from ...core.constants import (
+from pydidas.core import SingletonFactory, get_generic_param_collection
+from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_PARAM_EDIT_WIDTH,
     GENERIC_STANDARD_WIDGET_WIDTH,
@@ -46,12 +45,13 @@ from ...core.constants import (
     QSETTINGS_USER_KEYS,
     QT_REG_EXP_RGB_VALIDATOR,
 )
-from ...core.generic_params.generic_params_settings import GENERIC_PARAMS_SETTINGS
-from ...core.utils import update_palette
-from ...plugins import GENERIC_PLUGIN_PATH, PluginCollection
-from ..dialogues import PydidasExceptionMessageBox, QuestionBox
-from ..factory import SquareButton
-from ..framework import PydidasWindow
+from pydidas.core.generic_params.generic_params_settings import GENERIC_PARAMS_SETTINGS
+from pydidas.core.utils import update_palette
+from pydidas.plugins import GENERIC_PLUGIN_PATH, PluginCollection
+from pydidas.widgets.dialogues import PydidasExceptionMessageBox, QuestionBox
+from pydidas.widgets.factory import SquareButton
+from pydidas.widgets.framework import PydidasWindow
+from pydidas_qtcore import PydidasQApplication
 
 
 PLUGINS = PluginCollection()

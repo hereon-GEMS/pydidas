@@ -27,13 +27,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
+
 from qtpy import QtCore, QtWidgets
 from silx.gui.data.DataViews import IMAGE_MODE
 
-from ...core import Dataset
-from .pydidas_plot1d import PydidasPlot1D
-from .pydidas_plot2d import PydidasPlot2D
-from .silx_data_viewer import SilxDataViewer
+from pydidas.core import Dataset
+from pydidas.widgets.silx_plot.pydidas_plot1d import PydidasPlot1D
+from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
+from pydidas.widgets.silx_plot.silx_data_viewer import SilxDataViewer
 
 
 class PydidasPlotStack(QtWidgets.QStackedWidget):

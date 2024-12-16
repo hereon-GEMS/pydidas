@@ -33,7 +33,7 @@ __all__ = ["PluginPositionNode"]
 
 import numpy as np
 
-from .generic_node import GenericNode
+from pydidas.workflow.generic_node import GenericNode
 
 
 class PluginPositionNode(GenericNode):

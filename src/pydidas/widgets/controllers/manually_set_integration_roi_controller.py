@@ -35,10 +35,10 @@ import numpy as np
 from qtpy import QtCore
 from qtpy.QtWidgets import QWidget
 
-from ...core import UserConfigError, get_generic_param_collection
-from ...core.constants import PYDIDAS_COLORS
-from ...core.utils import get_chi_from_x_and_y
-from ...plugins import BasePlugin
+from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core.constants import PYDIDAS_COLORS
+from pydidas.core.utils import get_chi_from_x_and_y
+from pydidas.plugins import BasePlugin
 
 
 class ManuallySetIntegrationRoiController(QtCore.QObject):

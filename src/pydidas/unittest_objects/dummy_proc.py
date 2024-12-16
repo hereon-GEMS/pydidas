@@ -27,12 +27,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DummyProc"]
 
+
 from typing import Union
 
 import numpy as np
 
-# because these Plugins will be loaded directly by importlib, absolute imports
-# are required:
 from pydidas.core import Dataset
 from pydidas.plugins import ProcPlugin
 

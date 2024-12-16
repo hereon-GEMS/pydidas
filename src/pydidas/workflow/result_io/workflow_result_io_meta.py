@@ -35,12 +35,12 @@ import os
 from pathlib import Path
 from typing import Union
 
-from ...contexts.diff_exp import DiffractionExperiment
-from ...contexts.scan import Scan
-from ...core import Dataset
-from ...core.io_registry import GenericIoMeta
-from ...core.utils import get_extension
-from ..processing_tree import ProcessingTree
+from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.contexts.scan import Scan
+from pydidas.core import Dataset
+from pydidas.core.io_registry import GenericIoMeta
+from pydidas.core.utils import get_extension
+from pydidas.workflow.processing_tree import ProcessingTree
 
 
 class WorkflowResultIoMeta(GenericIoMeta):

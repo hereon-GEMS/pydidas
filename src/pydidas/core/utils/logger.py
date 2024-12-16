@@ -36,8 +36,8 @@ from typing import List
 
 from qtpy import QtCore
 
-from ...logging_level import LOGGING_LEVEL
-from ...version import VERSION
+from pydidas.logging_level import LOGGING_LEVEL
+from pydidas.version import VERSION
 
 
 _LOG_FORMATTER = logging.Formatter(

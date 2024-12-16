@@ -31,6 +31,7 @@ import tempfile
 import unittest
 
 import numpy as np
+
 from pydidas.core import PydidasQsettings, UserConfigError
 from pydidas.managers import CompositeImageManager
 

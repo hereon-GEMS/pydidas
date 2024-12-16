@@ -44,9 +44,9 @@ from typing import List, Literal, Tuple, Union
 import h5py
 import numpy as np
 
-from ..constants import HDF5_EXTENSIONS
-from ..dataset import Dataset
-from .file_utils import CatchFileErrors, get_extension
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.dataset import Dataset
+from pydidas.core.utils.file_utils import CatchFileErrors, get_extension
 
 
 def get_hdf5_populated_dataset_keys(

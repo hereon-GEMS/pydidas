@@ -27,6 +27,7 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.unittest_objects import DummyLoader, DummyProc
 from pydidas.workflow import WorkflowNode

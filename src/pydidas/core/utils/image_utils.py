@@ -31,8 +31,8 @@ from numbers import Real
 
 import numpy as np
 
-from ..exceptions import UserConfigError
-from ..pydidas_q_settings import PydidasQsettings
+from pydidas.core.exceptions import UserConfigError
+from pydidas.core.pydidas_q_settings import PydidasQsettings
 
 
 __NUM_BINS = 32768

@@ -31,7 +31,7 @@ __all__ = ["plugin_getter"]
 
 from typing import NewType
 
-from .plugin_collection import PluginCollection
+from pydidas.plugins.plugin_collection import PluginCollection
 
 
 COLL = PluginCollection()

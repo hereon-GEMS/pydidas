@@ -30,6 +30,7 @@ import unittest
 from numbers import Integral
 
 import numpy as np
+
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import PluginCollection

@@ -31,9 +31,9 @@ from pathlib import Path
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core import constants
-from ..framework import PydidasWindow
-from ..scroll_area import ScrollArea
+from pydidas.core import constants
+from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.scroll_area import ScrollArea
 
 
 INTRO_TEXT = (

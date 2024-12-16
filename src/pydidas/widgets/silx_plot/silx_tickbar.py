@@ -33,7 +33,7 @@ __all__ = ["tickbar_paintEvent", "tickbar_paintTick"]
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.plot.ColorBar import _TickBar
 
-from ...core.utils import update_qobject_font
+from pydidas.core.utils import update_qobject_font
 
 
 def tickbar_paintEvent(instance: QtWidgets.QWidget, event: QtCore.QEvent):

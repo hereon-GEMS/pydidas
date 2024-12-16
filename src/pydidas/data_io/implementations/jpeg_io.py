@@ -27,8 +27,8 @@ __status__ = "Production"
 __all__ = []
 
 
-from ...core.constants import JPG_EXTENSIONS
-from .io_exporter_matplotlib import IoExporterMatplotlib
+from pydidas.core.constants import JPG_EXTENSIONS
+from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMatplotlib
 
 
 class JpegIo(IoExporterMatplotlib):

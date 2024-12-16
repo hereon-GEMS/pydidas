@@ -31,8 +31,8 @@ __all__ = ["ProcessingTreeIoMeta"]
 from pathlib import Path
 from typing import NewType, Union
 
-from ...core.io_registry import GenericIoMeta
-from ...core.utils import get_extension
+from pydidas.core.io_registry import GenericIoMeta
+from pydidas.core.utils import get_extension
 
 
 WorkflowTree = NewType("WWorkflowTree", type)

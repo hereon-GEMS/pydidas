@@ -32,8 +32,8 @@ from typing import Self
 from qtpy import QtCore
 from qtpy.QtWidgets import QComboBox
 
-from ...core.constants import GENERIC_IO_WIDGET_WIDTH
-from .pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.core.constants import GENERIC_IO_WIDGET_WIDTH
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
 class PydidasComboBox(PydidasWidgetMixin, QComboBox):

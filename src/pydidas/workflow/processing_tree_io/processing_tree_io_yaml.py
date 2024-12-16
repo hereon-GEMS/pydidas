@@ -33,10 +33,12 @@ from typing import NewType, Union
 
 import yaml
 
-from ...core import UserConfigError
-from ...core.constants import YAML_EXTENSIONS
-from ...version import VERSION
-from .processing_tree_io_base import ProcessingTreeIoBase
+from pydidas.core import UserConfigError
+from pydidas.core.constants import YAML_EXTENSIONS
+from pydidas.version import VERSION
+from pydidas.workflow.processing_tree_io.processing_tree_io_base import (
+    ProcessingTreeIoBase,
+)
 
 
 ProcessingTree = NewType("ProcessingTree", type)
@@ -91,7 +93,7 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
         pydidas.workflow.ProcessingTree
             The restored ProcessingTree.
         """
-        from ..processing_tree import ProcessingTree
+        from pydidas.workflow.processing_tree import ProcessingTree
 
         _version = "23.7.5 or earlier"
 

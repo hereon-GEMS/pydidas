@@ -28,6 +28,7 @@ import pickle
 import unittest
 
 import numpy as np
+
 from pydidas.core import Dataset
 from pydidas.unittest_objects.dummy_proc import DummyProc
 

@@ -32,8 +32,8 @@ import inspect
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
-from ...core import Dataset
-from .special_plot_types_button import SpecialPlotTypesButton
+from pydidas.core import Dataset
+from pydidas.widgets.silx_plot.special_plot_types_button import SpecialPlotTypesButton
 
 
 class PydidasPlot1D(Plot1D):

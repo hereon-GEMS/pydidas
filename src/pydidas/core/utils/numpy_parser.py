@@ -33,8 +33,8 @@ from functools import partialmethod
 
 import numpy as np
 
-from ..constants import NUMPY_ARGPARSE_ARGS, NUMPY_DTYPES
-from ..exceptions import UserConfigError
+from pydidas.core.constants import NUMPY_ARGPARSE_ARGS, NUMPY_DTYPES
+from pydidas.core.exceptions import UserConfigError
 
 
 _NUM_NUMERIC_CHARS_TRANSLATE = str.maketrans("", "", "01234567890. ")

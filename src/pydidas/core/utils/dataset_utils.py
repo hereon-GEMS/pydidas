@@ -39,6 +39,7 @@ __all__ = [
     "get_corresponding_dims",
 ]
 
+
 import textwrap
 import warnings
 from collections.abc import Iterable
@@ -47,7 +48,7 @@ from typing import List, Literal, NewType, Tuple, Union
 
 import numpy as np
 
-from ..exceptions import PydidasConfigError, UserConfigError
+from pydidas.core.exceptions import PydidasConfigError, UserConfigError
 
 
 Dataset = NewType("Dataset", np.ndarray)

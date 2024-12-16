@@ -27,6 +27,7 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+
 from pydidas.contexts import Scan
 from pydidas.core import UserConfigError
 from pydidas.core.utils import get_random_string

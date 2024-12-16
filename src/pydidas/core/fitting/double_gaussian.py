@@ -29,8 +29,8 @@ __all__ = ["DoubleGaussian"]
 
 from typing import Tuple
 
-from .gaussian import Gaussian
-from .multi_peak_mixin import MultiPeakMixin
+from pydidas.core.fitting.gaussian import Gaussian
+from pydidas.core.fitting.multi_peak_mixin import MultiPeakMixin
 
 
 class DoubleGaussian(MultiPeakMixin, Gaussian):

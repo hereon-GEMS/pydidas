@@ -32,14 +32,16 @@ from typing import Literal
 
 from qtpy import QtCore
 
-from ...core import get_generic_param_collection
-from ...core.constants import (
+from pydidas.core import get_generic_param_collection
+from pydidas.core.constants import (
     FONT_METRIC_PARAM_EDIT_WIDTH,
     POLICY_FIX_EXP,
     POLICY_MIN_MIN,
 )
-from ...plugins import BasePlugin
-from ..widget_with_parameter_collection import WidgetWithParameterCollection
+from pydidas.plugins import BasePlugin
+from pydidas.widgets.widget_with_parameter_collection import (
+    WidgetWithParameterCollection,
+)
 
 
 class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):

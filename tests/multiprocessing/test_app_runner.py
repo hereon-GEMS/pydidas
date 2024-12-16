@@ -27,11 +27,12 @@ __status__ = "Production"
 import time
 import unittest
 
+from qtpy import QtCore, QtTest, QtWidgets
+
 from pydidas import IS_QT6
 from pydidas.core import BaseApp, PydidasQsettings
 from pydidas.multiprocessing import AppRunner
 from pydidas.unittest_objects.mp_test_app import MpTestApp
-from qtpy import QtCore, QtTest, QtWidgets
 
 
 class TestAppRunner(unittest.TestCase):

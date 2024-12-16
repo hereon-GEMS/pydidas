@@ -32,6 +32,7 @@ import unittest
 
 import h5py
 import numpy as np
+
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter
 from pydidas.core.constants import INPUT_PLUGIN

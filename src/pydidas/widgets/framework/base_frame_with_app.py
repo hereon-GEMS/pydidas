@@ -35,8 +35,8 @@ from typing import Tuple
 
 from qtpy import QtCore
 
-from ...core import BaseApp
-from .base_frame import BaseFrame
+from pydidas.core import BaseApp
+from pydidas.widgets.framework.base_frame import BaseFrame
 
 
 class BaseFrameWithApp(BaseFrame):

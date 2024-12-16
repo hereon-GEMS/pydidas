@@ -27,29 +27,30 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DataBrowsingFrame"]
 
+
 from pathlib import Path
 from typing import Union
 
 import h5py
 import numpy as np
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore
 from silx.gui.data.DataViews import IMAGE_MODE, PLOT1D_MODE, RAW_MODE
 from silx.gui.hdf5 import H5Node
 from silx.gui.hdf5.Hdf5Item import Hdf5Item
 from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
-from ...core import Dataset
-from ...core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
-from ...core.exceptions import FileReadError
-from ...core.utils import CatchFileErrors, get_extension
-from ...data_io import IoManager, import_data
-from ...widgets.framework import BaseFrame
-from ...widgets.windows import Hdf5BrowserWindow
-from .builders.data_browsing_frame_builder import (
+from pydidas.core import Dataset
+from pydidas.core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
+from pydidas.core.exceptions import FileReadError
+from pydidas.core.utils import CatchFileErrors, get_extension
+from pydidas.data_io import IoManager, import_data
+from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     create_splitter,
     get_widget_creation_information,
 )
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.windows import Hdf5BrowserWindow
+from pydidas_qtcore import PydidasQApplication
 
 
 class DataBrowsingFrame(BaseFrame):

@@ -30,10 +30,10 @@ __all__ = ["ShowDetailedPluginResultsWindow"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
-from ...core.utils import update_size_policy
-from ..framework import PydidasWindow
-from ..silx_plot import PydidasPlotStack
+from pydidas.core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
+from pydidas.core.utils import update_size_policy
+from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.silx_plot import PydidasPlotStack
 
 
 class ShowDetailedPluginResultsWindow(PydidasWindow):

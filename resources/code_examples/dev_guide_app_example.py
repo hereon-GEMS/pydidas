@@ -26,6 +26,7 @@ import multiprocessing as mp
 import time
 
 import numpy as np
+
 import pydidas
 from pydidas.core import Parameter, ParameterCollection
 

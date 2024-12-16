@@ -27,9 +27,10 @@ __status__ = "Production"
 import time
 import unittest
 
+from qtpy import QtCore, QtWidgets
+
 from pydidas.core import SingletonFactory
 from pydidas.core.utils import get_random_string
-from qtpy import QtCore, QtWidgets
 
 
 class TestClass:

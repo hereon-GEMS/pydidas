@@ -29,9 +29,10 @@ import pickle
 import unittest
 from numbers import Integral, Real
 
+from qtpy import QtCore
+
 from pydidas.core import Parameter, ParameterCollection, PydidasQsettingsMixin
 from pydidas.core.pydidas_q_settings_mixin import _CopyablePydidasQSettings
-from qtpy import QtCore
 
 
 VERSION = "unittesting"

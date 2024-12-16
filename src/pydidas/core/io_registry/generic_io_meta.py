@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["GenericIoMeta"]
 
 
-from ..exceptions import UserConfigError
-from ..utils.file_utils import get_extension
+from pydidas.core.exceptions import UserConfigError
+from pydidas.core.utils.file_utils import get_extension
 
 
 class GenericIoMeta(type):

@@ -33,12 +33,12 @@ from typing import Tuple, Union
 import numpy as np
 from qtpy import QtCore
 
-from ...core.constants import PYDIDAS_COLORS
-from ...core.utils import (
+from pydidas.core.constants import PYDIDAS_COLORS
+from pydidas.core.utils import (
     get_chi_from_x_and_y,
     ray_from_center_intersection_with_detector,
 )
-from .pydidas_plot2d import PydidasPlot2D
+from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
 cos_phi = np.cos(np.linspace(0, 2 * np.pi, num=145))

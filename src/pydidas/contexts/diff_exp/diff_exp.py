@@ -37,14 +37,14 @@ from pyFAI.detectors import Detector
 from pyFAI.geometry import Geometry
 from qtpy import QtCore
 
-from ...core import (
+from pydidas.contexts.diff_exp.diff_exp_io import DiffractionExperimentIo
+from pydidas.core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
-from ...core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
-from ...core.utils import NoPrint
-from .diff_exp_io import DiffractionExperimentIo
+from pydidas.core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
+from pydidas.core.utils import NoPrint
 
 
 class DiffractionExperiment(ObjectWithParameterCollection):

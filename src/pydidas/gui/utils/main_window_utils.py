@@ -33,8 +33,8 @@ __all__ = [
 import os
 from pathlib import Path
 
-from ...core.utils import format_input_to_multiline_str
-from ...widgets.utilities import get_pyqt_icon_from_str
+from pydidas.core.utils import format_input_to_multiline_str
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 def find_toolbar_bases(items):

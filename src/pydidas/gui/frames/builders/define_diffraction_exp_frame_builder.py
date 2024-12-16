@@ -30,10 +30,10 @@ __all__ = ["DefineDiffractionExpFrameBuilder"]
 
 from qtpy import QtGui
 
-from ....core import constants
-from ....core.utils import update_palette
-from ....widgets import ScrollArea, get_pyqt_icon_from_str
-from ....widgets.framework import BaseFrame
+from pydidas.core import constants
+from pydidas.core.utils import update_palette
+from pydidas.widgets import ScrollArea, get_pyqt_icon_from_str
+from pydidas.widgets.framework import BaseFrame
 
 
 class DefineDiffractionExpFrameBuilder:

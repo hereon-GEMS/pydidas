@@ -81,6 +81,7 @@ extend-select = ["I", "C90", "F401"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
+known-local-folder = ["pydidas", "pydidas_qtcore"]
 
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 12.

@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 import yaml
+
 from pydidas.contexts import ScanContext
 from pydidas.contexts.scan import Scan
 from pydidas.contexts.scan.scan_io_yaml import ScanIoYaml

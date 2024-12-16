@@ -31,7 +31,7 @@ import os
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core.constants import (
+from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_CONSOLE_WIDTH,
     FONT_METRIC_HALF_CONSOLE_WIDTH,
@@ -39,10 +39,10 @@ from ...core.constants import (
     POLICY_EXP_EXP,
     PYDIDAS_FEEDBACK_URL,
 )
-from ...core.utils import copy_text_to_system_clipbord, get_logging_dir
-from ...resources import icons, logos
-from ..factory import CreateWidgetsMixIn
-from ..scroll_area import ScrollArea
+from pydidas.core.utils import copy_text_to_system_clipbord, get_logging_dir
+from pydidas.resources import icons, logos
+from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.scroll_area import ScrollArea
 
 
 class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):

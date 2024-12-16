@@ -31,7 +31,7 @@ from typing import List, Tuple, Union
 
 from numpy import amax, amin, inf, ndarray, pi
 
-from .fit_func_base import FitFuncBase
+from pydidas.core.fitting.fit_func_base import FitFuncBase
 
 
 class Lorentzian(FitFuncBase):

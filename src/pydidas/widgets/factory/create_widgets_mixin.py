@@ -33,15 +33,15 @@ from typing import Dict, List, Tuple, Union
 from qtpy import QtWidgets
 from qtpy.QtWidgets import QWidget
 
-from ...core.utils import apply_qt_properties
-from ..utilities import get_widget_layout_args
-from .empty_widget import EmptyWidget
-from .pydidas_checkbox import PydidasCheckBox
-from .pydidas_combobox import PydidasComboBox
-from .pydidas_label import PydidasLabel
-from .pydidas_lineedit import PydidasLineEdit
-from .pydidas_pushbutton import PydidasPushButton
-from .radio_button_group import RadioButtonGroup
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.factory.empty_widget import EmptyWidget
+from pydidas.widgets.factory.pydidas_checkbox import PydidasCheckBox
+from pydidas.widgets.factory.pydidas_combobox import PydidasComboBox
+from pydidas.widgets.factory.pydidas_label import PydidasLabel
+from pydidas.widgets.factory.pydidas_lineedit import PydidasLineEdit
+from pydidas.widgets.factory.pydidas_pushbutton import PydidasPushButton
+from pydidas.widgets.factory.radio_button_group import RadioButtonGroup
+from pydidas.widgets.utilities import get_widget_layout_args
 
 
 class CreateWidgetsMixIn:

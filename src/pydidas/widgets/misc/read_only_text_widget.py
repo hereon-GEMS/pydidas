@@ -31,7 +31,7 @@ from typing import Optional, Union
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ..factory.pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
 class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):

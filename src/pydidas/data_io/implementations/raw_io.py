@@ -33,10 +33,10 @@ from typing import Union
 
 import numpy as np
 
-from ...core import Dataset
-from ...core.constants import BINARY_EXTENSIONS
-from ...core.utils import CatchFileErrors
-from .io_base import IoBase
+from pydidas.core import Dataset
+from pydidas.core.constants import BINARY_EXTENSIONS
+from pydidas.core.utils import CatchFileErrors
+from pydidas.data_io.implementations.io_base import IoBase
 
 
 class RawIo(IoBase):

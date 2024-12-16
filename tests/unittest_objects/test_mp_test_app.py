@@ -27,6 +27,7 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+
 from pydidas.core import BaseApp
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 

@@ -34,8 +34,9 @@ import unittest
 from typing import Callable
 
 import numpy as np
-from pydidas.multiprocessing import processor
 from qtpy import QtWidgets
+
+from pydidas.multiprocessing import processor
 
 
 def test_func(number, fixed_arg, fixed_arg2, kw_arg=0):

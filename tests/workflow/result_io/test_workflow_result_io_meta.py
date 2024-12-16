@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 import numpy as np
+
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import Dataset, UserConfigError
 from pydidas.workflow import WorkflowResults, WorkflowTree

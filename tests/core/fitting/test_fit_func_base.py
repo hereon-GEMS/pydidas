@@ -27,6 +27,7 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+
 from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.fitting.fit_func_base import FitFuncBase
 

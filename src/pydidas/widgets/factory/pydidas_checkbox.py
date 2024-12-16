@@ -29,7 +29,7 @@ __all__ = ["PydidasCheckBox"]
 
 from qtpy import QtWidgets
 
-from .pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
 class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):

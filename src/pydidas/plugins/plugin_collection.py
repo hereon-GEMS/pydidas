@@ -27,8 +27,8 @@ __status__ = "Production"
 __all__ = ["PluginCollection"]
 
 
-from ..core import SingletonFactory
-from .plugin_registry import PluginRegistry
+from pydidas.core import SingletonFactory
+from pydidas.plugins.plugin_registry import PluginRegistry
 
 
 PluginCollection = SingletonFactory(PluginRegistry)

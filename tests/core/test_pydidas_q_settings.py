@@ -30,9 +30,10 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 
+from qtpy import QtCore
+
 from pydidas.core import Parameter, ParameterCollection, PydidasQsettings
 from pydidas.core.pydidas_q_settings_mixin import _CopyablePydidasQSettings
-from qtpy import QtCore
 
 
 VERSION = "unittesting"

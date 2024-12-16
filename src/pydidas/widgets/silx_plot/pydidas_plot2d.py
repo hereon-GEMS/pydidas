@@ -33,25 +33,30 @@ from functools import partial
 from typing import Union
 
 import numpy as np
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
 from silx.gui.plot.items import Scatter
 
-from ...contexts import DiffractionExperimentContext
-from ...core import Dataset, PydidasQsettingsMixin, UserConfigError
-from .coordinate_transform_button import CoordinateTransformButton
-from .pydidas_position_info import PydidasPositionInfo
-from .silx_actions import (
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.core import Dataset, PydidasQsettingsMixin, UserConfigError
+from pydidas.widgets.silx_plot.coordinate_transform_button import (
+    CoordinateTransformButton,
+)
+from pydidas.widgets.silx_plot.pydidas_position_info import PydidasPositionInfo
+from pydidas.widgets.silx_plot.silx_actions import (
     AutoscaleToMeanAndThreeSigma,
     ChangeCanvasToData,
     CropHistogramOutliers,
     ExpandCanvas,
     PydidasGetDataInfoAction,
 )
-from .silx_tickbar import tickbar_paintEvent, tickbar_paintTick
-from .utilities import get_2d_silx_plot_ax_settings, user_config_update_func
+from pydidas.widgets.silx_plot.silx_tickbar import tickbar_paintEvent, tickbar_paintTick
+from pydidas.widgets.silx_plot.utilities import (
+    get_2d_silx_plot_ax_settings,
+    user_config_update_func,
+)
+from pydidas_qtcore import PydidasQApplication
 
 
 _SCATTER_LEGEND = "pydidas non-uniform image"

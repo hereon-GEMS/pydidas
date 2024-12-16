@@ -30,15 +30,15 @@ __all__ = ["PydidasExceptionMessageBox"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import (
+from pydidas.core.constants import (
     FONT_METRIC_SMALL_BUTTON_WIDTH,
     FONT_METRIC_WIDE_CONFIG_WIDTH,
     POLICY_EXP_EXP,
 )
-from ...core.utils import format_input_to_multiline_str
-from ...resources import icons, logos
-from ..factory import CreateWidgetsMixIn
-from ..scroll_area import ScrollArea
+from pydidas.core.utils import format_input_to_multiline_str
+from pydidas.resources import icons, logos
+from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.scroll_area import ScrollArea
 
 
 class PydidasExceptionMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):

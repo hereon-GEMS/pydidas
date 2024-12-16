@@ -31,8 +31,8 @@ __all__ = ["DiffractionExperimentIo"]
 
 from typing import Union
 
-from ...core.io_registry import GenericIoMeta
-from ...core.utils import get_extension
+from pydidas.core.io_registry import GenericIoMeta
+from pydidas.core.utils import get_extension
 
 
 class DiffractionExperimentIo(GenericIoMeta):

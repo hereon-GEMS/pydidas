@@ -34,10 +34,10 @@ from typing import Self, Union
 import numpy as np
 from qtpy import QtCore
 
-from ...core import Dataset, UserConfigError
-from ...widgets import PydidasFileDialog
-from ...widgets.dialogues import critical_warning
-from ...workflow import WorkflowResultsContext
+from pydidas.core import Dataset, UserConfigError
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.dialogues import critical_warning
+from pydidas.workflow import WorkflowResultsContext
 
 
 class ViewResultsMixin:

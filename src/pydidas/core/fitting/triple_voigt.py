@@ -32,8 +32,8 @@ from typing import Tuple
 
 from scipy.special import voigt_profile
 
-from .multi_peak_mixin import MultiPeakMixin
-from .voigt import Voigt
+from pydidas.core.fitting.multi_peak_mixin import MultiPeakMixin
+from pydidas.core.fitting.voigt import Voigt
 
 
 class TripleVoigt(MultiPeakMixin, Voigt):

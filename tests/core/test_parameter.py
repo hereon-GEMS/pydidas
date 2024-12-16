@@ -32,6 +32,7 @@ from numbers import Integral, Real
 from pathlib import Path
 
 import numpy as np
+
 from pydidas.core import Hdf5key
 from pydidas.core.parameter import Parameter, _get_base_class
 from pydidas.core.utils import get_random_string

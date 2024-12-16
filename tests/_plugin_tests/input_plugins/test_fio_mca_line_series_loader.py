@@ -29,11 +29,12 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+from qtpy import QtCore
+
 from pydidas.contexts import ScanContext
 from pydidas.core import FileReadError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
-from qtpy import QtCore
 
 
 COLLECTION = LocalPluginCollection()

@@ -34,11 +34,11 @@ from functools import partial
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QFrame
 
-from ...core.constants import ALIGN_CENTER_LEFT, ALIGN_TOP_RIGHT
-from ...core.utils import apply_qt_properties
-from ...workflow import WorkflowTree
-from ..factory import CreateWidgetsMixIn
-from ..utilities import get_pyqt_icon_from_str
+from pydidas.core.constants import ALIGN_CENTER_LEFT, ALIGN_TOP_RIGHT
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
+from pydidas.workflow import WorkflowTree
 
 
 TREE = WorkflowTree()

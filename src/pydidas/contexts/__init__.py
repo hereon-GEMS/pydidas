@@ -46,9 +46,11 @@ from .scan import ScanContext, ScanIo, Scan
 __all__.extend(
     [
         "DiffractionExperimentContext",
+        "DiffractionExperiment",
         "DiffractionExperimentIo",
         "ScanContext",
         "ScanIo",
+        "Scan",
     ]
 )
 
@@ -56,6 +58,3 @@ GLOBAL_CONTEXTS = {
     "diffraction_experiment_context": DiffractionExperimentContext(),
     "scan_context": ScanContext(),
 }
-
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:

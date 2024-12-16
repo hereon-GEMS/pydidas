@@ -27,6 +27,7 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+
 from pydidas.core import UserConfigError, utils
 from pydidas.data_io import IoManager
 

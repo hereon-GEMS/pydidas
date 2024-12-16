@@ -31,7 +31,7 @@ from typing import Union
 
 from qtpy import QtWidgets
 
-from ..utilities import get_pyqt_icon_from_str
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 class QuestionBox(QtWidgets.QMessageBox):

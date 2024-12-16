@@ -30,13 +30,13 @@ __all__ = ["MaskEditorWindow"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
-from ...core.utils import update_size_policy
-from ...data_io import import_data
-from .. import parameter_config, silx_plot
-from ..framework import PydidasWindow
-from ..misc import SelectImageFrameWidget
+from pydidas.core import get_generic_param_collection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.utils import update_size_policy
+from pydidas.data_io import import_data
+from pydidas.widgets import parameter_config, silx_plot
+from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.misc import SelectImageFrameWidget
 
 
 class MaskEditorWindow(PydidasWindow):

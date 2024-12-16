@@ -29,6 +29,7 @@ __all__ = ["RemoveOutliers"]
 
 
 import numpy as np
+
 from pydidas.core import Dataset, Parameter, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims

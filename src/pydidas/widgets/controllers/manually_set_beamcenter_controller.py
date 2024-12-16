@@ -36,14 +36,14 @@ import numpy as np
 import pyFAI
 from qtpy import QtCore, QtWidgets
 
-from ...core import UserConfigError
-from ...core.constants import PYDIDAS_COLORS
-from ...core.utils import (
+from pydidas.core import UserConfigError
+from pydidas.core.constants import PYDIDAS_COLORS
+from pydidas.core.utils import (
     calc_points_on_ellipse,
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,
 )
-from ...data_io import import_data
+from pydidas.data_io import import_data
 
 
 BaseFrame = NewType("BaseFrame", QtWidgets.QWidget)

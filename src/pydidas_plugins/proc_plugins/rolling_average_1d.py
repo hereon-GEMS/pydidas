@@ -28,6 +28,7 @@ __status__ = "Production"
 __all__ = ["RollingAverage1d"]
 
 import numpy as np
+
 from pydidas.core import (
     Dataset,
     Parameter,

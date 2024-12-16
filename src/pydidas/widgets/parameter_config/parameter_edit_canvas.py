@@ -28,9 +28,11 @@ __status__ = "Production"
 __all__ = ["ParameterEditCanvas"]
 
 
-from ...core.constants import POLICY_MIN_MIN
-from ..factory import EmptyWidget
-from .parameter_widgets_mixin import ParameterWidgetsMixIn
+from pydidas.core.constants import POLICY_MIN_MIN
+from pydidas.widgets.factory import EmptyWidget
+from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
+    ParameterWidgetsMixIn,
+)
 
 
 class ParameterEditCanvas(ParameterWidgetsMixIn, EmptyWidget):

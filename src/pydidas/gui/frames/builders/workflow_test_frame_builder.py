@@ -29,12 +29,12 @@ __all__ = ["WorkflowTestFrameBuilder"]
 
 from qtpy import QtCore
 
-from ....core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
-from ....core.utils import apply_qt_properties
-from ....widgets import ScrollArea
-from ....widgets.framework import BaseFrame
-from ....widgets.misc import ReadOnlyTextWidget
-from ....widgets.silx_plot import PydidasPlotStack
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets import ScrollArea
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.misc import ReadOnlyTextWidget
+from pydidas.widgets.silx_plot import PydidasPlotStack
 
 
 class WorkflowTestFrameBuilder:

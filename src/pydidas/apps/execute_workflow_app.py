@@ -37,19 +37,19 @@ from typing import Optional, Union
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ..contexts import DiffractionExperimentContext, ScanContext
-from ..core import (
+from pydidas.apps.parsers import execute_workflow_app_parser
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.core import (
     BaseApp,
     Dataset,
     FileReadError,
     UserConfigError,
     get_generic_param_collection,
 )
-from ..core.utils import pydidas_logger
-from ..core.utils.dataset_utils import get_default_property_dict
-from ..workflow import WorkflowResultsContext, WorkflowTree
-from ..workflow.result_io import WorkflowResultIoMeta
-from .parsers import execute_workflow_app_parser
+from pydidas.core.utils import pydidas_logger
+from pydidas.core.utils.dataset_utils import get_default_property_dict
+from pydidas.workflow import WorkflowResultsContext, WorkflowTree
+from pydidas.workflow.result_io import WorkflowResultIoMeta
 
 
 TREE = WorkflowTree()

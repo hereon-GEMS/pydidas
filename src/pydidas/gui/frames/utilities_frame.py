@@ -32,16 +32,16 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...widgets.framework import BaseFrame
-from ...widgets.windows import (
+from pydidas.gui.frames.builders import UtilitiesFrameBuilder
+from pydidas.gui.frames.composite_creator_frame import CompositeCreatorFrame
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.windows import (
     ExportEigerPixelmaskWindow,
     GlobalSettingsWindow,
     ImageSeriesOperationsWindow,
     MaskEditorWindow,
     UserConfigWindow,
 )
-from .builders import UtilitiesFrameBuilder
-from .composite_creator_frame import CompositeCreatorFrame
 
 
 class UtilitiesFrame(BaseFrame):

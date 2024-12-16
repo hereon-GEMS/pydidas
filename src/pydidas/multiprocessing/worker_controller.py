@@ -38,11 +38,11 @@ from typing import Callable, Optional, Union
 
 from qtpy import QtCore, QtWidgets
 
-from ..core import PydidasQsettings
-from ..core.utils import pydidas_logger
-from ..logging_level import LOGGING_LEVEL
-from .processor_ import processor
-from .pydidas_process import PydidasProcess
+from pydidas.core import PydidasQsettings
+from pydidas.core.utils import pydidas_logger
+from pydidas.logging_level import LOGGING_LEVEL
+from pydidas.multiprocessing.processor_ import processor
+from pydidas.multiprocessing.pydidas_process import PydidasProcess
 
 
 logger = pydidas_logger()

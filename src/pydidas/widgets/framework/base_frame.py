@@ -30,11 +30,15 @@ __all__ = ["BaseFrame"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import ParameterCollection, ParameterCollectionMixIn, PydidasQsettingsMixin
-from ...core.utils import ShowBusyMouse
-from ...resources import icons
-from ..factory import CreateWidgetsMixIn
-from ..parameter_config import ParameterWidgetsMixIn
+from pydidas.core import (
+    ParameterCollection,
+    ParameterCollectionMixIn,
+    PydidasQsettingsMixin,
+)
+from pydidas.core.utils import ShowBusyMouse
+from pydidas.resources import icons
+from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 
 
 class BaseFrame(

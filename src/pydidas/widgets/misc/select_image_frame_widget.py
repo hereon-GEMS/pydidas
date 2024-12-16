@@ -33,13 +33,15 @@ from typing import Union
 
 from qtpy import QtCore
 
-from ...core import Parameter, UserConfigError
-from ...core.constants import POLICY_EXP_FIX
-from ...core.utils import get_hdf5_populated_dataset_keys, is_hdf5_filename
-from ...data_io import IoManager
-from ...widgets.dialogues import Hdf5DatasetSelectionPopup
-from ..file_dialog import PydidasFileDialog
-from ..widget_with_parameter_collection import WidgetWithParameterCollection
+from pydidas.core import Parameter, UserConfigError
+from pydidas.core.constants import POLICY_EXP_FIX
+from pydidas.core.utils import get_hdf5_populated_dataset_keys, is_hdf5_filename
+from pydidas.data_io import IoManager
+from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
+from pydidas.widgets.file_dialog import PydidasFileDialog
+from pydidas.widgets.widget_with_parameter_collection import (
+    WidgetWithParameterCollection,
+)
 
 
 class SelectImageFrameWidget(WidgetWithParameterCollection):

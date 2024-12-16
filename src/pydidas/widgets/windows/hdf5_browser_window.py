@@ -32,12 +32,12 @@ from pathlib import Path
 from typing import Union
 
 import h5py
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui import icons as silx_icons
 from silx.gui.hdf5 import Hdf5TreeModel, Hdf5TreeView, NexusSortFilterProxyModel
 
-from ..framework import PydidasWindow
+from pydidas.widgets.framework import PydidasWindow
+from pydidas_qtcore import PydidasQApplication
 
 
 class Hdf5BrowserWindow(PydidasWindow):

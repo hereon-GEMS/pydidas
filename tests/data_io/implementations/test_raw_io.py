@@ -30,6 +30,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+
 from pydidas.core import FileReadError
 from pydidas.core.constants import BINARY_EXTENSIONS
 from pydidas.data_io.implementations.raw_io import RawIo

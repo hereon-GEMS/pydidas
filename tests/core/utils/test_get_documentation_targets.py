@@ -28,13 +28,14 @@ import os
 import unittest
 from pathlib import Path
 
+from qtpy import QtCore
+
 from pydidas.core.utils import (
     DOC_HOME_ADDRESS,
     DOC_HOME_FILENAME,
     DOC_HOME_QURL,
     DOC_SOURCE_DIRECTORY,
 )
-from qtpy import QtCore
 
 
 class TestGetDocQUrl(unittest.TestCase):

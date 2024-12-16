@@ -32,12 +32,12 @@ from typing import Self, Tuple, Union
 
 import numpy as np
 
-from ...core import (
+from pydidas.contexts.scan.scan_io import ScanIo
+from pydidas.core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
-from .scan_io import ScanIo
 
 
 SCAN_DEFAULT_PARAMS = get_generic_param_collection(

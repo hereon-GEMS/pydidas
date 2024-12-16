@@ -28,10 +28,10 @@ __all__ = []
 
 # import __all__ items from modules:
 from .pydidas_masktools_widget import *
-from .pydidas_plot1d import *
-from .pydidas_plot2d import *
+from pydidas.widgets.silx_plot.pydidas_plot1d import *
+from pydidas.widgets.silx_plot.pydidas_plot2d import *
 from .pydidas_plot_stack import *
-from .pydidas_plot2d_with_integration_regions import *
+from pydidas.widgets.silx_plot.pydidas_plot2d_with_integration_regions import *
 from .silx_actions import *
 from .utilities import *
 

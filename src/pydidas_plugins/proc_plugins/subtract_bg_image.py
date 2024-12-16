@@ -32,6 +32,7 @@ import os
 from typing import Union
 
 import numpy as np
+
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.data_io import import_data

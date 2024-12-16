@@ -33,8 +33,8 @@ from typing import Union
 
 from numpy import ndarray
 
-from ..core import Dataset
-from .io_manager import IoManager
+from pydidas.core import Dataset
+from pydidas.data_io.io_manager import IoManager
 
 
 def export_data(filename: Union[str, Path], data: ndarray, **kwargs: dict):

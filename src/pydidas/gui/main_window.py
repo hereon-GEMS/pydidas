@@ -33,11 +33,15 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ..core import PydidasGuiError, UserConfigError
-from ..widgets.framework import FontScalingToolbar
-from . import utils
-from .frames import DefineDiffractionExpFrame, DefineScanFrame, WorkflowEditFrame
-from .main_menu import MainMenu
+from pydidas.core import PydidasGuiError, UserConfigError
+from pydidas.gui import utils
+from pydidas.gui.frames import (
+    DefineDiffractionExpFrame,
+    DefineScanFrame,
+    WorkflowEditFrame,
+)
+from pydidas.gui.main_menu import MainMenu
+from pydidas.widgets.framework import FontScalingToolbar
 
 
 class MainWindow(MainMenu):

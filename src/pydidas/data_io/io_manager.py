@@ -33,8 +33,8 @@ from typing import Literal, Union
 
 import numpy as np
 
-from ..core import Dataset, UserConfigError
-from ..core.utils import get_extension
+from pydidas.core import Dataset, UserConfigError
+from pydidas.core.utils import get_extension
 
 
 class IoManager(type):

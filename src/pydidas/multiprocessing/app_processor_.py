@@ -32,8 +32,8 @@ import queue
 import time
 from typing import Union
 
-from ..core import BaseApp, ParameterCollection
-from ..core.utils import LOGGING_LEVEL, pydidas_logger
+from pydidas.core import BaseApp, ParameterCollection
+from pydidas.core.utils import LOGGING_LEVEL, pydidas_logger
 
 
 logger = pydidas_logger()

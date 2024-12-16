@@ -29,7 +29,7 @@ __all__ = ["WarningBox"]
 
 from qtpy import QtWidgets
 
-from ..utilities import get_pyqt_icon_from_str
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 class WarningBox(QtWidgets.QMessageBox):

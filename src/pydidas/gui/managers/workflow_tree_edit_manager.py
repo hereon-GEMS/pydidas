@@ -34,10 +34,10 @@ from typing import Iterable, Optional
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core import SingletonFactory
-from ...plugins import PluginCollection
-from ...widgets.workflow_edit import PluginInWorkflowBox
-from ...workflow import PluginPositionNode, WorkflowTree
+from pydidas.core import SingletonFactory
+from pydidas.plugins import PluginCollection
+from pydidas.widgets.workflow_edit import PluginInWorkflowBox
+from pydidas.workflow import PluginPositionNode, WorkflowTree
 
 
 PLUGIN_COLLECTION = PluginCollection()

@@ -30,13 +30,13 @@ __all__ = ["create_splitter", "get_widget_creation_information"]
 
 from qtpy import QtGui, QtWidgets
 
-from ....core.constants import POLICY_EXP_EXP
-from ....widgets.selection import (
+from pydidas.core.constants import POLICY_EXP_EXP
+from pydidas.widgets.selection import (
     DirectoryExplorer,
     Hdf5DatasetSelector,
     RawMetadataSelector,
 )
-from ....widgets.silx_plot.silx_data_viewer import SilxDataViewer
+from pydidas.widgets.silx_plot.silx_data_viewer import SilxDataViewer
 
 
 def get_widget_creation_information() -> list[list[str, tuple, dict]]:

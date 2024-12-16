@@ -32,14 +32,16 @@ from typing import Self
 
 from qtpy import QtCore
 
-from ...contexts.diff_exp import DiffractionExperiment
-from ...contexts.scan import Scan
-from ...core import get_generic_param_collection
-from ...widgets import PydidasFileDialog
-from ...widgets.framework import BaseFrame
-from ...workflow import ProcessingTree, WorkflowResults, result_io
-from ..mixins import ViewResultsMixin
-from .builders.view_results_frame_builder import ViewResultsFrameBuilder
+from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.contexts.scan import Scan
+from pydidas.core import get_generic_param_collection
+from pydidas.gui.frames.builders.view_results_frame_builder import (
+    ViewResultsFrameBuilder,
+)
+from pydidas.gui.mixins import ViewResultsMixin
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.framework import BaseFrame
+from pydidas.workflow import ProcessingTree, WorkflowResults, result_io
 
 
 SAVER = result_io.WorkflowResultIoMeta

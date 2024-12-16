@@ -31,6 +31,7 @@ from pathlib import Path
 
 import numpy as np
 import skimage.io
+
 from pydidas.core import FileReadError
 from pydidas.core.constants import TIFF_EXTENSIONS
 from pydidas.data_io.implementations.tiff_io import TiffIo

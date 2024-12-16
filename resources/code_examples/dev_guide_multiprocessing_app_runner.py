@@ -23,8 +23,9 @@ __status__ = "Production"
 
 
 import numpy as np
-import pydidas
 from qtpy import QtCore
+
+import pydidas
 
 
 class TestApp(pydidas.core.BaseApp):

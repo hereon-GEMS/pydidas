@@ -30,9 +30,10 @@ import time
 import unittest
 
 import numpy as np
+from qtpy import QtCore, QtTest, QtWidgets
+
 from pydidas import IS_QT6
 from pydidas.multiprocessing import WorkerController
-from qtpy import QtCore, QtTest, QtWidgets
 
 
 def local_test_func(index, *args, **kwargs):

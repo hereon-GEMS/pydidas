@@ -26,11 +26,12 @@ __status__ = "Production"
 
 import unittest
 
+from qtpy import QtCore, QtWidgets
+
 from pydidas.core import Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication
-from qtpy import QtCore, QtWidgets
 
 
 class SignalTestClass(QtCore.QObject):

@@ -33,12 +33,14 @@ from pathlib import Path
 from qtpy import QtCore, QtWidgets
 from qtpy.QtWidgets import QStyle
 
-from ...core import Hdf5key
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
-from ...plugins import BasePlugin
-from ..factory import CreateWidgetsMixIn, EmptyWidget
-from ..utilities import delete_all_items_in_layout
-from .parameter_widgets_mixin import ParameterWidgetsMixIn
+from pydidas.core import Hdf5key
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
+from pydidas.plugins import BasePlugin
+from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
+from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
+    ParameterWidgetsMixIn,
+)
+from pydidas.widgets.utilities import delete_all_items_in_layout
 
 
 class EditPluginParametersWidget(

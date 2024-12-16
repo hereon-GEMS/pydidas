@@ -32,16 +32,16 @@ from pathlib import Path
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core import Dataset, UserConfigError, get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
-from ...core.utils import apply_qt_properties
-from ...data_io import import_data
-from ..controllers import ManuallySetIntegrationRoiController
-from ..dialogues import QuestionBox
-from ..framework import PydidasWindow
-from ..misc import SelectImageFrameWidget, ShowIntegrationRoiParamsWidget
-from ..scroll_area import ScrollArea
-from ..silx_plot import PydidasPlot2DwithIntegrationRegions
+from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.utils import apply_qt_properties
+from pydidas.data_io import import_data
+from pydidas.widgets.controllers import ManuallySetIntegrationRoiController
+from pydidas.widgets.dialogues import QuestionBox
+from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.misc import SelectImageFrameWidget, ShowIntegrationRoiParamsWidget
+from pydidas.widgets.scroll_area import ScrollArea
+from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
 class SelectIntegrationRegionWindow(PydidasWindow):

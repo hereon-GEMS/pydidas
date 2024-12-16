@@ -34,11 +34,11 @@ from typing import Union
 import numpy as np
 import yaml
 
-from ...core import UserConfigError
-from ...core.constants import LAMBDA_IN_A_TO_E, YAML_EXTENSIONS
-from .diff_exp import DiffractionExperiment
-from .diff_exp_context import DiffractionExperimentContext
-from .diff_exp_io_base import DiffractionExperimentIoBase
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
+from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
+from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
+from pydidas.core import UserConfigError
+from pydidas.core.constants import LAMBDA_IN_A_TO_E, YAML_EXTENSIONS
 
 
 EXP = DiffractionExperimentContext()

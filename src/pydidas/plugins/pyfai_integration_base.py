@@ -38,19 +38,19 @@ from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from qtpy import QtWidgets
 from silx.opencl.common import OpenCL
 
-from ..contexts import DiffractionExperimentContext
-from ..core import UserConfigError, get_generic_param_collection
-from ..core.constants import (
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core.constants import (
     ASCII_TO_UNI,
     PROC_PLUGIN,
     PROC_PLUGIN_IMAGE,
     pyFAI_METHOD,
     pyFAI_UNITS,
 )
-from ..core.utils import pydidas_logger
-from ..data_io import import_data
-from ..widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
-from .base_proc_plugin import ProcPlugin
+from pydidas.core.utils import pydidas_logger
+from pydidas.data_io import import_data
+from pydidas.plugins.base_proc_plugin import ProcPlugin
+from pydidas.widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
 
 
 logger = pydidas_logger()

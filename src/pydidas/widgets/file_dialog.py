@@ -34,12 +34,12 @@ from typing import Union
 
 from qtpy import QtCore, QtWidgets
 
-from ..contexts import ScanContext
-from ..core import PydidasQsettingsMixin, SingletonFactory, UserConfigError
-from ..core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
-from ..core.utils import flatten, update_child_qobject
-from ..resources import icons
-from .factory import CreateWidgetsMixIn
+from pydidas.contexts import ScanContext
+from pydidas.core import PydidasQsettingsMixin, SingletonFactory, UserConfigError
+from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
+from pydidas.core.utils import flatten, update_child_qobject
+from pydidas.resources import icons
+from pydidas.widgets.factory import CreateWidgetsMixIn
 
 
 SCAN = ScanContext()

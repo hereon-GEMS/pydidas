@@ -33,6 +33,7 @@ from pathlib import Path
 
 import numpy as np
 import pyFAI
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import UserConfigError, get_generic_parameter
 from pydidas.plugins import BasePlugin, pyFAIintegrationBase

@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = []
 
 
-from .io_exporter_matplotlib import IoExporterMatplotlib
+from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMatplotlib
 
 
 class PngIo(IoExporterMatplotlib):

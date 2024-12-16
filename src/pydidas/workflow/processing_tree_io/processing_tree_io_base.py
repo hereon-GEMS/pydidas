@@ -28,8 +28,10 @@ __status__ = "Production"
 __all__ = ["ProcessingTreeIoBase"]
 
 
-from ...core.io_registry import GenericIoBase
-from .processing_tree_io_meta import ProcessingTreeIoMeta
+from pydidas.core.io_registry import GenericIoBase
+from pydidas.workflow.processing_tree_io.processing_tree_io_meta import (
+    ProcessingTreeIoMeta,
+)
 
 
 class ProcessingTreeIoBase(GenericIoBase, metaclass=ProcessingTreeIoMeta):

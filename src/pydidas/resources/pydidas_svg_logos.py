@@ -39,7 +39,7 @@ if qtpy.QT5:
 elif qtpy.QT6:
     from qtpy.QtSvgWidgets import QSvgWidget
 
-from .pydidas_icons import ICON_PATH
+from pydidas.resources.pydidas_icons import ICON_PATH
 
 
 def pydidas_logo_svg() -> QSvgWidget:

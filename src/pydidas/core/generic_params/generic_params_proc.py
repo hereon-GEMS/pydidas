@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["GENERIC_PARAMS_PROC"]
 
+
 from pydidas.core.constants import ASCII_TO_UNI
 
 

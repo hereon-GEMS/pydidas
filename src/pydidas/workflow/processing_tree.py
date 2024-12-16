@@ -33,11 +33,11 @@ from numbers import Integral
 from pathlib import Path
 from typing import Self, Union
 
-from ..core import UserConfigError
-from ..plugins import BasePlugin, PluginCollection
-from .generic_tree import GenericTree
-from .processing_tree_io import ProcessingTreeIoMeta
-from .workflow_node import WorkflowNode
+from pydidas.core import UserConfigError
+from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.workflow.generic_tree import GenericTree
+from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
+from pydidas.workflow.workflow_node import WorkflowNode
 
 
 PLUGINS = PluginCollection()

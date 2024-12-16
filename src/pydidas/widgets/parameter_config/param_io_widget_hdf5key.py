@@ -31,11 +31,13 @@ __all__ = ["ParamIoWidgetHdf5Key"]
 
 from qtpy import QtCore
 
-from ...core import Parameter
-from ...core.constants import HDF5_EXTENSIONS
-from ..dialogues import Hdf5DatasetSelectionPopup
-from ..file_dialog import PydidasFileDialog
-from .param_io_widget_with_button import ParamIoWidgetWithButton
+from pydidas.core import Parameter
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
+from pydidas.widgets.file_dialog import PydidasFileDialog
+from pydidas.widgets.parameter_config.param_io_widget_with_button import (
+    ParamIoWidgetWithButton,
+)
 
 
 class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):

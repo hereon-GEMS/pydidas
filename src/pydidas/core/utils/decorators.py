@@ -33,9 +33,9 @@ from typing import Callable, Tuple
 
 import numpy as np
 
-from ..dataset import Dataset
-from ..exceptions import UserConfigError
-from .iterable_utils import (
+from pydidas.core.dataset import Dataset
+from pydidas.core.exceptions import UserConfigError
+from pydidas.core.utils.iterable_utils import (
     insert_item_in_tuple,
     insert_items_in_tuple,
     remove_item_at_index_from_iterable,

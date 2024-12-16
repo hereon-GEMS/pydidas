@@ -30,8 +30,8 @@ __all__ = ["UtilitiesFrameBuilder"]
 
 from qtpy import QtWidgets
 
-from ....core import constants
-from ....widgets.framework import BaseFrame
+from pydidas.core import constants
+from pydidas.widgets.framework import BaseFrame
 
 
 UTILITIES = {

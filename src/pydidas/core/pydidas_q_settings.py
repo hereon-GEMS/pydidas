@@ -30,7 +30,7 @@ __all__ = ["PydidasQsettings"]
 
 from typing import Optional, Union
 
-from .pydidas_q_settings_mixin import PydidasQsettingsMixin
+from pydidas.core.pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class PydidasQsettings(PydidasQsettingsMixin):

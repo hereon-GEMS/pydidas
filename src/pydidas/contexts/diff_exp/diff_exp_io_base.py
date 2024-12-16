@@ -30,11 +30,11 @@ __all__ = ["DiffractionExperimentIoBase"]
 
 from typing import Union
 
-from ...core import UserConfigError
-from ...core.io_registry import GenericIoBase
-from .diff_exp import DiffractionExperiment
-from .diff_exp_context import DiffractionExperimentContext
-from .diff_exp_io import DiffractionExperimentIo
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
+from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
+from pydidas.contexts.diff_exp.diff_exp_io import DiffractionExperimentIo
+from pydidas.core import UserConfigError
+from pydidas.core.io_registry import GenericIoBase
 
 
 EXP = DiffractionExperimentContext()

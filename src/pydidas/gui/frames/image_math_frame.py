@@ -33,18 +33,18 @@ from pathlib import Path
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import ScanContext
-from ...core import (
+from pydidas.contexts import ScanContext
+from pydidas.core import (
     ParameterCollection,
     UserConfigError,
     constants,
     get_generic_param_collection,
 )
-from ...data_io import IoManager, export_data, import_data
-from ...gui.frames.builders import ImageMathFrameBuilder
-from ...widgets import PydidasFileDialog
-from ...widgets.framework import BaseFrame
-from ...workflow import WorkflowTree
+from pydidas.data_io import IoManager, export_data, import_data
+from pydidas.gui.frames.builders import ImageMathFrameBuilder
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.framework import BaseFrame
+from pydidas.workflow import WorkflowTree
 
 
 SCAN_SETTINGS = ScanContext()

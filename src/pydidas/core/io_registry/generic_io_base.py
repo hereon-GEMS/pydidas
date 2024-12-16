@@ -30,7 +30,7 @@ __all__ = ["GenericIoBase"]
 
 import os
 
-from .generic_io_meta import GenericIoMeta
+from pydidas.core.io_registry.generic_io_meta import GenericIoMeta
 
 
 class GenericIoBase(metaclass=GenericIoMeta):

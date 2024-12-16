@@ -31,10 +31,10 @@ __all__ = ["PydidasQsettingsMixin"]
 from numbers import Integral, Real
 from typing import Optional, Self, Union
 
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore
 
-from ..version import VERSION
+from pydidas.version import VERSION
+from pydidas_qtcore import PydidasQApplication
 
 
 class _CopyablePydidasQSettings(QtCore.QSettings):

@@ -35,23 +35,24 @@ from pathlib import Path
 from typing import Optional, Union
 
 import yaml
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ..contexts import GLOBAL_CONTEXTS
-from ..core import PydidasQsettingsMixin, UserConfigError
-from ..core.constants import MAIN_MENU_MENU_ACTIONS, PYDIDAS_STANDARD_CONFIG_PATH
-from ..core.utils import (
+from pydidas.contexts import GLOBAL_CONTEXTS
+from pydidas.core import PydidasQsettingsMixin, UserConfigError
+from pydidas.core.constants import MAIN_MENU_MENU_ACTIONS, PYDIDAS_STANDARD_CONFIG_PATH
+from pydidas.core.utils import (
     DOC_HOME_QURL,
     doc_filename_for_frame_manual,
     doc_qurl_for_frame_manual,
 )
-from ..resources import icons
-from ..version import VERSION
-from ..widgets import PydidasFileDialog, get_pyqt_icon_from_str
-from ..widgets.dialogues import AcknowledgeBox, QuestionBox, critical_warning
-from ..widgets.framework import PydidasFrameStack, PydidasStatusWidget
-from ..widgets.windows import (
+from pydidas.gui import utils
+from pydidas.gui.gui_excepthook_ import gui_excepthook
+from pydidas.resources import icons
+from pydidas.version import VERSION
+from pydidas.widgets import PydidasFileDialog, get_pyqt_icon_from_str
+from pydidas.widgets.dialogues import AcknowledgeBox, QuestionBox, critical_warning
+from pydidas.widgets.framework import PydidasFrameStack, PydidasStatusWidget
+from pydidas.widgets.windows import (
     AboutWindow,
     ExportEigerPixelmaskWindow,
     FeedbackWindow,
@@ -61,9 +62,8 @@ from ..widgets.windows import (
     QtPathsWindow,
     UserConfigWindow,
 )
-from ..workflow import WorkflowTree
-from . import utils
-from .gui_excepthook_ import gui_excepthook
+from pydidas.workflow import WorkflowTree
+from pydidas_qtcore import PydidasQApplication
 
 
 TREE = WorkflowTree()

@@ -30,7 +30,7 @@ __all__ = ["PydidasLineEdit"]
 
 from qtpy import QtCore, QtWidgets
 
-from .pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
 class PydidasLineEdit(PydidasWidgetMixin, QtWidgets.QLineEdit):

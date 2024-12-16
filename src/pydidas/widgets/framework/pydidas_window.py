@@ -32,13 +32,13 @@ import os
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core.utils import (
+from pydidas.core.utils import (
     DOC_HOME_QURL,
     doc_filename_for_window_manual,
     doc_qurl_for_window_manual,
 )
-from ...resources import icons
-from .base_frame import BaseFrame
+from pydidas.resources import icons
+from pydidas.widgets.framework.base_frame import BaseFrame
 
 
 class PydidasWindowMixIn:

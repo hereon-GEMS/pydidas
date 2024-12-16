@@ -33,12 +33,12 @@ from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import Parameter, ParameterCollection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
-from ...core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
-from ...data_io import IoManager
-from ..dialogues import critical_warning
-from ..framework import PydidasWindow
+from pydidas.core import Parameter, ParameterCollection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
+from pydidas.data_io import IoManager
+from pydidas.widgets.dialogues import critical_warning
+from pydidas.widgets.framework import PydidasWindow
 
 
 class ExportEigerPixelmaskWindow(PydidasWindow):

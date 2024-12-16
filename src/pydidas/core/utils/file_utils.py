@@ -39,9 +39,9 @@ from numbers import Integral
 from pathlib import Path
 from typing import List, Tuple, Union
 
-from ..constants import FILENAME_DELIMITERS
-from ..exceptions import FileReadError, UserConfigError
-from .iterable_utils import flatten
+from pydidas.core.constants import FILENAME_DELIMITERS
+from pydidas.core.exceptions import FileReadError, UserConfigError
+from pydidas.core.utils.iterable_utils import flatten
 
 
 _FILE_NAME_SCHEME_ERROR_STR = (

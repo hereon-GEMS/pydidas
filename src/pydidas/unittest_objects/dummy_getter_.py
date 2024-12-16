@@ -42,9 +42,9 @@ def dummy_getter(plugin_name: str) -> object:
     plugin : pydidas.plugins.BasePlugin
         The new Plugin instance.
     """
-    from .dummy_loader import DummyLoader
-    from .dummy_proc import DummyProc
-    from .dummy_proc_new_dataset import DummyProcNewDataset
+    from pydidas.unittest_objects.dummy_loader import DummyLoader
+    from pydidas.unittest_objects.dummy_proc import DummyProc
+    from pydidas.unittest_objects.dummy_proc_new_dataset import DummyProcNewDataset
 
     if plugin_name == "DummyLoader":
         return DummyLoader()

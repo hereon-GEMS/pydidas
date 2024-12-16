@@ -32,7 +32,7 @@ from typing import List, Tuple, Union
 from numpy import amax, amin, inf, ndarray
 from scipy.special import voigt_profile
 
-from .fit_func_base import FitFuncBase
+from pydidas.core.fitting.fit_func_base import FitFuncBase
 
 
 class Voigt(FitFuncBase):

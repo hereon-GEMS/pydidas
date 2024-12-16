@@ -34,9 +34,9 @@ import numpy as np
 from qtpy import QtCore
 from silx.gui.plot.tools import PositionInfo
 
-from ...contexts import DiffractionExperimentContext
-from ...core import UserConfigError
-from ...core.utils import get_chi_from_x_and_y
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.core import UserConfigError
+from pydidas.core.utils import get_chi_from_x_and_y
 
 
 AX_LABELS = {

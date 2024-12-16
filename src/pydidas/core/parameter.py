@@ -37,7 +37,7 @@ from typing import Any, Self, Type, Union
 
 from numpy import asarray, ndarray
 
-from .hdf5_key import Hdf5key
+from pydidas.core.hdf5_key import Hdf5key
 
 
 _ITERATORS = (list, set, tuple)

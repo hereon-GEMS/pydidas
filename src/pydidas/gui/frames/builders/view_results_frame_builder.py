@@ -28,11 +28,11 @@ __status__ = "Production"
 __all__ = ["ViewResultsFrameBuilder"]
 
 
-from ....core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
-from ....widgets import ScrollArea
-from ....widgets.framework import BaseFrame
-from ....widgets.selection import ResultSelectionWidget
-from ....widgets.silx_plot import PydidasPlotStack
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
+from pydidas.widgets import ScrollArea
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.selection import ResultSelectionWidget
+from pydidas.widgets.silx_plot import PydidasPlotStack
 
 
 class ViewResultsFrameBuilder:

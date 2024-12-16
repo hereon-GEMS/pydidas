@@ -32,10 +32,10 @@ from typing import Union
 
 import pyFAI
 
-from ...core.constants import LAMBDA_IN_M_TO_E
-from .diff_exp import DiffractionExperiment
-from .diff_exp_context import DiffractionExperimentContext
-from .diff_exp_io_base import DiffractionExperimentIoBase
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
+from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
+from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
+from pydidas.core.constants import LAMBDA_IN_M_TO_E
 
 
 EXP = DiffractionExperimentContext()

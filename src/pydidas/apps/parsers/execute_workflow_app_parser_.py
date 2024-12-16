@@ -31,7 +31,7 @@ __all__ = ["execute_workflow_app_parser"]
 import argparse
 from typing import Union
 
-from ...core.generic_params import GENERIC_PARAMS_METADATA as PARAMS
+from pydidas.core.generic_params import GENERIC_PARAMS_METADATA as PARAMS
 
 
 def execute_workflow_app_parser(caller: Union[object, None] = None) -> dict:

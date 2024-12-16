@@ -33,9 +33,11 @@ from functools import partial
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QStyle
 
-from ...core import Parameter
-from ..factory import PydidasLineEdit, SquareButton
-from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
+from pydidas.core import Parameter
+from pydidas.widgets.factory import PydidasLineEdit, SquareButton
+from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+    BaseParamIoWidgetMixIn,
+)
 
 
 class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):

@@ -33,15 +33,20 @@ from pathlib import Path
 
 from qtpy import QtCore
 
-from ...core import Parameter
-from ...core.constants import HDF5_EXTENSIONS
-from ...core.utils import (
+from pydidas.core import Parameter
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import (
     get_extension,
     get_hdf5_populated_dataset_keys,
     update_child_qobject,
 )
-from ..utilities import get_max_pixel_width_of_entries, get_pyqt_icon_from_str
-from ..widget_with_parameter_collection import WidgetWithParameterCollection
+from pydidas.widgets.utilities import (
+    get_max_pixel_width_of_entries,
+    get_pyqt_icon_from_str,
+)
+from pydidas.widgets.widget_with_parameter_collection import (
+    WidgetWithParameterCollection,
+)
 
 
 DEFAULT_FILTERS = {

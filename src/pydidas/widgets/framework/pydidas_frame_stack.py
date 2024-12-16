@@ -36,9 +36,9 @@ from typing import List, Union
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import SingletonFactory, utils
-from ..utilities import get_pyqt_icon_from_str
-from .base_frame import BaseFrame
+from pydidas.core import SingletonFactory, utils
+from pydidas.widgets.framework.base_frame import BaseFrame
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 class _PydidasFrameStack(QtWidgets.QStackedWidget):

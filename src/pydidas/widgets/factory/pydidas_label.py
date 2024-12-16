@@ -29,8 +29,8 @@ __all__ = ["PydidasLabel"]
 
 from qtpy import QtWidgets
 
-from ...core.constants import POLICY_EXP_FIX
-from .pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.core.constants import POLICY_EXP_FIX
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
 class PydidasLabel(PydidasWidgetMixin, QtWidgets.QLabel):

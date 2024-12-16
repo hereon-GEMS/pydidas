@@ -31,8 +31,8 @@ __all__ = ["ScrollArea"]
 from qtpy.QtCore import QSize, Slot
 from qtpy.QtWidgets import QApplication, QFrame, QScrollArea
 
-from ..core.constants import POLICY_EXP_EXP
-from ..core.utils import apply_qt_properties
+from pydidas.core.constants import POLICY_EXP_EXP
+from pydidas.core.utils import apply_qt_properties
 
 
 class ScrollArea(QScrollArea):

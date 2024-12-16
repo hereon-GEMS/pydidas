@@ -27,11 +27,12 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+from qtpy import QtCore
+
 from pydidas.contexts import DiffractionExperiment
 from pydidas.core import Dataset, UserConfigError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
-from qtpy import QtCore
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()

@@ -31,6 +31,7 @@ from typing import Union
 
 import numpy as np
 import scipy.ndimage
+
 from pydidas.core import (
     Dataset,
     Parameter,

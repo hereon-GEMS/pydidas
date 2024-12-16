@@ -30,14 +30,17 @@ __all__ = ["QuickIntegrationFrameBuilder"]
 
 from qtpy import QtWidgets
 
-from ....core import constants
-from ....widgets import ScrollArea
-from ....widgets.misc import (
+from pydidas.core import constants
+from pydidas.widgets import ScrollArea
+from pydidas.widgets.misc import (
     PointsForBeamcenterWidget,
     SelectImageFrameWidget,
     ShowIntegrationRoiParamsWidget,
 )
-from ....widgets.silx_plot import PydidasPlot2DwithIntegrationRegions, PydidasPlotStack
+from pydidas.widgets.silx_plot import (
+    PydidasPlot2DwithIntegrationRegions,
+    PydidasPlotStack,
+)
 
 
 class QuickIntegrationFrameBuilder:

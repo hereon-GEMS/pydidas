@@ -29,6 +29,7 @@ __all__ = ["MaskImage"]
 from typing import Union
 
 import numpy as np
+
 from pydidas.core import (
     Dataset,
     ParameterCollection,

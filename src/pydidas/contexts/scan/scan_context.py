@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["ScanContext"]
 
 
-from ...core import SingletonFactory
-from .scan import Scan
+from pydidas.contexts.scan.scan import Scan
+from pydidas.core import SingletonFactory
 
 
 ScanContext = SingletonFactory(Scan)

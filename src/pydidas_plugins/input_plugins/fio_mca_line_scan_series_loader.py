@@ -31,6 +31,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+
 from pydidas.contexts import ScanContext
 from pydidas.core import (
     Dataset,

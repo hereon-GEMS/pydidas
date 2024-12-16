@@ -34,8 +34,8 @@ from typing import Optional, Self
 
 from qtpy import QtCore
 
-from .object_with_parameter_collection import ObjectWithParameterCollection
-from .parameter_collection import ParameterCollection
+from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
+from pydidas.core.parameter_collection import ParameterCollection
 
 
 _TYPES_NOT_TO_COPY = (QtCore.SignalInstance, QtCore.QMetaObject, ParameterCollection)

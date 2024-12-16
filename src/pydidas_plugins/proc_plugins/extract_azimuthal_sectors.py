@@ -29,6 +29,7 @@ __all__ = ["ExtractAzimuthalSectors"]
 
 
 import numpy as np
+
 from pydidas.core import Dataset, Parameter, ParameterCollection, UserConfigError
 from pydidas.core.constants import FLOAT_REGEX, PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin

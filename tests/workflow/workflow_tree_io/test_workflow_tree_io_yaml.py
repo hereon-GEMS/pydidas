@@ -29,8 +29,9 @@ import shutil
 import tempfile
 import unittest
 
-import pydidas
 import yaml
+
+import pydidas
 from pydidas.core import UserConfigError
 from pydidas.workflow import ProcessingTree, WorkflowTree
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta

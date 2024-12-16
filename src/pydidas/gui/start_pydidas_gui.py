@@ -31,13 +31,13 @@ import multiprocessing as mp
 import signal
 import warnings
 
-from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 from qtpy.QtWidgets import QApplication
 
-from ..core import UserConfigError
-from ..widgets.framework import BaseFrame
-from . import MainWindow
-from .frames import DEFAULT_FRAMES
+from pydidas.core import UserConfigError
+from pydidas.gui import MainWindow
+from pydidas.gui.frames import DEFAULT_FRAMES
+from pydidas.widgets.framework import BaseFrame
+from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
 
 def start_pydidas_gui(

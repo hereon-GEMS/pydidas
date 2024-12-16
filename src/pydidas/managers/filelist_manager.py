@@ -33,13 +33,13 @@ import os
 from pathlib import Path
 from typing import Union
 
-from ..core import (
+from pydidas.core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
-from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import (
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import (
     check_file_exists,
     get_file_naming_scheme,
     verify_files_in_same_directory,

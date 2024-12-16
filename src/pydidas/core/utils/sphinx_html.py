@@ -37,7 +37,7 @@ from typing import Union
 
 from qtpy import QtWidgets
 
-from .get_documentation_targets import (
+from pydidas.core.utils.get_documentation_targets import (
     DOC_BUILD_DIRECTORY,
     DOC_HOME_FILENAME,
     DOC_SOURCE_DIRECTORY,

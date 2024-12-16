@@ -31,11 +31,12 @@ import warnings
 
 import numpy as np
 import pyFAI
+from pyFAI.distortion import Distortion
+from qtpy import QtCore
+
 from pydidas.core import Dataset, UserConfigError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
-from pyFAI.distortion import Distortion
-from qtpy import QtCore
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()

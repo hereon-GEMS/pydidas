@@ -40,12 +40,12 @@ from pathlib import Path
 import requests
 from qtpy import QtCore, QtGui
 
-from ... import VERSION
-from ...contexts import GLOBAL_CONTEXTS
-from ...core import UserConfigError, utils
-from ...core.constants import PYDIDAS_CONFIG_PATHS, PYDIDAS_STANDARD_CONFIG_PATH
-from ...widgets.dialogues import QuestionBox
-from ...workflow import WorkflowTree
+from pydidas import VERSION
+from pydidas.contexts import GLOBAL_CONTEXTS
+from pydidas.core import UserConfigError, utils
+from pydidas.core.constants import PYDIDAS_CONFIG_PATHS, PYDIDAS_STANDARD_CONFIG_PATH
+from pydidas.widgets.dialogues import QuestionBox
+from pydidas.workflow import WorkflowTree
 
 
 TREE = WorkflowTree()

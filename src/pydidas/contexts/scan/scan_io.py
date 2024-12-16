@@ -30,8 +30,8 @@ __all__ = ["ScanIo"]
 
 from typing import Optional, TypeVar
 
-from ...core.io_registry import GenericIoMeta
-from ...core.utils.file_utils import get_extension
+from pydidas.core.io_registry import GenericIoMeta
+from pydidas.core.utils.file_utils import get_extension
 
 
 Scan = TypeVar("Scan")

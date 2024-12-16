@@ -33,8 +33,11 @@ from typing import Union
 from qtpy import QtCore
 from qtpy.QtWidgets import QApplication
 
-from ...core.constants import GENERIC_STANDARD_WIDGET_WIDTH, MINIMUN_WIDGET_DIMENSIONS
-from ...core.utils import apply_qt_properties, update_qobject_font
+from pydidas.core.constants import (
+    GENERIC_STANDARD_WIDGET_WIDTH,
+    MINIMUN_WIDGET_DIMENSIONS,
+)
+from pydidas.core.utils import apply_qt_properties, update_qobject_font
 
 
 class PydidasWidgetMixin:

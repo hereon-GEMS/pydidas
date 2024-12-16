@@ -29,7 +29,7 @@ __all__ = []
 
 
 # import __all__ items from modules:
-from .io_base import *
+from pydidas.data_io.implementations.io_base import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:

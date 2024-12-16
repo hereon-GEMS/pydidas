@@ -29,7 +29,7 @@ __all__ = ["rebin2d", "rebin"]
 
 import numpy as np
 
-from ..dataset import Dataset
+from pydidas.core.dataset import Dataset
 
 
 def rebin2d(image: np.ndarray, binning: int) -> np.ndarray:

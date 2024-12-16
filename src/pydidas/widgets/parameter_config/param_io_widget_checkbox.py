@@ -28,13 +28,16 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ParamIoWidgetCheckBox"]
 
+
 from typing import Union
 
 import qtpy as __qtpy
 
-from ...core import Parameter
-from ..factory import PydidasCheckBox
-from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
+from pydidas.core import Parameter
+from pydidas.widgets.factory import PydidasCheckBox
+from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+    BaseParamIoWidgetMixIn,
+)
 
 
 IS_QT6 = __qtpy.QT_VERSION[0] == "6"

@@ -30,11 +30,11 @@ __all__ = ["PluginCollectionBrowser"]
 
 from qtpy import QtCore
 
-from ...core.constants import PROC_PLUGIN_TYPE_NAMES
-from ...plugins import PluginCollection
-from ..factory import CreateWidgetsMixIn, EmptyWidget
-from ..misc import ReadOnlyTextWidget
-from .select_new_plugin_widget import SelectNewPluginWidget
+from pydidas.core.constants import PROC_PLUGIN_TYPE_NAMES
+from pydidas.plugins import PluginCollection
+from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
+from pydidas.widgets.misc import ReadOnlyTextWidget
+from pydidas.widgets.workflow_edit.select_new_plugin_widget import SelectNewPluginWidget
 
 
 PLUGIN_COLLECTION = PluginCollection()

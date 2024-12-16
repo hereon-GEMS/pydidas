@@ -34,9 +34,9 @@ from typing import Union
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ...core import Dataset
-from ..utils import calculate_fig_size_arguments
-from .io_base import IoBase
+from pydidas.core import Dataset
+from pydidas.data_io.implementations.io_base import IoBase
+from pydidas.data_io.utils import calculate_fig_size_arguments
 
 
 class IoExporterMatplotlib(IoBase):

@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 import numpy as np
+
 from pydidas.data_io import export_data, import_data
 
 

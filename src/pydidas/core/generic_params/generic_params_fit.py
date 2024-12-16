@@ -30,8 +30,8 @@ __all__ = ["GENERIC_PARAMS_FIT"]
 
 from itertools import combinations
 
-from ..constants import ASCII_TO_UNI
-from .param_lists import FIT_OUTPUT_OPTIONS
+from pydidas.core.constants import ASCII_TO_UNI
+from pydidas.core.generic_params.param_lists import FIT_OUTPUT_OPTIONS
 
 
 GENERIC_PARAMS_FIT = (

@@ -35,10 +35,10 @@ import platform
 import qtpy
 from qtpy import QtCore, QtWidgets
 
-from ...core import PydidasQsettings, PydidasQsettingsMixin
-from ...core.constants import POLICY_EXP_EXP
-from ...core.utils import apply_qt_properties
-from ..factory import CreateWidgetsMixIn, EmptyWidget
+from pydidas.core import PydidasQsettings, PydidasQsettingsMixin
+from pydidas.core.constants import POLICY_EXP_EXP
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
 
 
 AscendingOrder = QtCore.Qt.AscendingOrder

@@ -30,15 +30,15 @@ __all__ = ["AcknowledgeBox"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import (
+from pydidas.core.constants import (
     FONT_METRIC_CONSOLE_WIDTH,
     FONT_METRIC_MEDIUM_BUTTON_WIDTH,
     FONT_METRIC_WIDE_CONFIG_WIDTH,
     POLICY_EXP_EXP,
 )
-from ...core.utils import format_input_to_multiline_str
-from ...resources import icons
-from ..factory import CreateWidgetsMixIn
+from pydidas.core.utils import format_input_to_multiline_str
+from pydidas.resources import icons
+from pydidas.widgets.factory import CreateWidgetsMixIn
 
 
 class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):

@@ -33,8 +33,8 @@ import numpy as np
 from numpy import amin, ndarray
 from scipy import interpolate
 
-from ..exceptions import UserConfigError
-from .fit_func_meta import FitFuncMeta
+from pydidas.core.exceptions import UserConfigError
+from pydidas.core.fitting.fit_func_meta import FitFuncMeta
 
 
 class FitFuncBase(metaclass=FitFuncMeta):

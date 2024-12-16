@@ -28,14 +28,14 @@ __status__ = "Production"
 __all__ = ["DirectorySpyFrameBuilder"]
 
 
-from ....core.constants import (
+from pydidas.core.constants import (
     FONT_METRIC_PARAM_EDIT_WIDTH,
     POLICY_EXP_EXP,
     POLICY_FIX_EXP,
 )
-from ....widgets import ScrollArea
-from ....widgets.framework import BaseFrameWithApp
-from ....widgets.silx_plot import PydidasPlot2D
+from pydidas.widgets import ScrollArea
+from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets.silx_plot import PydidasPlot2D
 
 
 class DirectorySpyFrameBuilder:

@@ -35,7 +35,7 @@ from typing import Union
 import numpy as np
 from qtpy import QtCore
 
-from ...core import (
+from pydidas.core import (
     Parameter,
     ParameterCollection,
     ParameterCollectionMixIn,
@@ -43,17 +43,19 @@ from ...core import (
     get_generic_parameter,
     utils,
 )
-from ...core.constants import (
+from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
     QT_REG_EXP_SLICE_VALIDATOR,
 )
-from ...workflow import WorkflowResultsContext, WorkflowResultsSelector
-from ..factory import CreateWidgetsMixIn, EmptyWidget
-from ..misc import ReadOnlyTextWidget
-from ..parameter_config.parameter_widgets_mixin import ParameterWidgetsMixIn
-from ..utilities import update_param_and_widget_choices
-from ..windows import ShowInformationForResult
+from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
+from pydidas.widgets.misc import ReadOnlyTextWidget
+from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
+    ParameterWidgetsMixIn,
+)
+from pydidas.widgets.utilities import update_param_and_widget_choices
+from pydidas.widgets.windows import ShowInformationForResult
+from pydidas.workflow import WorkflowResultsContext, WorkflowResultsSelector
 
 
 class ResultSelectionWidget(

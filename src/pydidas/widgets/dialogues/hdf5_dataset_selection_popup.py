@@ -34,9 +34,12 @@ from typing import Union
 
 from qtpy import QtWidgets
 
-from ...core import Hdf5key
-from ...core.utils import get_hdf5_populated_dataset_keys
-from ..utilities import get_max_pixel_width_of_entries, get_pyqt_icon_from_str
+from pydidas.core import Hdf5key
+from pydidas.core.utils import get_hdf5_populated_dataset_keys
+from pydidas.widgets.utilities import (
+    get_max_pixel_width_of_entries,
+    get_pyqt_icon_from_str,
+)
 
 
 class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):

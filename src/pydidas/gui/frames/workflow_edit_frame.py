@@ -32,13 +32,13 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...plugins import PluginCollection
-from ...widgets import PydidasFileDialog
-from ...widgets.framework import BaseFrame
-from ...workflow import WorkflowTree
-from ...workflow.processing_tree_io import ProcessingTreeIoMeta
-from ..managers import WorkflowTreeEditManager
-from .builders import WorkflowEditFrameBuilder
+from pydidas.gui.frames.builders import WorkflowEditFrameBuilder
+from pydidas.gui.managers import WorkflowTreeEditManager
+from pydidas.plugins import PluginCollection
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.framework import BaseFrame
+from pydidas.workflow import WorkflowTree
+from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
 
 
 TREE = WorkflowTree()

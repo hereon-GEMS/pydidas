@@ -29,9 +29,9 @@ __all__ = ["OutputPlugin"]
 
 import os
 
-from ..core import UserConfigError, get_generic_param_collection
-from ..core.constants import OUTPUT_PLUGIN
-from .base_plugin import BasePlugin
+from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core.constants import OUTPUT_PLUGIN
+from pydidas.plugins.base_plugin import BasePlugin
 
 
 class OutputPlugin(BasePlugin):

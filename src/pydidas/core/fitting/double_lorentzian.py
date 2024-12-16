@@ -31,8 +31,8 @@ from typing import Tuple
 
 from numpy import pi
 
-from .lorentzian import Lorentzian
-from .multi_peak_mixin import MultiPeakMixin
+from pydidas.core.fitting.lorentzian import Lorentzian
+from pydidas.core.fitting.multi_peak_mixin import MultiPeakMixin
 
 
 class DoubleLorentzian(MultiPeakMixin, Lorentzian):

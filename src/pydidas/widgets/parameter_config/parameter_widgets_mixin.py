@@ -30,9 +30,9 @@ __all__ = ["ParameterWidgetsMixIn"]
 
 from qtpy import QtCore
 
-from ...core import Parameter, PydidasGuiError
-from ..utilities import get_widget_layout_args
-from .parameter_widget import ParameterWidget
+from pydidas.core import Parameter, PydidasGuiError
+from pydidas.widgets.parameter_config.parameter_widget import ParameterWidget
+from pydidas.widgets.utilities import get_widget_layout_args
 
 
 class ParameterWidgetsMixIn:

@@ -32,10 +32,10 @@ from typing import Union
 
 import yaml
 
-from ...core.constants import YAML_EXTENSIONS
-from .scan import Scan
-from .scan_context import ScanContext
-from .scan_io_base import ScanIoBase
+from pydidas.contexts.scan.scan import Scan
+from pydidas.contexts.scan.scan_context import ScanContext
+from pydidas.contexts.scan.scan_io_base import ScanIoBase
+from pydidas.core.constants import YAML_EXTENSIONS
 
 
 SCAN = ScanContext()

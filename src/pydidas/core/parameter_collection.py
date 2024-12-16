@@ -34,7 +34,7 @@ from collections.abc import Iterable
 from itertools import chain
 from typing import List, Self, Union
 
-from .parameter import Parameter
+from pydidas.core.parameter import Parameter
 
 
 class ParameterCollection(dict):

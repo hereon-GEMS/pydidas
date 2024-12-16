@@ -27,10 +27,11 @@ __status__ = "Production"
 import unittest
 from pathlib import Path
 
+from qtpy import QtCore, QtWidgets
+
 from pydidas.core import BaseApp, get_generic_parameter
 from pydidas.widgets.framework import BaseFrameWithApp
 from pydidas_qtcore import PydidasQApplication
-from qtpy import QtCore, QtWidgets
 
 
 class DummyRunner:

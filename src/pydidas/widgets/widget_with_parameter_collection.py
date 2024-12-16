@@ -30,10 +30,14 @@ __all__ = ["WidgetWithParameterCollection"]
 
 from qtpy import QtWidgets
 
-from ..core import ParameterCollection, ParameterCollectionMixIn, PydidasQsettingsMixin
-from ..core.utils import apply_qt_properties
-from .factory import CreateWidgetsMixIn
-from .parameter_config import ParameterWidgetsMixIn
+from pydidas.core import (
+    ParameterCollection,
+    ParameterCollectionMixIn,
+    PydidasQsettingsMixin,
+)
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 
 
 class WidgetWithParameterCollection(

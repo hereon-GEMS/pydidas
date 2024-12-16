@@ -30,10 +30,13 @@ __all__ = ["ConvertFit2dGeometryWindow"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...contexts.diff_exp import DiffractionExperiment, DiffractionExperimentContext
-from ...core import get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
-from ..framework import PydidasWindow
+from pydidas.contexts.diff_exp import (
+    DiffractionExperiment,
+    DiffractionExperimentContext,
+)
+from pydidas.core import get_generic_param_collection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.widgets.framework import PydidasWindow
 
 
 EXP = DiffractionExperimentContext()

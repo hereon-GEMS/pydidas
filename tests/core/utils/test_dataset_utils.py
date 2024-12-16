@@ -28,6 +28,7 @@ import unittest
 import warnings
 
 import numpy as np
+
 from pydidas.core import PydidasConfigError
 from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (

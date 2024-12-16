@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["CompositeCreatorApp"]
 
+
 import os
 import time
 from typing import Union
@@ -33,18 +34,22 @@ from typing import Union
 import numpy as np
 from qtpy import QtCore
 
-from ..core import BaseApp, Dataset, UserConfigError, get_generic_param_collection
-from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import (
+from pydidas.apps.parsers import composite_creator_app_parser
+from pydidas.core import BaseApp, Dataset, UserConfigError, get_generic_param_collection
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import (
     check_file_exists,
     check_hdf5_key_exists_in_file,
     copy_docstring,
     get_extension,
     rebin2d,
 )
-from ..data_io import import_data
-from ..managers import CompositeImageManager, FilelistManager, ImageMetadataManager
-from .parsers import composite_creator_app_parser
+from pydidas.data_io import import_data
+from pydidas.managers import (
+    CompositeImageManager,
+    FilelistManager,
+    ImageMetadataManager,
+)
 
 
 COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(

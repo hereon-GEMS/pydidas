@@ -34,6 +34,7 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
+
 from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import OutputPlugin
 

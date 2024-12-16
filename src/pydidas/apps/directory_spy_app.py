@@ -36,7 +36,8 @@ from typing import Tuple, Union
 import numpy as np
 from qtpy import QtCore
 
-from ..core import (
+from pydidas.apps.parsers import directory_spy_app_parser
+from pydidas.core import (
     BaseApp,
     Dataset,
     FileReadError,
@@ -44,16 +45,15 @@ from ..core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import (
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import (
     check_file_exists,
     check_hdf5_key_exists_in_file,
     get_extension,
     get_hdf5_metadata,
     pydidas_logger,
 )
-from ..data_io import import_data
-from .parsers import directory_spy_app_parser
+from pydidas.data_io import import_data
 
 
 logger = pydidas_logger()

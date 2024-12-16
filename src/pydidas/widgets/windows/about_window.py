@@ -30,15 +30,15 @@ __all__ = ["AboutWindow"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import (
+from pydidas.core.constants import (
     ALIGN_BOTTOM_RIGHT,
     ALIGN_TOP_RIGHT,
     FONT_METRIC_SMALL_BUTTON_WIDTH,
     FONT_METRIC_WIDE_CONFIG_WIDTH,
 )
-from ...resources import logos
-from ...version import VERSION
-from ..framework import PydidasWindow
+from pydidas.resources import logos
+from pydidas.version import VERSION
+from pydidas.widgets.framework import PydidasWindow
 
 
 PYDIDAS_INFO = (

@@ -30,6 +30,7 @@ __all__ = ["PyFAIradialIntegration"]
 from typing import Union
 
 import numpy as np
+
 from pydidas.core import Dataset
 from pydidas.plugins import pyFAIintegrationBase
 

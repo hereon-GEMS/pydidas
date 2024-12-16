@@ -33,13 +33,13 @@ import os
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core import Parameter, UserConfigError, get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
-from ...core.utils import ShowBusyMouse, get_extension, get_hdf5_metadata
-from ...data_io import IoManager, export_data, import_data
-from ...managers import FilelistManager
-from .. import dialogues
-from ..framework import PydidasWindow
+from pydidas.core import Parameter, UserConfigError, get_generic_param_collection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
+from pydidas.core.utils import ShowBusyMouse, get_extension, get_hdf5_metadata
+from pydidas.data_io import IoManager, export_data, import_data
+from pydidas.managers import FilelistManager
+from pydidas.widgets import dialogues
+from pydidas.widgets.framework import PydidasWindow
 
 
 _operation = Parameter(

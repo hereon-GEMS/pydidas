@@ -35,10 +35,11 @@ from typing import Union
 
 import numpy as np
 import pyFAI
+from pyFAI.distortion import Distortion
+
 from pydidas.core import Dataset, Parameter, ParameterCollection, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.plugins import ProcPlugin
-from pyFAI.distortion import Distortion
 
 
 _SPLINE_PARAMS = ParameterCollection(

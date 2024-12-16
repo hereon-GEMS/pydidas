@@ -34,7 +34,7 @@ import h5py
 import hdf5plugin
 import numpy as np
 
-from ...core import UserConfigError
+from pydidas.core import UserConfigError
 
 
 def read_hdf5_dataset(filename, dataset="entry/data/data", axes=None):

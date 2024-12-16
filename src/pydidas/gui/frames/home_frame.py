@@ -30,11 +30,15 @@ __all__ = ["HomeFrame"]
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core.constants import ALIGN_TOP_RIGHT, FONT_METRIC_CONSOLE_WIDTH, POLICY_FIX_EXP
-from ...core.utils import DOC_HOME_ADDRESS
-from ...resources import logos
-from ...widgets import ScrollArea
-from ...widgets.framework import BaseFrame
+from pydidas.core.constants import (
+    ALIGN_TOP_RIGHT,
+    FONT_METRIC_CONSOLE_WIDTH,
+    POLICY_FIX_EXP,
+)
+from pydidas.core.utils import DOC_HOME_ADDRESS
+from pydidas.resources import logos
+from pydidas.widgets import ScrollArea
+from pydidas.widgets.framework import BaseFrame
 
 
 _GENERIC_INTRO = (

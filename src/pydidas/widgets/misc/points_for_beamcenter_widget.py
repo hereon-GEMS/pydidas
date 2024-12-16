@@ -30,11 +30,11 @@ __all__ = ["PointsForBeamcenterWidget"]
 
 from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 
-from ...core import get_generic_parameter
-from ...core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
-from ...core.utils import apply_qt_properties
-from ..factory import CreateWidgetsMixIn
-from ..parameter_config import ParameterWidgetsMixIn
+from pydidas.core import get_generic_parameter
+from pydidas.core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 
 
 class _TableWithXYPositions(QtWidgets.QTableWidget):

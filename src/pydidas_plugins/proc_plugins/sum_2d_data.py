@@ -28,6 +28,7 @@ __all__ = ["Sum2dData"]
 
 
 import numpy as np
+
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.plugins import ProcPlugin
 

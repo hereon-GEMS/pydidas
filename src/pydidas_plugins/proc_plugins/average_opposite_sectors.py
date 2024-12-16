@@ -29,6 +29,7 @@ __all__ = ["AverageOppositeSectors"]
 
 
 import numpy as np
+
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin

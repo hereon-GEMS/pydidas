@@ -390,7 +390,7 @@ class BasePlugin(ObjectWithParameterCollection):
         dict
             The state to set the state of the new object.
         """
-        from .plugin_getter_ import plugin_getter
+        from pydidas.plugins.plugin_getter_ import plugin_getter
 
         return plugin_getter, (self.__class__.__name__,), self.__getstate__()
 

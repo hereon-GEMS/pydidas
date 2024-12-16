@@ -31,14 +31,18 @@ __all__ = ["ImageMetadataManager"]
 from pathlib import Path
 from typing import Union
 
-from ..core import (
+from pydidas.core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
-from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import check_hdf5_key_exists_in_file, get_extension, get_hdf5_metadata
-from ..data_io import import_data
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import (
+    check_hdf5_key_exists_in_file,
+    get_extension,
+    get_hdf5_metadata,
+)
+from pydidas.data_io import import_data
 
 
 class ImageMetadataManager(ObjectWithParameterCollection):

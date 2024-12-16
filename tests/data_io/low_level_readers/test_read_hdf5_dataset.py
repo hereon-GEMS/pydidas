@@ -32,6 +32,7 @@ import unittest
 
 import h5py
 import numpy as np
+
 from pydidas.data_io.low_level_readers.read_hdf5_dataset_ import (
     get_selection,
     read_hdf5_dataset,

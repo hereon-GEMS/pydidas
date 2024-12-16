@@ -32,8 +32,8 @@ import copy
 
 from qtpy import QtCore
 
-from ...contexts import DiffractionExperimentContext, ScanContext
-from ...core import (
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.core import (
     Dataset,
     Parameter,
     ParameterCollection,
@@ -41,14 +41,14 @@ from ...core import (
     get_generic_param_collection,
     utils,
 )
-from ...widgets.dialogues import WarningBox
-from ...widgets.framework import BaseFrame
-from ...widgets.windows import (
+from pydidas.gui.frames.builders import WorkflowTestFrameBuilder
+from pydidas.widgets.dialogues import WarningBox
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.windows import (
     ShowDetailedPluginResultsWindow,
     TweakPluginParameterWindow,
 )
-from ...workflow import WorkflowNode, WorkflowTree
-from .builders import WorkflowTestFrameBuilder
+from pydidas.workflow import WorkflowNode, WorkflowTree
 
 
 SCAN = ScanContext()

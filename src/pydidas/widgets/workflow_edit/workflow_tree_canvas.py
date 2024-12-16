@@ -31,8 +31,8 @@ __all__ = ["WorkflowTreeCanvas"]
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core import constants
-from ..factory import CreateWidgetsMixIn
+from pydidas.core import constants
+from pydidas.widgets.factory import CreateWidgetsMixIn
 
 
 class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):

@@ -34,10 +34,12 @@ from numbers import Real
 import numpy as np
 from qtpy import QtCore
 
-from ...core import Parameter
-from ...core.constants import FLOAT_DISPLAY_ACCURACY, POLICY_EXP_FIX
-from ..factory import PydidasLineEdit
-from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
+from pydidas.core import Parameter
+from pydidas.core.constants import FLOAT_DISPLAY_ACCURACY, POLICY_EXP_FIX
+from pydidas.widgets.factory import PydidasLineEdit
+from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+    BaseParamIoWidgetMixIn,
+)
 
 
 class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):

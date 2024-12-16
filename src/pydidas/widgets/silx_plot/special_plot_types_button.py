@@ -34,7 +34,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot.PlotToolButtons import PlotToolButton
 
-from ...resources import icons
+from pydidas.resources import icons
 
 
 class SpecialPlotTypesButton(PlotToolButton):

@@ -33,13 +33,18 @@ import copy
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
-from ...core.utils import ShowBusyMouse
-from ..framework import PydidasWindow
-from ..parameter_config import EditPluginParametersWidget, ParameterEditCanvas
-from ..scroll_area import ScrollArea
-from ..silx_plot import PydidasPlotStack
-from .show_detailed_plugin_results_window import ShowDetailedPluginResultsWindow
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.utils import ShowBusyMouse
+from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.parameter_config import (
+    EditPluginParametersWidget,
+    ParameterEditCanvas,
+)
+from pydidas.widgets.scroll_area import ScrollArea
+from pydidas.widgets.silx_plot import PydidasPlotStack
+from pydidas.widgets.windows.show_detailed_plugin_results_window import (
+    ShowDetailedPluginResultsWindow,
+)
 
 
 class TweakPluginParameterWindow(PydidasWindow):

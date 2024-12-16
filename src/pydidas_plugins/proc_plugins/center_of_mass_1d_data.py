@@ -28,6 +28,7 @@ __all__ = ["CenterOfMass1dData"]
 
 
 import numpy as np
+
 from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.utils import (
     process_1d_with_multi_input_dims,

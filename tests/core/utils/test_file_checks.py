@@ -32,6 +32,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+
 from pydidas.core import UserConfigError
 from pydidas.core.utils.file_checks import (
     check_file_exists,

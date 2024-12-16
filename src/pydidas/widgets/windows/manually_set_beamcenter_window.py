@@ -33,15 +33,15 @@ from pathlib import Path
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import DiffractionExperimentContext
-from ...core import Dataset, get_generic_param_collection
-from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYFAI_DETECTOR_NAMES
-from ...data_io import import_data
-from ..controllers import ManuallySetBeamcenterController
-from ..dialogues import QuestionBox
-from ..framework import PydidasWindow
-from ..misc import PointsForBeamcenterWidget, SelectImageFrameWidget
-from ..silx_plot import PydidasPlot2D
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.core import Dataset, get_generic_param_collection
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYFAI_DETECTOR_NAMES
+from pydidas.data_io import import_data
+from pydidas.widgets.controllers import ManuallySetBeamcenterController
+from pydidas.widgets.dialogues import QuestionBox
+from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.misc import PointsForBeamcenterWidget, SelectImageFrameWidget
+from pydidas.widgets.silx_plot import PydidasPlot2D
 
 
 class ManuallySetBeamcenterWindow(PydidasWindow):

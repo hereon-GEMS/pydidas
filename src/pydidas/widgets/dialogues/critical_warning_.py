@@ -30,7 +30,7 @@ __all__ = ["critical_warning"]
 
 from qtpy import QtWidgets
 
-from ..utilities import get_pyqt_icon_from_str
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 def critical_warning(title: str, text: str):

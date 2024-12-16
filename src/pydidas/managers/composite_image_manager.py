@@ -33,15 +33,15 @@ from typing import Literal, Self, Union
 
 import numpy as np
 
-from ..core import (
+from pydidas.core import (
     ObjectWithParameterCollection,
     Parameter,
     ParameterCollection,
     UserConfigError,
     get_generic_parameter,
 )
-from ..core.constants.image_ops import IMAGE_OPS
-from ..data_io import export_data
+from pydidas.core.constants.image_ops import IMAGE_OPS
+from pydidas.data_io import export_data
 
 
 class CompositeImageManager(ObjectWithParameterCollection):

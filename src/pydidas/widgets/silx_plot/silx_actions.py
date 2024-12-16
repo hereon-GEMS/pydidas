@@ -42,11 +42,11 @@ from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot.actions import PlotAction
 
-from ...core import PydidasQsettingsMixin, UserConfigError
-from ...core.utils import calculate_histogram_limits
-from ...data_io import IoManager, import_data
-from ...resources import icons
-from ..file_dialog import PydidasFileDialog
+from pydidas.core import PydidasQsettingsMixin, UserConfigError
+from pydidas.core.utils import calculate_histogram_limits
+from pydidas.data_io import IoManager, import_data
+from pydidas.resources import icons
+from pydidas.widgets.file_dialog import PydidasFileDialog
 
 
 PydidasPlot2d = NewType("PydidasPlot2d", QtWidgets.QWidget)

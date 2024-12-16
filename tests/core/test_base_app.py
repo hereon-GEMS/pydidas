@@ -31,6 +31,8 @@ import tempfile
 import unittest
 
 import yaml
+from qtpy import QtWidgets
+
 from pydidas.core import (
     BaseApp,
     ParameterCollection,
@@ -38,7 +40,6 @@ from pydidas.core import (
     get_generic_parameter,
 )
 from pydidas_qtcore import PydidasQApplication
-from qtpy import QtWidgets
 
 
 class TestApp(BaseApp):

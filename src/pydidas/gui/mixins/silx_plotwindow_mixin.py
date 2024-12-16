@@ -32,7 +32,7 @@ import warnings
 import numpy as np
 from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlibQt
 
-from ...core.utils import LOGGING_LEVEL, pydidas_logger
+from pydidas.core.utils import LOGGING_LEVEL, pydidas_logger
 
 
 logger = pydidas_logger(LOGGING_LEVEL)

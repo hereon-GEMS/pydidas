@@ -32,10 +32,10 @@ import re
 from pathlib import Path
 from typing import Union
 
-from ...contexts.scan import Scan
-from ...core import Dataset
-from ...core.io_registry import GenericIoBase
-from .workflow_result_io_meta import WorkflowResultIoMeta
+from pydidas.contexts.scan import Scan
+from pydidas.core import Dataset
+from pydidas.core.io_registry import GenericIoBase
+from pydidas.workflow.result_io.workflow_result_io_meta import WorkflowResultIoMeta
 
 
 class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):

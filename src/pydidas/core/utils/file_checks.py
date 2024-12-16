@@ -40,8 +40,8 @@ from typing import List, Union
 
 from numpy import array
 
-from ..exceptions import UserConfigError
-from .hdf5_dataset_utils import get_hdf5_populated_dataset_keys
+from pydidas.core.exceptions import UserConfigError
+from pydidas.core.utils.hdf5_dataset_utils import get_hdf5_populated_dataset_keys
 
 
 def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):

@@ -33,6 +33,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
+
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.data_io.implementations.hdf5_io import Hdf5Io

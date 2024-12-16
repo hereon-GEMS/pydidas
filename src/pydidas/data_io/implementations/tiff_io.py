@@ -35,10 +35,10 @@ import numpy as np
 from skimage.io import imread, imsave
 from tifffile import TiffFileError
 
-from ...core import Dataset
-from ...core.constants import TIFF_EXTENSIONS
-from ...core.utils import CatchFileErrors
-from .io_base import IoBase
+from pydidas.core import Dataset
+from pydidas.core.constants import TIFF_EXTENSIONS
+from pydidas.core.utils import CatchFileErrors
+from pydidas.data_io.implementations.io_base import IoBase
 
 
 class TiffIo(IoBase):

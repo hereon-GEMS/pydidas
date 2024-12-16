@@ -56,7 +56,7 @@ from typing import Union
 
 import numpy as np
 
-from ..constants import ASCII_TO_UNI, UNI_TO_ASCII
+from pydidas.core.constants import ASCII_TO_UNI, UNI_TO_ASCII
 
 
 def get_fixed_length_str(

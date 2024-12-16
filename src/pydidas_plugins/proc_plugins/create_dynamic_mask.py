@@ -33,6 +33,7 @@ from typing import Union
 
 import numpy as np
 import scipy.ndimage
+
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN_IMAGE

@@ -30,16 +30,16 @@ __all__ = ["ExecuteWorkflowRunner"]
 import argparse
 from pathlib import Path
 
-from pydidas_qtcore import PydidasQApplication
 from qtpy import QtCore
 
-from ..contexts import DiffractionExperimentContext, ScanContext
-from ..contexts.diff_exp import DiffractionExperiment
-from ..contexts.scan import Scan
-from ..core import UserConfigError
-from ..multiprocessing import AppRunner
-from ..workflow import ProcessingTree, WorkflowResultsContext, WorkflowTree
-from .execute_workflow_app import ExecuteWorkflowApp
+from pydidas.apps.execute_workflow_app import ExecuteWorkflowApp
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.contexts.scan import Scan
+from pydidas.core import UserConfigError
+from pydidas.multiprocessing import AppRunner
+from pydidas.workflow import ProcessingTree, WorkflowResultsContext, WorkflowTree
+from pydidas_qtcore import PydidasQApplication
 
 
 SCAN = ScanContext()

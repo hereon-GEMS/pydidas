@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["DiffractionExperimentContext"]
 
 
-from ...core import SingletonFactory
-from .diff_exp import DiffractionExperiment
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
+from pydidas.core import SingletonFactory
 
 
 DiffractionExperimentContext = SingletonFactory(DiffractionExperiment)

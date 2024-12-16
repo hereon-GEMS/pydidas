@@ -35,8 +35,8 @@ from typing import Self
 
 from qtpy import QtCore
 
-from .parameter_collection_mixin import ParameterCollectionMixIn
-from .pydidas_q_settings_mixin import PydidasQsettingsMixin
+from pydidas.core.parameter_collection_mixin import ParameterCollectionMixIn
+from pydidas.core.pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class ObjectWithParameterCollection(

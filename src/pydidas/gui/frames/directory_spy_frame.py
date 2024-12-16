@@ -34,15 +34,17 @@ from typing import Self
 from qtpy import QtCore
 from qtpy.QtWidgets import QApplication
 
-from ...apps import DirectorySpyApp
-from ...contexts import ScanContext
-from ...core import ParameterCollection
-from ...core.constants import HDF5_EXTENSIONS
-from ...core.utils import get_extension, pydidas_logger
-from ...multiprocessing import AppRunner
-from ...widgets.framework import BaseFrameWithApp
-from ...workflow import WorkflowResultsContext, WorkflowTree
-from .builders.directory_spy_frame_builder import DirectorySpyFrameBuilder
+from pydidas.apps import DirectorySpyApp
+from pydidas.contexts import ScanContext
+from pydidas.core import ParameterCollection
+from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import get_extension, pydidas_logger
+from pydidas.gui.frames.builders.directory_spy_frame_builder import (
+    DirectorySpyFrameBuilder,
+)
+from pydidas.multiprocessing import AppRunner
+from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 
 
 SCAN = ScanContext()

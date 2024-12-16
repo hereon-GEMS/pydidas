@@ -31,7 +31,7 @@ from contextlib import nullcontext
 
 from qtpy import QtCore
 
-from ...core import Dataset
+from pydidas.core import Dataset
 
 
 def get_2d_silx_plot_ax_settings(data: Dataset) -> tuple[float, float]:

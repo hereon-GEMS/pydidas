@@ -36,13 +36,13 @@ from typing import Union
 import numpy as np
 from qtpy import QtCore
 
-from ..contexts import DiffractionExperimentContext, ScanContext
-from ..contexts.diff_exp import DiffractionExperiment
-from ..contexts.scan import Scan
-from ..core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
-from .processing_tree import ProcessingTree
-from .result_io import WorkflowResultIoMeta as ResultSaver
-from .workflow_tree import WorkflowTree
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.contexts.scan import Scan
+from pydidas.core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
+from pydidas.workflow.processing_tree import ProcessingTree
+from pydidas.workflow.result_io import WorkflowResultIoMeta as ResultSaver
+from pydidas.workflow.workflow_tree import WorkflowTree
 
 
 class WorkflowResults(QtCore.QObject):

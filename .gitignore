@@ -13,7 +13,7 @@ __*
 !__init__.py
 
 # local build files
-pydidas/sphinx
+src/pydidas/sphinx
 *.html
 !versions/**/*.html
 dist/*
@@ -23,7 +23,7 @@ build/*
 htmlcov
 coverage_html_report
 .ruff_cache/*
-pydidas/docs/src/dev_guide/dev_guide_list_of_generic_params.rst
+src/pydidas/docs/src/dev_guide/dev_guide_list_of_generic_params.rst
 
 # logging
 *.log

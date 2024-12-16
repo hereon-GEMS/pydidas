@@ -31,7 +31,13 @@ Improvements
     - Updated WorkflowResults contexts to accept dynamic result shapes.
     - Removed redundant code from plugins (because of changes in shape handling).
     - Switched to using ruff instead of black, flake8 and isort in github actions.
+	- Moved the pydidas, pydidas_qtcore and pydidas_plugins folders to src.
+	- Renamed `slaves` to `clones`
+	- Changed the builder of the DefineScanFrame to use functions instead of an 
+	  abstract class.
 - Improved the formatting when displaying Plugin information.
+- Improved the behaviour of the logging and status widget and added options to
+  hide and show it.
 
 
 Bugfixes
@@ -48,6 +54,11 @@ Bugfixes
   fit point had an invalid result (e.g. peak intensity too low).
 - Fixed an issue when copying a ProcessingTree which had no nodes.
 - Fixed an issue when entering `None` for path parameters.
+- Fixed an issue with formatting of regex strings in the qr_presets
+- Fixed an issue where the SplashScreen would still show when an exception was 
+  raised during GUI initialization.
+- Fixed an issue when the font family is not supportted by matplotlib where the
+  user notification would not be correctly formatted.
 
 
 v24.09.19

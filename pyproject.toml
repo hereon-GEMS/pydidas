@@ -10,7 +10,7 @@ name = "pydidas"
 authors = [{name = "Malte Storm"}]
 description = "pydidas - the PYthon DIffraction Data Analysis Suite"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, <3.13"
 license = {text = "GNU General Public License v3"}
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
 classifiers = [
@@ -18,6 +18,7 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Physics",
@@ -36,8 +37,8 @@ version = { attr = "pydidas.version.VERSION" }
 dependencies = { file = ["requirements.txt"]}
 optional-dependencies.dev = { file = ["requirements_dev.txt"]}
 
-[tool.setuptools]
-packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [project.scripts]
 pydidas-clear-settings = "pydidas_scripts.clear_local_settings:clear_local_settings"
@@ -48,7 +49,7 @@ run-pydidas-workflow = "pydidas_scripts.run_pydidas_workflow:run_workflow"
 remove-pydidas = "pydidas_scripts.remove_pydidas_from_system:remove_pydidas_from_system"
 
 [project.gui-scripts]
-pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
+pydidas-gui = "pydidas_scripts.pydidas_gui:open_gui"
 
 [tool.coverage.run]
 branch = true
@@ -80,6 +81,7 @@ extend-select = ["I", "C90", "F401"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
+known-local-folder = ["pydidas", "pydidas_qtcore"]
 
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 12.

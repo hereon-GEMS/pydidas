@@ -34,7 +34,8 @@ Pydidas should be installed in a clean environment to allow pydidas to fix the
 required dependency versions. This environment should be used exclusively for
 pydidas and no further packages should be installed.
 
-Pydidas requires a **Python version >= 3.11**.
+Pydidas requires a **Python version >= 3.11**. Note that pydidas has not yet been 
+tested extensively with Python 3.13.
 
 ### Preparing the environment
 

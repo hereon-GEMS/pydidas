@@ -30,7 +30,7 @@ import unittest
 
 import numpy as np
 
-from pydidas.data_io import IoMaster
+from pydidas.data_io import IoManager
 from pydidas.data_io.implementations import IoBase
 
 
@@ -52,15 +52,15 @@ def create_tester_class():
 class TestIoBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._stored_exts_import = IoMaster.registry_import.copy()
-        cls._stored_exts_export = IoMaster.registry_export.copy()
+        cls._stored_exts_import = IoManager.registry_import.copy()
+        cls._stored_exts_export = IoManager.registry_export.copy()
         create_tester_class()
         cls._tmpdir = tempfile.mkdtemp()
 
     @classmethod
     def tearDownClass(cls):
-        IoMaster.registry_import = cls._stored_exts_import
-        IoMaster.registry_export = cls._stored_exts_export
+        IoManager.registry_import = cls._stored_exts_import
+        IoManager.registry_export = cls._stored_exts_export
 
     def setUp(self): ...
 

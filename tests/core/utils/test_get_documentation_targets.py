@@ -49,7 +49,7 @@ class TestGetDocQUrl(unittest.TestCase):
 
     def test_DOC_HOME_FILENAME(self):
         _fname = Path(DOC_HOME_FILENAME)
-        self.assertEqual(_fname.parents[3].name, "pydidas")
+        self.assertEqual(_fname.parents[2].name, "pydidas")
 
     def test_DOC_HOME_ADDRESS(self):
         _address = DOC_HOME_ADDRESS

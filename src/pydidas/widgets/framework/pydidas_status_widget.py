@@ -100,5 +100,17 @@ class _PydidasStatusWidget(QtWidgets.QDockWidget):
             QtWidgets.QScrollBar.SliderToMinimum
         )
 
+    @QtCore.Slot()
+    def text(self) -> str:
+        """
+        Get the text of the widget.
+
+        Returns
+        -------
+        str
+            The text of the widget.
+        """
+        return self._text_edit.toPlainText()
+
 
 PydidasStatusWidget = SingletonFactory(_PydidasStatusWidget)

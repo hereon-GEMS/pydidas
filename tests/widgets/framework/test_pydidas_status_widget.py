@@ -46,7 +46,7 @@ class TestPydidasStatusWidget(unittest.TestCase):
 
     def test_init(self):
         obj = PydidasStatusWidget()
-        self.assertIsInstance(obj, QtWidgets.QPlainTextEdit)
+        self.assertIsInstance(obj, QtWidgets.QDockWidget)
 
     def test_sizeHint(self):
         obj = PydidasStatusWidget()
@@ -56,7 +56,7 @@ class TestPydidasStatusWidget(unittest.TestCase):
         _test = "This is the test string"
         obj = PydidasStatusWidget()
         obj.add_status(_test)
-        _text = obj.toPlainText()
+        _text = obj.text()
         self.assertTrue(_text.strip().endswith(_test))
 
 

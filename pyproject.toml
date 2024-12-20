@@ -97,3 +97,6 @@ max-complexity = 12
 "__init__.py" = ["F401", "F403", "F405", "F821"]
 "pydidas/__init__.py" = ["F401", "F403", "F405", "E402", "I"]
 "app_processor_.py" = ["C901"]
+
+[tool.pytest.ini_options]
+addopts = "--disable-warnings"

@@ -39,7 +39,7 @@ from qtpy import QtWidgets
 from pydidas.multiprocessing import processor
 
 
-def test_func(number, fixed_arg, fixed_arg2, kw_arg=0):
+def _test_func(number, fixed_arg, fixed_arg2, kw_arg=0):
     return (number - fixed_arg) / fixed_arg2 + kw_arg
 
 
@@ -132,9 +132,9 @@ class Test_processor(unittest.TestCase):
     def test_run__with_args(self):
         _args = (0, 1)
         self.put_ints_in_queue()
-        processor(test_func, self._queues, *_args)
+        processor(_test_func, self._queues, *_args)
         _input, _output = self.get_results()
-        _direct_out = test_func(_input, *_args)
+        _direct_out = _test_func(_input, *_args)
         self.assertTrue((_output == _direct_out).all())
         self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
@@ -142,7 +142,7 @@ class Test_processor(unittest.TestCase):
         self.put_ints_in_queue()
         old_stdout = sys.stdout
         sys.stdout = mystdout = io.StringIO()
-        processor(test_func, self._queues)
+        processor(_test_func, self._queues)
         sys.stdout = old_stdout
         # Assert that the processor returned directly and did not wait for any
         # queue timeouts.
@@ -154,13 +154,13 @@ class Test_processor(unittest.TestCase):
         _kwargs = dict(kw_arg=12)
         self.put_ints_in_queue()
         processor(
-            test_func,
+            _test_func,
             self._queues,
             *_args,
             **_kwargs,
         )
         _input, _output = self.get_results()
-        _direct_out = test_func(_input, *_args, **_kwargs)
+        _direct_out = _test_func(_input, *_args, **_kwargs)
         self.assertTrue((_output == _direct_out).all())
         self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 

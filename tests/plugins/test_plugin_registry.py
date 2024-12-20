@@ -183,7 +183,8 @@ class TestPluginRegistry(unittest.TestCase):
                 [self._pluginpath],
             ],
         ]:
-            with self.subTest(_path=_path):
+            with self.subTest(_path=_path), warnings.catch_warnings():
+                warnings.simplefilter("ignore")
                 PC = PluginRegistry(plugin_path=_path)
                 self.assertIsInstance(PC, PluginRegistry)
                 self.assertEqual(PC._config["initial_plugin_path"], _target)

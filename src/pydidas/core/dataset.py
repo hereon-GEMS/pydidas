@@ -568,7 +568,7 @@ class Dataset(ndarray):
             warnings.warn(
                 f"The number of {key.replace('_', ' ')} entries "
                 f"does not match the number of dimensions of the Dataset. "
-                f"Resetting the{key}."
+                f"Resetting the {key}."
             )
             self._meta[key] = {
                 i: (np.arange(_length) if key == "axis_ranges" else "invalid")

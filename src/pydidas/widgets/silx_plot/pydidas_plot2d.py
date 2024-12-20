@@ -40,8 +40,12 @@ from silx.gui.plot.items import Scatter
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, PydidasQsettingsMixin, UserConfigError
-from pydidas.widgets.silx_plot.coordinate_transform_button import (
+from pydidas.widgets.silx_plot._coordinate_transform_button import (
     CoordinateTransformButton,
+)
+from pydidas.widgets.silx_plot._silx_tickbar import (
+    tickbar_paintEvent,
+    tickbar_paintTick,
 )
 from pydidas.widgets.silx_plot.pydidas_position_info import PydidasPositionInfo
 from pydidas.widgets.silx_plot.silx_actions import (
@@ -51,7 +55,6 @@ from pydidas.widgets.silx_plot.silx_actions import (
     ExpandCanvas,
     PydidasGetDataInfoAction,
 )
-from pydidas.widgets.silx_plot.silx_tickbar import tickbar_paintEvent, tickbar_paintTick
 from pydidas.widgets.silx_plot.utilities import (
     get_2d_silx_plot_ax_settings,
     user_config_update_func,

@@ -24,37 +24,33 @@ __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
+
 
 # import sub-packages:
-from . import diff_exp
-from . import scan
+from . import diff_exp, scan
 
-__all__.extend(["diff_exp", "scan", "GLOBAL_CONTEXTS"])
-
-
-# import __all__ items from modules:
-
-# explicitly import the singleton factories from the subpackages
+# explicitly import the main context items from the subpackages:
 from .diff_exp import (
     DiffractionExperiment,
     DiffractionExperimentContext,
     DiffractionExperimentIo,
 )
-from .scan import ScanContext, ScanIo, Scan
+from .scan import Scan, ScanContext, ScanIo
 
-__all__.extend(
-    [
-        "DiffractionExperimentContext",
-        "DiffractionExperiment",
-        "DiffractionExperimentIo",
-        "ScanContext",
-        "ScanIo",
-        "Scan",
-    ]
-)
+
+__all__ = [
+    "diff_exp",
+    "scan",
+    "DiffractionExperimentContext",
+    "DiffractionExperiment",
+    "DiffractionExperimentIo",
+    "ScanContext",
+    "ScanIo",
+    "Scan",
+    "GLOBAL_CONTEXTS",
+]
 
 GLOBAL_CONTEXTS = {
-    "diffraction_experiment_context": DiffractionExperimentContext(),
-    "scan_context": ScanContext(),
+    "diffraction_experiment_context": diff_exp.DiffractionExperimentContext(),
+    "scan_context": scan.ScanContext(),
 }

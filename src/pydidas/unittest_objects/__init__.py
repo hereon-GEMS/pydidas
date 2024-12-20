@@ -26,11 +26,9 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
-from .create_dataset import *
+from .create_dataset_ import *
 from .create_dummy_plugins import *
 from .create_hdf5_io_file_ import *
 from .dummy_loader import *
@@ -39,39 +37,25 @@ from .dummy_proc_new_dataset import *
 from .local_plugin_collection import *
 from .mp_test_app import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import create_dummy_plugins
 
-__all__.extend(create_dummy_plugins.__all__)
-del create_dummy_plugins
+__all__ = (
+    create_dataset_.__all__
+    + create_dummy_plugins.__all__
+    + create_hdf5_io_file_.__all__
+    + dummy_loader.__all__
+    + dummy_proc.__all__
+    + dummy_proc_new_dataset.__all__
+    + local_plugin_collection.__all__
+    + mp_test_app.__all__
+)
 
-from . import create_hdf5_io_file_
-
-__all__.extend(create_hdf5_io_file_.__all__)
-del create_hdf5_io_file_
-
-from . import dummy_loader
-
-__all__.extend(dummy_loader.__all__)
-del dummy_loader
-
-from . import dummy_proc
-
-__all__.extend(dummy_proc.__all__)
-del dummy_proc
-
-from . import dummy_proc_new_dataset
-
-__all__.extend(dummy_proc_new_dataset.__all__)
-del dummy_proc_new_dataset
-
-from . import local_plugin_collection
-
-__all__.extend(local_plugin_collection.__all__)
-del local_plugin_collection
-
-from . import mp_test_app
-
-__all__.extend(mp_test_app.__all__)
-del mp_test_app
+del (
+    create_dataset_,
+    create_dummy_plugins,
+    create_hdf5_io_file_,
+    dummy_loader,
+    dummy_proc,
+    dummy_proc_new_dataset,
+    local_plugin_collection,
+    mp_test_app,
+)

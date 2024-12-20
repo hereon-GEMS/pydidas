@@ -25,15 +25,11 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
 from .workflow_tree_edit_manager import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import workflow_tree_edit_manager
 
-__all__.extend(workflow_tree_edit_manager.__all__)
+__all__ = workflow_tree_edit_manager.__all__
+
 del workflow_tree_edit_manager

@@ -40,10 +40,10 @@ from pathlib import Path
 import requests
 from qtpy import QtCore, QtGui
 
-from pydidas import VERSION
 from pydidas.contexts import GLOBAL_CONTEXTS
 from pydidas.core import UserConfigError, utils
 from pydidas.core.constants import PYDIDAS_CONFIG_PATHS, PYDIDAS_STANDARD_CONFIG_PATH
+from pydidas.version import VERSION
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.workflow import WorkflowTree
 

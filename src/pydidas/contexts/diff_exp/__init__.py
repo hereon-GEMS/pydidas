@@ -27,51 +27,31 @@ __copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
 # import __all__ items from modules:
+# even though not explicitly used, the import is necessary for python to read
+# the code and to register the classes in the metaclass registry
+from . import diff_exp_io_poni, diff_exp_io_yaml
 from .diff_exp import *
 from .diff_exp_context import *
 from .diff_exp_io import *
 from .diff_exp_io_base import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import diff_exp
 
-__all__.extend(diff_exp.__all__)
-del diff_exp
-
-from . import diff_exp_context
-
-__all__.extend(diff_exp_context.__all__)
-del diff_exp_context
-
-from . import diff_exp_io
-
-__all__.extend(diff_exp_io.__all__)
-del diff_exp_io
-
-from . import diff_exp_io_base
-
-__all__.extend(diff_exp_io_base.__all__)
-del diff_exp_io_base
-
-
-# Automatically find and import IO classes to have them registered
-# with the Metaclass:
-import os as __os
-import importlib as __importlib
-
-_dir = __os.path.dirname(__file__)
-_io_classes = set(
-    item.strip(".py")
-    for item in __os.listdir(_dir)
-    if (item.startswith("diff_exp_io") and item[-7:] not in ["base.py", "meta.py"])
+__all__ = (
+    diff_exp.__all__
+    + diff_exp_context.__all__
+    + diff_exp_io.__all__
+    + diff_exp_io_base.__all__
 )
 
-for _module in _io_classes:
-    _module = __importlib.import_module(f".{_module}", __package__)
-    __all__ += _module.__all__
-    del _module
+# Clean up the namespace:
+del (
+    diff_exp,
+    diff_exp_context,
+    diff_exp_io,
+    diff_exp_io_base,
+    diff_exp_io_yaml,
+    diff_exp_io_poni,
+)

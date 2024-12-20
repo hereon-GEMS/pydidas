@@ -27,19 +27,19 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
+
+import logging as __logging
 import os as __os
 import sys as __sys
-import logging as __logging
-
-import qtpy.QtCore as __QtCore
-import qtpy.QtWidgets as __QtWidgets
-import qtpy as __qtpy
 
 # must import h5py here to have the dll libraries linked correctly
-import h5py as __h5py
-import hdf5plugin as __hdf5plugin
+# in Windows before using them in the package in different orders
+import h5py as __h5py  # noqa: F401
+import hdf5plugin as __hdf5plugin  # noqa: F401
+import qtpy as __qtpy
+import qtpy.QtCore as __QtCore
+import qtpy.QtWidgets as __QtWidgets
 
 
 if __QtWidgets.QApplication.instance() is None:
@@ -49,46 +49,45 @@ if __QtWidgets.QApplication.instance() is None:
 
 
 # import local modules
-from .version import version, VERSION
-from .logging_level import LOGGING_LEVEL
-
 # import sub-packages:
-from . import core
-from . import resources
-from . import contexts
-from . import data_io
-from . import multiprocessing
-from . import managers
-from . import plugins
-from . import workflow
-from . import apps
-from . import unittest_objects
-from . import widgets
-from . import gui
+from . import (
+    apps,
+    contexts,
+    core,
+    data_io,
+    gui,
+    managers,
+    multiprocessing,
+    plugins,
+    resources,
+    unittest_objects,
+    widgets,
+    workflow,
+)
+from .logging_level import LOGGING_LEVEL
+from .version import VERSION, version
 
 
 IS_QT6 = __qtpy.QT_VERSION[0] == "6"
 
 __version__ = VERSION
-__all__.extend(
-    [
-        "core",
-        "contexts",
-        "data_io",
-        "multiprocessing",
-        "managers",
-        "plugins",
-        "workflow",
-        "apps",
-        "unittest_objects",
-        "widgets",
-        "gui",
-        "IS_QT6",
-        "version",
-        "VERSION",
-        "LOGGING_LEVEL",
-    ]
-)
+__all__ = [
+    "core",
+    "contexts",
+    "data_io",
+    "multiprocessing",
+    "managers",
+    "plugins",
+    "workflow",
+    "apps",
+    "unittest_objects",
+    "widgets",
+    "gui",
+    "IS_QT6",
+    "version",
+    "VERSION",
+    "LOGGING_LEVEL",
+]
 
 
 # Check whether the sphinx documentation has been built and build it if it
@@ -98,7 +97,7 @@ if not core.utils.check_sphinx_html_docs() and "--no-sphinx" not in __sys.argv:
 
 # Disable the pyFAI logging to console
 __os.environ["PYFAI_NO_LOGGING"] = "1"
-# Change the pyFAI logging level to ERROR and above
+# Change the pyFAI logging level to ERROR and above:
 pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")
 pyFAI_azi_logger.setLevel(__logging.ERROR)
 pyFAI_logger = __logging.getLogger("pyFAI")

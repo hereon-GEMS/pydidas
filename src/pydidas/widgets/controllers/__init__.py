@@ -25,20 +25,15 @@ __license__ = "GPL-3.0-only"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import __all__ items from modules:
+
 from .manually_set_beamcenter_controller import *
 from .manually_set_integration_roi_controller import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import manually_set_beamcenter_controller
 
-__all__.extend(manually_set_beamcenter_controller.__all__)
-del manually_set_beamcenter_controller
+__all__ = (
+    manually_set_beamcenter_controller.__all__
+    + manually_set_integration_roi_controller.__all__
+)
 
-from . import manually_set_integration_roi_controller
-
-__all__.extend(manually_set_integration_roi_controller.__all__)
-del manually_set_integration_roi_controller
+del manually_set_beamcenter_controller, manually_set_integration_roi_controller

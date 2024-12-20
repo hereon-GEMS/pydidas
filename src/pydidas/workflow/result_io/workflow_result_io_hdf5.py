@@ -35,7 +35,6 @@ from typing import Union
 
 import h5py
 
-from pydidas import VERSION
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
@@ -43,6 +42,7 @@ from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
 from pydidas.data_io import import_data
+from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
 from pydidas.workflow.result_io.workflow_result_io_base import WorkflowResultIoBase
 from pydidas.workflow.workflow_tree import WorkflowTree
@@ -56,9 +56,9 @@ def get_detector_metadata_entries(
 
     Parameters
     ----------
-    scan : Scan
+    scan : pydidas.contexts.Scan
         The scan context.
-    exp : DiffractionExp
+    exp : pydidas.contexts.DiffractionExperiment
         The diffraction experiment context.
 
     Returns
@@ -98,9 +98,9 @@ def get_pydidas_context_config_entries(
 
     Parameters
     ----------
-    scan : Scan
+    scan : pydidas.contexts.Scan
         The scan (context).
-    exp : DiffractionExperiment
+    exp : pydidas.contexts.DiffractionExperiment
         The diffraction experiment (context).
     tree : WorkflowTree
         The workflow tree.
@@ -155,11 +155,11 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         **kwargs:
             Supported kwargs are:
 
-            scan_context : Union[Scan, None], optional
+            scan_context : Optional[pydidas.contexts.Scan]
                 The scan context. If None, the generic context will be used.
                 Only specify this, if you explicitly require a different context.
                 The default is None.
-            diffraction_exp_context : Union[DiffractionExp, None], optional
+            diffraction_exp_context : Optional[pydidas.contexts.DiffractionExperiment]
                 The diffraction experiment context. If None, the generic context
                 will be used. Only specify this, if you explicitly require a
                 different context. The default is None.
@@ -196,9 +196,9 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         ----------
         node_id : int
             The nodeID.
-        scan : Scan
+        scan : pydidas.contexts.Scan
             The scan (context).
-        exp : DiffractionExperiment
+        exp : pydidas.contexts.DiffractionExperiment
             The diffraction experiment (context).
         workflow : WorkflowTree
             The workflow tree.
@@ -320,9 +320,9 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         node_info : dict
             A dictionary with node_label, data_label, plugin_name keys and the
             respective values.
-        scan : pydidas.contexts.scan.Scan
+        scan : pydidas.contexts.Scan
             The imported scan configuration.
-        diffraction_exp : pydidas.contexts.diffraction_exp.DiffractionExperiment
+        diffraction_exp : pydidas.contexts.DiffractionExperiment
             The imported diffraction experiment configuration.
         tree : pydidas.workflow.WorkflowTree
             The imported workflow tree.

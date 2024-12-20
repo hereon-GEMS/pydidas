@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+#
+# ruff: noqa: C901
 
 """
 Module with the PydidasPlot2DwithIntegrationRegions class which extends the

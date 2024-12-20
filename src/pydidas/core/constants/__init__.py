@@ -25,10 +25,10 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
 # import __all__ items from modules:
+from . import image_ops
 from .colors import *
 from .constants import *
 from .file_extensions import *
@@ -42,66 +42,34 @@ from .q_settings import *
 from .qt_presets import *
 from .unicode_letters import *
 
-from . import image_ops
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import colors
+__all__ = ["image_ops"] + (
+    colors.__all__
+    + constants.__all__
+    + file_extensions.__all__
+    + gui_constants.__all__
+    + links.__all__
+    + main_menu_actions.__all__
+    + numpy_names.__all__
+    + paths.__all__
+    + pyfai_names.__all__
+    + q_settings.__all__
+    + qt_presets.__all__
+    + unicode_letters.__all__
+)
 
-__all__.extend(colors.__all__)
-del colors
-
-from . import constants
-
-__all__.extend(constants.__all__)
-del constants
-
-from . import file_extensions
-
-__all__.extend(file_extensions.__all__)
-del file_extensions
-
-from . import gui_constants
-
-__all__.extend(gui_constants.__all__)
-del gui_constants
-
-from . import links
-
-__all__.extend(links.__all__)
-del links
-
-from . import main_menu_actions
-
-__all__.extend(main_menu_actions.__all__)
-del main_menu_actions
-
-from . import numpy_names
-
-__all__.extend(numpy_names.__all__)
-del numpy_names
-
-from . import paths
-
-__all__.extend(paths.__all__)
-del paths
-
-from . import pyfai_names
-
-__all__.extend(pyfai_names.__all__)
-del pyfai_names
-
-from . import q_settings
-
-__all__.extend(q_settings.__all__)
-del q_settings
-
-from . import qt_presets
-
-__all__.extend(qt_presets.__all__)
-del qt_presets
-
-from . import unicode_letters
-
-__all__.extend(unicode_letters.__all__)
-del unicode_letters
+# Clean up the namespace:
+del (
+    colors,
+    constants,
+    file_extensions,
+    gui_constants,
+    links,
+    main_menu_actions,
+    numpy_names,
+    paths,
+    pyfai_names,
+    q_settings,
+    qt_presets,
+    unicode_letters,
+)

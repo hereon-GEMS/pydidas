@@ -27,11 +27,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["read_hdf5_dataset"]
 
+
 import itertools
 from numbers import Integral
 
 import h5py
-import hdf5plugin
 import numpy as np
 
 from pydidas.core import UserConfigError

@@ -34,9 +34,9 @@ from typing import NewType, Union
 
 import h5py
 
-from pydidas import VERSION
 from pydidas.contexts import DiffractionExperiment, Scan
 from pydidas.core import Dataset, UserConfigError
+from pydidas.version import VERSION
 from pydidas.workflow import ProcessingTree
 
 

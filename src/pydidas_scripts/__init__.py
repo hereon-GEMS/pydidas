@@ -29,7 +29,4 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from . import clear_local_settings
-from . import pydidas_gui
-from . import remove_pydidas
-from . import remove_local_files
+from . import clear_local_settings, pydidas_gui, remove_local_files, remove_pydidas

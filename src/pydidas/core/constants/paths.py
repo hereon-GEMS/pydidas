@@ -24,7 +24,11 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PYDIDAS_CONFIG_PATHS", "PYDIDAS_STANDARD_CONFIG_PATH"]
+__all__ = [
+    "PYDIDAS_CONFIG_PATHS",
+    "PYDIDAS_STANDARD_CONFIG_PATH",
+    "GENERIC_PLUGIN_PATH",
+]
 
 
 from pathlib import Path
@@ -45,3 +49,7 @@ for _path in QtCore.QStandardPaths.standardLocations(
     PYDIDAS_CONFIG_PATHS.append(_config_path)
 
 PYDIDAS_STANDARD_CONFIG_PATH = PYDIDAS_CONFIG_PATHS[0]
+
+GENERIC_PLUGIN_PATH = (
+    Path(__file__).absolute().parent.parent.parent.parent.joinpath("pydidas_plugins")
+)

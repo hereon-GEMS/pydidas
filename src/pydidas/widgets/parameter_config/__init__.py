@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Package with individual QWidgets used editing pydidas Parameters.
+Package with individual QWidgets used for displaying and editing pydidas Parameters.
 """
 
 __author__ = "Malte Storm"
@@ -24,33 +24,24 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
-from .parameter_widget import *
-from .parameter_edit_canvas import *
-from .parameter_widgets_mixin import *
 from .edit_plugin_parameters_widget import *
+from .parameter_edit_canvas import *
+from .parameter_widget import *
+from .parameter_widgets_mixin import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import parameter_widget
 
-__all__.extend(parameter_widget.__all__)
-del parameter_widget
+__all__ = (
+    parameter_widget.__all__
+    + parameter_edit_canvas.__all__
+    + parameter_widgets_mixin.__all__
+    + edit_plugin_parameters_widget.__all__
+)
 
-from . import parameter_edit_canvas
-
-__all__.extend(parameter_edit_canvas.__all__)
-del parameter_edit_canvas
-
-from . import parameter_widgets_mixin
-
-__all__.extend(parameter_widgets_mixin.__all__)
-del parameter_widgets_mixin
-
-from . import edit_plugin_parameters_widget
-
-__all__.extend(edit_plugin_parameters_widget.__all__)
-del edit_plugin_parameters_widget
+del (
+    parameter_widget,
+    parameter_edit_canvas,
+    parameter_widgets_mixin,
+    edit_plugin_parameters_widget,
+)

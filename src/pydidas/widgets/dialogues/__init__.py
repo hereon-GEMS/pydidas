@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-
 """
 Subpackage with PyQt dialogues.
 """
@@ -25,10 +24,8 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
 from .acknowledge_box import *
 from .critical_warning_ import *
 from .error_message_box import *
@@ -37,39 +34,23 @@ from .pydidas_exception_message_box import *
 from .question_box import *
 from .warning_box import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import acknowledge_box
 
-__all__.extend(acknowledge_box.__all__)
-del acknowledge_box
+__all__ = (
+    acknowledge_box.__all__
+    + critical_warning_.__all__
+    + error_message_box.__all__
+    + hdf5_dataset_selection_popup.__all__
+    + pydidas_exception_message_box.__all__
+    + question_box.__all__
+    + warning_box.__all__
+)
 
-from . import critical_warning_
-
-__all__.extend(critical_warning_.__all__)
-del critical_warning_
-
-from . import error_message_box
-
-__all__.extend(error_message_box.__all__)
-del error_message_box
-
-from . import hdf5_dataset_selection_popup
-
-__all__.extend(hdf5_dataset_selection_popup.__all__)
-del hdf5_dataset_selection_popup
-
-from . import pydidas_exception_message_box
-
-__all__.extend(pydidas_exception_message_box.__all__)
-del pydidas_exception_message_box
-
-from . import question_box
-
-__all__.extend(question_box.__all__)
-del question_box
-
-from . import warning_box
-
-__all__.extend(warning_box.__all__)
-del warning_box
+del (
+    acknowledge_box,
+    critical_warning_,
+    error_message_box,
+    hdf5_dataset_selection_popup,
+    pydidas_exception_message_box,
+    question_box,
+    warning_box,
+)

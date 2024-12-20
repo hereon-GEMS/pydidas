@@ -49,9 +49,10 @@ from silx.gui.plot.tools import ImageToolBar
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
-from pydidas.widgets import PydidasFileDialog, silx_plot
+from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.silx_plot import actions
 
 
 EXP = DiffractionExperimentContext()
@@ -100,17 +101,17 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
     ]
     for _item in ["_imageLoader", "_maskLoader"]:
         _obj = getattr(tasks[0], _item)
-        _action = silx_plot.PydidasLoadImageAction(_obj, ref=f"PyFAI_calib{_item}")
+        _action = actions.PydidasLoadImageAction(_obj, ref=f"PyFAI_calib{_item}")
         _obj.addAction(_action)
         _obj.setDefaultAction(_action)
         _obj.setText("...")
     for _task in tasks[0:4]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar)[0]
-        _histo_crop_action = silx_plot.CropHistogramOutliers(
+        _histo_crop_action = actions.CropHistogramOutliers(
             _plot, parent=_plot, forced_image_legend="image"
         )
-        _autoscale_action = silx_plot.AutoscaleToMeanAndThreeSigma(
+        _autoscale_action = actions.AutoscaleToMeanAndThreeSigma(
             _plot, parent=_plot, forced_image_legend="image"
         )
         _widget_action = [

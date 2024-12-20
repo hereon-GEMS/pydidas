@@ -26,7 +26,6 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
 # import sub-packages:
@@ -38,24 +37,17 @@ from .directory_spy_app import *
 from .execute_workflow_app import *
 from .execute_workflow_runner import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import composite_creator_app
 
-__all__.extend(composite_creator_app.__all__)
-del composite_creator_app
+__all__ = ["parsers"] + (
+    composite_creator_app.__all__
+    + directory_spy_app.__all__
+    + execute_workflow_app.__all__
+    + execute_workflow_runner.__all__
+)
 
-from . import directory_spy_app
-
-__all__.extend(directory_spy_app.__all__)
-del directory_spy_app
-
-from . import execute_workflow_app
-
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
-
-from . import execute_workflow_runner
-
-__all__.extend(execute_workflow_runner.__all__)
-del execute_workflow_runner
+del (
+    composite_creator_app,
+    directory_spy_app,
+    execute_workflow_app,
+    execute_workflow_runner,
+)

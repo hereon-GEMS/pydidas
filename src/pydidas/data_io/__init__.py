@@ -25,26 +25,26 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
+
 
 # import sub-packages:
-from . import implementations
-from . import low_level_readers
-from . import utils
+from . import implementations, low_level_readers, utils
 
-# import __all__ items from modules:
-
+# import items from modules:
 from .import_export import *
 from .io_manager import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import import_export
 
-__all__.extend(import_export.__all__)
-del import_export
+# define __all__ items:
+__all__ = (
+    [
+        "implementations",
+        "low_level_readers",
+        "utils",
+    ]
+    + import_export.__all__
+    + io_manager.__all__
+)
 
-from . import io_manager
 
-__all__.extend(io_manager.__all__)
-del io_manager
+del import_export, io_manager

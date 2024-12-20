@@ -24,31 +24,38 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
-
-# import __all__ items from modules:
-from .fit_func_meta import *
-from .fit_func_base import *
 
 
-# Automatically find and import fit function classes to have them registered
-# with the Metaclass:
-import os
-import importlib
-
-_dir = os.path.dirname(__file__)
-_fit_classes = set(
-    item.strip(".py")
-    for item in os.listdir(_dir)
-    if (
-        os.path.isfile(os.path.join(_dir, item))
-        and item not in ["__init__.py", "fit_func_base.py", "fit_func_meta.py"]
-    )
+# Import all fit functions to have them available in the
+# fitting MetaClass
+from . import (
+    double_gaussian,
+    double_lorentzian,
+    double_voigt,
+    gaussian,
+    lorentzian,
+    triple_gaussian,
+    triple_lorentzian,
+    triple_voigt,
+    voigt,
 )
+from .fit_func_base import *
+from .fit_func_meta import *
 
-for __module in _fit_classes:
-    __module = importlib.import_module(f".{__module}", __package__)
-    __all__ += __module.__all__
 
-del os
-del importlib
+__all__ = fit_func_base.__all__ + fit_func_meta.__all__
+
+# Clean up the namespace:
+del (
+    fit_func_base,
+    fit_func_meta,
+    voigt,
+    lorentzian,
+    gaussian,
+    double_gaussian,
+    double_lorentzian,
+    double_voigt,
+    triple_gaussian,
+    triple_lorentzian,
+    triple_voigt,
+)

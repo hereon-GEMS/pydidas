@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The data_io.implementations package includes imports/exporters for data
+The data__io.implementations package includes imports/exporters for data
 in different formats.
 """
 
@@ -25,35 +25,34 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
-from pydidas.data_io.implementations.io_base import *
-
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import io_base
-
-__all__.extend(io_base.__all__)
-del io_base
-
-# Automatically find and import IO classes to have them registered
-# with the Metaclass:
-import os
-import importlib
-
-_dir = os.path.dirname(__file__)
-_io_classes = set(
-    item[:-3]
-    for item in os.listdir(_dir)
-    if (item.endswith(".py") and item not in ["io_base.py", "__init__.py"])
+# import  items from modules:
+# need to import all modules to have the IO classes
+# registered in the IOManager metaclass
+from . import (
+    fabio_io,
+    hdf5_io,
+    io_exporter_matplotlib,
+    jpeg_io,
+    numpy_io,
+    png_io,
+    raw_io,
+    tiff_io,
 )
+from .io_base import *
 
-for _module in _io_classes:
-    _module = importlib.import_module(f".{_module}", __package__)
-    __all__ += _module.__all__
 
-del _module
-del os
-del importlib
+__all__ = io_base.__all__
+
+# Clean up the namespace:
+del (
+    fabio_io,
+    hdf5_io,
+    io_exporter_matplotlib,
+    jpeg_io,
+    numpy_io,
+    png_io,
+    raw_io,
+    tiff_io,
+)

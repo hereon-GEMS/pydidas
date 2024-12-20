@@ -24,32 +24,26 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import __all__ items from modules:
+
+from . import plugin_collection_browser
 from .plugin_collection_browser import *
 from .plugin_in_workflow_box import *
 from .select_new_plugin_widget import *
 from .workflow_tree_canvas import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import plugin_collection_browser
 
-__all__.extend(plugin_collection_browser.__all__)
-del plugin_collection_browser
+__all__ = (
+    plugin_collection_browser.__all__
+    + plugin_in_workflow_box.__all__
+    + select_new_plugin_widget.__all__
+    + workflow_tree_canvas.__all__
+)
 
-from . import plugin_in_workflow_box
-
-__all__.extend(plugin_in_workflow_box.__all__)
-del plugin_in_workflow_box
-
-from . import select_new_plugin_widget
-
-__all__.extend(select_new_plugin_widget.__all__)
-del select_new_plugin_widget
-
-from . import workflow_tree_canvas
-
-__all__.extend(workflow_tree_canvas.__all__)
-del workflow_tree_canvas
+# Clean up the namespace:
+del (
+    plugin_collection_browser,
+    plugin_in_workflow_box,
+    select_new_plugin_widget,
+    workflow_tree_canvas,
+)

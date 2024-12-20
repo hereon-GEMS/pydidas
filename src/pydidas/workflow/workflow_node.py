@@ -162,6 +162,7 @@ class WorkflowNode(GenericNode):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin.
             Supported keywords are:
+
             test : bool, optional
                 Flag to indicate that the plugin should be executed in test mode.
                 This flag will prevent the plugin from storing any data to the

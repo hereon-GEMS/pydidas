@@ -26,10 +26,8 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
 from .create_widgets_mixin import *
 from .empty_widget import *
 from .pydidas_checkbox import *
@@ -37,53 +35,30 @@ from .pydidas_combobox import *
 from .pydidas_label import *
 from .pydidas_lineedit import *
 from .pydidas_pushbutton import *
-from .square_button import *
 from .radio_button_group import *
+from .square_button import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
 
-from . import create_widgets_mixin
+__all__ = (
+    create_widgets_mixin.__all__
+    + empty_widget.__all__
+    + pydidas_checkbox.__all__
+    + pydidas_combobox.__all__
+    + pydidas_label.__all__
+    + pydidas_lineedit.__all__
+    + pydidas_pushbutton.__all__
+    + square_button.__all__
+    + radio_button_group.__all__
+)
 
-__all__.extend(create_widgets_mixin.__all__)
-del create_widgets_mixin
-
-from . import empty_widget
-
-__all__.extend(empty_widget.__all__)
-del empty_widget
-
-from . import pydidas_checkbox
-
-__all__.extend(pydidas_checkbox.__all__)
-del pydidas_checkbox
-
-from . import pydidas_combobox
-
-__all__.extend(pydidas_combobox.__all__)
-del pydidas_combobox
-
-from . import pydidas_label
-
-__all__.extend(pydidas_label.__all__)
-del pydidas_label
-
-from . import pydidas_lineedit
-
-__all__.extend(pydidas_lineedit.__all__)
-del pydidas_lineedit
-
-from . import pydidas_pushbutton
-
-__all__.extend(pydidas_pushbutton.__all__)
-del pydidas_pushbutton
-
-from . import square_button
-
-__all__.extend(square_button.__all__)
-del square_button
-
-from . import radio_button_group
-
-__all__.extend(radio_button_group.__all__)
-del radio_button_group
+del (
+    create_widgets_mixin,
+    empty_widget,
+    pydidas_checkbox,
+    pydidas_combobox,
+    pydidas_label,
+    pydidas_lineedit,
+    pydidas_pushbutton,
+    square_button,
+    radio_button_group,
+)

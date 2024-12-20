@@ -5,7 +5,7 @@
     SPDX-License-Identifier: CC-BY-4.0
 
 workflow.result_io
-----------------------
+------------------
 
 .. automodule:: pydidas.workflow.result_io
     :members:

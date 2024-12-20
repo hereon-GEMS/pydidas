@@ -7,13 +7,13 @@
 
 .. |WorkflowTree| replace:: :py:class:`WorkflowTree <pydidas.workflow.processing_tree.ProcessingTree>`
 
-.. |Scan| replace:: :py:class:`Scan <pydidas.contexts.scan.Scan>`
+.. |Scan| replace:: :py:class:`Scan <pydidas.contexts.scan.scan.Scan>`
 
 .. |DiffractionExperiment| replace:: :py:class:`DiffractionExperiment <pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment>` 
 
 .. |ExecuteWorkflowRunner| replace:: :py:class:`ExecuteWorkflowRunner <pydidas.apps.execute_workflow_runner.ExecuteWorkflowRunner>`
 
-.. |process_scan| replace:: py:method:`process_scan <pydidas.apps.execute_workflow_runner.ExecuteWorkflowRunner.process_scan>`
+.. |process_scan| replace:: :py:meth:`process_scan <pydidas.apps.execute_workflow_runner.ExecuteWorkflowRunner.process_scan>`
 
 
 Running pydidas workflows from the command line
@@ -127,7 +127,7 @@ Running a workflow is very simple and only requires calling the
 The code above will execute the workflow, save the results in the given
 directory and exit the event loop for additional user input. **Please be aware
 that the call to the ExecuteWorkflowRunner must be made from within a function
-due to using of python's :py:module:`multiprocessing` module.**
+due to using of python's** :mod:`multiprocessing` **module.**
 
 .. tip::
     

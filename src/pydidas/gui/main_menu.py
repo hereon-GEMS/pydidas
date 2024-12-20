@@ -670,6 +670,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             for _index, _ in enumerate(self.centralWidget().frames)
         ]
         if False in _frame_info:
+            self._qtapp.sig_gui_exception_occurred.emit()
             critical_warning(
                 "Error",
                 "The state is not defined for all frames. Aborting Frame state import.",

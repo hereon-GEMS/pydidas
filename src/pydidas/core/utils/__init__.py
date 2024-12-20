@@ -25,22 +25,22 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
+
 
 # import __all__ items from modules:
 from .clipboard_ import *
 from .decorators import *
 from .file_checks import *
 from .file_utils import *
-from .iterable_utils import *
 from .format_arguments_ import *
 from .get_documentation_targets import *
 from .hdf5_dataset_utils import *
-from .logger import *
 from .image_utils import *
+from .iterable_utils import *
+from .logger import *
 from .math_utils import *
-from .numpy_parser import *
 from .no_print import *
+from .numpy_parser import *
 from .qt_utilities import *
 from .rebin_ import *
 from .show_busy_mouse import *
@@ -48,99 +48,48 @@ from .sphinx_html import *
 from .str_utils import *
 from .timer import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import clipboard_
 
-__all__.extend(clipboard_.__all__)
-del clipboard_
+__all__ = (
+    clipboard_.__all__
+    + decorators.__all__
+    + file_checks.__all__
+    + file_utils.__all__
+    + iterable_utils.__all__
+    + format_arguments_.__all__
+    + get_documentation_targets.__all__
+    + hdf5_dataset_utils.__all__
+    + logger.__all__
+    + image_utils.__all__
+    + math_utils.__all__
+    + numpy_parser.__all__
+    + no_print.__all__
+    + qt_utilities.__all__
+    + rebin_.__all__
+    + show_busy_mouse.__all__
+    + sphinx_html.__all__
+    + str_utils.__all__
+    + timer.__all__
+)
 
-from . import decorators
-
-__all__.extend(decorators.__all__)
-del decorators
-
-from . import file_checks
-
-__all__.extend(file_checks.__all__)
-del file_checks
-
-from . import file_utils
-
-__all__.extend(file_utils.__all__)
-del file_utils
-
-from . import format_arguments_
-
-__all__.extend(format_arguments_.__all__)
-del format_arguments_
-
-from . import get_documentation_targets
-
-__all__.extend(get_documentation_targets.__all__)
-del get_documentation_targets
-
-from . import hdf5_dataset_utils
-
-__all__.extend(hdf5_dataset_utils.__all__)
-del hdf5_dataset_utils
-
-from . import image_utils
-
-__all__.extend(image_utils.__all__)
-del image_utils
-
-from . import iterable_utils
-
-__all__.extend(iterable_utils.__all__)
-del iterable_utils
-
-from . import logger
-
-__all__.extend(logger.__all__)
-del logger
-
-from . import math_utils
-
-__all__.extend(math_utils.__all__)
-del math_utils
-
-from . import numpy_parser
-
-__all__.extend(numpy_parser.__all__)
-del numpy_parser
-
-from . import no_print
-
-__all__.extend(no_print.__all__)
-del no_print
-
-from . import qt_utilities
-
-__all__.extend(qt_utilities.__all__)
-del qt_utilities
-
-from . import rebin_
-
-__all__.extend(rebin_.__all__)
-del rebin_
-
-from . import show_busy_mouse
-
-__all__.extend(show_busy_mouse.__all__)
-del show_busy_mouse
-
-from . import sphinx_html
-
-__all__.extend(sphinx_html.__all__)
-del sphinx_html
-
-from . import str_utils
-
-__all__.extend(str_utils.__all__)
-del str_utils
-
-from . import timer
-
-__all__.extend(timer.__all__)
-del timer
+# Clean up the namespace
+del (
+    clipboard_,
+    decorators,
+    file_checks,
+    file_utils,
+    iterable_utils,
+    format_arguments_,
+    get_documentation_targets,
+    hdf5_dataset_utils,
+    logger,
+    image_utils,
+    math_utils,
+    numpy_parser,
+    no_print,
+    qt_utilities,
+    rebin_,
+    show_busy_mouse,
+    sphinx_html,
+    str_utils,
+    timer,
+)

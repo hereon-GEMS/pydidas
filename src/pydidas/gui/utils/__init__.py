@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-
 """
 The pydidas.gui.utils sub-package provides convenience functions and classes
 which are used in the gui package.
@@ -26,21 +25,13 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
 # import __all__ items from modules:
 from .main_menu_utils import *
 from .main_window_utils import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import main_menu_utils
 
-__all__.extend(main_menu_utils.__all__)
-del main_menu_utils
+__all__ = main_menu_utils.__all__ + main_window_utils.__all__
 
-from . import main_window_utils
-
-__all__.extend(main_window_utils.__all__)
-del main_window_utils
+del main_window_utils, main_menu_utils

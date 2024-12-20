@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-
 """
 The low_level_readers subpackage includes functionality to import data on a very low
 programmatic level.
@@ -26,15 +25,11 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import sub-packages:
+
 from .read_hdf5_dataset_ import *
 
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import read_hdf5_dataset_
+__all__ = read_hdf5_dataset_.__all__
 
-__all__.extend(read_hdf5_dataset_.__all__)
 del read_hdf5_dataset_

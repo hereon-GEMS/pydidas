@@ -25,32 +25,19 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import __all__ items from modules:
+
 from .app_processor_ import *
-from .processor_ import *
 from .app_runner import *
+from .processor_ import *
 from .worker_controller import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import app_processor_
 
-__all__.extend(app_processor_.__all__)
-del app_processor_
+__all__ = (
+    app_processor_.__all__
+    + processor_.__all__
+    + app_runner.__all__
+    + worker_controller.__all__
+)
 
-from . import processor_
-
-__all__.extend(processor_.__all__)
-del processor_
-
-from . import app_runner
-
-__all__.extend(app_runner.__all__)
-del app_runner
-
-from . import worker_controller
-
-__all__.extend(worker_controller.__all__)
-del worker_controller
+del app_processor_, processor_, app_runner, worker_controller

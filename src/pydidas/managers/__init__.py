@@ -25,26 +25,17 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import __all__ items from modules:
+
 from .composite_image_manager import *
 from .filelist_manager import *
 from .image_metadata_manager import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import composite_image_manager
 
-__all__.extend(composite_image_manager.__all__)
-del composite_image_manager
+__all__ = (
+    composite_image_manager.__all__
+    + filelist_manager.__all__
+    + image_metadata_manager.__all__
+)
 
-from . import filelist_manager
-
-__all__.extend(filelist_manager.__all__)
-del filelist_manager
-
-from . import image_metadata_manager
-
-__all__.extend(image_metadata_manager.__all__)
-del image_metadata_manager
+del composite_image_manager, filelist_manager, image_metadata_manager

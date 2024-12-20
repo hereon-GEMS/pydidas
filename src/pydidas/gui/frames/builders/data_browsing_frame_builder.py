@@ -36,7 +36,7 @@ from pydidas.widgets.selection import (
     Hdf5DatasetSelector,
     RawMetadataSelector,
 )
-from pydidas.widgets.silx_plot.silx_data_viewer import SilxDataViewer
+from pydidas.widgets.silx_plot import SilxDataViewer
 
 
 def get_widget_creation_information() -> list[list[str, tuple, dict]]:

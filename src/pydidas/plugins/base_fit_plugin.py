@@ -38,7 +38,6 @@ from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins.base_proc_plugin import ProcPlugin
-from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
 
 
 class BaseFitPlugin(ProcPlugin):
@@ -568,6 +567,8 @@ class BaseFitPlugin(ProcPlugin):
         QtWidgets.QWidget
             The unique ParameterConfig widget
         """
+        from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
+
         return FitPluginConfigWidget(self)
 
 

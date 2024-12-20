@@ -60,7 +60,7 @@ class BaseApp(ObjectWithParameterCollection):
     """
 
     default_params = ParameterCollection()
-    parse_func = lambda self: {}
+    parse_func = lambda self: {}  # noqa E731
     attributes_not_to_copy_to_app_clone = ["_mp_manager_instance"]
 
     def __init__(self, *args: tuple, **kwargs: dict):

@@ -39,6 +39,7 @@ from pydidas.core import SingletonFactory, get_generic_param_collection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_PARAM_EDIT_WIDTH,
+    GENERIC_PLUGIN_PATH,
     GENERIC_STANDARD_WIDGET_WIDTH,
     POLICY_EXP_FIX,
     POLICY_MIN_MIN,
@@ -47,7 +48,7 @@ from pydidas.core.constants import (
 )
 from pydidas.core.generic_params.generic_params_settings import GENERIC_PARAMS_SETTINGS
 from pydidas.core.utils import update_palette
-from pydidas.plugins import GENERIC_PLUGIN_PATH, PluginCollection
+from pydidas.plugins import PluginCollection
 from pydidas.widgets.dialogues import PydidasExceptionMessageBox, QuestionBox
 from pydidas.widgets.factory import SquareButton
 from pydidas.widgets.framework import PydidasWindow

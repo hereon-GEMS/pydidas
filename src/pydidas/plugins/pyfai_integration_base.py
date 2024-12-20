@@ -50,7 +50,6 @@ from pydidas.core.constants import (
 from pydidas.core.utils import pydidas_logger
 from pydidas.data_io import import_data
 from pydidas.plugins.base_proc_plugin import ProcPlugin
-from pydidas.widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
 
 
 logger = pydidas_logger()
@@ -406,6 +405,8 @@ class pyFAIintegrationBase(ProcPlugin):
         QtWidgets.QWidget
             The unique ParameterConfig widget
         """
+        from pydidas.widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
+
         return PyfaiIntegrationConfigWidget(self)
 
     def get_radial_range(self) -> Union[tuple[float, float, None]]:

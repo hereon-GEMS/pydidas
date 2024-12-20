@@ -24,32 +24,25 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import __all__ items from modules:
+
 from .directory_explorer import *
 from .hdf5_dataset_selector import *
 from .raw_metadata_selector import *
 from .result_selection_widget import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import directory_explorer
 
-__all__.extend(directory_explorer.__all__)
-del directory_explorer
+__all__ = (
+    directory_explorer.__all__
+    + hdf5_dataset_selector.__all__
+    + raw_metadata_selector.__all__
+    + result_selection_widget.__all__
+)
 
-from . import hdf5_dataset_selector
-
-__all__.extend(hdf5_dataset_selector.__all__)
-del hdf5_dataset_selector
-
-from . import raw_metadata_selector
-
-__all__.extend(raw_metadata_selector.__all__)
-del raw_metadata_selector
-
-from . import result_selection_widget
-
-__all__.extend(result_selection_widget.__all__)
-del result_selection_widget
+# Clean up the namespace:
+del (
+    directory_explorer,
+    hdf5_dataset_selector,
+    raw_metadata_selector,
+    result_selection_widget,
+)

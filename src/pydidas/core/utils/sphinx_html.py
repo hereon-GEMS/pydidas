@@ -83,7 +83,9 @@ def run_sphinx_html_build(
     verbose : bool, optional
         Flag to control printing of a message. The default is True.
     """
-    if "sphinx-build" in sys.argv or sys.argv[0].endswith(f"sphinx{os.sep}__main__.py"):
+    if "sphinx-build" in sys.argv[0] or sys.argv[0].endswith(
+        f"sphinx{os.sep}__main__.py"
+    ):
         return
     if "-m" in sys.argv:
         _index = sys.argv.index("-m")

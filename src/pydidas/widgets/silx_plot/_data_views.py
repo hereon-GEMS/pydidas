@@ -42,6 +42,16 @@ from silx.gui.utils import blockSignals
 from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
+DATA_VIEW_AXES_NAMES = {
+    "_Plot1dView": ["use as curve y"],
+    "_Plot3dView": ["use as z", "use as y", "use as x"],
+    "_ComplexImageView": ["use as image y-axis", "use as image x-axis"],
+    "_ArrayView": ["use as column", "use as row"],
+    "_StackView": ["depth", "use as image y-axis", "use as image x-axis"],
+    "_NXdataScalarView": ["use as column", "use as row"],
+}
+
+
 class PydidasImageDataView(CompositeDataView):
     """
     Display data as 2D image.
@@ -78,16 +88,6 @@ class _PydidasPlot2dView(_Plot2dView):
 
     def axesNames(self, data, info):
         return ["use as image y-axis", "use as image x-axis"]
-
-
-DATA_VIEW_AXES_NAMES = {
-    "_Plot1dView": ["use as curve y"],
-    "_Plot3dView": ["use as z", "use as y", "use as x"],
-    "_ComplexImageView": ["use as image y-axis", "use as image x-axis"],
-    "_ArrayView": ["use as column", "use as row"],
-    "_StackView": ["depth", "use as image y-axis", "use as image x-axis"],
-    "_NXdataScalarView": ["use as column", "use as row"],
-}
 
 
 def _DataView_axes_names(self, label, data, info):

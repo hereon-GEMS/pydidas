@@ -25,21 +25,13 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
 # import __all__ items from modules:
 from .generic_io_base import *
 from .generic_io_meta import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import generic_io_base
 
-__all__.extend(generic_io_base.__all__)
-del generic_io_base
+__all__ = generic_io_base.__all__ + generic_io_meta.__all__
 
-from . import generic_io_meta
-
-__all__.extend(generic_io_meta.__all__)
-del generic_io_meta
+del generic_io_base, generic_io_meta

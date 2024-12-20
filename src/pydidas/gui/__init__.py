@@ -25,30 +25,19 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
 # import subpackages
-from . import frames
-from . import managers
-from . import mixins
+from . import frames, managers, mixins
 
-__all__.extend(["frames", "managers", "mixins"])
-
-# import __all__ items from modules:
+# import items from modules:
 from .gui_excepthook_ import *
 from .main_window import *
-from .start_pydidas_gui import *
+from .start_pydidas_gui_ import *
 
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import gui_excepthook_
+__all__ = ["frames", "managers", "mixins"] + (
+    gui_excepthook_.__all__ + main_window.__all__ + start_pydidas_gui_.__all__
+)
 
-__all__.extend(gui_excepthook_.__all__)
-del gui_excepthook_
-
-from . import main_window
-
-__all__.extend(main_window.__all__)
-del main_window
+del gui_excepthook_, main_window, start_pydidas_gui_

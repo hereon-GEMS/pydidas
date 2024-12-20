@@ -39,8 +39,9 @@ from typing import Literal, Union
 from qtpy import QtCore
 
 from pydidas.core import PydidasQsettingsMixin, UserConfigError
+from pydidas.core.constants import GENERIC_PLUGIN_PATH
 from pydidas.core.utils import find_valid_python_files
-from pydidas.plugins import GENERIC_PLUGIN_PATH, BasePlugin
+from pydidas.plugins import BasePlugin
 
 
 class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):

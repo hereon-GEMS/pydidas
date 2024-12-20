@@ -31,14 +31,17 @@ __all__ = ["WorkflowResults", "WorkflowResultsContext"]
 import os
 import re
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.contexts import DiffractionExperimentContext, ScanContext
-from pydidas.contexts.diff_exp import DiffractionExperiment
-from pydidas.contexts.scan import Scan
+from pydidas.contexts import (
+    DiffractionExperiment,
+    DiffractionExperimentContext,
+    Scan,
+    ScanContext,
+)
 from pydidas.core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
 from pydidas.workflow.processing_tree import ProcessingTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta as ResultSaver
@@ -57,7 +60,7 @@ class WorkflowResults(QtCore.QObject):
 
     Parameters
     ----------
-    scan_context : Union[Scan, None], optional
+    scan_context : Optional[pydidas.contexts.Scan]
         The scan context. If None, the generic context will be used. Only specify this,
         if you explicitly require a different context. The default is None.
     diffraction_exp_context : Union[DiffractionExp, None], optional
@@ -73,9 +76,9 @@ class WorkflowResults(QtCore.QObject):
 
     def __init__(
         self,
-        diffraction_exp_context: Union[None, DiffractionExperiment] = None,
-        scan_context: Union[None, Scan] = None,
-        workflow_tree: Union[None, ProcessingTree] = None,
+        diffraction_exp_context: Optional[DiffractionExperiment] = None,
+        scan_context: Optional[Scan] = None,
+        workflow_tree: Optional[ProcessingTree] = None,
     ):
         super().__init__()
         self._SCAN = ScanContext() if scan_context is None else scan_context

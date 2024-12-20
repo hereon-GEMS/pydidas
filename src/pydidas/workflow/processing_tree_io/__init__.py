@@ -26,43 +26,13 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
+from . import processing_tree_io_yaml
 from .processing_tree_io_base import *
 from .processing_tree_io_meta import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import processing_tree_io_base
 
-__all__.extend(processing_tree_io_base.__all__)
-del processing_tree_io_base
+__all__ = processing_tree_io_meta.__all__ + processing_tree_io_base.__all__
 
-from . import processing_tree_io_meta
-
-__all__.extend(processing_tree_io_meta.__all__)
-del processing_tree_io_meta
-
-# Automatically find and import IO classes to have them registered
-# with the Metaclass:
-from pathlib import Path as __Path
-import importlib as __importlib
-
-_dir = __Path(__file__).parent
-__io_classes = set(
-    item.stem
-    for item in _dir.iterdir()
-    if (
-        item.is_file()
-        and item.name.startswith("processing_tree_io")
-        and not any(item.name.endswith(_suffix) for _suffix in ["base.py", "meta.py"])
-    )
-)
-
-for __module in __io_classes:
-    __pymodule = __importlib.import_module(f".{__module}", __package__)
-    __all__ += __pymodule.__all__
-
-del __pymodule
+del (processing_tree_io_base, processing_tree_io_meta, processing_tree_io_yaml)

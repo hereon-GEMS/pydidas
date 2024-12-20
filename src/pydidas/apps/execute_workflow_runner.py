@@ -78,7 +78,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         output_directory : Union[Path, str]
             The directory to write results to.
         verbose : bool, optional
-            Flag to enable printed output message. Do not use this settings for
+            Flag to enable printed output message. Do not use this setting for
             remote processing. The default is False.
         overwrite : bool, optional
             Flag to enable writing of results to existing directories, possibly
@@ -86,7 +86,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
     """
 
     def __init__(self, **kwargs: dict):
-        QtCore.QObject.__init__(self)
+        QtCore.QObject.__init__(self, None)
         self._qtapp = PydidasQApplication.instance()
         self.parse_args_for_pydidas_workflow()
         self.update_parsed_args_from_kwargs(**kwargs)
@@ -120,7 +120,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         parser.add_argument(
             "-output_dir",
             "-o",
-            help="The outpout directory to store results in.",
+            help="The output directory to store results in.",
         )
         _options, _unknown = parser.parse_known_args()
         self.parsed_args = dict(vars(_options))
@@ -258,7 +258,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             f"{_name}: -{_key} {_val}"
             for _key, _name, _val in [
                 ["scan", "Scan", "filename"],
-                ["workflow", "WorkfromTree", "filename"],
+                ["workflow", "WorkflowTree", "filename"],
                 ["diffraction_exp", "DiffractionExperiment", "filename"],
                 ["output_dir", "Output directory", "directory"],
             ]

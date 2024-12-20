@@ -25,20 +25,13 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import __all__ items from modules:
+
 from .figure_utils import *
 from .roi_slice_manager import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import figure_utils
 
-__all__.extend(figure_utils.__all__)
-del figure_utils
+__all__ = figure_utils.__all__ + roi_slice_manager.__all__
 
-from . import roi_slice_manager
-
-__all__.extend(roi_slice_manager.__all__)
-del roi_slice_manager
+# Clean up the namespace:
+del (figure_utils, roi_slice_manager)

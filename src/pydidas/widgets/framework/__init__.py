@@ -25,45 +25,30 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
+from .font_scaling_toolbar import *
+from .pydidas_frame_stack import *
+from .pydidas_status_widget import *
+from .pydidas_window import *
 from pydidas.widgets.framework.base_frame import *
 from pydidas.widgets.framework.base_frame_with_app import *
-from .font_scaling_toolbar import *
-from .pydidas_status_widget import *
-from .pydidas_frame_stack import *
-from .pydidas_window import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import base_frame
 
-__all__.extend(base_frame.__all__)
-del base_frame
+__all__ = (
+    base_frame.__all__
+    + base_frame_with_app.__all__
+    + font_scaling_toolbar.__all__
+    + pydidas_status_widget.__all__
+    + pydidas_frame_stack.__all__
+    + pydidas_window.__all__
+)
 
-from . import base_frame_with_app
-
-__all__.extend(base_frame_with_app.__all__)
-del base_frame_with_app
-
-from . import font_scaling_toolbar
-
-__all__.extend(font_scaling_toolbar.__all__)
-del font_scaling_toolbar
-
-from . import pydidas_status_widget
-
-__all__.extend(pydidas_status_widget.__all__)
-del pydidas_status_widget
-
-from . import pydidas_frame_stack
-
-__all__.extend(pydidas_frame_stack.__all__)
-del pydidas_frame_stack
-
-from . import pydidas_window
-
-__all__.extend(pydidas_window.__all__)
-del pydidas_window
+del (
+    base_frame,
+    base_frame_with_app,
+    font_scaling_toolbar,
+    pydidas_status_widget,
+    pydidas_frame_stack,
+    pydidas_window,
+)

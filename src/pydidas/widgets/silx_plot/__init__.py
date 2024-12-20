@@ -24,50 +24,32 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
-# import __all__ items from modules:
+
+from . import silx_actions as actions
+from ._silx_data_viewer import *
 from .pydidas_masktools_widget import *
-from pydidas.widgets.silx_plot.pydidas_plot1d import *
-from pydidas.widgets.silx_plot.pydidas_plot2d import *
+from .pydidas_plot1d import *
+from .pydidas_plot2d import *
+from .pydidas_plot2d_with_integration_regions import *
 from .pydidas_plot_stack import *
-from pydidas.widgets.silx_plot.pydidas_plot2d_with_integration_regions import *
-from .silx_actions import *
-from .utilities import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import pydidas_masktools_widget
 
-__all__.extend(pydidas_masktools_widget.__all__)
-del pydidas_masktools_widget
+__all__ = ["actions", "utilities"] + (
+    pydidas_masktools_widget.__all__
+    + pydidas_plot1d.__all__
+    + pydidas_plot2d.__all__
+    + pydidas_plot_stack.__all__
+    + pydidas_plot2d_with_integration_regions.__all__
+)
 
-from . import pydidas_plot1d
-
-__all__.extend(pydidas_plot1d.__all__)
-del pydidas_plot1d
-
-from . import pydidas_plot2d
-
-__all__.extend(pydidas_plot2d.__all__)
-del pydidas_plot2d
-
-from . import pydidas_plot_stack
-
-__all__.extend(pydidas_plot_stack.__all__)
-del pydidas_plot_stack
-
-from . import pydidas_plot2d_with_integration_regions
-
-__all__.extend(pydidas_plot2d_with_integration_regions.__all__)
-del pydidas_plot2d_with_integration_regions
-
-from . import silx_actions
-
-__all__.extend(silx_actions.__all__)
-del silx_actions
-
-from . import utilities
-
-__all__.extend(utilities.__all__)
-del utilities
+# Clean up the namespace:
+del (
+    pydidas_masktools_widget,
+    pydidas_plot1d,
+    pydidas_plot2d,
+    pydidas_plot_stack,
+    pydidas_plot2d_with_integration_regions,
+    pydidas_position_info,  # noqa
+    silx_actions,  # noqa
+)

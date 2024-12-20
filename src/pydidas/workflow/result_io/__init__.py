@@ -26,44 +26,13 @@ __copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
 
 
-# import __all__ items from modules:
+from . import workflow_result_io_hdf5
 from .workflow_result_io_base import *
 from .workflow_result_io_meta import *
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import workflow_result_io_base
 
-__all__.extend(workflow_result_io_base.__all__)
-del workflow_result_io_base
+__all__ = workflow_result_io_base.__all__ + workflow_result_io_meta.__all__
 
-from . import workflow_result_io_meta
-
-__all__.extend(workflow_result_io_meta.__all__)
-del workflow_result_io_meta
-
-# Automatically find and import IO classes to have them registered
-# with the Metaclass:
-import os
-import importlib
-
-_dir = os.path.dirname(__file__)
-_io_classes = set(
-    item.strip(".py")
-    for item in os.listdir(_dir)
-    if (
-        item.startswith("workflow_result_io")
-        and item[-7:] not in ["base.py", "meta.py"]
-    )
-)
-
-for _module in _io_classes:
-    _module = importlib.import_module(f".{_module}", __package__)
-    __all__ += _module.__all__
-
-del _module
-del os
-del importlib
+del (workflow_result_io_base, workflow_result_io_meta, workflow_result_io_hdf5)

@@ -49,7 +49,7 @@ from silx.gui.plot.tools import ImageToolBar
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
-from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets import PydidasFileDialog, icon_with_inverted_colors
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.silx_plot import actions
@@ -91,6 +91,7 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
         MaskTask,
         PeakPickingTask,
     )
+    from silx.gui.qt import QToolBar
 
     tasks = [
         ExperimentTask.ExperimentTask(),
@@ -99,7 +100,7 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
         GeometryTask.GeometryTask(),
         IntegrationTask.IntegrationTask(),
     ]
-    for _item in ["_imageLoader", "_maskLoader"]:
+    for _item in ["_imageLoader", "_maskLoader", "_darkLoader", "_flatLoader"]:
         _obj = getattr(tasks[0], _item)
         _action = actions.PydidasLoadImageAction(_obj, ref=f"PyFAI_calib{_item}")
         _obj.addAction(_action)
@@ -124,9 +125,10 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
         _toolbar.insertAction(_widget_action, _histo_crop_action)
         _toolbar.insertAction(_widget_action, _autoscale_action)
     # explicitly hide the toolbar with the 3D visualization:
-    tasks[0]._ExperimentTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
+    tasks[0]._ExperimentTask__plot.findChildren(QToolBar)[2].setVisible(False)
+    tasks[3]._GeometryTask__plot.findChildren(QToolBar)[2].setVisible(False)
+    # disable the default ring option in the peak picking task:
     tasks[2]._PeakPickingTask__createNewRingOption.setChecked(False)
-    tasks[3]._GeometryTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
     # insert button for exporting to DiffractionExperimentContext:
     _parent = tasks[4]._savePoniButton.parent()
     tasks[4]._update_context_button = QtWidgets.QPushButton(
@@ -162,8 +164,13 @@ class PyfaiCalibFrame(BaseFrame):
 
     def _setup_pyfai_context(self):
         """
-        Setup the context for the pyfai calibration.
+        Set up the context for the pyfai calibration.
+
         """
+        import silx.gui.utils.matplotlib  # noqa F401
+
+        pyFAI.resources.silx_integration()
+
         _settings = QtCore.QSettings(
             QtCore.QSettings.IniFormat,
             QtCore.QSettings.UserScope,
@@ -230,9 +237,11 @@ class PyfaiCalibFrame(BaseFrame):
         self._widgets["but_help"].clicked.connect(self._display_help)
         for task in self._tasks:
             task.nextTaskRequested.connect(self.display_next_task)
+            _inverted_icon = icon_with_inverted_colors(task.windowIcon())
             _menu_item = MenuItem(self._widgets["task_list"])
             _menu_item.setText(task.windowTitle())
-            _menu_item.setIcon(task.windowIcon())
+            _menu_item.setIcon(_inverted_icon)
+            print(task.windowIcon())
             task.warningUpdated.connect(
                 functools.partial(self._update_task_state, task, _menu_item)
             )

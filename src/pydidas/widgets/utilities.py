@@ -30,6 +30,7 @@ __all__ = [
     "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
     "update_param_and_widget_choices",
+    "icon_with_inverted_colors",
 ]
 
 
@@ -269,3 +270,24 @@ def update_param_and_widget_choices(param_widget: QtWidgets.QWidget, new_choices
             return
         param_widget.io_widget.update_choices(new_choices)
         param_widget.io_widget.setCurrentText(new_choices[0])
+
+
+def icon_with_inverted_colors(icon: QtGui.QIcon) -> QtGui.QIcon:
+    """
+    Invert the colors of a QIcon.
+
+    Parameters
+    ----------
+    icon : QIcon
+        The icon to be inverted.
+
+    Returns
+    -------
+    QIcon
+        The inverted icon.
+    """
+    _pixmap = icon.pixmap(30, 30)
+    _image = _pixmap.toImage()
+    _image.invertPixels()
+    _inverted_pixmap = QtGui.QPixmap.fromImage(_image)
+    return QtGui.QIcon(_inverted_pixmap)

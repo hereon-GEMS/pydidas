@@ -481,7 +481,7 @@ document.write(`
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
 is the pydidas Singleton instance of the
-<a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.DiffractionExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperiment</span></code></a>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperiment</span></code>
 class. It is used for storing and accessing global information about the
 experimental setup. Stored information include</p>
 <ul class="simple">
@@ -599,7 +599,7 @@ detector which is not inclued in pyFAI, by setting all Parameters values:</p>
 <h4>Using a pyFAI detector<a class="headerlink" href="#using-a-pyfai-detector" title="Link to this heading">#</a></h4>
 <p>If the detector is defined in pyFAI, this library can be used to update the
 detector settings automatically by giving the detector name in the
-<a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment.set_detector_params_from_name" title="pydidas.contexts.diff_exp.DiffractionExperiment.set_detector_params_from_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_detector_params_from_name</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">set_detector_params_from_name</span></code>
 method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">EXP</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">DiffractionExperimentContext</span><span class="p">()</span>
@@ -701,13 +701,13 @@ the available im-/exporters. The standard distribution ships with support for
 YAML files and pyFAI .poni files. Both types are supported for import and
 export. The format will be determined automatically based on the file extension.</p>
 <p>Imports and exports are started by calling the
-<a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment.import_from_file" title="pydidas.contexts.diff_exp.DiffractionExperiment.import_from_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">import_from_file(filename)</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">import_from_file(filename)</span></code>
 and
-<a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment.export_to_file" title="pydidas.contexts.diff_exp.DiffractionExperiment.export_to_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">export_to_file(filename)</span></code></a>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">export_to_file(filename)</span></code>,
 respectively. The filename must include the absolute path to the file.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Importing the <a class="reference internal" href="../../code/api/contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.DiffractionExperiment"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code></a>
+<p>Importing the <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
 from file will overwrite all current values without asking for confirmation.</p>
 </div>
 <p>An example to demonstrate these methods is given below:</p>

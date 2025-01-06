@@ -403,6 +403,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="composite_creator_app.html">CompositeCreatorApp</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">ExecuteWorkflowApp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="directory_spy_app.html">DirectorySpyApp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute_workflow_runner.html">ExecuteWorkflowRunner</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../widgets.html">The widgets sub-package</a></li>
@@ -546,17 +547,17 @@ subclasses full control over args and kwargs.</p>
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.close_shared_arrays_and_memory">
 <span class="sig-name descname"><span class="pre">close_shared_arrays_and_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.close_shared_arrays_and_memory" title="Link to this definition">#</a></dt>
 <dd><p>Close (and unlink) the shared memory buffers.</p>
-<p>Note that only the master app should unlink the shared memory buffers.</p>
+<p>Note that only the manager app should unlink the shared memory buffers.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slave_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.copy" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.copy" title="Link to this definition">#</a></dt>
 <dd><p>Get a copy of the App.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>slave_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle creation of a slave app which does not include
-attributes marked in the classes slave_mode attribute.</p>
+<dd class="field-odd"><p><strong>clone_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to toggle creation of an app clone which does not include
+attributes marked in the classes clone_mode attribute.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>App</strong> – A copy of the App instance.</p>
@@ -908,7 +909,7 @@ and entered values or - if missing - the default values.</p>
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.prepare_run">
 <span class="sig-name descname"><span class="pre">prepare_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.prepare_run" title="Link to this definition">#</a></dt>
 <dd><p>Prepare running the workflow execution.</p>
-<p>For the main App (i.e. running not in slave_mode), this involves the
+<p>For the main App (i.e. running not in clone_mode), this involves the
 following steps:</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -920,7 +921,7 @@ requirements are okay.</p></li>
 <li><p>Initialize the shared memory arrays.</p></li>
 </ol>
 </div></blockquote>
-<p>Both the slaved and the main applications then initialize local numpy
+<p>Both the cloned and the main applications then initialize local numpy
 arrays from the shared memory.</p>
 </dd></dl>
 

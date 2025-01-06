@@ -471,7 +471,7 @@ document.write(`
 <h1>workflow<a class="headerlink" href="#workflow" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.workflow_results.</span></span><span class="sig-name descname"><span class="pre">WorkflowResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.workflow.ProcessingTree" title="pydidas.workflow.processing_tree.ProcessingTree"><span class="pre">ProcessingTree</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.workflow_results.</span></span><span class="sig-name descname"><span class="pre">WorkflowResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.workflow.ProcessingTree" title="pydidas.workflow.processing_tree.ProcessingTree"><span class="pre">ProcessingTree</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults" title="Link to this definition">#</a></dt>
 <dd><p>A class for handling composite data from multiple plugins.</p>
 <p>This class handles Datasets from each plugin in the WorkflowTree. Results
 are referenced by the node ID of the data’s producer.</p>
@@ -480,7 +480,7 @@ and never use the _WorkflowResults directly unless explicitly required.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify this,
+<li><p><strong>scan_context</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>pydidas.contexts.Scan</em></a><em>]</em>) – The scan context. If None, the generic context will be used. Only specify this,
 if you explicitly require a different context. The default is None.</p></li>
 <li><p><strong>diffraction_exp_context</strong> (<em>Union</em><em>[</em><em>DiffractionExp</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The diffraction experiment context. If None, the generic context will be used.
 Only specify this, if you explicitly require a different context. The default
@@ -528,35 +528,35 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.frozen_exp">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_exp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_exp" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_exp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_exp" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the DiffractionExperiment context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The DiffractionExperiment at the time of processing.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.DiffractionExperiment">DiffractionExperiment</a></p>
+<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.DiffractionExperiment">DiffractionExperiment</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.frozen_scan">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_scan</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_scan" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_scan</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_scan" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the Scan context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The Scan at the time of processing.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan">Scan</a></p>
+<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan">Scan</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7fc16f762cd0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f77dc3a1f70&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1710,13 +1710,11 @@ If the tree has not changed, it will skip this method unless the forced
 keyword is set to True.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Optional keyword arguments. Supported keywords are:
-forced : bool, optional</p>
-<blockquote>
-<div><p>Flag to force running the prepare_execution method. The default
-is False.</p>
-</div></blockquote>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
 <dl class="simple">
+<dt>forced<span class="classifier">bool, optional</span></dt><dd><p>Flag to force running the prepare_execution method. The default
+is False.</p>
+</dd>
 <dt>test<span class="classifier">bool, optional</span></dt><dd><p>Flag to run the prepare_execution method in test mode. The default
 is False.</p>
 </dd>
@@ -1898,13 +1896,13 @@ node_id.setter in the WorkflowNode.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Any keyword arguments which need to be passed to the plugin.
-Supported keywords are:
-test : bool, optional</p>
-<blockquote>
-<div><p>Flag to indicate that the plugin should be executed in test mode.
+Supported keywords are:</p>
+<dl class="simple">
+<dt>test<span class="classifier">bool, optional</span></dt><dd><p>Flag to indicate that the plugin should be executed in test mode.
 This flag will prevent the plugin from storing any data to the
 file system.</p>
-</div></blockquote>
+</dd>
+</dl>
 </p>
 </dd>
 </dl>
@@ -1929,7 +1927,7 @@ calculated. Else, returns None.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.workflow.ProcessingTree" title="pydidas.workflow.processing_tree.ProcessingTree"><span class="pre">ProcessingTree</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.workflow.ProcessingTree" title="pydidas.workflow.processing_tree.ProcessingTree"><span class="pre">ProcessingTree</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults" title="Link to this definition">#</a></dt>
 <dd><p>A class for handling composite data from multiple plugins.</p>
 <p>This class handles Datasets from each plugin in the WorkflowTree. Results
 are referenced by the node ID of the data’s producer.</p>
@@ -1938,7 +1936,7 @@ and never use the _WorkflowResults directly unless explicitly required.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify this,
+<li><p><strong>scan_context</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>pydidas.contexts.Scan</em></a><em>]</em>) – The scan context. If None, the generic context will be used. Only specify this,
 if you explicitly require a different context. The default is None.</p></li>
 <li><p><strong>diffraction_exp_context</strong> (<em>Union</em><em>[</em><em>DiffractionExp</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The diffraction experiment context. If None, the generic context will be used.
 Only specify this, if you explicitly require a different context. The default
@@ -1986,35 +1984,35 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.frozen_exp">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_exp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_exp" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_exp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_exp" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the DiffractionExperiment context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The DiffractionExperiment at the time of processing.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.diff_exp.DiffractionExperiment" title="pydidas.contexts.diff_exp.DiffractionExperiment">DiffractionExperiment</a></p>
+<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.DiffractionExperiment">DiffractionExperiment</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.frozen_scan">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_scan</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_scan" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_scan</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_scan" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the Scan context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The Scan at the time of processing.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.scan.Scan" title="pydidas.contexts.scan.Scan">Scan</a></p>
+<dd class="field-even"><p><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan">Scan</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7fc16f762cd0&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f77dc3a1f70&gt;</span></em><a class="headerlink" href="#pydidas.workflow.WorkflowResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Define scan frame &#8212; pydidas</title>
+    <title>ExecuteWorkflowRunner &#8212; pydidas</title>
   
   
   
@@ -44,8 +44,7 @@
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'manuals/gui/frames/DefineScanFrame';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/apps/execute_workflow_runner';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
@@ -54,8 +53,8 @@
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Workflow edit frame" href="WorkflowEditFrame.html" />
-    <link rel="prev" title="Define diffraction experiment" href="DefineDiffractionExpFrame.html" />
+    <link rel="next" title="The widgets sub-package" href="../widgets.html" />
+    <link rel="prev" title="DirectorySpyApp" href="directory_spy_app.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -153,15 +152,15 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../../manuals_main.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
     User manuals
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../code/code_documentation.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
     Code documentation
   </a>
 </li>
@@ -297,15 +296,15 @@ document.write(`
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../../manuals_main.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
     User manuals
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../code/code_documentation.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
     Code documentation
   </a>
 </li>
@@ -388,32 +387,27 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../commandline_start.html">Command line manuals</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../menu.html">The menu</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../editing_parameters.html">Editing Parameters in the GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../silx/plots.html">Plots</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="frames_main.html">Frames</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="DefineDiffractionExpFrame.html">Define diffraction experiment</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">Define scan frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../concepts.html">Key concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../package_structure.html">Package structure</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../apps.html">The apps sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="composite_creator_app.html">CompositeCreatorApp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute_workflow_app.html">ExecuteWorkflowApp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directory_spy_app.html">DirectorySpyApp</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">ExecuteWorkflowRunner</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../windows/windows_main.html">Windows</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../recipes/pydidas_processing.html">Using the pydidas processing pipeline</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets.html">The widgets sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
 </ul>
 </div>
 </nav></div>
@@ -443,8 +437,6 @@ document.write(`
 
 
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -454,15 +446,12 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../../manuals_main.html" class="nav-link">User manuals</a></li>
+    <li class="breadcrumb-item"><a href="../../code_documentation.html" class="nav-link">Code documentation</a></li>
     
     
-    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    <li class="breadcrumb-item"><a href="../apps.html" class="nav-link">The apps sub-package</a></li>
     
-    
-    <li class="breadcrumb-item"><a href="frames_main.html" class="nav-link">Frames</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">Define scan frame</li>
+    <li class="breadcrumb-item active" aria-current="page">ExecuteWorkf...</li>
   </ul>
 </nav>
 </div>
@@ -479,181 +468,108 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="define-scan-frame">
-<span id="id1"></span><h1>Define scan frame<a class="headerlink" href="#define-scan-frame" title="Link to this heading">#</a></h1>
-<nav class="contents local" id="contents">
-<ul class="simple">
-<li><p><a class="reference internal" href="#control-buttons" id="id2">Control buttons</a></p>
-<ul>
-<li><p><a class="reference internal" href="#import-scan-settings" id="id3">Import scan settings</a></p></li>
-<li><p><a class="reference internal" href="#reset-parameters" id="id4">Reset Parameters</a></p></li>
-<li><p><a class="reference internal" href="#export-scan-settings" id="id5">Export scan settings</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#scan-dimension-explanation" id="id6">Scan dimension explanation</a></p></li>
-<li><p><a class="reference internal" href="#global-parameters" id="id7">Global Parameters</a></p></li>
-<li><p><a class="reference internal" href="#configuring-a-scan-dimension" id="id8">Configuring a scan dimension</a></p></li>
-<li><p><a class="reference internal" href="#list-of-all-scancontext-parameters" id="id9">List of all ScanContext Parameters</a></p></li>
-</ul>
-</nav>
-<p>The <em>Scan setup</em> frame is a graphical interface to configure the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
-which holds information about the scan setup.</p>
-<p>The frame only holds the configuration widgets for its Parameters as well as
-some buttons for convenience functionality.</p>
-<a class="reference internal image-reference" href="../../../_images/overview1.png"><img alt="../../../_images/overview1.png" class="align-center" src="../../../_images/overview1.png" style="width: 600px;" />
-</a>
-<section id="control-buttons">
-<h2>Control buttons<a class="headerlink" href="#control-buttons" title="Link to this heading">#</a></h2>
-<section id="import-scan-settings">
-<h3>Import scan settings<a class="headerlink" href="#import-scan-settings" title="Link to this heading">#</a></h3>
-<img alt="../../../_images/import.png" class="align-left" src="../../../_images/import.png" />
-<p>The Scan settings can be imported from file. Clicking the corresponding
-button will open a selection dialogue to pick the file with the stored settings.
-File extensions will be pre-selected based on the available importers.</p>
-</section>
-<section id="reset-parameters">
-<h3>Reset Parameters<a class="headerlink" href="#reset-parameters" title="Link to this heading">#</a></h3>
-<img alt="../../../_images/reset.png" class="align-left" src="../../../_images/reset.png" />
-<p>The “Reset all scan settings” button allows the user to change all Parameters
-back to their default values.</p>
-</section>
-<section id="export-scan-settings">
-<h3>Export scan settings<a class="headerlink" href="#export-scan-settings" title="Link to this heading">#</a></h3>
-<img alt="../../../_images/export1.png" class="align-left" src="../../../_images/export1.png" />
-<p>At the bottom of the Frame, the export button allows users to export the current
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
-Parameters to a file. This button will open a filename dialogue.</p>
-</section>
-</section>
-<section id="scan-dimension-explanation">
-<h2>Scan dimension explanation<a class="headerlink" href="#scan-dimension-explanation" title="Link to this heading">#</a></h2>
-<img alt="../../../_images/more_dim_info.png" class="align-left" src="../../../_images/more_dim_info.png" />
-<p>The scan dimension explanation section gives detailed information about the
-ordering of scan scan dimensions. The <em>slowest</em> scan dimension is dimension no.
-1 and the fastest is the last scan dimension. This ordering corresponds to how
-the scan must be performed algorithmically. The button opens a window with an
-in-depth explanation, including images.</p>
-</section>
-<section id="global-parameters">
-<h2>Global Parameters<a class="headerlink" href="#global-parameters" title="Link to this heading">#</a></h2>
-<img alt="../../../_images/globals.png" class="align-left" src="../../../_images/globals.png" />
-<p>Here, <em>global</em> refers to general scan Parameters in contrast to Parameters for
-a specific scan dimension. The scan dimensionality defines the number of used
-dimensions (and also shows or hides the corresponding widgets for the selected
-dimensions). The scan title is used as reference in titles and captions.</p>
-<p>The base directory and scan name pattern are used for <a class="reference internal" href="../../../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugins</span></code></a> to define the raw data source. The starting index
-defines the number of the first data file.</p>
-<p>For a detailed description of each Parameter, please refer to the
-<a class="reference internal" href="#scan-context-params"><span class="std std-ref">list of ScanContext Parameters</span></a> found at the bottom of
-this page.</p>
-</section>
-<section id="configuring-a-scan-dimension">
-<h2>Configuring a scan dimension<a class="headerlink" href="#configuring-a-scan-dimension" title="Link to this heading">#</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Following the python nomenclature, the first index is 0 (zero) and so forth.</p>
-</div>
-<img alt="../../../_images/dimension.png" class="align-left" src="../../../_images/dimension.png" />
-<p>The configuration for each scan dimension is the same, and dimension #1 is shown
-only exemplarily.</p>
-<p>At the top, next to the name, are two small buttons with up and down arrows
-which allow to move the given scan dimension up or down in the list to change
-the order. Only reasonable arrows are shown, for example the first scan
-dimension cannot be further moved upwards.</p>
-<p>Each scan dimension has one mandatory field which is the number of scan points.
-This number determines the layout of the data in pydidas. The other information
-is metadata which is used to determine labels and axis ranges (for plots and
-export metadata) but which has no further relevance. The name of the scan
-dimension corresponds to the label. The unit is also used to label the
-dimension range.</p>
-<p>The range of each scan dimension is determined by the number of points
-<span class="math notranslate nohighlight">\(N\)</span>, the step width <span class="math notranslate nohighlight">\(\Delta x\)</span> between two points and the offset
-<span class="math notranslate nohighlight">\(x_0\)</span>. The full range is thus</p>
-<div class="math notranslate nohighlight">
-\[x_0,\ x_0 + \Delta x,\ x_0 + 2 * \Delta x,\ ...,\ x_0 + (N - 1) * \Delta x.\]</div>
-<span class="target" id="scan-context-params"></span></section>
-<section id="list-of-all-scancontext-parameters">
-<h2>List of all ScanContext Parameters<a class="headerlink" href="#list-of-all-scancontext-parameters" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><dl class="simple">
-<dt>scan_dim (type: int, default: 2, unit: “”)</dt><dd><p>The scan dimensionality. This defines the number of processed dimensions.</p>
+  <section id="class-name">
+<h1>ExecuteWorkflowRunner<a class="headerlink" href="#class-name" title="Link to this heading">#</a></h1>
+<section id="class-name-with-inherited-methods">
+<span id="all-methods-executeworkflowrunner"></span><h2>ExecuteWorkflowRunner with inherited methods<a class="headerlink" href="#class-name-with-inherited-methods" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.apps.</span></span><span class="sig-name descname"><span class="pre">ExecuteWorkflowRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
+<p>Class to run pydidas workflows from the command line with parallelization.</p>
+<p>The WorkflowRunner can be run from the command line and creates and handles
+a Qt EventLoop for processing.</p>
+<p>Parameters are all handled as kwargs to allow argument parsing and arbitrary
+orders, but an output directory as well as all three of Workflow, Scan, and
+DiffractionExperiment must be supplied, either through parsed command line
+arguments or as keyword arguments.</p>
+<p>Keyword arguments will override given command line inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Supported keyword arguments are:</p>
+<dl class="simple">
+<dt>workflow<span class="classifier">Union[Path, str, ProcessingTree]</span></dt><dd><p>The filename to the workflow or a ProcessingTree instance.</p>
+</dd>
+<dt>scan<span class="classifier">Union[Path, str, Scan]</span></dt><dd><p>The filename to the stored Scan or a Scan instance.</p>
+</dd>
+<dt>diffraction_exp<span class="classifier">Union[Path, str, DiffractionExperiment]</span></dt><dd><p>The filename to the stored DiffractionExperiment or a
+DiffractionExperiment instance. Note that ‘diffraction_experiment’
+is also available as alias.</p>
+</dd>
+<dt>output_directory<span class="classifier">Union[Path, str]</span></dt><dd><p>The directory to write results to.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Flag to enable printed output message. Do not use this setting for
+remote processing. The default is False.</p>
+</dd>
+<dt>overwrite<span class="classifier">bool, optional</span></dt><dd><p>Flag to enable writing of results to existing directories, possibly
+overwriting existing results. The default is False.</p>
 </dd>
 </dl>
-</li>
-<li><dl class="simple">
-<dt>scan_title (type: str, default: “”, unit: “”)</dt><dd><p>The scan name or title. This is used exclusively for reference in axis
-labels and result exporters.</p>
+</p>
 </dd>
 </dl>
-</li>
-<li><dl class="simple">
-<dt>scan_base_directory (type: Path, default: “.”, unit: “”)</dt><dd><p>The base directory in which the raw scan data is stored.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.check_all_args_okay">
+<span class="sig-name descname"><span class="pre">check_all_args_okay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.check_all_args_okay" title="Link to this definition">#</a></dt>
+<dd><p>Check that all required (keyword) arguments have been set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If the configuration is incomplete or problematic.</p>
 </dd>
 </dl>
-</li>
-<li><dl class="simple">
-<dt>scan_name_pattern (type: str, default: “”, unit: “”)</dt><dd><p>The name pattern for scan files, subdirectories etc. User hashes (“#”) to
-mark wildcard characters to be filled in with the current index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.execute_workflow_in_apprunner">
+<span class="sig-name descname"><span class="pre">execute_workflow_in_apprunner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.execute_workflow_in_apprunner" title="Link to this definition">#</a></dt>
+<dd><p>Execute the given workflow in an AppRunner with a QEventLoop.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.parse_args_for_pydidas_workflow">
+<span class="sig-name descname"><span class="pre">parse_args_for_pydidas_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.parse_args_for_pydidas_workflow" title="Link to this definition">#</a></dt>
+<dd><p>Parse the command line arguments for the run_pydidas_workflow script.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.process_scan">
+<span class="sig-name descname"><span class="pre">process_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.process_scan" title="Link to this definition">#</a></dt>
+<dd><p>Process a scan.</p>
+<p>This method will check if new metadata has been provided in the given
+keywords and will update the stored arguments respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – The updated keyword arguments. For the full list of supported keyword
+arguments, please refer to the global class docstring.</p>
 </dd>
 </dl>
-</li>
-<li><dl class="simple">
-<dt>scan_start_index (type: int, default: 0, unit: “”)</dt><dd><p>The starting index for files etc. of the first point in the scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.update_contexts_from_stored_args">
+<span class="sig-name descname"><span class="pre">update_contexts_from_stored_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.update_contexts_from_stored_args" title="Link to this definition">#</a></dt>
+<dd><p>Update the global contexts from the stored arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.update_parsed_args_from_kwargs">
+<span class="sig-name descname"><span class="pre">update_parsed_args_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.update_parsed_args_from_kwargs" title="Link to this definition">#</a></dt>
+<dd><p>Update the parsed arguments with the given keyword arguments.</p>
+<p>For the specific supported keyword arguments, please check the class
+definition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>dict</em>) – The dictionary with the user-provided keyword-arguments</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If both the ‘diffraction_experiment’ and ‘diffraction_exp’ keywords
+    are provided.</p>
 </dd>
 </dl>
-</li>
-<li><dl class="simple">
-<dt>scan_index_stepping (type: int, default: 1, unit: “”)</dt><dd><p>The stepping of the index, i.e. the difference in the index between two
-adjacent scan points.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_multiplicity (type: int, default: 1, unit: “”)</dt><dd><p>The image multiplicity: The number of frames acquired at each unique scan
-point. Use this value only if the multiple images should be combined.
-Otherwise, use an additional scan dimension for the multiplicity.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_multi_image_handling (type: str, default: “Average”, unit: “”)</dt><dd><p>The handling instructions for multiple frames at each scan point. Can be
-either “Average” or “Sum”.</p>
-</dd>
-</dl>
-</li>
-</ul>
-<p>The following Parameters exist for each scan dimension, i.e. scan_dim<em>{i}</em>_label stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
-scan_dim3_label. For clarity, only the generic form is described here.</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
-for labelling.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
-counter / motor position for scan step #0).</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
-</dd>
-</dl>
-</li>
-</ul>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -668,20 +584,20 @@ counter / motor position for scan step #0).</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="DefineDiffractionExpFrame.html"
+       href="directory_spy_app.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Define diffraction experiment</p>
+        <p class="prev-next-title">DirectorySpyApp</p>
       </div>
     </a>
     <a class="right-next"
-       href="WorkflowEditFrame.html"
+       href="../widgets.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Workflow edit frame</p>
+        <p class="prev-next-title">The widgets sub-package</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -703,16 +619,18 @@ counter / motor position for scan step #0).</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-buttons">Control buttons</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-scan-settings">Import scan settings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reset-parameters">Reset Parameters</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export-scan-settings">Export scan settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-name-with-inherited-methods">ExecuteWorkflowRunner with inherited methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowRunner"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowRunner</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowRunner.check_all_args_okay"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowRunner.check_all_args_okay</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowRunner.execute_workflow_in_apprunner"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowRunner.execute_workflow_in_apprunner</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowRunner.parse_args_for_pydidas_workflow"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowRunner.parse_args_for_pydidas_workflow</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowRunner.process_scan"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowRunner.process_scan</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowRunner.update_contexts_from_stored_args"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowRunner.update_contexts_from_stored_args</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowRunner.update_parsed_args_from_kwargs"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowRunner.update_parsed_args_from_kwargs</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scan-dimension-explanation">Scan dimension explanation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#global-parameters">Global Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuring-a-scan-dimension">Configuring a scan dimension</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-all-scancontext-parameters">List of all ScanContext Parameters</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -720,7 +638,7 @@ counter / motor position for scan step #0).</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/manuals/gui/frames/DefineScanFrame.rst">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/apps/execute_workflow_runner.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -735,7 +653,7 @@ counter / motor position for scan step #0).</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../../_sources/manuals/gui/frames/DefineScanFrame.rst.txt">
+    <a href="../../../_sources/code/api/apps/execute_workflow_runner.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

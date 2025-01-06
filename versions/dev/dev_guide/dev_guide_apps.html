@@ -476,9 +476,9 @@ document.write(`
 <td><p>The function used to parse command line arguments to starting Parameter
 values.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">attributes_not_to_copy_to_slave_app</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">attributes_not_to_copy_to_app_clone</span></code></p></td>
 <td><p>A list with the names of instance attributes which must not be copied
-to a slave app. This is relevant for using the AppRunner for parallel
+to an app clone. This is relevant for using the AppRunner for parallel
 processing, where it should be avoided to copy large objects because
 of the serialization of all objects during pickling.</p></td>
 </tr>
@@ -499,9 +499,9 @@ of the serialization of all objects during pickling.</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">slave_app</span></code></p></td>
-<td><p>A boolean flag to toggle whether the current app instance is a master
-or slave.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">app_clone</span></code></p></td>
+<td><p>A boolean flag to toggle whether the current app instance is a manager
+or clone.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_config</span></code></p></td>
 <td><p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">_config</span></code> dictionary should be used to store all app
@@ -571,12 +571,12 @@ task should be defined. <strong>This method must be defined in a custom app.</st
 <td><p>This method takes the task index and the function results and stores
 them in whichever way the app defined. It is separated from the
 processing to separate it in parallel processing and only store the
-results in the master process. <strong>This method must be defined in a
+results in the main process. <strong>This method must be defined in a
 custom app.</strong></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">initialize_shared_memory</span></code></p></td>
 <td><p>This method is used to create shared memory objects to be shared between
-master and slave apps or it initialize it again. Details must be defined
+manager and app clones or it initialize it again. Details must be defined
 by the app which wishes to use it.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">export_state</span></code></p></td>
@@ -727,7 +727,7 @@ The run method’s definition is given below to demonstrate the exact sequence:<
 The app will create a random noisy image of the given shape as its core
 function.
 It will utilize a shared memory array to store results to demonstrate how
-master and slave apps interact in multiprocessing.
+manager and app clones interact in multiprocessing.
 Just for demonstration purposes, it will wait for 50 ms for every 5th index
 and fail every 2nd carryon check. These methods will also print some info for
 demonstration:</p>
@@ -761,7 +761,7 @@ demonstration:</p>
         <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
         <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;image_shape&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)),</span>
     <span class="p">)</span>
-    <span class="n">attributes_not_to_copy_to_slave_app</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;shared_array&quot;</span><span class="p">,</span> <span class="s2">&quot;shared_index_in_use&quot;</span><span class="p">,</span> <span class="s2">&quot;_tasks&quot;</span><span class="p">]</span>
+    <span class="n">attributes_not_to_copy_to_app_clone</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;shared_array&quot;</span><span class="p">,</span> <span class="s2">&quot;shared_index_in_use&quot;</span><span class="p">,</span> <span class="s2">&quot;_tasks&quot;</span><span class="p">]</span>
     <span class="n">parse_func</span> <span class="o">=</span> <span class="n">app_param_parser</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -778,9 +778,9 @@ demonstration:</p>
 <span class="sd">        Perform operations prior to running main parallel processing function.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tasks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">))</span>
-        <span class="c1"># only the master must initialize the shared memory, the slaves are passed</span>
+        <span class="c1"># only the manager must initialize the shared memory, the clones are passed</span>
         <span class="c1"># the reference:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">slave_mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone_mode</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initialize_shared_memory</span><span class="p">()</span>
         <span class="c1"># create the shared arrays:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shared_index_in_use</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
@@ -878,22 +878,22 @@ the app’s <code class="xref py py-data docutils literal notranslate"><span cla
 <section id="using-the-app-s-shared-memory">
 <h3>Using the app’s shared memory<a class="headerlink" href="#using-the-app-s-shared-memory" title="Link to this heading">#</a></h3>
 <p>To use the app’s shared memory, we only need to create a copy of the app (in the
-slave mode). This will allow the two apps to use the joint shared memory:</p>
+clone mode). This will allow the two apps to use the joint shared memory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">multiprocessing_pre_run</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">app_slave</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">slave_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">app_slave</span><span class="o">.</span><span class="n">multiprocessing_pre_run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_clone</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">clone_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_clone</span><span class="o">.</span><span class="n">multiprocessing_pre_run</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">buffer_index</span> <span class="o">=</span> <span class="n">app_slave</span><span class="o">.</span><span class="n">multiprocessing_func</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">buffer_index</span> <span class="o">=</span> <span class="n">app_clone</span><span class="o">.</span><span class="n">multiprocessing_func</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># The first buffer has now been used:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">shared_index_in_use</span>
 <span class="go">array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># now, the data from the slave is stored in the shared array and</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># also accessible by the master app:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># now, the data from the clone is stored in the shared array and</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># also accessible by the manager app:</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">shared_array</span><span class="p">[</span><span class="n">buffer_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
 <span class="go">array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],</span>
 <span class="go">  dtype=float32)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">app_slave</span><span class="o">.</span><span class="n">shared_array</span><span class="p">[</span><span class="n">buffer_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_clone</span><span class="o">.</span><span class="n">shared_array</span><span class="p">[</span><span class="n">buffer_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
 <span class="go">array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],</span>
 <span class="go">  dtype=float32)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># we can now get the results from the shared buffer and store them</span>

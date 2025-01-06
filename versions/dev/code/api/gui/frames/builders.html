@@ -501,18 +501,6 @@ without any connections and functionality.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DataBrowsingFrameBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">DataBrowsingFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DataBrowsingFrameBuilder" title="Link to this definition">#</a></dt>
-<dd><p>Class to populate the DataBrowsingFrame with widgets.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DataBrowsingFrameBuilder.build_frame">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DataBrowsingFrameBuilder.build_frame" title="Link to this definition">#</a></dt>
-<dd><p>Build the frame and create all required widgets.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">DefineDiffractionExpFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder" title="Link to this definition">#</a></dt>
 <dd><p>Class to populate the DefineDiffractionExpFrame with widgets.</p>
@@ -537,40 +525,6 @@ without any connections and functionality.</p>
 <dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_geometry_header">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_geometry_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_geometry_header" title="Link to this definition">#</a></dt>
 <dd><p>Create header items (label / buttons) for the detector.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineScanFrameBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">DefineScanFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder" title="Link to this definition">#</a></dt>
-<dd><p>Create all widgets and initialize their state.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineScanFrameBuilder.build_frame">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder.build_frame" title="Link to this definition">#</a></dt>
-<dd><p>Create all widgets for the frame and place them in the layout.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The DefineScanFrame instance.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.DefineScanFrameBuilder.width_factor">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">two_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder.width_factor" title="Link to this definition">#</a></dt>
-<dd><p>Get the width factor based on the number of visible columns.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dim_columns</strong> (<em>int</em>) – The number of columns</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The resulting total width factor for font metrics.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -706,6 +660,93 @@ with widgets.</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.build_header_config">
+<span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">build_header_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.build_header_config" title="Link to this definition">#</a></dt>
+<dd><p>Get information to build the frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list with the information required to build the frame.
+The list include the callable method name, the arguments and
+the keyword arguments.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[list[str, tuple, dict]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.build_scan_dim_groups">
+<span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">build_scan_dim_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.build_scan_dim_groups" title="Link to this definition">#</a></dt>
+<dd><p>Build the scan dimension groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>start_row</strong> (<em>int</em>) – The row to start the scan dimension groups.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.column_width_factor">
+<span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">column_width_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">two_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.gui.frames.builders.column_width_factor" title="Link to this definition">#</a></dt>
+<dd><p>Get the width factor based on the number of visible columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dim_columns</strong> (<em>int</em>) – The number of columns</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting total width factor for font metrics.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.create_splitter">
+<span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">create_splitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filesystem_browser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_viewer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QSplitter</span></span></span><a class="headerlink" href="#pydidas.gui.frames.builders.create_splitter" title="Link to this definition">#</a></dt>
+<dd><p>Create a splitter widget for the frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filesystem_browser</strong> (<em>QtWidgets.QWidget</em>) – The filesystem browser widget.</p></li>
+<li><p><strong>data_viewer</strong> (<em>QtWidgets.QWidget</em>) – The data viewer widget.</p></li>
+<li><p><strong>frame_width</strong> (<em>int</em>) – The width of the frame.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The splitter widget.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QtWidgets.QSplitter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.get_widget_creation_information">
+<span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">get_widget_creation_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.gui.frames.builders.get_widget_creation_information" title="Link to this definition">#</a></dt>
+<dd><p>Get the widget creation information for the DataBrowsingFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>The widget creation information. Each list entry includes all the
+necessary information to create a single widget in the form of a
+list with the following entries:</p>
+<ul class="simple">
+<li><p>The widget creation method name.</p></li>
+<li><p>The arguments for the widget creation method.</p></li>
+<li><p>The keyword arguments for the widget creation method.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[list[str, tuple, dict]]</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -758,19 +799,10 @@ with widgets.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorFrameBuilder.build_frame</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DataBrowsingFrameBuilder"><code class="docutils literal notranslate"><span class="pre">DataBrowsingFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DataBrowsingFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">DataBrowsingFrameBuilder.build_frame</span></code></a></li>
-</ul>
-</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder.build_frame</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_detector_header"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder.create_detector_header</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DefineDiffractionExpFrameBuilder.create_geometry_header"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrameBuilder.create_geometry_header</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder"><code class="docutils literal notranslate"><span class="pre">DefineScanFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">DefineScanFrameBuilder.build_frame</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.DefineScanFrameBuilder.width_factor"><code class="docutils literal notranslate"><span class="pre">DefineScanFrameBuilder.width_factor</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.ImageMathFrameBuilder"><code class="docutils literal notranslate"><span class="pre">ImageMathFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
@@ -798,6 +830,11 @@ with widgets.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.WorkflowTestFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">WorkflowTestFrameBuilder.build_frame</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.build_header_config"><code class="docutils literal notranslate"><span class="pre">build_header_config</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.build_scan_dim_groups"><code class="docutils literal notranslate"><span class="pre">build_scan_dim_groups</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.column_width_factor"><code class="docutils literal notranslate"><span class="pre">column_width_factor</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.create_splitter"><code class="docutils literal notranslate"><span class="pre">create_splitter</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.get_widget_creation_information"><code class="docutils literal notranslate"><span class="pre">get_widget_creation_information</span></code></a></li>
 </ul>
   </nav></div>
 

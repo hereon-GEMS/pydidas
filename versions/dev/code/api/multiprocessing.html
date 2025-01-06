@@ -565,7 +565,7 @@ starting the workers.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.multiprocessing.</span></span><span class="sig-name descname"><span class="pre">WorkerController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController" title="Link to this definition">#</a></dt>
-<dd><p>The WorkerController is a QThread for spawing and controlling workers.</p>
+<dd><p>The WorkerController is a QThread for spawning and controlling workers.</p>
 <p>The WorkerControllers workers are used to perform computations in parallel.</p>
 <p>A function with defined args and kwargs can be called in separate
 processes with the first function argument as the variable that differs
@@ -578,7 +578,7 @@ use the globally defined pydidas setting for the number of workers.</p></li>
 <li><p><strong>function</strong> (<em>Callable</em><em>, </em><em>optional</em>) – The function to be called by the workers. If not specified at init, it must
 be set later for the workers to actually perform tasks.</p></li>
 <li><p><strong>func_args</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The function arguments. The default is an empty tuple.</p></li>
-<li><p><strong>func_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Kwywords passed to the function. The default is an empty dictionary.</p></li>
+<li><p><strong>func_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keywords passed to the function. The default is an empty dictionary.</p></li>
 </ul>
 </dd>
 </dl>
@@ -637,7 +637,7 @@ function argument will always be the task.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.cycle_post_run">
 <span class="sig-name descname"><span class="pre">cycle_post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.cycle_post_run" title="Link to this definition">#</a></dt>
-<dd><p>Perform operations after the the main processing loop.</p>
+<dd><p>Perform operations after the main processing loop.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>timeout</strong> (<em>float</em>) – The waiting time to wait on the workers to send the finished
@@ -748,7 +748,7 @@ queue to the workers.</p>
 <dd><p>Send stop signal to workers.</p>
 <p>This method will send stop signals to all workers.
 Note that the runtime of the workers will be determined by the runtime
-of the called function. The currrent call will be finished before the stop
+of the called function. The current call will be finished before the stop
 signal will be processed.</p>
 </dd></dl>
 

@@ -32,9 +32,9 @@ Class attributes
     * - :py:data:`parse_func`
       - The function used to parse command line arguments to starting Parameter
         values.
-    * - :py:data:`attributes_not_to_copy_to_slave_app`
+    * - :py:data:`attributes_not_to_copy_to_app_clone`
       - A list with the names of instance attributes which must not be copied
-        to a slave app. This is relevant for using the AppRunner for parallel
+        to an app clone. This is relevant for using the AppRunner for parallel
         processing, where it should be avoided to copy large objects because
         of the serialization of all objects during pickling.
 
@@ -48,9 +48,9 @@ Instance attributes
 
     * - instance attribute
       - description
-    * - :py:data:`slave_app`
-      - A boolean flag to toggle whether the current app instance is a master
-        or slave.
+    * - :py:data:`app_clone`
+      - A boolean flag to toggle whether the current app instance is a manager
+        or clone.
     * - :py:data:`_config`
       - The :py:data:`_config` dictionary should be used to store all app
         configuration which is not directly controlled by a Parameter. The
@@ -106,11 +106,11 @@ return values and calling parameters, please refer to the class documentation:
       - This method takes the task index and the function results and stores
         them in whichever way the app defined. It is separated from the
         processing to separate it in parallel processing and only store the
-        results in the master process. **This method must be defined in a
+        results in the main process. **This method must be defined in a
         custom app.**
     * - :py:data:`initialize_shared_memory`
       - This method is used to create shared memory objects to be shared between
-        master and slave apps or it initialize it again. Details must be defined
+        manager and app clones or it initialize it again. Details must be defined
         by the app which wishes to use it.
     * - :py:data:`export_state`
       - This method returns a dictionary with the app state in a serializable
@@ -268,7 +268,7 @@ As example, let us extend the RandomImageGeneratorApp to a fully functional app.
 The app will create a random noisy image of the given shape as its core
 function.
 It will utilize a shared memory array to store results to demonstrate how
-master and slave apps interact in multiprocessing.
+manager and app clones interact in multiprocessing.
 Just for demonstration purposes, it will wait for 50 ms for every 5th index
 and fail every 2nd carryon check. These methods will also print some info for
 demonstration:
@@ -305,7 +305,7 @@ demonstration:
             Parameter("num_images", int, 50),
             Parameter("image_shape", tuple, (100, 100)),
         )
-        attributes_not_to_copy_to_slave_app = ["shared_array", "shared_index_in_use", "_tasks"]
+        attributes_not_to_copy_to_app_clone = ["shared_array", "shared_index_in_use", "_tasks"]
         parse_func = app_param_parser
 
         def __init__(self, *args, **kwargs):
@@ -322,9 +322,9 @@ demonstration:
             Perform operations prior to running main parallel processing function.
             """
             self._tasks = np.arange(self.get_param_value("num_images"))
-            # only the master must initialize the shared memory, the slaves are passed
+            # only the manager must initialize the shared memory, the clones are passed
             # the reference:
-            if not self.slave_mode:
+            if not self.clone_mode:
                 self.initialize_shared_memory()
             # create the shared arrays:
             self.shared_index_in_use = np.frombuffer(
@@ -424,25 +424,25 @@ Using the app's shared memory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To use the app's shared memory, we only need to create a copy of the app (in the
-slave mode). This will allow the two apps to use the joint shared memory:
+clone mode). This will allow the two apps to use the joint shared memory:
 
 .. code-block::
 
     >>> app = RandomImageGeneratorApp()
     >>> app.multiprocessing_pre_run()
-    >>> app_slave = app.copy(slave_mode=True)
-    >>> app_slave.multiprocessing_pre_run()
+    >>> app_clone = app.copy(clone_mode=True)
+    >>> app_clone.multiprocessing_pre_run()
     >>> index = 10
-    >>> buffer_index = app_slave.multiprocessing_func(index)
+    >>> buffer_index = app_clone.multiprocessing_func(index)
     >>> # The first buffer has now been used:
     >>> app.shared_index_in_use
     array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    >>> # now, the data from the slave is stored in the shared array and
-    >>> # also accessible by the master app:
+    >>> # now, the data from the clone is stored in the shared array and
+    >>> # also accessible by the manager app:
     >>> app.shared_array[buffer_index, 0, 0:5]
     array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],
       dtype=float32)
-    >>> app_slave.shared_array[buffer_index, 0, 0:5]
+    >>> app_clone.shared_array[buffer_index, 0, 0:5]
     array([0.09039891, 0.7184127 , 0.46342215, 0.34047562, 0.18884952],
       dtype=float32)
     >>> # we can now get the results from the shared buffer and store them

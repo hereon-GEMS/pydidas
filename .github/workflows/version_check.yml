@@ -7,7 +7,7 @@
 # to verify that all files are corretly formatted.
 
 
-name: version tag check
+name: Check version tags are consistent
 
 on:
   pull_request:

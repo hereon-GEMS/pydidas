@@ -183,7 +183,7 @@ def check_version_tags(directory: Optional[Path] = None):
         this script file. The default is None.
     """
     _directory = Path(__file__).parent if directory is None else Path(directory)
-    with open(_directory.joinpath("pydidas", "version.py"), "r") as f:
+    with open(_directory.joinpath("src", "pydidas", "version.py"), "r") as f:
         _line = [_line for _line in f.readlines() if _line.startswith("__version__")]
     _version = _line[0].split("=")[1].strip().strip('"')
     _timed_print("Starting version tag check.", new_lines=1)

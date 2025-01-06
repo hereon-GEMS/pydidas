@@ -7,9 +7,9 @@ version = 1
 path = [
     ".pre-commit-config.yaml",
     "requirements.txt",
-    "pydidas/docs/make.bat",
-    "pydidas/docs/Makefile",
-    "pydidas/docs/src/_static/_css/pydidas-custom.css",
+    "src/pydidas/docs/make.bat",
+    "src/pydidas/docs/Makefile",
+    "src/pydidas/docs/src/_static/_css/pydidas-custom.css",
     "tests/_data/*",
 ]
 precedence = "aggregate"
@@ -18,9 +18,9 @@ SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]
 path = [
-    "pydidas/docs/src/**/*.png",
-    "pydidas/resources/icons/*",
-    "pydidas/resources/**/*.png",
+    "src/pydidas/docs/src/**/*.png",
+    "src/pydidas/resources/icons/*",
+    "src/pydidas/resources/**/*.png",
     "resources/**/*.png",
     "resources/**/*.svg",
     "resources/**/*.ico",
@@ -33,14 +33,14 @@ SPDX-License-Identifier = "CC-BY-ND-4.0"
 
 [[annotations]]
 path = [
-    "pydidas/resources/mdi_icons/account-cog.svg",
-    "pydidas/resources/mdi_icons/application-cog.svg",
-    "pydidas/resources/mdi_icons/application-cog-outline.svg",
-    "pydidas/resources/mdi_icons/arrow-bottom-left-thick.svg",
-    "pydidas/resources/mdi_icons/arrow-top-right-thick.svg",
-    "pydidas/resources/mdi_icons/comment-quote-outline.svg",
-    "pydidas/resources/mdi_icons/content-save-check-outline.svg",
-    "pydidas/resources/mdi_icons/folder-open-outline.svg",
+    "src/pydidas/resources/mdi_icons/account-cog.svg",
+    "src/pydidas/resources/mdi_icons/application-cog.svg",
+    "src/pydidas/resources/mdi_icons/application-cog-outline.svg",
+    "src/pydidas/resources/mdi_icons/arrow-bottom-left-thick.svg",
+    "src/pydidas/resources/mdi_icons/arrow-top-right-thick.svg",
+    "src/pydidas/resources/mdi_icons/comment-quote-outline.svg",
+    "src/pydidas/resources/mdi_icons/content-save-check-outline.svg",
+    "src/pydidas/resources/mdi_icons/folder-open-outline.svg",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Michael Irigoyen"
@@ -48,72 +48,85 @@ SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
 path = [
-    "pydidas/resources/mdi_icons/apps-box.svg",
-    "pydidas/resources/mdi_icons/backup-restore.svg",
-    "pydidas/resources/mdi_icons/book-open-outline.svg",
-    "pydidas/resources/mdi_icons/chevron-down.svg",
-    "pydidas/resources/mdi_icons/chevron-up.svg",
-    "pydidas/resources/mdi_icons/delete-outline.svg",
-    "pydidas/resources/mdi_icons/folder-outline.svg",
-    "pydidas/resources/mdi_icons/history.svg",
-    "pydidas/resources/mdi_icons/home-outline.svg",
-    "pydidas/resources/mdi_icons/image-multiple-outline.svg",
-    "pydidas/resources/mdi_icons/information-outline.svg",
-    "pydidas/resources/mdi_icons/update.svg",
-    "pydidas/resources/mdi_icons/view-comfy.svg",
+    "src/pydidas/resources/mdi_icons/apps-box.svg",
+    "src/pydidas/resources/mdi_icons/backup-restore.svg",
+    "src/pydidas/resources/mdi_icons/book-open-outline.svg",
+    "src/pydidas/resources/mdi_icons/chevron-down.svg",
+    "src/pydidas/resources/mdi_icons/chevron-up.svg",
+    "src/pydidas/resources/mdi_icons/delete-outline.svg",
+    "src/pydidas/resources/mdi_icons/folder-outline.svg",
+    "src/pydidas/resources/mdi_icons/history.svg",
+    "src/pydidas/resources/mdi_icons/home-outline.svg",
+    "src/pydidas/resources/mdi_icons/image-multiple-outline.svg",
+    "src/pydidas/resources/mdi_icons/information-outline.svg",
+    "src/pydidas/resources/mdi_icons/update.svg",
+    "src/pydidas/resources/mdi_icons/view-comfy.svg",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Google"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "pydidas/resources/mdi_icons/magnify-scan.svg"
+path = "src/pydidas/resources/mdi_icons/magnify-scan.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Sascha Wohlgemuth"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
 path = [
-    "pydidas/resources/mdi_icons/arrow-left-circle.svg",
-    "pydidas/resources/mdi_icons/arrow-right-circle.svg",
+    "src/pydidas/resources/mdi_icons/arrow-left-circle.svg",
+    "src/pydidas/resources/mdi_icons/arrow-right-circle.svg",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Austin Andrews"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "pydidas/resources/mdi_icons/monitor-eye.svg"
+path = "src/pydidas/resources/mdi_icons/monitor-eye.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "MasksUr"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "pydidas/resources/mdi_icons/folder-upload-outline.svg"
+path = "src/pydidas/resources/mdi_icons/folder-upload-outline.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Michael Richins"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "pydidas/resources/mdi_icons/wrench-cog.svg"
+path = "src/pydidas/resources/mdi_icons/wrench-cog.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Andrej Sharapov"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "pydidas/resources/mdi_icons/image-lock-outline.svg"
+path = "src/pydidas/resources/mdi_icons/image-lock-outline.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Simran"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "pydidas/resources/mdi_icons/image-sync-outline.svg"
+path = "src/pydidas/resources/mdi_icons/image-sync-outline.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Colton Wiscombe"
 SPDX-License-Identifier = "Apache-2.0"
 
 
 [[annotations]]
-path = "pydidas/resources/mdi_icons/trash-can-outline.svg"
+path = "src/pydidas/resources/mdi_icons/trash-can-outline.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = ""
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "src/pydidas/resources/mdi_icons/eye-plus-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "GreenTurtwig"
+SPDX-License-Identifier = "Apache-2.0"
+
+
+[[annotations]]
+path = "src/pydidas/resources/mdi_icons/eye-remove-outline.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Colton Wiscombe"
 SPDX-License-Identifier = "Apache-2.0"

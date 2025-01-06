@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -47,7 +47,7 @@ class TestPydidasStatusWidget(unittest.TestCase):
 
     def test_init(self):
         obj = PydidasStatusWidget()
-        self.assertIsInstance(obj, QtWidgets.QPlainTextEdit)
+        self.assertIsInstance(obj, QtWidgets.QDockWidget)
 
     def test_sizeHint(self):
         obj = PydidasStatusWidget()
@@ -57,7 +57,7 @@ class TestPydidasStatusWidget(unittest.TestCase):
         _test = "This is the test string"
         obj = PydidasStatusWidget()
         obj.add_status(_test)
-        _text = obj.toPlainText()
+        _text = obj.text()
         self.assertTrue(_text.strip().endswith(_test))
 
 

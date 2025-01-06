@@ -153,16 +153,16 @@ class TestBaseApp(unittest.TestCase):
         self.assertEqual(app.mp_manager["lock"], _copy.mp_manager["lock"])
         self.assertEqual(app.mp_manager["shared_dict"], _copy.mp_manager["shared_dict"])
 
-    def test_copy__as_slave(self):
+    def test_copy__as_clone(self):
         app = BaseApp()
-        app.attributes_not_to_copy_to_slave_app = ["slave_att"]
-        app.slave_att = 12
-        app.non_slave_att = 42
-        _copy = app.copy(slave_mode=True)
+        app.attributes_not_to_copy_to_app_clone = ["clone_att"]
+        app.clone_att = 12
+        app.non_clone_att = 42
+        _copy = app.copy(clone_mode=True)
         self.assertNotEqual(app, _copy)
-        self.assertTrue(hasattr(_copy, "non_slave_att"))
-        self.assertFalse(hasattr(_copy, "slave_att"))
-        self.assertTrue(_copy.slave_mode)
+        self.assertTrue(hasattr(_copy, "non_clone_att"))
+        self.assertFalse(hasattr(_copy, "clone_att"))
+        self.assertTrue(_copy.clone_mode)
 
     def test_export_state(self):
         _label = "the new label value"

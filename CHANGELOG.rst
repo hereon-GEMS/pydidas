@@ -1,4 +1,4 @@
-.. Copyright 2021 - 2024, Helmholtz-Zentrum Hereon
+.. Copyright 2021 - 2025, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
 
@@ -7,6 +7,8 @@ v24.mm.dd
 
 Improvements
 ------------
+- Changed the structure of the repository. The source code for all subpackages is
+  now located in the src/ folder
 - Replaced the default azimuthal integration range to (-180, 180) or (0, 360)
   respectively instead of None to have more consistent ranges (pyFAI issue #2291)
 - Updated Sum1dData plugin to use np.sum directly for improved performance.
@@ -31,7 +33,15 @@ Improvements
     - Updated WorkflowResults contexts to accept dynamic result shapes.
     - Removed redundant code from plugins (because of changes in shape handling).
     - Switched to using ruff instead of black, flake8 and isort in github actions.
+	- Moved the pydidas, pydidas_qtcore and pydidas_plugins folders to src.
+	- Renamed `slaves` to `clones`
+	- Changed the builder of the DefineScanFrame to use functions instead of an 
+	  abstract class.
+	- Restructured the layout of the __init__ files for more clarity.
 - Improved the formatting when displaying Plugin information.
+- Improved the behaviour of the logging and status widget and added options to
+  hide and show it.
+- Added support for pytest tests in the CI pipeline. 
 
 
 Bugfixes
@@ -48,6 +58,14 @@ Bugfixes
   fit point had an invalid result (e.g. peak intensity too low).
 - Fixed an issue when copying a ProcessingTree which had no nodes.
 - Fixed an issue when entering `None` for path parameters.
+- Fixed an issue with formatting of regex strings in the qr_presets
+- Fixed an issue where the SplashScreen would still show when an exception was 
+  raised during GUI initialization.
+- Fixed an issue when the font family is not supportted by matplotlib where the
+  user notification would not be correctly formatted.
+- Fixed the pyFAIcalibFrame to be compatible with pyFAI 2024.09
+- Fixed an issue with the WorkerController when the thread shutdown was toggled
+  while waiting in a sleep state.
 
 
 v24.09.19

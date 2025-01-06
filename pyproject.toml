@@ -10,7 +10,7 @@ name = "pydidas"
 authors = [{name = "Malte Storm"}]
 description = "pydidas - the PYthon DIffraction Data Analysis Suite"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, <3.13"
 license = {text = "GNU General Public License v3"}
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
 classifiers = [
@@ -18,6 +18,7 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Physics",
@@ -36,8 +37,8 @@ version = { attr = "pydidas.version.VERSION" }
 dependencies = { file = ["requirements.txt"]}
 optional-dependencies.dev = { file = ["requirements_dev.txt"]}
 
-[tool.setuptools]
-packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [project.scripts]
 pydidas-clear-settings = "pydidas_scripts.clear_local_settings:clear_local_settings"
@@ -48,7 +49,7 @@ run-pydidas-workflow = "pydidas_scripts.run_pydidas_workflow:run_workflow"
 remove-pydidas = "pydidas_scripts.remove_pydidas_from_system:remove_pydidas_from_system"
 
 [project.gui-scripts]
-pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
+pydidas-gui = "pydidas_scripts.pydidas_gui:open_gui"
 
 [tool.coverage.run]
 branch = true
@@ -80,6 +81,7 @@ extend-select = ["I", "C90", "F401"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
+known-local-folder = ["pydidas", "pydidas_qtcore"]
 
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 12.
@@ -92,22 +94,9 @@ max-complexity = 12
 # E402 module level import not at top of file
 # E501 line too long
 # W605 invalid escape sequence
-"__init__.py" = ["F401", "F403", "F405", "E402", "I"]
+"__init__.py" = ["F401", "F403", "F405", "F821"]
 "pydidas/__init__.py" = ["F401", "F403", "F405", "E402", "I"]
-"generic_base_plugins.py" = ["F401"]
-"qt_presets.py" = ["W605"]
-"file_extensions.py" = ["W605"]
-"numpy_parser.py" = ["W605"]
-"base_app.py" = ["E731"]
-"pydidas_plot2d_with_integration_regions.py" = ["C901"]
-"pydidas_gui.py" = ["F401"]
-"workflow_run_frame.py" = ["E722"]
 "app_processor_.py" = ["C901"]
-# For reading Eiger data, the hdf5plugin must be imported to allow
-# decompressing the data, but it is not actually used.
-"dectris_utils.py" = ["F401"]
-"hdf5_dataset_utils.py" = ["F401"]
-"read_hdf5_slice.py" = ["F401"]
-"read_hdf5_dataset_.py" = ["F401"]
-"hdf5_io.py" = ["F401"]
 
+[tool.pytest.ini_options]
+addopts = "--disable-warnings"

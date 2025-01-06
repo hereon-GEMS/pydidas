@@ -64,6 +64,8 @@ Bugfixes
 - Fixed an issue when the font family is not supportted by matplotlib where the
   user notification would not be correctly formatted.
 - Fixed the pyFAIcalibFrame to be compatible with pyFAI 2024.09
+- Fixed an issue with the WorkerController when the thread shutdown was toggled
+  while waiting in a sleep state.
 
 
 v24.09.19

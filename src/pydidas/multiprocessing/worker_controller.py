@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ control multiprocessing of computations.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -50,7 +50,7 @@ logger = pydidas_logger()
 
 class WorkerController(QtCore.QThread):
     """
-    The WorkerController is a QThread for spawing and controlling workers.
+    The WorkerController is a QThread for spawning and controlling workers.
 
     The WorkerControllers workers are used to perform computations in parallel.
 
@@ -69,7 +69,7 @@ class WorkerController(QtCore.QThread):
     func_args : tuple, optional
          The function arguments. The default is an empty tuple.
     func_kwargs : dict, optional
-        Kwywords passed to the function. The default is an empty dictionary.
+        Keywords passed to the function. The default is an empty dictionary.
     """
 
     sig_progress = QtCore.Signal(float)
@@ -324,7 +324,7 @@ class WorkerController(QtCore.QThread):
 
         This method will send stop signals to all workers.
         Note that the runtime of the workers will be determined by the runtime
-        of the called function. The currrent call will be finished before the stop
+        of the called function. The current call will be finished before the stop
         signal will be processed.
         """
         logger.debug("WorkerController: Sending stop queue signals")
@@ -357,6 +357,8 @@ class WorkerController(QtCore.QThread):
             if self.flags["must_restart"]:
                 self.flags["must_restart"] = False
                 self.flags["running"] = True
+        if self.flags["active"]:
+            self.cycle_post_run()
         _app.unregister_thread(self)
         self.join_queues()
         logger.debug("WorkerController: Finished worker_controller loop")
@@ -441,7 +443,7 @@ class WorkerController(QtCore.QThread):
 
     def cycle_post_run(self, timeout: float = 10):
         """
-        Perform operations after the the main processing loop.
+        Perform operations after the main processing loop.
 
         Parameters
         ----------

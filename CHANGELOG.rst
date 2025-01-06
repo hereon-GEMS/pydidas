@@ -7,6 +7,8 @@ v24.mm.dd
 
 Improvements
 ------------
+- Changed the structure of the repository. The source code for all subpackages is
+  now located in the src/ folder
 - Replaced the default azimuthal integration range to (-180, 180) or (0, 360)
   respectively instead of None to have more consistent ranges (pyFAI issue #2291)
 - Updated Sum1dData plugin to use np.sum directly for improved performance.
@@ -35,9 +37,11 @@ Improvements
 	- Renamed `slaves` to `clones`
 	- Changed the builder of the DefineScanFrame to use functions instead of an 
 	  abstract class.
+	- Restructured the layout of the __init__ files for more clarity.
 - Improved the formatting when displaying Plugin information.
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.
+- Added support for pytest tests in the CI pipeline. 
 
 
 Bugfixes
@@ -59,6 +63,7 @@ Bugfixes
   raised during GUI initialization.
 - Fixed an issue when the font family is not supportted by matplotlib where the
   user notification would not be correctly formatted.
+- Fixed the pyFAIcalibFrame to be compatible with pyFAI 2024.09
 
 
 v24.09.19

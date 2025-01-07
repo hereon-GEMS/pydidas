@@ -68,8 +68,11 @@ def assert_general_scan_params_in_order(scan: ScanContext, filename: Path):
 
 
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
-def test_import_from_single_file__validation(scan: Optional[Scan], reset_scan_context):
-    _filename = _TEST_DIR.joinpath("_data", "test_single_fio_ascan.fio")
+@pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
+def test_import_from_single_file__validation(
+    scan: Optional[Scan], scan_type: str, reset_scan_context
+):
+    _filename = _TEST_DIR.joinpath("_data", f"test_single_fio_{scan_type}.fio")
     ScanIoFio.import_from_file(_filename, scan=scan)
     if scan is None:
         scan = ScanContext()

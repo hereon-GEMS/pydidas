@@ -84,16 +84,16 @@ class ScanIoFio(ScanIoBase):
 
     @classmethod
     def import_from_file(
-        cls, *filenames: list[Union[Path, str]], scan: Optional[Scan] = None
+        cls, *filenames: Union[Path, str], scan: Optional[Scan] = None
     ):
         """
         Import scan metadata from a single or multiple fio files.
 
         Parameters
         ----------
-        filenames : list[Union[Path, str]]
+        *filenames : Union[Path, str]
             The filename(s) of the file(s) to be imported.
-        scan : Optional[Scan], optional
+        scan : Scan, optional
             The scan object to import the data into. If None, the global
             ScanContext is used.
         """
@@ -101,12 +101,14 @@ class ScanIoFio(ScanIoBase):
         if len(filenames) == 1 and isinstance(filenames[0], (list, tuple)):
             filenames = filenames[0]
         if len(filenames) == 1:
-            cls.import_single_fio(filenames[0], scan)
+            cls._import_single_fio(filenames[0], scan)
         else:
-            cls.import_multiple_fio(filenames, scan)
+            cls._import_multiple_fio(*filenames, scan)
 
     @classmethod
-    def import_single_fio(cls, filename: Union[Path, str], scan: Optional[Scan] = None):
+    def _import_single_fio(
+        cls, filename: Union[Path, str], scan: Optional[Scan] = None
+    ):
         """
         Import scan metadata from a single fio file.
 
@@ -114,7 +116,7 @@ class ScanIoFio(ScanIoBase):
         ----------
         filename : Union[Path, str]
             The filename of the file to be imported.
-        scan : Optional[Scan], optional
+        scan : Scan, optional
             The scan object to import the data into. If None, the global
             ScanContext is used
         """
@@ -125,53 +127,25 @@ class ScanIoFio(ScanIoBase):
         with open(filename, "r") as stream:
             file_lines = stream.readlines()
         try:
-            for _line in file_lines:
-                if _line.startswith("ascan"):
+            for _i_line, _line in enumerate(file_lines):
+                if _line.startswith("ascan") or _line.startswith("dscan"):
                     if _scan_command_found:
                         cls._process_duplicate_scan_command()
-                    _, _motor, *_scan_pars = _line.split()
+                    _cmd, _motor, *_scan_pars = _line.split()
                     _start = float(_scan_pars[0])
                     _end = float(_scan_pars[1])
                     # The scan defines the number of intervals, not the number of points
                     _n_points = int(_scan_pars[2]) + 1
                     _delta = (_end - _start) / (_n_points - 1)
+                    if _line.startswith("dscan"):
+                        for _l in file_lines[_i_line + 1 :]:
+                            if _l.startswith(_motor):
+                                _start += float(_l.split("= ")[1])
 
                     cls.imported_params["scan_dim0_delta"] = _delta
                     cls.imported_params["scan_dim0_n_points"] = _n_points
                     cls.imported_params["scan_dim0_offset"] = _start
                     cls.imported_params["scan_dim0_label"] = _motor
-                    _scan_command_found = True
-                elif _line.startswith("dscan"):
-                    if _scan_command_found:
-                        cls._process_duplicate_scan_command()
-                    scan_motor_name = _line.split(" ")[1]
-                    len_scan = int(_line.split(" ")[4])
-                    str_scan_pars = [float(i) for i in _line.split(" ")[2:]]
-                    step_scan = (str_scan_pars[1] - str_scan_pars[0]) / (
-                        str_scan_pars[2]
-                    )
-                    flag = 0
-                    # _scan.set_param_value("scan_dim0_offset",float(file_lines[-3].split(' ')[1]))
-                    for i_end in [1, 2, 3, 4, 5]:
-                        if flag == 0:
-                            try:
-                                for i_line in [1, 2, 3, 4, 5]:
-                                    if flag == 0:
-                                        end_scan = float(
-                                            file_lines[-i_end].split(" ")[i_line]
-                                        )
-                                    flag = 1
-                            except:
-                                pass
-                    start_scan = end_scan - step_scan * (len_scan)
-
-                    scan_pos = np.linspace(
-                        start_scan, end_scan, int(str_scan_pars[2]) + 1
-                    )
-                    cls.imported_params["scan_dim0_delta"] = step_scan
-                    cls.imported_params["scan_dim0_n_points"] = len_scan
-                    cls.imported_params["scan_dim0_offset"] = start_scan
-                    cls.imported_params["scan_dim0_label"] = scan_motor_name
                     _scan_command_found = True
             if not _scan_command_found:
                 raise UserConfigError("No scan command found.")
@@ -193,9 +167,25 @@ class ScanIoFio(ScanIoBase):
         raise UserConfigError(_ERROR_TEXT_MULTIPLE_SCAN_COMMANDS)
 
     @classmethod
-    def import_multiple_fio(cls, filename: list[str], scan: Union[Scan, None] = None):
+    def _import_multiple_fio(
+        cls, *filenames: Union[Path, str], scan: Union[Scan, None] = None
+    ):
+        """
+        Import scan metadata from multiple fio files.
+
+        The list of filenames is expected to be ordered and the metadata
+        differences between the files determine the second scan dimension.
+
+        Parameters
+        ----------
+        *filenames : Union[Path, str]
+            The filenames of the files to be imported.
+        scan : Scan, optional
+            The scan object to import the data into. If None, the global
+            ScanContext is used.
+        """
         _scan = SCAN if scan is None else scan
-        with open(filename[0], "r") as stream:
+        with open(filenames[0], "r") as stream:
             file_lines = stream.read().split("\n")
             try:
                 for item in file_lines:
@@ -247,7 +237,7 @@ class ScanIoFio(ScanIoBase):
             _scan.set_param_value("scan_dim1_offset", start_scan)
             _scan.set_param_value("scan_dim1_label", scan_motor_name)
             num_motors = 0
-            with open(filename[0], "r") as stream:
+            with open(filenames[0], "r") as stream:
                 for item in stream.read().split("\n"):
                     if "=" in item:
                         if "nan" not in item:
@@ -255,9 +245,9 @@ class ScanIoFio(ScanIoBase):
                             varnum[1] = float(varnum[1])
                             num_motors += 1
             arr_motor_names = ["" for x in range(num_motors)]
-            arr_motor_pos = np.ones((num_motors, len(filename)))
+            arr_motor_pos = np.ones((num_motors, len(filenames)))
             i_scan = 0
-            for f in filename:
+            for f in filenames:
                 str_r = open(f).read()
                 i_arr_motors = 0
                 for item in str_r.split("\n"):

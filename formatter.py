@@ -95,6 +95,7 @@ _DIRS_TO_SKIP = [
     "pydidas.egg-info",
     "dist",
     "sphinx",
+    ".pytest_cache",
 ]
 _FILES_TO_SKIP = [".coverage"]
 

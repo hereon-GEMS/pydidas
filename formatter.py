@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Formatting script to avoid manually calling formatting modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -187,17 +187,27 @@ def check_version_tags(directory: Optional[Path] = None):
         _line = [_line for _line in f.readlines() if _line.startswith("__version__")]
     _version = _line[0].split("=")[1].strip().strip('"')
     _timed_print("Starting version tag check.", new_lines=1)
+    # check the CHANGELOG:
     with open(_directory.joinpath("CHANGELOG.rst"), "r") as f:
         _changelog_lines = f.readlines()
     _changelog_okay = f"v{_version}" in [_line.strip() for _line in _changelog_lines]
     if not _changelog_okay:
         _timed_print("The CHANGELOG does not include a current version tag.")
+    # check the CITATION.cff:
     with open(_directory.joinpath("CITATION.cff"), "r") as f:
         _lines = [_line.strip() for _line in f.readlines()]
     _citation_okay = f"version: {_version}" in _lines
     if not _citation_okay:
         _timed_print("The CITATION.cff does not include the latest version tag.")
-    if not (_citation_okay and _changelog_okay):
+    # check the pydidas/version.py file which is required for consistency with old
+    # updaters:
+    with open(_directory.joinpath("pydidas", "version.py"), "r") as f:
+        _line = [_line for _line in f.readlines() if _line.startswith("__version__")]
+    _updater_version = _line[0].split("=")[1].strip().strip('"')
+    _updater_version_okay = _updater_version == _version
+    if not _updater_version_okay:
+        _timed_print("The pydidas/version.py differs from the src version.")
+    if not (_citation_okay and _changelog_okay and _updater_version_okay):
         sys.exit(1)
     _timed_print("Version tag check sucessfully concluded.")
 

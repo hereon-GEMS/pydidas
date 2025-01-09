@@ -116,11 +116,8 @@ def test_import_from_multiple_files__validation(scan: Optional[Scan], scan_type:
     ]
 
     ScanIoFio.import_from_file(filenames, scan=scan)
-
     if scan is None:
         scan = ScanContext()
-    #
-    print(scan_type, scan.param_values)
 
     assert 9.9 < scan.get_param_value("scan_dim0_offset") < 10.1
     assert 2.05 < scan.get_param_value("scan_dim0_delta") < 2.15
@@ -130,7 +127,7 @@ def test_import_from_multiple_files__validation(scan: Optional[Scan], scan_type:
     assert scan.get_param_value("scan_dim1_offset") == 10.0
     assert 2.0 < scan.get_param_value("scan_dim1_delta") < 2.1
     assert scan.get_param_value("scan_dim1_label") == "cube1_x"
-    assert scan.get_param_value("scan_dim1_n_points") == 34
+    assert scan.get_param_value("scan_dim1_n_points") == 35
 
 
 def test_import_from_file__corrupt_file():

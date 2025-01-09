@@ -188,61 +188,61 @@ class ScanIoFio(ScanIoBase):
             ScanContext is used.
         """
         _scan = SCAN if scan is None else scan
-        # cls._import_single_fio(filenames[0], scan=_scan)
-        # for _key in ["delta", "n_points", "offset", "label"]:
-        #     cls.imported_params[f"scan_dim1_{_key}"] = cls.imported_params[f"scan_dim0_{_key}"]
-        #     cls.imported_params[f"scan_dim0_{_key}"] = "" if _key == "label" else 0
-        with open(filenames[0], "r") as stream:
-            file_lines = stream.read().split("\n")
-            try:
-                for item in file_lines:
-                    if ("ascan") in item:
-                        scan_motor_name = item.split(" ")[1]
-                        len_scan = int(item.split(" ")[4])
-                        str_scan_pars = [float(i) for i in item.split(" ")[2:]]
-                        start_scan = str_scan_pars[0]
-                        end_scan = str_scan_pars[1]
-                        step_scan = (str_scan_pars[1] - str_scan_pars[0]) / (
-                            str_scan_pars[2]
-                        )
-                        # scan_pos = numpy.linspace(start_scan,end_scan,int(str_scan_pars[2])+1)
-
-                    if ("dscan") in item:
-                        scan_motor_name = item.split(" ")[1]
-                        len_scan = int(item.split(" ")[4])
-                        str_scan_pars = [float(i) for i in item.split(" ")[2:]]
-                        step_scan = (str_scan_pars[1] - str_scan_pars[0]) / (
-                            str_scan_pars[2]
-                        )
-                        flag = 0
-                        # _scan.set_param_value("scan_dim0_offset",float(file_lines[-3].split(' ')[1]))
-                        for i_end in [1, 2, 3, 4, 5]:
-                            if flag == 0:
-                                try:
-                                    for i_line in [1, 2, 3, 4, 5]:
-                                        if flag == 0:
-                                            end_scan = float(
-                                                file_lines[-i_end].split(" ")[i_line]
-                                            )
-                                        flag = 1
-                                except:
-                                    pass
-                        start_scan = end_scan - step_scan * (len_scan)
-
-                        scan_pos = np.linspace(
-                            start_scan, end_scan, int(str_scan_pars[2]) + 1
-                        )
-                # raise UserConfigError("No scan command found.")
-            except yaml.YAMLError as yaml_error:
-                cls.imported_params = {}
-                raise yaml.YAMLError from yaml_error
+        cls._import_single_fio(filenames[0], scan=_scan)
+        for _key in ["delta", "n_points", "offset", "label"]:
+            cls.imported_params[f"scan_dim1_{_key}"] = cls.imported_params[f"scan_dim0_{_key}"]
+            cls.imported_params[f"scan_dim0_{_key}"] = "" if _key == "label" else 0
+        # with open(filenames[0], "r") as stream:
+        #     file_lines = stream.read().split("\n")
+        #     try:
+        #         for item in file_lines:
+        #             if ("ascan") in item:
+        #                 scan_motor_name = item.split(" ")[1]
+        #                 len_scan = int(item.split(" ")[4])
+        #                 str_scan_pars = [float(i) for i in item.split(" ")[2:]]
+        #                 start_scan = str_scan_pars[0]
+        #                 end_scan = str_scan_pars[1]
+        #                 step_scan = (str_scan_pars[1] - str_scan_pars[0]) / (
+        #                     str_scan_pars[2]
+        #                 )
+        #                 # scan_pos = numpy.linspace(start_scan,end_scan,int(str_scan_pars[2])+1)
+        #
+        #             if ("dscan") in item:
+        #                 scan_motor_name = item.split(" ")[1]
+        #                 len_scan = int(item.split(" ")[4])
+        #                 str_scan_pars = [float(i) for i in item.split(" ")[2:]]
+        #                 step_scan = (str_scan_pars[1] - str_scan_pars[0]) / (
+        #                     str_scan_pars[2]
+        #                 )
+        #                 flag = 0
+        #                 # _scan.set_param_value("scan_dim0_offset",float(file_lines[-3].split(' ')[1]))
+        #                 for i_end in [1, 2, 3, 4, 5]:
+        #                     if flag == 0:
+        #                         try:
+        #                             for i_line in [1, 2, 3, 4, 5]:
+        #                                 if flag == 0:
+        #                                     end_scan = float(
+        #                                         file_lines[-i_end].split(" ")[i_line]
+        #                                     )
+        #                                 flag = 1
+        #                         except:
+        #                             pass
+        #                 start_scan = end_scan - step_scan * (len_scan)
+        #
+        #                 scan_pos = np.linspace(
+        #                     start_scan, end_scan, int(str_scan_pars[2]) + 1
+        #                 )
+        #         # raise UserConfigError("No scan command found.")
+        #     except yaml.YAMLError as yaml_error:
+        #         cls.imported_params = {}
+        #         raise yaml.YAMLError from yaml_error
 
         try:
-            cls.imported_params["scan_dim"] = 2
-            cls.imported_params["scan_dim1_delta"] = step_scan
-            cls.imported_params["scan_dim1_n_points"] = len_scan
-            cls.imported_params["scan_dim1_offset"] = start_scan
-            cls.imported_params["scan_dim1_label"] = scan_motor_name
+            # cls.imported_params["scan_dim"] = 2
+            # cls.imported_params["scan_dim1_delta"] = step_scan
+            # cls.imported_params["scan_dim1_n_points"] = len_scan
+            # cls.imported_params["scan_dim1_offset"] = start_scan
+            # cls.imported_params["scan_dim1_label"] = scan_motor_name
             num_motors = 0
             with open(filenames[0], "r") as stream:
                 for item in stream.read().split("\n"):
@@ -273,7 +273,7 @@ class ScanIoFio(ScanIoBase):
                 np.argsort(motors_moved_ind_arr[1][:2])
             ]
 
-            scan_motor_index = arr_motor_names.index(scan_motor_name)
+            scan_motor_index = arr_motor_names.index(cls.imported_params["scan_dim1_label"])
             motor_moved_scans_ind = np.setdiff1d(motors_moved_ind, [scan_motor_index])[
                 0
             ]

@@ -30,6 +30,7 @@ __all__ = ["ScanIo"]
 
 from typing import Optional, TypeVar
 
+from pydidas.core import UserConfigError
 from pydidas.core.io_registry import GenericIoMeta
 from pydidas.core.utils.file_utils import get_extension
 
@@ -47,6 +48,46 @@ class ScanIo(GenericIoMeta):
 
     # need to redefine the registry to have a unique registry for ScanIo
     registry = {}
+    beamline_format_registry = {}
+
+    @classmethod
+    def register_class(cls, new_class, update_registry=False):
+        """
+        Register a class as object for its native extensions.
+
+        Parameters
+        ----------
+        new_class : type
+            The class to be registered.
+        update_registry : bool, optional
+            Keyword to allow updating / overwriting of registered extensions.
+            The default is False.
+
+        Raises
+        ------
+        KeyError
+            If an extension associated with new_class has already been
+            registered and update_registry is False.
+        """
+        _ref_registry = (
+            cls.beamline_format_registry
+            if getattr(new_class, "beamline_format", False)
+            else cls.registry
+        )
+        for _ext in new_class.extensions:
+            if _ext in _ref_registry and not update_registry:
+                raise KeyError(
+                    "A class has already been registered for the " f"extension {_ext}."
+                )
+            _ref_registry[_ext] = new_class
+
+    @classmethod
+    def clear_registry(cls):
+        """
+        Clear the registry and remove all items.
+        """
+        cls.registry = {}
+        cls.beamline_format_registry = {}
 
     @classmethod
     def import_from_file(cls, filename: str, scan: Optional[Scan] = None):
@@ -66,5 +107,79 @@ class ScanIo(GenericIoMeta):
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
-        _io_class = cls.registry[_extension]
+        if _extension in cls.registry:
+            _io_class = cls.registry[_extension]
+        elif _extension in cls.beamline_format_registry:
+            _io_class = cls.beamline_format_registry[_extension]
         _io_class.import_from_file(filename, scan=scan)
+
+    @classmethod
+    def export_to_file(cls, filename, **kwargs):
+        """
+        Call the concrete export_to_file method in the subclass registered
+        to the extension of the filename.
+
+        Parameters
+        ----------
+        filename : str
+            The full filename and path.
+        tree : pydidas.workflow.WorkflowTree
+            The instance of the WorkflowTree
+        kwargs : dict
+            Any kwargs which should be passed to the udnerlying exporter.
+        """
+        _extension = get_extension(filename, lowercase=False)
+        cls.verify_extension_is_registered(_extension)
+        if _extension in cls.registry:
+            _io_class = cls.registry[_extension]
+        elif _extension in cls.beamline_format_registry:
+            _io_class = cls.beamline_format_registry[_extension]
+        if _io_class.import_only:
+            raise UserConfigError(
+                f"The extension `{_extension}` is only registered for import."
+            )
+        _io_class.export_to_file(filename, **kwargs)
+
+    @classmethod
+    def is_extension_registered(cls, extension):
+        """
+        Check if the extension of filename corresponds to a registered
+        class.
+
+        Parameters
+        ----------
+        extension : str
+            The extension to be checked.
+
+        Returns
+        -------
+        bool
+            Flag whether the extension is registered or not.
+        """
+        if extension in cls.registry or extension in cls.beamline_format_registry:
+            return True
+        return False
+
+    @classmethod
+    def get_string_of_beamline_formats(cls):
+        """
+        Get a list of strings with the different beamline formats and extensions.
+
+        This class method is designed to have an easy way of creating the
+        required lists for QFileDialog windows.
+
+        Returns
+        -------
+        str
+            The string entries for each format and one entry for all formats,
+            each separated by a ";;".
+        """
+        _formats = {
+            _cls.format_name: _cls.extensions
+            for _cls in cls.beamline_format_registry.values()
+        }
+        _extensions = [f"*.{_key}" for _key in cls.beamline_format_registry.keys()]
+        _all = [f"All supported files ({' '.join(_extensions)})"] + [
+            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
+        ]
+        return ";;".join(_all)

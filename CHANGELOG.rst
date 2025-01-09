@@ -42,6 +42,7 @@ Improvements
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.
 - Added support for pytest tests in the CI pipeline. 
+- Added an importer for Sardana fio files into Scan objects.
 
 
 Bugfixes

@@ -49,6 +49,8 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
     extensions = []
     format_name = "unknown"
     imported_params = {}
+    beamline_format = False
+    import_only = False
 
     @classmethod
     def _verify_all_entries_present(cls):

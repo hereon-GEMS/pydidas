@@ -31,6 +31,7 @@ __status__ = "Production"
 # import __all__ items from modules:
 # even though not explicitly used, the import is necessary for python to read
 # the code and to register the classes in the metaclass registry
+from . import scan_io_fio
 from . import scan_io_yaml
 from .scan import *
 from .scan_context import *

@@ -55,7 +55,7 @@ def temp_dir():
     shutil.rmtree(_temp_path)
 
 
-def assert_general_scan_params_in_order(scan: ScanContext, filename: Path):
+def assert_general_1d_scan_params_in_order(scan: ScanContext, filename: Path):
     """
     Asserts the general scan parameters have been reset correctly during the import.
     """
@@ -80,7 +80,7 @@ def test_import_from_single_file__validation(
     assert scan.get_param_value("scan_dim0_delta") == 2.0
     assert scan.get_param_value("scan_dim0_label") == "cube1_x"
     assert scan.get_param_value("scan_dim0_n_points") == 35
-    assert_general_scan_params_in_order(scan, _filename)
+    assert_general_1d_scan_params_in_order(scan, _filename)
     if scan != ScanContext():
         assert ScanContext().get_param_value("scan_dim") == 4
 
@@ -107,24 +107,30 @@ def test_import_from_single_file__empty(reset_scan_context, temp_dir):
     assert ScanIoFio.imported_params == {}
 
 
-def test_import_from_multiple_files__validation():
-    SCAN = ScanContext()
+@pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
+@pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
+def test_import_from_multiple_files__validation(scan: Optional[Scan], scan_type: str, reset_scan_context):
     filenames = [
-        _TEST_DIR.joinpath("_data", "2d_mesh_fios", f"2dmesh_{i:05d}.fio")
+        _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{i:05d}.fio")
         for i in range(1, 11)
     ]
 
-    ScanIoFio.import_from_file(filenames, scan=SCAN)
+    ScanIoFio.import_from_file(filenames, scan=scan)
 
-    assert 9.9 < SCAN.get_param_value("scan_dim0_offset") < 10.1
-    assert 2.05 < SCAN.get_param_value("scan_dim0_delta") < 2.15
-    assert SCAN.get_param_value("scan_dim0_label") == "cube1_y"
-    assert SCAN.get_param_value("scan_dim0_n_points") == 10
+    if scan is None:
+        scan = ScanContext()
+    #
+    print(scan_type, scan.param_values)
 
-    assert SCAN.get_param_value("scan_dim1_offset") == 10.0
-    assert 2.0 < SCAN.get_param_value("scan_dim1_delta") < 2.1
-    assert SCAN.get_param_value("scan_dim1_label") == "cube1_x"
-    assert SCAN.get_param_value("scan_dim1_n_points") == 34
+    assert 9.9 < scan.get_param_value("scan_dim0_offset") < 10.1
+    assert 2.05 < scan.get_param_value("scan_dim0_delta") < 2.15
+    assert scan.get_param_value("scan_dim0_label") == "cube1_y"
+    assert scan.get_param_value("scan_dim0_n_points") == 10
+
+    assert scan.get_param_value("scan_dim1_offset") == 10.0
+    assert 2.0 < scan.get_param_value("scan_dim1_delta") < 2.1
+    assert scan.get_param_value("scan_dim1_label") == "cube1_x"
+    assert scan.get_param_value("scan_dim1_n_points") == 34
 
 
 def test_import_from_file__corrupt_file():

@@ -55,7 +55,7 @@ class ScanIoFio(ScanIoBase):
     format_name = "FIO"
 
     @staticmethod
-    def _get_1d_default_values(filepath: Path) -> dict[str, Union[int, str]]:
+    def _get_default_values(filepath: Path, ndim: int) -> dict[str, Union[int, str]]:
         """
         Get the default Parameter values for a 1D scan.
 
@@ -63,6 +63,8 @@ class ScanIoFio(ScanIoBase):
         ----------
         filepath : Path
             The path to the file being imported.
+        ndim : int
+            The number of dimensions of the scan.
 
         Returns
         -------
@@ -70,10 +72,9 @@ class ScanIoFio(ScanIoBase):
             The default values for the Parameters. This dictionary is meant
             to be used by the importer and not to set the Parameters directly.
         """
-        return {
-            "scan_dim": 1,
+        _defaults =  {
+            "scan_dim": ndim,
             "scan_title": "",
-            "scan_dim0_unit": "",
             "scan_start_index": 0,
             "scan_index_stepping": 1,
             "scan_multiplicity": 1,
@@ -81,6 +82,9 @@ class ScanIoFio(ScanIoBase):
             "scan_name_pattern": filepath.stem,
             "scan_base_directory": filepath.parents[1],
         }
+        for _dim in range(ndim):
+            _defaults[f"scan_dim{_dim}_unit"] = ""
+        return _defaults
 
     @classmethod
     def import_from_file(
@@ -97,13 +101,16 @@ class ScanIoFio(ScanIoBase):
             The scan object to import the data into. If None, the global
             ScanContext is used.
         """
-        scan = SCAN if scan is None else scan
+        _scan = SCAN if scan is None else scan
+        cls.imported_params = {}
         if len(filenames) == 1 and isinstance(filenames[0], (list, tuple)):
             filenames = filenames[0]
         if len(filenames) == 1:
             cls._import_single_fio(filenames[0], scan)
         else:
-            cls._import_multiple_fio(*filenames, scan)
+            cls._import_multiple_fio(*filenames, scan=scan)
+        cls._verify_all_entries_present()
+        cls._write_to_scan_settings(scan=scan)
 
     @classmethod
     def _import_single_fio(
@@ -122,7 +129,6 @@ class ScanIoFio(ScanIoBase):
         """
         _scan = SCAN if scan is None else scan
         _scan_command_found = False
-        cls.imported_params = {}
 
         with open(filename, "r") as stream:
             file_lines = stream.readlines()
@@ -153,10 +159,7 @@ class ScanIoFio(ScanIoBase):
             cls.imported_params = {}
             raise yaml.YAMLError from yaml_error
 
-        _fpath = Path(filename)
-        cls.imported_params.update(cls._get_1d_default_values(_fpath))
-        cls._verify_all_entries_present()
-        cls._write_to_scan_settings(scan=_scan)
+        cls.imported_params.update(cls._get_default_values(Path(filename), 1))
 
     @classmethod
     def _process_duplicate_scan_command(cls):
@@ -185,6 +188,10 @@ class ScanIoFio(ScanIoBase):
             ScanContext is used.
         """
         _scan = SCAN if scan is None else scan
+        # cls._import_single_fio(filenames[0], scan=_scan)
+        # for _key in ["delta", "n_points", "offset", "label"]:
+        #     cls.imported_params[f"scan_dim1_{_key}"] = cls.imported_params[f"scan_dim0_{_key}"]
+        #     cls.imported_params[f"scan_dim0_{_key}"] = "" if _key == "label" else 0
         with open(filenames[0], "r") as stream:
             file_lines = stream.read().split("\n")
             try:
@@ -231,11 +238,11 @@ class ScanIoFio(ScanIoBase):
                 raise yaml.YAMLError from yaml_error
 
         try:
-            _scan.set_param_value("scan_dim", 2)
-            _scan.set_param_value("scan_dim1_delta", step_scan)
-            _scan.set_param_value("scan_dim1_n_points", len_scan)
-            _scan.set_param_value("scan_dim1_offset", start_scan)
-            _scan.set_param_value("scan_dim1_label", scan_motor_name)
+            cls.imported_params["scan_dim"] = 2
+            cls.imported_params["scan_dim1_delta"] = step_scan
+            cls.imported_params["scan_dim1_n_points"] = len_scan
+            cls.imported_params["scan_dim1_offset"] = start_scan
+            cls.imported_params["scan_dim1_label"] = scan_motor_name
             num_motors = 0
             with open(filenames[0], "r") as stream:
                 for item in stream.read().split("\n"):
@@ -271,14 +278,13 @@ class ScanIoFio(ScanIoBase):
                 0
             ]
             scsp = arr_motor_pos[motor_moved_scans_ind]
-            _scan.set_param_value(
-                "scan_dim0_delta", (scsp[-1] - scsp[0]) / (len(scsp) - 1)
+            cls.imported_params["scan_dim0_delta"] = (scsp[-1] - scsp[0]) / (
+                len(scsp) - 1
             )
-            _scan.set_param_value("scan_dim0_n_points", len(scsp))
-            _scan.set_param_value("scan_dim0_offset", scsp[0])
-            _scan.set_param_value(
-                "scan_dim0_label", str(arr_motor_names[motor_moved_scans_ind])
-            )
+            cls.imported_params["scan_dim0_n_points"] = len(scsp)
+            cls.imported_params["scan_dim0_offset"] = scsp[0]
+            cls.imported_params["scan_dim0_label"] = str(arr_motor_names[motor_moved_scans_ind])
         except yaml.YAMLError as yaml_error:
             cls.imported_params = {}
             raise yaml.YAMLError from yaml_error
+        cls.imported_params.update(cls._get_default_values(Path(filenames[0]), 2))

@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -109,7 +109,9 @@ def test_import_from_single_file__empty(reset_scan_context, temp_dir):
 
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
-def test_import_from_multiple_files__validation(scan: Optional[Scan], scan_type: str, reset_scan_context):
+def test_import_from_multiple_files__validation(
+    scan: Optional[Scan], scan_type: str, reset_scan_context
+):
     filenames = [
         _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{i:05d}.fio")
         for i in range(1, 11)
@@ -130,19 +132,83 @@ def test_import_from_multiple_files__validation(scan: Optional[Scan], scan_type:
     assert scan.get_param_value("scan_dim1_n_points") == 35
 
 
-def test_import_from_file__corrupt_file():
-    SCAN = ScanContext()
-    # _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    # filenames = [_test_dir+r'\_data\test_single_fio.fio']
-    _tmppath = tempfile.mkdtemp()
-    _tmpfile = tempfile.mkstemp(dir=_tmppath)
+def test_import_from_multiple_files__corrupt_file(reset_scan_context, temp_dir):
+    shutil.copytree(
+        _TEST_DIR.joinpath("_data", "2d_mesh_fio_ascan"),
+        temp_dir.joinpath("test"),
+    )
+    _filenames = [
+        temp_dir.joinpath("test", f"2dmesh_{i:05d}.fio") for i in range(1, 11)
+    ]
+    with open(_filenames[5], "w") as _file:
+        _file.write("")
+    ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
-        ScanIoFio.import_from_file([_tmpfile[1]], scan=SCAN)
+        ScanIoFio.import_from_file(*_filenames)
     assert ScanIoFio.imported_params == {}
-    os.close(_tmpfile[0])
-    os.remove(_tmpfile[1])
 
-    os.rmdir(_tmppath)
+
+def test_import_from_multiple_files__missing_file(reset_scan_context, temp_dir):
+    shutil.copytree(
+        _TEST_DIR.joinpath("_data", "2d_mesh_fio_ascan"),
+        temp_dir.joinpath("test"),
+    )
+    _filenames = [
+        temp_dir.joinpath("test", f"2dmesh_{i:05d}.fio") for i in range(1, 11)
+    ]
+    os.remove(_filenames[5])
+    ScanIoFio.imported_params = {"test_entry": True}
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file(*_filenames)
+    assert ScanIoFio.imported_params == {}
+
+
+def test_import_from_multiple_files__multiple_motors_moved(
+    reset_scan_context, temp_dir
+):
+    _filenames = [temp_dir.joinpath(f"2dmesh_{i:05d}.fio") for i in range(10)]
+    for _index, _fname in enumerate(_filenames):
+        with open(_fname, "w") as _file:
+            _file.write("!\n! Comments\n!\n%c\nascan x -5 5 10 1.0\n")
+            _file.write("!\n! Parameters\n!\n%p\n")
+            _file.write("motor1 = 12.04")
+            _file.write("motor2 = nan")
+            _file.write(f"motor3 = {3 * _index}")
+            _file.write(f"motor4 = {_index - 10}")
+            _file.write("!\n! Data\n!\n%d\n")
+            _file.write(" COL0 x DOUBLE\n")
+            _file.write(" COL1 ioni DOUBLE\n")
+            _file.write(" COL2 dummy DOUBLE\n")
+            for _n in range(11):
+                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+    ScanIoFio.imported_params = {"test_entry": True}
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file(*_filenames)
+    assert ScanIoFio.imported_params == {}
+
+
+def test_import_from_multiple_files__different_scan_commands(
+    reset_scan_context, temp_dir
+):
+    _filenames = [temp_dir.joinpath(f"2dmesh_{i:05d}.fio") for i in range(10)]
+    for _index, _fname in enumerate(_filenames):
+        with open(_fname, "w") as _file:
+            _file.write(f"!\n! Comments\n!\n%c\nascan x -5 5 {10 + _index} 1.0\n")
+            _file.write("!\n! Parameters\n!\n%p\n")
+            _file.write("motor1 = 12.04")
+            _file.write("motor2 = nan")
+            _file.write(f"motor3 = {3 * _index}")
+            _file.write("motor4 = 12.4")
+            _file.write("!\n! Data\n!\n%d\n")
+            _file.write(" COL0 x DOUBLE\n")
+            _file.write(" COL1 ioni DOUBLE\n")
+            _file.write(" COL2 dummy DOUBLE\n")
+            for _n in range(11):
+                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+    ScanIoFio.imported_params = {"test_entry": True}
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file(*_filenames)
+    assert ScanIoFio.imported_params == {}
 
 
 if __name__ == "__main__":

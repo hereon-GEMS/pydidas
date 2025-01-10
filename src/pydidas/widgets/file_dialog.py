@@ -286,6 +286,8 @@ class PydidasFileDialogWidget(
             reference : Union[str, int], optional
                 A reference key to store the selection only during the active instance.
                 The default is None.
+            select_multiple : bool, optional
+                If True, multiple files can be selected. The default is False.
             qsettings_ref : str, optional
                 The reference key for storing the selection in the QSettings registry.
                 The qsettings_ref will take precedence over the reference keyword.
@@ -296,17 +298,38 @@ class PydidasFileDialogWidget(
             The full file path, if selected, or None.
         """
         self._calling_kwargs = kwargs
+        _select_multiple = kwargs.get("select_multiple", False)
         self.setWindowTitle(kwargs.get("caption", "Select existing file"))
         self._set_name_filter()
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptOpen)
-        self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
+        self.setFileMode(
+            QtWidgets.QFileDialog.ExistingFiles
+            if _select_multiple
+            else QtWidgets.QFileDialog.ExistingFile
+        )
         self.setProxyModel(None)
         res = self.exec_()
         if res == 0:
             return None
-        _selection = self.selectedFiles()[0]
         self._store_current_directory()
-        return _selection
+        if _select_multiple:
+            return self.selectedFiles()
+        return self.selectedFiles()[0]
+
+    def get_existing_filenames(self, **kwargs: dict) -> list[str]:
+        """
+        Execute the dialog and get a list of existing files.
+
+        This is a wrapper around get_existing_filename with the necessary
+        kwargs settings taken care of for the user.
+
+        Please refer to get_existing_filename for more information and
+        Parameters.
+        """
+        kwargs["caption"] = "Select existing files"
+        kwargs["select_multiple"] = True
+        _names = self.get_existing_filename(**kwargs)
+        return [] if _names is None else _names
 
     def _set_name_filter(self):
         """

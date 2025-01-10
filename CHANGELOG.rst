@@ -38,11 +38,13 @@ Improvements
 	- Changed the builder of the DefineScanFrame to use functions instead of an 
 	  abstract class.
 	- Restructured the layout of the __init__ files for more clarity.
+	- Added a second category of importers named 'beamline file formats'
+	 to Scan and added a second registry in the ScanIo.
 - Improved the formatting when displaying Plugin information.
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.
 - Added support for pytest tests in the CI pipeline. 
-- Added an importer for Sardana fio files into Scan objects.
+- Added import functionality for Sardana FIO files to the Scan import.
 
 
 Bugfixes

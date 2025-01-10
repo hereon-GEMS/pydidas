@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ScanIoFio"]
 
+import os
 from pathlib import Path
 from typing import Optional, Union
 
@@ -137,27 +138,39 @@ class ScanIoFio(ScanIoBase):
 
     @classmethod
     def import_from_file(
-        cls, *filenames: Union[Path, str], scan: Optional[Scan] = None
+        cls, filenames: Union[Path, str, list[Union[Path, str]]], **kwargs: dict
     ):
         """
         Import scan metadata from a single or multiple fio files.
 
         Parameters
         ----------
-        *filenames : Union[Path, str]
-            The filename(s) of the file(s) to be imported.
-        scan : Scan, optional
-            The scan object to import the data into. If None, the global
-            ScanContext is used.
+        filenames : Union[Path, str, list[Union[Path, str]]]
+            The filename(s) of the file(s) to be imported. Filenames can
+            either be a single
+        **kwargs : dict
+            Additional keyword arguments. The following keys are supported:
+
+            scan : Scan, optional
+                The scan object to import the data into. If None, the global
+                ScanContext is used.
+            scan_dim0_motor : str, optional
+                The name of the motor that is scanned in the first dimension.
+                If None, the motor name is determined from differences in the
+                motor positions between the scans.
         """
-        _scan = SCAN if scan is None else scan
+        scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
         cls.imported_params = {}
-        if len(filenames) == 1 and isinstance(filenames[0], (list, tuple)):
-            filenames = filenames[0]
-        if len(filenames) == 1:
-            cls._import_single_fio(filenames[0], scan)
+        if isinstance(filenames, (Path, str)):
+            cls._import_single_fio(filenames, scan=scan)
+        elif isinstance(filenames, (list, tuple)):
+            cls._import_multiple_fio(filenames, **kwargs)
         else:
-            cls._import_multiple_fio(*filenames, scan=scan)
+            raise UserConfigError(
+                "The input for the fio importer must be a single filename or "
+                "a list or tuple of filenames. Filenames can be given as string "
+                "or Path objects."
+            )
         cls._verify_all_entries_present()
         cls._write_to_scan_settings(scan=scan)
 
@@ -218,9 +231,41 @@ class ScanIoFio(ScanIoBase):
         raise UserConfigError(_ERROR_TEXT_MULTIPLE_SCAN_COMMANDS)
 
     @classmethod
-    def _import_multiple_fio(
-        cls, *filenames: Union[Path, str], scan: Union[Scan, None] = None
-    ):
+    def check_file_list(
+        cls, filenames: list[Union[Path, str]], **kwargs: dict
+    ) -> list[str]:
+        """
+        Check if the given list of files is valid for import.
+
+        The return values are a coded message plus any additional information.
+
+        Parameters
+        ----------
+        filenames : list[Union[Path, str]]
+            The list of filenames to be checked.
+        **kwargs : dict
+            Additional keyword arguments. Please refer to _import_multiple_fio
+            for the supported keys.
+
+        Returns
+        -------
+        list[str]
+            The error message and additional information.
+        """
+        _scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
+        _motor_pos, _motor_names = cls._process_fio_file_list(filenames, _scan)
+        _index_moved_motors = cls._get_moved_motor_indices(_motor_pos, _motor_names)
+        if len(_index_moved_motors) == 1:
+            return ["::no_error::"]
+        if len(_index_moved_motors) == 0:
+            return ["::no_motor_moved::", "No motor has moved between scans."]
+        if len(_index_moved_motors) > 1:
+            return ["::multiple_motors::"] + [
+                _motor_names[_i] for _i in _index_moved_motors
+            ]
+
+    @classmethod
+    def _import_multiple_fio(cls, filenames: list[Union[Path, str]], **kwargs: dict):
         """
         Import scan metadata from multiple fio files.
 
@@ -229,14 +274,78 @@ class ScanIoFio(ScanIoBase):
 
         Parameters
         ----------
-        *filenames : Union[Path, str]
+        filenames : list[Union[Path, str]]
             The filenames of the files to be imported.
-        scan : Scan, optional
-            The scan object to import the data into. If None, the global
-            ScanContext is used.
+        **kwargs : dict
+            Additional keyword arguments. The following keys are supported:
+
+            scan : Scan, optional
+                The scan object to import the data into. If None, the global
+                ScanContext is used.
+            scan_dim0_motor : str, optional
+                The name of the motor that is scanned in the first dimension.
+                If None, the motor name is determined from differences in the
+                motor positions between the scans.
+            return_moved_motor_names : bool, optional
+                Flag to return the names of the motors that have moved between
+                scans. If True, the function returns a list with the error message
+                and the names of the motors that have moved.
         """
-        _scan = SCAN if scan is None else scan
-        cls._import_single_fio(filenames[0], scan=_scan)
+        _scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
+        scan_dim0_motor = kwargs.get("scan_dim0_motor", None)
+        _motor_pos, _motor_names = cls._process_fio_file_list(filenames, _scan)
+
+        # Determine the second scan dimension:
+        _index_moved_motors = cls._get_moved_motor_indices(_motor_pos, _motor_names)
+        if scan_dim0_motor is not None:
+            _motors = {_motor_name: _i for _i, _motor_name in enumerate(_motor_names)}
+            _index_moved_motors = [_motors[scan_dim0_motor]]
+        if len(_index_moved_motors) != 1 and scan_dim0_motor is None:
+            cls.imported_params = {}
+            raise UserConfigError(
+                "Could not determine the second scan dimension!\n"
+                + "Multiple motors have been moved between scans: "
+                + ", ".join([_motor_names[_i] for _i in _index_moved_motors])
+            )
+
+        _values = _motor_pos[_index_moved_motors[0]]
+        _delta, _start = np.polyfit(np.arange(_values.size), _values, 1)
+        cls.imported_params[f"{_D0}_delta"] = _delta
+        cls.imported_params[f"{_D0}_n_points"] = len(filenames)
+        cls.imported_params[f"{_D0}_offset"] = _start
+        cls.imported_params[f"{_D0}_label"] = _motor_names[_index_moved_motors[0]]
+        cls.imported_params.update(cls._get_default_values(Path(filenames[0]), 2))
+        _stems = [Path(_fname).stem for _fname in filenames]
+        _stem_lengths = np.unique([len(_stem) for _stem in _stems])
+        _common = os.path.commonprefix(_stems)
+        while _common[-1] == "0":
+            _common = _common[:-1]
+        if _common and _stem_lengths.size == 1:
+            cls.imported_params["scan_start_index"] = int(_stems[0][len(_common) :])
+            _common += "#" * (_stem_lengths[0] - len(_common))
+        cls.imported_params["scan_name_pattern"] = _common
+
+    @classmethod
+    def _process_fio_file_list(cls, filenames: list[Union[Path, str]], scan: Scan):
+        """
+        Read the content of multiple fio files.
+
+        Parameters
+        ----------
+        filenames : list[Union[Path, str]]
+            The filenames of the files to be read.
+        scan : Scan
+            The scan object to import the data into.
+
+        Returns
+        -------
+        np.ndarray
+            The motor positions.
+        list[str]
+            The motor names.
+        """
+
+        cls._import_single_fio(filenames[0], scan=scan)
         for _key in ["delta", "n_points", "offset", "label"]:
             cls.imported_params[f"{_D1}_{_key}"] = cls.imported_params[f"{_D0}_{_key}"]
             cls.imported_params[f"{_D0}_{_key}"] = "" if _key == "label" else 0
@@ -256,6 +365,7 @@ class ScanIoFio(ScanIoBase):
                     _motor_pos = np.full((len(_motor_names), len(filenames)), np.nan)
                 _motor_pos[:, _index] = cls._get_motor_positions(_device_pos_str)
                 if _scan_command_ref != _file_content[_index_scan:].split("\n")[0]:
+                    cls.imported_params = {}
                     raise UserConfigError(
                         "The selection of FIO files has different scan commands. "
                         "Please check your file selection and make sure they "
@@ -268,7 +378,6 @@ class ScanIoFio(ScanIoBase):
                 "files are valid and belong to the same scan.\n\n"
                 f"The following error occurred:\n {error}"
             )
-
         # Filter for motors which have logged nan values:
         _index_not_nan = ~np.isnan(_motor_pos).all(axis=1)
         _motor_names = [
@@ -276,23 +385,34 @@ class ScanIoFio(ScanIoBase):
         ]
         _motor_pos = _motor_pos[_index_not_nan]
 
-        # Determine the second scan dimension:
+        return _motor_pos, _motor_names
+
+    @classmethod
+    def _get_moved_motor_indices(
+        cls, motor_pos: np.ndarray, motor_names: list[str]
+    ) -> list[int]:
+        """
+        Get the indices of the motors that have moved between scans.
+
+        Parameters
+        ----------
+        motor_pos : np.ndarray
+            The motor positions.
+        motor_names : list[str]
+            The motor names.
+
+        Returns
+        -------
+        list[int]
+            The indices of the motors that have moved.
+        """
         _index_moved_motors = list(
-            np.unique(np.where(np.diff(_motor_pos, axis=1) != 0)[0])
+            np.unique(np.where(np.diff(motor_pos, axis=1) != 0)[0])
         )
-        _dim1_motor_index = _motor_names.index(cls.imported_params["scan_dim1_label"])
-        if _dim1_motor_index in _index_moved_motors:
-            _index_moved_motors.remove(_dim1_motor_index)
-        if len(_index_moved_motors) != 1:
-            raise UserConfigError(
-                "Could not determine the second scan dimension!\n"
-                + "Multiple motors have been moved between scans: "
-                + ", ".join([_motor_names[_i] for _i in _index_moved_motors])
+        if cls.imported_params["scan_dim1_label"] in motor_names:
+            _dim1_motor_index = motor_names.index(
+                cls.imported_params["scan_dim1_label"]
             )
-        _values = _motor_pos[_index_moved_motors[0]]
-        _delta, _start = np.polyfit(np.arange(_values.size), _values, 1)
-        cls.imported_params[f"{_D0}_delta"] = _delta
-        cls.imported_params[f"{_D0}_n_points"] = len(filenames)
-        cls.imported_params[f"{_D0}_offset"] = _start
-        cls.imported_params[f"{_D0}_label"] = _motor_names[_index_moved_motors[0]]
-        cls.imported_params.update(cls._get_default_values(Path(filenames[0]), 2))
+            if _dim1_motor_index in _index_moved_motors:
+                _index_moved_motors.remove(_dim1_motor_index)
+        return _index_moved_motors

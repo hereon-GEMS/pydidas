@@ -105,13 +105,89 @@ class ScanIo(GenericIoMeta):
             The Scan object to be updated. If None, the generic ScanContext is used.
             The default is None.
         """
+        _io_class = cls.get_io_class(filename)
+        _io_class.import_from_file(filename, scan=scan)
+
+    @classmethod
+    def get_io_class(cls, filename: str):
+        """
+        Get the IO class for a given filename.
+
+        Parameters
+        ----------
+        filename : str
+            The filename with extension.
+
+        Returns
+        -------
+        type
+            The IO class.
+        """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         if _extension in cls.registry:
-            _io_class = cls.registry[_extension]
+            return cls.registry[_extension]
         elif _extension in cls.beamline_format_registry:
-            _io_class = cls.beamline_format_registry[_extension]
-        _io_class.import_from_file(filename, scan=scan)
+            return cls.beamline_format_registry[_extension]
+
+    @classmethod
+    def import_from_multiple_files(cls, filenames: list[str], **kwargs: dict):
+        """
+        Import a Scan from multiple files and update the given Scan object.
+
+        Parameters
+        ----------
+        filenames : list[str]
+            The list of full filenames and paths.
+        **kwargs : dict
+            Any kwargs which should be passed to the underlying importer.
+            Supported kwargs are:
+
+            scan : Optional[Scan]
+                The Scan object to be updated. If None, the generic ScanContext is used.
+                The default is None.
+            scan_dim0_motor : Optional[str]
+                The motor name for the first dimension. The default is None.
+        """
+        _extensions = set([get_extension(_filename) for _filename in filenames])
+        if len(_extensions) > 1:
+            raise UserConfigError(
+                "All files must have the same extension for batch import."
+            )
+        _io_class = cls.get_io_class(filenames[0])
+        _io_class.import_from_file(filenames, **kwargs)
+
+    @classmethod
+    def check_multiple_files(cls, filenames: list[str], **kwargs: dict) -> list[str]:
+        """
+        Check whether a selection of multiple files can be imported.
+
+        Parameters
+        ----------
+        filenames : list[str]
+            The list of full filenames and paths.
+        **kwargs : dict
+            Any kwargs which should be passed to the underlying importer.
+            Supported kwargs are:
+
+            scan : Optional[Scan]
+                The Scan object to be updated. If None, the generic ScanContext is used.
+                The default is None.
+
+        Returns
+        -------
+        list[str]
+            A coded message about whether the files can be imported and additional
+            information.
+        """
+        _extensions = set([get_extension(_filename) for _filename in filenames])
+        if len(_extensions) > 1:
+            raise UserConfigError(
+                "All files must have the same extension for batch import."
+            )
+        _io_class = cls.get_io_class(filenames[0])
+        _result = _io_class.check_file_list(filenames, **kwargs)
+        return _result
 
     @classmethod
     def export_to_file(cls, filename, **kwargs):

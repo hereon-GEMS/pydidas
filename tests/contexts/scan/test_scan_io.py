@@ -54,7 +54,7 @@ class TestIo(ScanIoBase):
         cls.export_filename = filename
 
     @classmethod
-    def import_from_file(cls, filename, scan):
+    def import_from_file(cls, filename, scan=None, **kwargs):
         cls.imported = True
         cls.scan = SCAN if scan is None else scan
         cls.import_filename = filename
@@ -71,6 +71,7 @@ class TestScanIo(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._original_registry = ScanIo.registry.copy()
+        cls._original_bl_format_registry = ScanIo.beamline_format_registry.copy()
         ScanIo.clear_registry()
         ScanIo.register_class(TestIo)
         ScanIo.register_class(TestIoBeamlineFormat)
@@ -78,6 +79,7 @@ class TestScanIo(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         ScanIo.registry = cls._original_registry
+        ScanIo.beamline_format_registry = cls._original_bl_format_registry
 
     def setUp(self):
         self._tmppath = Path(tempfile.mkdtemp())
@@ -88,6 +90,9 @@ class TestScanIo(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self._tmppath)
         SCAN.restore_all_defaults(True)
+        ScanIo.clear_registry()
+        ScanIo.register_class(TestIo)
+        ScanIo.register_class(TestIoBeamlineFormat)
 
     def test_register_class(self):
         # this is done implicitly in the metaclass
@@ -137,6 +142,12 @@ class TestScanIo(unittest.TestCase):
         self.assertEqual(TestIo.import_filename, _fname)
         self.assertEqual(TestIo.scan, _scan)
 
+    def test_import_from_multiple_files(self):
+        _fnames = [os.path.join(self._tmppath, f"test_{i}.test") for i in range(5)]
+        ScanIo.import_from_multiple_files(_fnames)
+        self.assertTrue(TestIo.imported)
+        self.assertEqual(TestIo.import_filename, _fnames)
+
     def test_get_string_of_beamline_formats(self):
         _str = ScanIo.get_string_of_beamline_formats()
         self.assertIn("*.bl_test", _str)
@@ -145,4 +156,3 @@ class TestScanIo(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    ScanIo.clear_registry()

@@ -55,6 +55,23 @@ def temp_dir():
     shutil.rmtree(_temp_path)
 
 
+def _write_fio_files_with_2moved_motors(filenames: list[Path]):
+    for _index, _fname in enumerate(filenames):
+        with open(_fname, "w") as _file:
+            _file.write("!\n! Comments\n!\n%c\nascan x -5 5 10 1.0\n")
+            _file.write("!\n! Parameter\n!\n%p\n")
+            _file.write("motor1 = 12.04\n")
+            _file.write("motor2 = nan\n")
+            _file.write(f"motor3 = {3 * _index + 4.0}\n")
+            _file.write(f"motor4 = {_index - 10}\n")
+            _file.write("!\n! Data\n!\n%d\n")
+            _file.write(" COL0 x DOUBLE\n")
+            _file.write(" COL1 ioni DOUBLE\n")
+            _file.write(" COL2 dummy DOUBLE\n")
+            for _n in range(11):
+                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+
+
 def assert_general_1d_scan_params_in_order(scan: ScanContext, filename: Path):
     """
     Asserts the general scan parameters have been reset correctly during the import.
@@ -144,7 +161,7 @@ def test_import_from_multiple_files__corrupt_file(reset_scan_context, temp_dir):
         _file.write("")
     ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
-        ScanIoFio.import_from_file(*_filenames)
+        ScanIoFio.import_from_file(_filenames)
     assert ScanIoFio.imported_params == {}
 
 
@@ -159,7 +176,7 @@ def test_import_from_multiple_files__missing_file(reset_scan_context, temp_dir):
     os.remove(_filenames[5])
     ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
-        ScanIoFio.import_from_file(*_filenames)
+        ScanIoFio.import_from_file(_filenames)
     assert ScanIoFio.imported_params == {}
 
 
@@ -167,24 +184,27 @@ def test_import_from_multiple_files__multiple_motors_moved(
     reset_scan_context, temp_dir
 ):
     _filenames = [temp_dir.joinpath(f"2dmesh_{i:05d}.fio") for i in range(10)]
-    for _index, _fname in enumerate(_filenames):
-        with open(_fname, "w") as _file:
-            _file.write("!\n! Comments\n!\n%c\nascan x -5 5 10 1.0\n")
-            _file.write("!\n! Parameters\n!\n%p\n")
-            _file.write("motor1 = 12.04")
-            _file.write("motor2 = nan")
-            _file.write(f"motor3 = {3 * _index}")
-            _file.write(f"motor4 = {_index - 10}")
-            _file.write("!\n! Data\n!\n%d\n")
-            _file.write(" COL0 x DOUBLE\n")
-            _file.write(" COL1 ioni DOUBLE\n")
-            _file.write(" COL2 dummy DOUBLE\n")
-            for _n in range(11):
-                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+    _write_fio_files_with_2moved_motors(_filenames)
     ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
-        ScanIoFio.import_from_file(*_filenames)
+        ScanIoFio.import_from_file(_filenames)
     assert ScanIoFio.imported_params == {}
+
+
+def test_import_from_multiple_files__multiple_motors_moved_but_scan_dim0_motor_given(
+    reset_scan_context, temp_dir
+):
+    _filenames = [temp_dir.joinpath(f"2dmesh_{i:05d}.fio") for i in range(10)]
+    _write_fio_files_with_2moved_motors(_filenames)
+    ScanIoFio.import_from_file(_filenames, scan_dim0_motor="motor3")
+    scan = ScanContext()
+    assert abs(scan.get_param_value("scan_dim0_offset") - 4.0) < 1e-5
+    assert abs(scan.get_param_value("scan_dim0_delta") - 3.0) < 1e-5
+    assert scan.get_param_value("scan_dim0_label") == "motor3"
+    assert scan.get_param_value("scan_dim0_n_points") == 10
+    assert scan.get_param_value("scan_dim1_offset") == -5.0
+    assert scan.get_param_value("scan_dim1_delta") == 1.0
+    assert scan.get_param_value("scan_dim1_label") == "x"
 
 
 def test_import_from_multiple_files__different_scan_commands(
@@ -194,11 +214,11 @@ def test_import_from_multiple_files__different_scan_commands(
     for _index, _fname in enumerate(_filenames):
         with open(_fname, "w") as _file:
             _file.write(f"!\n! Comments\n!\n%c\nascan x -5 5 {10 + _index} 1.0\n")
-            _file.write("!\n! Parameters\n!\n%p\n")
-            _file.write("motor1 = 12.04")
-            _file.write("motor2 = nan")
-            _file.write(f"motor3 = {3 * _index}")
-            _file.write("motor4 = 12.4")
+            _file.write("!\n! Parameter\n!\n%p\n")
+            _file.write("motor1 = 12.04\n")
+            _file.write("motor2 = nan\n")
+            _file.write(f"motor3 = {3 * _index}\n")
+            _file.write("motor4 = 12.4\n")
             _file.write("!\n! Data\n!\n%d\n")
             _file.write(" COL0 x DOUBLE\n")
             _file.write(" COL1 ioni DOUBLE\n")
@@ -207,7 +227,7 @@ def test_import_from_multiple_files__different_scan_commands(
                 _file.write(f"{_n - 5} {143.256554} {42.5}\n")
     ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
-        ScanIoFio.import_from_file(*_filenames)
+        ScanIoFio.import_from_file(_filenames)
     assert ScanIoFio.imported_params == {}
 
 

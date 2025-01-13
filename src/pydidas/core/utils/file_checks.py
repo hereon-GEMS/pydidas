@@ -17,7 +17,7 @@
 
 """
 The file_checks module includes functions to interact with files and perform some
-basic checks for existance, size and same directory.
+basic checks for existence, size and same directory.
 """
 
 __author__ = "Malte Storm"
@@ -46,7 +46,7 @@ from pydidas.core.utils.hdf5_dataset_utils import get_hdf5_populated_dataset_key
 
 def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
     """
-    Veriy that the selected file has a dataset with key.
+    Verify that the selected file has a dataset with key.
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
     key : str
         The dataset key.
 
-    Raisesa
+    Raises
     ------
     UserConfigError
         If the dataset key is not found in the hdf5 file.
@@ -64,7 +64,7 @@ def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
     dsets = get_hdf5_populated_dataset_keys(fname, 0, 0)
     if key not in dsets:
         raise UserConfigError(
-            f'hdf5_key "{key}" is not a valid key ' f'for the file "{fname}."'
+            f"hdf5_key `{key}` is not a valid key for the file `{fname}`."
         )
 
 
@@ -86,7 +86,7 @@ def check_file_exists(fname: Union[Path, str]):
         fname = Path(fname)
     if not fname.is_file():
         raise UserConfigError(
-            f"The selected filename '{fname}' does not point to a valid file."
+            f"The selected filename `{fname}` does not point to a valid file."
         )
 
 
@@ -130,7 +130,7 @@ def verify_files_of_range_are_same_size(files: List[Path]):
     Raises
     ------
     UserConfigError
-        If the files in the filelist are not all of the same size.
+        If the files in the filelist are not all the same size.
     """
     _fsizes = array([_f.stat().st_size for _f in files])
     if _fsizes.std() > 0.0:

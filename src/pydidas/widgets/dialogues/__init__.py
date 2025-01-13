@@ -30,6 +30,7 @@ from .acknowledge_box import *
 from .critical_warning_ import *
 from .error_message_box import *
 from .hdf5_dataset_selection_popup import *
+from .item_in_list_selection_widget import *
 from .pydidas_exception_message_box import *
 from .question_box import *
 from .warning_box import *
@@ -40,6 +41,7 @@ __all__ = (
     + critical_warning_.__all__
     + error_message_box.__all__
     + hdf5_dataset_selection_popup.__all__
+    + item_in_list_selection_widget.__all__
     + pydidas_exception_message_box.__all__
     + question_box.__all__
     + warning_box.__all__
@@ -50,6 +52,7 @@ del (
     critical_warning_,
     error_message_box,
     hdf5_dataset_selection_popup,
+    item_in_list_selection_widget,
     pydidas_exception_message_box,
     question_box,
     warning_box,

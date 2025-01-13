@@ -555,8 +555,8 @@ class DirectorySpyApp(BaseApp):
         if len(self.__read_image_meta) == 0:
             return ""
         return (
-            f' (frame: {self.__read_image_meta["indices"]}, '
-            f'dataset: {self.__read_image_meta["dataset"]})'
+            f" (frame: {self.__read_image_meta['indices']}, "
+            f"dataset: {self.__read_image_meta['dataset']})"
         )
 
     @QtCore.Slot(object, object)

@@ -123,7 +123,7 @@ def _create_str_description_of_node_result(
         + "\n\n".join(
             (
                 f"Axis #{_axis:02d}:\n"
-                f'  Label: {_meta["axis_labels"][_axis]}\n'
+                f"  Label: {_meta['axis_labels'][_axis]}\n"
                 f"  N points: {_ax_points[_axis]}\n"
                 f"  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}"
             )
@@ -131,7 +131,7 @@ def _create_str_description_of_node_result(
         )
     )
     _str += f"\n\nValues:\n{_values}"
-    _str += f'\n\nMetadata:\n{_meta["metadata"]}'
+    _str += f"\n\nMetadata:\n{_meta['metadata']}"
     _str += f"\n\nPlugin runtime: {node.runtime:.4f} s"
     return _str
 
@@ -412,7 +412,9 @@ class WorkflowTestFrame(BaseFrame):
                 )
             else:
                 _text = (
-                    f"[{_i0}, {_i0 + _delta}, ..., {_i0 + (SCAN.n_points - 1)*_delta}]."
+                    "["
+                    f"{_i0}, {_i0 + _delta}, ..., {_i0 + (SCAN.n_points - 1) * _delta}"
+                    "]."
                 )
             raise UserConfigError(
                 f"The selected number {_num} is not included in the images of the scan "

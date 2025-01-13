@@ -301,7 +301,7 @@ class FilelistManager(ObjectWithParameterCollection):
         if not 0 <= index < _n:
             raise UserConfigError(
                 f'The selected number "{index}" is out of '
-                f"the range of the file list [0, {_n-1}]"
+                f"the range of the file list [0, {_n - 1}]"
             )
         return self._config["file_list"][index]
 

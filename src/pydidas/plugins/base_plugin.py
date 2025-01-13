@@ -560,8 +560,7 @@ class BasePlugin(ObjectWithParameterCollection):
                 self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
             )
         raise UserConfigError(
-            "The Plugin does not have the correct data dimensionality to define a "
-            "ROI."
+            "The Plugin does not have the correct data dimensionality to define a ROI."
         )
 
 

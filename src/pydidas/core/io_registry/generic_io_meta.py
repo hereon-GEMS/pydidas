@@ -94,7 +94,7 @@ class GenericIoMeta(type):
         for _ext in new_class.extensions:
             if _ext in cls.registry and not update_registry:
                 raise KeyError(
-                    "A class has already been registered for the " f"extension {_ext}."
+                    f"A class has already been registered for the extension {_ext}."
                 )
             cls.registry[_ext] = new_class
 

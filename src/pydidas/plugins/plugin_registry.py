@@ -401,7 +401,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         if plugin_name in self._plugin_names:
             return self.plugins[self._plugin_names[plugin_name]]
         raise KeyError(
-            f'No plugin with plugin_name "{plugin_name}" has been' " registered!"
+            f"No plugin with plugin_name `{plugin_name}` has been registered!"
         )
 
     def get_plugin_by_name(self, name: str) -> type:
@@ -423,7 +423,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             return self.plugins[name]
         if name in self._plugin_basic_types:
             return self._plugin_basic_types[name]
-        raise KeyError(f'No plugin with name "{name}" has been registered!')
+        raise KeyError(f"No plugin with name `{name}` has been registered!")
 
     def get_all_plugins(self) -> list[type]:
         """

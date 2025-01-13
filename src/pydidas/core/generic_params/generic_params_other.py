@@ -100,7 +100,7 @@ GENERIC_PARAMS_OTHER = {
         "name": "Total number of images",
         "choices": None,
         "unit": "",
-        "tooltip": "The toal number of images in the composite images.",
+        "tooltip": "The total number of images in the composite images.",
     },
     "n_files": {
         "type": int,
@@ -330,7 +330,7 @@ GENERIC_PARAMS_OTHER = {
         "allow_None": False,
         "tooltip": (
             "Save the results automatically after finishing processing. The "
-            "results for each plugin will be saved in a separete file (or files if "
+            "results for each plugin will be saved in a separate file (or files if "
             "multiple formats have been selected)."
         ),
     },
@@ -352,7 +352,7 @@ GENERIC_PARAMS_OTHER = {
         "allow_None": True,
         "tooltip": (
             "The file format(s) for the data to be saved after the workflow has "
-            "been excuted. All data will be saved in a single folder for each run "
+            "been executed. All data will be saved in a single folder for each run "
             "with one file for each plugin."
         ),
     },
@@ -452,7 +452,7 @@ GENERIC_PARAMS_OTHER = {
     "active_node": {
         "type": int,
         "default": 0,
-        "name": "The ative node",
+        "name": "The active node",
         "choices": None,
         "unit": "",
         "allow_None": False,
@@ -481,8 +481,7 @@ GENERIC_PARAMS_OTHER = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The axis which is to be used as the first axis in the "
-            "plot of the results."
+            "The axis which is to be used as the first axis in the plot of the results."
         ),
     },
     "plot_ax2": {

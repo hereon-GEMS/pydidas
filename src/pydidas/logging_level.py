@@ -33,7 +33,7 @@ import sys
 
 
 __log_keys = ["logging", "logger", "logging-level", "log"]
-__log_levels = ["DEBUG", "INFO", "WARN" "WARNING", "ERROR", "CRITICAL", "FATAL"]
+__log_levels = ["DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL", "FATAL"]
 __log_level = logging.ERROR
 
 

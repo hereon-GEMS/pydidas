@@ -33,7 +33,7 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 
 from pydidas.contexts import ScanContext, ScanIo
-from pydidas.core import constants, utils
+from pydidas.core import UserConfigError, constants, utils
 from pydidas.gui.frames.builders.define_scan_frame_builder import (
     build_header_config,
     build_scan_dim_groups,
@@ -41,6 +41,7 @@ from pydidas.gui.frames.builders.define_scan_frame_builder import (
 )
 from pydidas.plugins import PluginCollection
 from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.dialogues import ItemInListSelectionWidget
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.windows import ScanDimensionInformationWindow
 from pydidas.workflow import WorkflowTree
@@ -111,7 +112,12 @@ class DefineScanFrame(BaseFrame):
         Connect all required signals and slots.
         """
         self._widgets["but_save"].clicked.connect(self.export_to_file)
-        self._widgets["but_load"].clicked.connect(self.load_from_file)
+        self._widgets["but_import_from_pydidas"].clicked.connect(
+            self._import_from_pydidas_file
+        )
+        self._widgets["but_import_bl_metadata"].clicked.connect(
+            self._import_from_beamline_file_format
+        )
         self._widgets["but_reset"].clicked.connect(self.reset_entries)
         self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_info_window)
         self.param_widgets["scan_dim"].currentTextChanged.connect(
@@ -166,7 +172,7 @@ class DefineScanFrame(BaseFrame):
         self._widgets["config_area"].force_width_from_size_hint()
 
     @QtCore.Slot()
-    def load_from_file(self):
+    def _import_from_pydidas_file(self):
         """
         Load ScanContext from a file.
 
@@ -179,6 +185,53 @@ class DefineScanFrame(BaseFrame):
         )
         if _fname is not None:
             SCAN.import_from_file(_fname)
+            for param in SCAN.params.values():
+                self.param_widgets[param.refkey].set_value(param.value)
+
+    @QtCore.Slot()
+    def _import_from_beamline_file_format(self):
+        """
+        Load ScanContext from a file or multiple files in the beamline format.
+
+        This method will open a QFileDialog to select the file to be read.
+        """
+        _fnames = self._io_dialog.get_existing_filenames(
+            caption="Import scan context files",
+            formats=ScanIo.get_string_of_beamline_formats(),
+            info_string=(
+                "Please select all files which belong to the scan. Please note "
+                "that only 1d or 2d scans can be imported from beamline file "
+                "formats."
+            ),
+            qsettings_ref="DefineScanFrame__import",
+        )
+        if len(_fnames) > 0:
+            _return = ScanIo.check_multiple_files(_fnames, scan=SCAN)
+            print("Return:", _return)
+            if _return[0] == "::no_error::":
+                _return = ScanIo.import_from_multiple_files(_fnames, scan=SCAN)
+            elif _return[0] == "::multiple_motors::":
+                _choice = ItemInListSelectionWidget(
+                    _return[1:],
+                    title="Select motor",
+                    label=(
+                        "Multiple motors/devices have changed values in the "
+                        "selected beamline files.\n"
+                        "Please select motor to use for first scan dimension:"
+                    ),
+                ).get_item()
+                if _choice is None:
+                    raise UserConfigError(
+                        "No motor selected for scan dimension 0. Aborting import of "
+                        "Scan from beamline files."
+                    )
+                ScanIo.import_from_multiple_files(
+                    _fnames, scan=SCAN, scan_dim0_motor=_choice
+                )
+            else:
+                raise UserConfigError(
+                    "An unknown error occurred during the import of the scan."
+                )
             for param in SCAN.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 

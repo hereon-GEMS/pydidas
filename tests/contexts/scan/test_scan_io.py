@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,8 +28,10 @@ import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 from pydidas.contexts.scan import Scan, ScanContext, ScanIo, ScanIoBase
+from pydidas.core import UserConfigError
 
 
 SCAN = ScanContext()
@@ -52,36 +54,78 @@ class TestIo(ScanIoBase):
         cls.export_filename = filename
 
     @classmethod
-    def import_from_file(cls, filename, scan):
+    def import_from_file(cls, filename, scan=None, **kwargs):
         cls.imported = True
         cls.scan = SCAN if scan is None else scan
         cls.import_filename = filename
+
+
+class TestIoBeamlineFormat(TestIo):
+    extensions = ["bl_test"]
+    format_name = "Beamline Test"
+    beamline_format = True
+    import_only = True
 
 
 class TestScanIo(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._original_registry = ScanIo.registry.copy()
+        cls._original_bl_format_registry = ScanIo.beamline_format_registry.copy()
         ScanIo.clear_registry()
         ScanIo.register_class(TestIo)
+        ScanIo.register_class(TestIoBeamlineFormat)
 
     @classmethod
     def tearDownClass(cls):
         ScanIo.registry = cls._original_registry
+        ScanIo.beamline_format_registry = cls._original_bl_format_registry
 
     def setUp(self):
-        self._tmppath = tempfile.mkdtemp()
+        self._tmppath = Path(tempfile.mkdtemp())
         TestIo.reset()
+        TestIoBeamlineFormat.reset()
+        TestIoBeamlineFormat.import_only = True
 
     def tearDown(self):
         shutil.rmtree(self._tmppath)
         SCAN.restore_all_defaults(True)
+        ScanIo.clear_registry()
+        ScanIo.register_class(TestIo)
+        ScanIo.register_class(TestIoBeamlineFormat)
+
+    def test_register_class(self):
+        # this is done implicitly in the metaclass
+        self.assertIn("test", ScanIo.registry)
+        self.assertIn("bl_test", ScanIo.beamline_format_registry)
+
+    def test_clear_registry(self):
+        ScanIo.clear_registry()
+        self.assertEqual(ScanIo.registry, {})
+        self.assertEqual(ScanIo.beamline_format_registry, {})
+
+    def test_is_extension_registered(self):
+        for _ext in ["test", "bl_test"]:
+            with self.subTest(ext=_ext):
+                self.assertTrue(ScanIo.is_extension_registered(_ext))
 
     def test_export_to_file(self):
-        _fname = os.path.join(self._tmppath, "test.test")
+        _fname = self._tmppath.joinpath("test.test")
         ScanIo.export_to_file(_fname)
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
+
+    def test_export_to_file__bl_format(self):
+        _fname = self._tmppath.joinpath("test.bl_test")
+        ScanIo.beamline_format_registry["bl_test"].import_only = False
+        ScanIo.export_to_file(_fname)
+        self.assertTrue(TestIoBeamlineFormat.exported)
+        self.assertEqual(TestIoBeamlineFormat.export_filename, _fname)
+
+    def test_export_to_file__import_only(self):
+        _fname = self._tmppath.joinpath("test.bl_test")
+        with self.assertRaises(UserConfigError):
+            ScanIo.export_to_file(_fname)
 
     def test_import_from_file__generic_ScanContext(self):
         _fname = os.path.join(self._tmppath, "test.test")
@@ -98,7 +142,17 @@ class TestScanIo(unittest.TestCase):
         self.assertEqual(TestIo.import_filename, _fname)
         self.assertEqual(TestIo.scan, _scan)
 
+    def test_import_from_multiple_files(self):
+        _fnames = [os.path.join(self._tmppath, f"test_{i}.test") for i in range(5)]
+        ScanIo.import_from_multiple_files(_fnames)
+        self.assertTrue(TestIo.imported)
+        self.assertEqual(TestIo.import_filename, _fnames)
+
+    def test_get_string_of_beamline_formats(self):
+        _str = ScanIo.get_string_of_beamline_formats()
+        self.assertIn("*.bl_test", _str)
+        self.assertNotIn("*.test", _str)
+
 
 if __name__ == "__main__":
     unittest.main()
-    ScanIo.clear_registry()

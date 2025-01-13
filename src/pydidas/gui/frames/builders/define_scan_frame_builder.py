@@ -120,9 +120,19 @@ def build_header_config():
         ],
         [
             "create_button",
-            ("but_load", "Import scan settings from file"),
+            ("but_import_from_pydidas", "Import scan settings from pydidas file"),
             {
                 "icon": "qt-std::SP_DialogOpenButton",
+                "parent_widget": "config_header",
+            },
+        ],
+        [
+            "create_button",
+            (
+                "but_import_bl_metadata",
+                "Import scan settings from beamline scan metadata",
+            ),
+            {
                 "parent_widget": "config_header",
             },
         ],

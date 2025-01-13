@@ -609,8 +609,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
                     "and cannot be imported."
                 )
             raise UserConfigError(
-                "Error during GUI state import.\n"
-                f"The following error occurred: {exc}\n"
+                f"Error during GUI state import.\nThe following error occurred: {exc}\n"
             )
 
     def restore_window_states(self, state: dict):

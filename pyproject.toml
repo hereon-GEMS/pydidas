@@ -75,6 +75,7 @@ skips = ["B311"]
 [tool.ruff]
 extend-exclude = ["docs/source/conf.py"]
 show-fixes = true
+line-length = 88
 
 [tool.ruff.lint]
 extend-select = ["I", "C90", "F401"]

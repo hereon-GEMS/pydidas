@@ -27,8 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ScanIoBase"]
 
-
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 from pydidas.contexts.scan.scan import Scan
 from pydidas.contexts.scan.scan_context import ScanContext
@@ -49,6 +49,8 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
     extensions = []
     format_name = "unknown"
     imported_params = {}
+    beamline_format = False
+    import_only = False
 
     @classmethod
     def _verify_all_entries_present(cls):
@@ -89,3 +91,24 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
         for _key, _item in cls.imported_params.items():
             _scan.set_param_value(_key, _item)
         cls.imported_params = {}
+
+    @classmethod
+    def check_file_list(
+        cls, filenames: list[Union[Path, str]], **kwargs: dict
+    ) -> list[str]:
+        """
+        Check if the list of filenames is valid.
+
+        Parameters
+        ----------
+        filenames : List[Path]
+            List of filenames to be checked.
+        **kwargs : dict
+            Additional keyword arguments. Must be defined by the subclass.
+
+        Returns
+        -------
+        List[str]
+            A list of coded messages.
+        """
+        return ["::no_error::"]

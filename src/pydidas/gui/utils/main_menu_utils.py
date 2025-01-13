@@ -115,11 +115,13 @@ def get_latest_release_tag() -> str:
     """
     _url = "https://api.github.com/repos/hereon-GEMS/pydidas/releases/latest"
     try:
-        _response = requests.get(_url, timeout=5)
+        _response = requests.get(_url, timeout=1)
         _response.raise_for_status()
     except requests.RequestException:
         return "-1"
     _tag = _response.json()["tag_name"]
+    if not isinstance(_tag, str):
+        return "-1"
     if _tag.startswith("v"):
         return _tag[1:]
     return _tag

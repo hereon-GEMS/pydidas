@@ -45,7 +45,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
     """
     A QStackedWidget with references to all the possible top level widgets.
 
-    Widgets are responsible for registering themself with this class to
+    Widgets are responsible for registering themselves with this class to
     allow a later reference. For the pydidas main application, the main
     window takes care of registration.
 
@@ -57,7 +57,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
     Attributes
     ----------
     widgets : list
-        A list of all the registed widgets.
+        A list of all the registered widgets.
     frame_indices : dict
         A dictionary with (widget_name: index) entries to reference
         widgets with their names.
@@ -86,7 +86,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         ------
         TypeError
             If a widget is not of type pydidas.widgets.framework.BaseFrame
-        KeyEror
+        KeyError
             When a widget with the same name has already been registered
             to prevent duplicate entries in the index reference.
         """
@@ -148,9 +148,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
             The widget referenced by the name.
         """
         if ref_name not in self.frame_indices:
-            raise KeyError(
-                f'No widget with the name "{ref_name}" has been' " registered."
-            )
+            raise KeyError(f"No widget with the name `{ref_name}` has been registered.")
         return self.widget(self.frame_indices[ref_name])
 
     @property
@@ -236,7 +234,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         if ref_name not in self.frame_indices:
             raise KeyError(
-                f'No widget with the name "{ref_name}" has been'
+                f"No widget with the name `{ref_name}` has been"
                 " registered with the CENTRAL_WIDGET_STACK."
             )
         index = self.frame_indices[ref_name]
@@ -248,13 +246,13 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
 
         This method finds the widget associated with the reference name and
         deletes it from the QStackedWidget.
-        Note: This does not delete the widget ifself, only the reference in
+        Note: This does not delete the widget itself, only the reference in
         the QStackedWidget.
 
         Parameters
         ----------
         ref_name : str
-            The referene name of the widget
+            The reference name of the widget
 
         Raises
         ------
@@ -263,7 +261,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         if ref_name not in self.frame_indices:
             raise KeyError(
-                f'No widget width the name "{ref_name}" has been ' "registered."
+                f"No widget width the name `{ref_name}` has been registered."
             )
         _widget = self.frames[self.frame_indices[ref_name]]
         self.removeWidget(_widget)
@@ -296,15 +294,15 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         Parameters
         ----------
         widget : BaseFrame
-            The widget to be remvoed from the QStackedWidget.
+            The widget to be removed from the QStackedWidget.
 
         Raises
         ------
         KeyError
-            If the widget is not registed.
+            If the widget is not registered.
         """
         if widget not in self.frames:
-            raise KeyError(f'The widget "{widget}" is not registered.')
+            raise KeyError(f"The widget `{widget}` is not registered.")
         widget.frame_index = None
         _index = self.frames.index(widget)
         _ref_name = self.get_name_from_index(_index)
@@ -356,7 +354,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         new_name : str
             The new reference name.
         widget : BaseFrame
-            The widget of which the refernce name shall be changed.
+            The widget of which the reference name shall be changed.
 
         Raises
         ------
@@ -364,7 +362,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
             If the widget is not registered at all.
         """
         if not self.is_registered(widget):
-            raise KeyError(f'The widget "{widget}" is not registered.')
+            raise KeyError(f"The widget `{widget}` is not registered.")
         index = self.frames.index(widget)
         name = self.get_name_from_index(index)
         if name != new_name:

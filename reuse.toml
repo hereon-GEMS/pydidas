@@ -10,10 +10,10 @@ path = [
     "src/pydidas/docs/make.bat",
     "src/pydidas/docs/Makefile",
     "src/pydidas/docs/src/_static/_css/pydidas-custom.css",
-    "tests/_data/*",
+    "tests/_data/**",
 ]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2021 - 2024 Helmholtz-Zentrum Hereon"
+SPDX-FileCopyrightText = "2021 - 2025 Helmholtz-Zentrum Hereon"
 SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]

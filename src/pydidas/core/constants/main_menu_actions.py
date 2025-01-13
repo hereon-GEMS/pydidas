@@ -66,8 +66,7 @@ MAIN_MENU_MENU_ACTIONS = {
     "import_state": {
         "label": "&Import GUI state",
         "status_tip": (
-            "Import the state of the graphical user interface from a user-defined "
-            "file."
+            "Import the state of the graphical user interface from a user-defined file."
         ),
         "icon": "qt-std::SP_DialogOpenButton",
     },

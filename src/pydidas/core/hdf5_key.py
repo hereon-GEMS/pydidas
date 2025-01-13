@@ -68,6 +68,6 @@ class Hdf5key(str):
         """
         if type(txt) not in (str, Path):
             raise TypeError(
-                '"hdf5_filename" property must be of type' " str or pathlib.Path."
+                "`hdf5_filename` property must be of type str or pathlib.Path."
             )
         self.__hdf_fname = Path(txt)

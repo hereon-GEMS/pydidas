@@ -104,6 +104,11 @@ class _NumpyParser:
             The remaining items.
         """
         input_str = input_str[len(func_name) + 1 : -1]
+        if len(input_str) == 0:
+            raise UserConfigError(
+                "The argument string is empty. Please check the input and provide "
+                f"arguments for `{func_name}`."
+            )
         _kwargs, _other = self._parsers[func_name].parse_known_args(
             self._get_items_as_list(input_str)
         )
@@ -127,7 +132,6 @@ class _NumpyParser:
         list[str]
             The string, formatted into a list for use in argparse.
         """
-        # re.find("\(.* ?\)", input_str)
         _bracketed = []
         while True:
             _result = re.search(r"\(.*?\)|\[.*?\]|\{.*?\}", input_str)
@@ -251,7 +255,6 @@ class _NumpyParser:
                 if _type is bool:
                     _tmp_arg = _tmp_arg.lower() in ("true", "1")
                 _kwargs[_key] = _type(_tmp_arg)
-        # print("arange kwargs", _kwargs)
         if _kwargs["dtype"] not in NUMPY_DTYPES:
             raise UserConfigError("Invalid dtype.")
         _kwargs["dtype"] = NUMPY_DTYPES[_kwargs["dtype"]]

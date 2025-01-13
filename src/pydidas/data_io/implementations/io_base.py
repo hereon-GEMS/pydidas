@@ -88,8 +88,7 @@ class IoBase(metaclass=IoManager):
     @classmethod
     def check_for_existing_file(cls, filename: Union[Path, str], **kwargs: dict):
         """
-        Check if the file exists and if yes if the overwrite flag has been
-        set.
+        Check if the file exists and if the overwrite flag has been set.
 
         Parameters
         ----------
@@ -107,8 +106,7 @@ class IoBase(metaclass=IoManager):
         _overwrite = kwargs.get("overwrite", False)
         if os.path.exists(filename) and not _overwrite:
             raise FileExistsError(
-                f'The file "{filename}" exists and '
-                "overwriting has not been confirmed."
+                f"The file `{filename}` exists and overwriting has not been confirmed."
             )
 
     @classmethod
@@ -154,7 +152,7 @@ class IoBase(metaclass=IoManager):
         Raises
         ------
         ValueError
-            If no deata has beeen read.
+            If no data has been read.
 
         Returns
         -------

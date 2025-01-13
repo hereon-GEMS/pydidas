@@ -76,8 +76,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
     @classmethod
     def check_for_existing_file(cls, filename, **kwargs):
         """
-        Check if the file exists and if yes if the overwrite flag has been
-        set.
+        Check if the file exists and if the overwrite flag has been set.
 
         Parameters
         ----------
@@ -96,6 +95,5 @@ class GenericIoBase(metaclass=GenericIoMeta):
         _overwrite = kwargs.get("overwrite", False)
         if os.path.exists(filename) and not _overwrite:
             raise FileExistsError(
-                f'The file "{filename}" exists and '
-                "overwriting has not been confirmed."
+                f"The file `{filename}` exists and overwriting has not been confirmed."
             )

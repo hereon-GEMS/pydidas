@@ -180,7 +180,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             "\u2588" * _n_chars
             + "-" * (60 - _n_chars)
             + "|"
-            + f" {100*progress:05.2f}% "
+            + f" {100 * progress:05.2f}% "
         )
         print(_txt, end="\r", flush=True)
 

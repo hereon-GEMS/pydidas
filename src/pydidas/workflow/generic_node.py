@@ -51,7 +51,7 @@ class GenericNode:
         item : object
             Any object that needs to be checked for its type.
         allowNone : bool, optional
-            Keyword which allowes "None" items. The default is False.
+            Keyword which allows "None" items. The default is False.
 
         Raises
         ------
@@ -62,13 +62,12 @@ class GenericNode:
             return
         if not isinstance(item, GenericNode):
             raise TypeError(
-                "Cannot add objects which are not of type "
-                "GenericNode (or subclasses)."
+                "Cannot add objects which are not of type GenericNode (or subclasses)."
             )
 
     def __init__(self, **kwargs: dict):
         """
-        Setup the generic node.
+        Set up the generic node.
 
         Any keywords will be stored as class attributes. This behaviour is motivated
         by the requirements of subclasses with specific calling arguments.
@@ -395,7 +394,7 @@ class GenericNode:
         Returns
         -------
         pydidas.workflow.GenericNode
-            The nodes's copy.
+            The node's copy.
         """
         return copy.copy(self)
 
@@ -440,7 +439,7 @@ class GenericNode:
         Get a hash value for the GenericNode.
 
         The hash is determined by the node ID, the parent and the number of
-        children (but not by the children themselves to prevent circural
+        children (but not by the children themselves to prevent circular
         recursion).
 
         Returns

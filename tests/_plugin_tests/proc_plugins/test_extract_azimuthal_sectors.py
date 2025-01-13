@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -103,7 +103,7 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin = self.get_default_plugin()
         plugin.set_param_value("width", 10 * np.pi / 180)
         plugin.set_param_value(
-            "centers", ";".join(f"{i*np.pi/2:.10f}" for i in range(4))
+            "centers", ";".join(f"{i * np.pi / 2:.10f}" for i in range(4))
         )
         plugin._data.update_axis_unit(0, "rad")
         plugin._data.update_axis_range(0, np.linspace(np.pi / 72, 143 / 72 * np.pi, 72))

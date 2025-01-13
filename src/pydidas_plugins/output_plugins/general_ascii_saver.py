@@ -184,7 +184,7 @@ class GeneralAsciiSaver(OutputPlugin):
         """
         _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
         return (
-            f"#F { Path(self.get_output_filename('dat')).name}\n"
+            f"#F {Path(self.get_output_filename('dat')).name}\n"
             + f"#E {time.time()}\n"
             + f"#D {_time}\n\n"
             + "#S 1 pydidas results\n"

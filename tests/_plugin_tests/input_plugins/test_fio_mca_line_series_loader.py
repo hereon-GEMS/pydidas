@@ -63,7 +63,7 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         cls._global_fnames = {}
         cls._name_pattern = "test_#####"
         for _i in range(cls._n_dirs):
-            _tmpname = cls._name_pattern.replace("#####", f"{1+_i:05d}")
+            _tmpname = cls._name_pattern.replace("#####", f"{1 + _i:05d}")
             _dir = cls._path.joinpath(_tmpname)
             _dir.mkdir()
             for _ifile in range(cls._n_files):

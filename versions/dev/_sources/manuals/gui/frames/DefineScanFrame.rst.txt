@@ -34,15 +34,43 @@ Import scan settings
 .. image:: images/scan/import.png
     :align: left
 
-The Scan settings can be imported from file. Clicking the corresponding 
-button will open a selection dialogue to pick the file with the stored settings.
-File extensions will be pre-selected based on the available importers. 
+|
+
+The Scan settings can be imported from files written by pydidas. Clicking the
+corresponding button will open a selection dialogue to pick the file with the
+stored settings. File extensions will be pre-selected based on the available
+importers.
+
+Import scan settings from beamline metadata files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: images/scan/import_bl_file.png
+    :align: left
+
+|
+
+A second option for importing scan settings is to use beamline metadata files.
+These files are created by beamline software and contain information about the
+scan setup. The button will open a file selection dialogue to pick the file with
+the stored settings. File extensions will be pre-selected based on the available
+importers.
+
+If you are unsure how to proceed for your specific beamline metadata files,
+please discuss with your local beamline support.
+
+If you are missing a specific beamline metadata importer, please contact the
+development team by raising a
+`GitHub issue <https://github.com/hereon-GEMS/pydidas/issues>`_.
+
+
 
 Reset Parameters
 ^^^^^^^^^^^^^^^^
 
 .. image:: images/scan/reset.png
     :align: left
+
+|
 
 The "Reset all scan settings" button allows the user to change all Parameters
 back to their default values. 
@@ -52,6 +80,8 @@ Export scan settings
 
 .. image:: images/scan/export.png
     :align: left
+
+|
 
 At the bottom of the Frame, the export button allows users to export the current
 :py:class:`ScanContext <pydidas.contexts.scan.Scan>` 
@@ -63,9 +93,11 @@ Scan dimension explanation
 .. image:: images/scan/more_dim_info.png
     :align: left
 
+|
+
 The scan dimension explanation section gives detailed information about the 
 ordering of scan scan dimensions. The *slowest* scan dimension is dimension no. 
-1 and the fastest is the last scan dimension. This ordering corresponds to how
+0 and the fastest is the last scan dimension. This ordering corresponds to how
 the scan must be performed algorithmically. The button opens a window with an
 in-depth explanation, including images.
 

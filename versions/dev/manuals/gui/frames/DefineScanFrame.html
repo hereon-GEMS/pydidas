@@ -486,14 +486,15 @@ document.write(`
 <li><p><a class="reference internal" href="#control-buttons" id="id2">Control buttons</a></p>
 <ul>
 <li><p><a class="reference internal" href="#import-scan-settings" id="id3">Import scan settings</a></p></li>
-<li><p><a class="reference internal" href="#reset-parameters" id="id4">Reset Parameters</a></p></li>
-<li><p><a class="reference internal" href="#export-scan-settings" id="id5">Export scan settings</a></p></li>
+<li><p><a class="reference internal" href="#import-scan-settings-from-beamline-metadata-files" id="id4">Import scan settings from beamline metadata files</a></p></li>
+<li><p><a class="reference internal" href="#reset-parameters" id="id5">Reset Parameters</a></p></li>
+<li><p><a class="reference internal" href="#export-scan-settings" id="id6">Export scan settings</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#scan-dimension-explanation" id="id6">Scan dimension explanation</a></p></li>
-<li><p><a class="reference internal" href="#global-parameters" id="id7">Global Parameters</a></p></li>
-<li><p><a class="reference internal" href="#configuring-a-scan-dimension" id="id8">Configuring a scan dimension</a></p></li>
-<li><p><a class="reference internal" href="#list-of-all-scancontext-parameters" id="id9">List of all ScanContext Parameters</a></p></li>
+<li><p><a class="reference internal" href="#scan-dimension-explanation" id="id7">Scan dimension explanation</a></p></li>
+<li><p><a class="reference internal" href="#global-parameters" id="id8">Global Parameters</a></p></li>
+<li><p><a class="reference internal" href="#configuring-a-scan-dimension" id="id9">Configuring a scan dimension</a></p></li>
+<li><p><a class="reference internal" href="#list-of-all-scancontext-parameters" id="id10">List of all ScanContext Parameters</a></p></li>
 </ul>
 </nav>
 <p>The <em>Scan setup</em> frame is a graphical interface to configure the
@@ -508,19 +509,46 @@ some buttons for convenience functionality.</p>
 <section id="import-scan-settings">
 <h3>Import scan settings<a class="headerlink" href="#import-scan-settings" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/import.png" class="align-left" src="../../../_images/import.png" />
-<p>The Scan settings can be imported from file. Clicking the corresponding
-button will open a selection dialogue to pick the file with the stored settings.
-File extensions will be pre-selected based on the available importers.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The Scan settings can be imported from files written by pydidas. Clicking the
+corresponding button will open a selection dialogue to pick the file with the
+stored settings. File extensions will be pre-selected based on the available
+importers.</p>
+</section>
+<section id="import-scan-settings-from-beamline-metadata-files">
+<h3>Import scan settings from beamline metadata files<a class="headerlink" href="#import-scan-settings-from-beamline-metadata-files" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/import_bl_file.png" class="align-left" src="../../../_images/import_bl_file.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>A second option for importing scan settings is to use beamline metadata files.
+These files are created by beamline software and contain information about the
+scan setup. The button will open a file selection dialogue to pick the file with
+the stored settings. File extensions will be pre-selected based on the available
+importers.</p>
+<p>If you are unsure how to proceed for your specific beamline metadata files,
+please discuss with your local beamline support.</p>
+<p>If you are missing a specific beamline metadata importer, please contact the
+development team by raising a
+<a class="reference external" href="https://github.com/hereon-GEMS/pydidas/issues">GitHub issue</a>.</p>
 </section>
 <section id="reset-parameters">
 <h3>Reset Parameters<a class="headerlink" href="#reset-parameters" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/reset.png" class="align-left" src="../../../_images/reset.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
 <p>The “Reset all scan settings” button allows the user to change all Parameters
 back to their default values.</p>
 </section>
 <section id="export-scan-settings">
 <h3>Export scan settings<a class="headerlink" href="#export-scan-settings" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/export1.png" class="align-left" src="../../../_images/export1.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
 <p>At the bottom of the Frame, the export button allows users to export the current
 <code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
 Parameters to a file. This button will open a filename dialogue.</p>
@@ -529,9 +557,12 @@ Parameters to a file. This button will open a filename dialogue.</p>
 <section id="scan-dimension-explanation">
 <h2>Scan dimension explanation<a class="headerlink" href="#scan-dimension-explanation" title="Link to this heading">#</a></h2>
 <img alt="../../../_images/more_dim_info.png" class="align-left" src="../../../_images/more_dim_info.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
 <p>The scan dimension explanation section gives detailed information about the
 ordering of scan scan dimensions. The <em>slowest</em> scan dimension is dimension no.
-1 and the fastest is the last scan dimension. This ordering corresponds to how
+0 and the fastest is the last scan dimension. This ordering corresponds to how
 the scan must be performed algorithmically. The button opens a window with an
 in-depth explanation, including images.</p>
 </section>
@@ -705,6 +736,7 @@ counter / motor position for scan step #0).</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-buttons">Control buttons</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-scan-settings">Import scan settings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-scan-settings-from-beamline-metadata-files">Import scan settings from beamline metadata files</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reset-parameters">Reset Parameters</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export-scan-settings">Export scan settings</a></li>
 </ul>

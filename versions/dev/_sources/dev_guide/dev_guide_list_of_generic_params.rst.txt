@@ -706,7 +706,7 @@ Other
        | **name** : Total number of images
        | **choices** : None
        | **unit** : 
-       | **tooltip** : The toal number of images in the composite images.
+       | **tooltip** : The total number of images in the composite images.
    * - :py:data:`n_files`
      - | **type** : int
        | **default** : 0
@@ -850,7 +850,7 @@ Other
        | **choices** : [True, False]
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : Save the results automatically after finishing processing. The results for each plugin will be saved in a separete file (or files if multiple formats have been selected).
+       | **tooltip** : Save the results automatically after finishing processing. The results for each plugin will be saved in a separate file (or files if multiple formats have been selected).
    * - :py:data:`autosave_directory`
      - | **type** : Path
        | **default** : 
@@ -866,7 +866,7 @@ Other
        | **choices** : [None, 'HDF5']
        | **unit** : 
        | **allow_None** : True
-       | **tooltip** : The file format(s) for the data to be saved after the workflow has been excuted. All data will be saved in a single folder for each run with one file for each plugin.
+       | **tooltip** : The file format(s) for the data to be saved after the workflow has been executed. All data will be saved in a single folder for each run with one file for each plugin.
    * - :py:data:`output_fname`
      - | **type** : Path
        | **default** : 
@@ -934,7 +934,7 @@ Other
    * - :py:data:`active_node`
      - | **type** : int
        | **default** : 0
-       | **name** : The ative node
+       | **name** : The active node
        | **choices** : None
        | **unit** : 
        | **allow_None** : False

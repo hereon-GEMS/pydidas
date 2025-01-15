@@ -44,6 +44,7 @@ __all__ = [
     "POLICY_FIX_EXP",
     "POLICY_EXP_EXP",
     "POLICY_EXP_FIX",
+    "POLICY_FIX_FIX",
     "POLICY_MIN_MIN",
 ]
 

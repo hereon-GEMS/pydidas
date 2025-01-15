@@ -100,4 +100,6 @@ POLICY_EXP_EXP = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expandi
 
 POLICY_EXP_FIX = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
+POLICY_FIX_FIX = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
 POLICY_MIN_MIN = (QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)

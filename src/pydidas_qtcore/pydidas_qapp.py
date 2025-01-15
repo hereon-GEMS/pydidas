@@ -146,6 +146,10 @@ class PydidasQApplication(QApplication):
         - sig_gui_exception_occurred:
             Signal that an exception has occurred in the GUI. This signal can be
             used to inform other widgets about the exception.
+        - sig_user_signal: (str, str)
+            A signal which can be used by the user to emit custom signals. The
+            signal takes two strings as arguments which can be used at the
+            receiver side to identify the signal and its content.
     """
 
     sig_exit_pydidas = QtCore.Signal()
@@ -160,6 +164,7 @@ class PydidasQApplication(QApplication):
     sig_status_message = QtCore.Signal(str)
     sig_updated_user_config = QtCore.Signal(str, str)
     sig_gui_exception_occurred = QtCore.Signal()
+    sig_user_signal = QtCore.Signal(str, str)
     _instance = None
 
     @staticmethod

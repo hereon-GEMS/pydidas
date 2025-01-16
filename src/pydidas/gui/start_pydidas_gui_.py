@@ -30,6 +30,7 @@ __all__ = ["start_pydidas_gui"]
 import multiprocessing as mp
 import signal
 import warnings
+from typing import Optional, Type
 
 from qtpy.QtWidgets import QApplication
 
@@ -44,6 +45,7 @@ def start_pydidas_gui(
     *frames: tuple[BaseFrame],
     use_default_frames: bool = True,
     restore_state: str = "exit",
+    custom_mainwindow: Optional[Type[MainWindow]] = None,
 ):
     """
     Open the pydidas GUI with the given frames and run the QEventLoop.
@@ -58,9 +60,12 @@ def start_pydidas_gui(
         Flag to restore the state of the pydidas GUI. Flags can be either "None" to
         start fresh, "exit" to restore the exit state or "saved" to restore the last
         saved state.
+    custom_mainwindow : MainWindow, optional
+        Custom MainWindow class to be used. If not provided, the default MainWindow
+        class will be used.
     """
-    # need to import here to prevent crash on Debian
-
+    main_window_cls = MainWindow if custom_mainwindow is None else custom_mainwindow
+    restore_state = "None" if restore_state is None else restore_state
     _prepare_interpreter()
     if use_default_frames:
         frames = DEFAULT_FRAMES + frames
@@ -71,7 +76,7 @@ def start_pydidas_gui(
         _app = _get_pydidas_qapplication()
         _app.sig_gui_exception_occurred.connect(_splash.close)
         _splash.show_aligned_message("Creating objects")
-        _gui = MainWindow()
+        _gui = main_window_cls()
         for frame in frames:
             _gui.register_frame(frame)
         _splash.show_aligned_message("Creating widgets")

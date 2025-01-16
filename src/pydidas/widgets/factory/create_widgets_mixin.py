@@ -187,7 +187,6 @@ class CreateWidgetsMixIn:
         kwargs["range"] = kwargs.get("range", (0, 1))
         self.create_any_widget(ref, QtWidgets.QSpinBox, **kwargs)
 
-
     def create_double_spin_box(self, ref: Union[str, None], **kwargs: Dict):
         """
         Create a QDoubleSpinBox for floating point values and store the widget.

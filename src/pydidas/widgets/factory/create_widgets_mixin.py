@@ -171,7 +171,7 @@ class CreateWidgetsMixIn:
 
     def create_spin_box(self, ref: Union[str, None], **kwargs: Dict):
         """
-        Create a QSpinBox and store the widget.
+        Create a QSpinBox for integer values and store the widget.
 
         Parameters
         ----------
@@ -186,6 +186,25 @@ class CreateWidgetsMixIn:
         """
         kwargs["range"] = kwargs.get("range", (0, 1))
         self.create_any_widget(ref, QtWidgets.QSpinBox, **kwargs)
+
+
+    def create_double_spin_box(self, ref: Union[str, None], **kwargs: Dict):
+        """
+        Create a QDoubleSpinBox for floating point values and store the widget.
+
+        Parameters
+        ----------
+        ref : Union[str, None]
+            The reference string for storing the widget.
+        **kwargs : dict
+            Any attributes supported by QSpinBox with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the SpinBox's position in its parent's layout. The
+            default range is set to (0, 1), if it is not overridden with the
+            'range' keyword.
+        """
+        kwargs["range"] = kwargs.get("range", (0, 1))
+        self.create_any_widget(ref, QtWidgets.QDoubleSpinBox, **kwargs)
 
     def create_progress_bar(self, ref: Union[str, None], **kwargs: Dict):
         """

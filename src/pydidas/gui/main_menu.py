@@ -87,6 +87,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
     EXIT_STATE_FILENAME = f"pydidas_gui_exit_state_{VERSION}.yaml"
+    MAIN_MENU_MENU_ACTIONS = MAIN_MENU_MENU_ACTIONS
 
     sig_close_main_window = QtCore.Signal()
 
@@ -191,7 +192,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
         Actions are stored in the internal self._actions dictionary.
         """
-        for _ref, _action_config in MAIN_MENU_MENU_ACTIONS.items():
+        for _ref, _action_config in self.MAIN_MENU_MENU_ACTIONS.items():
             _icon_name = _action_config.get("icon", None)
             if _icon_name is not None:
                 _icon = get_pyqt_icon_from_str(_icon_name)
@@ -297,6 +298,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._menus["state"] = _state_menu
         self._menus["utilities"] = _utilities_menu
         self._menus["options"] = _options_menu
+        self._menus["window"] = _window_menu
         self._menus["help"] = _help_menu
 
     @QtCore.Slot()

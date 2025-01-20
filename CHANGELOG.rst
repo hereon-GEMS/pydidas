@@ -40,6 +40,8 @@ Improvements
 	- Restructured the layout of the __init__ files for more clarity.
 	- Added a second category of importers named 'beamline file formats'
 	 to Scan and added a second registry in the ScanIo.
+	- Changed the creation of generic toolbar menus to use a dictionary which 
+	  can easily be extended by 3rd parties.
 - Improved the formatting when displaying Plugin information.
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.

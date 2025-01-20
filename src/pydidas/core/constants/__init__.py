@@ -35,6 +35,7 @@ from .file_extensions import *
 from .gui_constants import *
 from .links import *
 from .main_menu_actions import *
+from .main_window_menu_entries import *
 from .numpy_names import *
 from .paths import *
 from .pyfai_names import *
@@ -50,6 +51,7 @@ __all__ = ["image_ops"] + (
     + gui_constants.__all__
     + links.__all__
     + main_menu_actions.__all__
+    + main_window_menu_entries.__all__
     + numpy_names.__all__
     + paths.__all__
     + pyfai_names.__all__
@@ -66,6 +68,7 @@ del (
     gui_constants,
     links,
     main_menu_actions,
+    main_window_menu_entries,
     numpy_names,
     paths,
     pyfai_names,

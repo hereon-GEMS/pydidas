@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,6 +33,7 @@ import unittest
 import numpy as np
 from qtpy import QtCore
 
+from pydidas.core import UserConfigError
 from pydidas.core.utils import rebin2d
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
@@ -87,27 +88,16 @@ class TestMaskImage(unittest.TestCase):
         self.assertEqual(kwargs, _kwargs)
         self.assertTrue(np.all(_masked[self._mask == 1] == _maskval))
 
-    def test_execute__with_legacy_ops(self):
+    def test_execute__with_cropped_data(self):
         _maskval = 0.42
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
         plugin.set_param_value("detector_mask_file", _maskfilename)
         plugin.set_param_value("detector_mask_val", _maskval)
-        plugin._legacy_image_ops = [
-            ["roi", (1, self._shape[0], 3, self._shape[1])],
-            ["binning", 2],
-        ]
-        plugin._original_input_shape = self._shape
         _data = rebin2d(self._data[1:, 3:], 2)
-        _mask = np.where(rebin2d(self._mask[1:, 3:], 2) > 0, 1, 0)
         plugin.pre_execute()
-        kwargs = {"key": 1, "another_key": "another_val"}
-        _masked, _kwargs = plugin.execute(_data, **kwargs)
-        self.assertEqual(kwargs, _kwargs)
-        self.assertEqual(
-            _masked.shape, ((self._shape[0] - 1) // 2, (self._shape[1] - 3) // 2)
-        )
-        self.assertTrue(np.all(_masked[_mask == 1] == _maskval))
+        with self.assertRaises(UserConfigError):
+            plugin.execute(_data)
 
 
 if __name__ == "__main__":

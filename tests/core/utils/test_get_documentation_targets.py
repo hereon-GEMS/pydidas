@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -49,7 +49,7 @@ class TestGetDocQUrl(unittest.TestCase):
 
     def test_DOC_HOME_FILENAME(self):
         _fname = Path(DOC_HOME_FILENAME)
-        self.assertEqual(_fname.parents[3].name, "pydidas")
+        self.assertEqual(_fname.parents[2].name, "pydidas")
 
     def test_DOC_HOME_ADDRESS(self):
         _address = DOC_HOME_ADDRESS

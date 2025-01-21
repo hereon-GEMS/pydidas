@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,13 +18,14 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
 import multiprocessing as mp
+import queue
 import threading
 import time
 import unittest
@@ -33,40 +34,30 @@ from qtpy import QtWidgets
 
 from pydidas.multiprocessing import app_processor
 from pydidas.unittest_objects.mp_test_app import MpTestApp
+from pydidas.unittest_objects.mp_test_app_wo_tasks import MpTestAppWoTasks
 
 
 class _ProcThread(threading.Thread):
     """Simple Thread to test blocking input / output."""
 
     def __init__(
-        self,
-        input_queue,
-        output_queue,
-        stop_queue,
-        aborted_queue,
-        app,
-        app_params,
-        app_config,
+        self, mp_config: dict, app, app_params, app_config, use_tasks: bool = True
     ):
         super().__init__()
-        self.input_queue = input_queue
-        self.output_queue = output_queue
-        self.stop_queue = stop_queue
-        self.aborted_queue = aborted_queue
+        self._mp_config = mp_config
         self.app = app
         self.app_params = app_params
         self.app_config = app_config
+        self._use_tasks = use_tasks
 
     def run(self):
         app_processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app,
             self.app_params,
             self.app_config,
             wait_for_output_queue=False,
+            use_tasks=self._use_tasks,
         )
 
 
@@ -82,88 +73,140 @@ class Test_app_processor(unittest.TestCase):
         cls._qtapp.quit()
 
     def setUp(self):
-        self.input_queue = mp.Queue()
-        self.output_queue = mp.Queue()
-        self.stop_queue = mp.Queue()
-        self.aborted_queue = mp.Queue()
-        self.app = MpTestApp()
-        self.n_test = self.app._config["max_index"]
-        self.app.multiprocessing_pre_run()
+        self._lock_manager = mp.Manager()
+        self._mp_config = {
+            "queue_input": mp.Queue(),
+            "queue_output": mp.Queue(),
+            "queue_stop": mp.Queue(),
+            "queue_finished": mp.Queue(),
+            "queue_signal": mp.Queue(),
+            "logging_level": 10,
+            "lock": self._lock_manager.Lock(),
+        }
 
     def tearDown(self):
-        self.input_queue.close()
-        self.output_queue.close()
-        self.stop_queue.close()
-        self.aborted_queue.close()
+        self._mp_config["queue_input"].close()
+        self._mp_config["queue_output"].close()
+        self._mp_config["queue_stop"].close()
+        self._mp_config["queue_finished"].close()
+        self._mp_config["queue_signal"].close()
+        self._lock_manager.shutdown()
 
     def put_ints_in_queue(self, finalize=True):
-        for i in range(self.n_test):
-            self.input_queue.put(i)
+        for i in range(self.app._config["max_index"]):
+            self._mp_config["queue_input"].put(i)
         if finalize:
-            self.input_queue.put(None)
+            self._mp_config["queue_input"].put(None)
 
-    def get_results(self):
+    def get_task_results(self):
         _tasks = []
         _results = []
-        for i in range(self.n_test):
-            item = self.output_queue.get()
+        for i in range(self.app._config["max_index"]):
+            item = self._mp_config["queue_output"].get()
             _tasks.append(item[0])
             _results.append(item[1])
         return _tasks, _results
 
-    def test_run_plain(self):
+    def get_taskless_results(self):
+        _results = []
+        _tasks = []
+        while True:
+            try:
+                _index, _item = self._mp_config["queue_output"].get_nowait()
+                _results.append(_item)
+                _tasks.append(_index)
+            except queue.Empty:
+                break
+        return _tasks, _results
+
+    def test_run__w_tasks(self):
+        self.app = MpTestApp()
+        self.app.multiprocessing_pre_run()
         self.put_ints_in_queue()
         app_processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
             self.app._config,
             wait_for_output_queue=False,
         )
         time.sleep(0.1)
-        _tasks, _results = self.get_results()
+        _tasks, _results = self.get_task_results()
         self.assertEqual(_tasks, list(self.app.multiprocessing_get_tasks()))
-        _stopper = self.output_queue.get()
+        _stopper = self._mp_config["queue_output"].get()
         self.assertEqual(_stopper, [None, None])
 
-    def test_run_with_empty_queue(self):
+    def test_run__w_tasks_and_empty_queue(self):
+        self.app = MpTestApp()
+        self.app.multiprocessing_pre_run()
         _thread = _ProcThread(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
             self.app._config,
+            use_tasks=True,
         )
         _thread.start()
         time.sleep(0.05)
-        self.input_queue.put(None)
+        self._mp_config["queue_input"].put(None)
         time.sleep(0.05)
-        _stopper = self.output_queue.get_nowait()
+        _stopper = self._mp_config["queue_output"].get_nowait()
         self.assertEqual(_stopper, [None, None])
 
-    def test_stop_signal(self):
+    def test_run__stop_signal(self):
+        self.app = MpTestApp()
+        self.app.multiprocessing_pre_run()
         self.put_ints_in_queue(finalize=False)
         _thread = _ProcThread(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
+            self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
             self.app._config,
+            use_tasks=True,
         )
         _thread.start()
-        _tasks, _results = self.get_results()
+        _tasks, _results = self.get_task_results()
         time.sleep(0.1)
         self.assertTrue(_thread.is_alive())
-        self.stop_queue.put(1)
+        self._mp_config["queue_stop"].put(1)
         time.sleep(0.1)
-        self.assertEqual(self.aborted_queue.get(), 1)
+        self.assertEqual(self._mp_config["queue_finished"].get(), 1)
+
+    def test_run__wo_tasks(self):
+        self.app = MpTestAppWoTasks()
+        self.app.multiprocessing_pre_run()
+        _thread = _ProcThread(
+            self._mp_config,
+            self.app.__class__,
+            self.app.params.copy(),
+            self.app._config,
+            use_tasks=False,
+        )
+        _thread.start()
+        time.sleep(0.1)
+        self._mp_config["queue_stop"].put(1)
+        time.sleep(0.05)
+        _tasks, _results = self.get_taskless_results()
+        time.sleep(0.01)
+        self.assertTrue(len(_tasks) > 0)
+        self.assertEqual(self._mp_config["queue_finished"].get_nowait(), 1)
+
+    def test_run__stop_signal_wo_tasks(self):
+        self.app = MpTestAppWoTasks()
+        self.app.multiprocessing_pre_run()
+        _thread = _ProcThread(
+            self._mp_config,
+            self.app.__class__,
+            self.app.params.copy(),
+            self.app._config,
+            use_tasks=False,
+        )
+        _thread.start()
+        time.sleep(0.05)
+        self._mp_config["queue_stop"].put(1)
+        time.sleep(0.05)
+        self.assertEqual(self._mp_config["queue_finished"].get(), 1)
+        _thread.join()
 
 
 if __name__ == "__main__":

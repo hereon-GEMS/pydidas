@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -206,9 +206,9 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _spy_result = _spy.count() if IS_QT6 else len(_spy)
         self.assertEqual(_spy_result, 1)
 
-    def test_multiprocessing_store_results__as_slave(self):
+    def test_multiprocessing_store_results__as_clone(self):
         app = self.get_default_app()
-        app.slave_mode = True
+        app.clone_mode = True
         _spy = QtTest.QSignalSpy(app.updated_composite)
         app.multiprocessing_store_results(0, 0)
         time.sleep(0.02)
@@ -549,9 +549,9 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertEqual(app._composite.get_param_value("threshold_low"), _thresh_low)
         self.assertEqual(app._composite.get_param_value("threshold_high"), _thresh_high)
 
-    def test_prepare_run__slave_mode(self):
+    def test_prepare_run__clone_mode(self):
         app = self.get_default_app()
-        app.slave_mode = True
+        app.clone_mode = True
         app.prepare_run()
         self.assertIsNone(app._composite)
 

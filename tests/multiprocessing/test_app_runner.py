@@ -127,7 +127,7 @@ class TestAppRunner(unittest.TestCase):
         _app = self._runner.get_app()
         self.assertIsInstance(_app, BaseApp)
 
-    def testcycle_pre_run(self):
+    def test_cycle_pre_run(self):
         self._runner = AppRunner(self.app)
         self._runner.cycle_pre_run()
         if IS_QT6:
@@ -138,8 +138,9 @@ class TestAppRunner(unittest.TestCase):
         else:
             self.assertEqual(self._runner.receivers(self._runner.sig_results), 2)
             self.assertEqual(self._runner.receivers(self._runner.sig_progress), 1)
+        self._runner.join_workers()
 
-    def testcycle_post_run(self):
+    def test_cycle_post_run(self):
         self._runner = AppRunner(self.app)
         _spy = QtTest.QSignalSpy(self._runner.sig_final_app_state)
         self._runner._workers = []

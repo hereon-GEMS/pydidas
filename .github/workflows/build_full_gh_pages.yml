@@ -30,22 +30,14 @@ jobs:
       run: |
         echo "Fetched ref: ${{ github.ref }}"
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
-    - name: Set environment variable "commit-message"
-      run: |
-        echo "commit-message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
-        echo "commit-message=${{ env.commit-message }}"
-    - name: Set environment variable "commit-author"
-      run: |
-        echo "commit-author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
-        echo "commit-author=${{ env.commit-author }}"
+        python-version: "3.12"
     - name: Configure local git
       run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git config pull.ff true
+        echo "COMMIT_EMAIL=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_ENV
+        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email "${{env.COMMIT_EMAIL}}"
     - name: Install dependencies
       run: |
         python -m pip cache purge
@@ -92,7 +84,7 @@ jobs:
     - name: Sphinx build
       run: |
         export QT_QPA_PLATFORM=offscreen
-        sphinx-build pydidas/docs/src versions/${{ steps.extract_version.outputs.THIS_VERSION }}
+        sphinx-build src/pydidas/docs/src versions/${{ steps.extract_version.outputs.THIS_VERSION }}
     - name: Create temporary branch for gh-pages-output
       run: |
         git checkout -b __temp-gh-pages
@@ -134,15 +126,12 @@ jobs:
 
   deploy_docs:
     needs: create_docs
-
     permissions:
       pages: write
       id-token: write
-
     environment:
       name: github-pages
       url: _site
-
     runs-on: ubuntu-latest
     steps:
     - name: Deploy to Github Pages

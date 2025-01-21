@@ -33,7 +33,7 @@ import h5py
 import numpy as np
 
 from pydidas.contexts import ScanContext
-from pydidas.core import Dataset, Parameter, UserConfigError
+from pydidas.core import Dataset, FileReadError, Parameter, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
@@ -106,19 +106,13 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
 
     def test_pre_execute__no_input(self):
         plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
-        with self.assertRaises(UserConfigError):
+        with self.assertRaises(FileReadError):
             plugin.pre_execute()
-
-    def test_pre_execute__simple(self):
-        plugin = self.create_standard_plugin()
-        plugin.pre_execute()
-        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
 
     def test_pre_execute__no_images_per_file_set(self):
         plugin = self.create_standard_plugin()
         plugin.set_param_value("images_per_file", -1)
         plugin.pre_execute()
-        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
         self.assertEqual(
             plugin.get_param_value("_counted_images_per_file"), self._n_per_file
         )

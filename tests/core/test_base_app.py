@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,12 +18,13 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import multiprocessing as mp
 import os
 import shutil
 import tempfile
@@ -51,12 +52,8 @@ class TestApp(BaseApp):
             "item1": 1,
             "item2": slice(0, 5),
             "item3": "dummy",
-            "shared_memory": {"test": None},
             "carryon_counter": -1,
         }
-
-    def initialize_shared_memory(self):
-        self._config["shared_memory"] = {"test": True}
 
     def multiprocessing_get_tasks(self):
         return [1, 2, 3]
@@ -138,20 +135,34 @@ class TestBaseApp(unittest.TestCase):
         self.assertEqual(app.get_config(), {"run_prepared": False})
 
     def test_copy(self):
+        _mgr = mp.Manager()
         app = BaseApp()
+        _items = {
+            "dummy": 42,
+            "test_func": lambda x: x,
+            "some_kwargs": {"a": 1, "b": 2},
+        }
+        app.mp_manager = {"lock": _mgr.Lock(), "shared_dict": _mgr.dict()}
+        for _key, _val in _items.items():
+            setattr(app, _key, _val)
         _copy = app.copy()
         self.assertNotEqual(app, _copy)
         self.assertIsInstance(_copy, BaseApp)
+        for _key in _items.keys():
+            self.assertTrue(hasattr(_copy, _key))
+        self.assertEqual(app.mp_manager["lock"], _copy.mp_manager["lock"])
+        self.assertEqual(app.mp_manager["shared_dict"], _copy.mp_manager["shared_dict"])
 
-    def test_copy__as_slave(self):
+    def test_copy__as_clone(self):
         app = BaseApp()
-        app.attributes_not_to_copy_to_slave_app = ["slave_att"]
-        app.slave_att = 12
-        app.non_slave_att = 42
-        _copy = app.copy(slave_mode=True)
+        app.attributes_not_to_copy_to_app_clone = ["clone_att"]
+        app.clone_att = 12
+        app.non_clone_att = 42
+        _copy = app.copy(clone_mode=True)
         self.assertNotEqual(app, _copy)
-        self.assertTrue(hasattr(_copy, "non_slave_att"))
-        self.assertFalse(hasattr(_copy, "slave_att"))
+        self.assertTrue(hasattr(_copy, "non_clone_att"))
+        self.assertFalse(hasattr(_copy, "clone_att"))
+        self.assertTrue(_copy.clone_mode)
 
     def test_export_state(self):
         _label = "the new label value"
@@ -165,7 +176,6 @@ class TestBaseApp(unittest.TestCase):
         _state = app.export_state()
         self.assertEqual(_state["params"]["label"], _label)
         self.assertEqual(_state["params"]["active_node"], _node)
-        self.assertEqual(_state["config"]["shared_memory"], "::restore::True")
         self.assertEqual(_state["config"]["new_key"], True)
         self.assertEqual(_state["config"]["item1"], _item1)
         self.assertIsInstance(_state["config"]["item2"], str)
@@ -179,7 +189,6 @@ class TestBaseApp(unittest.TestCase):
                 "item1": 55,
                 "item2": "::slice::1::7::2",
                 "item3": "new_dummy",
-                "shared_memory": "::restore::True",
             },
         }
         app = TestApp()
@@ -189,7 +198,6 @@ class TestBaseApp(unittest.TestCase):
         for _key in ["item1", "item3"]:
             self.assertEqual(app._config[_key], _state["config"][_key])
         self.assertEqual(app._config["item2"], slice(1, 7, 2))
-        self.assertEqual(app._config["shared_memory"], {"test": True})
 
     def test_run(self):
         app = TestApp()

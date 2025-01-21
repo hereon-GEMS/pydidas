@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,6 +40,10 @@ class TestFitFuncBase(unittest.TestCase):
     def setUpClass(cls):
         cls._x = np.arange(20)
         cls._y = np.random.random((cls._x.size))
+
+    def tearDown(self):
+        if "Test class" in FitFuncMeta.registry:
+            del FitFuncMeta.registry["Test class"]
 
     def test_class_params_okay(self):
         for _attribute in [
@@ -136,7 +140,7 @@ class TestFitFuncBase(unittest.TestCase):
         _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
         self.assertTrue(np.all(np.array([]) == _range))
 
-    def test_backgroup_at_peak__single_peak_no_bg(self):
+    def test_background_at_peak__single_peak_no_bg(self):
         class FitTestClass(FitFuncBase):
             name = "Test class"
             num_peaks = 1
@@ -145,10 +149,9 @@ class TestFitFuncBase(unittest.TestCase):
 
         c = (1, 1, 1)
         _bg = FitTestClass.background_at_peak(c)
-        del FitFuncMeta.registry["Test class"]
         self.assertEqual(_bg, 0)
 
-    def test_backgroup_at_peak__single_peak_0th_order_bg(self):
+    def test_background_at_peak__single_peak_0th_order_bg(self):
         _bg0 = 12
 
         class FitTestClass(FitFuncBase):
@@ -159,10 +162,9 @@ class TestFitFuncBase(unittest.TestCase):
 
         c = (1, 1, 1, _bg0)
         _bg = FitTestClass.background_at_peak(c)
-        del FitFuncMeta.registry["Test class"]
         self.assertEqual(_bg, _bg0)
 
-    def test_backgroup_at_peak__single_peak_1st_order_bg(self):
+    def test_background_at_peak__single_peak_1st_order_bg(self):
         _bg0 = 12
         _bg1 = 25
 
@@ -174,10 +176,9 @@ class TestFitFuncBase(unittest.TestCase):
 
         c = (1, 1, 1, _bg0, _bg1)
         _bg = FitTestClass.background_at_peak(c)
-        del FitFuncMeta.registry["Test class"]
         self.assertEqual(_bg, _bg0 + _bg1)
 
-    def test_backgroup_at_peak__double_peak_no_bg(self):
+    def test_background_at_peak__double_peak_no_bg(self):
         _x0 = 3
         _x1 = 7
 
@@ -189,10 +190,9 @@ class TestFitFuncBase(unittest.TestCase):
 
         c = (1, 1, _x0, 1, 1, _x1)
         _bg = FitTestClass.background_at_peak(c)
-        del FitFuncMeta.registry["Test class"]
         self.assertTrue(np.all(_bg == 0 * np.asarray((_x0, _x1))))
 
-    def test_backgroup_at_peak__double_peak_0th_order_bg(self):
+    def test_background_at_peak__double_peak_0th_order_bg(self):
         _bg0 = 12
         _x0 = 3
         _x1 = 7
@@ -205,10 +205,9 @@ class TestFitFuncBase(unittest.TestCase):
 
         c = (1, 1, _x0, 1, 1, _x1, _bg0)
         _bg = FitTestClass.background_at_peak(c)
-        del FitFuncMeta.registry["Test class"]
         self.assertTrue(np.all(_bg == _bg0 + 0 * np.asarray((_x0, _x1))))
 
-    def test_backgroup_at_peak__double_peak_1st_order_bg(self):
+    def test_background_at_peak__double_peak_1st_order_bg(self):
         _bg0 = 12
         _bg1 = 25
         _x0 = 3
@@ -222,10 +221,9 @@ class TestFitFuncBase(unittest.TestCase):
 
         c = (1, 1, _x0, 1, 1, _x1, _bg0, _bg1)
         _bg = FitTestClass.background_at_peak(c)
-        del FitFuncMeta.registry["Test class"]
         self.assertTrue(np.all(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
 
-    def test_backgroup_at_peak__double_peak_1st_order_bg_more_params(self):
+    def test_background_at_peak__double_peak_1st_order_bg_more_params(self):
         _bg0 = 12
         _bg1 = 25
         _x0 = 3
@@ -239,7 +237,6 @@ class TestFitFuncBase(unittest.TestCase):
 
         c = (1, 1, _x0, 1, 1, 1, _x1, 1, _bg0, _bg1)
         _bg = FitTestClass.background_at_peak(c)
-        del FitFuncMeta.registry["Test class"]
         self.assertTrue(np.all(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
 
 

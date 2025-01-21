@@ -1,4 +1,4 @@
-.. Copyright 2021 - 2024, Helmholtz-Zentrum Hereon
+.. Copyright 2021 - 2025, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
 
@@ -7,21 +7,68 @@ v24.mm.dd
 
 Improvements
 ------------
+- Changed the structure of the repository. The source code for all subpackages is
+  now located in the src/ folder
 - Replaced the default azimuthal integration range to (-180, 180) or (0, 360)
   respectively instead of None to have more consistent ranges (pyFAI issue #2291)
 - Updated Sum1dData plugin to use np.sum directly for improved performance.
 - Extended Sum2dData plugin to work on an arbitrary number of dimensions.
+- Added a calling option to add a `-screen <i>` command line option to force the 
+  GUI on the selected screen.
+- ExecuteWorkflowApp now works with dynamic plugin shapes, i.e. the plugin result
+  shapes can be dynamically modified during runtime.
+- Updated the classmethods of FitFuncBase to include attributes which correspond 
+  to the fit result output labels.
+- Added a test mode flag to the WorkflowTree to prevent the creation of directories
+  in output plugins when testing workflows.
 - Programmatic improvements:
     - Removed the basic_plugin class attribute from Plugins and shifted the check
       to the core code of the base plugins.
+    - Changed the internal handling of multiprocessing arguments (e.g. Queue objects)
+      for more streamlined code.
+    - Added a multiprocessing Lock to worker process logging for consistent 
+      output formatting.
+    - Added a new signal to the BaseApp and app multiprocessing to prepare
+      ExecuteWorkflowApp update.
+    - Updated WorkflowResults contexts to accept dynamic result shapes.
+    - Removed redundant code from plugins (because of changes in shape handling).
+    - Switched to using ruff instead of black, flake8 and isort in github actions.
+	- Moved the pydidas, pydidas_qtcore and pydidas_plugins folders to src.
+	- Renamed `slaves` to `clones`
+	- Changed the builder of the DefineScanFrame to use functions instead of an 
+	  abstract class.
+	- Restructured the layout of the __init__ files for more clarity.
+	- Added a second category of importers named 'beamline file formats'
+	 to Scan and added a second registry in the ScanIo.
+- Improved the formatting when displaying Plugin information.
+- Improved the behaviour of the logging and status widget and added options to
+  hide and show it.
+- Added support for pytest tests in the CI pipeline. 
+- Added import functionality for Sardana FIO files to the Scan import.
+
 
 Bugfixes
 --------
 - Fixed an issue when trying to read hdf5 metadata from non-hdf5 files.
 - Fixed in issue in Parameter where sub-type checking in tuple/set/list Parameters
   was not enforced.
-- Fixed an issue when changing the shape of pyFAI integration results in plugins
-  between workflow runs.
+- Fixed an issue with PydidasPlot2D when cs_transform was disabled.
+- Fixed an issue with pickling unittest plugins loaded through the PluginRegistry.
+- Fixed an issue in the WorkflowNode which allowed accessing outdated results.
+- Fixed an issue when preparing to run an empty Workflow.
+- Fixed an issue when restoring the GUI to a different screen in multiscreen systems.
+- Fixed an issue with inspecting detailed results for fit plugins when the first 
+  fit point had an invalid result (e.g. peak intensity too low).
+- Fixed an issue when copying a ProcessingTree which had no nodes.
+- Fixed an issue when entering `None` for path parameters.
+- Fixed an issue with formatting of regex strings in the qr_presets
+- Fixed an issue where the SplashScreen would still show when an exception was 
+  raised during GUI initialization.
+- Fixed an issue when the font family is not supportted by matplotlib where the
+  user notification would not be correctly formatted.
+- Fixed the pyFAIcalibFrame to be compatible with pyFAI 2024.09
+- Fixed an issue with the WorkerController when the thread shutdown was toggled
+  while waiting in a sleep state.
 
 
 v24.09.19

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -99,7 +99,7 @@ def import_results(saver, fname):
     return _data[_id], _node_info[_id], SCAN, EXP, TREE
 
 
-def update_frame_metadata(saver, metadata, scan):
+def update_metadata(saver, metadata, scan):
     saver._metadata = metadata
 
 
@@ -218,12 +218,12 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
             np.equal(_Saver._exported["frame_results"][2], _frame_results[2]).all()
         )
 
-    def test_push_frame_metadata_to_active_savers(self):
+    def test_push_metadata_to_active_savers(self):
         _metadata = self.generate_test_metadata()
         _Saver = self.create_saver_class("SAVER", "Test")
-        _Saver.update_frame_metadata = classmethod(update_frame_metadata)
+        _Saver.update_metadata = classmethod(update_metadata)
         META.set_active_savers_and_title(["TEST"])
-        META.push_frame_metadata_to_active_savers(_metadata)
+        META.push_metadata_to_active_savers(_metadata)
         self.assertEqual(_Saver._metadata, _metadata)
 
     def test_export_full_data_to_active_savers(self):

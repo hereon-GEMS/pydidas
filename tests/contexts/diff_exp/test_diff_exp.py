@@ -286,6 +286,11 @@ class TestDiffractionExperiment(unittest.TestCase):
         self.assertAlmostEqual(_cx, _cx_calc, 8)
         self.assertAlmostEqual(_cy, _cy_calc, 8)
 
+    def test_hash(self):
+        obj = prepare_exp_with_Eiger()
+        _copy = obj.copy()
+        self.assertEqual(hash(obj), hash(_copy))
+
 
 if __name__ == "__main__":
     unittest.main()

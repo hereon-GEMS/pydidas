@@ -7,14 +7,14 @@
 # to verify that all files are corretly formatted.
 
 
-name: formatting checks
+name: Check formatting, linting, and copyrights
 
 on:
   pull_request:
     branches: [ "master" ]
 
 jobs:
-  check_black:
+  check_ruff_formatting:
     runs-on: ubuntu-latest   
     steps:
     - name: Check out source repository
@@ -26,12 +26,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install black
-    - name: Code formatting with black
+        python -m pip install ruff
+    - name: Code formatting with ruff
       run: |
-        python -m black . --check
+        python -m ruff format . --check
   
-  check_flake8:
+  check_ruff_linting:
     runs-on: ubuntu-latest
     steps:
     - name: Check out source repository
@@ -43,24 +43,16 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8
-    - name: Lint with flake8
+        python -m pip install ruff
+    - name: Lint with ruff
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        python -m flake8 --config .flake8 --exit-zero
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-
+        python -m ruff check .
+        
   check_reuse:
     runs-on: ubuntu-latest
     steps:
     - name: Reuse check
       uses: fsfe/reuse-action@v2
-
-  check_isort:
-    runs-on: ubuntu-latest
-    steps:
-    - name: isort checks
-      uses: isort/isort-action@master
 
   check_copyrights:
     runs-on: ubuntu-latest

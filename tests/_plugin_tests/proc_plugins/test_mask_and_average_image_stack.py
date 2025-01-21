@@ -131,8 +131,6 @@ class TestMaskAndAverageImageStack(unittest.TestCase):
         _thresh_high = 80
         plugin.set_param_value("mask_threshold_high", _thresh_high)
         plugin.set_param_value("mask_grow", 9)
-        #        plugin.input_shape = self._data.shape
-        #        plugin.calculate_result_shape()
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         _ref = np.full(_data.shape, np.sum(self._data, axis=0) / self._data.shape[0])

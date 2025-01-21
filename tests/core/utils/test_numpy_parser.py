@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -133,9 +133,11 @@ class Test_numpy_utils(unittest.TestCase):
 
     def test_parse_string_to_ndarray__illegal_entries(self):
         for _input in [
-            "1 'e' 3 5" "npp.array(('a', 1, 12, None))",
+            "1 'e' 3 5",
+            "npp.array(('a', 1, 12, None))",
             "np.arrrange(5)",
-            "npp.arange(1, 4, 5)" "np.arange()",
+            "npp.arange(1, 4, 5)",
+            "np.arange()",
             "np.arange(1, 2, 3, 4)",
             "np.loadtxt('test.txt', converters='12')",
             "np.loadtxt('dummy/file.name', unpack=True)",

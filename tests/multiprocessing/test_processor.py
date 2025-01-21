@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,6 +31,7 @@ import sys
 import threading
 import time
 import unittest
+from typing import Callable
 
 import numpy as np
 from qtpy import QtWidgets
@@ -38,28 +39,26 @@ from qtpy import QtWidgets
 from pydidas.multiprocessing import processor
 
 
-def test_func(number, fixed_arg, fixed_arg2, kw_arg=0):
+def _test_func(number, fixed_arg, fixed_arg2, kw_arg=0):
     return (number - fixed_arg) / fixed_arg2 + kw_arg
 
 
 class _ProcThread(threading.Thread):
     """Simple Thread to test blocking input / output."""
 
-    def __init__(self, input_queue, output_queue, stop_queue, aborted_queue, func):
+    def __init__(self, func: Callable, mp_config: dict, *args: tuple, **kwargs: dict):
         super().__init__()
-        self.input_queue = input_queue
-        self.output_queue = output_queue
-        self.stop_queue = stop_queue
-        self.aborted_queue = aborted_queue
+        self._kwargs = kwargs
+        self._args = args
         self.func = func
+        self._mp_config = mp_config
 
     def run(self):
         processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
             self.func,
+            self._mp_config,
+            *self._args,
+            **self._kwargs,
         )
 
 
@@ -83,136 +82,97 @@ class Test_processor(unittest.TestCase):
         cls._qtapp.deleteLater()
 
     def setUp(self):
-        self.input_queue = mp.Queue()
-        self.output_queue = mp.Queue()
-        self.stop_queue = mp.Queue()
-        self.aborted_queue = mp.Queue()
+        self._queues = {
+            "queue_input": mp.Queue(),
+            "queue_output": mp.Queue(),
+            "queue_stop": mp.Queue(),
+            "queue_finished": mp.Queue(),
+        }
         self.n_test = 20
 
     def tearDown(self):
-        self.input_queue.close()
-        self.output_queue.close()
-        self.stop_queue.close()
-        self.aborted_queue.close()
+        for _queue in self._queues.values():
+            _queue.close()
 
     def put_ints_in_queue(self):
         for i in range(self.n_test):
-            self.input_queue.put(i)
-        self.input_queue.put(None)
+            self._queues["queue_input"].put(i)
+        self._queues["queue_input"].put(None)
 
     def get_results(self):
-        _return = np.array([self.output_queue.get() for i in range(self.n_test)])
+        _return = np.array(
+            [self._queues["queue_output"].get() for i in range(self.n_test)]
+        )
         _res = _return[:, 1]
         _input = _return[:, 0]
         return _input, _res
 
     def test_run__plain(self):
         self.put_ints_in_queue()
-        processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
-            lambda x: x,
-        )
+        processor(lambda x: x, self._queues)
         _input, _output = self.get_results()
         self.assertTrue((_input == _output).all())
 
     def test_run__with_empty_queue(self):
-        _thread = _ProcThread(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
-            lambda x: x,
-        )
+        _thread = _ProcThread(lambda x: x, self._queues)
         _thread.start()
         time.sleep(0.08)
-        self.input_queue.put(None)
+        self._queues["queue_input"].put(None)
         time.sleep(0.08)
-        self.assertEqual(self.output_queue.get(timeout=1), [None, None])
+        self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
     def test_run__with_stop_signal(self):
-        _thread = _ProcThread(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
-            lambda x: x,
-        )
-        self.stop_queue.put(1)
+        _thread = _ProcThread(lambda x: x, self._queues)
+        self._queues["queue_stop"].put(1)
         _thread.start()
         with self.assertRaises(queue.Empty):
-            self.output_queue.get(timeout=0.1)
-        self.assertEqual(self.aborted_queue.get(), 1)
+            self._queues["queue_output"].get(timeout=0.1)
+        self.assertEqual(self._queues["queue_finished"].get(), 1)
 
     def test_run__with_args(self):
         _args = (0, 1)
         self.put_ints_in_queue()
-        processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
-            test_func,
-            *_args,
-        )
+        processor(_test_func, self._queues, *_args)
         _input, _output = self.get_results()
-        _direct_out = test_func(_input, *_args)
+        _direct_out = _test_func(_input, *_args)
         self.assertTrue((_output == _direct_out).all())
-        self.assertEqual(self.output_queue.get(timeout=1), [None, None])
+        self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
     def test_run__exception_in_func(self):
         self.put_ints_in_queue()
         old_stdout = sys.stdout
         sys.stdout = mystdout = io.StringIO()
-        processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
-            test_func,
-        )
+        processor(_test_func, self._queues)
         sys.stdout = old_stdout
         # Assert that the processor returned directly and did not wait for any
         # queue timeouts.
         self.assertTrue(len(mystdout.getvalue()) > 0)
-        self.assertEqual(self.aborted_queue.get(), 1)
+        self.assertEqual(self._queues["queue_finished"].get(), 1)
 
     def test_run__with_kwargs(self):
         _args = (0, 1)
         _kwargs = dict(kw_arg=12)
         self.put_ints_in_queue()
         processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
-            test_func,
+            _test_func,
+            self._queues,
             *_args,
             **_kwargs,
         )
         _input, _output = self.get_results()
-        _direct_out = test_func(_input, *_args, **_kwargs)
+        _direct_out = _test_func(_input, *_args, **_kwargs)
         self.assertTrue((_output == _direct_out).all())
-        self.assertEqual(self.output_queue.get(timeout=1), [None, None])
+        self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
     def test_run__with_class_method(self):
         _args = (0, 1)
         self.put_ints_in_queue()
         app = AppWithFunc()
-        processor(
-            self.input_queue,
-            self.output_queue,
-            self.stop_queue,
-            self.aborted_queue,
-            app.test_func,
-            *_args,
-        )
+        processor(app.test_func, self._queues, *_args)
         _input, _output = self.get_results()
         _direct_out = app.test_func(_input, *_args)
         self.assertTrue((_output == _direct_out).all())
-        self.assertEqual(self.output_queue.get(timeout=1), [None, None])
+        self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
 
 if __name__ == "__main__":

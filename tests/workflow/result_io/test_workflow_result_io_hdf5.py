@@ -199,41 +199,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             self.assertEqual(_data.shape, self._shapes[1])
             self.assertIsInstance(_data, h5py.Dataset)
 
-    def test_update_node_metadata__with_None(self):
-        self.prepare_with_defaults()
-        _data = {
-            _key: Dataset(np.random.random(_shape[3:]))
-            for _key, _shape in self._shapes.items()
-        }
-        _data1 = _data[1]
-        H5SAVER.update_node_metadata(1, _data1, SCAN)
-
-    def test_update_node_metadata__with_entries(self):
-        self.prepare_with_defaults()
-        _data = {
-            _key: Dataset(np.random.random(_shape[3:]))
-            for _key, _shape in self._shapes.items()
-        }
-        _data[1], _labels, _units, _ranges = self.populate_metadata(_data[1])
-        H5SAVER.update_node_metadata(1, _data[1], SCAN)
-        _fname = os.path.join(self._resdir, self._filenames[1])
-        with h5py.File(_fname, "r") as _file:
-            for _ax in [2, 3]:
-                _axentry = _file[f"entry/data/axis_{_ax}"]
-                self.assertEqual(
-                    read_and_decode_hdf5_dataset(_axentry["label"]), _labels[_ax - 2]
-                )
-                self.assertEqual(
-                    read_and_decode_hdf5_dataset(_axentry["unit"]), _units[_ax - 2]
-                )
-                self.assertTrue(
-                    np.allclose(
-                        read_and_decode_hdf5_dataset(_axentry["range"]),
-                        _ranges[_ax - 2],
-                    )
-                )
-
-    def test_update_frame_metadata__standard(self):
+    def test_update_metadata__standard(self):
         self.prepare_with_defaults()
         _data = {
             _key: Dataset(np.random.random(_shape[3:]))
@@ -249,19 +215,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             )
             for _key, _item in _data.items()
         }
-        H5SAVER.update_frame_metadata(_metadata)
-        self.assert_written_files_are_okay(_data, _metadata)
-
-    def test_write_metadata_to_files(self):
-        self.prepare_with_defaults()
-        _data = self.get_datasets()
-        _metadata = {}
-        for _node_id in self._shapes:
-            _data[_node_id], _labels, _units, _ranges = self.populate_metadata(
-                _data[_node_id]
-            )
-            _metadata[_node_id] = dict(labels=_labels, units=_units, ranges=_ranges)
-        H5SAVER.write_metadata_to_files(_data, SCAN)
+        H5SAVER.update_metadata(_metadata)
         self.assert_written_files_are_okay(_data, _metadata)
 
     def test_export_full_data_to_file(self):

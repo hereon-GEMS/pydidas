@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -123,17 +123,18 @@ class TestSubtractBgImage(unittest.TestCase):
         self.assertTrue(np.all(_new_data >= _thresh))
         self.assertTrue(np.all(self._data - self._bg <= _new_data))
 
-    def test_execute__with_legacy_ops(self):
+    def test_execute__with_roi_and_binning(self):
         _thresh = 0.12
         _kwargs = {"key": 1, "another_key": "another_val"}
         plugin = self.create_plugin(hdf5=False)
         plugin.set_param_value("threshold_low", _thresh)
+        plugin.set_param_value("binning", 2)
+        plugin.set_param_value("use_roi", True)
+        plugin.set_param_value("roi_xlow", 3)
+        plugin.set_param_value("roi_xhigh", self._shape[0])
+        plugin.set_param_value("roi_ylow", 1)
+        plugin.set_param_value("roi_yhigh", self._shape[1])
         plugin.pre_execute()
-        plugin._legacy_image_ops = [
-            ["roi", (1, self._shape[0], 3, self._shape[1])],
-            ["binning", 2],
-        ]
-        plugin._original_input_shape = self._shape
         _data = rebin2d(self._data[1:, 3:], 2)
         _new_data, _new_kwargs = plugin.execute(_data, **_kwargs)
         self.assertEqual(_kwargs, _new_kwargs)

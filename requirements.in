@@ -1,9 +1,9 @@
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
-pyFAI==2024.5.0
+pyFAI==2024.9.0
 scikit-image>=0.22.0
-sphinx>=7.2.0
+sphinx>=8.0.0
 pydata_sphinx_theme>=0.15.4
 sphinx-copybutton>=0.5.2
 sphinx-design>=0.6.0
@@ -12,7 +12,7 @@ qtpy>=2.4.0
 hdf5plugin>=4.4.0
 pyyaml>=6.0
 requests>=2.31.0
-PyQt5==5.15.10
+PyQt5==5.15.11
 build>=1.0.3
 setuptools>69.0.0
 siphash24>=1.6

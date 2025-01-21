@@ -1,6 +1,6 @@
 # License
 
-Copyright 2021-2024, Helmholtz-Zentrum Hereon (Hereon)
+Copyright 2021 - 2025, Helmholtz-Zentrum Hereon (Hereon)
 
 This work is licensed under multiple licenses:
 - The source code and the accompanying material are licensed under [GPL-3.0-only]

@@ -158,21 +158,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         return d_output_sin2chi_method, kwargs
     
-    def calculate_result_shape(self) -> None:
-        """
-        Calculate the shape of the Plugin results.
-        """
-        _shape = self._config.get("input_shape", None)
-        
-        if not isinstance(_shape, tuple):
-            raise UserConfigError(
-                f'Cannot calculate the result shape for the "{self.plugin_name}" '
-                'plugin because the input shape is unknown or invalid.'
-            )
-            
-        # currently an upper boundary for the expected shape of the result, affects only second dimension
-        self._config["result_shape"] = (3, _shape[0])        
-        
+
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
         """
         Ensure the input is an instance of Dataset.

@@ -260,10 +260,22 @@ class BaseFitPlugin(ProcPlugin):
                 _attr = getattr(self._fitter, _key.lower())
                 results[slice(None), _i] = _attr(_fit_pvals)
             if _key == "total count intensity":
-                _dx = self._data.axis_ranges[0][1] - self._data.axis_ranges[0][0]
-                results[slice(None), _i] = [
-                    a / _dx for a in self._fitter.area(_fit_pvals)
-                ]
+                _dx = self._data.axis_ranges[0][1] - self._data.axis_ranges[0][0]                
+                
+                print("\N{PINEAPPLE}" * 30)
+                #TODO temporary fix 
+                #see https://github.com/hereon-GEMS/pydidas/issues/84                
+                
+                _areas = self._fitter.area(_fit_pvals)
+                if np.isscalar(_areas):  # Check if _areas is scalar
+                    results[slice(None), _i] = _areas / _dx
+                else:
+                    results[slice(None), _i] = [a / _dx for a in _areas]
+                            
+                #results[slice(None), _i] = [
+                #    a / _dx for a in self._fitter.area(_fit_pvals)
+                #]
+                print("\N{PINEAPPLE}" * 30)
         return results
 
     def check_center_positions(self) -> bool:

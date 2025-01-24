@@ -1709,8 +1709,8 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     #Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
-    assert nan_allclose(result.array, expected.array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
-    assert nan_allclose(result.axis_ranges[1], expected.axis_ranges[1], atol=1e-8) 
+    assert np.allclose(result.array, expected.array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
+    assert np.allclose(result.axis_ranges[1], expected.axis_ranges[1], atol=1e-8) 
     assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit

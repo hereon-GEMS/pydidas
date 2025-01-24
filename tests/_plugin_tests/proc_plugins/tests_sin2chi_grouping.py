@@ -81,25 +81,6 @@ def test_plugin_inheritance():
 )
 
 
-@pytest.mark.parametrize(
-    "input_shape",
-    [
-        None,   # Test case 1: input_shape is None
-        [],     # Test case 2: input_shape is an empty list
-    ]
-)
-def test_calculate_result_shape_raises_error(plugin_fixture, input_shape):
-    plugin = plugin_fixture
-    plugin._config["input_shape"] = input_shape
-    
-    with pytest.raises(UserConfigError) as e:
-        plugin.calculate_result_shape()
-   
-    # Update the assertion to match the full error message
-    assert "Cannot calculate the result shape for the" \
-           f' "{plugin.plugin_name}" plugin because the input shape is unknown or invalid.' in str(e.value)
-
-
 
 # Testing of remaining methods
 

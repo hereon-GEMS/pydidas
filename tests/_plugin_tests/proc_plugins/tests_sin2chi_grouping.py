@@ -1845,9 +1845,13 @@ ds_case1_exe =  Ds2cTestConfig(
     chi_start=-180,
     chi_stop=180,
     d_spacing_func=d_spacing_simple,
-    d_mean_pos=np.array([4, 5, 6, 7, 8] +[np.nan] * 11),
-    d_mean_neg=np.array([8, 11, 10, 9, 8]  +[np.nan] * 11),
-    d_mean_avg= np.array([6, 8, 8, 8, 8] +[np.nan] * 11),
+    #d_mean_pos=np.array([4, 5, 6, 7, 8] +[np.nan] * 11),
+    #d_mean_neg=np.array([8, 11, 10, 9, 8]  +[np.nan] * 11),
+    #d_mean_avg= np.array([6, 8, 8, 8, 8] +[np.nan] * 11),
+    #s2c_range_sorted=np.array([0.0, 0.14645, 0.5, 0.85355, 1] +[np.nan] * 11),
+    d_mean_pos=np.array([4, 5, 6, 7, 8]),
+    d_mean_neg=np.array([8, 11, 10, 9, 8]),
+    d_mean_avg= np.array([6, 8, 8, 8, 8]),
     s2c_range_sorted=np.array([0.0, 0.14645, 0.5, 0.85355, 1] +[np.nan] * 11),
     azimuth_name = LABELS_CHI,
     chi_unit= UNITS_DEGREE,
@@ -2132,7 +2136,7 @@ def test_execute_with_various_cases(plugin_fixture, case):
     
     ds_in = case.create_simple_input_ds()
     # Calculation for test   
-    plugin._config["input_shape"] = ds_in.shape
+    #plugin._config["input_shape"] = ds_in.shape
     expected_ds = case.create_output_ds()
     
     result, _ = plugin.execute(ds_in)

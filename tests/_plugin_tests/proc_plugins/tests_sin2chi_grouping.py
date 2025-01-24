@@ -1702,8 +1702,7 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
         )
     )
     )
-    
-    
+        
     #Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
@@ -1719,11 +1718,7 @@ def test__create_final_result_sin2chi_method_precision2(plugin_fixture, d_spacin
     _, _, d_spacing_combined = d_spacing_datasets
     
     plugin = plugin_fixture
-    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
-    # We can deduct the incoming length of chi-values via the length of the sin2chi axis. 
-    # Current requirement: plugin._config["input_shape"][0] = plugin._config["result_shape"][1], hence we can deduct here:
-    plugin._config["input_shape"] = (10, 5)
-      
+          
     expected = Dataset(
         axis_ranges={
             0: np.arange(3),
@@ -1768,7 +1763,7 @@ def test__create_final_result_sin2chi_method_precision2(plugin_fixture, d_spacin
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
     assert np.allclose(result.array, expected.array,rtol=1e-5, atol=1e-8) 
-    assert np.allclose(result.axis_ranges[1], expected.axis_ranges[1])
+    assert np.allclose(result.axis_ranges[1], expected.axis_ranges[1], atol=1e-8)
     assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit

@@ -2107,14 +2107,11 @@ ds_case14_exe =  Ds2cTestConfig(
                                          
 test_cases = [ds_case1_exe, ds_case2_exe, ds_case3_exe, ds_case4_exe, ds_case5_exe, ds_case6_exe,
               ds_case7_exe, ds_case8_exe, ds_case9_exe, ds_case10_exe, ds_case11_exe, ds_case12_exe]
-#test_cases =[ds_case12_exe]
 @pytest.mark.parametrize("case", test_cases)        
 def test_execute_with_various_cases(plugin_fixture, case):    
     plugin = plugin_fixture
     
     ds_in = case.create_simple_input_ds()
-    # Calculation for test   
-    #plugin._config["input_shape"] = ds_in.shape
     expected_ds = case.create_output_ds()
     
     result, _ = plugin.execute(ds_in)
@@ -2130,12 +2127,10 @@ def test_execute_with_various_cases(plugin_fixture, case):
 
 test_cases_1d= [ds_case13_exe, ds_case14_exe]
 @pytest.mark.parametrize("case", test_cases_1d)        
-def test_execute_with_various_cases2(plugin_fixture, case):    
+def test_execute_with_various_cases_1d(plugin_fixture, case):    
     plugin = plugin_fixture
     
     ds_in = case.create_simple_input_ds_1d()
-    # Calculation for test   
-    #plugin._config["input_shape"] = ds_in.shape
     expected_ds = case.create_output_ds()
     
     result, _ = plugin.execute(ds_in)

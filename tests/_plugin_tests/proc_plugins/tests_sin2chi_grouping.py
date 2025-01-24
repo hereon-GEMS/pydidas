@@ -1712,61 +1712,6 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit
     
-def test__create_final_result_sin2chi_method_precision2(plugin_fixture, d_spacing_datasets):
-    "Similar to the previous precision test, but removes the need for nan_allclose as expected output shape in 2nd dimension is hardcoded." 
-       
-    _, _, d_spacing_combined = d_spacing_datasets
-    
-    plugin = plugin_fixture
-          
-    expected = Dataset(
-        axis_ranges={
-            0: np.arange(3),
-            1: np.array(
-                [
-                    0.0,
-                    0.030154,
-                    0.116978,
-                    0.25,
-                    0.413176,
-                    0.586824,
-                    0.75,
-                    0.883022,
-                    0.969846,
-                    1.0,
-                ]
-            )
-        },
-        axis_labels = {0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
-        metadata={},
-        data_unit="nm",
-        data_label='d_spacing',
-        array=np.vstack((d_spacing_combined, np.array(
-            [
-                26.281715,
-                26.275108,
-                26.265263,
-                26.248177,
-                26.18344,
-                26.161894,
-                26.121524,
-                26.094265,
-                26.0692,
-                26.063213
-            ]
-            )
-        )
-    )
-    )
-        
-    #Calculation for test
-    result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
-
-    assert np.allclose(result.array, expected.array,rtol=1e-5, atol=1e-8) 
-    assert np.allclose(result.axis_ranges[1], expected.axis_ranges[1], atol=1e-8)
-    assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
-    assert result.data_label == expected.data_label
-    assert result.data_unit == expected.data_unit
     
     
 @pytest.fixture

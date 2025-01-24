@@ -2077,13 +2077,13 @@ ds_case13_exe =  Ds2cTestConfig(
     chi_stop=181,
     d_spacing_func=d_spacing_simu,
     d_mean_pos=np.array([25.25007189 ,25.27466048 ,25.2832   ,  25.27466048 ,25.25007189, 25.2124,
- 25.16618858 ,25.11701142 ,25.0708    , 25.03312811] +[np.nan]*27),
+ 25.16618858 ,25.11701142 ,25.0708    , 25.03312811] ),
     d_mean_neg=np.array([25.25007189 ,25.2124   ,  25.16618858, 25.11701142, 25.0708   ,  25.03312811,
- 25.00853952, 25.     ,    25.00853952 ,25.03312811]+[np.nan]*27),
+ 25.00853952, 25.     ,    25.00853952 ,25.03312811]),
     d_mean_avg = np.array([25.25007189, 25.24353024 ,25.22469429 ,25.19583595, 25.16043595, 25.12276405,
- 25.08736405, 25.05850571 ,25.03966976 ,25.03312811]+[np.nan]*27),
+ 25.08736405, 25.05850571 ,25.03966976 ,25.03312811]),
     s2c_range_sorted=np.array([0.0000000, 0.0301537, 0.1169778, 0.2500000,
-                               0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000] +[np.nan]*27),
+                               0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]),
     azimuth_name = LABELS_CHI,
     chi_unit= UNITS_DEGREE,
     d_unit= UNITS_NANOMETER ,
@@ -2135,7 +2135,7 @@ def test_execute_with_various_cases2(plugin_fixture, case):
     
     ds_in = case.create_simple_input_ds_1d()
     # Calculation for test   
-    plugin._config["input_shape"] = ds_in.shape
+    #plugin._config["input_shape"] = ds_in.shape
     expected_ds = case.create_output_ds()
     
     result, _ = plugin.execute(ds_in)

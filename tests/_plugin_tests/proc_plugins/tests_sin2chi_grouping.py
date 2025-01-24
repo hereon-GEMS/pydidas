@@ -1664,9 +1664,6 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     _, _, d_spacing_combined = d_spacing_datasets
     
     plugin = plugin_fixture
-    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
-    # We randomly increase the input_shape[0] by 2. This simulates in total a random number of chis. The test works works with any positive, whole number.
-    #plugin._config["input_shape"] = (d_spacing_combined.axis_ranges[1].size+2, 5)     
 
     expected = Dataset(
         axis_ranges={
@@ -1708,17 +1705,7 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     )
     )
     
-    #The desired length of the output array    
-    #desired_length = int(plugin._config["input_shape"][0])
-   
-    # I pad here, because technically this is only necessary due to the pre-allocation requirements in pydidas, dynamic allocation is not yet supported
-    # Padding length needed to reach the desired length
-    #padding_length = desired_length - expected.array.shape[1]
-
-    # Pad only the column dimension (2nd dimension) at the end
-    #padded_array = np.pad(expected.array, ((0, 0), (0, padding_length)), mode='constant', constant_values=np.nan)
-    #padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=np.nan)
-
+    
     #Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 

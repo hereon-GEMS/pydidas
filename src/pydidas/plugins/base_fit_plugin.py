@@ -426,7 +426,7 @@ class BaseFitPlugin(ProcPlugin):
         """
         _min_peak = self._config["min_peak_height"]
         if _min_peak is not None:
-            _tmp_y, bg_params = self._fitter.calculate_background_params(
+            _tmp_y, bg_params = self._fitter.estimate_background_params(
                 self._data_x, self._data, self.get_param_value("fit_bg_order")
             )
             if np.amax(_tmp_y) < _min_peak:

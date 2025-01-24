@@ -1709,21 +1709,21 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     )
     
     #The desired length of the output array    
-    desired_length = int(plugin._config["input_shape"][0])
+    #desired_length = int(plugin._config["input_shape"][0])
    
     # I pad here, because technically this is only necessary due to the pre-allocation requirements in pydidas, dynamic allocation is not yet supported
     # Padding length needed to reach the desired length
-    padding_length = desired_length - expected.array.shape[1]
+    #padding_length = desired_length - expected.array.shape[1]
 
     # Pad only the column dimension (2nd dimension) at the end
-    padded_array = np.pad(expected.array, ((0, 0), (0, padding_length)), mode='constant', constant_values=np.nan)
-    padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=np.nan)
+    #padded_array = np.pad(expected.array, ((0, 0), (0, padding_length)), mode='constant', constant_values=np.nan)
+    #padded_axis_ranges = np.pad(expected.axis_ranges[1], (0, padding_length), mode='constant', constant_values=np.nan)
 
     #Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
-    assert nan_allclose(result.array, padded_array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
-    assert nan_allclose(result.axis_ranges[1], padded_axis_ranges, atol=1e-8) 
+    assert nan_allclose(result.array, expected.array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
+    assert nan_allclose(result.axis_ranges[1], expected.axis_ranges[1], atol=1e-8) 
     assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit

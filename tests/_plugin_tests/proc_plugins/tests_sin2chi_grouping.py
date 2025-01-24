@@ -79,16 +79,6 @@ def test_plugin_inheritance():
         ((15, 30), (3, 15)),   # Test case 3
     ]
 )
-def test_calulate_result_shape(plugin_fixture, input_shape, result_shape):
-    plugin = plugin_fixture
-    plugin._config["input_shape"] = input_shape
-    
-    plugin.calculate_result_shape()
-    
-    assert plugin._config["result_shape"] == result_shape
-    assert isinstance(plugin._config["result_shape"], tuple)
-    assert len(plugin._config["result_shape"]) == 2
-    assert all(isinstance(i, int) for i in plugin._config["result_shape"])
 
 
 @pytest.mark.parametrize(

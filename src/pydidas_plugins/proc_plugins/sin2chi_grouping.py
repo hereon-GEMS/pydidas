@@ -995,27 +995,10 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_avg = d_spacing_combined.mean(axis=0).reshape(1, -1)
         arr = np.vstack((d_spacing_combined, d_spacing_avg))
                 
-        #Preallocation of shape for output array
-       
 
-        #dummy_arr= np.full((3, self._config["input_shape"][0]), np.nan)
         print("\N{Strawberry}" * 30)
         
-        # Filling of dummy array. All rows and all columns of real data. Rest remains np.nan.      
-        #dummy_arr[:,0:arr.shape[1]] = arr
-        
-    
-        #Preallocation of axis range, non occupied values remain np.nan (#TODO: Check again if 1 is not better than np.nan)
-        #dummy_axis_ranges= np.full(self._config["input_shape"][0], np.nan)
-
-        #dummy_axis_ranges[0:len(d_spacing_combined.axis_ranges[1])] = d_spacing_combined.axis_ranges[1]
-        
-        # Create the final result Dataset, when dynamic array allocation is not implemented
-        #result=Dataset(dummy_arr, axis_ranges={0: np.arange(dummy_arr.shape[0]), 1: dummy_axis_ranges}, 
-        #        axis_labels={0: LABELS_DIM0, 1: LABELS_SIN2CHI}, data_unit=d_spacing_combined.data_unit,
-        #        data_label='d_spacing'
-        #    )
-        
+                
         # Create the final result Dataset, when dynamic array allocation is implemented       
         result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 
                 axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit=d_spacing_combined.data_unit,

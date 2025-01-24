@@ -1959,15 +1959,12 @@ ds_case7_exe =  Ds2cTestConfig(
     chi_stop=180,
     d_spacing_func=d_spacing_simple,
     d_mean_pos=np.array(
-        [4., 5., 6.,7., 8.]+[np.nan]*11
-    ),
+        [4., 5., 6.,7., 8.]    ),
     d_mean_neg=np.array(
-       [ 8. ,11. ,10.,  9.,  8.]+[np.nan]*11
-    ),
-    d_mean_avg= np.array( [6., 8., 8., 8., 8.]+[np.nan]*11),    
+       [ 8. ,11. ,10.,  9.,  8.]    ),
+    d_mean_avg= np.array( [6., 8., 8., 8., 8.]),    
     s2c_range_sorted=np.array(
-        [0.0000000, 0.1464466, 0.5000000, 0.8535534, 1.0000000] +[np.nan]*11
-    ),
+        [0.0000000, 0.1464466, 0.5000000, 0.8535534, 1.0000000]     ),
     azimuth_name = LABELS_CHI,
     chi_unit= UNITS_DEGREE,
     d_unit= UNITS_NANOMETER ,

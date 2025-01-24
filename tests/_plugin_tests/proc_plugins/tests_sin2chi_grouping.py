@@ -1666,7 +1666,7 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     plugin = plugin_fixture
     # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
     # We randomly increase the input_shape[0] by 2. This simulates in total a random number of chis. The test works works with any positive, whole number.
-    plugin._config["input_shape"] = (d_spacing_combined.axis_ranges[1].size+2, 5)     
+    #plugin._config["input_shape"] = (d_spacing_combined.axis_ranges[1].size+2, 5)     
 
     expected = Dataset(
         axis_ranges={

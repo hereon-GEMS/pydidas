@@ -1656,9 +1656,7 @@ def test__create_final_result_sin2chi_method_with_nan_explicit(plugin_fixture, d
     
 def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing_datasets):
     """ 
-    Ugly test due to pre-allocation requirements in pydidas, dynamic allocation is currently not yet supported. 
-    I delibertly left the Dataset expected as it is, as this is the future version when dynamic allocation is supported,
-    see also second test below.
+    Test to check the precision in create_final_result_sin2chi_method
     """
     
     _, _, d_spacing_combined = d_spacing_datasets
@@ -1709,7 +1707,7 @@ def test__create_final_result_sin2chi_method_precision(plugin_fixture, d_spacing
     #Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
-    assert np.allclose(result.array, expected.array, atol=1e-8) #due to dummy allocation necessary instead of np.allclose rtol=1e-5, atol=1e-8
+    assert np.allclose(result.array, expected.array, atol=1e-8) 
     assert np.allclose(result.axis_ranges[1], expected.axis_ranges[1], atol=1e-8) 
     assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
     assert result.data_label == expected.data_label

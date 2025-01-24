@@ -1845,13 +1845,9 @@ ds_case1_exe =  Ds2cTestConfig(
     chi_start=-180,
     chi_stop=180,
     d_spacing_func=d_spacing_simple,
-    #d_mean_pos=np.array([4, 5, 6, 7, 8] +[np.nan] * 11),
-    #d_mean_neg=np.array([8, 11, 10, 9, 8]  +[np.nan] * 11),
-    #d_mean_avg= np.array([6, 8, 8, 8, 8] +[np.nan] * 11),
-    #s2c_range_sorted=np.array([0.0, 0.14645, 0.5, 0.85355, 1] +[np.nan] * 11),
-    d_mean_pos=np.array([4, 5, 6, 7, 8]),
-    d_mean_neg=np.array([8, 11, 10, 9, 8]),
-    d_mean_avg= np.array([6, 8, 8, 8, 8]),
+    d_mean_pos=np.array([4, 5, 6, 7, 8] +[np.nan] * 11),
+    d_mean_neg=np.array([8, 11, 10, 9, 8]  +[np.nan] * 11),
+    d_mean_avg= np.array([6, 8, 8, 8, 8] +[np.nan] * 11),
     s2c_range_sorted=np.array([0.0, 0.14645, 0.5, 0.85355, 1] +[np.nan] * 11),
     azimuth_name = LABELS_CHI,
     chi_unit= UNITS_DEGREE,
@@ -2152,7 +2148,7 @@ def test_execute_with_various_cases(plugin_fixture, case):
 
 test_cases_1d= [ds_case13_exe, ds_case14_exe]
 @pytest.mark.parametrize("case", test_cases_1d)        
-def test_execute_with_various_cases(plugin_fixture, case):    
+def test_execute_with_various_cases2(plugin_fixture, case):    
     plugin = plugin_fixture
     
     ds_in = case.create_simple_input_ds_1d()

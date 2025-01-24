@@ -994,10 +994,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 
         d_spacing_avg = d_spacing_combined.mean(axis=0).reshape(1, -1)
         arr = np.vstack((d_spacing_combined, d_spacing_avg))
-                
-
-        print("\N{Strawberry}" * 30)
-        
+            
                 
         # Create the final result Dataset, when dynamic array allocation is implemented       
         result=Dataset(arr, axis_ranges={0: np.arange(arr.shape[0]), 1: d_spacing_combined.axis_ranges[1]}, 
@@ -1006,11 +1003,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
             )
              
              
-        print("\N{Hot Pepper}" * 30)
-        print('Between hot pepper and strawberry') 
-        print('Shape: ', result.shape)
-        print('result\n', result)
-        print("\N{Strawberry}" * 30)
+        #print("\N{Hot Pepper}" * 30)
+        #print('Between hot pepper and strawberry') 
+        #print('Shape: ', result.shape)
+        #print('result\n', result)
+        #print("\N{Strawberry}" * 30)
         
     
         return result

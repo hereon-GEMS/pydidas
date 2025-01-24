@@ -992,10 +992,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         if d_spacing_combined.axis_labels[1] != LABELS_SIN2CHI:
             raise ValueError(f'axis_labels[1] does not match {LABELS_SIN2CHI}.')
                 
-        d_spacing_avg = d_spacing_combined.mean(axis=0) 
-        d_spacing_avg = d_spacing_avg.reshape(1,-1)
-                
-        arr= np.vstack((d_spacing_combined, d_spacing_avg.reshape(1,-1)))
+        d_spacing_avg = d_spacing_combined.mean(axis=0).reshape(1, -1)
+        arr = np.vstack((d_spacing_combined, d_spacing_avg))
                 
         #Preallocation of shape for output array
        

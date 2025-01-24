@@ -262,7 +262,7 @@ class BaseFitPlugin(ProcPlugin):
             if _key == "total count intensity":
                 _dx = self._data.axis_ranges[0][1] - self._data.axis_ranges[0][0]                
                 
-                print("\N{PINEAPPLE}" * 30)
+
                 #TODO temporary fix 
                 #see https://github.com/hereon-GEMS/pydidas/issues/84                
                 
@@ -275,7 +275,7 @@ class BaseFitPlugin(ProcPlugin):
                 #results[slice(None), _i] = [
                 #    a / _dx for a in self._fitter.area(_fit_pvals)
                 #]
-                print("\N{PINEAPPLE}" * 30)
+
         return results
 
     def check_center_positions(self) -> bool:

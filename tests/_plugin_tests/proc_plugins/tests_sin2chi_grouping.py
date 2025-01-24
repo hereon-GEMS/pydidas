@@ -1920,15 +1920,14 @@ ds_case5_exe =  Ds2cTestConfig(
     chi_stop=91,
     d_spacing_func=d_spacing_simple,
     d_mean_pos=np.array(
-         [ 1.  ,2. , 3. , 4. , 5. , 6. , 7.,  8. , 9., 10.]+[np.nan]*1
+         [ 1.  ,2. , 3. , 4. , 5. , 6. , 7.,  8. , 9., 10.]
     ),
     d_mean_neg=np.array(
-        [1., 0.]+[np.nan]*9
+        [1., 0.]+[np.nan]*8
     ),
-    d_mean_avg= np.array([18. ,18., 18., 18., 18., 18., 18., 18., 18., 18.]+[np.nan]*27),    
+    d_mean_avg= np.array([18. ,18., 18., 18., 18., 18., 18., 18., 18., 18.]),    
     s2c_range_sorted=np.array(
-       [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]+[np.nan]*1
-    ),
+       [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]),
     azimuth_name = LABELS_CHI,
     chi_unit= UNITS_DEGREE,
     d_unit= UNITS_NANOMETER ,

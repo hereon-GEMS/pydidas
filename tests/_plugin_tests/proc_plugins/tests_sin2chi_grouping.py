@@ -1826,8 +1826,6 @@ class Ds2cTestConfig:
         expected_result = np.vstack([
         self.d_mean_neg,
         self.d_mean_pos,
-        #np.mean([self.d_mean_neg, self.d_mean_pos], axis=0)
-        #changed this line to have it explicit
         self.d_mean_avg
         ])    
         

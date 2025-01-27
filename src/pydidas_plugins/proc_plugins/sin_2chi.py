@@ -33,7 +33,7 @@ from typing import Dict, Any, Tuple
 
 from pydidas.core import Dataset, UserConfigError
 
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import ProcPlugin
 
 
@@ -74,7 +74,7 @@ class DspacingSin_2chi(ProcPlugin):
     plugin_name = "Difference in d-spacing vs sin(2*chi)"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    plugin_group = PROC_PLUGIN_INTEGRATED
+    plugin_group = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = 2
     output_data_dim = 2
     #TODO: to be decided

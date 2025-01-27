@@ -27,15 +27,10 @@ __status__ = "Production"
 __all__ = ["DoubleLorentzian"]
 
 
-from typing import Tuple
-
-from numpy import pi
-
 from pydidas.core.fitting.lorentzian import Lorentzian
-from pydidas.core.fitting.multi_peak_mixin import MultiPeakMixin
 
 
-class DoubleLorentzian(MultiPeakMixin, Lorentzian):
+class DoubleLorentzian(Lorentzian):
     """
     Class for fitting a double Lorentzian function.
 
@@ -59,79 +54,3 @@ class DoubleLorentzian(MultiPeakMixin, Lorentzian):
     param_labels = [
         f"{key}{i}" for i in range(num_peaks) for key in Lorentzian.param_labels
     ]
-
-    @staticmethod
-    def fwhm(c: Tuple[float]) -> Tuple[float]:
-        """
-        Get the FWHM of the fit from the values of the parameters.
-
-        This method needs to be implemented by each fitting function.
-
-        Parameters
-        ----------
-        c : Tuple[float]
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float, float]
-            The function FWHMs for the first an second peak.
-        """
-        return (c[1], c[4])
-
-    @staticmethod
-    def area(c: Tuple[float]) -> Tuple[float]:
-        """
-        Get the peak area based on the values of the parameters.
-
-        For all normalized fitting functions, the area is equal to the amplitude term.
-
-        Parameters
-        ----------
-        c : Tuple[float]
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The areas of the two peaks defined through the given parameters c.
-        """
-        return (c[0], c[3])
-
-    @staticmethod
-    def center(c: Tuple[float]) -> Tuple[float]:
-        """
-        Get the center positions.
-
-        Parameters
-        ----------
-        c : Tuple[float]
-            The fitted parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The center positions of the peaks.
-        """
-        return (c[2], c[5])
-
-    @staticmethod
-    def amplitude(c: Tuple) -> float:
-        """
-        Get the amplitude of the peaks from the values of the fitted parameters.
-
-        For a Lorentzian function, this corresponds to
-
-        I_peak = A / (sigma * sqrt(2 * Pi))
-
-        Parameters
-        ----------
-        c : tuple
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The peaks' amplitude.
-        """
-        return (2 * c[0] / pi / c[1], 2 * c[3] / pi / c[4])

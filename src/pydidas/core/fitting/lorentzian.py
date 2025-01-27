@@ -26,8 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Lorentzian"]
 
-
-from typing import List, Tuple, Union
+from numbers import Real
+from typing import Optional
 
 from numpy import amax, amin, inf, ndarray, pi
 
@@ -43,9 +43,12 @@ class Lorentzian(FitFuncBase):
     param_bounds_low = [0, 0, -inf]
     param_bounds_high = [inf, inf, inf]
     param_labels = ["amplitude", "gamma", "center"]
+    amplitude_param_index = 0
+    num_peak_params = 3
+    center_param_index = 2
 
     @staticmethod
-    def func(c: Tuple[float], x: ndarray) -> ndarray:
+    def func(c: tuple[Real], x: ndarray) -> ndarray:
         """
         Get the function values for a Lorentzian defined by the parameters c.
 
@@ -59,7 +62,7 @@ class Lorentzian(FitFuncBase):
 
         Parameters
         ----------
-        c : Tuple[float]
+        c : tuple[Real]
             The tuple with the function parameters.
             c[0] : amplitude
             c[1] : gamma
@@ -76,8 +79,8 @@ class Lorentzian(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: Union[None, int], **kwargs: dict
-    ) -> List[float]:
+        cls, x: ndarray, y: ndarray, index: Optional[int] = None, **kwargs: dict
+    ) -> tuple[Real]:
         """
         Guess the starting parameters for a Lorentzian peak fit.
 
@@ -87,15 +90,15 @@ class Lorentzian(FitFuncBase):
             The x data points.
         y : np.ndarray
             The function data points to be fitted.
-        index : Union[None, str]
-            The peak index. Use None for a non-indexed single peak or the integer peak
-            number (starting with 1).
+        index : Optional[int]
+            The peak index. Use None for a non-indexed single peak or the
+            integer peak number (starting with 1).
         **kwargs : dict
             Optional keyword arguments.
 
         Returns
         -------
-        List[float]
+        tuple[Real]
             The list with estimated amplitude, width and center parameters.
         """
         if amin(y) < 0:
@@ -124,10 +127,10 @@ class Lorentzian(FitFuncBase):
         # height of the normalized distribution which is 2 / (pi * Gamma).
         # Because the FWHM is often underestimated, ignore the factor 2
         _amp = (_ycenter - amin(y)) * _gamma_start * pi
-        return [_amp, _gamma_start, _center_start]
+        return _amp, _gamma_start, _center_start
 
     @classmethod
-    def fwhm(cls, c: Tuple[float]) -> float:
+    def fwhm(cls, c: tuple[Real]) -> tuple[Real]:
         """
         Get the FWHM of the fit from the values of the parameters.
 
@@ -135,18 +138,18 @@ class Lorentzian(FitFuncBase):
 
         Parameters
         ----------
-        c : tuple
+        c : tuple[Real]
             The tuple with the function parameters.
 
         Returns
         -------
-        float
-            The function FWHM.
+        tuple[Real]
+            The function FWHMs for all peaks.
         """
-        return 2 * c[1]
+        return tuple(2 * c[1 + 3 * _i] for _i in range(cls.num_peaks))
 
-    @staticmethod
-    def amplitude(c: Tuple[float]) -> float:
+    @classmethod
+    def amplitude(cls, c: tuple[Real]) -> tuple[Real]:
         """
         Get the amplitude of the peak from the values of the fitted parameters.
 
@@ -156,12 +159,12 @@ class Lorentzian(FitFuncBase):
 
         Parameters
         ----------
-        c : tuple
+        c : tuple[Real]
             The tuple with the function parameters.
 
         Returns
         -------
-        float
+        tuple[Real]
             The function amplitude.
         """
-        return c[0] / pi / c[1]
+        return tuple(c[3 * _i] / (pi * c[1 + 3 * _i]) for _i in range(cls.num_peaks))

@@ -28,7 +28,7 @@ __all__ = ["FitFuncBase"]
 
 import copy
 from numbers import Real
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 
 import numpy as np
 from numpy import amin, ndarray
@@ -36,6 +36,7 @@ from scipy import interpolate
 
 from pydidas.core.exceptions import UserConfigError
 from pydidas.core.fitting.fit_func_meta import FitFuncMeta
+from pydidas.core.utils import flatten
 
 
 class FitFuncBase(metaclass=FitFuncMeta):
@@ -178,6 +179,16 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return tuple(c[_index] for _index in _indices)
 
     @classmethod
+    def amplitude(cls, c: tuple[Real]) -> tuple[Real]:
+        """
+        Get the amplitude of the peak from the values of the parameters.
+
+        Note that the peak amplitude is not the same as the fitted amplitude
+        which is a scaling factor for the peak function.
+        """
+        raise NotImplementedError
+
+    @classmethod
     def fwhm(cls, c: tuple[Real]) -> tuple[Real]:
         """
         Get the FWHM of the fit from the values of the parameters.
@@ -213,11 +224,24 @@ class FitFuncBase(metaclass=FitFuncMeta):
         tuple[Real]
             The center positions for all peaks.
         """
-        _indices = [
+        return tuple(c[_index] for _index in cls._center_param_indices())
+
+    @classmethod
+    def _center_param_indices(cls, num_peaks: Optional[int] = None) -> list[int]:
+        """
+        Get the indices for the center parameters.
+
+        Parameters
+        ----------
+        num_peaks : Optional[int]
+            The number of peaks. If None, the number of peaks is taken
+            from the class attribute.
+        """
+        num_peaks = cls.num_peaks if num_peaks is None else num_peaks
+        return [
             cls.center_param_index + i * cls.num_peak_params
-            for i in range(0, cls.num_peaks)
+            for i in range(0, num_peaks)
         ]
-        return tuple(c[_index] for _index in _indices)
 
     @classmethod
     def position(cls, c: tuple[Real]) -> tuple[Real]:
@@ -284,6 +308,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
         list[Real]
             The list with the starting fit parameters.
         """
+
         def _calc_starting_params(local_kws: dict) -> tuple[Real]:
             """Calculate the starting parameters for all the given peaks."""
             _peak_params = []
@@ -292,8 +317,9 @@ class FitFuncBase(metaclass=FitFuncMeta):
                 _params = cls.guess_peak_start_params(x, _y_temp, _index, **local_kws)
                 _peak_params.extend(_params)
                 _y_temp = _y_temp - cls.func(_params, x)
-            print(cls.num_peaks, cls.num_peak_params, len(_peak_params))
-            return cls.sort_fitted_peaks_by_position(tuple(_peak_params) + _bg_params)
+            return cls.sort_fitted_peaks_by_position(
+                tuple(_peak_params) + _bg_params, num_peaks=_index + 1
+            )
 
         bg_order = kwargs.get("bg_order", None)
         _y, _bg_params = cls.estimate_background_params(x, y, bg_order)
@@ -437,7 +463,9 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return np.array([])
 
     @classmethod
-    def sort_fitted_peaks_by_position(cls, c: tuple[Real]) -> tuple[Real]:
+    def sort_fitted_peaks_by_position(
+        cls, c: tuple[Real], num_peaks: Optional[int] = None
+    ) -> tuple[Real]:
         """
         Sort the peaks by their center's position.
 
@@ -445,20 +473,28 @@ class FitFuncBase(metaclass=FitFuncMeta):
         ----------
         c : tuple[Real]
             The fitted parameters.
+        num_peaks : Optional[int]
+            The number of peaks to sort. If None, the number of peaks
+            is taken from the class attribute. The num_peaks parameter
+            should only be used if the number of peaks is different from
+            the generic number of peaks, i.e. if the function is used
+            during initial peak pos guessing.
 
         Returns
         -------
         tuple[Real]
             The sorted fitted parameters.
         """
-        if cls.num_peaks == 1:
+        num_peaks = cls.num_peaks if num_peaks is None else num_peaks
+        if num_peaks == 1:
             return c
-        _centers = cls.center(c)
-        _center_order = np.argsort(_centers)
-        _temp_c = tuple()
-        for _index in _center_order:
-            _temp_c += c[
-                _index * cls.num_peak_params : (_index + 1) * cls.num_peak_params
-            ]
-        _temp_c += c[cls.num_peaks * cls.num_peak_params :]
+        _indices = np.argsort([c[i] for i in cls._center_param_indices(num_peaks)])
+        _temp_c = flatten(
+            [
+                c[_index * cls.num_peak_params : (_index + 1) * cls.num_peak_params]
+                for _index in _indices
+            ],
+            astype=tuple,
+        )
+        _temp_c += c[num_peaks * cls.num_peak_params :]
         return tuple(_temp_c)

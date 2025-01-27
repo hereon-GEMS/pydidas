@@ -33,6 +33,7 @@ from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.fitting.fit_func_base import FitFuncBase
 from pydidas.core.utils import flatten
 
+
 FIT_CLASS = FitFuncBase
 
 
@@ -182,6 +183,58 @@ class TestFitFuncBase(unittest.TestCase):
                                 )
                             )
 
+    def test_center_param_indices(self):
+        _params = np.arange(12)
+        for _num_peaks in [1, 2, 3]:
+            TEST_FIT_CLASS.num_peaks = _num_peaks
+            for _num_peak_params in [1, 2, 3]:
+                TEST_FIT_CLASS.num_peak_params = _num_peak_params
+                for _center_pos in range(_num_peak_params):
+                    TEST_FIT_CLASS.center_param_index = _center_pos
+                    with self.subTest(
+                        num_peaks=_num_peaks,
+                        num_peak_params=_num_peak_params,
+                        center_pos=_center_pos,
+                    ):
+                        self.assertEqual(
+                            TEST_FIT_CLASS._center_param_indices(),
+                            list(
+                                range(
+                                    _center_pos,
+                                    _num_peak_params * _num_peaks,
+                                    _num_peak_params,
+                                )
+                            ),
+                        )
+
+    def test_center_param_indices__w_num_peaks_keyword(self):
+        _params = np.arange(12)
+        for _num_peaks in [1, 2, 3, 4]:
+            TEST_FIT_CLASS.num_peaks = _num_peaks
+            for _num_peak_params in [1, 2, 3]:
+                TEST_FIT_CLASS.num_peak_params = _num_peak_params
+                for _center_pos in range(_num_peak_params):
+                    TEST_FIT_CLASS.center_param_index = _center_pos
+                    for _used_num_peaks in range(1, _num_peaks + 1):
+                        with self.subTest(
+                            num_peaks=_num_peaks,
+                            num_peak_params=_num_peak_params,
+                            center_pos=_center_pos,
+                            used_num_of_peaks=_used_num_peaks,
+                        ):
+                            self.assertEqual(
+                                TEST_FIT_CLASS._center_param_indices(
+                                    num_peaks=_used_num_peaks
+                                ),
+                                list(
+                                    range(
+                                        _center_pos,
+                                        _num_peak_params * _used_num_peaks,
+                                        _num_peak_params,
+                                    )
+                                ),
+                            )
+
     def test_background_at_peak(self):
         _full_params = (1.0, 2.5, 4.25, 6.5, 8.2, 10.1, 12.3, 14.5, 16.7)
         for _bg_params in [(), (12,), (12, 25)]:
@@ -206,6 +259,7 @@ class TestFitFuncBase(unittest.TestCase):
                         self.assertTrue(np.allclose(_bg, _expected_bg))
 
     def test_guess_fit_start_params(self):
+        TEST_FIT_CLASS.center_param_index = 0
         for _bg_params in [(), (4.5,), (2.5, 2.0)]:
             _y = (
                 0 * self._x
@@ -222,13 +276,15 @@ class TestFitFuncBase(unittest.TestCase):
                         [f"center{i}", f"amp{i}", f"sigma{i}"][:_num_peak_params]
                         for i in range(_num_peaks)
                     )
-                    print(_num_peaks, _num_peak_params, TEST_FIT_CLASS.param_labels)
                     with self.subTest(bg_order=_bg_order, num_peaks=_num_peaks):
                         _params = TEST_FIT_CLASS.guess_fit_start_params(
                             self._x, _y, bg_order=_bg_order
                         )
                         self.assertIsInstance(_params, tuple)
-                        self.assertEqual(len(_params), _num_peaks * _num_peak_params + len(_bg_params))
+                        self.assertEqual(
+                            len(_params),
+                            _num_peaks * _num_peak_params + len(_bg_params),
+                        )
                         self.assertTrue(np.allclose(_y, _y_copy))
 
     def test_estimate_background_params(self):
@@ -332,39 +388,40 @@ class TestFitFuncBase(unittest.TestCase):
         _raw_peak_params = (4, 5, 6, 1, 2, 3, 10, 11, 12, 7, 8, 9)
         for _num_peaks in [1, 2, 3, 4]:
             TEST_FIT_CLASS.num_peaks = _num_peaks
-            for _num_peak_params in [1, 2, 3]:
-                TEST_FIT_CLASS.num_peak_params = _num_peak_params
-                _peak_params = tuple(
-                    p
-                    for i, p in enumerate(_raw_peak_params[: 3 * _num_peaks])
-                    if i % 3 < _num_peak_params
-                )
-                for _center_param_index in range(_num_peak_params):
-                    TEST_FIT_CLASS.center_param_index = _center_param_index
-                    for _bg_params in [(), (4,), (4, 5)]:
-                        _params = _peak_params + _bg_params
-                        with self.subTest(
-                            num_peaks=_num_peaks,
-                            num_peak_params=_num_peak_params,
-                            bg_order=len(_bg_params),
-                        ):
-                            _sorted_params = (
-                                TEST_FIT_CLASS.sort_fitted_peaks_by_position(_params)
-                            )
-                            self.assertIsInstance(_sorted_params, tuple)
-                            self.assertEqual(
-                                len(_sorted_params),
-                                _num_peaks * _num_peak_params + len(_bg_params),
-                            )
-                            self.assertEqual(
-                                _sorted_params,
-                                tuple(
-                                    sorted(
-                                        _peak_params[: _num_peaks * _num_peak_params]
+            for _used_num_peaks in range(1, _num_peaks + 1):
+                for _num_peak_params in [1, 2, 3]:
+                    TEST_FIT_CLASS.num_peak_params = _num_peak_params
+                    _peak_params = tuple(
+                        p
+                        for i, p in enumerate(_raw_peak_params[: 3 * _num_peaks])
+                        if i % 3 < _num_peak_params
+                    )
+                    for _center_param_index in range(_num_peak_params):
+                        TEST_FIT_CLASS.center_param_index = _center_param_index
+                        for _bg_params in [(), (4,), (4, 5)]:
+                            _params = _peak_params + _bg_params
+                            with self.subTest(
+                                num_peaks=_num_peaks,
+                                used_num_peaks=_used_num_peaks,
+                                num_peak_params=_num_peak_params,
+                                bg_order=len(_bg_params),
+                            ):
+                                _index_where_sorted = _used_num_peaks * _num_peak_params
+                                _sorted_params = (
+                                    TEST_FIT_CLASS.sort_fitted_peaks_by_position(
+                                        _params, num_peaks=_used_num_peaks
                                     )
                                 )
-                                + _bg_params,
-                            )
+                                self.assertIsInstance(_sorted_params, tuple)
+                                self.assertEqual(
+                                    len(_sorted_params),
+                                    _num_peaks * _num_peak_params + len(_bg_params),
+                                )
+                                self.assertEqual(
+                                    _sorted_params,
+                                    tuple(sorted(_peak_params[:_index_where_sorted]))
+                                    + _params[_index_where_sorted:],
+                                )
 
 
 if __name__ == "__main__":

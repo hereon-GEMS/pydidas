@@ -312,7 +312,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
         def _calc_starting_params(local_kws: dict) -> tuple[Real]:
             """Calculate the starting parameters for all the given peaks."""
             _peak_params = []
-            _y_temp = y.copy()
+            _y_temp = _y.copy()
             for _index in range(cls.num_peaks):
                 _params = cls.guess_peak_start_params(x, _y_temp, _index, **local_kws)
                 _peak_params.extend(_params)

@@ -36,7 +36,7 @@ from scipy.sparse.csgraph import connected_components
 from pydidas.core import Dataset, UserConfigError
 from typing import List, Tuple, Dict
 
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import ProcPlugin
 
 LABELS_CHI = "chi"
@@ -124,7 +124,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     plugin_name = "Group d-spacing according to sin^2(chi) method"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    plugin_subtype = PROC_PLUGIN_INTEGRATED
+    plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = -1 
     output_data_dim = 2 
     output_data_label = "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"

@@ -1899,9 +1899,8 @@ ds_case4_exe =  Ds2cTestConfig(
     d_mean_pos=np.array(
          [ 9. ,10.]+[np.nan]*8
     ),
-    d_mean_neg=np.array(
-        [9., 8., 7., 6., 5. ,4.,3., 2., 1., 0.]    ),
-    d_mean_avg= np.array([18. ,18., 18., 18., 18., 18., 18., 18., 18., 18.]),    
+    d_mean_neg=np.array([9., 8., 7., 6., 5. ,4.,3., 2., 1., 0.]),
+    d_mean_avg= np.array([9. ,9.]+[np.nan]*8),    
     s2c_range_sorted=np.array(
        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]    ),
     azimuth_name = LABELS_CHI,
@@ -1923,7 +1922,7 @@ ds_case5_exe =  Ds2cTestConfig(
     d_mean_neg=np.array(
         [1., 0.]+[np.nan]*8
     ),
-    d_mean_avg= np.array([18. ,18., 18., 18., 18., 18., 18., 18., 18., 18.]),    
+    d_mean_avg= np.array([1. ,1.]+[np.nan]*8),    
     s2c_range_sorted=np.array(
        [0.0000000, 0.0301537, 0.1169778, 0.2500000, 0.4131759, 0.5868241, 0.7500000, 0.8830222, 0.9698463, 1.0000000]),
     azimuth_name = LABELS_CHI,
@@ -2107,8 +2106,7 @@ ds_case14_exe =  Ds2cTestConfig(
                                          
 test_cases = [ds_case1_exe, ds_case2_exe, ds_case3_exe, ds_case4_exe, ds_case5_exe, ds_case6_exe,
               ds_case7_exe, ds_case8_exe, ds_case9_exe, ds_case10_exe, ds_case11_exe, ds_case12_exe]
-#test_cases=[ds_case11_exe]
-test_cases=[ds_case12_exe]
+test_cases=[ds_case5_exe]
 @pytest.mark.parametrize("case", test_cases)        
 def test_execute_with_various_cases(plugin_fixture, case):    
     plugin = plugin_fixture

@@ -1828,7 +1828,6 @@ class Ds2cTestConfig:
         self.d_mean_pos,
         self.d_mean_avg
         ])    
-        
         output_ds =  Dataset(expected_result, axis_ranges= {0: np.arange(expected_result.shape[0]), 1: self.s2c_range_sorted}, 
                              axis_labels = {0: '0: d-, 1: d+, 2: d_mean', 1: LABELS_SIN2CHI}, data_unit = f'{self.d_unit}', data_label='d_spacing')
         
@@ -2103,7 +2102,7 @@ ds_case14_exe =  Ds2cTestConfig(
                                          
 test_cases = [ds_case1_exe, ds_case2_exe, ds_case3_exe, ds_case4_exe, ds_case5_exe, ds_case6_exe,
               ds_case7_exe, ds_case8_exe, ds_case9_exe, ds_case10_exe, ds_case11_exe, ds_case12_exe]
-test_cases=[ds_case11_exe]
+#test_cases=[ds_case12_exe]
 @pytest.mark.parametrize("case", test_cases)        
 def test_execute_with_various_cases(plugin_fixture, case):    
     plugin = plugin_fixture
@@ -2140,6 +2139,7 @@ def test_execute_with_various_cases_1d(plugin_fixture, case):
     result, _ = plugin.execute(ds_in)
 
     npt.assert_allclose(result.array, expected_ds.array, rtol=5e-10, atol=1e-15, equal_nan=True, err_msg='Tolerance not matchend.', verbose=True)
+    npt.assert_allclose(expected_ds.array[2,:], np.mean([case.d_mean_neg, case.d_mean_pos], axis=0), rtol=1e-5, atol=1e-8, equal_nan=True, err_msg='Tolerance not matchend.', verbose=True)
     npt.assert_allclose(result.axis_ranges[1], expected_ds.axis_ranges[1], rtol=1e-05, atol=1e-05, equal_nan=True, err_msg='Tolerance not matchend.', verbose=True)
     npt.assert_array_equal(result.axis_ranges[0], expected_ds.axis_ranges[0], err_msg='Values are not eequal for axis_ranges[0]', verbose=True)
     assert result.data_label == expected_ds.data_label

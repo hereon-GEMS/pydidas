@@ -167,7 +167,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         ds (Dataset): The input to check.
 
         Raises:
-        TypeError: If ds is not an instance of Dataset.
+        UserConfigError: If ds is not an instance of Dataset.
         """
         if not isinstance(ds, Dataset):
             raise UserConfigError("Input must be an instance of Dataset.")
@@ -207,7 +207,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
         ------
         UserConfigError
             If the input is not of type Dataset.
+        UserConfigError
             If multiple 'chi' entries are found in the dataset.
+        UserConfigError
             If 'chi' or the key containing 'position' is missing in the dataset.
 
         Examples
@@ -286,9 +288,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         Raises
         ------
-        TypeError
+        UserConfigError
             If `ds` is not an instance of `Dataset`.
-        ValueError
+        UserConfigError
             If a unit for any parameter specified in `fit_labels` is not found in `data_label`.
 
         Examples
@@ -339,7 +341,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
             try:
                 unit = data_label_dict[param]
             except KeyError:
-                raise ValueError(f"Unit not found for parameter: {param}")
+                raise UserConfigError(f"Unit not found for parameter: {param}")
             result[index] = [param, unit]
             
         # Step 4: Append chi and its unit to the result as the highest key
@@ -370,9 +372,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
     
         Raises
         ------
-        TypeError
+        UserConfigError
             Raised if the input `ds` is not an instance of Dataset.
-        ValueError
+        UserConfigError
             Raised if the units for 'chi' or 'position' are not within the allowed parameters. The allowed units for
             'position' are 'nm' (nanometers) and 'A' (angstroms). For 'chi', the allowed unit is 'deg' (degrees).
 
@@ -398,9 +400,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
             if label in params_to_check:
                 if label == LABELS_POSITION and unit not in pos_units_allowed:
-                    raise ValueError(f"Unit {unit} not allowed for {label}.")
+                    raise UserConfigError(f"Unit {unit} not allowed for {label}.")
                 if label == LABELS_CHI and unit not in chi_units_allowed:
-                    raise ValueError(f"Unit {unit} not allowed for {label}.")
+                    raise UserConfigError(f"Unit {unit} not allowed for {label}.")
 
        
     
@@ -543,7 +545,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         # Ensure 'position' is in the data_label
         if LABELS_POSITION not in ds.data_label:
-            raise ValueError(f"Key '{LABELS_POSITION}' not found in data_label.")
+            raise UserConfigError(f"Key '{LABELS_POSITION}' not found in data_label.")
         
         parts = ds.data_label.split('/')
 
@@ -555,7 +557,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         
         # Compare with allowed units for position
         if pos_unit not in pos_units_allowed:
-            raise ValueError(f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}.")
+            raise UserConfigError(f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}.")
         
         # Update the dataset with the verified unit
         ds.data_label = parts[0].strip()
@@ -595,7 +597,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         Raises
         ------
-        TypeError
+        UserConfigError
             If the input `ds` is not of type Dataset, indicating an incorrect data type was passed.
         ValueError
             If the dimension of the extracted d_spacing is not 1, indicating a mismatch in expected data structure.

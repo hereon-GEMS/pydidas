@@ -91,8 +91,7 @@ class DspacingSin_2chi(ProcPlugin):
     def execute(self, ds: Dataset, **kwargs: Dict[str, Any]) -> Tuple[Dataset, dict]:
       
         d_output_sin_2chi_method = self._calculate_diff_d_spacing_vs_sin_2chi(ds)
-        
-        
+                
         return d_output_sin_2chi_method, kwargs
 
 
@@ -108,7 +107,7 @@ class DspacingSin_2chi(ProcPlugin):
         TypeError: If ds is not an instance of Dataset.
         """
         if not isinstance(ds, Dataset):
-            raise TypeError("Input must be an instance of Dataset.")
+            raise UserConfigError("Input must be an instance of Dataset.")
         
     def _ensure_axis_labels(self, ds: Dataset) -> None:
         """

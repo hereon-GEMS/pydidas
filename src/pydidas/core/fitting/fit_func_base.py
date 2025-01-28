@@ -238,6 +238,11 @@ class FitFuncBase(metaclass=FitFuncMeta):
             from the class attribute.
         """
         num_peaks = cls.num_peaks if num_peaks is None else num_peaks
+        if num_peaks > cls.num_peaks:
+            raise ValueError(
+                f"The requested number of peaks `{num_peaks}` is larger than the"
+                f"number of peaks defined by the function: `{cls.num_peaks}`."
+            )
         return [
             cls.center_param_index + i * cls.num_peak_params
             for i in range(0, num_peaks)

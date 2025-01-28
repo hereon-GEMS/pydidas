@@ -205,11 +205,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         Raises
         ------
-        TypeError
+        UserConfigError
             If the input is not of type Dataset.
-        KeyError
             If multiple 'chi' entries are found in the dataset.
-        ValueError
             If 'chi' or the key containing 'position' is missing in the dataset.
 
         Examples
@@ -233,11 +231,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # Check for multiple 'chi'
         if len(chi_indices) > 1:
-            raise KeyError('Multiple "chi" found. Check your dataset.')
+            raise UserConfigError('Multiple "chi" found. Check your dataset.')
 
         # Check for absence of 'chi'
         if not chi_indices:
-            raise ValueError("chi is missing. Check your dataset.")
+            raise UserConfigError("chi is missing. Check your dataset.")
 
         # Assuming there's exactly one 'chi', get the index
         chi_key = chi_indices[0]
@@ -261,7 +259,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # Check if 'position' is found
         if position_key is None:
-            raise ValueError('Key containing "position" is missing. Check your dataset.')
+            raise UserConfigError('Key containing "position" is missing. Check your dataset.')
 
         return (chi_key, position_key)
 

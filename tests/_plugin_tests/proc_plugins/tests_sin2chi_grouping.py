@@ -35,7 +35,7 @@ from dataclasses import dataclass
 
 from pydidas.plugins import PluginCollection
 from pydidas.plugins import ProcPlugin
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 
 from pydidas.core import Dataset, UserConfigError
 

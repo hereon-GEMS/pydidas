@@ -170,7 +170,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         TypeError: If ds is not an instance of Dataset.
         """
         if not isinstance(ds, Dataset):
-            raise TypeError("Input must be an instance of Dataset.")
+            raise UserConfigError("Input must be an instance of Dataset.")
         
 
     def _ensure_npt_azim_limit(self, chi: np.ndarray) -> None:

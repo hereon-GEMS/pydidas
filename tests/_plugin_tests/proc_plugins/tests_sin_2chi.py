@@ -227,7 +227,7 @@ def test__ensure_dataset_instance_valid_input(plugin_fixture):
     None,                # NoneType input
 ])
 def test__ensure_dataset_instance_invalid_input(plugin_fixture, invalid_input):
-    with pytest.raises(TypeError, match="Input must be an instance of Dataset."):
+    with pytest.raises(UserConfigError, match="Input must be an instance of Dataset."):
         plugin_fixture._ensure_dataset_instance(invalid_input)
 
 @pytest.fixture
@@ -318,7 +318,7 @@ def test_DspacingSin_2chi_params(plugin_fixture):
     assert plugin.plugin_name == 'Difference in d-spacing vs sin(2*chi)'
     assert plugin.plugin_type == PROC_PLUGIN
     assert plugin.basic_plugin == False
-    assert plugin.plugin_group == PROC_PLUGIN_INTEGRATED
+    assert plugin.plugin_group == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == 2
     assert plugin.output_data_dim == 2
     assert plugin.output_data_label == '0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg'

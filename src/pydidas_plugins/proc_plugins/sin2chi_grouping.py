@@ -943,11 +943,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_neg_sorted = d_spacing_neg[sorted_idx_neg]
 
         d_spacing_combi_arr = np.vstack((d_spacing_neg_sorted, d_spacing_pos_sorted))
-
-        # TODO: Is the data_label how we want them to be?
-        # TODO: Is the axis_label for idx 0 correct and a good axis label?
-        # TODO: I set the axis_ranges[1] explicitly to s2c_axis_pos_sorted. This why I did not detect in the corresponding test
-        # the problem with the .sort method on the Dataset. This covered the problem with the .sort method on the Dataset.
+        
         d_spacing_combined = Dataset(
             d_spacing_combi_arr,
             axis_ranges={0: np.arange(2), 1: s2c_axis_pos_sorted},

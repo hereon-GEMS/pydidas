@@ -26,8 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Gaussian"]
 
-
-from typing import Dict, List, Tuple, Union
+from numbers import Real
+from typing import Dict, Optional
 
 from numpy import amax, amin, exp, inf, ndarray, pi
 
@@ -43,9 +43,12 @@ class Gaussian(FitFuncBase):
     param_bounds_low = [0, 1e-20, -inf]
     param_bounds_high = [inf, inf, inf]
     param_labels = ["amplitude", "sigma", "center"]
+    num_peak_params = 3
+    center_param_index = 2
+    amplitude_param_index = 0
 
     @staticmethod
-    def func(c: Tuple, x: ndarray) -> ndarray:
+    def func(c: tuple[Real], x: ndarray) -> ndarray:
         """
         Get function values for a Gaussian function.
 
@@ -55,12 +58,12 @@ class Gaussian(FitFuncBase):
                + bg_0 + x * bg_1
 
         where A is the amplitude, mu is the expectation value, and sigma is the
-        variance. A polinomial background of 0th or 1st order can be added by
+        variance. A polynomial background of 0th or 1st order can be added by
         using additional coefficients.
 
         Parameters
         ----------
-        c : Tuple
+        c : tuple
             The tuple with the function parameters.
             c[0] : amplitude
             c[1] : sigma
@@ -79,8 +82,8 @@ class Gaussian(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: Union[None, int], **kwargs: Dict
-    ) -> List[float]:
+        cls, x: ndarray, y: ndarray, index: Optional[int], **kwargs: Dict
+    ) -> tuple[Real]:
         """
         Guess the starting parameters for a Gaussian peak fit.
 
@@ -90,15 +93,15 @@ class Gaussian(FitFuncBase):
             The x data points.
         y : np.ndarray
             The function data points to be fitted.
-        index : Union[None, int]
-            The peak index. Use None for a non-indexed single peak or the integer peak
-            number (starting with 1).
+        index : Optional[int]
+            The peak index. Use None for a non-indexed single peak or the
+             integer peak number (starting with 1).
         **kwargs : dict
             Optional keyword arguments.
 
         Returns
         -------
-        List[float]
+        tuple[Real]
             The list with estimated amplitude, width and center parameters.
         """
         if amin(y) < 0:
@@ -128,10 +131,10 @@ class Gaussian(FitFuncBase):
         # height of the normalized distribution which is
         # 1 / (sqrt(2 * PI) * sigma) = 1 / (0.40 * sigma)
         _amp = (_ycenter - amin(y)) * 2.5 * _sigma_start
-        return [_amp, _sigma_start, _center_start]
+        return _amp, _sigma_start, _center_start
 
-    @staticmethod
-    def fwhm(c: Tuple[float]) -> float:
+    @classmethod
+    def fwhm(cls, c: tuple[Real]) -> tuple[Real]:
         """
         Get the FWHM of the fit from the values of the fitted parameters.
 
@@ -142,13 +145,15 @@ class Gaussian(FitFuncBase):
 
         Returns
         -------
-        float
-            The function FWHM.
+        Real
+            The function FWHM(s) at all peak positions.
         """
-        return 2.3548200450 * c[1]
+        return tuple(
+            2.3548200450 * c[_i] for _i in [1 + 3 * _ii for _ii in range(cls.num_peaks)]
+        )
 
-    @staticmethod
-    def amplitude(c: Tuple[float]) -> float:
+    @classmethod
+    def amplitude(cls, c: tuple[Real]) -> tuple[Real]:
         """
         Get the amplitude of the peak from the values of the fitted parameters.
 
@@ -158,12 +163,14 @@ class Gaussian(FitFuncBase):
 
         Parameters
         ----------
-        c : tuple
+        c : tuple[Real]
             The tuple with the function parameters.
 
         Returns
         -------
-        float
-            The function amplitude.
+        tuple[Real]
+            The function amplitude(s) at all peak positions.
         """
-        return 0.39894228 * c[0] / c[1]
+        return tuple(
+            0.39894228 * c[0 + 3 * _i] / c[1 + 3 * _i] for _i in range(cls.num_peaks)
+        )

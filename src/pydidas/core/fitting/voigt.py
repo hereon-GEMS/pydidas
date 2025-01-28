@@ -26,8 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Voigt"]
 
-
-from typing import List, Tuple, Union
+from numbers import Real
+from typing import Union
 
 from numpy import amax, amin, inf, ndarray
 from scipy.special import voigt_profile
@@ -44,11 +44,12 @@ class Voigt(FitFuncBase):
     param_bounds_low = [0, 0, 0, -inf]
     param_bounds_high = [inf, inf, inf, inf]
     param_labels = ["amplitude", "sigma", "gamma", "center"]
+    amplitude_param_index = 0
     num_peak_params = 4
     center_param_index = 3
 
     @staticmethod
-    def func(c: Tuple, x: ndarray) -> ndarray:
+    def func(c: tuple[Real], x: ndarray) -> ndarray:
         """
         Get function values for a Voigt function.
 
@@ -57,7 +58,7 @@ class Voigt(FitFuncBase):
 
         Parameters
         ----------
-        c : Tuple
+        c : tuple
             The tuple with the function parameters.
             c[0] : amplitude
             c[1] : sigma
@@ -76,7 +77,7 @@ class Voigt(FitFuncBase):
     @classmethod
     def guess_peak_start_params(
         cls, x: ndarray, y: ndarray, index: Union[None, int], **kwargs: dict
-    ) -> List[float]:
+    ) -> tuple[Real]:
         """
         Guess the starting parameters for a Voigt peak fit.
 
@@ -94,7 +95,7 @@ class Voigt(FitFuncBase):
 
         Returns
         -------
-        List[float]
+        tuple[Real]
             The list with estimated amplitude, width and center parameters.
         """
         if amin(y) < 0:
@@ -126,10 +127,10 @@ class Voigt(FitFuncBase):
         # estimate the amplitude based on the maximum data height and the
         # height of the normalized distribution
         _amp = (_ycenter - amin(y)) / voigt_profile(0, _sigma_start, _gamma_start)
-        return [_amp, _sigma_start, _gamma_start, _center_start]
+        return _amp, _sigma_start, _gamma_start, _center_start
 
     @classmethod
-    def fwhm(cls, c: Tuple[float]) -> float:
+    def fwhm(cls, c: tuple[Real]) -> tuple[Real]:
         """
         Get the FWHM of the fit from the values of the parameters.
 
@@ -143,18 +144,21 @@ class Voigt(FitFuncBase):
 
         Parameters
         ----------
-        c : tuple
+        c : tuple[Real]
             The tuple with the function parameters.
 
         Returns
         -------
-        float
-            The function FWHM.
+        tuple[Real]
+            The function FWHM(s) for each peak.
         """
-        return 1.0686 * c[2] + (0.8676 * c[2] ** 2 + 5.545177 * c[1] ** 2) ** 0.5
+        return tuple(
+            1.0686 * c[i + 1] + (0.8676 * c[i + 1] ** 2 + 5.545177 * c[i] ** 2) ** 0.5
+            for i in [1 + 4 * _ii for _ii in range(cls.num_peaks)]
+        )
 
-    @staticmethod
-    def amplitude(c: Tuple[float]) -> float:
+    @classmethod
+    def amplitude(cls, c: tuple[Real]) -> tuple[Real]:
         """
         Get the amplitude of the peak from the values of the fitted parameters.
 
@@ -165,7 +169,10 @@ class Voigt(FitFuncBase):
 
         Returns
         -------
-        float
-            The function amplitude.
+        tuple[Real]
+            The function amplitude(s).
         """
-        return c[0] * voigt_profile(0, c[1], c[2])
+        return tuple(
+            c[_i] * voigt_profile(0, c[_i + 1], c[_i + 2])
+            for _i in [4 * _ii for _ii in range(cls.num_peaks)]
+        )

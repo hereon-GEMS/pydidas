@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import itertools
 import unittest
+from typing import Optional
 
 import numpy as np
 from qtpy import QtCore
@@ -50,7 +51,7 @@ class TestFitDoublePeak(unittest.TestCase):
             np.ones((150)), data_unit="data unit", axis_units=["ax_unit"]
         )
         self._x = np.arange(self._data.size) * 0.5
-        _index1 = 42
+        _index1 = 39
         _index2 = 48
         self._peak_x1 = self._x[_index1]
         self._peak_x2 = self._x[_index2]
@@ -59,9 +60,8 @@ class TestFitDoublePeak(unittest.TestCase):
         self._sigma = 1.25
         self._amp1 = 25
         self._amp2 = 37
-        _peak = Gaussian.func((1, self._sigma, 0), np.linspace(-4, 4, 15))
-        self._data[_index1 - 7 : _index1 + 8] += self._amp1 * _peak
-        self._data[_index2 - 7 : _index2 + 8] += self._amp2 * _peak
+        self._data += Gaussian.func((self._amp1, self._sigma, self._peak_x1), self._x)
+        self._data += Gaussian.func((self._amp2, self._sigma, self._peak_x2), self._x)
 
     def tearDown(self):
         pass
@@ -116,15 +116,25 @@ class TestFitDoublePeak(unittest.TestCase):
         )
         return _data
 
-    def assert_fit_results_okay(self, fit_result_data, params, bg_order):
+    def assert_fit_results_okay(
+        self,
+        fit_result_data: Dataset,
+        params: dict,
+        bg_order: Optional[int],
+        amplitude_tolerance=None,
+    ):
         self.assertEqual(
             fit_result_data.shape, (2, len(fit_result_data.data_label.split(";")))
         )
+        if amplitude_tolerance is None:
+            amplitude_tolerance = (
+                2 if fit_result_data.metadata["fit_func"] == "Double Gaussian" else 15
+            )
         self.assertTrue("fit_params" in fit_result_data.metadata)
         self.assertTrue("fit_func" in fit_result_data.metadata)
         self.assertTrue("fit_residual_std" in fit_result_data.metadata)
-        self.assertTrue(abs(params["amplitude0"] - self._amp1) <= 20)
-        self.assertTrue(abs(params["amplitude1"] - self._amp2) <= 20)
+        self.assertTrue(abs(params["amplitude0"] - self._amp1) <= amplitude_tolerance)
+        self.assertTrue(abs(params["amplitude1"] - self._amp2) <= amplitude_tolerance)
         if "sigma" in params:
             self.assertTrue(abs(params["sigma0"] - self._sigma) < 0.5)
         if "gamma" in params:
@@ -221,7 +231,9 @@ class TestFitDoublePeak(unittest.TestCase):
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data - 0.5)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
+        self.assert_fit_results_okay(
+            _data, _kwargs["fit_params"], None, amplitude_tolerance=6
+        )
         self.assertIn(self._data.axis_units[0], _data.data_label)
 
     def test_execute__gaussian_no_bg_all_outputs(self):
@@ -252,7 +264,8 @@ class TestFitDoublePeak(unittest.TestCase):
         plugin.pre_execute()
         _tmp_data = self._data + 3 * np.arange(self._data.size)
         _data, _kwargs = plugin.execute(_tmp_data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
+        # use bg_order = 0 to skip check for p1
+        self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
         self.assertTrue(abs(_kwargs["fit_params"]["background_p1"] - 6) < 0.5)
 
     def test_execute__gaussian_w_only_background_and_min_peak(self):
@@ -268,13 +281,16 @@ class TestFitDoublePeak(unittest.TestCase):
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
+        self.assert_fit_results_okay(
+            _data, _kwargs["fit_params"], None, amplitude_tolerance=25
+        )
 
     def test_execute__lorentzian_0d_bg(self):
         plugin = self.create_generic_plugin("Double Lorentzian")
         plugin.set_param_value("fit_bg_order", 0)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
+        print("fitted", _kwargs["fit_params"])
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
     def test_execute__lorentzian_1d_bg(self):

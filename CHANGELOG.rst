@@ -69,6 +69,7 @@ Bugfixes
 - Fixed the pyFAIcalibFrame to be compatible with pyFAI 2024.09
 - Fixed an issue with the WorkerController when the thread shutdown was toggled
   while waiting in a sleep state.
+- Fixed a bug in fitting plugins which only returned a single fit parameter.
 
 
 v24.09.19

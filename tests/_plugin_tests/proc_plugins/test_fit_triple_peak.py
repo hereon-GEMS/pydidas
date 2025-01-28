@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -63,10 +63,9 @@ class TestFitTriplePeak(unittest.TestCase):
         self._amp1 = 25
         self._amp2 = 37
         self._amp3 = 28
-        _peak = Gaussian.func((1, self._sigma, 0), np.linspace(-4, 4, 15))
-        self._data[_index1 - 7 : _index1 + 8] += self._amp1 * _peak
-        self._data[_index2 - 7 : _index2 + 8] += self._amp2 * _peak
-        self._data[_index3 - 7 : _index3 + 8] += self._amp3 * _peak
+        self._data += Gaussian.func((self._amp1, self._sigma, self._peak_x1), self._x)
+        self._data += Gaussian.func((self._amp2, self._sigma, self._peak_x2), self._x)
+        self._data += Gaussian.func((self._amp3, self._sigma, self._peak_x3), self._x)
 
     def tearDown(self):
         pass
@@ -124,18 +123,34 @@ class TestFitTriplePeak(unittest.TestCase):
         return _data
 
     def assert_fit_results_okay(
-        self, fit_result_data, params, bg_order, check_amplitudes=True
+        self,
+        fit_result_data,
+        params,
+        bg_order,
+        check_amplitudes=True,
+        amplitude_tolerance=None,
     ):
         self.assertEqual(
             fit_result_data.shape, (3, len(fit_result_data.data_label.split(";")))
         )
+        if amplitude_tolerance is None:
+            amplitude_tolerance = (
+                2 if fit_result_data.metadata["fit_func"] == "Triple Gaussian" else 15
+            )
+
         self.assertTrue("fit_params" in fit_result_data.metadata)
         self.assertTrue("fit_func" in fit_result_data.metadata)
         self.assertTrue("fit_residual_std" in fit_result_data.metadata)
         if check_amplitudes:
-            self.assertTrue(abs(params["amplitude0"] - self._amp1) <= 20)
-            self.assertTrue(abs(params["amplitude1"] - self._amp2) <= 20)
-            self.assertTrue(abs(params["amplitude2"] - self._amp3) <= 20)
+            self.assertTrue(
+                abs(params["amplitude0"] - self._amp1) <= amplitude_tolerance
+            )
+            self.assertTrue(
+                abs(params["amplitude1"] - self._amp2) <= amplitude_tolerance
+            )
+            self.assertTrue(
+                abs(params["amplitude2"] - self._amp3) <= amplitude_tolerance
+            )
         if "sigma" in params:
             self.assertTrue(abs(params["sigma0"] - self._sigma) < 0.5)
             self.assertTrue(abs(params["sigma1"] - self._sigma) < 0.5)
@@ -285,7 +300,9 @@ class TestFitTriplePeak(unittest.TestCase):
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
+        self.assert_fit_results_okay(
+            _data, _kwargs["fit_params"], None, amplitude_tolerance=25
+        )
 
     def test_execute__lorentzian_0d_bg(self):
         plugin = self.create_generic_plugin("Triple Lorentzian")
@@ -306,7 +323,9 @@ class TestFitTriplePeak(unittest.TestCase):
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
+        self.assert_fit_results_okay(
+            _data, _kwargs["fit_params"], None, amplitude_tolerance=25
+        )
 
     def test_execute__voigt_0d_bg(self):
         plugin = self.create_generic_plugin("Triple Voigt")

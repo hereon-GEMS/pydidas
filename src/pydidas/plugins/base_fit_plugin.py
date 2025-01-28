@@ -27,8 +27,6 @@ __status__ = "Production"
 __all__ = ["BaseFitPlugin"]
 
 
-from typing import List
-
 import numpy as np
 from qtpy import QtWidgets
 from scipy.optimize import least_squares
@@ -181,7 +179,7 @@ class BaseFitPlugin(ProcPlugin):
                 self._config["param_bounds_high"],
             ),
         )
-        _res_c = self._fitter.sort_fitted_peaks_by_position(_res.x)
+        _res_c = self._fitter.sort_fitted_peaks_by_position(tuple(_res.x))
         self._fit_params = dict(zip(self._config["param_labels"], _res_c))
         kwargs = kwargs | {
             "fit_params": self._fit_params,
@@ -212,7 +210,7 @@ class BaseFitPlugin(ProcPlugin):
         """
         _new_data = np.full(self._config["result_shape"], np.nan)
         if valid and self.check_center_positions():
-            _fit_pvals = list(self._fit_params.values())
+            _fit_pvals = tuple(self._fit_params.values())
             _datafit = self._fitter.profile(_fit_pvals, self._data_x)
             _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
             if _residual <= self._config["sigma_threshold"]:
@@ -254,7 +252,7 @@ class BaseFitPlugin(ProcPlugin):
         np.ndarray
             The new data array with the results.
         """
-        _fit_pvals = list(self._fit_params.values())
+        _fit_pvals = tuple(self._fit_params.values())
         for _i, _key in enumerate(self.fit_outputs):
             if _key in ["position", "amplitude", "area", "FWHM", "background"]:
                 _attr = getattr(self._fitter, _key.lower())
@@ -441,7 +439,7 @@ class BaseFitPlugin(ProcPlugin):
         """
         _min_peak = self._config["min_peak_height"]
         if _min_peak is not None:
-            _tmp_y, bg_params = self._fitter.calculate_background_params(
+            _tmp_y, bg_params = self._fitter.estimate_background_params(
                 self._data_x, self._data, self.get_param_value("fit_bg_order")
             )
             if np.amax(_tmp_y) < _min_peak:
@@ -451,7 +449,9 @@ class BaseFitPlugin(ProcPlugin):
                 return False
         return True
 
-    def create_detailed_results(self, results: Dataset, start_fit_params: List) -> dict:
+    def create_detailed_results(
+        self, results: Dataset, start_fit_params: tuple[float]
+    ) -> dict:
         """
         Create the detailed results for a single fit.
 
@@ -468,7 +468,7 @@ class BaseFitPlugin(ProcPlugin):
         ----------
         results : pydidas.core.Dataset
             The Dataset with the regular results.
-        start_fit_params : list
+        start_fit_params : tuple[float]
             The list with the starting fit params.
 
         Returns
@@ -481,7 +481,7 @@ class BaseFitPlugin(ProcPlugin):
         _xfit = np.linspace(
             self._data_x[0], self._data_x[-1], num=(self._data_x.size - 1) * 10 + 1
         )
-        _fit_param_vals = list(self._fit_params.values())
+        _fit_param_vals = tuple(self._fit_params.values())
         _dset_kws = {
             "axis_ranges": [_xfit],
             "axis_labels": self._data.axis_labels,
@@ -528,7 +528,9 @@ class BaseFitPlugin(ProcPlugin):
             _details["items"].append({"plot": 0, "label": "background", "data": _bg})
         return _details
 
-    def _create_details_for_invalid_peak(self, bg_corrected_data, bg_params):
+    def _create_details_for_invalid_peak(
+        self, bg_corrected_data: np.ndarray, bg_params: tuple[float]
+    ):
         """
         Create the details for an invalid peak.
 
@@ -536,7 +538,7 @@ class BaseFitPlugin(ProcPlugin):
         ----------
         bg_corrected_data : np.ndarray
             The background-corrected data.
-        bg_params : list
+        bg_params : tuple[float]
             The parameters to calculate the background level.
 
         Returns

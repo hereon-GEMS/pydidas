@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -48,7 +48,7 @@ class TestGaussian(unittest.TestCase):
             axis_units=["ax_unit"],
             axis_ranges=[self._x],
         )
-        self._params = [self._amplitude, self._sigma, self._x0]
+        self._params = (self._amplitude, self._sigma, self._x0)
 
     def tearDown(self):
         pass
@@ -101,7 +101,7 @@ class TestGaussian(unittest.TestCase):
 
     def test_amplitude(self):
         _amp = Gaussian.amplitude(self._params)
-        self.assertAlmostEqual(np.amax(self._data), _amp)
+        self.assertAlmostEqual(np.amax(self._data), max(_amp))
 
     def test_fwhm(self):
         _y_max = np.amax(self._data)

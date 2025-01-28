@@ -28,15 +28,10 @@ __status__ = "Production"
 __all__ = ["TripleVoigt"]
 
 
-from typing import Tuple
-
-from scipy.special import voigt_profile
-
-from pydidas.core.fitting.multi_peak_mixin import MultiPeakMixin
 from pydidas.core.fitting.voigt import Voigt
 
 
-class TripleVoigt(MultiPeakMixin, Voigt):
+class TripleVoigt(Voigt):
     """
     Class for fitting a triple Voigt function.
 
@@ -79,86 +74,3 @@ class TripleVoigt(MultiPeakMixin, Voigt):
     param_bounds_low = Voigt.param_bounds_low * num_peaks
     param_bounds_high = Voigt.param_bounds_high * num_peaks
     param_labels = [f"{key}{i}" for i in range(num_peaks) for key in Voigt.param_labels]
-
-    @staticmethod
-    def fwhm(c: Tuple) -> Tuple[float]:
-        """
-        Get the FWHM of the fit from the values of the parameters.
-
-        The FWHM for the Voigt function is determined according to Kielkopf:
-        John F. Kielkopf: New approximation to the Voigt function with applications
-        to spectral-line profile analysis. 8. Auflage. Vol. 63. Journal of the Optical
-        Society of America, 1973.
-
-        Parameters
-        ----------
-        c : tuple
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float, float]
-            The function FWHMs for the first an second peak.
-        """
-        return (
-            0.5343 * c[2] + (0.2169 * c[2] ** 2 + 5.545177 * c[1] ** 2) ** 0.5,
-            0.5343 * c[6] + (0.2169 * c[6] ** 2 + 5.545177 * c[5] ** 2) ** 0.5,
-            0.5343 * c[10] + (0.2169 * c[10] ** 2 + 5.545177 * c[9] ** 2) ** 0.5,
-        )
-
-    @staticmethod
-    def area(c: Tuple) -> Tuple[float]:
-        """
-        Get the peak area based on the values of the parameters.
-
-        For all normalized fitting functions, the area is equal to the amplitude term.
-
-        Parameters
-        ----------
-        c : tuple
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The areas of the two peaks defined through the given parameters c.
-        """
-        return (c[0], c[4], c[8])
-
-    @staticmethod
-    def center(c: Tuple[float]) -> Tuple[float]:
-        """
-        Get the center positions.
-
-        Parameters
-        ----------
-        c : Tuple[float]
-            The fitted parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The center positions of the peaks.
-        """
-        return (c[3], c[7], c[11])
-
-    @staticmethod
-    def amplitude(c: Tuple) -> float:
-        """
-        Get the amplitude of the peaks from the values of the fitted parameters.
-
-        Parameters
-        ----------
-        c : tuple
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The peaks' amplitude.
-        """
-        return (
-            c[0] * voigt_profile(0, c[1], c[2]),
-            c[4] * voigt_profile(0, c[5], c[6]),
-            c[8] * voigt_profile(0, c[9], c[10]),
-        )

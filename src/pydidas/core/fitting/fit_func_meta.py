@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["FitFuncMeta"]
 
 
-from typing import Tuple, TypeVar
+from typing import TypeVar
 
 
 FitFuncBase = TypeVar("FitFuncBase")
@@ -40,18 +40,17 @@ class FitFuncMeta(type):
 
     registry = {}
 
-    def __new__(mcs, clsname, bases, attrs):
+    def __new__(mcls, cls_name: str, bases: tuple, attrs: dict):
         """
-        Call the class' (i.e. the WorkflowTree exporter) __new__ method
-        and register the class with the registry.
+        Call the class' __new__ method and register the class with the registry.
 
         Parameters
         ----------
-        mcs : type
+        mcls : type
             The new class.
-        clsname : str
+        cls_name : str
             The name of the new class
-        bases : list
+        bases : tuple
             The list of class bases.
         attrs : dict
             The class attributes.
@@ -61,19 +60,19 @@ class FitFuncMeta(type):
         type
             The new class.
         """
-        _new_class = super(FitFuncMeta, mcs).__new__(mcs, clsname, bases, attrs)
-        mcs.register_class(_new_class)
+        _new_class = super(FitFuncMeta, mcls).__new__(mcls, cls_name, bases, attrs)
+        mcls.register_class(_new_class)
         return _new_class
 
     @classmethod
-    def clear_registry(mcs):
+    def clear_registry(mcls):
         """
         Clear the registry and remove all items.
         """
-        mcs.registry = {}
+        mcls.registry = {}
 
     @classmethod
-    def register_class(mcs, new_class: FitFuncBase, update_registry=False):
+    def register_class(mcls, new_class: FitFuncBase, update_registry: bool = False):
         """
         Register a fit function class.
 
@@ -94,14 +93,14 @@ class FitFuncMeta(type):
         _name = new_class.name
         if _name == "base fit function":
             return
-        if _name in mcs.registry and not update_registry:
+        if _name in mcls.registry and not update_registry:
             raise KeyError(
                 f"A fitting function with the name '{_name}' is already registered."
             )
-        mcs.registry[_name] = new_class
+        mcls.registry[_name] = new_class
 
     @classmethod
-    def get_fitter(mcs, name: str) -> FitFuncBase:
+    def get_fitter(mcls, name: str) -> FitFuncBase:
         """
         Get the fit function class referenced by given name.
 
@@ -115,10 +114,10 @@ class FitFuncMeta(type):
         FitFuncBase
             The fitter class.
         """
-        return mcs.registry[name]
+        return mcls.registry[name]
 
     @classmethod
-    def get_fitter_names_with_num_peaks(mcs, num_peaks: int) -> Tuple[str]:
+    def get_fitter_names_with_num_peaks(mcls, num_peaks: int) -> tuple[str]:
         """
         Get the names of all FitFuncBase classes with the given number of peaks.
 
@@ -129,12 +128,12 @@ class FitFuncMeta(type):
 
         Returns
         -------
-        Tuple[str]
+        tuple[str]
             The tuple with the names of the FitFuncBase classes that have registered
             with the given number of peaks.
         """
         return tuple(
             _key
-            for _key, _class in mcs.registry.items()
+            for _key, _class in mcls.registry.items()
             if _class.num_peaks == num_peaks
         )

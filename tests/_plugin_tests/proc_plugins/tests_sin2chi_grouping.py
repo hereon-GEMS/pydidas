@@ -559,7 +559,7 @@ def test__extract_and_verify_units_position_missing(plugin_fixture, base_dataset
     test_ds.data_label=f'length / {UNITS_ANGSTROM}'
 
     # Check that UserConfigError is raised when 'position' is missing
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(UserConfigError) as excinfo:
         plugin._extract_and_verify_units(test_ds)
     
     assert f"Key '{LABELS_POSITION}' not found in data_label." in str(excinfo.value)    
@@ -571,7 +571,7 @@ def test__extract_and_verify_units_position_unit_wrong(plugin_fixture, base_data
     test_ds.data_label = f'{LABELS_POSITION} / m'  # Set an invalid unit for position
 
     # Check that ValueError is raised when the unit for 'position' is not allowed
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(UserConfigError) as excinfo:
         plugin._extract_and_verify_units(test_ds)
     
     assert f"Unit 'm' is not allowed for key '{LABELS_POSITION}." in str(excinfo.value)    
@@ -672,7 +672,7 @@ def test__chi_pos_verification_missing_position(plugin_fixture):
     axis_labels = ["y", "x", "chi", fit_labels]
 
     ds = Dataset(result_array_spatial, axis_labels=axis_labels)
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification(ds)
     assert 'Key containing "position" is missing' in str(excinfo.value)
     
@@ -680,7 +680,7 @@ def test_chi_pos_verification_wrong_input_type(plugin_fixture):
     
     plugin = plugin_fixture
     
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification([])  # Pass a list instead of a Dataset
     assert "Input must be an instance of Dataset." in str(excinfo.value), "Error message should indicate wrong type for Dataset."
 
@@ -693,7 +693,7 @@ def test__chi_pos_verification_all_labels_missing(plugin_fixture):
 
     # labels are missing while creating a Dataset
     ds = Dataset(result_array_spatial)
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification(ds)
     assert "chi is missing" in str(excinfo.value)
 
@@ -715,7 +715,7 @@ def test__multiple_chis_in_labels(plugin_fixture):
 
     ds = Dataset(result_array_spatial, axis_labels=axis_labels, data_label=data_labels)
 
-    with pytest.raises(KeyError) as excinfo:
+    with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification(ds)
 
     assert 'Multiple "chi" found' in str(
@@ -761,7 +761,7 @@ def test__position_not_at_zero_3d(plugin_fixture):
 def test__ds_slicing_type_error(plugin_fixture):
     plugin = plugin_fixture
     
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(UserConfigError) as excinfo:
         plugin._ds_slicing([])  # Pass an empty list instead of a Dataset
     assert "Input must be an instance of Dataset." in str(
         excinfo.value
@@ -2157,7 +2157,7 @@ def test_execute_with_various_cases_1d(plugin_fixture, case):
 ])
 def test_execute_with_invalid_input(plugin_fixture, invalid_input):
     plugin = plugin_fixture
-    with pytest.raises((AttributeError, TypeError)):
+    with pytest.raises((AttributeError, UserConfigError)):
         plugin.execute(invalid_input)
 
 @pytest.mark.parametrize("data, expected_error_message", [
@@ -2203,7 +2203,7 @@ def test_execute_with_missing_field(plugin_fixture, base_execute_dataset, missin
     elif removal_key == 4:
         test_ds.update_axis_unit(0, 'dummy')
      
-    with pytest.raises(ValueError, match=expected_error_message):
+    with pytest.raises(UserConfigError, match=expected_error_message):
         plugin.execute(test_ds)
 
 @pytest.mark.parametrize("fit_label, data_label, expected_units_dict", [

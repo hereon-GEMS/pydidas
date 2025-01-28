@@ -102,7 +102,7 @@ class DspacingSin_2chi(ProcPlugin):
             raise UserConfigError(
                 "Cannot calculate the output shape because the input shape is unknown."
             )
-        self._config["result_shape"] = (3, _shape[1])  
+
         
 
     def _ensure_dataset_instance(self, ds: Dataset) -> None:

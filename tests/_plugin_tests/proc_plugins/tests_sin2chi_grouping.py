@@ -2252,7 +2252,7 @@ def test__chi_pos_unit_verification_error_position_unit(plugin_fixture, base_exe
     test_ds.update_axis_label(1, fit_label)
     test_ds.data_label = data_label
     
-    with pytest.raises(ValueError, match=expected_error_message):
+    with pytest.raises(UserConfigError, match=expected_error_message):
         plugin._chi_pos_unit_verification(test_ds)
         
 @pytest.mark.parametrize('fit_label, data_label',
@@ -2289,7 +2289,7 @@ def test__chi_pos_unit_verification_error_chi_unit(plugin_fixture, base_execute_
     test_ds = base_execute_dataset
     test_ds.update_axis_unit(0, chi_unit)
     
-    with pytest.raises(ValueError, match=expected_error_message):
+    with pytest.raises(UserConfigError, match=expected_error_message):
         plugin._chi_pos_unit_verification(test_ds)
 
 @pytest.mark.parametrize("ds_units_dict, pos_index, expected_param_with_unit",[

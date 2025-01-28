@@ -55,7 +55,7 @@ def test_plugin_initialization(plugin_fixture):
     assert plugin.plugin_name == "Group d-spacing according to sin^2(chi) method"
     assert plugin.basic_plugin == False
     assert plugin.plugin_type == PROC_PLUGIN
-    assert plugin.plugin_subtype == PROC_PLUGIN_INTEGRATED
+    assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == -1
     assert plugin.output_data_dim == 2
     assert plugin.output_data_label == "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"

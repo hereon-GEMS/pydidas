@@ -997,13 +997,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 data_label='d_spacing'
             )
              
-             
-        #print("\N{Hot Pepper}" * 30)
-        #print('Between hot pepper and strawberry') 
-        #print('Shape: ', result.shape)
-        #print('result\n', result)
-        #print("\N{Strawberry}" * 30)
-        
     
         return result
     

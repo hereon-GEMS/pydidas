@@ -8,19 +8,14 @@
 [![zenodo badge](https://zenodo.org/badge/DOI/10.5281/zenodo.7568610.svg)](https://doi.org/10.5281/zenodo.7568610)
 
 
-pydidas (the Python DIffraction Data Analysis Suite) is a toolkit for
-the analysis of diffraction datasets, both live at beamlines and
-offline for in-depth analysis.
+pydidas (an acronym for the **Py**thon **di**ffraction **d**ata **a**nalysis **s**uite)
+is a toolkit for the analysis of X-ray diffraction datasets. It is designed to
+be accessible also for users with little experience in diffraction data analysis
+in order to broaden the user base of diffraction techniques and to make diffraction
+analysis more accessible for domain scientists.
 
 Pydidas includes a graphical user interface and a command line interface to
 embed its functionality in other projects or scripts.
-
-Pydidas relies on Qt for the user interface and for internal communication.
-Some widgets are extensions of [silx](https://github.com/silx-kit/silx) widgets.
-The (azimuthal/radial) integration uses the [pyFAI](https://github.com/silx-kit/pyFAI)
-engine for fast azimuthal integration. Both ``pyFAI`` and ``silx`` are developed at
-the [ESRF](https://www.esrf.fr/).
-
 
 ## References
 * Please check the citation file CITATION.cff
@@ -41,7 +36,7 @@ tested extensively with Python 3.13.
 
 Environments can be managed using any environment manager (e.g. venv,
 conda/mamba). Due to dependency management issues, pydidas does not support
-pre-configured conda/mamba environments any more but relies exclusively on pip
+pre-configured conda/mamba environments anymore but relies exclusively on pip
 for the dependency management.
 
 Pip will install all dependencies together with the pydidas package.
@@ -104,7 +99,7 @@ If installed as wheel, pydidas offers the following entry points:
     only cleans up the system.
 
 ### Scripts
-Pydidas includes multiple scripts which are located in the `pydidas_scripts` folder.
+Pydidas includes multiple scripts which are located in the `src/pydidas_scripts` folder.
 These can be called directly by python from the command line and they are:
   - `pydidas_gui.py` to start the GUI.
   - `pydidas_documentation.py` to open the html documentation in a browser.
@@ -116,8 +111,8 @@ These can be called directly by python from the command line and they are:
 ### Command line
 Much of pydidas' functionality is also available from the command line or notebooks.
 Pydidas can be imported and used as any other python module. Please refer to the 
-documentation for more details (see the entrypoint and script for opening the 
-documentation above).
+documentaion for more details (see the section below on how to access the 
+documentation). 
 
 ## Documentation
 
@@ -134,7 +129,10 @@ global start page.
 
 A ``pydidas-documentation`` entrypoint is available to open the documentation in the
 system's default browser.
+
 The graphical user interface also has a menu entry to open the help in a web browser.
+Pressing F1 in the graphical user interface will also open the help in the system's 
+default webbrowser.
 
 ### Online documentation
 
@@ -160,3 +158,10 @@ Images and logos are licensed under Creative Commons Attribution-NoDerivatives
 Insignificant files (e.g. changelog) are released under the CC0 1.0 Universal
 Public Domain Dedication (CC0-1.0).
 
+## Acknolwedgements
+pydidas is developed at [Helmholtz-Zentrum Hereon](https://www.hereon.de) and the 
+development is supported by [DAPHNE4NFDI](https://www.daphne4nfdi.de).
+
+The (azimuthal/radial) integration uses the [pyFAI](https://github.com/silx-kit/pyFAI)
+engine for fast azimuthal integration. Some widgets are extensions of [silx](https://github.com/silx-kit/silx) 
+widgets. Both ``pyFAI`` and ``silx`` are developed at the [ESRF](https://www.esrf.fr/).

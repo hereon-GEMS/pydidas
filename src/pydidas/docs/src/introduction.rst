@@ -29,8 +29,10 @@ The rational behind these two use cases are
 
 **Acknowledgements**
 
-The pydidas project is funded by `Helmholtz-Zentrum Hereon 
-<http://www.hereon.de>`_\ .
+The pydidas project is funded by `Helmholtz-Zentrum Hereon
+<http://www.hereon.de>`_  and through the `DAPHNE4NFDI <https://www.daphne4nfdi.de/>`_
+project within `Task area 3: Infrastructure for Data and Software Reuse
+<https://www.daphne4nfdi.de/english/73.php>`_\ .
 
 The pydidas software uses widgets and tools from the
 `pyFAI <https://pyfai.readthedocs.io/>`_ and `silx <http://www.silx.org/>`_ 

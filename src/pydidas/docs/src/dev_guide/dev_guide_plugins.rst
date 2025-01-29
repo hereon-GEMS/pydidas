@@ -188,10 +188,6 @@ there are no setter methods defined for these properties.**
  - :py:data:`result_title` (type: :py:data:`str`):
     The plugin's title. This property gives a formatted string including the plugin
     name and the node ID.
- - :py:data:`input_shape` (type: :py:data:`tuple`):
-    The shape of the input data. This property also has a setter method and will
-    usually be called by the parent plugin (i.e. the plugin which precedes the current
-    plugin in the workflow) to set the input shape.
 
 :ref:`(go back to top of the page) <developer_guide_to_plugins>`
 

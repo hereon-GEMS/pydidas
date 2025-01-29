@@ -27,13 +27,10 @@ __status__ = "Production"
 __all__ = ["TripleGaussian"]
 
 
-from typing import Tuple
-
 from pydidas.core.fitting.gaussian import Gaussian
-from pydidas.core.fitting.multi_peak_mixin import MultiPeakMixin
 
 
-class TripleGaussian(MultiPeakMixin, Gaussian):
+class TripleGaussian(Gaussian):
     """
     Class for fitting a triple Gaussian function to data.
 
@@ -74,83 +71,3 @@ class TripleGaussian(MultiPeakMixin, Gaussian):
     param_labels = [
         f"{key}{i}" for i in range(num_peaks) for key in Gaussian.param_labels
     ]
-
-    @staticmethod
-    def fwhm(c: Tuple) -> Tuple[float]:
-        """
-        Get the FWHM of the fit from the values of the parameters.
-
-        This method needs to be implemented by each fitting function.
-
-        Parameters
-        ----------
-        c : tuple
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float, float]
-            The function FWHMs for the first an second peak.
-        """
-        return (2.354820 * c[1], 2.354820 * c[4], 2.354820 * c[7])
-
-    @staticmethod
-    def area(c: Tuple) -> Tuple[float]:
-        """
-        Get the peak area based on the values of the parameters.
-
-        For all normalized fitting functions, the area is equal to the amplitude term.
-
-        Parameters
-        ----------
-        c : tuple
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The areas of the two peaks defined through the given parameters c.
-        """
-        return (c[0], c[3], c[6])
-
-    @staticmethod
-    def center(c: Tuple[float]) -> Tuple[float]:
-        """
-        Get the center positions.
-
-        Parameters
-        ----------
-        c : Tuple[float]
-            The fitted parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The center positions of the peaks.
-        """
-        return (c[2], c[5], c[8])
-
-    @staticmethod
-    def amplitude(c: Tuple) -> Tuple[float]:
-        """
-        Get the amplitude of the peaks from the values of the fitted parameters.
-
-        For a Gaussian function, this corresponds to
-
-        I_peak = A / (sigma * sqrt(2 * Pi))
-
-        Parameters
-        ----------
-        c : tuple
-            The tuple with the function parameters.
-
-        Returns
-        -------
-        Tuple[float]
-            The peaks' amplitude.
-        """
-        return (
-            0.39894228 * c[0] / c[1],
-            0.39894228 * c[3] / c[4],
-            0.39894228 * c[6] / c[7],
-        )

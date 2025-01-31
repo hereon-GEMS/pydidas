@@ -72,6 +72,33 @@ def _get_base_class(cls: Any) -> Union[type, Real, Integral, None]:
     return cls
 
 
+def _outside_range_string(val: object, range_: tuple[Real, Real]) -> str:
+    return (
+        f"The new value `{val}` is outside of the range for the "
+        f"Parameter (valid range: {range})."
+    )
+
+
+def _invalid_choice_str(val: object, choices: list) -> str:
+    return (
+        f"The selected value '{val}' does not correspond to any of the allowed "
+        f"choices: {choices}"
+    )
+
+
+def _value_set_valueerror_str(parameter: object, val: object) -> str:
+    _subtype = (
+        f"[{parameter._Parameter__meta['subtype'].__name__}]"
+        if parameter._Parameter__meta["subtype"]
+        else ""
+    )
+    return (
+        f"Cannot set Parameter (object ID:{id(parameter)}, refkey: '{parameter.refkey}', "
+        f"name: '{parameter.name}) because it is of the wrong data type. "
+        f"(expected: {parameter.dtype}({_subtype}), input type: {type(val)})"
+    )
+
+
 class Parameter:
     """
     A class used for storing a value and associated metadata.
@@ -519,27 +546,18 @@ class Parameter:
             datatype.
         """
         val = self.__convenience_type_conversion(val)
-        if self.__type in [Integral, Real] and self.__meta["range"] is not None:
-            if val < self.__meta["range"][0] or val > self.__meta["range"][1]:
-                raise UserConfigError(
-                    f"The new value `{val}` is outside of the the range for the "
-                    f"Parameter (valid range: {self.__meta['range']}."
-                )
+
+        if (
+            self.__type in _NUMBERS
+            and self.__meta["range"] is not None
+            and val is not None
+        ):
+            if not self.__meta["range"][0] <= val <= self.__meta["range"][1]:
+                raise UserConfigError(_outside_range_string(val, self.__meta["range"]))
         if self.__meta["choices"] and val not in self.__meta["choices"]:
-            raise ValueError(
-                f"The selected value '{val}' does not correspond to any of the allowed "
-                f"choices: {self.__meta['choices']}"
-            )
-        if not (self.__typecheck(val) or self.__meta["optional"] and (val is None)):
-            _name = self.__meta["name"]
-            _subtype = (
-                f"[{self.__meta['subtype'].__name__}]" if self.__meta["subtype"] else ""
-            )
-            raise ValueError(
-                f"Cannot set Parameter (object ID:{id(self)}, refkey: '{self.__refkey}'"
-                f", name: '{_name}') because it is of the wrong data type. (expected: "
-                f"{self.__type}{_subtype}, input type: {type(val)}"
-            )
+            raise ValueError(_invalid_choice_str(val, self.__meta["choices"]))
+        if not (self.__typecheck(val) or (self.__meta["optional"] and val is None)):
+            raise ValueError(_value_set_valueerror_str(self, val))
         self.__value = val
 
     @property
@@ -596,7 +614,7 @@ class Parameter:
         ValueError
             If the new range is not a tuple of two numbers.
         """
-        if self.__type not in [Integral, Real]:
+        if self.__type not in _NUMBERS:
             raise UserConfigError(
                 "The range attribute is only supported for numerical data types."
             )

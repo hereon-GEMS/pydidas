@@ -282,6 +282,12 @@ class TestParameter(unittest.TestCase):
                 with self.assertRaises(UserConfigError):
                     obj.value = _val
 
+    def test_set_value__w_range_to_None(self):
+        _val = 24.0
+        obj = Parameter("Test0", float, 12, range=(0, 12), allow_None=True)
+        obj.value = None
+        self.assertIsNone(obj.value)
+
     def test_set_value__tuple_w_subtype(self):
         _vals = ((1, 2, 3), (12, 24.0), (12, "42"))
         for _val in _vals:

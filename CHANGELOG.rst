@@ -47,6 +47,8 @@ Improvements
   hide and show it.
 - Added support for pytest tests in the CI pipeline. 
 - Added import functionality for Sardana FIO files to the Scan import.
+- Added a range property to the Parameter to limit the allowed range of Parameters
+  for numerical values.
 
 
 Bugfixes

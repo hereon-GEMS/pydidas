@@ -37,6 +37,7 @@ from typing import Any, Self, Type, Union
 
 from numpy import asarray, ndarray
 
+from pydidas.core.exceptions import UserConfigError
 from pydidas.core.hdf5_key import Hdf5key
 
 
@@ -94,6 +95,11 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | choices    | True      | A list with choices if the value of the   |
     |            |           | parameter is limited to specific values.  |
+    +------------+-----------+-------------------------------------------+
+    | range      | True      | The range of allowed values. The range    |
+    |            |           | is only supported for numerical datatypes.|
+    |            |           | The range must be given as a 2-tuple with |
+    |            |           | the lower and upper bound.                |
     +------------+-----------+-------------------------------------------+
     | name       | False     | A readable name as description.           |
     +------------+-----------+-------------------------------------------+
@@ -182,11 +188,14 @@ class Parameter:
             optional=kwargs.get("optional", False),
             name=kwargs.get("name", ""),
             allow_None=kwargs.get("allow_None", False),
+            range=None,
             subtype=_get_base_class(kwargs.get("subtype", None)),
         )
         self.__process_default_input(default)
         self.__process_choices_input(kwargs)
         self.value = kwargs.get("value", self.__meta["default"])
+        if kwargs.get("range", None):
+            self.range = kwargs["range"]
 
     def __process_default_input(self, default: object):
         """
@@ -425,7 +434,7 @@ class Parameter:
 
         Parameters
         ----------
-        choices : Union[list, tuple, set]
+        choices : Union[None, list, tuple, set]
             A list or tuple of allowed choices. A check will be performed that
             all entries correspond to the defined data type and that the
             current parameter value is one of the allowed choices.
@@ -510,6 +519,12 @@ class Parameter:
             datatype.
         """
         val = self.__convenience_type_conversion(val)
+        if self.__type in [Integral, Real] and self.__meta["range"] is not None:
+            if val < self.__meta["range"][0] or val > self.__meta["range"][1]:
+                raise UserConfigError(
+                    f"The new value `{val}` is outside of the the range for the "
+                    f"Parameter (valid range: {self.__meta['range']}."
+                )
         if self.__meta["choices"] and val not in self.__meta["choices"]:
             raise ValueError(
                 f"The selected value '{val}' does not correspond to any of the allowed "
@@ -554,6 +569,50 @@ class Parameter:
             return self.value.tolist()
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
+    @property
+    def range(self) -> Union[None, tuple[Real, Real]]:
+        """
+        Get the range of the Parameter.
+
+        Returns
+        -------
+        tuple[Real, Real]
+            The range of the Parameter.
+        """
+        return self.__meta["range"]
+
+    @range.setter
+    def range(self, new_range: Union[None, tuple[Real, Real]]):
+        """
+        Set a new range for the Parameter.
+
+        Parameters
+        ----------
+        new_range : Union[None, tuple[Real, Real]]
+            The new range for the Parameter.
+
+        Raises
+        ------
+        ValueError
+            If the new range is not a tuple of two numbers.
+        """
+        if self.__type not in [Integral, Real]:
+            raise UserConfigError(
+                "The range attribute is only supported for numerical data types."
+            )
+        if self.__meta["choices"] and new_range is not None:
+            raise UserConfigError(
+                "Parameter range can only be set for numerical data types which do "
+                "not have a defined set of choices."
+            )
+        if new_range is None:
+            self.__meta["range"] = None
+            return
+        if len(new_range) != 2:
+            raise UserConfigError("The new range must be a tuple of two numbers.")
+        new_range = (float(new_range[0]), float(new_range[1]))
+        self.__meta["range"] = new_range
+
     def update_value_and_choices(self, value: object, choices: Iterable[object, ...]):
         """
         Update the value and choices of the Parameter to prevent illegal selections.
@@ -569,6 +628,10 @@ class Parameter:
             raise ValueError(
                 f"The new value '{value}' of type '{type(value)}' is of the wrong "
                 f"type. Expected '{self.__type}'."
+            )
+        if self.__meta["range"] is not None:
+            raise UserConfigError(
+                "Choices are only valid if the Parameter does not have a range."
             )
         if value not in choices:
             raise ValueError("The new value must be included in the new choices.")

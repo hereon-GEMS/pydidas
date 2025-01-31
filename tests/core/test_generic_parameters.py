@@ -32,12 +32,24 @@ from pydidas.core import (
     get_generic_param_collection,
     get_generic_parameter,
 )
+from pydidas.core.generic_params import GENERIC_PARAMS_METADATA
 
 
 class TestGetGenericParameter(unittest.TestCase):
-    def setUp(self): ...
+    @classmethod
+    def setUpClass(cls):
+        GENERIC_PARAMS_METADATA["a_dummy_test_entry"] = {
+            "type": int,
+            "default": 42,
+            "name": "A dummy test entry",
+            "choices": None,
+            "range": (-5, 120),
+            "allow_None": True,
+        }
 
-    def tearDown(self): ...
+    @classmethod
+    def tearDownClass(cls):
+        del GENERIC_PARAMS_METADATA["a_dummy_test_entry"]
 
     def test_get_param(self):
         _p = get_generic_parameter("first_file")
@@ -56,6 +68,10 @@ class TestGetGenericParameter(unittest.TestCase):
         _pc = get_generic_param_collection(*_keys)
         for _key in _keys:
             self.assertIn(_key, _pc)
+
+    def test_get_generic_param_with_range(self):
+        _p = get_generic_parameter("a_dummy_test_entry")
+        self.assertEqual(_p.range, (-5, 120))
 
 
 if __name__ == "__main__":

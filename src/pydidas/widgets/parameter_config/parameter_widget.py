@@ -281,6 +281,6 @@ class ParameterWidget(EmptyWidget):
         _new_value = self._widgets["io"].get_value()
         try:
             self.param.value = _new_value
-        except ValueError:
+        except (ValueError, UserConfigError):
             self._widgets["io"].set_value(self.param.value)
             raise

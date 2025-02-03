@@ -72,10 +72,14 @@ def _get_base_class(cls: Any) -> Union[type, Real, Integral, None]:
     return cls
 
 
-def _outside_range_string(val: object, range_: tuple[Real, Real]) -> str:
+def _outside_range_string(val: object, parameter: object) -> str:
+    if parameter.dtype == Integral:
+        _range = (int(parameter.range[0]), int(parameter.range[1]))
+    else:
+        _range = parameter.range
     return (
-        f"The new value `{val}` is outside of the range for the "
-        f"Parameter (valid range: {range})."
+        f"The new value `{val}` is outside of the specified range for the "
+        f"Parameter `{parameter.refkey}`. The valid range is: {_range}."
     )
 
 
@@ -553,7 +557,7 @@ class Parameter:
             and val is not None
         ):
             if not self.__meta["range"][0] <= val <= self.__meta["range"][1]:
-                raise UserConfigError(_outside_range_string(val, self.__meta["range"]))
+                raise UserConfigError(_outside_range_string(val, self))
         if self.__meta["choices"] and val not in self.__meta["choices"]:
             raise ValueError(_invalid_choice_str(val, self.__meta["choices"]))
         if not (self.__typecheck(val) or (self.__meta["optional"] and val is None)):

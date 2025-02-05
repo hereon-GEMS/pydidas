@@ -134,7 +134,7 @@ def _Axis_setAxisNames(self, axesNames):
     """
     self._Axis__axes.clear()
     with blockSignals(self._Axis__axes):
-        self._Axis__axes.addItem("use slice:", "")
+        self._Axis__axes.addItem("use for slicing", "")
         for axis in axesNames:
             self._Axis__axes.addItem(axis, axis)
 

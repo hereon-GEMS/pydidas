@@ -53,11 +53,3 @@ class SilxDataViewer(DataViewerFrame):
                 )
         for _view in [_v for _v in self.availableViews() if isinstance(_v, _StackView)]:
             self.removeView(_view)
-
-        # TODO : remove after silx update with pull request #4131 has been released
-        indices = [
-            self._DataViewerFrame__dataViewer._DataViewer__getStackIndex(_view)
-            for _view in self.availableViews()
-        ]
-        if len(indices) != len(set(indices)):
-            raise ValueError("There are duplicate stack indices.")

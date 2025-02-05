@@ -204,6 +204,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             The workflow tree.
         """
         _node_attribute = partial(cls.get_node_attribute, node_id)
+
         _dsets = [
             ["entry", "scan_title", {"data": cls.scan_title}],
             ["entry", "node_id", {"data": node_id}],

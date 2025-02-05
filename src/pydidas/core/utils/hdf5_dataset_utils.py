@@ -33,6 +33,9 @@ __all__ = [
     "convert_data_for_writing_to_hdf5_dataset",
     "read_and_decode_hdf5_dataset",
     "is_hdf5_filename",
+    "create_nx_entry_groups",
+    "create_nx_dataset",
+    "create_nxdata_entry",
 ]
 
 
@@ -429,3 +432,131 @@ def read_and_decode_hdf5_dataset(
     if isinstance(_data, np.ndarray) and return_dataset:
         return Dataset(_data)
     return _data
+
+
+def create_nx_entry_groups(
+    parent: Union[h5py.File, h5py.Group],
+    group_name: str,
+    group_type: str = "NXdata",
+    **attributes: dict,
+) -> h5py.Group:
+    """
+    Create the NXentry groups in the hdf5 file and return the final group.
+
+    Note that the final group is set to be a NXdata group unless the `group_type`
+    is specified differently.
+
+    Parameters
+    ----------
+    parent: Union[h5py.File, h5py.Group]
+        The parent group or file object.
+    group_name : str
+        The name of the group to be created.
+    group_type : str, optional
+        The type of the last group. The default is "NXdata".
+    attributes : dict
+        The attributes to be set for the last group.
+
+    Returns
+    -------
+    h5py.Group
+        The final group object which is accessed by the given group_name.
+    """
+    _parent_groups = list(
+        str(_path).replace(os.sep, "/") for _path in Path(group_name).parents
+    )[:-1][::-1]
+    _defaults = group_name.split("/")[1:]
+    for _i, _parent in enumerate(_parent_groups):
+        _group = parent.create_group(_parent)
+        _group.attrs["NX_class"] = "NXentry"
+        _group.attrs["default"] = _defaults[_i]
+    _group = parent.create_group(group_name)
+    _group.attrs["NX_class"] = group_type
+    for key, value in attributes.items():
+        _group.attrs[key] = value
+    return _group
+
+
+def create_nxdata_entry(
+    parent: Union[h5py.File, h5py.Group],
+    name: str,
+    data: np.ndarray,
+    **attributes: dict,
+) -> h5py.Group:
+    """
+    Create a NXdata entry in the given parent object.
+
+    This function also writes the necessary attributes to the group. Note that the
+    respective datasets for the axes and signal data need to be created separately.
+
+    Necessary attributes for the axes will be created automatically.
+
+    Parameters
+    ----------
+    parent : Union[h5py.File, h5py.Group]
+        The parent group or file object.
+    name: str
+        The name of the NXdata data entry.
+    data: np.ndarray
+        The dataset to be stored in the group.
+    **attributes : dict
+        The attributes to be set for the group.
+    """
+    if not isinstance(data, Dataset):
+        data = Dataset(data)
+    _data_group_name, _dset_name = os.path.split(name)
+    _ax_indices = {f"axis_{_n}_repr_indices": [_n] for _n in range(data.ndim)}
+    _data_group = create_nx_entry_groups(
+        parent,
+        _data_group_name,
+        signal=_dset_name,
+        axes=[f"axis_{_i}_repr" for _i in range(data.ndim)],
+        **_ax_indices,
+    )
+    for key, value in attributes.items():
+        _data_group.attrs[key] = value
+    create_nx_dataset(
+        _data_group,
+        _dset_name,
+        data,
+        units=data.data_unit,
+        long_name=data.data_description,
+        NX_class="NX_NUMBER",
+    )
+    for _dim in range(data.ndim):
+        _group = _data_group.create_group(f"axis_{_dim}")
+        _group.create_dataset("label", data=data.axis_labels[_dim])
+        _group.create_dataset("unit", data=data.axis_units[_dim])
+        _ax = _group.create_dataset("range", data=data.axis_ranges[_dim])
+        _ = create_nx_dataset(
+            _data_group,
+            f"axis_{_dim}_repr",
+            _ax,
+            units=data.axis_units[_dim],
+            long_name=data.get_axis_description(_dim),
+            axis=_dim,
+        )
+    return _data_group
+
+
+def create_nx_dataset(
+    group: h5py.Group, name: str, data: np.ndarray, **attributes: dict
+) -> h5py.Dataset:
+    """
+    Create a NXdata dataset in the given Group (which should have an `NXdata` key).
+
+    Parameters
+    ----------
+    group : h5py.Group
+        The group to create the dataset in.
+    name : str
+        The name of the dataset.
+    data : np.ndarray
+        The data to be stored in the dataset.
+    **attributes : dict
+        The attributes to be set for the dataset.
+    """
+    _dataset = group.create_dataset(name, data=data)
+    for key, value in attributes.items():
+        _dataset.attrs[key] = value
+    return _dataset

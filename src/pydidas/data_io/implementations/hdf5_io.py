@@ -38,6 +38,9 @@ from numpy import ndarray, squeeze
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors
+from pydidas.core.utils.hdf5_dataset_utils import (
+    create_nxdata_entry,
+)
 from pydidas.data_io.implementations.io_base import IoBase
 
 
@@ -110,35 +113,6 @@ def _get_slice_repr(obj: tuple[slice]) -> str:
             else:
                 _repr.append(f"{_slice.start}:{_slice.stop}")
     return "[" + ", ".join(_repr) + "]"
-
-
-def _create_nx_entry_groups(file: h5py.File, group_name: str) -> h5py.Group:
-    """
-    Create the NXentry groups in the hdf5 file and return the final group.
-
-    Parameters
-    ----------
-    file : h5py.File
-        The open hdf5 file object.
-    group_name : str
-        The name of the group to be created.
-
-    Returns
-    -------
-    h5py.Group
-        The final group object which is accessed by the given group_name.
-    """
-    _parent_groups = list(
-        str(_path).replace(os.sep, "/") for _path in Path(group_name).parents
-    )[:-1][::-1]
-    _defaults = group_name.split("/")[1:]
-    for _i, _parent in enumerate(_parent_groups):
-        _group = file.create_group(_parent)
-        _group.attrs["NX_class"] = "NXentry"
-        _group.attrs["default"] = _defaults[_i]
-    _group = file.create_group(group_name)
-    _group.attrs["NX_class"] = "NXdata"
-    return _group
 
 
 class Hdf5Io(IoBase):
@@ -308,33 +282,10 @@ class Hdf5Io(IoBase):
                 "Please specify a dataset path with at least two groups levels, e.g. "
                 "`entry/data/data`."
             )
+        if not isinstance(data, Dataset):
+            data = Dataset(data)
         with h5py.File(filename, "w") as _file:
-            _data_group = _create_nx_entry_groups(_file, _data_group_name)
-            _data_group.attrs["signal"] = _dset_name
-            _dset = _data_group.create_dataset(_dset_name, data=data.__array__())
-            if isinstance(data, Dataset):
-                _data_group.attrs["axes"] = [
-                    f"axis_{_i}_repr" for _i in range(data.ndim)
-                ]
-                _dset.attrs["units"] = data.data_unit
-                _dset.attrs["long_name"] = data.data_description
-                _dset.attrs["NX_class"] = "NX_NUMBER"
-                _root_group = _file[_root_group_name]
-                _root_group.create_dataset("data_label", data=data.data_label)
-                _root_group.create_dataset("data_unit", data=data.data_unit)
-                for _dim in range(data.ndim):
-                    _data_group.attrs[f"axis_{_dim}_repr_indices"] = [
-                        _dim,
-                    ]
-                    _group = _data_group.create_group(f"axis_{_dim}")
-                    _group.create_dataset("label", data=data.axis_labels[_dim])
-                    _group.create_dataset("unit", data=data.axis_units[_dim])
-                    _ax = _group.create_dataset("range", data=data.axis_ranges[_dim])
-                    _ax_dset = _data_group.create_dataset(f"axis_{_dim}_repr", data=_ax)
-                    _ax_dset.attrs["units"] = data.axis_units[_dim]
-                    _ax_dset.attrs["long_name"] = data.get_axis_description(_dim)
-                    _ax_dset.attrs["axis"] = _dim
-            elif isinstance(data, ndarray):
-                _dset.attrs["units"] = ""
-                _dset.attrs["long_name"] = ""
-                _dset.attrs["NX_class"] = "NX_NUMBER"
+            _data_group = create_nxdata_entry(_file, _dataset, data)
+            _root_group = _file[_root_group_name]
+            _root_group.create_dataset("data_label", data=data.data_label)
+            _root_group.create_dataset("data_unit", data=data.data_unit)

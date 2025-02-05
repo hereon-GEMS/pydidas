@@ -313,7 +313,9 @@ class Hdf5Io(IoBase):
             _data_group.attrs["signal"] = _dset_name
             _dset = _data_group.create_dataset(_dset_name, data=data.__array__())
             if isinstance(data, Dataset):
-                _data_group.attrs["axes"] = [f"axis_{_i}_repr" for _i in range(data.ndim)]
+                _data_group.attrs["axes"] = [
+                    f"axis_{_i}_repr" for _i in range(data.ndim)
+                ]
                 _dset.attrs["units"] = data.data_unit
                 _dset.attrs["long_name"] = data.data_description
                 _dset.attrs["NX_class"] = "NX_NUMBER"

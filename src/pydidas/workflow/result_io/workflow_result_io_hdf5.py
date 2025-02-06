@@ -30,6 +30,7 @@ __all__ = ["WorkflowResultIoHdf5"]
 
 import os
 from functools import partial
+from numbers import Integral, Real
 from pathlib import Path
 from typing import Union
 
@@ -40,7 +41,12 @@ from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
+from pydidas.core.utils import (
+    create_nx_dataset,
+    create_nx_entry_groups,
+    read_and_decode_hdf5_dataset,
+)
+from pydidas.core.utils.hdf5_dataset_utils import _create_nxdata_axis_entry
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -48,49 +54,40 @@ from pydidas.workflow.result_io.workflow_result_io_base import WorkflowResultIoB
 from pydidas.workflow.workflow_tree import WorkflowTree
 
 
-def get_detector_metadata_entries(
-    scan: Scan, exp: DiffractionExperiment
-) -> list[list[str, str, dict]]:
+_DEFAULT_GROUPS = [
+    ["entry", "NXentry"],
+    ["entry/data", "NXdata"],
+    ["entry/instrument", "NXinstrument"],
+    ["entry/instrument/detector", "NXdetector"],
+    ["entry/instrument/detector/COLLECTION", "NXcollection"],
+    ["entry/pydidas_config", "NXcollection"],
+    ["entry/pydidas_config/diffraction_exp", "NXcollection"],
+    ["entry/pydidas_config/scan", "NXcollection"],
+]
+
+
+def _get_nx_class_for_param(param: str) -> str:
     """
-    Get the metadata for the detector.
+    Get the NX class for a parameter.
 
     Parameters
     ----------
-    scan : pydidas.contexts.Scan
-        The scan context.
-    exp : pydidas.contexts.DiffractionExperiment
-        The diffraction experiment context.
+    param : str
+        The parameter name.
 
     Returns
     -------
-    list[list[str, str, dict]]
-        List with entries of all metadata to be written.
+    str
+        The NX class.
     """
-    return [
-        [
-            "entry/instrument/detector",
-            "frame_start_number",
-            {"data": scan.get_param_value("scan_start_index")},
-        ],
-        [
-            "entry/instrument/detector",
-            "x_pixel_size",
-            {"data": exp.get_param_value("detector_pxsizex")},
-        ],
-        [
-            "entry/instrument/detector",
-            "y_pixel_size",
-            {"data": exp.get_param_value("detector_pxsizey")},
-        ],
-        [
-            "entry/instrument/detector",
-            "distance",
-            {"data": exp.get_param_value("detector_dist")},
-        ],
-    ]
+    if param.dtype == Integral:
+        return "NX_INT"
+    if param.dtype == Real:
+        return "NX_FLOAT"
+    return "NX_CHAR"
 
 
-def get_pydidas_context_config_entries(
+def _get_pydidas_context_config_entries(
     scan: Scan, exp: DiffractionExperiment, tree: ProcessingTree
 ) -> list[list[str, str, dict]]:
     """
@@ -111,14 +108,62 @@ def get_pydidas_context_config_entries(
         List with writable entries for the contexts.
     """
     _dsets = []
-    for _key, _value in scan.get_param_values_as_dict(True).items():
-        _dsets.append(["entry/pydidas_config/scan", _key, {"data": _value}])
-    for _key, _value in exp.get_param_values_as_dict(True).items():
-        _dsets.append(["entry/pydidas_config/diffraction_exp", _key, {"data": _value}])
-    _dsets.append(
-        ["entry/pydidas_config", "workflow", {"data": tree.export_to_string()}]
-    )
-    _dsets.append(["entry/pydidas_config", "pydidas_version", {"data": VERSION}])
+    for _key, _param in scan.params.items():
+        _dsets.append(
+            [
+                "entry/pydidas_config/scan",
+                _key,
+                {"data": _param.value_for_export},
+                {"NX_class": _get_nx_class_for_param(_param), "units": _param.unit},
+            ]
+        )
+    for _key, _param in exp.params.items():
+        _dsets.append(
+            [
+                "entry/pydidas_config/diffraction_exp",
+                _key,
+                {"data": _param.value_for_export},
+                {"NX_class": _get_nx_class_for_param(_param), "units": _param.unit},
+            ]
+        )
+    _dsets += [
+        [
+            "entry/pydidas_config",
+            "workflow",
+            {"data": tree.export_to_string()},
+            {"NX_class": "NX_CHAR", "units": ""},
+        ],
+        [
+            "entry/pydidas_config",
+            "pydidas_version",
+            {"data": VERSION},
+            {"NX_class": "NX_CHAR", "units": ""},
+        ],
+        [
+            "entry/instrument/detector/COLLECTION",
+            "frame_start_number",
+            {"data": scan.get_param_value("scan_start_index")},
+            {"NX_class": "NX_INT", "units": ""},
+        ],
+        [
+            "entry/instrument/detector",
+            "x_pixel_size",
+            {"data": exp.get_param_value("detector_pxsizex")},
+            {"NX_class": "NX_FLOAT", "units": "um"},
+        ],
+        [
+            "entry/instrument/detector",
+            "y_pixel_size",
+            {"data": exp.get_param_value("detector_pxsizey")},
+            {"NX_class": "NX_FLOAT", "units": "um"},
+        ],
+        [
+            "entry/instrument/detector",
+            "distance",
+            {"data": exp.get_param_value("detector_dist")},
+            {"NX_class": "NX_FLOAT", "units": "m"},
+        ],
+    ]
     return _dsets
 
 
@@ -203,22 +248,75 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         workflow : WorkflowTree
             The workflow tree.
         """
-        _node_attribute = partial(cls.get_node_attribute, node_id)
+        _dsets = cls._get_datasets_to_be_written(node_id, scan, exp, workflow)
+        with h5py.File(cls._save_dir / cls._filenames[node_id], "w") as _file:
+            for _group_key, _type in _DEFAULT_GROUPS:
+                create_nx_entry_groups(_file, _group_key, group_type=_type)
+            for _group, _name, kws, _nxs_attrs in _dsets:
+                create_nx_dataset(_file[_group], _name, kws, **_nxs_attrs)
 
+    @classmethod
+    def _get_datasets_to_be_written(
+        cls,
+        node_id: int,
+        scan: Scan,
+        exp: DiffractionExperiment,
+        workflow: ProcessingTree,
+    ) -> list[list[str, str, dict]]:
+        """
+        Get the datasets to be written to the hdf5 file.
+
+        Parameters
+        ----------
+        node_id : int
+            The nodeID.
+        scan : pydidas.contexts.Scan
+            The scan (context).
+        exp : pydidas.contexts.DiffractionExperiment
+            The diffraction experiment (context).
+        workflow : WorkflowTree
+            The workflow tree.
+
+        Returns
+        -------
+        list[list[str, str, dict, dict]]
+            List with the dataset information to be written.
+        """
+
+        _node_attribute = partial(cls.get_node_attribute, node_id)
         _dsets = [
-            ["entry", "scan_title", {"data": cls.scan_title}],
-            ["entry", "node_id", {"data": node_id}],
-            ["entry", "node_label", {"data": _node_attribute("node_label")}],
-            ["entry", "plugin_name", {"data": _node_attribute("plugin_name")}],
-            ["entry/data", "data", {"shape": _node_attribute("shape")}],
-        ]
-        _dsets.extend(get_detector_metadata_entries(scan, exp))
-        _dsets.extend(get_pydidas_context_config_entries(scan, exp, workflow))
-        with h5py.File(
-            os.path.join(cls._save_dir, cls._filenames[node_id]), "w"
-        ) as _file:
-            for _group, _name, kws in _dsets:
-                create_hdf5_dataset(_file, _group, _name, **kws)
+            [
+                "entry",
+                "scan_title",
+                {"data": cls.scan_title},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ],
+            [
+                "entry",
+                "node_id",
+                {"data": node_id},
+                {"NX_class": "NX_INT", "units": ""},
+            ],
+            [
+                "entry",
+                "node_label",
+                {"data": _node_attribute("node_label")},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ],
+            [
+                "entry",
+                "plugin_name",
+                {"data": _node_attribute("plugin_name")},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ],
+            [
+                "entry/data",
+                "data",
+                {"shape": _node_attribute("shape")},
+                {"NX_class": "NX_INT", "units": ""},
+            ],
+        ] + _get_pydidas_context_config_entries(scan, exp, workflow)
+        return _dsets
 
     @classmethod
     def export_frame_to_file(
@@ -247,8 +345,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         if not cls._metadata_written:
             cls.update_metadata(frame_result_dict)
         for _node_id, _data in frame_result_dict.items():
-            _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
-            with h5py.File(_fname, "r+") as _file:
+            with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
                 _file["entry/data/data"][_indices] = _data
 
     @classmethod
@@ -271,8 +368,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         if not cls._metadata_written:
             cls.update_metadata(full_data)
         for _node_id, _data in full_data.items():
-            _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
-            with h5py.File(_fname, "r+") as _file:
+            with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
@@ -290,16 +386,22 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         for _id, _metadata in metadata.items():
             if isinstance(_metadata, Dataset):
                 _metadata = _metadata.property_dict
-            with h5py.File(
-                os.path.join(cls._save_dir, cls._filenames[_id]), "r+"
-            ) as _file:
-                for _dim in range(len(_metadata["axis_labels"])):
-                    _group = _file["entry/data"]
-                    _axisgroup = _group.create_group(f"axis_{_dim}")
-                    for _key in ["label", "unit", "range"]:
-                        _val = _metadata[f"axis_{_key}s"][_dim]
-                        _val = "None" if _val is None else _val
-                        _axisgroup.create_dataset(_key, data=_val)
+            _ndim = len(_metadata["axis_labels"])
+            _shape = tuple(_range.size for _range in _metadata["axis_ranges"].values())
+            _axes_attr = [f"axis_{_i}_repr" for _i in range(_ndim)]
+            with h5py.File(cls._save_dir / cls._filenames[_id], "r+") as _file:
+                _nxdata_group = _file["entry/data"]
+                _nxdata_group.attrs["signal"] = "data"
+                _nxdata_group.attrs["axes"] = _axes_attr
+                for _dim in range(_ndim):
+                    _nxdata_group.attrs[f"axis_{_dim}_repr_indices"] = [_dim]
+                    _create_nxdata_axis_entry(
+                        _nxdata_group,
+                        _dim,
+                        _metadata["axis_labels"][_dim],
+                        _metadata["axis_units"][_dim],
+                        _metadata["axis_ranges"][_dim],
+                    )
         cls._metadata_written = True
 
     @classmethod

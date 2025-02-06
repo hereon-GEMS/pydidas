@@ -251,14 +251,16 @@ class BaseFitPlugin(ProcPlugin):
         """
         _fit_pvals = tuple(self._fit_params.values())
         for _i, _key in enumerate(self.fit_outputs):
-            if _key in ["position", "amplitude", "area", "FWHM", "background"]:
+            if _key in ["position", "amplitude", "area", "FWHM"]:
                 _attr = getattr(self._fitter, _key.lower())
                 results[slice(None), _i] = _attr(_fit_pvals)
-            if _key == "total count intensity":
+            elif _key == "total count intensity":
                 _dx = self._data.axis_ranges[0][1] - self._data.axis_ranges[0][0]
                 results[slice(None), _i] = [
                     a / _dx for a in self._fitter.area(_fit_pvals)
                 ]
+            elif _key == "background at peak":
+                results[slice(None), _i] = self._fitter.background_at_peak(_fit_pvals)
         return results
 
     def check_center_positions(self) -> bool:

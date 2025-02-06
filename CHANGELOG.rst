@@ -72,6 +72,8 @@ Bugfixes
   while waiting in a sleep state.
 - Fixed a bug in fitting plugins which only returned a single fit parameter.
 - Fixed a bug where WorkflowResults could not be exported again after import.
+- Fixed an issue where the Fit plugin would not store the background at the peak
+  positions correctly.
 
 
 

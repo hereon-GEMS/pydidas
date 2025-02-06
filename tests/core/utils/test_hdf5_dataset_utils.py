@@ -24,7 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
@@ -40,6 +39,9 @@ from pydidas.core.utils.hdf5_dataset_utils import (
     _get_hdf5_file_and_dataset_names,
     convert_data_for_writing_to_hdf5_dataset,
     create_hdf5_dataset,
+    create_nx_dataset,
+    create_nx_entry_groups,
+    create_nxdata_entry,
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
     hdf5_dataset_check,
@@ -50,14 +52,16 @@ from pydidas.core.utils.hdf5_dataset_utils import (
 class Test_Hdf5_dataset_utils(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
+        cls._path = Path(tempfile.mkdtemp())
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._path)
 
     def setUp(self):
-        self._fname = lambda s: os.path.join(self._path, f"test{s}.h5")
+        self.file = h5py.File(self._path / "temp_file.h5", "w")
+
+        self._fname = lambda s: self._path.joinpath(f"test{s}.h5")
         self._ref = f"{self._fname(1)}:///test/path/data"
         self._data = np.random.random((10, 10, 10, 10))
         self._fulldsets = [
@@ -85,7 +89,9 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
             )
         self._fulldsets += ["/test/other/extdata"]
 
-    def tearDown(self): ...
+    def tearDown(self):
+        # Close and remove the temporary file after tests
+        self.file.close()
 
     def test_get_hdf5_file_and_dataset_names__wrong_type(self):
         _name = 123
@@ -390,6 +396,100 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
             _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
         self.assertIsInstance(_out, Dataset)
         self.assertTrue(np.allclose(_out, _input))
+
+    def test_create_nx_entry_groups__basic(self):
+        group_name = "entry/test"
+        group_type = "NXdata"
+        attributes = {"attr1": "value1", "attr2": "value2"}
+        group = create_nx_entry_groups(self.file, group_name, group_type, **attributes)
+        self.assertIn(group_name, self.file)
+        self.assertEqual(group.attrs["NX_class"], group_type)
+        for key, value in attributes.items():
+            self.assertEqual(group.attrs[key], value)
+
+    def test_create_nx_entry_groups__nested(self):
+        group_name = "entry/test/nested"
+        group_type = "NXentry"
+        attributes = {"attr1": "value1"}
+        group = create_nx_entry_groups(self.file, group_name, group_type, **attributes)
+        self.assertIn(group_name, self.file)
+        self.assertEqual(group.attrs["NX_class"], group_type)
+        for key, value in attributes.items():
+            self.assertEqual(group.attrs[key], value)
+
+    def test_create_nx_entry_groups__no_attributes(self):
+        group_name = "entry/test"
+        group_type = "NXdata"
+        group = create_nx_entry_groups(self.file, group_name, group_type)
+        self.assertIn(group_name, self.file)
+        self.assertEqual(group.attrs["NX_class"], group_type)
+
+    def test_create_nx_entry_groups__w_existing_group(self):
+        group_name = "entry/test/group/name"
+        group_type = "NXentry"
+        group = create_nx_entry_groups(self.file, group_name, group_type)
+        group2 = create_nx_entry_groups(self.file, group_name, group_type)
+        self.assertEqual(group, group2)
+
+    def test_create_nx_entry_groups__w_existing_group_different_type(self):
+        group_name = "entry/test/group/name"
+        group_type = "NXentry"
+        _ = create_nx_entry_groups(self.file, group_name, group_type)
+        with self.assertRaises(ValueError):
+            create_nx_entry_groups(self.file, group_name, "AnotherEntry")
+
+    def test_create_nxdata_entry__basic(self):
+        name = "entry/test"
+        data = np.random.random((10, 10))
+        attributes = {"attr1": "value1", "attr2": "value2"}
+        group = create_nxdata_entry(self.file, name, data, **attributes)
+        self.assertIn(name, self.file)
+        self.assertEqual(group.attrs["NX_class"], "NXdata")
+        for key, value in attributes.items():
+            self.assertEqual(group.attrs[key], value)
+
+    def test_create_nxdata_entry__w_axes(self):
+        name = "entry/test"
+        data = Dataset(
+            np.random.random((10, 10)),
+            axis_labels=["x", "y"],
+            axis_units=["m", "s"],
+            axis_ranges=[np.arange(10), np.arange(10)],
+        )
+        attributes = {"attr1": "value1"}
+        group = create_nxdata_entry(self.file, name, data, **attributes)
+        self.assertIn(name, self.file)
+        self.assertEqual(group.attrs["NX_class"], "NXdata")
+        for key, value in attributes.items():
+            self.assertEqual(group.attrs[key], value)
+        for dim in range(data.ndim):
+            self.assertIn(f"axis_{dim}_repr", group)
+            self.assertTrue(
+                np.allclose(group[f"axis_{dim}_repr"][()], data.axis_ranges[dim])
+            )
+            axis_group = group[f"axis_{dim}"]
+            self.assertEqual(axis_group["label"][()].decode(), data.axis_labels[dim])
+            self.assertEqual(axis_group["unit"][()].decode(), data.axis_units[dim])
+            self.assertTrue(np.allclose(axis_group["range"][()], data.axis_ranges[dim]))
+
+    def test_create_nx_dataset__basic(self):
+        group = self.file.create_group("entry")
+        name = "test_dataset"
+        data = np.random.random((10, 10))
+        dataset = create_nx_dataset(group, name, data)
+        self.assertIn(name, group)
+        self.assertTrue(np.array_equal(dataset[()], data))
+
+    def test_create_nx_dataset__w_attributes(self):
+        group = self.file.create_group("entry")
+        name = "test_dataset"
+        data = np.random.random((10, 10))
+        attributes = {"units": "meters", "long_name": "Test Dataset"}
+        dataset = create_nx_dataset(group, name, data, **attributes)
+        self.assertIn(name, group)
+        self.assertTrue(np.array_equal(dataset[()], data))
+        for key, value in attributes.items():
+            self.assertEqual(dataset.attrs[key], value)
 
 
 if __name__ == "__main__":

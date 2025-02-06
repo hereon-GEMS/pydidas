@@ -444,7 +444,8 @@ def create_nx_entry_groups(
     Create the NXentry groups in the hdf5 file and return the final group.
 
     Note that the final group is set to be a NXdata group unless the `group_type`
-    is specified differently.
+    is specified differently. If the group already exists, the function will
+    only update (and replace existing) metadata.
 
     Parameters
     ----------
@@ -462,12 +463,27 @@ def create_nx_entry_groups(
     h5py.Group
         The final group object which is accessed by the given group_name.
     """
+    if group_name in parent:
+        _group = parent[group_name]
+        if _group.attrs.get("NX_class", group_type) != group_type:
+            raise ValueError(
+                "Error when creating the group {group_name}: The group already exists"
+                f"but is not of specified type {group_type} (existing group: "
+                f"{_group.attrs.get('NX_class')})."
+            )
+        for key, value in attributes.items():
+            _group.attrs[key] = value
+        return _group
     _parent_groups = list(
         str(_path).replace(os.sep, "/") for _path in Path(group_name).parents
     )[:-1][::-1]
     _defaults = group_name.split("/")[1:]
-    for _i, _parent in enumerate(_parent_groups):
-        _group = parent.create_group(_parent)
+    for _i, _intermediate_group_key in enumerate(_parent_groups):
+        _group = (
+            parent.create_group(_intermediate_group_key)
+            if _intermediate_group_key not in parent
+            else parent[_intermediate_group_key]
+        )
         _group.attrs["NX_class"] = "NXentry"
         _group.attrs["default"] = _defaults[_i]
     _group = parent.create_group(group_name)

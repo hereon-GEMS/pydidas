@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -431,6 +431,18 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         group2 = create_nx_entry_groups(self.file, group_name, group_type)
         self.assertEqual(group, group2)
 
+    def test_create_nx_entry_groups__w_nxclass(self):
+        _cases = [
+            ["entry", "NXtest"],
+            ["entry/data", "NXdata"],
+            ["entry/instrument", "NXinstrument"],
+        ]
+
+        for _key, _group in _cases:
+            _ = create_nx_entry_groups(self.file, _key, group_type=_group)
+        for _key, _group in _cases:
+            self.assertEqual(self.file[_key].attrs["NX_class"], _group)
+
     def test_create_nx_entry_groups__w_existing_group_different_type(self):
         group_name = "entry/test/group/name"
         group_type = "NXentry"
@@ -475,10 +487,33 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
     def test_create_nx_dataset__basic(self):
         group = self.file.create_group("entry")
         name = "test_dataset"
-        data = np.random.random((10, 10))
-        dataset = create_nx_dataset(group, name, data)
-        self.assertIn(name, group)
-        self.assertTrue(np.array_equal(dataset[()], data))
+        for data in [np.random.random((10, 10)), "a test string", 1, 12.2]:
+            if name in group:
+                del group[name]
+            with self.subTest(data=data):
+                dataset = create_nx_dataset(group, name, data)
+                self.assertIn(name, group)
+                if isinstance(data, str):
+                    self.assertEqual(dataset[()].decode(), data)
+                else:
+                    self.assertTrue(np.array_equal(dataset[()], data))
+
+    def test_create_nx_dataset__w_dict(self):
+        group = self.file.create_group("entry")
+        name = "test_dataset"
+        attrs = {"attr1": "value1", "attr2": "value2"}
+        for data in [
+            {"data": np.random.random((10, 10))},
+            {"shape": (10, 10)},
+        ]:
+            if name in group:
+                del group[name]
+            with self.subTest(data=data):
+                dataset = create_nx_dataset(group, name, data, **attrs)
+                self.assertIn(name, group)
+                self.assertTrue(np.array_equal(dataset[()].shape, (10, 10)))
+                for key, value in attrs.items():
+                    self.assertEqual(dataset.attrs[key], value)
 
     def test_create_nx_dataset__w_attributes(self):
         group = self.file.create_group("entry")

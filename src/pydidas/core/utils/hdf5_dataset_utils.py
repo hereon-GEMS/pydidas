@@ -36,11 +36,13 @@ __all__ = [
     "create_nx_entry_groups",
     "create_nx_dataset",
     "create_nxdata_entry",
+    "_create_nxdata_axis_entry"
 ]
 
 
 import os
 from collections.abc import Iterable
+from numbers import Integral, Real
 from pathlib import Path
 from typing import List, Literal, Tuple, Union
 
@@ -477,15 +479,13 @@ def create_nx_entry_groups(
     _parent_groups = list(
         str(_path).replace(os.sep, "/") for _path in Path(group_name).parents
     )[:-1][::-1]
-    _defaults = group_name.split("/")[1:]
+    _default = attributes.get("default", group_name.split("/")[1:])
     for _i, _intermediate_group_key in enumerate(_parent_groups):
-        _group = (
-            parent.create_group(_intermediate_group_key)
-            if _intermediate_group_key not in parent
-            else parent[_intermediate_group_key]
-        )
+        if _intermediate_group_key in parent:
+            continue
+        _group = parent.create_group(_intermediate_group_key)
         _group.attrs["NX_class"] = "NXentry"
-        _group.attrs["default"] = _defaults[_i]
+        _group.attrs["default"] = _default[_i]
     _group = parent.create_group(group_name)
     _group.attrs["NX_class"] = group_type
     for key, value in attributes.items():
@@ -521,16 +521,14 @@ def create_nxdata_entry(
     if not isinstance(data, Dataset):
         data = Dataset(data)
     _data_group_name, _dset_name = os.path.split(name)
-    _ax_indices = {f"axis_{_n}_repr_indices": [_n] for _n in range(data.ndim)}
     _data_group = create_nx_entry_groups(
         parent,
         _data_group_name,
         signal=_dset_name,
         axes=[f"axis_{_i}_repr" for _i in range(data.ndim)],
-        **_ax_indices,
+        **{f"axis_{_n}_repr_indices": [_n] for _n in range(data.ndim)},
+        **attributes,
     )
-    for key, value in attributes.items():
-        _data_group.attrs[key] = value
     create_nx_dataset(
         _data_group,
         _dset_name,
@@ -540,23 +538,59 @@ def create_nxdata_entry(
         NX_class="NX_NUMBER",
     )
     for _dim in range(data.ndim):
-        _group = _data_group.create_group(f"axis_{_dim}")
-        _group.create_dataset("label", data=data.axis_labels[_dim])
-        _group.create_dataset("unit", data=data.axis_units[_dim])
-        _ax = _group.create_dataset("range", data=data.axis_ranges[_dim])
-        _ = create_nx_dataset(
+        _create_nxdata_axis_entry(
             _data_group,
-            f"axis_{_dim}_repr",
-            _ax,
-            units=data.axis_units[_dim],
-            long_name=data.get_axis_description(_dim),
-            axis=_dim,
+            _dim,
+            data.axis_labels[_dim],
+            data.axis_units[_dim],
+            data.axis_ranges[_dim],
         )
     return _data_group
 
 
+def _create_nxdata_axis_entry(
+    group: h5py.Group, dim: int, label: str, unit: str, axdata: np.ndarray
+):
+    """
+    Create an entry for the given axis in the given group.
+
+    Parameters
+    ----------
+    group : h5py.Group
+        The group to create the axis entry in.
+    dim : int
+        The dimension of the axis.
+    label : str
+        The label of the axis.
+    unit : str
+        The unit of the axis.
+    axdata : np.ndarray
+        The data of the axis.
+
+    Returns
+    -------
+    h5py.Dataset
+        The created dataset.
+    """
+    _group = group.create_group(f"axis_{dim}")
+    _group.create_dataset("label", data=label)
+    _group.create_dataset("unit", data=unit)
+    _ax = _group.create_dataset("range", data=axdata)
+    _ = create_nx_dataset(
+        group,
+        f"axis_{dim}_repr",
+        _ax,
+        units=unit,
+        long_name=label + (" / " + unit if len(unit) > 0 else ""),
+        axis=dim,
+    )
+
+
 def create_nx_dataset(
-    group: h5py.Group, name: str, data: np.ndarray, **attributes: dict
+    group: h5py.Group,
+    name: str,
+    data: Union[dict, np.ndarray, str, Real, Integral],
+    **attributes: dict,
 ) -> h5py.Dataset:
     """
     Create a NXdata dataset in the given Group (which should have an `NXdata` key).
@@ -567,12 +601,17 @@ def create_nx_dataset(
         The group to create the dataset in.
     name : str
         The name of the dataset.
-    data : np.ndarray
-        The data to be stored in the dataset.
+    data: Union[dict, np.ndarray, str, Real, Integral]
+        The data to be stored in the dataset. This should typically be a numpy array
+        or a scalar value or a string. If a dict is given, this is interpreted as
+        the arguments for calling the create_dataset method.
     **attributes : dict
         The attributes to be set for the dataset.
     """
-    _dataset = group.create_dataset(name, data=data)
+    if isinstance(data, dict):
+        _dataset = group.create_dataset(name, **data)
+    else:
+        _dataset = group.create_dataset(name, data=data)
     for key, value in attributes.items():
         _dataset.attrs[key] = value
     return _dataset

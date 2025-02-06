@@ -36,7 +36,7 @@ __all__ = [
     "create_nx_entry_groups",
     "create_nx_dataset",
     "create_nxdata_entry",
-    "_create_nxdata_axis_entry"
+    "_create_nxdata_axis_entry",
 ]
 
 

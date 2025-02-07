@@ -126,7 +126,6 @@ jobs:
       with:
         path: _site/
 
-
   deploy_docs:
     needs: create_docs
     permissions:

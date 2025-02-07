@@ -49,6 +49,7 @@ Improvements
 - Added import functionality for Sardana FIO files to the Scan import.
 - Added a range property to the Parameter to limit the allowed range of Parameters
   for numerical values.
+- Pydidas result exports in hdf5 format writes metadata neXus-compatible
 
 
 Bugfixes
@@ -74,6 +75,10 @@ Bugfixes
 - Fixed an issue with the WorkerController when the thread shutdown was toggled
   while waiting in a sleep state.
 - Fixed a bug in fitting plugins which only returned a single fit parameter.
+- Fixed a bug where WorkflowResults could not be exported again after import.
+- Fixed an issue where the Fit plugin would not store the background at the peak
+  positions correctly.
+
 
 
 v24.09.19

@@ -38,6 +38,9 @@ from numpy import ndarray, squeeze
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors
+from pydidas.core.utils.hdf5_dataset_utils import (
+    create_nxdata_entry,
+)
 from pydidas.data_io.implementations.io_base import IoBase
 
 
@@ -271,7 +274,7 @@ class Hdf5Io(IoBase):
         """
         cls.check_for_existing_file(filename, **kwargs)
         _dataset = kwargs.get("dataset", "entry/data/data")
-        _data_group_name = os.path.dirname(_dataset)
+        _data_group_name, _dset_name = os.path.split(_dataset)
         _root_group_name = os.path.dirname(_data_group_name)
         if _root_group_name == "":
             raise UserConfigError(
@@ -279,18 +282,10 @@ class Hdf5Io(IoBase):
                 "Please specify a dataset path with at least two groups levels, e.g. "
                 "`entry/data/data`."
             )
-        _key = os.path.basename(_dataset)
+        if not isinstance(data, Dataset):
+            data = Dataset(data)
         with h5py.File(filename, "w") as _file:
-            _data_group = _file.create_group(_data_group_name)
-            if isinstance(data, Dataset):
-                _data_group.create_dataset(_key, data=data.array)
-                _root_group = _file[_root_group_name]
-                _root_group.create_dataset("data_label", data=data.data_label)
-                _root_group.create_dataset("data_unit", data=data.data_unit)
-                for _dim in range(data.ndim):
-                    _group = _data_group.create_group(f"axis_{_dim}")
-                    _group.create_dataset("label", data=data.axis_labels[_dim])
-                    _group.create_dataset("unit", data=data.axis_units[_dim])
-                    _group.create_dataset("range", data=data.axis_ranges[_dim])
-            elif isinstance(data, ndarray):
-                _data_group.create_dataset(_key, data=data)
+            _data_group = create_nxdata_entry(_file, _dataset, data)
+            _root_group = _file[_root_group_name]
+            _root_group.create_dataset("data_label", data=data.data_label)
+            _root_group.create_dataset("data_unit", data=data.data_unit)

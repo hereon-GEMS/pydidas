@@ -50,6 +50,7 @@ Improvements
 - Added a range property to the Parameter to limit the allowed range of Parameters
   for numerical values.
 - Pydidas result exports in hdf5 format writes metadata neXus-compatible
+- Added a new interface for browsing and slicing data based on its metadata.
 
 
 Bugfixes

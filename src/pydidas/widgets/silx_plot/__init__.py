@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+from . import data_viewer
 from . import silx_actions as actions
 from ._silx_data_viewer import *
 from .pydidas_masktools_widget import *
@@ -35,7 +36,7 @@ from .pydidas_plot2d_with_integration_regions import *
 from .pydidas_plot_stack import *
 
 
-__all__ = ["actions", "utilities"] + (
+__all__ = ["data_viewer", "actions", "utilities"] + (
     pydidas_masktools_widget.__all__
     + _silx_data_viewer.__all__
     + pydidas_plot1d.__all__

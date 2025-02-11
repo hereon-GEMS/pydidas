@@ -355,7 +355,7 @@ class CreateWidgetsMixIn:
         _parent = kwargs.pop("parent_widget", self)
         _layout_kwargs = kwargs.pop("layout_kwargs", None)
         if isinstance(_parent, str):
-            _parent = self._widgets[_parent]
+            _parent = self if _parent == "::self::" else self._widgets[_parent]
 
         apply_qt_properties(widget_instance, **kwargs)
         if _layout_kwargs is not None:

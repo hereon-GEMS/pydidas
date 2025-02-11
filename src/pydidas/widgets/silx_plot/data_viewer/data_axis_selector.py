@@ -367,30 +367,30 @@ class DataAxisSelector(WidgetWithParameterCollection):
         """
         Handle the click on the start button.
         """
-        self.__move_to_index(0)
+        self._move_to_index(0)
 
     @QtCore.Slot()
     def _clicked_backward(self):
         """
         Handle the click on the backward button.
         """
-        self.__move_to_index(max(0, self._current_index - 1))
+        self._move_to_index(max(0, self._current_index - 1))
 
     @QtCore.Slot()
     def _clicked_forward(self):
         """
         Handle the click on the forward button.
         """
-        self.__move_to_index(min(self._npoints - 1, self._current_index + 1))
+        self._move_to_index(min(self._npoints - 1, self._current_index + 1))
 
     @QtCore.Slot()
     def _clicked_end(self):
         """
         Handle the click on the end button.
         """
-        self.__move_to_index(self._npoints - 1)
+        self._move_to_index(self._npoints - 1)
 
-    def __move_to_index(self, index: int):
+    def _move_to_index(self, index: int):
         """
         Set the widgets to the given index.
 

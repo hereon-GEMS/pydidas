@@ -27,7 +27,7 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
-from qtpy import QtTest, QtWidgets
+from qtpy import QtCore, QtTest, QtWidgets
 
 from pydidas import IS_QT6
 from pydidas.widgets.silx_plot.data_viewer.data_axis_selector import DataAxisSelector
@@ -84,6 +84,43 @@ class TestDataAxisSelector(unittest.TestCase):
         self.assertEqual(_selector._current_index, 0)
         for _widget in ["label_axis", "combo_axis_use"]:
             self.assertIsInstance(_selector._widgets[_widget], QtWidgets.QWidget)
+
+    def test_npoints(self):
+        _selector = self.create_selector(0)
+        _selector._npoints = 42
+        self.assertEqual(_selector.npoints, 42)
+
+    def test_display_choice(self):
+        _selector = self.create_selector(0)
+        _selector.define_additional_choices("choice1;;choice2")
+        _selector._widgets["combo_axis_use"].setCurrentText("choice2")
+        self.assertEqual(_selector.display_choice, "choice2")
+
+    def test_display_choice_setter(self):
+        _selector = self.create_selector(0)
+        _selector.define_additional_choices("choice1;;choice2")
+        _selector.display_choice = "choice1"
+        self.assertEqual(_selector._widgets["combo_axis_use"].currentText(), "choice1")
+
+    def test_display_choice_setter__invalid(self):
+        _selector = self.create_selector(0)
+        _selector.define_additional_choices("choice1;;choice2")
+        with self.assertRaises(ValueError):
+            _selector.display_choice = "choice3"
+
+    def test_current_slice(self):
+        _selector = self.create_selector(0)
+        _selector._current_index = 5
+        _selector.set_axis_metadata(np.arange(10), "dummy", "unit")
+        _selector.define_additional_choices("choice1")
+        for _choice, _result in [
+            ("slice at index", slice(5, 6)),
+            ("slice at data value", slice(5, 6)),
+            ("choice1", slice(None)),
+        ]:
+            with self.subTest(choice=_choice):
+                _selector.display_choice = _choice
+                self.assertEqual(_selector.current_slice, _result)
 
     def test_set_axis_metadata(self):
         axis = np.arange(10)
@@ -162,26 +199,7 @@ class TestDataAxisSelector(unittest.TestCase):
                     _choice in ["slice at data value", "slice at index"],
                 )
 
-    def test_npoints(self):
-        _selector = self.create_selector(0)
-        _selector._npoints = 42
-        self.assertEqual(_selector.npoints, 42)
-
-    def test_current_slice(self):
-        _selector = self.create_selector(0)
-        _selector._current_index = 5
-        _selector.set_axis_metadata(np.arange(10), "dummy", "unit")
-        _selector.define_additional_choices("choice1")
-        for _choice, _result in [
-            ("slice at index", slice(5, 6)),
-            ("slice at data value", slice(5, 6)),
-            ("choice1", slice(None)),
-        ]:
-            with self.subTest(choice=_choice):
-                _selector.display_choice = _choice
-                self.assertEqual(_selector.current_slice, _result)
-
-    def test_change_slider(self):
+    def test_slider_changed(self):
         _range = 0.75 * np.arange(20) - 5
         _pos = 5
         _selector = self.create_selector(7)
@@ -193,6 +211,91 @@ class TestDataAxisSelector(unittest.TestCase):
         self.assertEqual(_results[0][1], str(_pos))
         self.assertEqual(_selector._widgets["edit_index"].text(), str(_pos))
         self.assertEqual(_selector._widgets["edit_data"].text(), f"{_range[_pos]:.4f}")
+
+    def test_manual_index_changed(self):
+        _range = 0.75 * np.arange(20) - 5
+        _pos = 5
+        _axindex = 6
+        _selector = self.create_selector(_axindex)
+        _selector.set_axis_metadata(_range, "dummy", "unit")
+        for _test_index, (_set, _expectation) in enumerate(
+            [[-5, 0], [_pos, _pos], [25, _range.size - 1]]
+        ):
+            with self.subTest(entry=_set, expectation=_expectation):
+                with QtCore.QSignalBlocker(_selector._widgets["edit_index"]):
+                    _selector._widgets["edit_index"].setText(str(_set))
+                _selector._manual_index_changed()
+                self.assertEqual(
+                    _selector._widgets["slider"].sliderPosition(), _expectation
+                )
+                self.assertEqual(
+                    _selector._widgets["edit_data"].text(),
+                    f"{_range[_expectation]:.4f}",
+                )
+                self.assertEqual(
+                    _selector._widgets["edit_index"].text(), str(_expectation)
+                )
+                _results = self.get_new_slicing_spy_results()
+                self.assertEqual(_results[_test_index][0], _axindex)
+                self.assertEqual(_results[_test_index][1], str(_expectation))
+
+    def test_manual_data_value_changed(self):
+        _range = 0.75 * np.arange(20) - 5
+        _pos = 5
+        _axindex = 6
+        _selector = self.create_selector(_axindex)
+        _selector.set_axis_metadata(_range, "dummy", "unit")
+        for _test_index, (_set, _expectation) in enumerate(
+            [
+                [_range[0] - 3, 0],
+                [_range[_pos] + 0.1, _pos],
+                [_range[-1] + 1, _range.size - 1],
+            ]
+        ):
+            with self.subTest(entry=_set, expectation=_expectation):
+                with QtCore.QSignalBlocker(_selector._widgets["edit_data"]):
+                    _selector._widgets["edit_data"].setText(str(_set))
+                _selector._manual_data_value_changed()
+                self.assertEqual(
+                    _selector._widgets["slider"].sliderPosition(), _expectation
+                )
+                self.assertEqual(
+                    _selector._widgets["edit_data"].text(),
+                    f"{_range[_expectation]:.4f}",
+                )
+                self.assertEqual(
+                    _selector._widgets["edit_index"].text(), str(_expectation)
+                )
+                _results = self.get_new_slicing_spy_results()
+                self.assertEqual(_results[_test_index][0], _axindex)
+                self.assertEqual(_results[_test_index][1], str(_expectation))
+
+    def test_move_to_index__no_change(self):
+        _selector = self.create_selector(0)
+        _range = 0.75 * np.arange(20) - 5
+        _axindex = 6
+        _selector = self.create_selector(_axindex)
+        _selector.set_axis_metadata(_range, "dummy", "unit")
+        _selector._current_index = 7
+        _selector._move_to_index(7)
+        _results = self.get_new_slicing_spy_results()
+        self.assertEqual(_results, [])
+
+    def test_move_to_index(self):
+        _selector = self.create_selector(0)
+        _range = 0.75 * np.arange(20) - 5
+        _axindex = 6
+        _index = 7
+        _selector = self.create_selector(_axindex)
+        _selector.set_axis_metadata(_range, "dummy", "unit")
+        _selector._move_to_index(_index)
+        _results = self.get_new_slicing_spy_results()
+        self.assertEqual(_results[0], [_axindex, str(_index)])
+        self.assertEqual(_selector._widgets["slider"].sliderPosition(), _index)
+        self.assertEqual(
+            _selector._widgets["edit_data"].text(), f"{_range[_index]:.4f}"
+        )
+        self.assertEqual(_selector._widgets["edit_index"].text(), str(_index))
 
 
 if __name__ == "__main__":

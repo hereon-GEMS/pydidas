@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DataAxisSelector"]
 
+
 from functools import partial
 from typing import Optional
 
@@ -37,37 +38,17 @@ from qtpy import QtCore, QtGui, QtWidgets
 from pydidas.core import UserConfigError
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
-    QT_REG_EXP_FLOAT_RANGE_VALIDATOR,
-    QT_REG_EXP_INT_RANGE_VALIDATOR,
 )
-from pydidas.widgets.factory import SquareButton
+from pydidas.widgets.data_viewer.data_viewer_utils import (
+    get_data_axis_widget_creation_args,
+    invalid_range_str, get_data_axis_header_creation_args,
+)
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
 
 
 _GENERIC_CHOICES = ["slice at index", "slice at data value"]
-
-
-def _invalid_range_str(input_range: str) -> str:
-    """
-    Get a string for an invalid range input to be displayed as exception.
-
-    Parameters
-    ----------
-    input_range : str
-        The invalid input range.
-
-    Returns
-    -------
-    str
-        The string for the exception.
-    """
-    return (
-        f"Invalid range syntax in the input: `{input_range}`\n"
-        "Please enter the values for the first and last point separated by a colon, "
-        "e.g. `0:10` or `-4.5:12.7`."
-    )
 
 
 class DataAxisSelector(WidgetWithParameterCollection):
@@ -79,7 +60,9 @@ class DataAxisSelector(WidgetWithParameterCollection):
     sig_display_choice_changed = QtCore.Signal(int, str)
     sig_new_data_dimension = QtCore.Signal(int)
 
-    def __init__(self, index: int, parent=None, **kwargs: dict):
+    def __init__(
+        self, index: int, parent: Optional[QtWidgets.QWidget] = None, **kwargs: dict
+    ):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
         self._axis_index = index
         self._current_slice = slice(0, 1)
@@ -89,128 +72,36 @@ class DataAxisSelector(WidgetWithParameterCollection):
         self._data_label = ""
         self._external_display_choices = ""
         self._all_choices = []
-        _multiline = kwargs.get("multiline", False)
-        self._use_multiline = _multiline
+        self._use_multiline = kwargs.get("multiline", False)
+        self._create_widgets()
+        self._connect_signals()
 
-        self.create_label(
-            "label_axis",
-            f"Dim {self._axis_index}",
-            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH if _multiline else 28,
-            gridPos=(0, 0, 1, 2),
-        )
-        self.create_combo_box(
-            "combo_axis_use",
-            gridPos=(1, 1, 1, 1) if _multiline else (0, -1, 1, 1),
-            items=["slice at index"],
-            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH - 10
-            if _multiline
-            else 25,
-        )
-        if not _multiline:
+    def _create_widgets(self):
+        """
+        Create the widgets for the DataAxisSelector.
+        """
+        _header = get_data_axis_header_creation_args(self._axis_index, self._use_multiline)
+        for _method_name, _args, _kwargs in _header:
+            _method = getattr(self, _method_name)
+            _method(*_args, **_kwargs)
+        if self._use_multiline:
+            self.create_empty_widget("point_selection_container", gridPos=(3, 0, 1, 2))
+        else:
             self.layout().setColumnStretch(self.layout().columnCount() - 1, 6)
-        if _multiline:
-            self.create_empty_widget(
-                "point_selection_container",
-                gridPos=(3, 0, 1, 2),
-            )
-        self.create_combo_box(
-            "combo_range",
-            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH - 25,
-            gridPos=(0, -1, 1, 1),
-            items=[
-                "use full axis",
-                "select range by indices",
-                "select range by data values",
-            ],
-            parent_widget="point_selection_container" if _multiline else self,
-            visible=False,
-        )
-        self.create_lineedit(
-            "edit_range_index",
-            font_metric_width_factor=25,
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-            toolTip=(
-                "Enter the start and end index separated by a colon. Please note that "
-                "contrary to Python slicing, the end index is included in the "
-                "selection."
-            ),
-            validator=QT_REG_EXP_INT_RANGE_VALIDATOR,
-            visible=False,
-        )
-        self.create_lineedit(
-            "edit_range_data",
-            font_metric_width_factor=25,
-            gridPos=(0, -1, 1, 1),
-            toolTip=(
-                "Enter the first and last data point to be included, separated by a "
-                "colon. Please note that contrary to Python slicing, the final data "
-                "point is included in the selection."
-            ),
-            parent_widget="point_selection_container" if _multiline else self,
-            validator=QT_REG_EXP_FLOAT_RANGE_VALIDATOR,
-            visible=False,
-        )
-        self.add_any_widget(
-            "slider",
-            QtWidgets.QSlider(QtCore.Qt.Horizontal),
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-        )
-        self.add_any_widget(
-            "button_start",
-            SquareButton(icon="mdi::skip-backward"),
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-        )
-        self.add_any_widget(
-            "button_backward",
-            SquareButton(icon="mdi::step-backward"),
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-        )
-        self.create_lineedit(
-            "edit_index",
-            font_metric_width_factor=10,
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-            text="0",
-            validator=QtGui.QIntValidator(),
-        )
-        self.create_lineedit(
-            "edit_data",
-            font_metric_width_factor=10,
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-            text="0.0",
-            validator=QtGui.QDoubleValidator(),
-            visible=False,
-        )
-        self.create_label(
-            "label_unit",
-            "",
-            font_metric_width_factor=8,
-            parent_widget="point_selection_container" if _multiline else self,
-            gridPos=(0, -1, 1, 1),
-            visible=False,
-        )
-        self.add_any_widget(
-            "button_forward",
-            SquareButton(icon="mdi::step-forward"),
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-        )
-        self.add_any_widget(
-            "button_end",
-            SquareButton(icon="mdi::skip-forward"),
-            gridPos=(0, -1, 1, 1),
-            parent_widget="point_selection_container" if _multiline else self,
-        )
-        if not _multiline:
+        _entries = get_data_axis_widget_creation_args(self._use_multiline)
+        for _method_name, _args, _kwargs in _entries:
+            _method = getattr(self, _method_name)
+            _method(*_args, **_kwargs)
+
+        if not self._use_multiline:
             self.create_spacer("final_spacer", fixedHeight=5, gridPos=(0, -1, 1, 1))
             self.__spacer_column = self.layout().columnCount() - 1
             self.layout().setColumnStretch(self.__spacer_column, 1)
 
+    def _connect_signals(self):
+        """
+        Connect the signals of the DataAxisSelector.
+        """
         self._widgets["combo_axis_use"].currentTextChanged.connect(
             self._handle_new_axis_use
         )
@@ -579,12 +470,12 @@ class DataAxisSelector(WidgetWithParameterCollection):
         _input = self._widgets["edit_range_index"].text()
         _range = _input.split(":")
         if len(_range) != 2:
-            raise UserConfigError(_invalid_range_str(_input))
+            raise UserConfigError(invalid_range_str(_input))
         try:
             _start = max(0, min(self._npoints, int(_range[0])))
             _stop = min(self._npoints, max(0, int(_range[1]) + 1))
         except ValueError:
-            raise UserConfigError(_invalid_range_str(_input))
+            raise UserConfigError(invalid_range_str(_input))
         if (_start, _stop) == (self._current_slice.start, self._current_slice.stop):
             return
         # need to set to stop -1 because the slicing index is incremented to
@@ -604,12 +495,12 @@ class DataAxisSelector(WidgetWithParameterCollection):
         _input = self._widgets["edit_range_data"].text()
         _range = _input.split(":")
         if len(_range) != 2:
-            raise UserConfigError(_invalid_range_str(_input))
+            raise UserConfigError(invalid_range_str(_input))
         try:
             _start = np.argmin(np.abs(self._data_range - float(_range[0])))
             _stop = np.argmin(np.abs(self._data_range - float(_range[1]))) + 1
         except ValueError:
-            raise UserConfigError(_invalid_range_str(_input))
+            raise UserConfigError(invalid_range_str(_input))
         # need to set to stop -1 because the slicing index is incremented to
         # include the last point
         _new_input = f"{self._data_range[_start]:.4f}:{self._data_range[_stop - 1]:.4f}"

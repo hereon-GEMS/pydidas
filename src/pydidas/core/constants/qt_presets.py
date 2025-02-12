@@ -39,7 +39,9 @@ __all__ = [
     "QT_REG_EXP_FLOAT_VALIDATOR",
     "QT_REG_EXP_INT_VALIDATOR",
     "QT_REG_EXP_SLICE_VALIDATOR",
+    "QT_REG_EXP_INT_RANGE_VALIDATOR",
     "QT_REG_EXP_FLOAT_SLICE_VALIDATOR",
+    "QT_REG_EXP_FLOAT_RANGE_VALIDATOR",
     "QT_REG_EXP_RGB_VALIDATOR",
     "POLICY_FIX_EXP",
     "POLICY_EXP_EXP",
@@ -87,9 +89,19 @@ QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(r"((-?\d*:?){1,3},?)*")
 )
 
+# validate a single range of type <start [int]>:<end [int]>
+QT_REG_EXP_INT_RANGE_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression(r"-?\d+:-?\d+")
+)
+
+# validate a single range of type <start [float]>:<end [float]>
 QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(r"((-?\d*\.?\d*:?){1,3},?)*")
 )
+QT_REG_EXP_FLOAT_RANGE_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression(r"-?\d+\.?\d*:-?\d+\.?\d*")
+)
+
 
 QT_REG_EXP_RGB_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(r"#[0-9A-Fa-f]{6}")

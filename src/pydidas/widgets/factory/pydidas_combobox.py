@@ -34,6 +34,7 @@ from qtpy.QtWidgets import QComboBox
 
 from pydidas.core.constants import GENERIC_IO_WIDGET_WIDTH
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
+from pydidas.widgets.utilities import get_max_pixel_width_of_entries
 
 
 class PydidasComboBox(PydidasWidgetMixin, QComboBox):
@@ -55,3 +56,38 @@ class PydidasComboBox(PydidasWidgetMixin, QComboBox):
         if "font_metric_height_factor" not in kwargs:
             kwargs["font_metric_height_factor"] = 1
         PydidasWidgetMixin.__init__(self, **kwargs)
+
+    def _update_view_width(self):
+        """
+        Update the view width of the combobox.
+
+        This method assures that the combobox is resized to the maximum
+        width of the entries and that all entries are always legible.
+        """
+        _items = [self.itemText(i) for i in range(self.count())]
+        if _items:
+            self.view().setMinimumWidth(get_max_pixel_width_of_entries(_items) + 50)
+
+    def addItem(self, *args, **kwargs):
+        super().addItem(*args, **kwargs)
+        self._update_view_width()
+
+    def addItems(self, *args, **kwargs):
+        super().addItems(*args, **kwargs)
+        self._update_view_width()
+
+    def insertItem(self, *args, **kwargs):
+        super().insertItem(*args, **kwargs)
+        self._update_view_width()
+
+    def insertItems(self, *args, **kwargs):
+        super().insertItems(*args, **kwargs)
+        self._update_view_width()
+
+    def removeItem(self, *args, **kwargs):
+        super().removeItem(*args, **kwargs)
+        self._update_view_width()
+
+    def clear(self):
+        super().clear()
+        self._update_view_width()

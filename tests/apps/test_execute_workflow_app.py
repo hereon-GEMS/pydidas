@@ -45,8 +45,8 @@ from pydidas.core import PydidasQsettings, UserConfigError, get_generic_paramete
 from pydidas.core.utils import get_random_string
 from pydidas.multiprocessing import app_processor
 from pydidas.plugins import PluginCollection
-from pydidas.workflow import WorkflowResultsContext, WorkflowTree
-from pydidas.workflow.result_io import WorkflowResultIoMeta
+from pydidas.workflow import WorkflowResults, WorkflowTree
+from pydidas.workflow.result_io import ProcessingResultIoMeta
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -54,8 +54,8 @@ COLL = PluginCollection()
 EXP = DiffractionExperimentContext()
 SCAN = ScanContext()
 TREE = WorkflowTree()
-RESULTS = WorkflowResultsContext()
-RESULT_SAVER = WorkflowResultIoMeta
+RESULTS = WorkflowResults()
+RESULT_SAVER = ProcessingResultIoMeta
 
 
 class TestExecuteWorkflowApp(unittest.TestCase):

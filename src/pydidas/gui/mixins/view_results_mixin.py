@@ -37,7 +37,7 @@ from qtpy import QtCore
 from pydidas.core import Dataset, UserConfigError
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import critical_warning
-from pydidas.workflow import WorkflowResultsContext
+from pydidas.workflow import WorkflowResults
 
 
 class ViewResultsMixin:
@@ -67,7 +67,7 @@ class ViewResultsMixin:
 
     def __init__(self, **kwargs: dict) -> Self:
         _results = kwargs.get("workflow_results", None)
-        self._RESULTS = _results if _results is not None else WorkflowResultsContext()
+        self._RESULTS = _results if _results is not None else WorkflowResults()
         self._config.update(
             {
                 "data_use_timeline": False,

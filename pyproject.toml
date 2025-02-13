@@ -100,4 +100,7 @@ max-complexity = 12
 "app_processor_.py" = ["C901"]
 
 [tool.pytest.ini_options]
-addopts = "--disable-warnings"
+addopts = "--disable-warnings -m 'not slow'"
+markers = [
+    "slow: mark test as slow to run only when '-m slow' is specified",
+]

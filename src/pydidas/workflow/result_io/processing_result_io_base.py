@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowResultIoBase class which exporters/importers should
+Module with the ProcessingResultIoBase class which exporters/importers should
 inherit from.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowResultIoBase"]
+__all__ = ["ProcessingResultIoBase"]
 
 
 import re
@@ -35,10 +35,10 @@ from typing import Union
 from pydidas.contexts.scan import Scan
 from pydidas.core import Dataset
 from pydidas.core.io_registry import GenericIoBase
-from pydidas.workflow.result_io.workflow_result_io_meta import WorkflowResultIoMeta
+from pydidas.workflow.result_io.processing_result_io_meta import ProcessingResultIoMeta
 
 
-class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
+class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     """
     Base class for WorkflowTree exporters.
     """

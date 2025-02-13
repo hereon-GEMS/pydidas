@@ -39,7 +39,7 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.workflow.workflow_results import WorkflowResultsContext
+from pydidas.workflow.workflow_results import WorkflowResults
 
 
 class WorkflowResultsSelector(ObjectWithParameterCollection):
@@ -57,9 +57,9 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
     **kwargs : dict
         Optional keyword arguments. Supported kwargs are:
 
-        workflow_results : WorkflowResults, optional
-            The WorkflowResults instance to use. If not specied, this will default
-            to the WorkflowResultsContext.
+        workflow_results : ProcessingResults, optional
+            The ProcessingResults instance to use. If not specied, this will default
+            to the WorkflowResults.
     """
 
     new_selection = QtCore.Signal(bool, int, int, object)
@@ -73,7 +73,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self.add_params(*args)
         self.set_default_params()
         _results = kwargs.get("workflow_results", None)
-        self._RESULTS = WorkflowResultsContext() if _results is None else _results
+        self._RESULTS = WorkflowResults() if _results is None else _results
         self._SCAN = self._RESULTS.frozen_scan
         self._selection = None
         self._npoints = []

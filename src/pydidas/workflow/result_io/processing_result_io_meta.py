@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowResultIoMeta class which is used for creating
+Module with the ProcessingResultIoMeta class which is used for creating
 exporter/importer classes and registering them.
 
 These exporters/importers are used to save the WorkflowTree results to
@@ -28,7 +28,7 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowResultIoMeta"]
+__all__ = ["ProcessingResultIoMeta"]
 
 
 import os
@@ -43,14 +43,14 @@ from pydidas.core.utils import get_extension
 from pydidas.workflow.processing_tree import ProcessingTree
 
 
-class WorkflowResultIoMeta(GenericIoMeta):
+class ProcessingResultIoMeta(GenericIoMeta):
     """
     Metaclass for WorkflowTree exporters and importers which holds the
     registry with all associated file extensions for exporting WorkflowTrees.
     """
 
     # need to redefine the registry to have a unique registry for
-    # WorkflowResultsSaverMeta
+    # ProcessingResultsSaverMeta
     registry = {}
     active_savers = []
     scan_title = ""
@@ -280,7 +280,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
         Import data from files in a directory.
 
         This method imports data, reads the metadata and passes it in a format for
-        the WorkflowResults to update itself.
+        the ProcessingResults to update itself.
 
         Parameters
         ----------

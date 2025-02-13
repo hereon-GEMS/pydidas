@@ -51,6 +51,9 @@ Improvements
   for numerical values.
 - Pydidas result exports in hdf5 format writes metadata neXus-compatible
 - Added a new interface for browsing and slicing data based on its metadata.
+- Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
+  (for the general class) and WorkflowResults (for the singleton instance)
+  for consistency, similarly to ProcessingTree and WorkflowTree.
 
 
 Bugfixes

@@ -502,10 +502,8 @@ def create_nxdata_entry(
     """
     Create a NXdata entry in the given parent object.
 
-    This function also writes the necessary attributes to the group. Note that the
-    respective datasets for the axes and signal data need to be created separately.
-
-    Necessary attributes for the axes will be created automatically.
+    This function also writes the necessary attributes to the group. Necessary
+    attributes for the axes will be created automatically.
 
     Parameters
     ----------
@@ -526,6 +524,7 @@ def create_nxdata_entry(
         _data_group_name,
         signal=_dset_name,
         axes=[f"axis_{_i}_repr" for _i in range(data.ndim)],
+        title=data.data_label,
         **{f"axis_{_n}_repr_indices": [_n] for _n in range(data.ndim)},
         **attributes,
     )

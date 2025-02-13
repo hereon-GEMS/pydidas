@@ -38,13 +38,13 @@ from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
 from pydidas.core import UserConfigError
 from pydidas.multiprocessing import AppRunner
-from pydidas.workflow import ProcessingTree, WorkflowResultsContext, WorkflowTree
+from pydidas.workflow import ProcessingTree, WorkflowResults, WorkflowTree
 from pydidas_qtcore import PydidasQApplication
 
 
 SCAN = ScanContext()
 TREE = WorkflowTree()
-RES = WorkflowResultsContext()
+RES = WorkflowResults()
 EXP = DiffractionExperimentContext()
 
 

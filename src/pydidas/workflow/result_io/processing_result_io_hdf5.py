@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowResultIoHdf5 class which exports and imports results in
+Module with the ProcessingResultIoHdf5 class which exports and imports results in
 Hdf5 file format.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowResultIoHdf5"]
+__all__ = ["ProcessingResultIoHdf5"]
 
 
 import os
@@ -50,7 +50,7 @@ from pydidas.core.utils.hdf5_dataset_utils import _create_nxdata_axis_entry
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
-from pydidas.workflow.result_io.workflow_result_io_base import WorkflowResultIoBase
+from pydidas.workflow.result_io.processing_result_io_base import ProcessingResultIoBase
 from pydidas.workflow.workflow_tree import WorkflowTree
 
 
@@ -167,9 +167,9 @@ def _get_pydidas_context_config_entries(
     return _dsets
 
 
-class WorkflowResultIoHdf5(WorkflowResultIoBase):
+class ProcessingResultIoHdf5(ProcessingResultIoBase):
     """
-    Implementation of the WorkflowResultIoBase for Hdf5 files.
+    Implementation of the ProcessingResultIoBase for Hdf5 files.
     """
 
     extensions = HDF5_EXTENSIONS
@@ -310,6 +310,18 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 {"NX_class": "NX_CHAR", "units": ""},
             ],
             [
+                "entry",
+                "data_label",
+                {"data": ""},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ],
+            [
+                "entry",
+                "data_unit",
+                {"data": ""},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ],
+            [
                 "entry/data",
                 "data",
                 {"shape": _node_attribute("shape")},
@@ -390,6 +402,8 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             _shape = tuple(_range.size for _range in _metadata["axis_ranges"].values())
             _axes_attr = [f"axis_{_i}_repr" for _i in range(_ndim)]
             with h5py.File(cls._save_dir / cls._filenames[_id], "r+") as _file:
+                _file["entry/data_label"][()] = _metadata.get("data_label", "")
+                _file["entry/data_unit"][()] = _metadata.get("data_unit", "")
                 _nxdata_group = _file["entry/data"]
                 _nxdata_group.attrs["signal"] = "data"
                 _nxdata_group.attrs["axes"] = _axes_attr

@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Function to create hdf5 files which are compatible with the WorkflowResults hdf5
+Function to create hdf5 files which are compatible with the ProcessingResults hdf5
 importer/exporter.
 """
 

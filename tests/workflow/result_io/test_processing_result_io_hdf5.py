@@ -38,20 +38,20 @@ from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_random_string, read_and_decode_hdf5_dataset
 from pydidas.unittest_objects import create_hdf5_results_file
-from pydidas.workflow import WorkflowResults, WorkflowTree
-from pydidas.workflow.result_io import WorkflowResultIoMeta
-from pydidas.workflow.result_io.workflow_result_io_hdf5 import WorkflowResultIoHdf5
+from pydidas.workflow import ProcessingResults, WorkflowTree
+from pydidas.workflow.result_io import ProcessingResultIoMeta
+from pydidas.workflow.result_io.processing_result_io_hdf5 import ProcessingResultIoHdf5
 
 
 TREE = WorkflowTree()
 SCAN = ScanContext()
 EXP = DiffractionExperimentContext()
-RESULTS = WorkflowResults()
-META = WorkflowResultIoMeta
-H5SAVER = WorkflowResultIoHdf5
+RESULTS = ProcessingResults()
+META = ProcessingResultIoMeta
+H5SAVER = ProcessingResultIoHdf5
 
 
-class TestWorkflowResultIoHdf5(unittest.TestCase):
+class TestProcessingResultIoHdf5(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._dir = tempfile.mkdtemp()

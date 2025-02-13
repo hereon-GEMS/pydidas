@@ -33,15 +33,15 @@ import numpy as np
 
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import Dataset, UserConfigError
-from pydidas.workflow import WorkflowResults, WorkflowTree
-from pydidas.workflow.result_io import WorkflowResultIoBase, WorkflowResultIoMeta
+from pydidas.workflow import ProcessingResults, WorkflowTree
+from pydidas.workflow.result_io import ProcessingResultIoBase, ProcessingResultIoMeta
 
 
 TREE = WorkflowTree()
 EXP = DiffractionExperimentContext()
 SCAN = ScanContext()
-RESULTS = WorkflowResults()
-META = WorkflowResultIoMeta
+RESULTS = ProcessingResults()
+META = ProcessingResultIoMeta
 
 
 def export_frame_to_file(saver, index, frame_result_dict, **kwargs):
@@ -103,7 +103,7 @@ def update_metadata(saver, metadata, scan):
     saver._metadata = metadata
 
 
-class TestWorkflowResultsSaverMeta(unittest.TestCase):
+class TestProcessingResultsSaverMeta(unittest.TestCase):
     def setUp(self):
         self._meta_registry = META.registry.copy()
         self._dir = tempfile.mkdtemp()
@@ -118,7 +118,7 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
     def create_saver_class(self, title, ext):
         _cls = META(
             title.upper(),
-            (WorkflowResultIoBase,),
+            (ProcessingResultIoBase,),
             dict(extensions=[ext.upper()], format_name=ext),
         )
         return _cls

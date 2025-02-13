@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowResultIoHdf5 class which exports and imports results in
+Module with the ProcessingResultIoHdf5 class which exports and imports results in
 Hdf5 file format.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowResultIoHdf5"]
+__all__ = ["ProcessingResultIoHdf5"]
 
 
 import os
@@ -50,7 +50,7 @@ from pydidas.core.utils.hdf5_dataset_utils import _create_nxdata_axis_entry
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
-from pydidas.workflow.result_io.workflow_result_io_base import WorkflowResultIoBase
+from pydidas.workflow.result_io.processing_result_io_base import ProcessingResultIoBase
 from pydidas.workflow.workflow_tree import WorkflowTree
 
 
@@ -167,9 +167,9 @@ def _get_pydidas_context_config_entries(
     return _dsets
 
 
-class WorkflowResultIoHdf5(WorkflowResultIoBase):
+class ProcessingResultIoHdf5(ProcessingResultIoBase):
     """
-    Implementation of the WorkflowResultIoBase for Hdf5 files.
+    Implementation of the ProcessingResultIoBase for Hdf5 files.
     """
 
     extensions = HDF5_EXTENSIONS

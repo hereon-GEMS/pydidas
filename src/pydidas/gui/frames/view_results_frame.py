@@ -41,15 +41,15 @@ from pydidas.gui.frames.builders.view_results_frame_builder import (
 from pydidas.gui.mixins import ViewResultsMixin
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.framework import BaseFrame
-from pydidas.workflow import ProcessingTree, WorkflowResults, result_io
+from pydidas.workflow import ProcessingResults, ProcessingTree, result_io
 
 
-SAVER = result_io.WorkflowResultIoMeta
+SAVER = result_io.ProcessingResultIoMeta
 
 
 class ViewResultsFrame(BaseFrame, ViewResultsMixin):
     """
-    The ViewResultsFrame is used to import and visualize the pydidas WorkflowResults.
+    The ViewResultsFrame is used to import and visualize the pydidas ProcessingResults.
     """
 
     menu_icon = "pydidas::frame_icon_workflow_results"
@@ -65,7 +65,7 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
         self._SCAN = Scan()
         self._TREE = ProcessingTree()
         self._EXP = DiffractionExperiment()
-        self._RESULTS = WorkflowResults(
+        self._RESULTS = ProcessingResults(
             diffraction_exp_context=self._EXP,
             scan_context=self._SCAN,
             workflow_tree=self._TREE,

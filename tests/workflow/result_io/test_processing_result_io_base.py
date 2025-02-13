@@ -27,17 +27,17 @@ __status__ = "Production"
 import unittest
 
 from pydidas.contexts import ScanContext
-from pydidas.workflow import WorkflowResults, WorkflowTree
-from pydidas.workflow.result_io import WorkflowResultIoBase, WorkflowResultIoMeta
+from pydidas.workflow import ProcessingResults, WorkflowTree
+from pydidas.workflow.result_io import ProcessingResultIoBase, ProcessingResultIoMeta
 
 
 TREE = WorkflowTree()
 SCAN = ScanContext()
-RESULTS = WorkflowResults()
-META = WorkflowResultIoMeta
+RESULTS = ProcessingResults()
+META = ProcessingResultIoMeta
 
 
-class TestWorkflowResultIoBase(unittest.TestCase):
+class TestProcessingResultIoBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._meta_registry = META.registry.copy()
@@ -47,7 +47,7 @@ class TestWorkflowResultIoBase(unittest.TestCase):
         }
         META.reset()
 
-        class SAVER(WorkflowResultIoBase):
+        class SAVER(ProcessingResultIoBase):
             extensions = ["TEST"]
             default_extension = "Test"
             format_name = "Test"
@@ -61,7 +61,7 @@ class TestWorkflowResultIoBase(unittest.TestCase):
         META.registry = cls._meta_registry.copy()
 
     def test_class_existance(self):
-        self.assertIn(WorkflowResultIoBase, self.SAVER.__bases__)
+        self.assertIn(ProcessingResultIoBase, self.SAVER.__bases__)
 
     def test_get_attribute_dict(self):
         _name = "test"

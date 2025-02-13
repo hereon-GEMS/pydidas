@@ -46,6 +46,9 @@ Improvements
 - Added support for pytest tests in the CI pipeline. 
 - Added import functionality for Sardana FIO files to the Scan import.
 - Pydidas result exports in hdf5 format writes metadata neXus-compatible
+- Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
+  (for the general class) and WorkflowResults (for the singleton instance)
+  for consistency, similarly to ProcessingTree and WorkflowTree.
 
 
 Bugfixes

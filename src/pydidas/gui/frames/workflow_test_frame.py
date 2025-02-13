@@ -523,7 +523,7 @@ class WorkflowTestFrame(BaseFrame):
         Update the plot.
 
         This method will get the latest result (subset) from the
-        WorkflowResults and update the plot.
+        ProcessingResults and update the plot.
         """
         if not self._config["plot_active"]:
             return

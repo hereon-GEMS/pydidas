@@ -28,11 +28,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from . import workflow_result_io_hdf5
-from .workflow_result_io_base import *
-from .workflow_result_io_meta import *
+from . import processing_result_io_hdf5
+from .processing_result_io_base import *
+from .processing_result_io_meta import *
 
 
-__all__ = workflow_result_io_base.__all__ + workflow_result_io_meta.__all__
+__all__ = processing_result_io_base.__all__ + processing_result_io_meta.__all__
 
-del (workflow_result_io_base, workflow_result_io_meta, workflow_result_io_hdf5)
+del (processing_result_io_base, processing_result_io_meta, processing_result_io_hdf5)

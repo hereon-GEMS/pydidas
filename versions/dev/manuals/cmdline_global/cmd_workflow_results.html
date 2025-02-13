@@ -477,9 +477,9 @@ document.write(`
 </nav>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a> is the
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code> is the
 Singleton instance of the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>.
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingResults</span></code>.
 It is used for managing the processing results.</p>
 <p>This class does not need any configuration as the layout of the results are
 determined based on</p>
@@ -492,7 +492,7 @@ class.</p></li>
 <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p></li>
 </ol>
 </div></blockquote>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code>
 is only responsible for storing and presenting the results.</p>
 <p>To access the instance, execute the following code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
@@ -500,13 +500,13 @@ is only responsible for storing and presenting the results.</p>
 </pre></div>
 </div>
 <p>The public interface is detailed in the class documentation
-(<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>)
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code>)
 and this document will focus on the use case to access results.</p>
 </section>
 <section id="getting-information-about-the-results">
 <h2>Getting information about the results<a class="headerlink" href="#getting-information-about-the-results" title="Link to this heading">#</a></h2>
 <p>To get more information about the results, the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code>
 class has several properties to get general information about the stored results</p>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
@@ -562,7 +562,7 @@ corresponding node in the
 <section id="metadata">
 <h4>Metadata<a class="headerlink" href="#metadata" title="Link to this heading">#</a></h4>
 <p>The metadata of a node ID’s Dataset can be accessed using the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults.get_result_metadata" title="pydidas.workflow.WorkflowResults.get_result_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_metadata(node_id)</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_metadata(node_id)</span></code>
 method. It will return a dictionary with the metadata keys and their respective
 data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
@@ -584,13 +584,13 @@ creating a copy of the full data.</p>
 </section>
 <section id="generic-data">
 <h4>Generic Data<a class="headerlink" href="#generic-data" title="Link to this heading">#</a></h4>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults.get_results" title="pydidas.workflow.WorkflowResults.get_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results(node_id)</span></code></a>
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results(node_id)</span></code>
 method is available to access the full Dataset with the results of a Plugin.
 The calling parameter is the node ID of the particular Plugin corresponding to
 the results:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">WorkflowResults.</span></span><span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
+<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
 <dd><p>Get the combined results for the requested node_id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -656,12 +656,12 @@ the results:</p>
 <h4>Flattened scan dimensions<a class="headerlink" href="#flattened-scan-dimensions" title="Link to this heading">#</a></h4>
 <p>For some applications, it might be interesting to ignore the detailed shape of
 the scan and flatten the scan to a <em>timeline</em>. The
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults.get_results_for_flattened_scan" title="pydidas.workflow.WorkflowResults.get_results_for_flattened_scan"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results_for_flattened_scan(node_id)</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results_for_flattened_scan(node_id)</span></code>
 method allows to get a Dataset with all the scan dimensions flattened to a
 single dimension renamed to <em>timeline</em>:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">WorkflowResults.</span></span><span class="sig-name descname"><span class="pre">get_results_for_flattened_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
+<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results_for_flattened_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
 <dd><p>Get the results for the requested node_id with all scan dimensions flatted.</p>
 <p>This method will essentially flatten all scan dimensions into a timeline for
 convenience. The squeeze Parameter can be used to remove all dimensions of
@@ -735,7 +735,7 @@ False.</p></li>
 well:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">WorkflowResults.</span></span><span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
+<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
 <dd><p>Get a sliced subset of a node_id result.</p>
 <p>Note that numpy’s slicing always squeezes dimensions with a length of 1 if
 they are given as integers, or slices. Iterable objects keep a
@@ -763,7 +763,7 @@ the resulting data. The default is False.</p></li>
 
 <p>This method is interesing if the user wants to access a specific subset in the
 flattened data, for example the results for the frames 40 to 55 of the
-experiment. This can easily be done using the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults.get_result_subset" title="pydidas.workflow.WorkflowResults.get_result_subset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_subset</span></code></a>
+experiment. This can easily be done using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_subset</span></code>
 method, as demonstrated in the example below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
@@ -810,11 +810,11 @@ method, as demonstrated in the example below:</p>
 </section>
 <section id="saving-results">
 <h2>Saving results<a class="headerlink" href="#saving-results" title="Link to this heading">#</a></h2>
-<p>Saving the results is achieved via the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults.save_results_to_disk" title="pydidas.workflow.WorkflowResults.save_results_to_disk"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_results_to_disk</span></code></a>
+<p>Saving the results is achieved via the <code class="xref py py-meth docutils literal notranslate"><span class="pre">save_results_to_disk</span></code>
 method:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">WorkflowResults.</span></span><span class="sig-name descname"><span class="pre">save_results_to_disk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">save_formats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">save_results_to_disk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">save_formats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Save results to disk.</p>
 <p>By default, this method saves all results to disk using the specified
 formats and directory.

@@ -7,8 +7,9 @@
 workflow
 --------
 
-.. autoclass:: pydidas.workflow.workflow_results.WorkflowResults
+.. autoclass:: pydidas.workflow.workflow_results.ProcessingResults
     :members:
 
 .. automodule:: pydidas.workflow
     :members:
+    :exclude-members: ProcessingResults

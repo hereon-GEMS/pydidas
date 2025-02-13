@@ -310,6 +310,18 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 {"NX_class": "NX_CHAR", "units": ""},
             ],
             [
+                "entry",
+                "data_label",
+                {"data": ""},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ],
+            [
+                "entry",
+                "data_unit",
+                {"data": ""},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ],
+            [
                 "entry/data",
                 "data",
                 {"shape": _node_attribute("shape")},
@@ -390,6 +402,8 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             _shape = tuple(_range.size for _range in _metadata["axis_ranges"].values())
             _axes_attr = [f"axis_{_i}_repr" for _i in range(_ndim)]
             with h5py.File(cls._save_dir / cls._filenames[_id], "r+") as _file:
+                _file["entry/data_label"][()] = _metadata.get("data_label", "")
+                _file["entry/data_unit"][()] = _metadata.get("data_unit", "")
                 _nxdata_group = _file["entry/data"]
                 _nxdata_group.attrs["signal"] = "data"
                 _nxdata_group.attrs["axes"] = _axes_attr

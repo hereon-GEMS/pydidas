@@ -277,8 +277,10 @@ class _NetworkLocationFilterModel(QtCore.QSortFilterProxyModel):
             __prefix = "\\\\?\\Volume"
         elif platform.system() in ["Unix", "Linux"]:
             __prefix = "/dev/"
+        elif platform.system() == "Darwin":  # for macOS
+            __prefix = "/Volumes"
         else:
-            raise SystemError("Only windows and unix operating systems are supported!")
+            raise SystemError("Only Windows, Linux, and macOS operating systems are supported!")
         self.__network_drives = [
             _vol.rootPath()
             for _vol in __storage.mountedVolumes()

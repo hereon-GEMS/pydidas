@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowResults"]
+__all__ = ["WorkflowResults", "WorkflowResultsContext"]
 
 
 from pydidas.core import SingletonFactory
@@ -33,3 +33,6 @@ from pydidas.workflow.processing_results import ProcessingResults
 
 
 WorkflowResults = SingletonFactory(ProcessingResults)
+
+# Alias for the WorkflowResults singleton for backwards compatibility:
+WorkflowResultsContext = WorkflowResults

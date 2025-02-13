@@ -71,7 +71,7 @@ class DataAxisSelector(WidgetWithParameterCollection):
         self._data_unit = ""
         self._data_label = ""
         self._external_display_choices = ""
-        self._all_choices = []
+        self._all_choices = ["slice at index"]
         self._use_multiline = kwargs.get("multiline", False)
         self._create_widgets()
         self._connect_signals()
@@ -166,8 +166,20 @@ class DataAxisSelector(WidgetWithParameterCollection):
             The choice to set.
         """
         if choice not in self._all_choices:
-            raise ValueError(f"Invalid choice {choice}")
+            raise ValueError(f"Invalid choice: `{choice}`")
         self._widgets["combo_axis_use"].setCurrentText(choice)
+
+    @property
+    def available_choices(self) -> list[str]:
+        """
+        Get the available display choices.
+
+        Returns
+        -------
+        list[str]
+            The available display choices.
+        """
+        return self._all_choices.copy()
 
     @property
     def current_slice(self) -> slice:

@@ -55,7 +55,7 @@ from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
 )
 from pydidas.widgets.utilities import update_param_and_widget_choices
 from pydidas.widgets.windows import ShowInformationForResult
-from pydidas.workflow import WorkflowResultsContext, WorkflowResultsSelector
+from pydidas.workflow import WorkflowResults, WorkflowResultsSelector
 
 
 class ResultSelectionWidget(
@@ -69,7 +69,7 @@ class ResultSelectionWidget(
 
     The widget allows to select a :py:class:`WorkflowNode
     <pydidas.workflow.WorkflowNode>`, using meta information from the
-    :py:class:`ScanContext <pydidas.core.ScanContext<` and
+    :py:class:`ScanContext <pydidas.core.ScanContext>` and
     :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
     singletons.
     It displays information for all dimensions in the results (label, unit,
@@ -141,7 +141,7 @@ class ResultSelectionWidget(
             "selected_node": -1,
         }
         _results = kwargs.get("workflow_results", None)
-        self._RESULTS = WorkflowResultsContext() if _results is None else _results
+        self._RESULTS = WorkflowResults() if _results is None else _results
         self._active_node = -1
         if select_results_param is not None:
             self.add_param(select_results_param)

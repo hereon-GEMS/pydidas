@@ -123,7 +123,7 @@ experiment to have the results in the correct structure.
 Each dimension is described by a total of five Parameters:
 
 .. list-table::
-    :widths: 15 10 16 59
+    :widths: 22 10 10 58
     :header-rows: 1
     :class: tight-table
     
@@ -133,7 +133,7 @@ Each dimension is described by a total of five Parameters:
       - description
     * - scan_dim{i}_label
       - str
-      - [empty str]
+      - ""
       - The axis name for scan direction *i*. This information will only be used 
         for labelling.
     * - scan_dim{i}_n_points
@@ -151,7 +151,7 @@ Each dimension is described by a total of five Parameters:
         counter / motor position for scan step #0)
     * - scan_dim{i}_unit
       - str
-      - [empty str]
+      - ""
       - The unit of the movement / steps / offset in scan direction *i*. This 
         value will only be used for labelling these numbers.
 

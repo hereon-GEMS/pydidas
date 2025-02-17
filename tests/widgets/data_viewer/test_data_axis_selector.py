@@ -91,8 +91,10 @@ def test_npoints(selector):
     selector._npoints = 42
     assert selector.npoints == 42
 
+
 def test_available_choices(selector):
     assert selector.available_choices == ["slice at index"]
+
 
 def test_display_choice(selector):
     selector.define_additional_choices("choice1;;choice2")

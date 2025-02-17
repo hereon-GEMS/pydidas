@@ -36,12 +36,10 @@ from numpy import ndarray
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import UserConfigError
-from pydidas.core.constants import (
-    FONT_METRIC_CONFIG_WIDTH,
-)
 from pydidas.widgets.data_viewer.data_viewer_utils import (
+    get_data_axis_header_creation_args,
     get_data_axis_widget_creation_args,
-    invalid_range_str, get_data_axis_header_creation_args,
+    invalid_range_str,
 )
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
@@ -80,7 +78,9 @@ class DataAxisSelector(WidgetWithParameterCollection):
         """
         Create the widgets for the DataAxisSelector.
         """
-        _header = get_data_axis_header_creation_args(self._axis_index, self._use_multiline)
+        _header = get_data_axis_header_creation_args(
+            self._axis_index, self._use_multiline
+        )
         for _method_name, _args, _kwargs in _header:
             _method = getattr(self, _method_name)
             _method(*_args, **_kwargs)
@@ -92,11 +92,10 @@ class DataAxisSelector(WidgetWithParameterCollection):
         for _method_name, _args, _kwargs in _entries:
             _method = getattr(self, _method_name)
             _method(*_args, **_kwargs)
-
-        if not self._use_multiline:
-            self.create_spacer("final_spacer", fixedHeight=5, gridPos=(0, -1, 1, 1))
-            self.__spacer_column = self.layout().columnCount() - 1
-            self.layout().setColumnStretch(self.__spacer_column, 1)
+            if "slider" in _args and not self._use_multiline:
+                _nitems = self.layout().count()
+                _column = self.layout().getItemPosition(_nitems - 1)[1]
+                self.layout().setColumnStretch(_column, 8)
 
     def _connect_signals(self):
         """
@@ -309,19 +308,13 @@ class DataAxisSelector(WidgetWithParameterCollection):
             "button_end",
         ]:
             self._widgets[_key].setVisible(_show_slider)
-        if not self._use_multiline:
-            if _show_slider:
-                self.layout().removeItem(self._widgets["final_spacer"])
-            else:
-                self.layout().addItem(
-                    self._widgets["final_spacer"], 0, self.__spacer_column
-                )
         self._widgets["combo_range"].setVisible(use_selection not in _GENERIC_CHOICES)
+        _range_selection = self._widgets["combo_range"].currentText()
         self._widgets["edit_range_index"].setVisible(
-            use_selection == "select range by indices"
+            _range_selection == "select range by indices"
         )
         self._widgets["edit_range_data"].setVisible(
-            use_selection == "select range by data values"
+            _range_selection == "select range by data values"
         )
         if use_selection not in _GENERIC_CHOICES:
             self._update_slice_from_non_generic_choice()
@@ -551,7 +544,7 @@ if __name__ == "__main__":
     sys.excepthook = gui_excepthook
 
     app = pydidas_qtcore.PydidasQApplication([])
-    window = DataAxisSelector(0, multiline=True)
+    window = DataAxisSelector(0, multiline=False)
     window.set_axis_metadata(
         0.643 * np.arange(20), "Distance and other things to be used", "m"
     )

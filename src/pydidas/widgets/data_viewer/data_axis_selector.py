@@ -132,15 +132,23 @@ class DataAxisSelector(WidgetWithParameterCollection):
 
     @property
     def npoints(self) -> int:
-        """
-        Get the number of points in the axis.
-
-        Returns
-        -------
-        int
-            The number of points in the axis.
-        """
+        """Get the number of points in the axis."""
         return self._npoints
+
+    @property
+    def data_label(self) -> str:
+        """Get the label of the axis."""
+        return self._data_label
+
+    @property
+    def data_unit(self) -> str:
+        """Get the unit of the axis."""
+        return self._data_unit
+
+    @property
+    def data_range(self) -> Optional[ndarray]:
+        """Get the axis values. If not specified, this will be None."""
+        return self._data_range
 
     @property
     def display_choice(self) -> str:

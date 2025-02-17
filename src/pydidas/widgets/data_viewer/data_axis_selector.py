@@ -104,7 +104,7 @@ class DataAxisSelector(WidgetWithParameterCollection):
         self._widgets["combo_axis_use"].currentTextChanged.connect(
             self._handle_new_axis_use
         )
-        self._widgets["slider"].valueChanged.connect(self._slider_changed)
+        self._widgets["slider"].valueChanged.connect(self._new_index_selection)
         self._widgets["edit_index"].editingFinished.connect(self._manual_index_changed)
         self._widgets["edit_data"].editingFinished.connect(
             self._manual_data_value_changed
@@ -316,13 +316,14 @@ class DataAxisSelector(WidgetWithParameterCollection):
             "button_end",
         ]:
             self._widgets[_key].setVisible(_show_slider)
-        self._widgets["combo_range"].setVisible(use_selection not in _GENERIC_CHOICES)
         _range_selection = self._widgets["combo_range"].currentText()
+        _show_range = use_selection not in _GENERIC_CHOICES
+        self._widgets["combo_range"].setVisible(_show_range)
         self._widgets["edit_range_index"].setVisible(
-            _range_selection == "select range by indices"
+            _range_selection == "select range by indices" and _show_range
         )
         self._widgets["edit_range_data"].setVisible(
-            _range_selection == "select range by data values"
+            _range_selection == "select range by data values" and _show_range
         )
         if use_selection not in _GENERIC_CHOICES:
             self._update_slice_from_non_generic_choice()
@@ -354,38 +355,32 @@ class DataAxisSelector(WidgetWithParameterCollection):
             self._current_slice = slice(_start, _end)
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
-    @QtCore.Slot(int)
-    def _slider_changed(self, value: int):
-        """
-        Handle changes from users dragging the slider.
-
-        Parameters
-        ----------
-        value : int
-            The new slider value.
-        """
-        self._current_slice = slice(value, value + 1)
-        with QtCore.QSignalBlocker(self._widgets["edit_index"]):
-            self._widgets["edit_index"].setText(str(value))
-        if self._data_range is not None:
-            with QtCore.QSignalBlocker(self._widgets["edit_data"]):
-                self._widgets["edit_data"].setText(f"{self._data_range[value]:.4f}")
-        self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
-
     @QtCore.Slot()
     def _manual_index_changed(self):
         """
         Handle changes from users entering a new index manually.
         """
         _index = max(0, min(self._npoints - 1, int(self._widgets["edit_index"].text())))
-        self._current_slice = slice(_index, _index + 1)
-        with QtCore.QSignalBlocker(self._widgets["edit_index"]):
-            self._widgets["edit_index"].setText(str(_index))
-        if self._data_range is not None:
-            with QtCore.QSignalBlocker(self._widgets["edit_data"]):
-                self._widgets["edit_data"].setText(f"{self._data_range[_index]:.4f}")
         with QtCore.QSignalBlocker(self._widgets["slider"]):
             self._widgets["slider"].setSliderPosition(_index)
+        self._new_index_selection(_index)
+
+    @QtCore.Slot(int)
+    def _new_index_selection(self, index: int):
+        """
+        Handle a new index selection.
+
+        Parameters
+        ----------
+        index : int
+            The new index.
+        """
+        self._current_slice = slice(index, index + 1)
+        with QtCore.QSignalBlocker(self._widgets["edit_index"]):
+            self._widgets["edit_index"].setText(str(index))
+        if self._data_range is not None:
+            with QtCore.QSignalBlocker(self._widgets["edit_data"]):
+                self._widgets["edit_data"].setText(f"{self._data_range[index]:.4f}")
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
     @QtCore.Slot()
@@ -443,15 +438,9 @@ class DataAxisSelector(WidgetWithParameterCollection):
         """
         if index == self._current_slice.start:
             return
-        self._current_slice = slice(index, index + 1)
         with QtCore.QSignalBlocker(self._widgets["slider"]):
             self._widgets["slider"].setSliderPosition(index)
-        with QtCore.QSignalBlocker(self._widgets["edit_index"]):
-            self._widgets["edit_index"].setText(str(index))
-        if self._data_range is not None:
-            with QtCore.QSignalBlocker(self._widgets["edit_data"]):
-                self._widgets["edit_data"].setText(f"{self._data_range[index]:.4f}")
-        self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
+        self._new_index_selection(index)
 
     @QtCore.Slot(str)
     def _handle_range_selection(self, selection: str):
@@ -489,11 +478,11 @@ class DataAxisSelector(WidgetWithParameterCollection):
             _stop = min(self._npoints, max(0, int(_range[1]) + 1))
         except ValueError:
             raise UserConfigError(invalid_range_str(_input))
-        if (_start, _stop) == (self._current_slice.start, self._current_slice.stop):
-            return
         # need to set to stop -1 because the slicing index is incremented to
         # include the last point
         self._widgets["edit_range_index"].setText(f"{_start}:{_stop - 1}")
+        if (_start, _stop) == (self._current_slice.start, self._current_slice.stop):
+            return
         self._current_slice = slice(_start, _stop)
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
@@ -536,6 +525,15 @@ class DataAxisSelector(WidgetWithParameterCollection):
             self._widgets[edit_name].setPalette(self._palette_base)
         else:
             self._widgets[edit_name].setPalette(self._palette_highlight)
+
+    def reset_to_slicing(self):
+        """
+        Reset the widget to the slicing state.
+        """
+        _slice_type = (
+            "slice at data value" if self._data_range is not None else "slice at index"
+        )
+        self._widgets["combo_axis_use"].setCurrentText(_slice_type)
 
     def closeEvent(self, event: QtCore.QEvent):
         for child in self.findChildren(QtWidgets.QWidget):

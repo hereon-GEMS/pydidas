@@ -24,7 +24,11 @@ __copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["invalid_range_str", "get_data_axis_header_creation_args", "get_data_axis_widget_creation_args"]
+__all__ = [
+    "invalid_range_str",
+    "get_data_axis_header_creation_args",
+    "get_data_axis_widget_creation_args",
+]
 
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -184,6 +188,7 @@ def get_data_axis_widget_creation_args(
             ["slider", QtWidgets.QSlider(QtCore.Qt.Horizontal)],
             {
                 "gridPos": (0, -1, 1, 1),
+                "minimumWidth": 100,
                 "parent_widget": "point_selection_container"
                 if multiline
                 else "::self::",

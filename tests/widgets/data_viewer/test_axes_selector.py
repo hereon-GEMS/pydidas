@@ -23,24 +23,21 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
 import numpy as np
 import pytest
-from qtpy import QtCore, QtTest, QtWidgets
+from qtpy import QtTest
 
 from pydidas import IS_QT6
-from pydidas.core import UserConfigError, Dataset
+from pydidas.core import UserConfigError
 from pydidas.unittest_objects import create_dataset
 from pydidas.widgets.data_viewer import AxesSelector
 from pydidas.widgets.data_viewer.data_axis_selector import (
-    _GENERIC_CHOICES,
     DataAxisSelector,
 )
 from pydidas_qtcore import PydidasQApplication
 
 
 _DATA = create_dataset(5, dtype=float)
-print(_DATA)
 
 
 @pytest.fixture(scope="module")
@@ -53,7 +50,6 @@ def app():
 @pytest.fixture
 def selector(request):
     _kwargs = getattr(request, "param", {})
-    index = _kwargs.get("index", 0)
     _selector = AxesSelector()
     yield _selector
     _selector.deleteLater()
@@ -90,13 +86,31 @@ def test_init(selector):
 def test_current_display_selection__empty(selector):
     assert selector.current_display_selection == ()
 
+
 def test_current_display_selection__simple(selector):
-    selector.set_data_shape((5,7,4))
-    assert selector.current_display_selection == ("slice at index", "slice at index", "slice at index")
+    selector.set_data_shape((5, 7, 4))
+    assert selector.current_display_selection == (
+        "slice at index",
+        "slice at index",
+        "slice at index",
+    )
+
+
+def test_current_display_selection__w_change(selector):
+    selector.set_data_shape((5, 7, 4))
+    selector.set_axis_metadata(1, np.arange(12), "axis 1", "unit 1")
+    selector._axwidgets[1].display_choice = "slice at data value"
+    assert selector.current_display_selection == (
+        "slice at index",
+        "slice at data value",
+        "slice at index",
+    )
+
 
 def test_set_data_shape__invalid_type(selector):
-    with pytest.raises(ValueError):
+    with pytest.raises(UserConfigError):
         selector.set_data_shape([0, 4])
+
 
 def test_set_data_shape__valid(selector):
     _shape = (5, 7, 4)
@@ -107,7 +121,106 @@ def test_set_data_shape__valid(selector):
         assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
         assert selector._axwidgets[_dim].npoints == _shape[_dim]
 
-#
+
+def test_create_data_axis_selectors(selector):
+    selector._data_shape = (5, 7, 4)
+    selector._data_ndim = 3
+    selector._additional_choices = "choice1;;choice2"
+    selector._create_data_axis_selectors()
+    assert len(selector._axwidgets) == selector._data_ndim
+    for _dim, _len in enumerate(selector._data_shape):
+        assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
+        assert "choice1" in selector._axwidgets[_dim].available_choices
+        assert "choice2" in selector._axwidgets[_dim].available_choices
+
+
+def test_create_data_axis_selectors__multiple_calls(selector):
+    _raw_shape = (5, 7, 4, 8, 3, 3, 5)
+    _ndim_list = [5, 3, 7, 6]
+    for _index, _ndim in enumerate(_ndim_list):
+        selector._data_shape = _raw_shape[:_ndim]
+        selector._data_ndim = _ndim
+        selector._additional_choices = "choice1;;choice2"
+        for _item in selector._axwidgets.values():
+            _item.set_axis_metadata(np.linspace(3, 7, num=_raw_shape[_index]), "", "")
+            _item.display_choice = "slice at data value"
+        selector._create_data_axis_selectors()
+        assert len(selector._axwidgets) == max(_ndim_list[: _index + 1])
+        for _dim, _len in enumerate(selector._data_shape):
+            assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
+            assert "choice1" in selector._axwidgets[_dim].available_choices
+            assert "choice2" in selector._axwidgets[_dim].available_choices
+
+        for _dim, _item in selector._axwidgets.items():
+            if _dim >= _ndim:
+                assert _item.display_choice == "slice at index"
+
+
+def test_set_axis_metadata(selector):
+    selector.set_data_shape((5, 7, 4))
+    selector.set_axis_metadata(1, np.arange(12), "axis 1", "unit 1")
+    assert selector._axwidgets[1].npoints == 12
+    assert "slice at data value" in selector._axwidgets[1].available_choices
+
+
+def test_set_axis_metadata__invalid_axis(selector):
+    selector.set_data_shape((5, 7, 4))
+    with pytest.raises(UserConfigError):
+        selector.set_axis_metadata(3, np.arange(12), "axis 1", "unit 1")
+
+
+def test_set_metadata_from_dataset(selector):
+    selector.set_metadata_from_dataset(_DATA)
+    assert selector._data_shape == _DATA.shape
+    for _dim, _item in selector._axwidgets.items():
+        assert _item.npoints == _DATA.shape[_dim]
+        assert _item.data_label == _DATA.axis_labels[_dim]
+        assert _item.data_unit == _DATA.axis_units[_dim]
+
+
+def test_set_metadata_from_dataset__no_dataset(selector):
+    with pytest.raises(UserConfigError):
+        selector.set_metadata_from_dataset("")
+
+
+def test_define_additional_choices(selector, data):
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    for _dim, _item in selector._axwidgets.items():
+        assert "choice1" in _item.available_choices
+        assert "choice2" in _item.available_choices
+
+
+def test_define_additional_choices__existing_choices(selector, data):
+    selector.set_metadata_from_dataset(data)
+    selector._additional_choices = "choice1;;choice2"
+    selector.define_additional_choices("choice3;;choice4")
+    assert selector._additional_choices == "choice3;;choice4"
+    for _item in selector._axwidgets.values():
+        assert "choice1" not in _item.available_choices
+        assert "choice2" not in _item.available_choices
+        assert "choice3" in _item.available_choices
+        assert "choice4" in _item.available_choices
+
+
+def test_define_additional_choices__values_set_in_widgets(selector, data):
+    selector.set_metadata_from_dataset(data)
+    selector._additional_choices = "choice1;;choice2"
+    for _item in selector._axwidgets.values():
+        _item.define_additional_choices("choice1;;choice2")
+        _item.display_choice = "choice1"
+    selector.define_additional_choices("choice3;;choice4")
+    assert selector._additional_choices == "choice3;;choice4"
+    for _item in selector._axwidgets.values():
+        assert "choice1" not in _item.available_choices
+        assert "choice2" not in _item.available_choices
+        assert "choice3" in _item.available_choices
+        assert "choice4" in _item.available_choices
+    assert selector.current_display_selection.count("choice1") == 0
+    assert selector.current_display_selection.count("choice3") == 1
+    assert selector.current_display_selection.count("choice4") == 1
+
+
 # def test_display_choice(selector):
 #     selector.define_additional_choices("choice1;;choice2")
 #     selector._widgets["combo_axis_use"].setCurrentText("choice2")

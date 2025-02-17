@@ -31,7 +31,8 @@ from typing import Optional
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import UserConfigError
+from pydidas.core import Dataset, UserConfigError
+from pydidas.core.constants import POLICY_EXP_FIX
 from pydidas.widgets.data_viewer.data_axis_selector import DataAxisSelector
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
@@ -46,6 +47,9 @@ class AxesSelector(WidgetWithParameterCollection):
         self._axwidgets = {}
         self._data_shape = ()
         self._data_ndim = 0
+        self._additional_choices = ""
+        self.layout().setColumnStretch(0, 1)
+        self.create_spacer("final_spacer", gridPos=(0, 1, 1, 1), fixedWidth=5)
 
     @property
     def current_display_selection(self) -> tuple[str]:
@@ -87,9 +91,15 @@ class AxesSelector(WidgetWithParameterCollection):
         for _dim in range(self._data_ndim):
             if _dim not in self._axwidgets:
                 self.add_any_widget(
-                    f"axis_{_dim}", DataAxisSelector(_dim), gridPos=(-1, 0, 1, 1)
+                    f"axis_{_dim}",
+                    DataAxisSelector(_dim),
+                    gridPos=(_dim, 0, 1, 1),
+                    sizePolicy=POLICY_EXP_FIX,
                 )
                 self._axwidgets[_dim] = self._widgets[f"axis_{_dim}"]
+                self._axwidgets[_dim].define_additional_choices(
+                    self._additional_choices
+                )
         for _key in self._axwidgets:
             self._axwidgets[_key].setVisible(_key < self._data_ndim)
             if _key >= self._data_ndim:
@@ -129,18 +139,78 @@ class AxesSelector(WidgetWithParameterCollection):
             )
         self._axwidgets[axis].set_axis_metadata(data_range, label, unit, npoints)
 
+    def set_metadata_from_dataset(self, dataset: Dataset):
+        """
+        Set the metadata from a pydidas Dataset.
+
+        Parameters
+        ----------
+        dataset : Dataset
+            The dataset to get the metadata from.
+        """
+        if not isinstance(dataset, Dataset):
+            raise UserConfigError(
+                "Invalid dataset: The given object is not a pydidas Dataset but "
+                f"`{type(dataset)}`. \nAlternatively, please set the metadata "
+                "manually using the `set_axis_metadata` method."
+            )
+        self.set_data_shape(dataset.data.shape)
+        for _dim in range(self._data_ndim):
+            self.set_axis_metadata(
+                _dim,
+                dataset.axis_ranges[_dim],
+                dataset.axis_labels[_dim],
+                dataset.axis_units[_dim],
+            )
+
+    def define_additional_choices(self, choices: str):
+        """
+        Define additional choices for the display selection.
+
+        Multiple choices must be separated by a double semicolon `;;`.
+
+        Parameters
+        ----------
+        choices : str
+            The additional choices.
+        """
+        self._additional_choices = choices
+        for _dim in self._axwidgets:
+            self._axwidgets[_dim].define_additional_choices(choices)
+        if choices == "":
+            return
+        _extra_choices = choices.split(";;")
+        for _choice in _extra_choices:
+            if _choice in self.current_display_selection:
+                pass
+            for _dim, _axwidget in self._axwidgets.items():
+                if _axwidget.display_choice not in _extra_choices:
+                    _axwidget.display_choice = _choice
+                    break
+
+    def closeEvent(self, event: QtCore.QEvent):
+        """Close the widget and delete Children"""
+        for _dim in self._axwidgets:
+            self._axwidgets[_dim].deleteLater()
+        super().closeEvent(event)
+
 
 if __name__ == "__main__":
     import sys
 
     import pydidas_qtcore
     from pydidas.gui import gui_excepthook
+    from pydidas.unittest_objects import create_dataset
 
     sys.excepthook = gui_excepthook
 
+    data = create_dataset(5, float)
     app = pydidas_qtcore.PydidasQApplication([])
     window = AxesSelector()
-    window.set_data_shape((3, 4, 5, 6))
-    window.set_data_shape((3, 4, 6))
+    window.set_metadata_from_dataset(data)
+    window.define_additional_choices("window x;;window y")
+    # window.set_data_shape((3, 4, 6))
+    # window.set_axis_metadata(1, 0.6 * np.arange(7), "axis 1", "unit 1")
+    # window._axwidgets[1].define_additional_choices("window x;;window y")
     window.show()
     app.exec_()

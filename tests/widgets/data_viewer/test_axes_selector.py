@@ -25,7 +25,7 @@ __status__ = "Production"
 
 import numpy as np
 import pytest
-from qtpy import QtTest
+from qtpy import QtCore, QtTest
 
 from pydidas import IS_QT6
 from pydidas.core import UserConfigError
@@ -169,6 +169,13 @@ def test_set_axis_metadata__invalid_axis(selector):
         selector.set_axis_metadata(3, np.arange(12), "axis 1", "unit 1")
 
 
+def test_set_axis_metadata__invalid_ndim(selector):
+    selector.define_additional_choices("choice1;;choice2;;choice3")
+    data = create_dataset(2, dtype=float)
+    with pytest.raises(UserConfigError):
+        selector.set_metadata_from_dataset(data)
+
+
 def test_set_metadata_from_dataset(selector):
     selector.set_metadata_from_dataset(_DATA)
     assert selector._data_shape == _DATA.shape
@@ -185,6 +192,13 @@ def test_set_metadata_from_dataset__no_dataset(selector):
 
 def test_define_additional_choices(selector, data):
     selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    for _dim, _item in selector._axwidgets.items():
+        assert "choice1" in _item.available_choices
+        assert "choice2" in _item.available_choices
+
+
+def test_define_additional_choices__no_metadata_set(selector, data):
     selector.define_additional_choices("choice1;;choice2")
     for _dim, _item in selector._axwidgets.items():
         assert "choice1" in _item.available_choices
@@ -219,6 +233,34 @@ def test_define_additional_choices__values_set_in_widgets(selector, data):
     assert selector.current_display_selection.count("choice1") == 0
     assert selector.current_display_selection.count("choice3") == 1
     assert selector.current_display_selection.count("choice4") == 1
+
+
+@pytest.mark.parametrize(
+    "choices", ["choice1;;choice2", "choice1;;choice2;;choice3", "another_choice"]
+)
+@pytest.mark.parametrize(
+    "set_axwidget",
+    [
+        [4, "choice1"],
+        [2, "choice2"],
+        [0, "another_choice"],
+        [1, "slice at index"],
+        [0, "slice at index"],
+        [3, "slice at data value"],
+    ],
+)
+def test_process_new_display_choice(selector, choices, set_axwidget, data):
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices(choices)
+    if set_axwidget[1] not in choices.split(";;"):
+        return
+    with QtCore.QSignalBlocker(selector._axwidgets[set_axwidget[0]]):
+        selector._axwidgets[set_axwidget[0]].display_choice = set_axwidget[1]
+    selector._process_new_display_choice(*set_axwidget)
+    _current_selection = selector.current_display_selection
+    print(set_axwidget, _current_selection)
+    for _choice in choices.split(";;"):
+        assert _current_selection.count(_choice) == 1
 
 
 # def test_display_choice(selector):

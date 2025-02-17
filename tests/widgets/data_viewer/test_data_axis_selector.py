@@ -170,11 +170,13 @@ def test_define_additional_choices__w_data_range_set(selector, data_range):
     assert combo_items == expected_choices
 
 
+@pytest.mark.parametrize("slicing_choice", _GENERIC_CHOICES)
 @pytest.mark.parametrize("choice", _GENERIC_CHOICES + ["choice1", "choice2"])
-def testhandle_new_axis_use(selector, data_range, choice):
+def test_handle_new_axis_use(selector, data_range, choice, slicing_choice):
     selector.show()
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector.define_additional_choices("choice1;;choice2")
+    selector._handle_new_axis_use(slicing_choice)
     selector._handle_new_axis_use(choice)
     assert selector._widgets["edit_index"].isVisible() == (choice == "slice at index")
     assert selector._widgets["edit_data"].isVisible() == (
@@ -184,6 +186,8 @@ def testhandle_new_axis_use(selector, data_range, choice):
         choice == "slice at data value"
     )
     assert selector._widgets["slider"].isVisible() == (choice in _GENERIC_CHOICES)
+    if choice not in _GENERIC_CHOICES:
+        assert selector._last_slicing_at_index == (slicing_choice == "slice at index")
 
 
 @pytest.mark.parametrize("selector", [{"index": 7}], indirect=True)

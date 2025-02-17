@@ -54,6 +54,8 @@ class DataAxisSelector(WidgetWithParameterCollection):
     A widget to select a data point on a specific axis.
     """
 
+    init_kwargs = WidgetWithParameterCollection.init_kwargs + ["multiline_layout"]
+
     sig_new_slicing = QtCore.Signal(int, str)
     sig_display_choice_changed = QtCore.Signal(int, str)
     sig_new_data_dimension = QtCore.Signal(int)
@@ -71,6 +73,7 @@ class DataAxisSelector(WidgetWithParameterCollection):
         self._external_display_choices = ""
         self._all_choices = ["slice at index"]
         self._use_multiline = kwargs.get("multiline", False)
+        self._last_slicing_at_index = True
         self._create_widgets()
         self._connect_signals()
 
@@ -307,6 +310,10 @@ class DataAxisSelector(WidgetWithParameterCollection):
         self._widgets["edit_index"].setVisible(use_selection == "slice at index")
         for _key in ["edit_data", "label_unit"]:
             self._widgets[_key].setVisible(use_selection == "slice at data value")
+        if use_selection == "slice at data value":
+            self._last_slicing_at_index = False
+        elif use_selection == "slice at index":
+            self._last_slicing_at_index = True
         _show_slider = use_selection in _GENERIC_CHOICES
         for _key in [
             "slider",
@@ -531,7 +538,7 @@ class DataAxisSelector(WidgetWithParameterCollection):
         Reset the widget to the slicing state.
         """
         _slice_type = (
-            "slice at data value" if self._data_range is not None else "slice at index"
+            "slice at index" if self._last_slicing_at_index else "slice at data value"
         )
         self._widgets["combo_axis_use"].setCurrentText(_slice_type)
 

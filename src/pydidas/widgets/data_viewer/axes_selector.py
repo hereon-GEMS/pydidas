@@ -110,14 +110,14 @@ class AxesSelector(WidgetWithParameterCollection):
         """
         for _dim in range(self._data_ndim):
             if _dim not in self._axwidgets:
+                if self._multiline_layout and _dim > 0:
+                    self.create_line(f"line_{_dim}", gridPos=(-1, 0, 1, 1))
                 self.add_any_widget(
                     f"axis_{_dim}",
                     DataAxisSelector(_dim, multiline=self._multiline_layout),
                     gridPos=(-1, 0, 1, 1),
                     sizePolicy=POLICY_EXP_FIX,
                 )
-                if self._multiline_layout:
-                    self.create_line(f"line_{_dim}", gridPos=(-1, 0, 1, 1))
                 self._current_slice.append(slice(None))
                 self._axwidgets[_dim] = self._widgets[f"axis_{_dim}"]
                 self._axwidgets[_dim].define_additional_choices(
@@ -127,14 +127,14 @@ class AxesSelector(WidgetWithParameterCollection):
                     self._process_new_display_choice
                 )
                 self._axwidgets[_dim].sig_new_slicing.connect(self._update_ax_slicing)
-        for _key in self._axwidgets:
-            self._axwidgets[_key].setVisible(_key < self._data_ndim)
-            if self._multiline_layout:
-                self._widgets[f"line_{_key}"].setVisible(_key < self._data_ndim)
+        for _dim in self._axwidgets:
+            self._axwidgets[_dim].setVisible(_dim < self._data_ndim)
+            if self._multiline_layout and _dim > 0:
+                self._widgets[f"line_{_dim}"].setVisible(_dim < self._data_ndim)
 
-            if _key >= self._data_ndim:
-                with QtCore.QSignalBlocker(self._axwidgets[_key]):
-                    self._axwidgets[_key].display_choice = "slice at index"
+            if _dim >= self._data_ndim:
+                with QtCore.QSignalBlocker(self._axwidgets[_dim]):
+                    self._axwidgets[_dim].display_choice = "slice at index"
 
     def set_axis_metadata(
         self,

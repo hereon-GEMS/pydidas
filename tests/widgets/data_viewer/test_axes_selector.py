@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 import numpy as np
 import pytest
 from qtpy import QtCore, QtTest
@@ -125,7 +126,7 @@ def test_set_data_shape__valid(selector):
 def test_create_data_axis_selectors(selector):
     selector._data_shape = (5, 7, 4)
     selector._data_ndim = 3
-    selector._additional_choices = "choice1;;choice2"
+    selector._additional_choices_str = "choice1;;choice2"
     selector._create_data_axis_selectors()
     assert len(selector._axwidgets) == selector._data_ndim
     for _dim, _len in enumerate(selector._data_shape):
@@ -140,17 +141,17 @@ def test_create_data_axis_selectors__multiple_calls(selector):
     for _index, _ndim in enumerate(_ndim_list):
         selector._data_shape = _raw_shape[:_ndim]
         selector._data_ndim = _ndim
-        selector._additional_choices = "choice1;;choice2"
+        selector._additional_choices_str = "choice1;;choice2"
         for _item in selector._axwidgets.values():
             _item.set_axis_metadata(np.linspace(3, 7, num=_raw_shape[_index]), "", "")
-            _item.display_choice = "slice at data value"
+            with QtCore.QSignalBlocker(_item):
+                _item.display_choice = "slice at data value"
         selector._create_data_axis_selectors()
         assert len(selector._axwidgets) == max(_ndim_list[: _index + 1])
         for _dim, _len in enumerate(selector._data_shape):
             assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
             assert "choice1" in selector._axwidgets[_dim].available_choices
             assert "choice2" in selector._axwidgets[_dim].available_choices
-
         for _dim, _item in selector._axwidgets.items():
             if _dim >= _ndim:
                 assert _item.display_choice == "slice at index"
@@ -191,25 +192,34 @@ def test_set_metadata_from_dataset__no_dataset(selector):
 
 
 def test_define_additional_choices(selector, data):
+    _choices = "choice1;;choice2"
     selector.set_metadata_from_dataset(data)
-    selector.define_additional_choices("choice1;;choice2")
+    selector.define_additional_choices(_choices)
+    assert selector._additional_choices_str == _choices
+    assert selector._additional_choices == _choices.split(";;")
     for _dim, _item in selector._axwidgets.items():
         assert "choice1" in _item.available_choices
         assert "choice2" in _item.available_choices
 
 
 def test_define_additional_choices__no_metadata_set(selector, data):
-    selector.define_additional_choices("choice1;;choice2")
+    _choices = "choice1;;choice2"
+    selector.define_additional_choices(_choices)
+    assert selector._additional_choices_str == _choices
+    assert selector._additional_choices == _choices.split(";;")
     for _dim, _item in selector._axwidgets.items():
         assert "choice1" in _item.available_choices
         assert "choice2" in _item.available_choices
 
 
 def test_define_additional_choices__existing_choices(selector, data):
+    _choices = "choice3;;choice4"
     selector.set_metadata_from_dataset(data)
-    selector._additional_choices = "choice1;;choice2"
-    selector.define_additional_choices("choice3;;choice4")
-    assert selector._additional_choices == "choice3;;choice4"
+    selector._additional_choices_str = "choice1;;choice2"
+    selector._additional_choices = ["choice1", "choice2"]
+    selector.define_additional_choices(_choices)
+    assert selector._additional_choices_str == "choice3;;choice4"
+    assert selector._additional_choices == _choices.split(";;")
     for _item in selector._axwidgets.values():
         assert "choice1" not in _item.available_choices
         assert "choice2" not in _item.available_choices
@@ -221,16 +231,19 @@ def test_define_additional_choices__values_set_in_widgets(selector, data):
     selector.set_metadata_from_dataset(data)
     selector._additional_choices = "choice1;;choice2"
     for _item in selector._axwidgets.values():
-        _item.define_additional_choices("choice1;;choice2")
-        _item.display_choice = "choice1"
+        with QtCore.QSignalBlocker(_item):
+            _item.define_additional_choices("choice1;;choice2")
+            _item.display_choice = "choice1"
     selector.define_additional_choices("choice3;;choice4")
-    assert selector._additional_choices == "choice3;;choice4"
+    assert selector._additional_choices_str == "choice3;;choice4"
+    assert selector._additional_choices == ["choice3", "choice4"]
     for _item in selector._axwidgets.values():
         assert "choice1" not in _item.available_choices
         assert "choice2" not in _item.available_choices
         assert "choice3" in _item.available_choices
         assert "choice4" in _item.available_choices
     assert selector.current_display_selection.count("choice1") == 0
+    assert selector.current_display_selection.count("choice2") == 0
     assert selector.current_display_selection.count("choice3") == 1
     assert selector.current_display_selection.count("choice4") == 1
 
@@ -263,258 +276,38 @@ def test_process_new_display_choice(selector, choices, set_axwidget, data):
         assert _current_selection.count(_choice) == 1
 
 
-# def test_display_choice(selector):
-#     selector.define_additional_choices("choice1;;choice2")
-#     selector._widgets["combo_axis_use"].setCurrentText("choice2")
-#     assert selector.display_choice == "choice2"
-#
-#
-# def test_display_choice_setter(selector):
-#     selector.define_additional_choices("choice1;;choice2")
-#     selector.display_choice = "choice1"
-#     assert selector._widgets["combo_axis_use"].currentText() == "choice1"
-#
-#
-# def test_display_choice_setter__invalid(selector):
-#     selector.define_additional_choices("choice1;;choice2")
-#     with pytest.raises(ValueError):
-#         selector.display_choice = "choice3"
-#
-#
-# def test_current_slice(selector):
-#     selector._current_slice = slice(4, 6)
-#     selector.set_axis_metadata(np.arange(10), "dummy", "unit")
-#     assert selector.current_slice == slice(4, 6)
-#
-#
-# def test_set_axis_metadata(selector, data_range):
-#     unit = "m"
-#     label = "Distance"
-#     selector.set_axis_metadata(data_range, label, unit)
-#     assert np.array_equal(selector._data_range, _DATA_RANGE)
-#     assert selector._data_label == label
-#     assert selector._data_unit == unit
-#
-#
-# def test_set_axis_metadata__no_data_range_no_npoints(selector):
-#     with pytest.raises(ValueError):
-#         selector.set_axis_metadata(None, "distance", "m")
-#
-#
-# def test_set_axis_metadata__no_data_range(selector):
-#     selector.set_axis_metadata(None, "distance", "m", npoints=42)
-#     assert selector._npoints == 42
-#     assert selector._data_range is None
-#     assert selector._data_unit == ""
-#     assert selector._data_label == ""
-#
-#
-# def test_define_additional_choices(selector):
-#     choices = "choice1;;choice2"
-#     selector.define_additional_choices(choices)
-#     expected_choices = [
-#         "slice at index",
-#         "choice1",
-#         "choice2",
-#     ]
-#     combo_items = [
-#         selector._widgets["combo_axis_use"].itemText(i)
-#         for i in range(selector._widgets["combo_axis_use"].count())
-#     ]
-#     assert combo_items == expected_choices
-#
-#
-# def test_define_additional_choices__w_data_range_set(selector, data_range):
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     choices = "choice1;;choice2"
-#     selector.define_additional_choices(choices + ";;choice3")
-#     selector.define_additional_choices(choices)
-#     expected_choices = _GENERIC_CHOICES + ["choice1", "choice2"]
-#     combo_items = [
-#         selector._widgets["combo_axis_use"].itemText(i)
-#         for i in range(selector._widgets["combo_axis_use"].count())
-#     ]
-#     assert combo_items == expected_choices
-#
-#
-# @pytest.mark.parametrize("choice", _GENERIC_CHOICES + ["choice1", "choice2"])
-# def testhandle_new_axis_use(selector, data_range, choice):
-#     selector.show()
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector.define_additional_choices("choice1;;choice2")
-#     selector._handle_new_axis_use(choice)
-#     assert selector._widgets["edit_index"].isVisible() == (choice == "slice at index")
-#     assert selector._widgets["edit_data"].isVisible() == (
-#         choice == "slice at data value"
-#     )
-#     assert selector._widgets["label_unit"].isVisible() == (
-#         choice == "slice at data value"
-#     )
-#     assert selector._widgets["slider"].isVisible() == (choice in _GENERIC_CHOICES)
-#
-#
-# @pytest.mark.parametrize("selector", [{"index": 7}], indirect=True)
-# def test_slider_changed(selector, data_range, spy_new_slicing):
-#     _pos = 5
-#     selector.show()
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector._widgets["slider"].setSliderPosition(_pos)
-#     _results = _get_spy_results(spy_new_slicing)
-#     assert _results[0][0] == 7
-#     assert _results[0][1] == f"{_pos}:{_pos + 1}"
-#     assert selector._widgets["edit_index"].text() == str(_pos)
-#     assert selector._widgets["edit_data"].text() == f"{data_range[_pos]:.4f}"
-#
-#
-# @pytest.mark.parametrize("selector", [{"index": 6}], indirect=True)
-# @pytest.mark.parametrize("case", [[-3, 0], [0, 5], [1, -1]])
-# def test_manual_index_changed(selector, data_range, spy_new_slicing, case):
-#     _range_index = np.mod(case[1], data_range.size)
-#     _input = _range_index + case[0]
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     with QtCore.QSignalBlocker(selector._widgets["edit_index"]):
-#         selector._widgets["edit_index"].setText(str(_input))
-#     selector._manual_index_changed()
-#     assert selector._widgets["slider"].sliderPosition() == _range_index
-#     assert selector._widgets["edit_data"].text() == f"{data_range[_range_index]:.4f}"
-#     assert selector._widgets["edit_index"].text() == str(_range_index)
-#     _results = _get_spy_results(spy_new_slicing)
-#     assert _results[0] == [6, f"{_range_index}:{_range_index + 1}"]
-#
-#
-# @pytest.mark.parametrize("selector", [{"index": 42}], indirect=True)
-# @pytest.mark.parametrize("case", [[-3, 0], [0, 5], [1, -1]])
-# def test_manual_data_value_changed(selector, data_range, spy_new_slicing, case):
-#     _range_index = np.mod(case[1], data_range.size)
-#     _expectation = data_range[_range_index]
-#     _value = data_range[_range_index] + case[0]
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     with QtCore.QSignalBlocker(selector._widgets["edit_data"]):
-#         selector._widgets["edit_data"].setText(str(_value))
-#     selector._manual_data_value_changed()
-#     assert selector._widgets["slider"].sliderPosition() == np.mod(
-#         _range_index, data_range.size
-#     )
-#     assert selector._widgets["edit_data"].text() == f"{_expectation:.4f}"
-#     assert selector._widgets["edit_index"].text() == str(_range_index)
-#     _results = _get_spy_results(spy_new_slicing)
-#     assert _results[0] == [42, f"{_range_index}:{_range_index + 1}"]
-#
-#
-# def test_move_to_index__no_change(selector, data_range, spy_new_slicing):
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector._current_slice = slice(7, 8)
-#     selector._move_to_index(7)
-#     _results = _get_spy_results(spy_new_slicing)
-#     assert _results == []
-#
-#
-# @pytest.mark.parametrize("selector", [{"index": 12}], indirect=True)
-# def test_move_to_index(selector, data_range, spy_new_slicing):
-#     _index = 7
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector._move_to_index(_index)
-#     _results = _get_spy_results(spy_new_slicing)
-#     assert _results[0] == [12, "7:8"]
-#     assert selector._widgets["slider"].sliderPosition() == _index
-#     assert selector._widgets["edit_data"].text() == f"{data_range[_index]:.4f}"
-#     assert selector._widgets["edit_index"].text() == str(_index)
-#
-#
-# @pytest.mark.parametrize("testcase", [["slice at index", 3, 4]])  # ["choice1", 0, 12],
-# def test__slice_after_changing_selection(selector, testcase):
-#     choice, start, stop = testcase
-#     selector.set_axis_metadata(None, npoints=12)
-#     selector.define_additional_choices("choice1;;choice2")
-#     selector._current_slice = slice(0, 1)
-#     with QtCore.QSignalBlocker(selector._widgets["edit_index"]):
-#         selector._widgets["edit_index"].setText("3")
-#     with QtCore.QSignalBlocker(selector._widgets["combo_axis_use"]):
-#         selector._widgets["combo_axis_use"].setCurrentText("choice2")
-#     selector.display_choice = choice
-#     assert selector._current_slice == slice(start, stop)
-#
-#
-# @pytest.mark.parametrize(
-#     "axis_range_selection",
-#     ["use full axis", "select range by indices", "select range by data values"],
-# )
-# def test_handle_range_selection(selector, data_range, axis_range_selection):
-#     selector.define_additional_choices("choice1;;choice2")
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector.show()
-#     selector._widgets["combo_range"].setCurrentText(axis_range_selection)
-#     assert selector._widgets["edit_range_data"].isVisible() == (
-#         axis_range_selection == "select range by data values"
-#     )
-#     assert selector._widgets["edit_range_index"].isVisible() == (
-#         axis_range_selection == "select range by indices"
-#     )
-#
-#
-# @pytest.mark.parametrize(
-#     "input",
-#     [
-#         ["0:5", 0, 6],
-#         ["-5:17", 0, 18],
-#         ["-5:25", 0, 20],
-#         ["7:14", 7, 15],
-#         ["9:24", 9, 20],
-#     ],
-# )
-# def test_handle_new_index_range_selection__correct_input(
-#     selector, input, spy_new_slicing, data_range
-# ):
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector._widgets["edit_range_index"].setText(input[0])
-#     selector._handle_new_index_range_selection()
-#     _results = _get_spy_results(spy_new_slicing)
-#     assert _results[0] == [0, f"{input[1]}:{input[2]}"]
-#     assert selector._current_slice == slice(input[1], input[2])
-#     assert selector._widgets["edit_range_index"].text() == f"{input[1]}:{input[2] - 1}"
-#
-#
-# @pytest.mark.parametrize("input", ["0:", "", ":-3", "a:5"])
-# def test_handle_new_index_range_selection__incorrect_input(
-#     selector, input, spy_new_slicing, data_range
-# ):
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector._widgets["edit_range_index"].setText(input)
-#     with pytest.raises(UserConfigError):
-#         selector._handle_new_index_range_selection()
-#
-#
-# @pytest.mark.parametrize(
-#     "input",
-#     [
-#         [f"{_DATA_RANGE[0]}:{_DATA_RANGE[5]} ", 0, 6],
-#         [f"{_DATA_RANGE[0] - 5}:{_DATA_RANGE[5]} ", 0, 6],
-#         [f"{_DATA_RANGE[7] - 0.05}:{_DATA_RANGE[14] - 0.04} ", 7, 15],
-#         [f"{_DATA_RANGE[9] - 0.05}:{_DATA_RANGE[19] + 12} ", 9, 20],
-#     ],
-# )
-# def test_handle_new_data_range_selection(selector, input, spy_new_slicing, data_range):
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector._widgets["edit_range_data"].setText(input[0])
-#     selector._handle_new_data_range_selection()
-#     _results = _get_spy_results(spy_new_slicing)
-#     assert _results[0] == [0, f"{input[1]}:{input[2]}"]
-#
-#     assert selector._current_slice == slice(input[1], input[2])
-#     assert (
-#         selector._widgets["edit_range_data"].text()
-#         == f"{_DATA_RANGE[input[1]]:.4f}:{_DATA_RANGE[input[2] - 1]:.4f}"
-#     )
-#
-#
-# @pytest.mark.parametrize("input", ["0.0:", "", ":-3.", "a:5"])
-# def test_handle_new_data_range_selection__incorrect_input(
-#     selector, input, spy_new_slicing, data_range
-# ):
-#     selector.set_axis_metadata(data_range, "dummy", "unit")
-#     selector._widgets["edit_range_data"].setText(input)
-#     with pytest.raises(UserConfigError):
-#         selector._handle_new_data_range_selection()
+def test_process_new_slicing(selector, data):
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    for _dim, _item in selector._axwidgets.items():
+        if _item.display_choice in ["choice1", "choice2"]:
+            continue
+        with QtCore.QSignalBlocker(_item):
+            _item._move_to_index(data.shape[_dim] - 2)
+    selector.process_new_slicing()
+    for _dim, _item in selector._axwidgets.items():
+        if _item.display_choice in ["choice1", "choice2"]:
+            assert selector._current_slice[_dim] == slice(0, data.shape[_dim])
+            assert selector._current_slice_strings[_dim] == _item.current_slice_str
+        else:
+            assert selector.current_slice[_dim] == slice(
+                data.shape[_dim] - 2, data.shape[_dim] - 1
+            )
+            assert selector._current_slice_strings[_dim] == _item.current_slice_str
+
+
+def test_update_ax_slicing(selector, data):
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    for _dim in selector._axwidgets:
+        selector._current_slice[_dim] = slice(0, 1)
+        selector._current_slice_strings[_dim] = "0:1"
+    with QtCore.QSignalBlocker(selector._axwidgets[3]):
+        selector._axwidgets[3]._move_to_index(3)
+    assert selector._current_slice[3] == slice(0, 1)
+    selector._update_ax_slicing(3, "3:4")
+    assert selector._current_slice[3] == slice(3, 4)
+    assert selector._current_slice_strings[3] == "3:4"
 
 
 if __name__ == "__main__":

@@ -308,7 +308,7 @@ if __name__ == "__main__":
     printer = Printer()
     data = create_dataset(5, float)
     app = pydidas_qtcore.PydidasQApplication([])
-    window = AxesSelector(multiline_layout=True)
+    window = AxesSelector(multiline_layout=False)
     window.set_data_shape((3, 4, 6, 7, 5, 6, 8))
     window.sig_new_slicing_str_repr.connect(printer.print_slicing)
     window.sig_new_slicing.connect(printer.slice_update)

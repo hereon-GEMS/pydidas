@@ -62,8 +62,8 @@ def data():
 
 
 @pytest.fixture
-def spy_display_choice(selector):
-    return QtTest.QSignalSpy(selector.sig_display_choice_changed)
+def spy_new_slicing_str(selector):
+    return QtTest.QSignalSpy(selector.sig_new_slicing_str_repr)
 
 
 @pytest.fixture
@@ -271,12 +271,11 @@ def test_process_new_display_choice(selector, choices, set_axwidget, data):
         selector._axwidgets[set_axwidget[0]].display_choice = set_axwidget[1]
     selector._process_new_display_choice(*set_axwidget)
     _current_selection = selector.current_display_selection
-    print(set_axwidget, _current_selection)
     for _choice in choices.split(";;"):
         assert _current_selection.count(_choice) == 1
 
 
-def test_process_new_slicing(selector, data):
+def test_process_new_slicing(selector, data, spy_new_slicing, spy_new_slicing_str):
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
     for _dim, _item in selector._axwidgets.items():
@@ -285,6 +284,8 @@ def test_process_new_slicing(selector, data):
         with QtCore.QSignalBlocker(_item):
             _item._move_to_index(data.shape[_dim] - 2)
     selector.process_new_slicing()
+    assert len(_get_spy_results(spy_new_slicing)) == 1
+    assert len(_get_spy_results(spy_new_slicing_str)) == 1
     for _dim, _item in selector._axwidgets.items():
         if _item.display_choice in ["choice1", "choice2"]:
             assert selector._current_slice[_dim] == slice(0, data.shape[_dim])
@@ -296,7 +297,7 @@ def test_process_new_slicing(selector, data):
             assert selector._current_slice_strings[_dim] == _item.current_slice_str
 
 
-def test_update_ax_slicing(selector, data):
+def test_update_ax_slicing(selector, data, spy_new_slicing, spy_new_slicing_str):
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
     for _dim in selector._axwidgets:
@@ -308,6 +309,9 @@ def test_update_ax_slicing(selector, data):
     selector._update_ax_slicing(3, "3:4")
     assert selector._current_slice[3] == slice(3, 4)
     assert selector._current_slice_strings[3] == "3:4"
+    assert len(_get_spy_results(spy_new_slicing)) == 1
+    assert len(_get_spy_results(spy_new_slicing_str)) == 1
+    assert "3::3:4" in _get_spy_results(spy_new_slicing_str)[0][0]
 
 
 if __name__ == "__main__":

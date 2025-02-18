@@ -42,6 +42,7 @@ Improvements
 	 to Scan and added a second registry in the ScanIo.
 	- Changed the creation of generic toolbar menus to use a dictionary which 
 	  can easily be extended by 3rd parties.
+	- Added widgets to select axes for data display also based on metadata.
 - Improved the formatting when displaying Plugin information.
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.

@@ -211,8 +211,9 @@ class AxesSelector(WidgetWithParameterCollection):
         """
         self._additional_choices_str = choices
         self._additional_choices = choices.split(";;")
-        for _dim in self._axwidgets:
-            self._axwidgets[_dim].define_additional_choices(choices)
+        for _dim, _axwidget in self._axwidgets.items():
+            with QtCore.QSignalBlocker(_axwidget):
+                _axwidget.define_additional_choices(choices)
         if choices == "":
             return
         for _choice in self._additional_choices:
@@ -220,8 +221,11 @@ class AxesSelector(WidgetWithParameterCollection):
                 continue
             for _axwidget in self._axwidgets.values():
                 if _axwidget.display_choice not in self._additional_choices:
-                    _axwidget.display_choice = _choice
+                    with QtCore.QSignalBlocker(_axwidget):
+                        _axwidget.display_choice = _choice
                     break
+        with QtCore.QSignalBlocker(self):
+            self.process_new_slicing()
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):

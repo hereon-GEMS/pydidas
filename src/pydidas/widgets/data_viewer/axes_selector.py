@@ -43,8 +43,22 @@ from pydidas.widgets.widget_with_parameter_collection import (
 
 
 class AxesSelector(WidgetWithParameterCollection):
+    """
+    The AxesSelector is a widget to select slicing for a given Dataset.
+
+    The AxesSelector allows to select slicing for a dataset based on indexing
+    or on metadata.
+
+    Supported signals:
+
+        - sig_new_slicing: emitted when the slicing has been updated.
+        - sig_new_slicing_str_repr[str, str]:
+            emitted when the slicing has been updated. The signal content
+            is the string representation of the slicing and the order of the axes.
+    """
+
     sig_new_slicing = QtCore.Signal()
-    sig_new_slicing_str_repr = QtCore.Signal(str)
+    sig_new_slicing_str_repr = QtCore.Signal(str, str)
 
     def __init__(self, parent: Optional[QtWidgets.QWidget] = None, **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
@@ -197,6 +211,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 dataset.axis_labels[_dim],
                 dataset.axis_units[_dim],
             )
+        self._verify_additional_choices_selected(-1)
 
     def define_additional_choices(self, choices: str):
         """
@@ -216,16 +231,27 @@ class AxesSelector(WidgetWithParameterCollection):
                 _axwidget.define_additional_choices(choices)
         if choices == "":
             return
+        self._verify_additional_choices_selected(-1)
+        with QtCore.QSignalBlocker(self):
+            self.process_new_slicing()
+
+    def _verify_additional_choices_selected(self, ignore_ax: int):
+        """
+        Verify that the additional choices are selected for all axes.
+
+        Parameters
+        ----------
+        ignore_ax : int
+            The axis index to ignore.
+        """
         for _choice in self._additional_choices:
             if _choice in self.current_display_selection:
                 continue
-            for _axwidget in self._axwidgets.values():
-                if _axwidget.display_choice not in self._additional_choices:
+            for _dim, _axwidget in self._axwidgets.items():
+                if _dim != ignore_ax and _axwidget.display_choice in _GENERIC_CHOICES:
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.display_choice = _choice
                     break
-        with QtCore.QSignalBlocker(self):
-            self.process_new_slicing()
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):
@@ -244,14 +270,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 if _dim != axis and _axwidget.display_choice == choice:
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.reset_to_slicing()
-        for _choice in self._additional_choices:
-            if _choice in self.current_display_selection:
-                continue
-            for _dim, _axwidget in self._axwidgets.items():
-                if _dim != axis and _axwidget.display_choice in _GENERIC_CHOICES:
-                    with QtCore.QSignalBlocker(_axwidget):
-                        _axwidget.display_choice = _choice
-                    break
+        self._verify_additional_choices_selected(axis)
         self.process_new_slicing()
 
     def process_new_slicing(self):
@@ -265,8 +284,9 @@ class AxesSelector(WidgetWithParameterCollection):
         self._current_slice = [
             self._axwidgets[_dim].current_slice for _dim in range(self._data_ndim)
         ]
+        _curr_selection = ";;".join(self.current_display_selection)
         self.sig_new_slicing.emit()
-        self.sig_new_slicing_str_repr.emit(self.current_slice_str)
+        self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 
     @QtCore.Slot(int, str)
     def _update_ax_slicing(self, axis: int, slicing: str):
@@ -282,8 +302,9 @@ class AxesSelector(WidgetWithParameterCollection):
         """
         self._current_slice_strings[axis] = slicing
         self._current_slice[axis] = self._axwidgets[axis].current_slice
+        _curr_selection = ";;".join(self.current_display_selection)
         self.sig_new_slicing.emit()
-        self.sig_new_slicing_str_repr.emit(self.current_slice_str)
+        self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 
     def closeEvent(self, event: QtCore.QEvent):
         """Close the widget and delete Children"""

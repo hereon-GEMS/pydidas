@@ -186,6 +186,18 @@ def test_set_metadata_from_dataset(selector):
         assert _item.data_unit == _DATA.axis_units[_dim]
 
 
+def test_set_metadata_from_dataset__w_choices(selector):
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(_DATA)
+    assert selector._data_shape == _DATA.shape
+    assert selector.current_display_selection.count("choice1") == 1
+    assert selector.current_display_selection.count("choice2") == 1
+    for _dim, _item in selector._axwidgets.items():
+        assert _item.npoints == _DATA.shape[_dim]
+        assert _item.data_label == _DATA.axis_labels[_dim]
+        assert _item.data_unit == _DATA.axis_units[_dim]
+
+
 def test_set_metadata_from_dataset__no_dataset(selector):
     with pytest.raises(UserConfigError):
         selector.set_metadata_from_dataset("")

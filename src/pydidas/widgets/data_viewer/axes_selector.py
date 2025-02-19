@@ -69,6 +69,8 @@ class AxesSelector(WidgetWithParameterCollection):
         self._additional_choices = []
         self._current_slice_strings = {}
         self._current_slice = []
+        self._current_display_selection = []
+        self._current_transpose_required = None
         self._multiline_layout = kwargs.get("multiline_layout", False)
         self.layout().setColumnStretch(0, 1)
         self.create_spacer("final_spacer", gridPos=(0, 1, 1, 1), fixedWidth=5)
@@ -83,9 +85,35 @@ class AxesSelector(WidgetWithParameterCollection):
         tuple[str]
             The current display selection.
         """
-        return tuple(
-            self._axwidgets[_dim].display_choice for _dim in range(self._data_ndim)
-        )
+        if self._current_display_selection == []:
+            self._current_display_selection = tuple(
+                self._axwidgets[_dim].display_choice for _dim in range(self._data_ndim)
+            )
+        return self._current_display_selection
+
+    @property
+    def transpose_required(self) -> bool:
+        """
+        Check if a transpose is required for the slicing.
+
+        If the current display selection differs in order from the default
+        selection order, a transpose is required.
+
+        Returns
+        -------
+        bool
+            True if a transpose is required, False otherwise.
+        """
+        if self._current_transpose_required is None:
+            _default_selection = [
+                _choice
+                for _choice in self.current_display_selection
+                if _choice not in _GENERIC_CHOICES
+            ]
+            self._current_transpose_required = (
+                _default_selection != self._additional_choices
+            )
+        return self._current_transpose_required
 
     @property
     def current_slice_str(self) -> str:
@@ -211,7 +239,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 dataset.axis_labels[_dim],
                 dataset.axis_units[_dim],
             )
-        self._verify_additional_choices_selected(-1)
+        self._verify_additional_choices_selected(-1, block_signals=True)
 
     def define_additional_choices(self, choices: str):
         """
@@ -231,11 +259,11 @@ class AxesSelector(WidgetWithParameterCollection):
                 _axwidget.define_additional_choices(choices)
         if choices == "":
             return
-        self._verify_additional_choices_selected(-1)
-        with QtCore.QSignalBlocker(self):
-            self.process_new_slicing()
+        self._verify_additional_choices_selected(-1, block_signals=True)
 
-    def _verify_additional_choices_selected(self, ignore_ax: int):
+    def _verify_additional_choices_selected(
+        self, ignore_ax: int, block_signals: bool = False
+    ):
         """
         Verify that the additional choices are selected for all axes.
 
@@ -243,8 +271,11 @@ class AxesSelector(WidgetWithParameterCollection):
         ----------
         ignore_ax : int
             The axis index to ignore.
+        block_signals : bool, optional
+            Flag to block signals during the verification.
         """
         for _choice in self._additional_choices:
+            self._current_display_selection = []
             if _choice in self.current_display_selection:
                 continue
             for _dim, _axwidget in self._axwidgets.items():
@@ -252,6 +283,9 @@ class AxesSelector(WidgetWithParameterCollection):
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.display_choice = _choice
                     break
+        self._current_display_selection = []
+        self._current_transpose_required = None
+        self.process_new_slicing(block_signals)
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):
@@ -271,11 +305,15 @@ class AxesSelector(WidgetWithParameterCollection):
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.reset_to_slicing()
         self._verify_additional_choices_selected(axis)
-        self.process_new_slicing()
 
-    def process_new_slicing(self):
+    def process_new_slicing(self, block_signals: bool = False):
         """
         Process the new slicing and emit a string representation as a signal.
+
+        Parameters
+        ----------
+        block_signals : bool, optional
+            Flag to block signals during the processing.
         """
         self._current_slice_strings = {
             _dim: self._axwidgets[_dim].current_slice_str
@@ -285,8 +323,9 @@ class AxesSelector(WidgetWithParameterCollection):
             self._axwidgets[_dim].current_slice for _dim in range(self._data_ndim)
         ]
         _curr_selection = ";;".join(self.current_display_selection)
-        self.sig_new_slicing.emit()
-        self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
+        if not block_signals:
+            self.sig_new_slicing.emit()
+            self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 
     @QtCore.Slot(int, str)
     def _update_ax_slicing(self, axis: int, slicing: str):

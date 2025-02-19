@@ -108,6 +108,37 @@ def test_current_display_selection__w_change(selector):
     )
 
 
+def test_transpose_required(selector):
+    selector.set_data_shape((5, 7, 4))
+    assert not selector.transpose_required
+
+
+def test_transpose_require__w_additional_choices(selector, data):
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(data)
+    assert not selector.transpose_required
+
+
+@pytest.mark.parametrize(
+    "modify_choice",
+    [
+        [0, "choice2", True],
+        [0, "slice at data value", True],
+        [2, "slice at data value", False],
+        [4, "choice1", True],
+        [4, "choice2", False],
+    ],
+)
+def test_transpose_require__w_additional_choices_modified(
+    selector, data, modify_choice
+):
+    _ax_to_set, _new_choice, _expected_result = modify_choice
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(data)
+    selector._axwidgets[_ax_to_set].display_choice = _new_choice
+    assert selector.transpose_required == _expected_result
+
+
 def test_set_data_shape__invalid_type(selector):
     with pytest.raises(UserConfigError):
         selector.set_data_shape([0, 4])
@@ -184,6 +215,7 @@ def test_set_metadata_from_dataset(selector):
         assert _item.npoints == _DATA.shape[_dim]
         assert _item.data_label == _DATA.axis_labels[_dim]
         assert _item.data_unit == _DATA.axis_units[_dim]
+        assert selector.current_slice[_dim] != slice(None)
 
 
 def test_set_metadata_from_dataset__w_choices(selector):

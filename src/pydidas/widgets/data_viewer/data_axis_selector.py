@@ -41,6 +41,7 @@ from pydidas.widgets.data_viewer.data_viewer_utils import (
     get_data_axis_widget_creation_args,
     invalid_range_str,
 )
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
@@ -49,7 +50,7 @@ from pydidas.widgets.widget_with_parameter_collection import (
 _GENERIC_CHOICES = ["slice at index", "slice at data value"]
 
 
-class DataAxisSelector(WidgetWithParameterCollection):
+class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     """
     A widget to select a data point on a specific axis.
     """
@@ -58,12 +59,12 @@ class DataAxisSelector(WidgetWithParameterCollection):
 
     sig_new_slicing = QtCore.Signal(int, str)
     sig_display_choice_changed = QtCore.Signal(int, str)
-    sig_new_data_dimension = QtCore.Signal(int)
 
     def __init__(
         self, index: int, parent: Optional[QtWidgets.QWidget] = None, **kwargs: dict
     ):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
+        PydidasWidgetMixin.__init__(self, **kwargs)
         self._axis_index = index
         self._current_slice = slice(0, 1)
         self._npoints = 0
@@ -76,6 +77,7 @@ class DataAxisSelector(WidgetWithParameterCollection):
         self._last_slicing_at_index = True
         self._create_widgets()
         self._connect_signals()
+        self.layout().setHorizontalSpacing(5)
 
     def _create_widgets(self):
         """
@@ -332,12 +334,13 @@ class DataAxisSelector(WidgetWithParameterCollection):
         self._widgets["edit_range_data"].setVisible(
             _range_selection == "select range by data values" and _show_range
         )
-        if use_selection not in _GENERIC_CHOICES:
-            self._update_slice_from_non_generic_choice()
-        elif use_selection == "slice at data value":
-            self._manual_data_value_changed()
-        elif use_selection == "slice at index":
-            self._manual_index_changed()
+        with QtCore.QSignalBlocker(self):
+            if use_selection not in _GENERIC_CHOICES:
+                self._update_slice_from_non_generic_choice()
+            elif use_selection == "slice at data value":
+                self._manual_data_value_changed()
+            elif use_selection == "slice at index":
+                self._manual_index_changed()
         self.sig_display_choice_changed.emit(self._axis_index, use_selection)
 
     def _update_slice_from_non_generic_choice(self):

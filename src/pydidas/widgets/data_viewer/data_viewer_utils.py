@@ -25,6 +25,9 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "DATA_VIEW_CONFIG",
+    "DATA_VIEW_TITLES",
+    "DATA_VIEW_REFS",
     "invalid_range_str",
     "get_data_axis_header_creation_args",
     "get_data_axis_widget_creation_args",
@@ -32,13 +35,66 @@ __all__ = [
 
 
 from qtpy import QtCore, QtGui, QtWidgets
+from silx.gui.data.DataViews import _Hdf5View, _RawView
 
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
+    POLICY_EXP_FIX,
     QT_REG_EXP_FLOAT_RANGE_VALIDATOR,
     QT_REG_EXP_INT_RANGE_VALIDATOR,
 )
 from pydidas.widgets.factory import SquareButton
+from pydidas.widgets.silx_plot._data_views import (
+    Pydidas_Plot1dGroupView,
+    Pydidas_Plot1dView,
+    Pydidas_Plot2dView,
+)
+
+
+DATA_VIEW_CONFIG = {
+    0: {
+        "title": "Hdf5",
+        "ref": "view-h5",
+        "view": _Hdf5View,
+        "use_axes_selector": False,
+        "additional choices": None,
+        "min_dims": 1,
+    },
+    1: {
+        "title": "Curve",
+        "ref": "view-curve",
+        "view": Pydidas_Plot1dView,
+        "use_axes_selector": True,
+        "additional choices": "use as curve y",
+        "min_dims": 1,
+    },
+    2: {
+        "title": "Curve group",
+        "ref": "view-curve-group",
+        "view": Pydidas_Plot1dGroupView,
+        "use_axes_selector": True,
+        "additional choices": "show all curves;;use as curve y",
+        "min_dims": 2,
+    },
+    3: {
+        "title": "Image",
+        "ref": "view-image",
+        "view": Pydidas_Plot2dView,
+        "use_axes_selector": True,
+        "additional choices": "use as image y;;use as image x",
+        "min_dims": 2,
+    },
+    4: {
+        "title": "Table",
+        "ref": "view-table",
+        "view": _RawView,
+        "use_axes_selector": True,
+        "additional choices": "use as table x;;use as table y",
+        "min_dims": 0,
+    },
+}
+DATA_VIEW_TITLES = {_value["title"]: _key for _key, _value in DATA_VIEW_CONFIG.items()}
+DATA_VIEW_REFS = {_value["ref"]: _key for _key, _value in DATA_VIEW_CONFIG.items()}
 
 
 def invalid_range_str(input_range: str) -> str:
@@ -192,6 +248,7 @@ def get_data_axis_widget_creation_args(
                 "parent_widget": "point_selection_container"
                 if multiline
                 else "::self::",
+                "sizePolicy": POLICY_EXP_FIX,
             },
         ],
         [

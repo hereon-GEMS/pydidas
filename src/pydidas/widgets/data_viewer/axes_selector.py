@@ -72,6 +72,7 @@ class AxesSelector(WidgetWithParameterCollection):
         self._current_display_selection = []
         self._current_transpose_required = None
         self._multiline_layout = kwargs.get("multiline_layout", False)
+        self._allow_less_dims = kwargs.get("allow_less_dims", False)
         self.layout().setColumnStretch(0, 1)
         self.create_spacer("final_spacer", gridPos=(0, 1, 1, 1), fixedWidth=5)
 
@@ -226,7 +227,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 f"`{type(dataset)}`. \nAlternatively, please set the metadata "
                 "manually using the `set_axis_metadata` method."
             )
-        if dataset.ndim < len(self._additional_choices):
+        if dataset.ndim < len(self._additional_choices) and not self._allow_less_dims:
             raise UserConfigError(
                 "The dataset has less dimensions than required for the display. "
                 "Please change the dataset or how to display the dataset."
@@ -300,8 +301,10 @@ class AxesSelector(WidgetWithParameterCollection):
             The new display choice.
         """
         if choice in self._additional_choices:
+            print("choice was in additional choices", choice)
             for _dim, _axwidget in self._axwidgets.items():
                 if _dim != axis and _axwidget.display_choice == choice:
+                    print("choice was already selected at", _dim)
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.reset_to_slicing()
         self._verify_additional_choices_selected(axis)
@@ -324,6 +327,7 @@ class AxesSelector(WidgetWithParameterCollection):
         ]
         _curr_selection = ";;".join(self.current_display_selection)
         if not block_signals:
+            print("emitting new slicing", self.current_display_selection)
             self.sig_new_slicing.emit()
             self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 

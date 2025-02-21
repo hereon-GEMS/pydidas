@@ -208,6 +208,14 @@ def test_set_axis_metadata__invalid_ndim(selector):
         selector.set_metadata_from_dataset(data)
 
 
+def test_set_axis_metadata__invalid_ndim_w__allow_less_axes(selector):
+    selector.define_additional_choices("choice1;;choice2;;choice3")
+    selector._allow_less_dims = True
+    data = create_dataset(2, dtype=float)
+    selector.set_metadata_from_dataset(data)
+    assert selector._data_ndim == 2
+
+
 def test_set_metadata_from_dataset(selector):
     selector.set_metadata_from_dataset(_DATA)
     assert selector._data_shape == _DATA.shape
@@ -356,6 +364,14 @@ def test_update_ax_slicing(selector, data, spy_new_slicing, spy_new_slicing_str)
     assert len(_get_spy_results(spy_new_slicing)) == 1
     assert len(_get_spy_results(spy_new_slicing_str)) == 1
     assert "3::3:4" in _get_spy_results(spy_new_slicing_str)[0][0]
+
+
+def test__integration_change_axis(selector, data, spy_new_slicing, spy_new_slicing_str):
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    selector._axwidgets[0].display_choice = "slice at index"
+    assert len(_get_spy_results(spy_new_slicing)) == 1
+    assert len(_get_spy_results(spy_new_slicing_str)) == 1
 
 
 if __name__ == "__main__":

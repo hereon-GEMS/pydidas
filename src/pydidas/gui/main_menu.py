@@ -101,6 +101,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         sys.excepthook = gui_excepthook
 
         self._qtapp = PydidasQApplication.instance()
+        self._qtapp.setWindowIcon(icons.pydidas_icon_with_bg())
         self._child_windows = {}
         self._actions = {}
         self._menus = {}

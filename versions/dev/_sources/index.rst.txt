@@ -15,11 +15,11 @@ pydidas
 =======
 
 
-pyDIDAS (**py**\ thon **DI**\ ffraction **D**\ ata **A**\ nalysis **S**\ uite)
+pydidas (**py**\ thon **DI**\ ffraction **D**\ ata **A**\ nalysis **S**\ uite)
 is a toolset developed at Helmholtz-Zentrum Hereon to improve the ease of use
 and efficiency of diffraction data analysis. A key requirement is to create
 a graphical user interface of the software and processing which scales with
-available resources to allow running pyDIDAS on a wide range of machines from
+available resources to allow running pydidas on a wide range of machines from
 a small laptop up to a central cluster at the facility level.
 
  .. grid:: 2

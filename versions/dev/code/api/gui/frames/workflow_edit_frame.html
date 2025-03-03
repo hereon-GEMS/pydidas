@@ -675,7 +675,7 @@ plugins.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The widget reference key.</p></li>
+<li><p><strong>ref</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The widget reference key.</p></li>
 <li><p><strong>widget_instance</strong> (<em>QWidget</em>) – The widget instance.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the specific QWidget with a setAttribute
 method are valid kwargs. In addition, ‘layout_kwargs’ is a valid key
@@ -873,7 +873,7 @@ can be added, however, using the <code class="docutils literal notranslate"><spa
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference name in the _widgets dictionary.</p></li>
+<li><p><strong>ref</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The reference name in the _widgets dictionary.</p></li>
 <li><p><strong>widget_class</strong> (<em>type</em>) – The class type of the widget.</p></li>
 <li><p><strong>*args</strong> (<em>args</em>) – Any arguments for the widget creation.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments for the widget creation.</p></li>
@@ -892,7 +892,8 @@ can be added, however, using the <code class="docutils literal notranslate"><spa
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QPushButton with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the button’s position in its parent’s layout.
@@ -912,7 +913,8 @@ the slot through the ‘clicked’ kwarg.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The CheckBox’s descriptive text.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QCheckBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
@@ -931,7 +933,8 @@ to control the font properties or generic Qt properties.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QComboBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the QComboBox’s position in its parent’s layout.
@@ -944,12 +947,32 @@ to control the font properties or generic Qt properties.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_double_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create a QDoubleSpinBox for floating point values and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpinBox with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the SpinBox’s position in its parent’s layout. The
+default range is set to (0, 1), if it is not overridden with the
+‘range’ keyword.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">create_empty_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create an ampty QWidget with a agrid layout.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the generic QWidget with a setAttribute
 method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the QWidget’s position in its parent’s layout.</p></li>
@@ -965,7 +988,8 @@ to specify the QWidget’s position in its parent’s layout.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The label’s displayed text.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QLabel with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
@@ -985,8 +1009,12 @@ be used to control the font properties.</p></li>
 and adds it to the parent widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
-implementation are valid kwargs.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
+implementation are valid kwargs.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -998,7 +1026,8 @@ implementation are valid kwargs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QLineEdit with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the LineEdit’s position in its parent’s layout.
@@ -1050,7 +1079,8 @@ The default is self.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QProgressBar with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the QProgressBar’s position in its parent’s layout.</p></li>
@@ -1066,7 +1096,8 @@ to specify the QProgressBar’s position in its parent’s layout.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The CheckBox’s descriptive text.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the generic QWidget with a setAttribute
 method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
@@ -1088,8 +1119,8 @@ number of rows and columns can be specified with the ‘rows’ and
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The widget reference string. If None, an internal reference will be
-used.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpacerItem with a setAttribute method
 are valid kwargs. In addition, the gridPos key allows to specify
 the spacer’s position in its parent’s layout.</p></li>
@@ -1101,16 +1132,35 @@ the spacer’s position in its parent’s layout.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">create_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Create a QSpinBox and store the widget.</p>
+<dd><p>Create a QSpinBox for integer values and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>None</em><em>]</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpinBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the SpinBox’s position in its parent’s layout. The
 default range is set to (0, 1), if it is not overridden with the
 ‘range’ keyword.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_vertical_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create a vertical line widget.</p>
+<p>This method creates a vertical line widget (implemented as flat QFrame) as
+separator and adds it to the parent widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
+implementation are valid kwargs.</p></li>
 </ul>
 </dd>
 </dl>

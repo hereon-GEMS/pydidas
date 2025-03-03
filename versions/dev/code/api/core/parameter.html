@@ -509,33 +509,40 @@ If None, no type-checking is performed.</p></td>
 <td><p>A list with choices if the value of the
 parameter is limited to specific values.</p></td>
 </tr>
-<tr class="row-even"><td><p>name</p></td>
+<tr class="row-even"><td><p>range</p></td>
+<td><p>True</p></td>
+<td><p>The range of allowed values. The range
+is only supported for numerical datatypes.
+The range must be given as a 2-tuple with
+the lower and upper bound.</p></td>
+</tr>
+<tr class="row-odd"><td><p>name</p></td>
 <td><p>False</p></td>
 <td><p>A readable name as description.</p></td>
 </tr>
-<tr class="row-odd"><td><p>unit</p></td>
+<tr class="row-even"><td><p>unit</p></td>
 <td><p>False</p></td>
 <td><p>The unit of the Parameter value.</p></td>
 </tr>
-<tr class="row-even"><td><p>optional</p></td>
+<tr class="row-odd"><td><p>optional</p></td>
 <td><p>False</p></td>
 <td><p>A flag whether the parameter is required
 or optional.</p></td>
 </tr>
-<tr class="row-odd"><td><p>allow_None</p></td>
+<tr class="row-even"><td><p>allow_None</p></td>
 <td><p>False</p></td>
 <td><p>A flag whether “None” is accepted as
 Parameter value.</p></td>
 </tr>
-<tr class="row-even"><td><p>tooltip</p></td>
+<tr class="row-odd"><td><p>tooltip</p></td>
 <td><p>False</p></td>
 <td><p>A readable tooltip.</p></td>
 </tr>
-<tr class="row-odd"><td><p>default</p></td>
+<tr class="row-even"><td><p>default</p></td>
 <td><p>False</p></td>
 <td><p>The default value.</p></td>
 </tr>
-<tr class="row-even"><td><p>subtype</p></td>
+<tr class="row-odd"><td><p>subtype</p></td>
 <td><p>False</p></td>
 <td><p>For Iterable datatypes, a subtype can be
 defined to determine the data type inside
@@ -753,6 +760,20 @@ in YAML files.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pydidas.core.Parameter.range">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">range</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Real</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Real</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.core.Parameter.range" title="Link to this definition">#</a></dt>
+<dd><p>Get the range of the Parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The range of the Parameter.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[Real, Real]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.refkey">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">refkey</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.refkey" title="Link to this definition">#</a></dt>
 <dd><p>Return the parameter reference key.</p>
@@ -906,6 +927,7 @@ data type.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Parameter.get_type_and_default_str"><code class="docutils literal notranslate"><span class="pre">Parameter.get_type_and_default_str</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Parameter.name"><code class="docutils literal notranslate"><span class="pre">Parameter.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Parameter.optional"><code class="docutils literal notranslate"><span class="pre">Parameter.optional</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Parameter.range"><code class="docutils literal notranslate"><span class="pre">Parameter.range</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Parameter.refkey"><code class="docutils literal notranslate"><span class="pre">Parameter.refkey</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Parameter.restore_default"><code class="docutils literal notranslate"><span class="pre">Parameter.restore_default</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Parameter.tooltip"><code class="docutils literal notranslate"><span class="pre">Parameter.tooltip</span></code></a></li>

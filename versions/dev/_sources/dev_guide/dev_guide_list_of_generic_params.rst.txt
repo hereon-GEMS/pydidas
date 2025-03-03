@@ -41,274 +41,6 @@ available:
    :local:
 
 
-Scan
-~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`scan_dim`
-     - | **type** : int
-       | **default** : 1
-       | **name** : Scan dimensionsionality
-       | **choices** : [1, 2, 3, 4]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The scan dimensionality. This defines the number of processed dimensions.
-   * - :py:data:`scan_title`
-     - | **type** : str
-       | **default** : 
-       | **name** : Scan name/title
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The scan name or title. This is used exclusively for reference in result exporters.
-   * - :py:data:`scan_base_directory`
-     - | **type** : Path
-       | **default** : 
-       | **name** : Scan base directory path
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The absolute path of the base directory in which to find this scan. Note that indivual plugins may automatically discover and use subdirectories. Please refer to the specific InputPlugin in use for more information.
-   * - :py:data:`scan_name_pattern`
-     - | **type** : Path
-       | **default** : 
-       | **name** : The scan naming pattern
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The pattern used for naming scan (files). Use hashes '#' for wildcards which will be filled in with numbers for the various files. Note that individual plugins may use this Parameter for either directory or file names. Please refer to the specific InputPlugin in use for more information.
-   * - :py:data:`scan_start_index`
-     - | **type** : int
-       | **default** : 0
-       | **name** : First filename number
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of the first file to be used in processing. This number will be applied as offset in the scan naming pattern to identify the respective filename for scan points.
-   * - :py:data:`scan_index_stepping`
-     - | **type** : int
-       | **default** : 1
-       | **name** : Frame index stepping
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The stepping of the index in frames. A value of n corresponds to only using every n-th index. For example, an index stepping of 3 with an offset of 5 would process the frames 5, 8, 11, 14 etc. 
-       | Please note that the index stepping refers to the frames, not the filenames. In the case of container files (e.g. hdf5), the index stepping will skip process every n-th frame, not every n-th file.
-   * - :py:data:`scan_multi_image_handling`
-     - | **type** : str
-       | **default** : Average
-       | **name** : Multi-image handling
-       | **choices** : ['Average', 'Sum', 'Maximum']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Define the handling of images if multiple images were acquired per scan point. If all individual images should be kept, please set the scan multiplicity to 1 and add an additional dimension with the multiplicity to the scan.
-   * - :py:data:`scan_multiplicity`
-     - | **type** : int
-       | **default** : 1
-       | **name** : Image multiplicity
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of images acquired at *each* scan point. The default of '1' corresponds to one image per scan point. Please note that the value for the multiplicity will be multiplied with the number of scan points. If this setting is used for 'averaging' images, please reduce the number of scan points correspondingly.
-   * - :py:data:`scan_dim0_label`
-     - | **type** : str
-       | **default** : 
-       | **name** : Name of scan direction 0
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The axis name for scan direction 0. This information will only be used for labelling.
-   * - :py:data:`scan_dim1_label`
-     - | **type** : str
-       | **default** : 
-       | **name** : Name of scan direction 1
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The axis name for scan direction 1. This information will only be used for labelling.
-   * - :py:data:`scan_dim2_label`
-     - | **type** : str
-       | **default** : 
-       | **name** : Name of scan direction 2
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The axis name for scan direction 2. This information will only be used for labelling.
-   * - :py:data:`scan_dim3_label`
-     - | **type** : str
-       | **default** : 
-       | **name** : Name of scan direction 3
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The axis name for scan direction 3. This information will only be used for labelling.
-   * - :py:data:`scan_dim0_n_points`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Number of scan points (dir. 0)
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The total number of scan points in scan direction 0. The number of points is one higher than the number of intervals.
-   * - :py:data:`scan_dim1_n_points`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Number of scan points (dir. 1)
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The total number of scan points in scan direction 1. The number of points is one higher than the number of intervals.
-   * - :py:data:`scan_dim2_n_points`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Number of scan points (dir. 2)
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The total number of scan points in scan direction 2. The number of points is one higher than the number of intervals.
-   * - :py:data:`scan_dim3_n_points`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Number of scan points (dir. 3)
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The total number of scan points in scan direction 3. The number of points is one higher than the number of intervals.
-   * - :py:data:`scan_dim0_delta`
-     - | **type** : float
-       | **default** : 1
-       | **name** : Step width in direction 0
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The step width between scan points in direction 0.
-   * - :py:data:`scan_dim1_delta`
-     - | **type** : float
-       | **default** : 1
-       | **name** : Step width in direction 1
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The step width between scan points in direction 1.
-   * - :py:data:`scan_dim2_delta`
-     - | **type** : float
-       | **default** : 1
-       | **name** : Step width in direction 2
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The step width between scan points in direction 2.
-   * - :py:data:`scan_dim3_delta`
-     - | **type** : float
-       | **default** : 1
-       | **name** : Step width in direction 3
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The step width between scan points in direction 3.
-   * - :py:data:`scan_dim0_offset`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Offset of direction 0
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The coordinate offset of the movement in scan direction 0 (i.e. the counter / motor position for scan step #0).
-   * - :py:data:`scan_dim1_offset`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Offset of direction 1
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The coordinate offset of the movement in scan direction 1 (i.e. the counter / motor position for scan step #0).
-   * - :py:data:`scan_dim2_offset`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Offset of direction 2
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The coordinate offset of the movement in scan direction 2 (i.e. the counter / motor position for scan step #0).
-   * - :py:data:`scan_dim3_offset`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Offset of direction 3
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The coordinate offset of the movement in scan direction 3 (i.e. the counter / motor position for scan step #0).
-   * - :py:data:`scan_dim0_unit`
-     - | **type** : str
-       | **default** : 
-       | **name** : Unit of direction 0
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit of the positions in scan direction 0.
-   * - :py:data:`scan_dim1_unit`
-     - | **type** : str
-       | **default** : 
-       | **name** : Unit of direction 1
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit of the positions in scan direction 1.
-   * - :py:data:`scan_dim2_unit`
-     - | **type** : str
-       | **default** : 
-       | **name** : Unit of direction 2
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit of the positions in scan direction 2.
-   * - :py:data:`scan_dim3_unit`
-     - | **type** : str
-       | **default** : 
-       | **name** : Unit of direction 3
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit of the positions in scan direction 3.
-   * - :py:data:`scan_index0`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Scan dim. 0 index
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The position index for the scan dimension 0.
-   * - :py:data:`scan_index1`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Scan dim. 1 index
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The position index for the scan dimension 1.
-   * - :py:data:`scan_index2`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Scan dim. 2 index
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The position index for the scan dimension 2.
-   * - :py:data:`scan_index3`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Scan dim. 3 index
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The position index for the scan dimension 3.
-
 Fit
 ~~~
 
@@ -930,25 +662,6 @@ Other
        | **allow_None** : False
        | **tooltip** : This parameter allows the user to activate/deactivate the automatic checking for updates at startup.
 
-Proc
-~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`d_spacing_unit`
-     - | **type** : str
-       | **default** : Angstrom
-       | **name** : d-spacing unit
-       | **choices** : ['Angstrom', 'nm']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The output d-spacing unit. Å for Angstroms and nm for nanometers.
-
 Data import
 ~~~~~~~~~~~
 
@@ -1159,6 +872,530 @@ Data import
        | **allow_None** : False
        | **tooltip** : The number of frames to be loaded and included in the stack. Frames are loaded starting with the first frame index and thus allow a rolling average over the frames.
 
+Scan
+~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`scan_dim`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Scan dimensionsionality
+       | **choices** : [1, 2, 3, 4]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The scan dimensionality. This defines the number of processed dimensions.
+   * - :py:data:`scan_title`
+     - | **type** : str
+       | **default** : 
+       | **name** : Scan name/title
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The scan name or title. This is used exclusively for reference in result exporters.
+   * - :py:data:`scan_base_directory`
+     - | **type** : Path
+       | **default** : 
+       | **name** : Scan base directory path
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The absolute path of the base directory in which to find this scan. Note that indivual plugins may automatically discover and use subdirectories. Please refer to the specific InputPlugin in use for more information.
+   * - :py:data:`scan_name_pattern`
+     - | **type** : Path
+       | **default** : 
+       | **name** : The scan naming pattern
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The pattern used for naming scan (files). Use hashes '#' for wildcards which will be filled in with numbers for the various files. Note that individual plugins may use this Parameter for either directory or file names. Please refer to the specific InputPlugin in use for more information.
+   * - :py:data:`scan_start_index`
+     - | **type** : int
+       | **default** : 0
+       | **name** : First filename number
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of the first file to be used in processing. This number will be applied as offset in the scan naming pattern to identify the respective filename for scan points.
+   * - :py:data:`scan_index_stepping`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Frame index stepping
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The stepping of the index in frames. A value of n corresponds to only using every n-th index. For example, an index stepping of 3 with an offset of 5 would process the frames 5, 8, 11, 14 etc. 
+       | Please note that the index stepping refers to the frames, not the filenames. In the case of container files (e.g. hdf5), the index stepping will skip process every n-th frame, not every n-th file.
+   * - :py:data:`scan_multi_image_handling`
+     - | **type** : str
+       | **default** : Average
+       | **name** : Multi-image handling
+       | **choices** : ['Average', 'Sum', 'Maximum']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Define the handling of images if multiple images were acquired per scan point. If all individual images should be kept, please set the scan multiplicity to 1 and add an additional dimension with the multiplicity to the scan.
+   * - :py:data:`scan_multiplicity`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Image multiplicity
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of images acquired at *each* scan point. The default of '1' corresponds to one image per scan point. Please note that the value for the multiplicity will be multiplied with the number of scan points. If this setting is used for 'averaging' images, please reduce the number of scan points correspondingly.
+   * - :py:data:`scan_dim0_label`
+     - | **type** : str
+       | **default** : 
+       | **name** : Name of scan direction 0
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The axis name for scan direction 0. This information will only be used for labelling.
+   * - :py:data:`scan_dim1_label`
+     - | **type** : str
+       | **default** : 
+       | **name** : Name of scan direction 1
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The axis name for scan direction 1. This information will only be used for labelling.
+   * - :py:data:`scan_dim2_label`
+     - | **type** : str
+       | **default** : 
+       | **name** : Name of scan direction 2
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The axis name for scan direction 2. This information will only be used for labelling.
+   * - :py:data:`scan_dim3_label`
+     - | **type** : str
+       | **default** : 
+       | **name** : Name of scan direction 3
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The axis name for scan direction 3. This information will only be used for labelling.
+   * - :py:data:`scan_dim0_n_points`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Number of scan points (dir. 0)
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The total number of scan points in scan direction 0. The number of points is one higher than the number of intervals.
+   * - :py:data:`scan_dim1_n_points`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Number of scan points (dir. 1)
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The total number of scan points in scan direction 1. The number of points is one higher than the number of intervals.
+   * - :py:data:`scan_dim2_n_points`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Number of scan points (dir. 2)
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The total number of scan points in scan direction 2. The number of points is one higher than the number of intervals.
+   * - :py:data:`scan_dim3_n_points`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Number of scan points (dir. 3)
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The total number of scan points in scan direction 3. The number of points is one higher than the number of intervals.
+   * - :py:data:`scan_dim0_delta`
+     - | **type** : float
+       | **default** : 1
+       | **name** : Step width in direction 0
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The step width between scan points in direction 0.
+   * - :py:data:`scan_dim1_delta`
+     - | **type** : float
+       | **default** : 1
+       | **name** : Step width in direction 1
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The step width between scan points in direction 1.
+   * - :py:data:`scan_dim2_delta`
+     - | **type** : float
+       | **default** : 1
+       | **name** : Step width in direction 2
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The step width between scan points in direction 2.
+   * - :py:data:`scan_dim3_delta`
+     - | **type** : float
+       | **default** : 1
+       | **name** : Step width in direction 3
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The step width between scan points in direction 3.
+   * - :py:data:`scan_dim0_offset`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Offset of direction 0
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The coordinate offset of the movement in scan direction 0 (i.e. the counter / motor position for scan step #0).
+   * - :py:data:`scan_dim1_offset`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Offset of direction 1
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The coordinate offset of the movement in scan direction 1 (i.e. the counter / motor position for scan step #0).
+   * - :py:data:`scan_dim2_offset`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Offset of direction 2
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The coordinate offset of the movement in scan direction 2 (i.e. the counter / motor position for scan step #0).
+   * - :py:data:`scan_dim3_offset`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Offset of direction 3
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The coordinate offset of the movement in scan direction 3 (i.e. the counter / motor position for scan step #0).
+   * - :py:data:`scan_dim0_unit`
+     - | **type** : str
+       | **default** : 
+       | **name** : Unit of direction 0
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit of the positions in scan direction 0.
+   * - :py:data:`scan_dim1_unit`
+     - | **type** : str
+       | **default** : 
+       | **name** : Unit of direction 1
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit of the positions in scan direction 1.
+   * - :py:data:`scan_dim2_unit`
+     - | **type** : str
+       | **default** : 
+       | **name** : Unit of direction 2
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit of the positions in scan direction 2.
+   * - :py:data:`scan_dim3_unit`
+     - | **type** : str
+       | **default** : 
+       | **name** : Unit of direction 3
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit of the positions in scan direction 3.
+   * - :py:data:`scan_index0`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Scan dim. 0 index
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The position index for the scan dimension 0.
+   * - :py:data:`scan_index1`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Scan dim. 1 index
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The position index for the scan dimension 1.
+   * - :py:data:`scan_index2`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Scan dim. 2 index
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The position index for the scan dimension 2.
+   * - :py:data:`scan_index3`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Scan dim. 3 index
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The position index for the scan dimension 3.
+
+Settings
+~~~~~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`mp_n_workers`
+     - | **type** : int
+       | **default** : 4
+       | **name** : Number of MP workers
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of multiprocessing workers. Note that this number should not be set too high for two reasons:
+       | 1. File reading processes interfere with each other if too many are active at once.
+       | 2. pyFAI already inherently uses parallelization and you can only gain limited performance increases for multiple parallel processes.
+   * - :py:data:`data_buffer_size`
+     - | **type** : float
+       | **default** : 1500
+       | **name** : Data buffer size
+       | **choices** : None
+       | **unit** : MB
+       | **allow_None** : False
+       | **tooltip** : The maximum size of the data buffer (for each display widget). Any data which is smaller than the buffer size will be stored in memory. Larger data will be read from disk in chunks.
+   * - :py:data:`shared_buffer_size`
+     - | **type** : float
+       | **default** : 100
+       | **name** : Shared buffer size limit
+       | **choices** : None
+       | **unit** : MB
+       | **allow_None** : False
+       | **tooltip** : A shared buffer is used to efficiently transport data between the main App and multiprocessing Processes. This buffer must be large enough to store at least one instance of all result data.
+   * - :py:data:`shared_buffer_max_n`
+     - | **type** : int
+       | **default** : 20
+       | **name** : Buffer dataframe limit
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The maximum number of datasets in the buffer. A dataset consists of all results for one frame. For performance reasons, the buffer should not be too large.
+   * - :py:data:`max_image_size`
+     - | **type** : float
+       | **default** : 100
+       | **name** : Maximum image size
+       | **choices** : None
+       | **unit** : Mpx
+       | **allow_None** : False
+       | **tooltip** : The maximum size (in megapixels) of images.
+   * - :py:data:`use_detector_mask`
+     - | **type** : bool
+       | **default** : False
+       | **name** : Use detector mask
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Flag to use a detector mask file and value. If False, no detector mask will be used.
+   * - :py:data:`detector_mask_val`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Masked pixels display value
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The value to be used for the pixels masked on the detector. Note that this value will only be used for displaying the images. For pyFAI integration, the pixels will be fully masked and not be included.
+   * - :py:data:`mosaic_border_width`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Mosaic tiling border width
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The width of the border inserted between adjacent frames in the mosaic creation.
+   * - :py:data:`mosaic_border_value`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Mosaic border value
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The value to be put in the border pixels in mosaics.
+   * - :py:data:`run_type`
+     - | **type** : str
+       | **default** : Process in GUI
+       | **name** : Run type
+       | **choices** : ['Process in GUI', 'Command line']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Specify how the processing shall be performed.
+   * - :py:data:`plugin_path`
+     - | **type** : str
+       | **default** : 
+       | **name** : Custom plugin paths
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The paths to all custom plugin locations. Individual entries must be separated by a double semicolon `;;`.
+   * - :py:data:`plot_update_time`
+     - | **type** : float
+       | **default** : 1.0
+       | **name** : Plot update time
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : s
+       | **tooltip** : The delay before any plot updates will be processed. This will prevent multiple frequent update of plots.
+   * - :py:data:`histogram_outlier_fraction_high`
+     - | **type** : float
+       | **default** : 0.07
+       | **name** : Histogram outlier fraction (high)
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The fraction of pixels with high values which will be ignored when cropping the histogram for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger detector.
+   * - :py:data:`histogram_outlier_fraction_low`
+     - | **type** : float
+       | **default** : 0.02
+       | **name** : Histogram outlier fraction (low)
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The fraction of pixels with low values which will be ignored when cropping the histogram for 2d plots. 
+   * - :py:data:`cmap_name`
+     - | **type** : str
+       | **default** : Gray
+       | **name** : Default colormap
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The default colormap used in pydidas plots.
+   * - :py:data:`cmap_nan_color`
+     - | **type** : str
+       | **default** : #9AFEFF
+       | **name** : Color for invalid data / no data
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The RGB color used to fill missing or invalid data points. Invalid data points are labeled with np.NaN values.
+
+Image ops
+~~~~~~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`use_roi`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Use ROI
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Keyword to toggle use of the ROI for cropping the original images before processing them.
+   * - :py:data:`roi_xlow`
+     - | **type** : int
+       | **default** : 0
+       | **name** : ROI lower x limit
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The lower boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width.
+   * - :py:data:`roi_xhigh`
+     - | **type** : int
+       | **default** : None
+       | **name** : ROI upper x limit
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : True
+       | **tooltip** : The upper boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
+   * - :py:data:`roi_ylow`
+     - | **type** : int
+       | **default** : 0
+       | **name** : ROI lower y limit
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The lower boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width.
+   * - :py:data:`roi_yhigh`
+     - | **type** : int
+       | **default** : None
+       | **name** : ROI upper y limit
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : True
+       | **tooltip** : The upper boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
+   * - :py:data:`use_thresholds`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Use thresholds
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Keyword to toggle use of the thresholds for clipping the data range in the original images before combining them.
+   * - :py:data:`threshold_low`
+     - | **type** : float
+       | **default** : None
+       | **name** : Lower threshold
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The lower threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
+   * - :py:data:`threshold_high`
+     - | **type** : float
+       | **default** : None
+       | **name** : Upper threshold
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The upper threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
+   * - :py:data:`binning`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Binning factor
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The re-binning factor for the images in the composite. The binning will be applied to the cropped images.
+   * - :py:data:`image_shape`
+     - | **type** : tuple
+       | **default** : (0, 0)
+       | **name** : Image shape
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The shape of an image.
+   * - :py:data:`raw_image_shape`
+     - | **type** : tuple
+       | **default** : (0, 0)
+       | **name** : Raw image shape
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The image shape of the original image as loaded from the file.
+   * - :py:data:`datatype`
+     - | **type** : None
+       | **default** : <class 'numpy.float32'>
+       | **name** : Datatype
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The datatype.
+   * - :py:data:`multiplicator`
+     - | **type** : float
+       | **default** : 1.0
+       | **name** : Multiplication factor
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The multiplication scaling factor to be applied to the resulting Dataset.
+
 Experiment
 ~~~~~~~~~~
 
@@ -1330,254 +1567,6 @@ Experiment
        | **allow_None** : False
        | **tooltip** : The sample-detector distance.
 
-Image ops
-~~~~~~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`use_roi`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Use ROI
-       | **choices** : [True, False]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Keyword to toggle use of the ROI for cropping the original images before processing them.
-   * - :py:data:`roi_xlow`
-     - | **type** : int
-       | **default** : 0
-       | **name** : ROI lower x limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The lower boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width.
-   * - :py:data:`roi_xhigh`
-     - | **type** : int
-       | **default** : None
-       | **name** : ROI upper x limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : True
-       | **tooltip** : The upper boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
-   * - :py:data:`roi_ylow`
-     - | **type** : int
-       | **default** : 0
-       | **name** : ROI lower y limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The lower boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width.
-   * - :py:data:`roi_yhigh`
-     - | **type** : int
-       | **default** : None
-       | **name** : ROI upper y limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : True
-       | **tooltip** : The upper boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
-   * - :py:data:`use_thresholds`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Use thresholds
-       | **choices** : [True, False]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Keyword to toggle use of the thresholds for clipping the data range in the original images before combining them.
-   * - :py:data:`threshold_low`
-     - | **type** : float
-       | **default** : None
-       | **name** : Lower threshold
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
-   * - :py:data:`threshold_high`
-     - | **type** : float
-       | **default** : None
-       | **name** : Upper threshold
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
-   * - :py:data:`binning`
-     - | **type** : int
-       | **default** : 1
-       | **name** : Binning factor
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The re-binning factor for the images in the composite. The binning will be applied to the cropped images.
-   * - :py:data:`image_shape`
-     - | **type** : tuple
-       | **default** : (0, 0)
-       | **name** : Image shape
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The shape of an image.
-   * - :py:data:`raw_image_shape`
-     - | **type** : tuple
-       | **default** : (0, 0)
-       | **name** : Raw image shape
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The image shape of the original image as loaded from the file.
-   * - :py:data:`datatype`
-     - | **type** : None
-       | **default** : <class 'numpy.float32'>
-       | **name** : Datatype
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The datatype.
-   * - :py:data:`multiplicator`
-     - | **type** : float
-       | **default** : 1.0
-       | **name** : Multiplication factor
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The multiplication scaling factor to be applied to the resulting Dataset.
-
-Settings
-~~~~~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`mp_n_workers`
-     - | **type** : int
-       | **default** : 4
-       | **name** : Number of MP workers
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of multiprocessing workers. Note that this number should not be set too high for two reasons:
-       | 1. File reading processes interfere with each other if too many are active at once.
-       | 2. pyFAI already inherently uses parallelization and you can only gain limited performance increases for multiple parallel processes.
-   * - :py:data:`shared_buffer_size`
-     - | **type** : float
-       | **default** : 100
-       | **name** : Shared buffer size limit
-       | **choices** : None
-       | **unit** : MB
-       | **allow_None** : False
-       | **tooltip** : A shared buffer is used to efficiently transport data between the main App and multiprocessing Processes. This buffer must be large enough to store at least one instance of all result data.
-   * - :py:data:`shared_buffer_max_n`
-     - | **type** : int
-       | **default** : 20
-       | **name** : Buffer dataframe limit
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The maximum number of datasets in the buffer. A dataset consists of all results for one frame. For performance reasons, the buffer should not be too large.
-   * - :py:data:`max_image_size`
-     - | **type** : float
-       | **default** : 100
-       | **name** : Maximum image size
-       | **choices** : None
-       | **unit** : Mpx
-       | **allow_None** : False
-       | **tooltip** : The maximum size (in megapixels) of images.
-   * - :py:data:`use_detector_mask`
-     - | **type** : bool
-       | **default** : False
-       | **name** : Use detector mask
-       | **choices** : [True, False]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Flag to use a detector mask file and value. If False, no detector mask will be used.
-   * - :py:data:`detector_mask_val`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Masked pixels display value
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The value to be used for the pixels masked on the detector. Note that this value will only be used for displaying the images. For pyFAI integration, the pixels will be fully masked and not be included.
-   * - :py:data:`mosaic_border_width`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Mosaic tiling border width
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The width of the border inserted between adjacent frames in the mosaic creation.
-   * - :py:data:`mosaic_border_value`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Mosaic border value
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The value to be put in the border pixels in mosaics.
-   * - :py:data:`run_type`
-     - | **type** : str
-       | **default** : Process in GUI
-       | **name** : Run type
-       | **choices** : ['Process in GUI', 'Command line']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Specify how the processing shall be performed.
-   * - :py:data:`plugin_path`
-     - | **type** : str
-       | **default** : 
-       | **name** : Custom plugin paths
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The paths to all custom plugin locations. Individual entries must be separated by a double semicolon `;;`.
-   * - :py:data:`plot_update_time`
-     - | **type** : float
-       | **default** : 1.0
-       | **name** : Plot update time
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : s
-       | **tooltip** : The delay before any plot updates will be processed. This will prevent multiple frequent update of plots.
-   * - :py:data:`histogram_outlier_fraction_high`
-     - | **type** : float
-       | **default** : 0.07
-       | **name** : Histogram outlier fraction (high)
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The fraction of pixels with high values which will be ignored when cropping the histogram for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger detector.
-   * - :py:data:`histogram_outlier_fraction_low`
-     - | **type** : float
-       | **default** : 0.02
-       | **name** : Histogram outlier fraction (low)
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The fraction of pixels with low values which will be ignored when cropping the histogram for 2d plots. 
-   * - :py:data:`cmap_name`
-     - | **type** : str
-       | **default** : Gray
-       | **name** : Default colormap
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The default colormap used in pydidas plots.
-   * - :py:data:`cmap_nan_color`
-     - | **type** : str
-       | **default** : #9AFEFF
-       | **name** : Color for invalid data / no data
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The RGB color used to fill missing or invalid data points. Invalid data points are labeled with np.NaN values.
-
 Pyfai
 ~~~~~
 
@@ -1724,3 +1713,22 @@ Pyfai
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The correct solid angle Parameter in pyFAI (de)activates the correction for the solid angle of the detector pixels. Detector pixels further away from the beam axis see a smaller projected intensity. Using this parameter allows to correct for this effect, if set to True.
+
+Proc
+~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`d_spacing_unit`
+     - | **type** : str
+       | **default** : Angstrom
+       | **name** : d-spacing unit
+       | **choices** : ['Angstrom', 'nm']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The output d-spacing unit. Å for Angstroms and nm for nanometers.

@@ -38,6 +38,7 @@ from qtpy.QtWidgets import QApplication
 from pydidas.core import UserConfigError
 from pydidas.gui import MainWindow
 from pydidas.gui.frames import DEFAULT_FRAMES
+from pydidas.resources import icons
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
@@ -97,6 +98,7 @@ def start_pydidas_gui(
             pass
         _splash.finish(_gui)
         _gui.check_for_updates(auto_check=True)
+        _gui.setWindowIcon(icons.pydidas_icon_with_bg())
         _gui.raise_()
         _ = _app.exec_()
     except Exception:

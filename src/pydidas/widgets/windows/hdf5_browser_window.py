@@ -36,6 +36,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui import icons as silx_icons
 from silx.gui.hdf5 import Hdf5TreeModel, Hdf5TreeView, NexusSortFilterProxyModel
 
+from pydidas.resources.pydidas_icons import pydidas_icon_with_bg
 from pydidas.widgets.framework import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
@@ -58,7 +59,7 @@ class Hdf5BrowserWindow(PydidasWindow):
     def __init__(self, **kwargs):
         self.__qtapp = PydidasQApplication.instance()
         PydidasWindow.__init__(self, title="Hdf5 structure browser", **kwargs)
-        # self.setWindowIcon(pydidas_icons.pydidas_icon_with_bg())
+        self.setWindowIcon(pydidas_icon_with_bg())
         self.__open_file = None
 
     def build_frame(self):

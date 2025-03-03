@@ -41,6 +41,7 @@ from pydidas.gui.frames import (
     WorkflowEditFrame,
 )
 from pydidas.gui.main_menu import MainMenu
+from pydidas.resources import icons
 from pydidas.widgets.framework import FontScalingToolbar
 
 
@@ -73,6 +74,7 @@ class MainWindow(MainMenu):
             "toolbars_created": False,
             "toolbar_visibility": {"": True},
         }
+        self.setWindowIcon(icons.pydidas_icon_with_bg())
 
     def show(self):
         """

@@ -40,12 +40,18 @@ Improvements
 	- Restructured the layout of the __init__ files for more clarity.
 	- Added a second category of importers named 'beamline file formats'
 	 to Scan and added a second registry in the ScanIo.
+	- Changed the creation of generic toolbar menus to use a dictionary which 
+	  can easily be extended by 3rd parties.
+	- Added widgets to select axes for data display also based on metadata.
 - Improved the formatting when displaying Plugin information.
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.
 - Added support for pytest tests in the CI pipeline. 
 - Added import functionality for Sardana FIO files to the Scan import.
+- Added a range property to the Parameter to limit the allowed range of Parameters
+  for numerical values.
 - Pydidas result exports in hdf5 format writes metadata neXus-compatible
+- Added a new interface for browsing and slicing data based on its metadata.
 - Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
   (for the general class) and WorkflowResults (for the singleton instance)
   for consistency, similarly to ProcessingTree and WorkflowTree.

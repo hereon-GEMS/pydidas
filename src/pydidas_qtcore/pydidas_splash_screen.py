@@ -28,24 +28,43 @@ __all__ = ["PydidasSplashScreen"]
 
 
 from pathlib import Path
+from typing import Optional
 
 from qtpy import QtCore, QtGui, QtWidgets
+
+
+_SPLASH_IMAGE_PATH = Path(__file__).parent.parent.joinpath(
+    "pydidas", "resources", "images", "splash_image.png"
+)
 
 
 class PydidasSplashScreen(QtWidgets.QSplashScreen):
     """
     A splash screen which allows to show centered messages and with the pydidas icon.
+
+    Parameters
+    ----------
+    pixmap : QtGui.QPixmap, optional
+        The pixmap to be displayed on the splash screen.
+    f : QtCore.Qt.WindowFlags, optional
+        The window flags for the splash screen.
+    custom_splash_image : Path, optional
+        The path to a custom splash image to be displayed. This setting
+        cannot be used in combination with the pixmap parameter. The
+        pixmap parameter takes precedence.
     """
 
-    def __init__(self, pixmap=None, f=QtCore.Qt.WindowStaysOnTopHint):
+    def __init__(
+        self,
+        pixmap=None,
+        f=QtCore.Qt.WindowStaysOnTopHint,
+        custom_splash_image: Optional[Path] = None,
+    ):
         if pixmap is None:
-            pixmap = QtGui.QPixmap(
-                str(
-                    Path(__file__).parent.parent.joinpath(
-                        "pydidas", "resources", "images", "splash_image.png"
-                    )
-                )
+            _splash_path = (
+                custom_splash_image if custom_splash_image else _SPLASH_IMAGE_PATH
             )
+            pixmap = QtGui.QPixmap(str(_splash_path))
         QtWidgets.QSplashScreen.__init__(self, pixmap, f)
         self.show_aligned_message("Importing packages")
         self.show()

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="40"
+   height="40"
+   viewBox="0 0 40 40"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="view-curve-group.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="8.6708969"
+     inkscape:cx="18.798517"
+     inkscape:cy="30.734998"
+     inkscape:window-width="1920"
+     inkscape:window-height="1177"
+     inkscape:window-x="5352"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <title
+     id="title1">Pydidas frame icon: Image math</title>
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="0.4"
+       markerHeight="0.4"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <rect
+       x="0.11325034"
+       y="11.041908"
+       width="39.750868"
+       height="19.592308"
+       id="rect2" />
+    <rect
+       x="0.67950201"
+       y="11.551534"
+       width="38.67499"
+       height="14.892419"
+       id="rect1" />
+    <rect
+       x="-2.7808754"
+       y="26.120365"
+       width="50.750975"
+       height="18.472958"
+       id="rect3" />
+    <linearGradient
+       id="linearGradient3">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.39525691;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.3992095;"
+         offset="0.63558418"
+         id="stop2" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient5488"
+       id="radialGradient5490"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(2.7858854,0,0,2.7858866,-53.709894,-132.41085)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5488">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5484" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         offset="0.11551156"
+         id="stop6286" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop5486" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient3"
+       id="radialGradient5490-6"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(1.46259,0,0,1.46259,-9.1976933,-64.515675)"
+       gradientUnits="userSpaceOnUse" />
+    <rect
+       x="33.203125"
+       y="57.03125"
+       width="39.212132"
+       height="17.609484"
+       id="rect1649" />
+  </defs>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+        <dc:title>Pydidas frame icon: Image math</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon GmbH</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <path
+     style="fill:none;stroke:#0091a0;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+     d="m 2.3065665,27.065666 c 0,0 1.787589,0.230657 5.6510878,-1.210947 3.8634987,-1.441605 5.2474387,-4.901454 11.1291827,-4.209484 5.881745,0.69197 8.418968,5.305102 8.418968,5.305102 0,0 2.191238,4.324813 6.573714,4.440141 4.382477,0.115328 5.189775,-1.095619 5.189775,-1.095619"
+     id="path5"
+     sodipodi:nodetypes="csscsc" />
+  <path
+     style="fill:none;stroke:#00aae6;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+     d="m 2.4795589,31.23573 c 2.825544,0 6.400722,-3.575178 6.400722,-3.575178 0,0 4.9014541,-5.305103 6.3430581,-10.148893 1.441604,-4.843789 1.845253,-9.9759 2.710215,-4.786125 0.864963,5.189775 1.326276,10.321885 4.497805,12.916772 3.171529,2.594888 11.705825,1.614597 11.705825,1.614597 0,0 3.402185,-0.345985 5.074446,2.940872"
+     id="path6" />
+  <path
+     style="fill:none;fill-opacity:1;stroke:#e60046;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+     d="m 2.2489023,22.449605 c 0,0 2.5372231,-3.805835 4.8437896,-4.324813 6.0591411,-1.363308 6.4007221,3.402186 9.2262661,5.132111 1.552841,0.950719 3.0562,1.153283 8.476631,0.576641 5.420431,-0.576641 3.632843,-2.594887 8.361304,-3.921163 4.728461,-1.326275 5.189774,-1.153283 5.189774,-1.153283"
+     id="path4"
+     sodipodi:nodetypes="cssssc" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Triangle);marker-end:url(#Triangle)"
+     d="M 2.5,3 2.2,37.5 H 37"
+     id="path1"
+     sodipodi:nodetypes="ccc" />
+</svg>

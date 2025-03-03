@@ -26,13 +26,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "find_toolbar_bases",
-    "get_generic_menu_entries",
     "create_generic_toolbar_entry",
 ]
 
 import os
 from pathlib import Path
 
+from pydidas.core.constants import MAIN_WINDOW_MENU_ENTRIES
 from pydidas.core.utils import format_input_to_multiline_str
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
@@ -88,9 +88,17 @@ def create_generic_toolbar_entry(entry):
     dict
         The metadata entry for the reference key.
     """
-    _generic_entries = get_generic_menu_entries()
-    if entry in _generic_entries:
-        return _generic_entries[entry]
+    if entry in MAIN_WINDOW_MENU_ENTRIES:
+        _config = MAIN_WINDOW_MENU_ENTRIES[entry].copy()
+        if isinstance(_config["icon"], str):
+            _config["icon"] = get_pyqt_icon_from_str(_config["icon"])
+        if isinstance(_config["icon_visible"], str):
+            _config["icon_visible"] = get_pyqt_icon_from_str(_config["icon_visible"])
+        if isinstance(_config["icon_invisible"], str):
+            _config["icon_invisible"] = get_pyqt_icon_from_str(
+                _config["icon_invisible"]
+            )
+        return _config
     return {
         "label": format_input_to_multiline_str("Expand " + entry, max_line_length=12),
         "label_invisible": format_input_to_multiline_str(
@@ -107,31 +115,4 @@ def create_generic_toolbar_entry(entry):
             for _path in reversed(Path(entry).parents)
         ]
         + [entry],
-    }
-
-
-def get_generic_menu_entries():
-    """
-    Get the generic menu entries for the MainWindow.
-
-    Note: This dict must be implemented as function return value not to call the
-    qtawesome icon creation without a QApplication.
-
-    Returns
-    -------
-    dict
-        The generic menu entries.
-    """
-    return {
-        "Workflow processing": {
-            "label": "Expand\nWorkflow\nprocessing",
-            "label_visible": "Hide\nworkflow\nprocessing",
-            "label_invisible": "Expand\nworkflow\nprocessing",
-            "icon": get_pyqt_icon_from_str("pydidas::workflow_processing_expand"),
-            "icon_visible": get_pyqt_icon_from_str("pydidas::workflow_processing_hide"),
-            "icon_invisible": get_pyqt_icon_from_str(
-                "pydidas::workflow_processing_expand"
-            ),
-            "menu_tree": ["", "Workflow processing"],
-        }
     }

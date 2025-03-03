@@ -100,6 +100,7 @@ class _GlobalSettingsWindow(PydidasWindow):
         self.create_spacer("spacer_1")
 
         self.create_label("section_memory", "Memory settings", **_section_options)
+        self.create_param_widget(self.get_param("data_buffer_size"), **_param_options)
         self.create_param_widget(self.get_param("shared_buffer_size"), **_param_options)
         self.create_param_widget(self.get_param("max_image_size"), **_param_options)
         self.create_spacer("spacer_3")

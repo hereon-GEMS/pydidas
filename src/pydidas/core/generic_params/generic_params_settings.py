@@ -44,6 +44,19 @@ GENERIC_PARAMS_SETTINGS = {
             "performance increases for multiple parallel processes."
         ),
     },
+    "data_buffer_size": {
+        "type": float,
+        "default": 1500,
+        "name": "Data buffer size",
+        "choices": None,
+        "unit": "MB",
+        "allow_None": False,
+        "tooltip": (
+            "The maximum size of the data buffer (for each display widget). "
+            "Any data which is smaller than the buffer size will be stored in "
+            "memory. Larger data will be read from disk in chunks."
+        ),
+    },
     "shared_buffer_size": {
         "type": float,
         "default": 100,

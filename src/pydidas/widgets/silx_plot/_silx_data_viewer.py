@@ -30,7 +30,7 @@ __all__ = ["SilxDataViewer"]
 from silx.gui.data.DataViewerFrame import DataViewerFrame
 from silx.gui.data.DataViews import PLOT2D_MODE, _ImageView, _StackView
 
-from pydidas.widgets.silx_plot._data_views import _PydidasPlot2dView
+from pydidas.widgets.silx_plot._data_views import Pydidas_Plot2dView
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -42,7 +42,7 @@ class SilxDataViewer(DataViewerFrame):
     def __init__(self, parent=None):
         self.__qtapp = PydidasQApplication.instance()
         super(SilxDataViewer, self).__init__(parent=parent)
-        self.__pydidas_view = _PydidasPlot2dView(self)
+        self.__pydidas_view = Pydidas_Plot2dView(self)
 
         for _view in [_v for _v in self.availableViews() if isinstance(_v, _ImageView)]:
             _success = _view.replaceView(PLOT2D_MODE, self.__pydidas_view)
@@ -53,11 +53,3 @@ class SilxDataViewer(DataViewerFrame):
                 )
         for _view in [_v for _v in self.availableViews() if isinstance(_v, _StackView)]:
             self.removeView(_view)
-
-        # TODO : remove after silx update with pull request #4131 has been released
-        indices = [
-            self._DataViewerFrame__dataViewer._DataViewer__getStackIndex(_view)
-            for _view in self.availableViews()
-        ]
-        if len(indices) != len(set(indices)):
-            raise ValueError("There are duplicate stack indices.")

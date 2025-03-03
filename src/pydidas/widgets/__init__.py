@@ -29,6 +29,7 @@ __status__ = "Production"
 
 from . import (
     controllers,
+    data_viewer,
     dialogues,
     factory,
     framework,
@@ -49,6 +50,7 @@ from .widget_with_parameter_collection import *
 
 __all__ = [
     "controllers",
+    "data_viewer",
     "dialogues",
     "factory",
     "framework",

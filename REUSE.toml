@@ -100,7 +100,13 @@ SPDX-FileCopyrightText = "Andrej Sharapov"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "src/pydidas/resources/mdi_icons/image-lock-outline.svg"
+path = [
+	"src/pydidas/resources/mdi_icons/image-lock-outline.svg",
+	"src/pydidas/resources/mdi_icons/skip-backward.svg",
+	"src/pydidas/resources/mdi_icons/skip-forward.svg",
+	"src/pydidas/resources/mdi_icons/step-backward.svg",
+	"src/pydidas/resources/mdi_icons/step-forward.svg",
+]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Simran"
 SPDX-License-Identifier = "Apache-2.0"

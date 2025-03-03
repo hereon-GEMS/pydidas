@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,36 +20,20 @@ Package with subclassed silx widgets and actions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-from . import silx_actions as actions
-from ._silx_data_viewer import *
-from .pydidas_masktools_widget import *
-from .pydidas_plot1d import *
-from .pydidas_plot2d import *
-from .pydidas_plot2d_with_integration_regions import *
-from .pydidas_plot_stack import *
+
+from .axes_selector import AxesSelector
+from .data_axis_selector import DataAxisSelector
 
 
-__all__ = ["actions", "utilities"] + (
-    pydidas_masktools_widget.__all__
-    + _silx_data_viewer.__all__
-    + pydidas_plot1d.__all__
-    + pydidas_plot2d.__all__
-    + pydidas_plot_stack.__all__
-    + pydidas_plot2d_with_integration_regions.__all__
-)
+__all__ = [axes_selector.__all__ + data_axis_selector.__all__]
 
 # Clean up the namespace:
 del (
-    pydidas_masktools_widget,
-    pydidas_plot1d,
-    pydidas_plot2d,
-    pydidas_plot_stack,
-    pydidas_plot2d_with_integration_regions,
-    pydidas_position_info,  # noqa
-    silx_actions,  # noqa
+    axes_selector,
+    data_axis_selector,
 )

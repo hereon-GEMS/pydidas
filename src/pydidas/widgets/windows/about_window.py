@@ -50,7 +50,7 @@ PYDIDAS_INFO = (
     "A small section of code is adapted from code which is distributed with other, "
     "more permissive licenses and copyrighted by their respective "
     "owners (particularly the ESRF for pyFAI and silx)."
-    "<br><br>pydidas Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+    "<br><br>pydidas Copyright 2020 - 2025, Helmholtz-Zentrum Hereon"
     "<br><br>pydidas homepage: "
     "<a href='https://pydidas.hereon.de/index.php.en'>pydidas.hereon.de</a>"
     "<br><br>pydidas GitHub: "

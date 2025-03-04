@@ -146,6 +146,7 @@ def test_set_data_shape__invalid_type(selector):
 
 def test_set_data_shape__valid(selector):
     _shape = (5, 7, 4)
+    selector._stored_slicings = {1: "test", 2: "test"}
     selector.set_data_shape(_shape)
     assert selector._data_shape == (5, 7, 4)
     assert selector._data_ndim == 3

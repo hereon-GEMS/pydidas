@@ -71,6 +71,7 @@ class AxesSelector(WidgetWithParameterCollection):
         self._current_slice = []
         self._current_display_selection = []
         self._current_transpose_required = None
+
         self._multiline_layout = kwargs.get("multiline_layout", False)
         self._allow_less_dims = kwargs.get("allow_less_dims", False)
         self.layout().setColumnStretch(0, 1)
@@ -152,24 +153,25 @@ class AxesSelector(WidgetWithParameterCollection):
         Create the DataAxisSelector widgets for the axes.
         """
         for _dim in range(self._data_ndim):
-            if _dim not in self._axwidgets:
-                if self._multiline_layout and _dim > 0:
-                    self.create_line(f"line_{_dim}", gridPos=(-1, 0, 1, 1))
-                self.add_any_widget(
-                    f"axis_{_dim}",
-                    DataAxisSelector(_dim, multiline=self._multiline_layout),
-                    gridPos=(-1, 0, 1, 1),
-                    sizePolicy=POLICY_EXP_FIX,
-                )
-                self._current_slice.append(slice(None))
-                self._axwidgets[_dim] = self._widgets[f"axis_{_dim}"]
-                self._axwidgets[_dim].define_additional_choices(
-                    self._additional_choices_str
-                )
-                self._axwidgets[_dim].sig_display_choice_changed.connect(
-                    self._process_new_display_choice
-                )
-                self._axwidgets[_dim].sig_new_slicing.connect(self._update_ax_slicing)
+            if _dim in self._axwidgets:
+                continue
+            if self._multiline_layout and _dim > 0:
+                self.create_line(f"line_{_dim}", gridPos=(-1, 0, 1, 1))
+            self.add_any_widget(
+                f"axis_{_dim}",
+                DataAxisSelector(_dim, multiline=self._multiline_layout),
+                gridPos=(-1, 0, 1, 1),
+                sizePolicy=POLICY_EXP_FIX,
+            )
+            self._current_slice.append(slice(None))
+            self._axwidgets[_dim] = self._widgets[f"axis_{_dim}"]
+            self._axwidgets[_dim].define_additional_choices(
+                self._additional_choices_str
+            )
+            self._axwidgets[_dim].sig_display_choice_changed.connect(
+                self._process_new_display_choice
+            )
+            self._axwidgets[_dim].sig_new_slicing.connect(self._update_ax_slicing)
         for _dim in self._axwidgets:
             self._axwidgets[_dim].setVisible(_dim < self._data_ndim)
             if self._multiline_layout and _dim > 0:
@@ -301,10 +303,8 @@ class AxesSelector(WidgetWithParameterCollection):
             The new display choice.
         """
         if choice in self._additional_choices:
-            print("choice was in additional choices", choice)
             for _dim, _axwidget in self._axwidgets.items():
                 if _dim != axis and _axwidget.display_choice == choice:
-                    print("choice was already selected at", _dim)
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.reset_to_slicing()
         self._verify_additional_choices_selected(axis)
@@ -327,7 +327,6 @@ class AxesSelector(WidgetWithParameterCollection):
         ]
         _curr_selection = ";;".join(self.current_display_selection)
         if not block_signals:
-            print("emitting new slicing", self.current_display_selection)
             self.sig_new_slicing.emit()
             self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 
@@ -354,36 +353,3 @@ class AxesSelector(WidgetWithParameterCollection):
         for _dim in self._axwidgets:
             self._axwidgets[_dim].deleteLater()
         super().closeEvent(event)
-
-
-if __name__ == "__main__":
-    import sys
-
-    import pydidas_qtcore
-    from pydidas.gui import gui_excepthook
-    from pydidas.unittest_objects import create_dataset
-
-    class Printer(QtCore.QObject):
-        @QtCore.Slot(str)
-        def print_slicing(self, slicing: str):
-            print(slicing)
-
-        @QtCore.Slot()
-        def slice_update(self):
-            print("Slicing updated")
-
-    sys.excepthook = gui_excepthook
-    printer = Printer()
-    data = create_dataset(5, float)
-    app = pydidas_qtcore.PydidasQApplication([])
-    window = AxesSelector(multiline_layout=False)
-    window.set_data_shape((3, 4, 6, 7, 5, 6, 8))
-    window.sig_new_slicing_str_repr.connect(printer.print_slicing)
-    window.sig_new_slicing.connect(printer.slice_update)
-    window.set_metadata_from_dataset(data)
-    window.define_additional_choices("window x;;window y")
-    # window.set_data_shape((3, 4, 6))
-    # window.set_axis_metadata(1, 0.6 * np.arange(7), "axis 1", "unit 1")
-    # window._axwidgets[1].define_additional_choices("window x;;window y")
-    window.show()
-    app.exec_()

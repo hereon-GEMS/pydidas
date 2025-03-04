@@ -37,7 +37,8 @@ from pydidas.widgets.data_viewer.data_axis_selector import (
 from pydidas_qtcore import PydidasQApplication
 
 
-_DATA_RANGE = 0.4 * np.arange(20) - 5
+_N_POINTS = 20
+_DATA_RANGE = 0.4 * np.arange(_N_POINTS) - 5
 
 
 @pytest.fixture(scope="module")
@@ -170,6 +171,27 @@ def test_define_additional_choices__w_data_range_set(selector, data_range):
     assert combo_items == expected_choices
 
 
+@pytest.mark.parametrize(
+    "config",
+    [
+        ("slice at index", "use full axis", slice(4, 5)),
+        ("slice at data value", "use full axis", slice(4, 5)),
+        ("choice1", "use full axis", slice(0, _N_POINTS)),
+        ("choice1", "select range by indices", slice(3, 6)),
+        ("choice1", "select range by data values", slice(2, 8)),
+    ],
+)
+def test_restore_old_config(selector, data_range, config, spy_new_slicing):
+    _key, _range_choice, _slice = config
+    selector.set_axis_metadata(data_range, "dummy", "unit")
+    selector.define_additional_choices("choice1;;choice2")
+    selector._stored_configs["choice1;;choice2"] = config
+    selector._restore_old_config("choice1;;choice2")
+    assert selector._widgets["combo_axis_use"].currentText() == _key
+    assert selector._widgets["combo_range"].currentText() == _range_choice
+    assert selector._current_slice == _slice
+
+
 @pytest.mark.parametrize("slicing_choice", _GENERIC_CHOICES)
 @pytest.mark.parametrize("choice", _GENERIC_CHOICES + ["choice1", "choice2"])
 def test_handle_new_axis_use(
@@ -254,6 +276,14 @@ def test_move_to_index__no_change(selector, data_range, spy_new_slicing):
     assert _results == []
 
 
+def test_move_to_index__with_custom_choice(selector, data_range, spy_new_slicing):
+    selector.set_axis_metadata(data_range, "dummy", "unit")
+    selector.define_additional_choices("choice1")
+    selector.display_choice = "choice1"
+    with pytest.raises(UserConfigError):
+        selector._move_to_index(7)
+
+
 @pytest.mark.parametrize("selector", [{"index": 12}], indirect=True)
 def test_move_to_index(selector, data_range, spy_new_slicing):
     _index = 7
@@ -317,6 +347,10 @@ def test_handle_new_index_range_selection__correct_input(
     assert _results[0] == [0, f"{input[1]}:{input[2]}"]
     assert selector._current_slice == slice(input[1], input[2])
     assert selector._widgets["edit_range_index"].text() == f"{input[1]}:{input[2] - 1}"
+    assert (
+        selector._widgets["edit_range_data"].text()
+        == f"{data_range[input[1]]:.4f}:{data_range[input[2] - 1]:.4f}"
+    )
 
 
 @pytest.mark.parametrize("input", ["0:", "", ":-3", "a:5"])
@@ -350,6 +384,7 @@ def test_handle_new_data_range_selection(selector, input, spy_new_slicing, data_
         selector._widgets["edit_range_data"].text()
         == f"{_DATA_RANGE[input[1]]:.4f}:{_DATA_RANGE[input[2] - 1]:.4f}"
     )
+    assert selector._widgets["edit_range_index"].text() == f"{input[1]}:{input[2] - 1}"
 
 
 @pytest.mark.parametrize("input", ["0.0:", "", ":-3.", "a:5"])

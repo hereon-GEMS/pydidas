@@ -52,7 +52,6 @@ class DataViewer(WidgetWithParameterCollection):
     """
     The DataViewer allows to display data in multiple display modes.
     """
-
     def __init__(self, parent: Optional[QtWidgets.QWidget] = None, **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
 
@@ -64,6 +63,7 @@ class DataViewer(WidgetWithParameterCollection):
             _key: DATA_VIEW_CONFIG[_key]["view"](None)
             for _key in DATA_VIEW_CONFIG.keys()
         }
+        self.__use_multilines = kwargs.get("multiline_layout", False)
         self._create_widgets()
 
     def _create_widgets(self):
@@ -113,7 +113,8 @@ class DataViewer(WidgetWithParameterCollection):
         )
         if _view_config["use_axes_selector"]:
             _selector = AxesSelector(
-                allow_less_dims=DATA_VIEW_REFS["view-table"] == view_id
+                allow_less_dims=DATA_VIEW_REFS["view-table"] == view_id,
+                multiline_layout=self.__use_multilines,
             )
             self.add_any_widget(
                 f"view_{view_id}_ax_selector",
@@ -219,7 +220,7 @@ if __name__ == "__main__":
     sys.excepthook = gui_excepthook
     data = create_dataset(5, float)
     app = pydidas_qtcore.PydidasQApplication([])
-    window = DataViewer()
+    window = DataViewer(multiline_layout=True)
     window.set_data(data)
     window.show()
     app.exec_()

@@ -73,6 +73,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._data_label = ""
         self._external_display_choices = ""
         self._all_choices = ["slice at index"]
+        self._stored_configs = {}
         self._use_multiline = kwargs.get("multiline", False)
         self._last_slicing_at_index = True
         self._create_widgets()
@@ -267,6 +268,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             self._widgets["edit_range_data"].setText(
                 f"{self._data_range[0]:.4f}:{self._data_range[-1]:.4f}"
             )
+        self._stored_configs = {}
         self.define_additional_choices(self._external_display_choices)
 
     @QtCore.Slot(str)
@@ -281,6 +283,11 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         choices : str
             The new choices for the combobox as a single string.
         """
+        self._stored_configs[self._external_display_choices] = (
+            self._widgets["combo_axis_use"].currentText(),
+            self._widgets["combo_range"].currentText(),
+            self.current_slice,
+        )
         self._external_display_choices = choices
         _old_choice = self._widgets["combo_axis_use"].currentText()
         self._all_choices = ["slice at index"]
@@ -298,6 +305,25 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             self._widgets["combo_axis_use"].currentTextChanged.emit(
                 self._widgets["combo_axis_use"].currentText()
             )
+        if choices in self._stored_configs:
+            self._restore_old_config(choices)
+
+    def _restore_old_config(self, choices: str):
+        """
+        Restore the configuration, based on the available choices.
+        """
+        _ax_use, _range_choice, _slice = self._stored_configs[choices]
+        with QtCore.QSignalBlocker(self):
+            self._widgets["combo_axis_use"].setCurrentText(_ax_use)
+            self._widgets["combo_range"].setCurrentText(_range_choice)
+            if _slice.stop - _slice.start == 1:
+                self._move_to_index(_slice.start)
+            else:
+                self._current_slice = _slice
+                self._widgets["edit_range_index"].setText(
+                    f"{_slice.start}:{_slice.stop - 1}"
+                )
+                self._handle_new_index_range_selection()
 
     @QtCore.Slot(str)
     def _handle_new_axis_use(self, use_selection: str):
@@ -446,6 +472,10 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         index : int
             The new index.
         """
+        if self._widgets["combo_axis_use"].currentText() not in _GENERIC_CHOICES:
+            raise UserConfigError(
+                "Cannot move to individual index for a range-selecting choice."
+            )
         if index == self._current_slice.start:
             return
         with QtCore.QSignalBlocker(self._widgets["slider"]):
@@ -494,6 +524,10 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         if (_start, _stop) == (self._current_slice.start, self._current_slice.stop):
             return
         self._current_slice = slice(_start, _stop)
+        with QtCore.QSignalBlocker(self._widgets["edit_range_data"]):
+            self._widgets["edit_range_data"].setText(
+                f"{self._data_range[_start]:.4f}:{self._data_range[_stop - 1]:.4f}"
+            )
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
     @QtCore.Slot()
@@ -520,6 +554,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         if (_start, _stop) == (self._current_slice.start, self._current_slice.stop):
             return
         self._current_slice = slice(_start, _stop)
+        with QtCore.QSignalBlocker(self._widgets["edit_range_index"]):
+            self._widgets["edit_range_index"].setText(f"{_start}:{_stop - 1}")
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
     def _check_edit_range_input(self, edit_name: str):
@@ -549,22 +585,3 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         for child in self.findChildren(QtWidgets.QWidget):
             child.deleteLater()
         QtWidgets.QWidget.closeEvent(self, event)
-
-
-if __name__ == "__main__":
-    import sys
-
-    import pydidas_qtcore
-    from pydidas.gui import gui_excepthook
-
-    sys.excepthook = gui_excepthook
-
-    app = pydidas_qtcore.PydidasQApplication([])
-    window = DataAxisSelector(0, multiline=False)
-    window.set_axis_metadata(
-        0.643 * np.arange(20), "Distance and other things to be used", "m"
-    )
-    window.define_additional_choices("choice1;;choice2")
-    window.display_choice = "slice at data value"
-    window.show()
-    app.exec_()

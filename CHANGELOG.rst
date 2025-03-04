@@ -83,6 +83,8 @@ Bugfixes
 - Fixed a bug where WorkflowResults could not be exported again after import.
 - Fixed an issue where the Fit plugin would not store the background at the peak
   positions correctly.
+- Fixed an issue where a given y label in a Plot1D was overwritten by Dataset
+  metadata.
 
 
 

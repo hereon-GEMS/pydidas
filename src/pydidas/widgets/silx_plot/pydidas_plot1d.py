@@ -104,8 +104,14 @@ class PydidasPlot1D(Plot1D):
 
         self._plot_config = {
             "ax_label_x": data.get_axis_description(0),
-            "ax_label_y": self._y_label(
-                data.axis_labels[0], data.axis_units[0], data.data_label, data.data_unit
+            "ax_label_y": kwargs.get(
+                "ylabel",
+                self._y_label(
+                    data.axis_labels[0],
+                    data.axis_units[0],
+                    data.data_label,
+                    data.data_unit,
+                ),
             ),
             "kwargs": {
                 "linewidth": 1.5,

@@ -85,6 +85,7 @@ Bugfixes
   positions correctly.
 - Fixed an issue where a given y label in a Plot1D was overwritten by Dataset
   metadata.
+- Fixed an issue in Dataset where calling .T would not transpose the axis metadata.
 
 
 

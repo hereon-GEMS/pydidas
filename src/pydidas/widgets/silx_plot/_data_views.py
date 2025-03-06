@@ -42,7 +42,7 @@ from silx.gui.data.DataViews import (
 )
 from silx.gui.utils import blockSignals
 
-from pydidas.core import Dataset
+from pydidas.core import Dataset, PydidasQsettings, UserConfigError
 from pydidas.widgets.silx_plot.pydidas_plot1d import PydidasPlot1D
 from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
@@ -55,6 +55,7 @@ DATA_VIEW_AXES_NAMES = {
     "_StackView": ["depth", "use as image y-axis", "use as image x-axis"],
     "_NXdataScalarView": ["use as column", "use as row"],
 }
+_QSETTINGS = PydidasQsettings()
 
 
 class PydidasImageDataView(CompositeDataView):
@@ -140,6 +141,7 @@ class Pydidas_Plot1dGroupView(Pydidas_Plot1dView):
         data : Dataset
             The data to display.
         """
+        self._check_data_dimensions(data)
         self.clear()
         if not isinstance(data, Dataset):
             data = Dataset(data)
@@ -161,8 +163,31 @@ class Pydidas_Plot1dGroupView(Pydidas_Plot1dView):
             )
         _widget.setActiveCurve("data")
 
+    def _check_data_dimensions(self, data: Dataset):
+        """
+        Check the data dimensions.
 
-# class Pydidas_RawView(_RawView):
+        Parameters
+        ----------
+        data : Dataset
+            The data to display.
+        """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition:\n The input data has {data.ndim} "
+                "dimensions."
+            )
+        _nmax = _QSETTINGS.value("user/max_number_curves", int)
+        if data.shape[0] > _nmax:
+            raise UserConfigError(
+                f"The number of given curves ({data.shape[0]}) exceeds the maximum "
+                f"number of curves allowed ({_nmax}). \n"
+                "Please limit the data range to be displayed or increase the maximum "
+                "number of curves in the user settings (Options -> User config). "
+                "Please note that displaying a large number of curves will slow down "
+                "the plotting performance."
+            )
 
 
 def _DataView_axes_names(self, label, data, info):

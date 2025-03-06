@@ -27,13 +27,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["get_ViewResultsFrame_build_config"]
 
-from qtpy import QtCore
 
-from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.data_viewer import DataViewer, TableWithResultDatasets
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.misc import ReadOnlyTextWidget
 
 
 def get_ViewResultsFrame_build_config(
@@ -66,135 +62,11 @@ def get_ViewResultsFrame_build_config(
         ],
         ["create_spacer", ("title_spacer",), {"fixedHeight": 15}],
         [
-            "create_empty_widget",
-            ("config",),
-            {
-                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
-                "parent_widget": None,
-                "sizePolicy": POLICY_FIX_EXP,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("config_area", ScrollArea),
-            {
-                "sizePolicy": POLICY_FIX_EXP,
-            },
-        ],
-        [
             "create_button",
             ("but_load", "Import results from directory"),
-            {"icon": "qt-std::SP_DialogOpenButton", "parent_widget": "config"},
-        ],
-        [
-            "create_spacer",
-            ("title_spacer",),
-            {"fixedHeight": 15, "parent_widget": "config"},
-        ],
-        [
-            "create_label",
-            ("label_select_header", "Select results to display:"),
             {
-                "bold": True,
-                "fontsize_offset": 1,
-                "parent_widget": "config",
-                "visible": False,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("result_table", TableWithResultDatasets),
-            {"parent_widget": "config", "visible": False},
-        ],
-        [
-            "create_spacer",
-            ("arrangement_spacer",),
-            {"fixedHeight": 15, "parent_widget": "config"},
-        ],
-        [
-            "create_radio_button_group",
-            ("radio_arrangement", ["by scan shape", "as a timeline"]),
-            {
-                "title": "Arrangement of results:",
-                "parent_widget": "config",
-                "vertical": False,
-                "visible": False,
-            },
-        ],
-        [
-            "create_spacer",
-            ("info_spacer",),
-            {"fixedHeight": 15, "parent_widget": "config"},
-        ],
-        [
-            "create_label",
-            ("label_details", "Detailed result information:"),
-            {
-                "bold": True,
-                "fontsize_offset": 1,
-                "parent_widget": "config",
-                "visible": False,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("result_info", ReadOnlyTextWidget),
-            {
-                "alignment": QtCore.Qt.AlignTop,
-                "font_metric_height_factor": 25,
+                "icon": "qt-std::SP_DialogOpenButton",
                 "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
-                "parent_widget": "config",
-                "visible": False,
-            },
-        ],
-        [
-            "create_spacer",
-            ("config_export_spacer",),
-            {"parent_widget": "config"},
-        ],
-        [
-            "create_param_widget",
-            (frame.get_param("saving_format"),),
-            {"parent_widget": "config", "visible": False},
-        ],
-        [
-            "create_param_widget",
-            (frame.get_param("enable_overwrite"),),
-            {"parent_widget": "config", "visible": False},
-        ],
-        [
-            "create_button",
-            ("but_export_current", "Export current node results"),
-            {
-                "enabled": False,
-                "icon": "qt-std::SP_FileIcon",
-                "parent_widget": "config",
-                "toolTip": (
-                    "Export the current node's results to file. Note that the "
-                    "filenames are pre-determined based on node ID and node label."
-                ),
-                "visible": False,
-            },
-        ],
-        [
-            "create_button",
-            ("but_export_all", "Export all results"),
-            {
-                "enabled": False,
-                "icon": "qt-std::SP_DialogSaveButton",
-                "parent_widget": "config",
-                "tooltip": "Export all results. Note that the directory must be empty.",
-                "visible": False,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("data_viewer", DataViewer),
-            {
-                "plot2d_diffraction_exp": frame._EXP,
-                "plot2d_use_data_info_action": True,
-                "gridPos": (0, 1, 3, 1),
-                "visible": False,
             },
         ],
     ]

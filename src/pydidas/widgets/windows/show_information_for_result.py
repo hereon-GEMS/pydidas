@@ -33,7 +33,7 @@ from pathlib import Path
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import UserConfigError
-from pydidas.core.constants import FONT_METRIC_CONSOLE_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import ShowBusyMouse, get_fixed_length_str
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.factory import CreateWidgetsMixIn
@@ -61,68 +61,85 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             "Information for selected data point:",
             bold=True,
             fontsize_offset=4,
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+            gridPos=(0, 0, 1, 2),
+        )
+        self.create_empty_widget("filename_container", gridPos=(-1, 0, 1, 2))
+        self.create_label(
+            "label_filename",
+            "Filename:",
+            bold=True,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
+            parent_widget="filename_container",
+        )
+        self.create_lineedit(
+            "edit_filename",
+            parent_widget="filename_container",
+            readOnly=True,
         )
         self.create_any_widget(
             "info_field",
             ReadOnlyTextWidget,
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
-            font_metric_height_factor=15,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
+            minimumHeight=300,
         )
         self.create_button(
             "but_show_input",
             "Show input frame",
             clicked=self.show_input_image,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
+            gridPos=(-1, 0, 1, 1),
         )
         self.create_any_widget(
-            "plot", PydidasPlotStack, visible=False, minimumHeight=600
+            "plot",
+            PydidasPlotStack,
+            visible=False,
+            minimumHeight=600,
+            minimumWidth=600,
+            gridPos=(2, 1, self.layout().rowCount() - 2, 1),
         )
         QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )
+        self.layout().setColumnStretch(1, 1)
 
     def display_information(
         self,
-        data: tuple,
-        selection_config: dict,
+        position: tuple,
+        active_dims: tuple,
+        selected_indices: list,
         result_metadata: dict,
         loader_plugin: BasePlugin,
+        use_timeline: bool = False,
     ):
         """
         Display the information about the selected datapoint.
 
         Parameters
         ----------
-        data : tuple
+        position : tuple
             A 2-tuple with the data position selected in the image.
-        selection_config : dict
-            Dictionary with information about the data selection.
+        active_dims : tuple
+            A 2-tuple with the active dimensions of the selection,
+            i.e. the dimensions in which the position is defined.
+        selected_indices : list
+            The selected indices of the full result dataset. This will be integers
+            for inactive dimensions and None for the active dimensions.
         result_metadata : dict
             The metadata of the results.
         loader_plugin : pydidas.plugins.BaseInputPlugin
             The input plugin associated with the results. Required to display the
             input image.
-        param_values : dict
-            The parameter values of the result selections.
+        use_timeline : bool
+            If True, the timeline index will be used to get the frame index.
         """
         self._loader_plugin = loader_plugin.copy()
         self._loader_plugin.update_filename_string()
         _scan = self._loader_plugin._SCAN
         _ax_ranges = result_metadata["axis_ranges"]
-        _dim_selections = []
-        for _dim in range(len(result_metadata["shape"])):
-            if _dim == selection_config["active_dims"][0]:
-                _index = (abs(_ax_ranges[_dim] - data[0])).argmin()
-            elif _dim == selection_config["active_dims"][1]:
-                _index = (abs(_ax_ranges[_dim] - data[1])).argmin()
-            else:
-                _val = float(selection_config[f"plot_slice_{_dim}"])
-                _index = (
-                    abs(_ax_ranges[_dim] - _val).argmin()
-                    if selection_config["selection_by_data_values"]
-                    else int(_val)
-                )
-            _dim_selections.append(_index)
+        _index_y = (abs(_ax_ranges[active_dims[0]] - position[1])).argmin()
+        selected_indices[active_dims[0]] = _index_y
+        _index_x = (abs(_ax_ranges[active_dims[1]] - position[0])).argmin()
+        selected_indices[active_dims[1]] = _index_x
 
         _info_str = "Selected data position:\n" + "\n".join(
             get_fixed_length_str(
@@ -132,12 +149,12 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
                 _ax_ranges[_dim][_index], 12, formatter="{:.5f}", fill_back=False
             )
             + f" {result_metadata['axis_units'][_dim]}"
-            for _dim, _index in enumerate(_dim_selections)
+            for _dim, _index in enumerate(selected_indices)
         )
         self._frame = (
-            _dim_selections[0]
-            if selection_config["use_timeline"]
-            else _scan.get_frame_from_indices(_dim_selections[: _scan.ndim])
+            selected_indices[0]
+            if use_timeline
+            else _scan.get_frame_from_indices(selected_indices[: _scan.ndim])
         )
         self._index = _scan.get_index_of_frame(self._frame)
         _scan_indices = _scan.get_frame_position_in_scan(self._frame)
@@ -153,15 +170,16 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
                 + get_fixed_length_str(_index, 6, fill_back=False, formatter="{:d}")
                 for _dim, _index in enumerate(_scan_indices)
             )
-            + "\n\nFilename:\n... "
-            + loader_plugin.get_filename(self._frame)
         )
         if "_counted_images_per_file" in loader_plugin.params:
             _index = self._frame % loader_plugin.get_param_value(
                 "_counted_images_per_file"
             )
-            _info_str += "\n" + get_fixed_length_str("Frame in file:", 18) + str(_index)
+            _info_str += (
+                "\n\n" + get_fixed_length_str("Frame in file:", 18) + str(_index)
+            )
         self._widgets["info_field"].setText(_info_str)
+        self._widgets["edit_filename"].setText(loader_plugin.get_filename(self._frame))
         self._widgets["but_show_input"].setEnabled(True)
         self._widgets["plot"].setVisible(False)
         self.show()

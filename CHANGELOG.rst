@@ -55,6 +55,8 @@ Improvements
 - Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
   (for the general class) and WorkflowResults (for the singleton instance)
   for consistency, similarly to ProcessingTree and WorkflowTree.
+- Modified the ViewResultsFrame to use the new DataViewer for more 
+  convenient data exploration.
 
 
 Bugfixes

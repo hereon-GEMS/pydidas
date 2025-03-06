@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["DataAxisSelector"]
+__all__ = ["DataAxisSelector", "GENERIC_AXIS_SELECTOR_CHOICES"]
 
 
 from functools import partial
@@ -47,7 +47,7 @@ from pydidas.widgets.widget_with_parameter_collection import (
 )
 
 
-_GENERIC_CHOICES = ["slice at index", "slice at data value"]
+GENERIC_AXIS_SELECTOR_CHOICES = ["slice at index", "slice at data value"]
 
 
 class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
@@ -269,10 +269,12 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 f"{self._data_range[0]:.4f}:{self._data_range[-1]:.4f}"
             )
         self._stored_configs = {}
-        self.define_additional_choices(self._external_display_choices)
+        self.define_additional_choices(
+            self._external_display_choices, store_config=False
+        )
 
     @QtCore.Slot(str)
-    def define_additional_choices(self, choices: str):
+    def define_additional_choices(self, choices: str, store_config: bool = True):
         """
         Set additional choices for the combobox.
 
@@ -282,12 +284,15 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         ----------
         choices : str
             The new choices for the combobox as a single string.
+        store_config : bool
+            If True, the current configuration will be stored.
         """
-        self._stored_configs[self._external_display_choices] = (
-            self._widgets["combo_axis_use"].currentText(),
-            self._widgets["combo_range"].currentText(),
-            self.current_slice,
-        )
+        if store_config:
+            self._stored_configs[self._external_display_choices] = (
+                self._widgets["combo_axis_use"].currentText(),
+                self._widgets["combo_range"].currentText(),
+                self.current_slice,
+            )
         self._external_display_choices = choices
         _old_choice = self._widgets["combo_axis_use"].currentText()
         self._all_choices = ["slice at index"]
@@ -342,7 +347,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             self._last_slicing_at_index = False
         elif use_selection == "slice at index":
             self._last_slicing_at_index = True
-        _show_slider = use_selection in _GENERIC_CHOICES
+        _show_slider = use_selection in GENERIC_AXIS_SELECTOR_CHOICES
         for _key in [
             "slider",
             "button_start",
@@ -352,7 +357,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         ]:
             self._widgets[_key].setVisible(_show_slider)
         _range_selection = self._widgets["combo_range"].currentText()
-        _show_range = use_selection not in _GENERIC_CHOICES
+        _show_range = use_selection not in GENERIC_AXIS_SELECTOR_CHOICES
         self._widgets["combo_range"].setVisible(_show_range)
         self._widgets["edit_range_index"].setVisible(
             _range_selection == "select range by indices" and _show_range
@@ -361,7 +366,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             _range_selection == "select range by data values" and _show_range
         )
         with QtCore.QSignalBlocker(self):
-            if use_selection not in _GENERIC_CHOICES:
+            if use_selection not in GENERIC_AXIS_SELECTOR_CHOICES:
                 self._update_slice_from_non_generic_choice()
             elif use_selection == "slice at data value":
                 self._manual_data_value_changed()
@@ -472,7 +477,10 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         index : int
             The new index.
         """
-        if self._widgets["combo_axis_use"].currentText() not in _GENERIC_CHOICES:
+        if (
+            self._widgets["combo_axis_use"].currentText()
+            not in GENERIC_AXIS_SELECTOR_CHOICES
+        ):
             raise UserConfigError(
                 "Cannot move to individual index for a range-selecting choice."
             )

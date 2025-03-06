@@ -29,7 +29,6 @@ __all__ = ["DataAxisSelector", "GENERIC_AXIS_SELECTOR_CHOICES"]
 
 
 from functools import partial
-from typing import Optional
 
 import numpy as np
 from numpy import ndarray
@@ -61,13 +60,14 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     sig_display_choice_changed = QtCore.Signal(int, str)
 
     def __init__(
-        self, index: int, parent: Optional[QtWidgets.QWidget] = None, **kwargs: dict
+        self, index: int, parent: QtWidgets.QWidget | None = None, **kwargs: dict
     ):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
         PydidasWidgetMixin.__init__(self, **kwargs)
         self._axis_index = index
         self._current_slice = slice(0, 1)
         self._npoints = 0
+        self._ndim = None
         self._data_range = None
         self._data_unit = ""
         self._data_label = ""
@@ -152,7 +152,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         return self._data_unit
 
     @property
-    def data_range(self) -> Optional[ndarray]:
+    def data_range(self) -> ndarray | None:
         """Get the axis values. If not specified, this will be None."""
         return self._data_range
 
@@ -221,17 +221,18 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     @QtCore.Slot(ndarray, str, str)
     def set_axis_metadata(
         self,
-        data_range: Optional[ndarray],
+        data_range: ndarray | None,
         label: str = "",
         unit: str = "",
-        npoints: Optional[int] = None,
+        npoints: int | None = None,
+        ndim: int | None = None,
     ):
         """
         Set the metadata for the axis.
 
         Parameters
         ----------
-        data_range : Optional[ndarray]
+        data_range : ndarray, optional
             The axis values. If None, selecting by data value is disabled.
         label : str, optional
             The label of the axis.
@@ -240,6 +241,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         npoints : int, optional
             The number of points in the axis. This is only required if data_range
             is None and ignored if data_range is given.
+        ndim : int, optional
+            The number of dimensions in the data. This is only required if the
+            generic choices should be hidden.
         """
         if data_range is None:
             if npoints is None:
@@ -248,6 +252,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             self._npoints = npoints
         else:
             self._npoints = data_range.size
+        self._ndim = ndim
         self._data_range = data_range
         self._data_unit = unit if unit is not None else ""
         self._data_label = label if label is not None else ""
@@ -295,12 +300,13 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             )
         self._external_display_choices = choices
         _old_choice = self._widgets["combo_axis_use"].currentText()
-        self._all_choices = ["slice at index"]
-        if self._data_range is not None:
-            self._all_choices.append("slice at data value")
-        self._all_choices.extend(
-            [_item for _item in choices.split(";;") if len(_item) > 0]
-        )
+        _new_choices = [_item for _item in choices.split(";;") if len(_item) > 0]
+        self._all_choices = []
+        if self._ndim is None or self._ndim > len(_new_choices):
+            self._all_choices.append("slice at index")
+            if self._data_range is not None:
+                self._all_choices.append("slice at data value")
+        self._all_choices.extend(_new_choices)
         with QtCore.QSignalBlocker(self._widgets["combo_axis_use"]):
             self._widgets["combo_axis_use"].clear()
             self._widgets["combo_axis_use"].addItems(self._all_choices)

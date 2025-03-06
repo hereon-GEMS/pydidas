@@ -280,6 +280,27 @@ def test_define_additional_choices__existing_choices(selector, data):
         assert "choice4" in _item.available_choices
 
 
+@pytest.mark.parametrize("nchoices", [2, 3, 4, 5])
+def test_define_additional_choices__no_generic_choices(selector, nchoices):
+    _choices = ";;".join([f"choice{i}" for i in range(nchoices)])
+    data = create_dataset(nchoices, dtype=float)
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices(_choices)
+    assert set(selector.current_display_selection) == set(_choices.split(";;"))
+
+
+@pytest.mark.parametrize("nchoices", [2, 3, 4, 5])
+def test_define_additional_choices__w_generic_choices(selector, nchoices):
+    _choices = ";;".join([f"choice{i}" for i in range(nchoices)])
+    data = create_dataset(nchoices + 3, dtype=float)
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices(_choices)
+    assert set(selector.current_display_selection) == {"slice at index"}.union(
+        set(_choices.split(";;"))
+    )
+    assert selector.current_display_selection.count("slice at index") == 3
+
+
 def test_define_additional_choices__values_set_in_widgets(selector, data):
     selector.set_metadata_from_dataset(data)
     selector._additional_choices = "choice1;;choice2"
@@ -367,12 +388,57 @@ def test_update_ax_slicing(selector, data, spy_new_slicing, spy_new_slicing_str)
     assert "3::3:4" in _get_spy_results(spy_new_slicing_str)[0][0]
 
 
-def test__integration_change_axis(selector, data, spy_new_slicing, spy_new_slicing_str):
+def test__integration__change_axis(
+    selector, data, spy_new_slicing, spy_new_slicing_str
+):
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
     selector._axwidgets[0].display_choice = "slice at index"
     assert len(_get_spy_results(spy_new_slicing)) == 1
     assert len(_get_spy_results(spy_new_slicing_str)) == 1
+
+
+def test__integration__unselect_choice(selector, spy_new_slicing, spy_new_slicing_str):
+    data = create_dataset(2, dtype=float)
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    with pytest.raises(ValueError):
+        selector._axwidgets[0].display_choice = "slice at index"
+
+
+def test__integration__swap_choices(selector, spy_new_slicing, spy_new_slicing_str):
+    data = create_dataset(2, dtype=float)
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    selector._axwidgets[0].display_choice = "choice2"
+    assert "choice1" in selector.current_display_selection
+    assert "choice2" in selector.current_display_selection
+    assert len(_get_spy_results(spy_new_slicing)) == 1
+    assert len(_get_spy_results(spy_new_slicing_str)) == 1
+
+
+def test__integration__swap_choices_case2(
+    selector, spy_new_slicing, spy_new_slicing_str
+):
+    data = create_dataset(2, dtype=float)
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    selector._axwidgets[1].display_choice = "choice1"
+    assert selector.current_display_selection == ("choice2", "choice1")
+    assert len(_get_spy_results(spy_new_slicing)) == 1
+    assert len(_get_spy_results(spy_new_slicing_str)) == 1
+
+
+def test__integration__change_dataset(selector, spy_new_slicing, spy_new_slicing_str):
+    data2 = create_dataset(2, dtype=float, shape=(19 * 21, 4))
+    data3 = create_dataset(3, dtype=float, shape=(19, 21, 4))
+    selector.set_metadata_from_dataset(data3)
+    selector.set_metadata_from_dataset(data2)
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(data3)
+    assert set(selector.current_display_selection) == set(
+        ("slice at index", "choice1", "choice2")
+    )
 
 
 if __name__ == "__main__":

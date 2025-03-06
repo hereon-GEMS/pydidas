@@ -27,8 +27,6 @@ __status__ = "Production"
 __all__ = ["AxesSelector"]
 
 
-from typing import Optional
-
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
@@ -61,7 +59,7 @@ class AxesSelector(WidgetWithParameterCollection):
     sig_new_slicing = QtCore.Signal()
     sig_new_slicing_str_repr = QtCore.Signal(str, str)
 
-    def __init__(self, parent: Optional[QtWidgets.QWidget] = None, **kwargs: dict):
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
         self._axwidgets = {}
         self._data_shape = ()
@@ -147,7 +145,9 @@ class AxesSelector(WidgetWithParameterCollection):
         self._data_ndim = len(shape)
         self._create_data_axis_selectors()
         for _dim, _npoints in enumerate(shape):
-            self._axwidgets[_dim].set_axis_metadata(None, "", "", npoints=_npoints)
+            self._axwidgets[_dim].set_axis_metadata(
+                None, "", "", npoints=_npoints, ndim=self._data_ndim
+            )
 
     def _create_data_axis_selectors(self):
         """
@@ -185,10 +185,10 @@ class AxesSelector(WidgetWithParameterCollection):
     def set_axis_metadata(
         self,
         axis: int,
-        data_range: Optional[np.ndarray],
+        data_range: np.ndarray | None,
         label: str = "",
         unit: str = "",
-        npoints: Optional[int] = None,
+        npoints: int | None = None,
     ):
         """
         Set the metadata for an axis.
@@ -197,7 +197,7 @@ class AxesSelector(WidgetWithParameterCollection):
         ----------
         axis : int
             The axis index.
-        data_range : Optional[np.ndarray]
+        data_range : np.ndarray, optional
             The data range for the axis. Set to None, if no metadata for the
             range is available.
         label : str, optional
@@ -213,7 +213,9 @@ class AxesSelector(WidgetWithParameterCollection):
                 f"The axis `{axis}` not defined in the AxesSelector. Please update "
                 "the data shape first."
             )
-        self._axwidgets[axis].set_axis_metadata(data_range, label, unit, npoints)
+        self._axwidgets[axis].set_axis_metadata(
+            data_range, label, unit, npoints=npoints, ndim=self._data_ndim
+        )
 
     def set_metadata_from_dataset(self, dataset: Dataset):
         """
@@ -280,19 +282,51 @@ class AxesSelector(WidgetWithParameterCollection):
         """
         for _choice in self._additional_choices:
             self._current_display_selection = []
-            if _choice in self.current_display_selection:
-                continue
-            for _dim, _axwidget in self._axwidgets.items():
-                if (
-                    _dim != ignore_ax
-                    and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
-                ):
-                    with QtCore.QSignalBlocker(_axwidget):
-                        _axwidget.display_choice = _choice
-                    break
+            if self.current_display_selection.count(_choice) > 1:
+                self._change_duplicate_choices(ignore_ax, _choice)
+
+            self._current_display_selection = []
+            if self.current_display_selection.count(_choice) == 0:
+                for _dim, _axwidget in self._axwidgets.items():
+                    if (
+                        _dim != ignore_ax
+                        and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
+                    ):
+                        with QtCore.QSignalBlocker(_axwidget):
+                            _axwidget.display_choice = _choice
+                        break
         self._current_display_selection = []
         self._current_transpose_required = None
         self.process_new_slicing(block_signals)
+
+    def _change_duplicate_choices(self, ignore_ax: int, choice: str):
+        """
+        Change duplicate choices in the current display selection.
+
+        Parameters
+        ----------
+        ignore_ax : int
+            The axis dimension to be ignored.
+        choice : str
+            The current choice to be replaced.
+        """
+        _dim_where_selected = [
+            _dim for _dim, _key in enumerate(self.current_display_selection)
+        ]
+        if ignore_ax in _dim_where_selected:
+            _dim_where_selected.remove(ignore_ax)
+        else:
+            _dim_where_selected = _dim_where_selected[1:]
+        _other_choices = [_c for _c in self._additional_choices if _c != choice]
+        if len(_other_choices) < len(_dim_where_selected):
+            if self._data_ndim == len(self._additional_choices):
+                raise ValueError("Cannot set the additional choices for all axes.")
+            _other_choices = _other_choices + ["slice at index"] * (
+                len(_dim_where_selected) - len(_other_choices)
+            )
+        for _i, _dim in enumerate(_dim_where_selected):
+            with QtCore.QSignalBlocker(self._axwidgets[_dim]):
+                self._axwidgets[_dim].display_choice = _other_choices[_i]
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):

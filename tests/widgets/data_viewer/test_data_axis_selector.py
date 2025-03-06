@@ -174,6 +174,24 @@ def test_define_additional_choices__w_data_range_set(selector, data_range):
 
 
 @pytest.mark.parametrize(
+    "ndims", [[None, True], [1, False], [2, False], [3, True], [4, True]]
+)
+def test_define_additional_choices__w_ndim_set(selector, data_range, ndims):
+    _ndim, _expected_generic_choices = ndims
+    selector.set_axis_metadata(data_range, "dummy", "unit", ndim=_ndim)
+    choices = "choice1;;choice2"
+    selector.define_additional_choices(choices)
+    expected_choices = ["choice1", "choice2"]
+    if _expected_generic_choices:
+        expected_choices = GENERIC_AXIS_SELECTOR_CHOICES + expected_choices
+    combo_items = [
+        selector._widgets["combo_axis_use"].itemText(i)
+        for i in range(selector._widgets["combo_axis_use"].count())
+    ]
+    assert combo_items == expected_choices
+
+
+@pytest.mark.parametrize(
     "config",
     [
         ("slice at index", "use full axis", slice(4, 5)),

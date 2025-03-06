@@ -26,8 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DataViewer"]
 
+
 from functools import partial
-from typing import Optional, Union
 
 import h5py
 import numpy as np
@@ -62,7 +62,7 @@ class DataViewer(WidgetWithParameterCollection):
     ]
     sig_plot2d_get_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, parent: Optional[QtWidgets.QWidget] = None, **kwargs: dict):
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
 
         self._data = None
@@ -241,13 +241,13 @@ class DataViewer(WidgetWithParameterCollection):
             _view.select()
             _view.setData(_data)
 
-    def set_data(self, data: Union[H5Node, h5py.Dataset, np.ndarray, None]):
+    def set_data(self, data: H5Node | h5py.Dataset | np.ndarray | None):
         """
         Set the data to display
 
         Parameters
         ----------
-        data : np.ndarray
+        data : H5Node | h5py.Dataset | np.ndarray | None
             The data to display. A ndarray is acceptable but will be converted to a
             Dataset object.
         """
@@ -287,19 +287,3 @@ class DataViewer(WidgetWithParameterCollection):
     def deleteLater(self):
         for _widget in self.findChildren(QtWidgets.QWidget):
             _widget.deleteLater()
-
-
-if __name__ == "__main__":
-    import sys
-
-    import pydidas_qtcore
-    from pydidas.gui import gui_excepthook
-    from pydidas.unittest_objects import create_dataset
-
-    sys.excepthook = gui_excepthook
-    data = create_dataset(5, float)
-    app = pydidas_qtcore.PydidasQApplication([])
-    window = DataViewer(multiline_layout=False)
-    window.set_data(data)
-    window.show()
-    app.exec_()

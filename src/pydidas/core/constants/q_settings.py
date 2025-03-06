@@ -49,6 +49,7 @@ QSETTINGS_GLOBAL_KEYS = [
 QSETTINGS_USER_KEYS = [
     "mosaic_border_width",
     "mosaic_border_value",
+    "max_number_curves",
     "histogram_outlier_fraction_low",
     "histogram_outlier_fraction_high",
     "plugin_path",

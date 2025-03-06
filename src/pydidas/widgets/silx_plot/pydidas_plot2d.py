@@ -106,11 +106,30 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
         if hasattr(self._qtapp, "sig_updated_user_config"):
             self._qtapp.sig_updated_user_config.connect(self.user_config_update)
+        self._update_config(kwargs)
+        self._update_position_widget()
+        self._add_canvas_resize_actions()
+        self._add_histogram_actions()
+        if self._config["cs_transform"]:
+            self._add_cs_transform_actions()
+        self._set_colormap_and_bar()
+
+        if self._config["use_data_info_action"]:
+            self._add_data_info_action()
+
+    def _update_config(self, kwargs: dict):
+        """
+        Update the plot configuration.
+
+        Parameters
+        ----------
+        kwargs : dict
+            The keyword arguments to update the configuration
+        """
         self.user_config_update("cmap_name", self.q_settings_get("user/cmap_name"))
         self.user_config_update(
             "cmap_nan_color", self.q_settings_get("user/cmap_nan_color")
         )
-
         self._config = {
             "cs_transform": kwargs.get("cs_transform", True),
             "cs_transform_valid": False,
@@ -127,16 +146,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             ],
         }
         self._plot_config = {"kwargs": {}}
-
-        self._update_position_widget()
-        self._add_canvas_resize_actions()
-        self._add_histogram_actions()
-        if self._config["cs_transform"]:
-            self._add_cs_transform_actions()
-        self._set_colormap_and_bar()
-
-        if self._config["use_data_info_action"]:
-            self._add_data_info_action()
 
     def _update_position_widget(self):
         """

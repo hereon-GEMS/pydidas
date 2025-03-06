@@ -197,12 +197,6 @@ class ViewResultsMixin:
 
     It requires specific widgets which can be added to Frame by using the
     `get_ViewResultsMixin_build_config` function.
-
-     It also requires the following Parameters which need to be created by
-     the main class:
-      - selected_results
-      - saving_format
-      - enable_overwrite
     """
 
     def __init__(self, **kwargs: dict):

@@ -25,15 +25,84 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowRunFrameBuilder"]
+__all__ = ["get_WorkflowRunFrame_build_config", "WorkflowRunFrameBuilder"]
 
 
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import ScrollArea
-from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets.framework import BaseFrameWithApp, BaseFrame
 from pydidas.widgets.selection import ResultSelectionWidget
 from pydidas.widgets.silx_plot import PydidasPlotStack
 
+
+def get_WorkflowRunFrame_build_config(
+    frame: BaseFrame,
+) -> list[list[str, tuple[str], dict]]:
+    """
+    Return the build configuration for the ViewResultsFrame.
+
+    Parameters
+    ----------
+    frame : BaseFrame
+        The ViewResultsFrame instance.
+
+    Returns
+    -------
+    list[list[str, tuple[str], dict]]
+        The build configuration in form of a list. Each list entry consists of the
+        widget creation method name, the method arguments and the method keywords.
+    """
+    return [
+        [
+          "create_label",
+            ("title", "Run full workflow processing"),
+            {
+                "fontsize_offset": 4,
+                "bold": True,
+                "gridPos": (0, 0, 1, 2)
+            }
+        ],
+        ["create_spacer", ("title_spacer",), {"fixedHeight": 15}],
+        [
+            "create_param_widget",
+            (frame.get_param("autosave_results"),),
+             {}
+         ],
+         [
+            "create_param_widget",
+            (frame.get_param("autosave_directory"),),
+            {"linebreak": True, "visible": False}
+        ],
+        [
+            "create_param_widget",
+            (frame.get_param("autosave_format"),),
+            {"visible": False}
+        ],
+        [
+            "create_line",
+            ("line_autosave", ),{}
+        ],
+        [
+            "create_button",
+            ("but_exec", "Start processing"),
+            {"icon": "qt-std::SP_MediaPlay"}
+         ],
+        [
+            "create_progress_bar",
+            ("progress",),
+            {"minimum": 0, "maximum": 100, "visible": False}
+        ],
+        [
+            "create_button",
+            ("but_abort", "Abort processing"),
+            {"icon": "qt-std::SP_BrowserStop", "visible": False}
+        ],
+        [
+            "line_results",
+            ("line_autosave",), {}
+        ],
+
+    ]
 
 class WorkflowRunFrameBuilder:
     """

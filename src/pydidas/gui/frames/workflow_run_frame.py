@@ -35,7 +35,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.utils import ShowBusyMouse, pydidas_logger
-from pydidas.gui.frames.builders import WorkflowRunFrameBuilder
+from pydidas.gui.frames.builders import WorkflowRunFrameBuilder, get_WorkflowRunFrame_build_config
 from pydidas.gui.mixins import ViewResultsMixin
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets.dialogues import WarningBox
@@ -64,6 +64,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
 
     def __init__(self, **kwargs: dict):
         BaseFrameWithApp.__init__(self, **kwargs)
+        ViewResultsMixin.__init__(self)
         _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
@@ -83,7 +84,10 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Populate the frame with widgets.
         """
-        WorkflowRunFrameBuilder.build_frame(self)
+        for _method, _args, _kwargs in get_WorkflowRunFrame_build_config(self):
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
+        self.build_view_results_mixin()
 
     def connect_signals(self):
         """
@@ -94,15 +98,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
-        self._widgets["plot"].sig_get_more_info_for_data.connect(
-            self._widgets["result_selector"].show_info_popup
-        )
-
-    def finalize_ui(self):
-        """
-        Connect the export functions to the widget data.
-        """
-        ViewResultsMixin.__init__(self)
+        self.connect_view_results_mixin_signals()
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int):
@@ -118,9 +114,9 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
             The index of the newly activated frame.
         """
         super().frame_activated(index)
-        if index == self.frame_index:
-            self.update_choices_of_selected_results()
-            self.update_export_button_activation()
+        # if index == self.frame_index:
+        #     self.update_choices_of_selected_results()
+        #     self.update_export_button_activation()
         self._config["frame_active"] = index == self.frame_index
 
     def __abort_execution(self):
@@ -240,7 +236,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         Update the information about the nodes' results after the AppRunner
         has sent the first results.
         """
-        self._widgets["result_selector"].get_and_store_result_node_labels()
+        self.update_choices_of_selected_results()
         if self._config["update_node_information_connected"]:
             self._runner.sig_results.disconnect(self.__update_result_node_information)
             self._config["update_node_information_connected"] = False
@@ -250,7 +246,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         _dt = time.time() - self._config["plot_last_update"]
         if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
             self._config["plot_last_update"] = time.time()
-            self.update_plot()
+            self._update_data()
 
     @QtCore.Slot(str)
     def __process_messages(self, message: str):

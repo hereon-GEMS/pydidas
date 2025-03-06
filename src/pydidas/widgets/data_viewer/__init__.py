@@ -28,12 +28,21 @@ __status__ = "Production"
 
 from .axes_selector import AxesSelector
 from .data_axis_selector import DataAxisSelector
+from .data_viewer import DataViewer
+from .table_with_result_datasets import TableWithResultDatasets
 
 
-__all__ = [axes_selector.__all__ + data_axis_selector.__all__]
+__all__ = [
+    axes_selector.__all__
+    + data_axis_selector.__all__
+    + data_viewer.__all__
+    + table_with_result_datasets.__all__
+]
 
 # Clean up the namespace:
 del (
     axes_selector,
     data_axis_selector,
+    data_viewer,
+    table_with_result_datasets,
 )

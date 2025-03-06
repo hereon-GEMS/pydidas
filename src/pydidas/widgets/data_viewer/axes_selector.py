@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["AxesSelector"]
 
+
 from typing import Optional
 
 import numpy as np
@@ -34,7 +35,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import POLICY_EXP_FIX
 from pydidas.widgets.data_viewer.data_axis_selector import (
-    _GENERIC_CHOICES,
+    GENERIC_AXIS_SELECTOR_CHOICES,
     DataAxisSelector,
 )
 from pydidas.widgets.widget_with_parameter_collection import (
@@ -110,7 +111,7 @@ class AxesSelector(WidgetWithParameterCollection):
             _default_selection = [
                 _choice
                 for _choice in self.current_display_selection
-                if _choice not in _GENERIC_CHOICES
+                if _choice not in GENERIC_AXIS_SELECTOR_CHOICES
             ]
             self._current_transpose_required = (
                 _default_selection != self._additional_choices
@@ -282,7 +283,10 @@ class AxesSelector(WidgetWithParameterCollection):
             if _choice in self.current_display_selection:
                 continue
             for _dim, _axwidget in self._axwidgets.items():
-                if _dim != ignore_ax and _axwidget.display_choice in _GENERIC_CHOICES:
+                if (
+                    _dim != ignore_ax
+                    and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
+                ):
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.display_choice = _choice
                     break

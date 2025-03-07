@@ -57,6 +57,8 @@ Improvements
   for consistency, similarly to ProcessingTree and WorkflowTree.
 - Modified the ViewResultsFrame to use the new DataViewer for more 
   convenient data exploration.
+- Modified the WorkflowRunFrame to use the new DataViewer for more convenient
+  data exploration.
 
 
 Bugfixes

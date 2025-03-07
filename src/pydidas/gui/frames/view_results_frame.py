@@ -32,7 +32,6 @@ from qtpy import QtCore
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
-from pydidas.core import get_generic_param_collection
 from pydidas.gui.frames.builders.view_results_frame_builder import (
     get_ViewResultsFrame_build_config,
 )
@@ -54,17 +53,11 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
     menu_title = "Import and display workflow results"
     menu_entry = "Workflow processing/View workflow results"
 
-    default_params = get_generic_param_collection(
-        "saving_format", "enable_overwrite", "use_scan_timeline"
-    )
-    params_not_to_restore = ["use_scan_timeline"]
-
     def __init__(self, **kwargs: dict):
         self._SCAN = Scan()
         self._TREE = ProcessingTree()
         self._EXP = DiffractionExperiment()
         BaseFrame.__init__(self, **kwargs)
-        print("ViewResultsFrame.__init__")
         ViewResultsMixin.__init__(
             self,
             workflow_results=ProcessingResults(
@@ -73,7 +66,6 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
                 workflow_tree=self._TREE,
             ),
         )
-        print("ViewResultsFrame.__init__ done")
 
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog()

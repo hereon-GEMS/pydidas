@@ -29,10 +29,7 @@ __all__ = ["get_WorkflowRunFrame_build_config"]
 
 
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.framework import BaseFrame, BaseFrameWithApp
-from pydidas.widgets.selection import ResultSelectionWidget
-from pydidas.widgets.silx_plot import PydidasPlotStack
+from pydidas.widgets.framework import BaseFrame
 
 
 def get_WorkflowRunFrame_build_config(

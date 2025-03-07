@@ -169,12 +169,27 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         logger.debug("WorkflowRunFrame: Clicked execute")
         self._verify_result_shapes_uptodate()
+        self._selected_new_node(-1)
+        self._check_autosaving()
         self.sig_processing_running.emit(True)
         try:
             self._run_app()
         except:
             self.sig_processing_running.emit(False)
             raise
+
+    def _check_autosaving(self):
+        """Check that the target directory is empty if autosaving has been enabled."""
+        if not self.get_param_value("autosave_results"):
+            return
+        _path = self.get_param_value("autosave_directory")
+        if _path.is_dir():
+            _items = [_item for _item in _path.iterdir()]
+            if len(_items) > 0:
+                raise UserConfigError(
+                    "The selected directory for autosaving of results is not empty.\n"
+                    "Please select another directory or remove the existing files."
+                )
 
     def _run_app(self):
         """
@@ -231,6 +246,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self.set_status("Started processing of full workflow.")
         self._widgets["progress"].setValue(0)
         self._clear_results()
+        self.update_export_button_activation()
 
     @QtCore.Slot()
     def _apprunner_finished(self):
@@ -284,6 +300,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Perform finishing touches after the processing has terminated.
         """
+        self.update_export_button_activation()
         self.__set_proc_widget_visibility_for_running(False)
         self.sig_processing_running.emit(False)
         QtWidgets.QApplication.instance().processEvents()

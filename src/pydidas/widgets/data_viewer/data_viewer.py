@@ -163,6 +163,18 @@ class DataViewer(WidgetWithParameterCollection):
             for _dim, _dim_slice in enumerate(self.current_slice)
         ]
 
+    @property
+    def data_is_set(self) -> bool:
+        """
+        Return a flag whether the data viewer currently has data associated with it.
+
+        Returns
+        -------
+        bool :
+            Flag whether data has been set.
+        """
+        return self._data is not None
+
     @QtCore.Slot(int)
     def _select_view(self, view_id: int):
         """Select the view to display"""
@@ -283,6 +295,29 @@ class DataViewer(WidgetWithParameterCollection):
             self._select_view(1)
         else:
             self._update_view()
+
+    def update_data(self, data: np.ndarray):
+        """
+        Update the stored data without updating the metadata.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The data.
+        """
+        if not (isinstance(data, np.ndarray) and isinstance(self._data, np.ndarray)):
+            raise UserConfigError(
+                "Can only update data if both the stored data and the new data"
+                "are np.ndarrays."
+            )
+        if data.shape != self._data.shape:
+            raise UserConfigError(
+                "Updated data must have the same shape as the previous data. "
+                "Please check the input and try again. If the data does have "
+                "a different shape, please use the `set_data` method."
+            )
+        self._data = data
+        self._update_view()
 
     def deleteLater(self):
         for _widget in self.findChildren(QtWidgets.QWidget):

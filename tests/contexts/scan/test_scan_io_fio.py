@@ -275,14 +275,12 @@ def test_import_from_multiple_files__different_scan_commands(
 
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan", "mesh", "dmesh"])
 def test_check_file_list__w_single_file(scan_type: str, reset_scan_context):
-    scan = Scan()
     _filename = _TEST_DIR.joinpath("_data", f"test_single_fio_{scan_type}.fio")
     assert ScanIoFio.check_file_list([_filename]) == ["::no_error::"]
 
 
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
 def test_check_file_list__w_multiple_files(scan_type: str, reset_scan_context):
-    scan = Scan()
     _filenames = [
         _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{_i:05d}.fio")
         for _i in range(1, 11)

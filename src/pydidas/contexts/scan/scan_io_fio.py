@@ -29,7 +29,6 @@ __all__ = ["ScanIoFio"]
 
 import os
 from pathlib import Path
-from typing import Optional, Union
 
 import numpy as np
 
@@ -60,7 +59,7 @@ class ScanIoFio(ScanIoBase):
     import_only = True
 
     @staticmethod
-    def _get_default_values(filepath: Path, ndim: int) -> dict[str, Union[int, str]]:
+    def _get_default_values(filepath: Path, ndim: int) -> dict[str, int | str]:
         """
         Get the default Parameter values for a 1D scan.
 
@@ -160,9 +159,7 @@ class ScanIoFio(ScanIoBase):
         )
 
     @classmethod
-    def import_from_file(
-        cls, filenames: Union[Path, str, list[Union[Path, str]]], **kwargs: dict
-    ):
+    def import_from_file(cls, filenames: Path | str | list[Path | str], **kwargs: dict):
         """
         Import scan metadata from a single or multiple fio files.
 
@@ -187,7 +184,10 @@ class ScanIoFio(ScanIoBase):
         if isinstance(filenames, (Path, str)):
             cls._import_single_fio(filenames, scan=scan)
         elif isinstance(filenames, (list, tuple)):
-            cls._import_multiple_fio(filenames, **kwargs)
+            if len(filenames) == 1:
+                cls._import_single_fio(filenames[0], scan=scan)
+            else:
+                cls._import_multiple_fio(filenames, **kwargs)
         else:
             raise UserConfigError(
                 "The input for the fio importer must be a single filename or "
@@ -198,9 +198,7 @@ class ScanIoFio(ScanIoBase):
         cls._write_to_scan_settings(scan=scan)
 
     @classmethod
-    def _import_single_fio(
-        cls, filename: Union[Path, str], scan: Optional[Scan] = None
-    ):
+    def _import_single_fio(cls, filename: Path | str, scan: Scan | None = None):
         """
         Import scan metadata from a single fio file.
 
@@ -319,9 +317,7 @@ class ScanIoFio(ScanIoBase):
         cls.imported_params[f"{_D1}_offset"] = _motor1_start
 
     @classmethod
-    def check_file_list(
-        cls, filenames: list[Union[Path, str]], **kwargs: dict
-    ) -> list[str]:
+    def check_file_list(cls, filenames: list[Path | str], **kwargs: dict) -> list[str]:
         """
         Check if the given list of files is valid for import.
 
@@ -340,6 +336,8 @@ class ScanIoFio(ScanIoBase):
         list[str]
             The error message and additional information.
         """
+        if len(filenames) == 1:
+            return ["::no_error::"]
         _scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
         _motor_pos, _motor_names = cls._process_fio_file_list(filenames, _scan)
         _index_moved_motors = cls._get_moved_motor_indices(_motor_pos, _motor_names)
@@ -353,7 +351,7 @@ class ScanIoFio(ScanIoBase):
             ]
 
     @classmethod
-    def _import_multiple_fio(cls, filenames: list[Union[Path, str]], **kwargs: dict):
+    def _import_multiple_fio(cls, filenames: list[Path | str], **kwargs: dict):
         """
         Import scan metadata from multiple fio files.
 
@@ -414,7 +412,7 @@ class ScanIoFio(ScanIoBase):
         cls.imported_params["scan_name_pattern"] = _common
 
     @classmethod
-    def _process_fio_file_list(cls, filenames: list[Union[Path, str]], scan: Scan):
+    def _process_fio_file_list(cls, filenames: list[Path | str], scan: Scan):
         """
         Read the content of multiple fio files.
 

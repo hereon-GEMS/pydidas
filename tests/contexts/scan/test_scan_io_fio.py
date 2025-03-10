@@ -72,16 +72,61 @@ def _write_fio_files_with_2moved_motors(filenames: list[Path]):
                 _file.write(f"{_n - 5} {143.256554} {42.5}\n")
 
 
-def assert_general_scan_params_in_order(scan: ScanContext, filename: Path, n_dim=1):
+def assert_general_scan_params_in_order(
+    scan: Scan, filename: Path, n_dim=1, start_index=0
+):
     """
     Asserts the general scan parameters have been reset correctly during the import.
     """
     assert scan.get_param_value("scan_dim") == n_dim
-    assert scan.get_param_value("scan_start_index") == 0
+    assert scan.get_param_value("scan_start_index") == start_index
     assert scan.get_param_value("scan_index_stepping") == 1
     assert scan.get_param_value("scan_multiplicity") == 1
     assert scan.get_param_value("scan_name_pattern") == Path(filename.stem)
     assert scan.get_param_value("scan_base_directory") == filename.parents[1]
+
+
+def assert_scan_params_from_filelist_in_order(scan: Scan):
+    """
+    Assert the scan parameters have been reset correctly during the import.
+    """
+    assert 9.9 < scan.get_param_value("scan_dim0_offset") < 10.1
+    assert 2.05 < scan.get_param_value("scan_dim0_delta") < 2.15
+    assert scan.get_param_value("scan_dim0_label") == "cube1_y"
+    assert scan.get_param_value("scan_dim0_n_points") == 10
+    assert scan.get_param_value("scan_dim1_offset") == 10.0
+    assert 2.0 < scan.get_param_value("scan_dim1_delta") < 2.1
+    assert scan.get_param_value("scan_dim1_label") == "cube1_x"
+    assert scan.get_param_value("scan_dim1_n_points") == 35
+    assert scan.get_param_value("scan_name_pattern") == Path("2dmesh_#####")
+    assert scan.get_param_value("scan_base_directory") == _TEST_DIR.joinpath("_data")
+
+
+@pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
+def test_import_from_file__single_file(scan_type):
+    scan = Scan()
+    _filename = _TEST_DIR.joinpath("_data", f"test_single_fio_{scan_type}.fio")
+    ScanIoFio.import_from_file(_filename, scan=scan)
+    assert_general_scan_params_in_order(scan, _filename)
+
+
+@pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
+def test_import_from_file__single_file_as_list(scan_type):
+    scan = Scan()
+    _filename = _TEST_DIR.joinpath("_data", f"test_single_fio_{scan_type}.fio")
+    ScanIoFio.import_from_file([_filename], scan=scan)
+    assert_general_scan_params_in_order(scan, _filename)
+
+
+@pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
+def test_import_from_file__filelist(scan_type):
+    scan = Scan()
+    _filenames = [
+        _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{_i:05d}.fio")
+        for _i in range(1, 11)
+    ]
+    ScanIoFio.import_from_file(_filenames, scan=scan)
+    assert_scan_params_from_filelist_in_order(scan)
 
 
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
@@ -140,20 +185,10 @@ def test_import_from_multiple_files__validation(
         _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{i:05d}.fio")
         for i in range(1, 11)
     ]
-
     ScanIoFio.import_from_file(filenames, scan=scan)
     if scan is None:
         scan = ScanContext()
-
-    assert 9.9 < scan.get_param_value("scan_dim0_offset") < 10.1
-    assert 2.05 < scan.get_param_value("scan_dim0_delta") < 2.15
-    assert scan.get_param_value("scan_dim0_label") == "cube1_y"
-    assert scan.get_param_value("scan_dim0_n_points") == 10
-
-    assert scan.get_param_value("scan_dim1_offset") == 10.0
-    assert 2.0 < scan.get_param_value("scan_dim1_delta") < 2.1
-    assert scan.get_param_value("scan_dim1_label") == "cube1_x"
-    assert scan.get_param_value("scan_dim1_n_points") == 35
+    assert_scan_params_from_filelist_in_order(scan)
 
 
 def test_import_from_multiple_files__corrupt_file(reset_scan_context, temp_dir):
@@ -236,6 +271,23 @@ def test_import_from_multiple_files__different_scan_commands(
     with pytest.raises(UserConfigError):
         ScanIoFio.import_from_file(_filenames)
     assert ScanIoFio.imported_params == {}
+
+
+@pytest.mark.parametrize("scan_type", ["ascan", "dscan", "mesh", "dmesh"])
+def test_check_file_list__w_single_file(scan_type: str, reset_scan_context):
+    scan = Scan()
+    _filename = _TEST_DIR.joinpath("_data", f"test_single_fio_{scan_type}.fio")
+    assert ScanIoFio.check_file_list([_filename]) == ["::no_error::"]
+
+
+@pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
+def test_check_file_list__w_multiple_files(scan_type: str, reset_scan_context):
+    scan = Scan()
+    _filenames = [
+        _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{_i:05d}.fio")
+        for _i in range(1, 11)
+    ]
+    assert ScanIoFio.check_file_list(_filenames) == ["::no_error::"]
 
 
 if __name__ == "__main__":

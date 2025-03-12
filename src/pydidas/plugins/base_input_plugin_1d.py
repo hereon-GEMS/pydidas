@@ -73,21 +73,5 @@ class InputPlugin1d(InputPlugin):
         self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
         self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
 
-    def get_raw_input_size(self):
-        """
-        Get the number of data points in the raw input.
-
-        Raises
-        ------
-        NotImplementedError
-            This method needs to be implemented by the concrete subclass.
-
-        Returns
-        -------
-        int
-            The raw input size in data points.
-        """
-        raise NotImplementedError
-
 
 InputPlugin1d.register_as_base_class()

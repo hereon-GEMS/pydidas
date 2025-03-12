@@ -59,6 +59,8 @@ Improvements
   convenient data exploration.
 - Modified the WorkflowRunFrame to use the new DataViewer for more convenient
   data exploration.
+- Added a new plugin to load a series of MCA data from file files located in 
+  a single directory.
 
 
 Bugfixes

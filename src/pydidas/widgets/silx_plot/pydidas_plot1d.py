@@ -161,10 +161,10 @@ class PydidasPlot1D(Plot1D):
         _xarr, _yarr, _, _ = _curve.getData()
         _title = self.getGraphTitle()
         self.getBackend().fig.gca().cla()
-        self.addCurve(_xarr, _yarr, **self._plot_config["kwargs"])
+        self.addCurve(_xarr, _yarr, **self._plot_config.get("kwargs", {}))
         self.setGraphTitle(_title)
-        self.setGraphXLabel(self._plot_config["ax_label_x"])
-        self.setGraphYLabel(self._plot_config["ax_label_y"])
+        self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
+        self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
 
     def _activeItemChanged(self, type_):
         """

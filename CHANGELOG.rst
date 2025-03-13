@@ -93,7 +93,8 @@ Bugfixes
 - Fixed an issue where a given y label in a Plot1D was overwritten by Dataset
   metadata.
 - Fixed an issue in Dataset where calling .T would not transpose the axis metadata.
-
+	- Fixed an issue in PydidasPlot1D where optional dictionary entries were queried
+	  directly without a get call.
 
 
 v24.09.19

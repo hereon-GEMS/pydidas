@@ -293,6 +293,8 @@ class DataViewer(WidgetWithParameterCollection):
             self._select_view(4)
         elif data.ndim == 1:
             self._select_view(1)
+        elif data.ndim >= 2 and self._active_view is None:
+            self._select_view(3)
         else:
             self._update_view()
 

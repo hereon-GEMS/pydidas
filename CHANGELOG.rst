@@ -62,6 +62,8 @@ Improvements
 - Added a new plugin to load a series of MCA data from file files located in 
   a single directory.
 - Added a new plugin to crop data by either its indices or data values.
+- Modified the TestWorkflowFrame to use the new DataViewer for more convenient
+  data exploration.
 
 
 Bugfixes

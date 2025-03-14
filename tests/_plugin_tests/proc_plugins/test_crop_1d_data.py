@@ -74,7 +74,7 @@ def test_pre_execute(plugin, bounds):
     else:
         plugin.pre_execute()
         assert plugin._data is None
-        assert plugin._config["slices"] == None
+        assert plugin._config["slices"] is None
 
 
 def test_get_slices__existing_slices(plugin):

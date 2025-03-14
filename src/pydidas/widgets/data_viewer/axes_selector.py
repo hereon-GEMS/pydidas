@@ -246,6 +246,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 dataset.axis_units[_dim],
             )
         self._verify_additional_choices_selected(-1, block_signals=True)
+        self.process_new_slicing(block_signals=True)
 
     def define_additional_choices(self, choices: str):
         """

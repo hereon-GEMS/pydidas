@@ -277,6 +277,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self.define_additional_choices(
             self._external_display_choices, store_config=False
         )
+        self._update_slice_from_choice(self.display_choice)
 
     @QtCore.Slot(str)
     def define_additional_choices(self, choices: str, store_config: bool = True):
@@ -371,6 +372,18 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._widgets["edit_range_data"].setVisible(
             _range_selection == "select range by data values" and _show_range
         )
+        self._update_slice_from_choice(use_selection)
+        self.sig_display_choice_changed.emit(self._axis_index, use_selection)
+
+    def _update_slice_from_choice(self, use_selection: str):
+        """
+        Update the slice based on the choice.
+
+        Parameters
+        ----------
+        use_selection : str
+            The selected axis use case.
+        """
         with QtCore.QSignalBlocker(self):
             if use_selection not in GENERIC_AXIS_SELECTOR_CHOICES:
                 self._update_slice_from_non_generic_choice()
@@ -378,7 +391,6 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 self._manual_data_value_changed()
             elif use_selection == "slice at index":
                 self._manual_index_changed()
-        self.sig_display_choice_changed.emit(self._axis_index, use_selection)
 
     def _update_slice_from_non_generic_choice(self):
         """

@@ -44,6 +44,8 @@ class TableWithResultDatasets(QtWidgets.QTableWidget):
     A QTableWidget used for selecting a dataset from the workflow results.
     """
 
+    init_kwargs = ["font_metric_height_factor", "font_metric_width_factor"]
+
     sig_new_selection = QtCore.Signal(int)
 
     def __init__(self, **kwargs: dict):
@@ -55,6 +57,10 @@ class TableWithResultDatasets(QtWidgets.QTableWidget):
             verticalScrollBarPolicy=QtCore.Qt.ScrollBarAlwaysOn,
             editTriggers=QtWidgets.QTableWidget.NoEditTriggers,
         )
+        self._font_metric_width_factor = kwargs.get(
+            "font_metric_width_factor", FONT_METRIC_CONFIG_WIDTH
+        )
+        self._font_metric_height_factor = kwargs.get("font_metric_height_factor", 6)
         self._row_items = {}
         self._qtapp = QtWidgets.QApplication.instance()
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
@@ -69,7 +75,7 @@ class TableWithResultDatasets(QtWidgets.QTableWidget):
     @property
     def table_display_height(self) -> int:
         """Calculate the required height for the table"""
-        _nrows = min(self.rowCount(), 6)
+        _nrows = min(self.rowCount(), self._font_metric_height_factor)
         return self.horizontalHeader().height() + sum(
             (self.rowHeight(_i) + 1) for _i in range(_nrows)
         )
@@ -101,7 +107,7 @@ class TableWithResultDatasets(QtWidgets.QTableWidget):
         char_height : float
             The font height in pixels.
         """
-        _new_width = int(FONT_METRIC_CONFIG_WIDTH * char_width)
+        _new_width = int(self._font_metric_width_factor * char_width)
         self.setFixedWidth(_new_width)
         self.setFixedHeight(self.table_display_height)
 

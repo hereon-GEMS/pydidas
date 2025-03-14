@@ -153,15 +153,27 @@ class Pydidas_Plot1dGroupView(Pydidas_Plot1dView):
         _ylabel = data.data_description if len(data.data_description) > 0 else "y"
         _widget = self.getWidget()
         _x = data.axis_ranges[1]
-        for _index in range(data.shape[0]):
+        _label = data.axis_labels[0] + " = {value:.4f} " + data.axis_units[0]
+        for _index, _pos in enumerate(data.axis_ranges[0]):
             _widget.addCurve(
-                legend=f"data_{_index}",
+                legend=_label.format(value=_pos),
                 x=_x,
                 y=data.array[_index],
                 xlabel=_xlabel,
                 ylabel=_ylabel,
             )
-        _widget.setActiveCurve("data")
+        _widget.setActiveCurve(_label.format(value=_pos))
+
+    def set_title(self, title: str):
+        """
+        Set the title of the plot.
+
+        Parameters
+        ----------
+        title : str
+            The title to set.
+        """
+        self.getWidget().setGraphTitle(title)
 
     def _check_data_dimensions(self, data: Dataset):
         """

@@ -118,7 +118,7 @@ def test_display_choice_setter__invalid(selector):
 def test_current_slice(selector):
     selector._current_slice = slice(4, 6)
     selector.set_axis_metadata(np.arange(10), "dummy", "unit")
-    assert selector.current_slice == slice(4, 6)
+    assert selector.current_slice == slice(0, 1)
 
 
 def test_set_axis_metadata(selector, data_range):
@@ -129,6 +129,16 @@ def test_set_axis_metadata(selector, data_range):
     assert selector._data_label == label
     assert selector._data_unit == unit
     assert selector._stored_configs == {}
+
+
+def test_set_axis_metadata__update_range(selector):
+    _range1 = np.arange(12)
+    _range2 = np.arange(25)
+    selector.define_additional_choices("choice1;;choice2")
+    selector.display_choice = "choice1"
+    selector.set_axis_metadata(_range1, "", "")
+    selector.set_axis_metadata(_range2, "", "")
+    assert selector.current_slice == slice(0, _range2.size)
 
 
 def test_set_axis_metadata__no_data_range_no_npoints(selector):

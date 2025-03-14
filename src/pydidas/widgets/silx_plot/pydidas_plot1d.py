@@ -122,8 +122,8 @@ class PydidasPlot1D(Plot1D):
                 if _key in self._allowed_kwargs
             },
         }
-        self.setGraphXLabel(self._plot_config["ax_label_x"])
-        self.setGraphYLabel(self._plot_config["ax_label_y"])
+        self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
+        self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
         self._current_raw_data[kwargs.get("legend", "Unnamed curve 1.1")] = (
             data,
             self._plot_config["kwargs"],

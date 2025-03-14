@@ -227,6 +227,22 @@ def test_set_metadata_from_dataset(selector):
         assert selector.current_slice[_dim] != slice(None)
 
 
+def test_set_metadata_from_dataset__new_shape(selector):
+    _data1 = create_dataset(3, dtype=float, shape=(10, 12, 14))
+    _data2 = create_dataset(3, dtype=float, shape=(10, 14, 14))
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(_data1)
+    selector.set_metadata_from_dataset(_data2)
+    print(selector._axwidgets[1].current_slice)
+    assert selector._data_shape == _data2.shape
+    assert selector.current_slice == [slice(0, 10), slice(0, 14), slice(0, 1)]
+    for _dim, _item in selector._axwidgets.items():
+        assert _item.npoints == _data2.shape[_dim]
+        assert _item.data_label == _data2.axis_labels[_dim]
+        assert _item.data_unit == _data2.axis_units[_dim]
+        assert selector.current_slice[_dim] != slice(None)
+
+
 def test_set_metadata_from_dataset__w_choices(selector):
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(_DATA)

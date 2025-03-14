@@ -50,6 +50,12 @@ from pydidas.widgets.widget_with_parameter_collection import (
 )
 
 
+DATASET_TOO_LARGE_ERROR = (
+    "The dataset is too large to display. Please check the dataset or "
+    "increase the data buffer size in the global settings."
+)
+
+
 class DataViewer(WidgetWithParameterCollection):
     """
     The DataViewer allows to display data in multiple display modes.
@@ -66,6 +72,8 @@ class DataViewer(WidgetWithParameterCollection):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
 
         self._data = None
+        self._metadata_updated = False
+        self._title = None
         self._active_view = None
         self._button_group = QtWidgets.QButtonGroup()
         self._view_objects = {
@@ -236,6 +244,9 @@ class DataViewer(WidgetWithParameterCollection):
                 return
             view_id = self._active_view
         _view = self._view_objects[view_id]
+        if not self._metadata_updated:
+            self._widgets["axes_selector"].set_metadata_from_dataset(self._data)
+            self._metadata_updated = True
         if DATA_VIEW_CONFIG[view_id]["use_axes_selector"]:
             _ax_selector = self._widgets["axes_selector"]
             _data = self._data[*_ax_selector.current_slice].squeeze()
@@ -245,6 +256,12 @@ class DataViewer(WidgetWithParameterCollection):
         else:
             _data = self._data
         self._view_objects[view_id].setData(_data)
+        if DATA_VIEW_CONFIG[view_id]["ref"] in [
+            "view-image",
+            "view-curve",
+            "view-curve-group",
+        ]:
+            _view.getWidget().setGraphTitle(self._title)
         if isinstance(_view, _RawView):
             _data_selection = DataSelection(None, None, None, None)
             _matching_views = _view.getMatchingViews(_data, DataInfo(_data))
@@ -253,7 +270,9 @@ class DataViewer(WidgetWithParameterCollection):
             _view.select()
             _view.setData(_data)
 
-    def set_data(self, data: H5Node | h5py.Dataset | np.ndarray | None):
+    def set_data(
+        self, data: H5Node | h5py.Dataset | np.ndarray | None, title: str | None = None
+    ):
         """
         Set the data to display
 
@@ -262,9 +281,39 @@ class DataViewer(WidgetWithParameterCollection):
         data : H5Node | h5py.Dataset | np.ndarray | None
             The data to display. A ndarray is acceptable but will be converted to a
             Dataset object.
+        title : str | None, optional
+            The title of the data. If None, the title will not be updated.
         """
         if data is None:
             return
+        self._import_data(data)
+        if title is not None:
+            self._title = title
+        for _id, _view in DATA_VIEW_CONFIG.items():
+            self._widgets[f"button_{_id}"].setVisible(_view["min_dims"] <= data.ndim)
+        self._widgets[f"button_{DATA_VIEW_REFS['view-h5']}"].setVisible(False)
+        _preferred_view = self._data.metadata.get("preferred_view", None)
+        if _preferred_view is not None:
+            self._select_view(DATA_VIEW_TITLES[_preferred_view])
+        elif self._data.ndim == 0:
+            self._select_view(4)
+        elif self._data.ndim == 1:
+            self._select_view(1)
+        elif self._data.ndim >= 2 and self._active_view is None:
+            self._select_view(3)
+        else:
+            self._update_view()
+
+    def _import_data(self, data: H5Node | h5py.Dataset | np.ndarray):
+        """
+        Import the data to a Dataset object.
+
+        Parameters
+        ----------
+        data : H5Node | h5py.Dataset | np.ndarray
+            The data to import.
+        """
+        _buffersize = self.q_settings_get("global/data_buffer_size", dtype=float)
         if isinstance(data, h5py.Dataset):
             # TODO: Implement the loading of HDF5 datasets
             raise NotImplementedError("HDF5 datasets are not supported yet.")
@@ -272,33 +321,19 @@ class DataViewer(WidgetWithParameterCollection):
             # TODO: Implement the loading of HDF5 nodes
             raise NotImplementedError("HDF5 nodes are not supported yet.")
         elif isinstance(data, np.ndarray):
+            if data.nbytes > _buffersize * 1e6:
+                raise UserConfigError(DATASET_TOO_LARGE_ERROR)
             if not isinstance(data, Dataset):
                 data = Dataset(data)
             self._data = data
-        self._widgets["axes_selector"].set_metadata_from_dataset(self._data)
-        _buffersize = self.q_settings_get("global/data_buffer_size", dtype=float)
-        if self._data.nbytes > _buffersize * 1e6:
-            raise UserConfigError(
-                "The dataset is too large to display. Please check the dataset or "
-                "increase the data buffer size in the global settings."
-            )
-        for _id, _view in DATA_VIEW_CONFIG.items():
-            self._widgets[f"button_{_id}"].setVisible(_view["min_dims"] <= data.ndim)
-        self._widgets[f"button_{DATA_VIEW_REFS['view-h5']}"].setVisible(False)
-        _preferred_view = data.metadata.get("preferred_view", None)
-        if _preferred_view is not None:
-            self._select_view(DATA_VIEW_TITLES[_preferred_view])
-            return
-        if data.ndim == 0:
-            self._select_view(4)
-        elif data.ndim == 1:
-            self._select_view(1)
-        elif data.ndim >= 2 and self._active_view is None:
-            self._select_view(3)
+            self._metadata_updated = False
         else:
-            self._update_view()
+            raise UserConfigError(
+                "The data to display must be a numpy array, a h5py dataset or a "
+                "H5Node object."
+            )
 
-    def update_data(self, data: np.ndarray):
+    def update_data(self, data: np.ndarray, title: str | None = None):
         """
         Update the stored data without updating the metadata.
 
@@ -306,7 +341,11 @@ class DataViewer(WidgetWithParameterCollection):
         ----------
         data : np.ndarray
             The data.
+        title : str | None, optional
+            The title of the data. If None, the title will not be updated.
         """
+        if title is not None:
+            self._title = title
         if not (isinstance(data, np.ndarray) and isinstance(self._data, np.ndarray)):
             raise UserConfigError(
                 "Can only update data if both the stored data and the new data"

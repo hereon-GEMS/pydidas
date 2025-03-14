@@ -314,10 +314,11 @@ class ViewResultsMixin:
                 self._active_node_id, self.get_param_value("use_scan_timeline")
             )
         )
+        _title = self._RESULTS.result_titles[self._active_node_id]
         if update and self._widgets["data_viewer"].data_is_set:
-            self._widgets["data_viewer"].update_data(self._data)
+            self._widgets["data_viewer"].update_data(self._data, title=_title)
         else:
-            self._widgets["data_viewer"].set_data(self._data)
+            self._widgets["data_viewer"].set_data(self._data, title=_title)
 
     def update_displayed_data(self):
         """Update the data to display"""

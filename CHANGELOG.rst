@@ -55,6 +55,15 @@ Improvements
 - Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
   (for the general class) and WorkflowResults (for the singleton instance)
   for consistency, similarly to ProcessingTree and WorkflowTree.
+- Modified the ViewResultsFrame to use the new DataViewer for more 
+  convenient data exploration.
+- Modified the WorkflowRunFrame to use the new DataViewer for more convenient
+  data exploration.
+- Added a new plugin to load a series of MCA data from file files located in 
+  a single directory.
+- Added a new plugin to crop data by either its indices or data values.
+- Modified the TestWorkflowFrame to use the new DataViewer for more convenient
+  data exploration.
 
 
 Bugfixes
@@ -83,7 +92,13 @@ Bugfixes
 - Fixed a bug where WorkflowResults could not be exported again after import.
 - Fixed an issue where the Fit plugin would not store the background at the peak
   positions correctly.
-
+- Fixed an issue where a given y label in a Plot1D was overwritten by Dataset
+  metadata.
+- Fixed an issue in Dataset where calling .T would not transpose the axis metadata.
+- Fixed an issue in PydidasPlot1D where optional dictionary entries were queried
+  directly without a get call.
+- Fixed an issue in pyFAI integration base when using radians as azimuthal unit
+  and the full detector
 
 
 v24.09.19

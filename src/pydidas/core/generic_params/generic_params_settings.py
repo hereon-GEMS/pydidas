@@ -171,6 +171,19 @@ GENERIC_PARAMS_SETTINGS = {
             " will prevent multiple frequent update of plots."
         ),
     },
+    "max_number_curves": {
+        "type": int,
+        "default": 40,
+        "name": "Maximum number of curves",
+        "choices": None,
+        "allow_None": False,
+        "unit": "",
+        "tooltip": (
+            "The maximum number of curves to plot. Increasing this number will "
+            "allow more curves to be plotted simultaneously, but at the cost of "
+            "significant performance decrease."
+        ),
+    },
     "histogram_outlier_fraction_high": {
         "type": float,
         "default": 0.07,

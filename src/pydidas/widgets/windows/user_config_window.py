@@ -200,6 +200,12 @@ class _UserConfigWindow(PydidasWindow):
         self.create_spacer("spacer_3", parent_widget="config_canvas")
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
+            self.get_param("max_number_curves"),
+            parent_widget="config_canvas",
+            width_io=0.25,
+            width_text=0.7,
+        )
+        self.create_param_widget(
             self.get_param("histogram_outlier_fraction_low"),
             parent_widget="config_canvas",
             width_io=0.25,

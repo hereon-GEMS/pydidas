@@ -477,6 +477,7 @@ class TestProcessingResults(unittest.TestCase):
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
+        res._create_composites()
         _ranges = res.get_result_ranges(1)
         _ref = dict(
             enumerate(
@@ -486,6 +487,13 @@ class TestProcessingResults(unittest.TestCase):
         )
         for _dim, _range in _ranges.items():
             self.assertTrue(np.allclose(_range, _ref[_dim]))
+
+    def test_get_result_ranges__no_such_node(self):
+        res = ProcessingResults()
+        res.prepare_new_results()
+        res.store_frame_metadata(self._plugin_metadata)
+        with self.assertRaises(UserConfigError):
+            _ranges = res.get_result_ranges(42)
 
     def test_get_results(self):
         res = self.create_standard_workflow_results()
@@ -502,6 +510,11 @@ class TestProcessingResults(unittest.TestCase):
         _res = res.get_results_for_flattened_scan(1)
         self.assertEqual(_res.shape, (np.prod(SCAN.shape),) + self._input_shape)
 
+    def test_get_results_for_flattened_scan__wrong_node_id(self):
+        res = self.create_standard_workflow_results()
+        with self.assertRaises(UserConfigError):
+            _res = res.get_results_for_flattened_scan(42)
+
     def test_get_results_for_flattened_scan__w_squeeze(self):
         res = self.create_standard_workflow_results()
         _res = res.get_results_for_flattened_scan(1, squeeze=True)
@@ -514,6 +527,12 @@ class TestProcessingResults(unittest.TestCase):
             _res2.shape,
             tuple(_i for _i in (np.prod(SCAN.shape),) + self._new_shape if _i > 1),
         )
+
+    def test_get_result_subset__wrong_node_id(self):
+        res = self.create_standard_workflow_results()
+        _slice = (0, 0, 0, 0, 0)
+        with self.assertRaises(UserConfigError):
+            _res = res.get_result_subset(42, *_slice)
 
     def test_get_result_subset__no_flatten_single_point(self):
         res = self.create_standard_workflow_results()

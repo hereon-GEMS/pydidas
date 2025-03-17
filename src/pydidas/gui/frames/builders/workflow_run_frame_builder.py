@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowRunFrameBuilder class which is used to
+Module with the get_WorkflowRunFrame_build_config function which is used to
 populate the WorkflowRunFrame with widgets.
 """
 
@@ -25,149 +25,93 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["WorkflowRunFrameBuilder"]
+__all__ = ["get_WorkflowRunFrame_build_config"]
 
 
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.framework import BaseFrameWithApp
-from pydidas.widgets.selection import ResultSelectionWidget
-from pydidas.widgets.silx_plot import PydidasPlotStack
+from pydidas.widgets.framework import BaseFrame
 
 
-class WorkflowRunFrameBuilder:
+def get_WorkflowRunFrame_build_config(
+    frame: BaseFrame,
+) -> list[list[str, tuple[str], dict]]:
     """
-    Builder class to build the WorkflowRunFrame.
+    Return the build configuration for the ViewResultsFrame.
+
+    Parameters
+    ----------
+    frame : BaseFrame
+        The ViewResultsFrame instance.
+
+    Returns
+    -------
+    list[list[str, tuple[str], dict]]
+        The build configuration in form of a list. Each list entry consists of the
+        widget creation method name, the method arguments and the method keywords.
     """
-
-    @classmethod
-    def __param_widget_config(cls, param_key: str) -> dict:
-        """
-        Get Formatting options for create_param_widget calls.
-
-        Parameters
-        ----------
-        param_key : str
-            The Parameter reference key.
-
-        Returns
-        -------
-        dict :
-            The dictionary with the formatting options.
-        """
-        return {
-            "linebreak": param_key in ["autosave_directory", "selected_results"],
-            "parent_widget": "config",
-            "visible": param_key not in ["autosave_directory", "autosave_format"],
-        }
-
-    @classmethod
-    def build_frame(cls, frame: BaseFrameWithApp):
-        """
-        Build the frame and create all widgets.
-
-        Parameters
-        ----------
-        frame : BaseFrameWithApp
-            The WorkflowRunFrame instance.
-        """
-        frame.create_label(
-            "title",
-            "Run full workflow processing",
-            fontsize_offset=4,
-            bold=True,
-            gridPos=(0, 0, 1, 2),
-        )
-
-        frame.create_spacer("title_spacer", fixedHeight=10)
-
-        frame.create_empty_widget(
-            "config",
-            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
-            parent_widget=None,
-            sizePolicy=POLICY_FIX_EXP,
-        )
-        frame.create_any_widget(
-            "config_area",
-            ScrollArea,
-            sizePolicy=POLICY_FIX_EXP,
-            widget=frame._widgets["config"],
-        )
-        frame.create_spacer("spacer1", parent_widget="config")
-        for _param in ["autosave_results", "autosave_directory", "autosave_format"]:
-            frame.create_param_widget(
-                frame.get_param(_param), **cls.__param_widget_config(_param)
-            )
-
-        frame.create_line("line_autosave", parent_widget="config")
-        frame.create_button(
-            "but_exec",
-            "Start processing",
-            icon="qt-std::SP_MediaPlay",
-            parent_widget="config",
-        )
-        frame.create_progress_bar(
-            "progress",
-            minimum=0,
-            maximum=100,
-            parent_widget="config",
-            visible=False,
-        )
-        frame.create_button(
-            "but_abort",
-            "Abort processing",
-            icon="qt-std::SP_BrowserStop",
-            parent_widget="config",
-            visible=False,
-        )
-        frame.create_line(
-            "line_results",
-            parent_widget="config",
-        )
-        frame.create_any_widget(
-            "result_selector",
-            ResultSelectionWidget,
-            parent_widget="config",
-            select_results_param=frame.get_param("selected_results"),
-        )
-        frame.create_line(
-            "line_export",
-            parent_widget="config",
-        )
-        frame.create_param_widget(
-            frame.get_param("saving_format"),
-            **cls.__param_widget_config("saving_format"),
-        )
-        frame.create_param_widget(
-            frame.get_param("enable_overwrite"),
-            **cls.__param_widget_config("enable_overwrite"),
-        )
-        frame.create_button(
-            "but_export_current",
-            "Export current node results",
-            enabled=False,
-            icon="qt-std::SP_FileIcon",
-            parent_widget="config",
-            toolTip=(
-                "Export the current node's results to file. Note that "
-                "the filenames are pre-determined based on node ID "
-                "and node label."
-            ),
-        )
-        frame.create_button(
-            "but_export_all",
-            "Export all results",
-            enabled=False,
-            icon="qt-std::SP_DialogSaveButton",
-            parent_widget="config",
-            tooltip=("Export all results. Note that the directory must be empty."),
-        )
-        frame.create_spacer(
-            "config_terminal_spacer",
-            parent_widget="config",
-        )
-        frame.create_spacer("menu_bottom_spacer")
-
-        frame.create_any_widget(
-            "plot", PydidasPlotStack, gridPos=(0, 1, 3, 1), use_data_info_action=True
-        )
+    return [
+        [
+            "create_label",
+            ("title", "Run full workflow processing"),
+            {
+                "fontsize_offset": 4,
+                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+                "bold": True,
+                "gridPos": (0, 0, 1, 2),
+            },
+        ],
+        ["create_spacer", ("title_spacer",), {"fixedHeight": 15}],
+        [
+            "create_empty_widget",
+            ("workflow_run_config",),
+            {
+                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+                "sizePolicy": POLICY_FIX_EXP,
+            },
+        ],
+        [
+            "create_param_widget",
+            (frame.get_param("autosave_results"),),
+            {"parent_widget": "workflow_run_config"},
+        ],
+        [
+            "create_param_widget",
+            (frame.get_param("autosave_directory"),),
+            {
+                "linebreak": True,
+                "visible": False,
+                "parent_widget": "workflow_run_config",
+            },
+        ],
+        [
+            "create_param_widget",
+            (frame.get_param("autosave_format"),),
+            {"visible": False, "parent_widget": "workflow_run_config"},
+        ],
+        ["create_line", ("line_autosave",), {"parent_widget": "workflow_run_config"}],
+        [
+            "create_button",
+            ("but_exec", "Start processing"),
+            {"icon": "qt-std::SP_MediaPlay", "parent_widget": "workflow_run_config"},
+        ],
+        [
+            "create_progress_bar",
+            ("progress",),
+            {
+                "minimum": 0,
+                "maximum": 100,
+                "visible": False,
+                "parent_widget": "workflow_run_config",
+            },
+        ],
+        [
+            "create_button",
+            ("but_abort", "Abort processing"),
+            {
+                "icon": "qt-std::SP_BrowserStop",
+                "visible": False,
+                "parent_widget": "workflow_run_config",
+            },
+        ],
+        ["create_line", ("line_results",), {"parent_widget": "workflow_run_config"}],
+    ]

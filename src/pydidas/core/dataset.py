@@ -323,6 +323,18 @@ class Dataset(ndarray):
     # ##########
 
     @property
+    def T(self) -> Self:
+        """
+        Get the transposed Dataset.
+
+        Returns
+        -------
+        Dataset
+            The transposed Dataset.
+        """
+        return self.transpose()
+
+    @property
     def property_dict(self) -> dict:
         """
         Get a copy of the properties dictionary.

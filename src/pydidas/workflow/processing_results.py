@@ -31,7 +31,6 @@ __all__ = ["ProcessingResults"]
 import os
 import re
 from pathlib import Path
-from typing import Optional, Union
 
 import numpy as np
 from qtpy import QtCore
@@ -76,11 +75,11 @@ class ProcessingResults(QtCore.QObject):
 
     def __init__(
         self,
-        diffraction_exp_context: Optional[DiffractionExperiment] = None,
-        scan_context: Optional[Scan] = None,
-        workflow_tree: Optional[ProcessingTree] = None,
+        diffraction_exp_context: DiffractionExperiment | None = None,
+        scan_context: Scan | None = None,
+        workflow_tree: ProcessingTree | None = None,
     ):
-        super().__init__()
+        super().__init__(parent=None)
         self._SCAN = ScanContext() if scan_context is None else scan_context
         self._EXP = (
             DiffractionExperimentContext()
@@ -93,6 +92,8 @@ class ProcessingResults(QtCore.QObject):
             "frozen_EXP": self._EXP.copy(),
             "frozen_TREE": self._TREE.copy(),
         }
+        self._composites = {}
+        self.__source_hash = -1
         self.clear_all_results()
 
     def clear_all_results(self):
@@ -170,6 +171,7 @@ class ProcessingResults(QtCore.QObject):
         _scan_ax_labels = [_item[0] for _item in _scan_metadata]
         _scan_ax_units = [_item[1] for _item in _scan_metadata]
         _scan_ax_ranges = [_item[2] for _item in _scan_metadata]
+        _meta = {}
         for node_id, _meta in metadata.items():
             _curr_metadata = self._config["plugin_res_metadata"].get(node_id, {})
             _curr_metadata["axis_labels"] = dict(
@@ -365,6 +367,23 @@ class ProcessingResults(QtCore.QObject):
         """
         return self._config["result_titles"].copy()
 
+    def _check_that_results_are_available(self, node_id: int):
+        """
+        Check if results are available for the specified node ID.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID for which results should be checked.
+        """
+        if node_id not in self._composites:
+            raise UserConfigError(
+                f"The selected node ID `{node_id}` does not have any results "
+                "associated with it. Please verify that that selected node is "
+                "either a leaf node (i.e. it does not have any children) or that "
+                "the `keep_results` flag is set to True in the plugin."
+            )
+
     def get_result_ranges(self, node_id: int) -> dict:
         """
         Get the data ranges for the requested node id.
@@ -380,10 +399,7 @@ class ProcessingResults(QtCore.QObject):
             The dictionary with the ranges with dimension keys and ranges
             values.
         """
-        if node_id not in self._config["plugin_res_metadata"]:
-            raise UserConfigError(
-                "The selected node ID does not have any results associated with it."
-            )
+        self._check_that_results_are_available(node_id)
         return self._config["plugin_res_metadata"].get(node_id).get("axis_ranges")
 
     def get_results(self, node_id: int) -> Dataset:
@@ -400,11 +416,7 @@ class ProcessingResults(QtCore.QObject):
         Dataset
             The combined results of all frames for a specific node.
         """
-        if node_id not in self._composites:
-            raise UserConfigError(
-                f"The selected node ID `{node_id}`does not have any results "
-                "associated with it."
-            )
+        self._check_that_results_are_available(node_id)
         return self._composites[node_id]
 
     def get_results_for_flattened_scan(
@@ -431,6 +443,7 @@ class ProcessingResults(QtCore.QObject):
         Dataset
             The combined results of all frames for a specific node.
         """
+        self._check_that_results_are_available(node_id)
         _data = self._composites[node_id].copy()
         _data.flatten_dims(
             *range(self._config["frozen_SCAN"].ndim),
@@ -444,7 +457,7 @@ class ProcessingResults(QtCore.QObject):
     def get_result_subset(
         self,
         node_id: int,
-        *slices: tuple[Union[int, slice]],
+        *slices: tuple[int | slice],
         flattened_scan_dim: bool = False,
         squeeze: bool = False,
     ) -> Dataset:
@@ -459,7 +472,7 @@ class ProcessingResults(QtCore.QObject):
         ----------
         node_id : int
             The node ID for which results should be returned.
-        *slices : tuple[Union[int, slice]]
+        *slices : tuple[int | slice]
             The tuple used for slicing/indexing the np.ndarray.
         flattened_scan_dim : bool, optional
             Keyword to process flattened Scan dimensions. If True, the Scan
@@ -477,6 +490,7 @@ class ProcessingResults(QtCore.QObject):
         if flattened_scan_dim:
             _data = self.get_results_for_flattened_scan(node_id)
         else:
+            self._check_that_results_are_available(node_id)
             _data = self._composites[node_id].copy()
         if set(type(_slice) for _slice in slices).issubset({int, slice}):
             _data = _data[slices]
@@ -490,7 +504,7 @@ class ProcessingResults(QtCore.QObject):
 
     def get_result_metadata(
         self, node_id: int, use_scan_timeline: bool = False
-    ) -> dict[str, object]:
+    ) -> dict:
         """
         Get the stored metadata for the results of the specified node.
 
@@ -504,13 +518,10 @@ class ProcessingResults(QtCore.QObject):
         Returns
         -------
         dict[str, object]
-            A dictionary with the metadata stored in the Dataset plus the shape
+            A dictionary with the metadata retrieved from the Dataset plus the shape
             and `node_label`.
         """
-        if node_id not in self._composites:
-            raise UserConfigError(
-                "The selected node ID does not have any results associated with it."
-            )
+        self._check_that_results_are_available(node_id)
         _metadata = self._composites[node_id].property_dict
         _metadata["node_label"] = self._config["node_labels"].get(node_id, "")
         if not use_scan_timeline:
@@ -531,10 +542,10 @@ class ProcessingResults(QtCore.QObject):
 
     def save_results_to_disk(
         self,
-        save_dir: Union[str, Path],
+        save_dir: str | Path,
         *save_formats: tuple[str],
         overwrite: bool = False,
-        node_id: Union[None, int] = None,
+        node_id: int | None = None,
     ):
         """
         Save results to disk.
@@ -557,7 +568,7 @@ class ProcessingResults(QtCore.QObject):
             (","), ampersand ("&") or slash ("/") characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
-        node_id : Union[None, int], optional
+        node_id : int | None, optional
             The node ID for which data shall be saved. If None, this defaults
             to all nodes. The default is None.
         """
@@ -574,10 +585,10 @@ class ProcessingResults(QtCore.QObject):
 
     def prepare_files_for_saving(
         self,
-        save_dir: Union[str, Path],
+        save_dir: str | Path,
         save_formats: str,
         overwrite: bool = False,
-        single_node: Union[None, int] = None,
+        single_node: int | None = None,
     ):
         """
         Prepare the required files and directories for saving.
@@ -595,7 +606,7 @@ class ProcessingResults(QtCore.QObject):
             characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
-        single_node: Union[None, int], optional
+        single_node: int | None, optional
             Keyword to select a single node. If None, all nodes will be
             selected. The default is None.
 
@@ -610,7 +621,7 @@ class ProcessingResults(QtCore.QObject):
                 "The shapes and metadata have not been set. Cannot save results yet."
             )
         save_dir = Path(save_dir) if isinstance(save_dir, str) else save_dir
-        save_formats = [s.strip() for s in re.split("&|/|,", save_formats)]
+        save_formats = [s.strip() for s in re.split("[&/,]", save_formats)]
         _name = self._config["frozen_SCAN"].get_param_value("scan_title")
         ResultSaver.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
@@ -732,7 +743,7 @@ class ProcessingResults(QtCore.QObject):
             _node_info += f"Data zero-dimensional\n  Value: {_val:.6f}"
         return _node_info
 
-    def import_data_from_directory(self, directory: Union[str, Path]):
+    def import_data_from_directory(self, directory: str | Path):
         """
         Import data from a directory.
 

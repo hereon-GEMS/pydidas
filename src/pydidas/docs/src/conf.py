@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2021 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath("./../.."))
 # -- Project information -----------------------------------------------------
 
 project = "pydidas"
-copyright = "2021 - 2024, Helmholtz-Zentrum Hereon"
+copyright = "2021 - 2025, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 

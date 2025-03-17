@@ -290,7 +290,6 @@ class TestFitDoublePeak(unittest.TestCase):
         plugin.set_param_value("fit_bg_order", 0)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
-        print("fitted", _kwargs["fit_params"])
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
     def test_execute__lorentzian_1d_bg(self):

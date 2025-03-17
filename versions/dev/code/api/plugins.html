@@ -1277,23 +1277,6 @@ as defined in the ScanContext class.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">InputPlugin1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class for input plugins.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.get_raw_input_size">
-<span class="sig-name descname"><span class="pre">get_raw_input_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.get_raw_input_size" title="Link to this definition">#</a></dt>
-<dd><p>Get the number of data points in the raw input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>NotImplementedError</strong> – This method needs to be implemented by the concrete subclass.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The raw input size in data points.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.input_data_dim">
 <span class="sig-name descname"><span class="pre">input_data_dim</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pydidas.plugins.InputPlugin1d.input_data_dim" title="Link to this definition">#</a></dt>
@@ -1413,7 +1396,7 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration in degrees.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[None, tuple[float, float]]</p>
+<dd class="field-even"><p>None | tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1430,7 +1413,7 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration in radian.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[None, tuple[float, float]]</p>
+<dd class="field-even"><p>None | tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1486,7 +1469,7 @@ if the integration discontinuity is located at pi, and (0, 360) otherwise.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range">
-<span class="sig-name descname"><span class="pre">get_radial_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_radial_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range" title="Link to this definition">#</a></dt>
 <dd><p>Get the radial range from the Parameters.</p>
 <p>If use_radial_range is True and both the lower and upper range limits
 are larger than zero, the tuple with both values is returned.
@@ -1496,14 +1479,14 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dd class="field-odd"><p>The radial range for the pyFAI integration.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[tuple[float, float, None]]</p>
+<dd class="field-even"><p>None | tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_2theta">
-<span class="sig-name descname"><span class="pre">get_radial_range_as_2theta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'deg'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'rad'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'deg'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_2theta" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_radial_range_as_2theta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'deg'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'rad'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'deg'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_2theta" title="Link to this definition">#</a></dt>
 <dd><p>Get the radial range converted to 2 theta.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1514,14 +1497,14 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 given as tuple.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[None, tuple[float, float]]</p>
+<dd class="field-odd"><p>None | tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_q">
-<span class="sig-name descname"><span class="pre">get_radial_range_as_q</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_q" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_radial_range_as_q</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_q" title="Link to this definition">#</a></dt>
 <dd><p>Get the radial range as q in nm^-1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1529,14 +1512,14 @@ given as tuple.</p>
 given as tuple.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[None, tuple[float, float]]</p>
+<dd class="field-even"><p>None | tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_r">
-<span class="sig-name descname"><span class="pre">get_radial_range_as_r</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_r" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_radial_range_as_r</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_r" title="Link to this definition">#</a></dt>
 <dd><p>Get the radial range as radius in mm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1544,7 +1527,7 @@ given as tuple.</p>
 given as tuple.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[None, tuple[float, float]]</p>
+<dd class="field-even"><p>None | tuple[float, float]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1701,7 +1684,6 @@ will be used.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.get_raw_input_size"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.get_raw_input_size</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.input_data_dim"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.input_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin1d.pre_execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin1d.pre_execute</span></code></a></li>
 </ul>

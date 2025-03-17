@@ -871,6 +871,54 @@ Data import
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The number of frames to be loaded and included in the stack. Frames are loaded starting with the first frame index and thus allow a rolling average over the frames.
+   * - :py:data:`files_per_directory`
+     - | **type** : int
+       | **default** : -1
+       | **name** : Images per directory
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of files in the directory.
+   * - :py:data:`_counted_files_per_directory`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Processed images per directory
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The counted number of images per directory.
+   * - :py:data:`fio_suffix`
+     - | **type** : str
+       | **default** : _mca_s#.fio
+       | **name** : FIO file suffix
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The file suffix for teh individual MCA files.
+   * - :py:data:`use_absolute_energy`
+     - | **type** : bool
+       | **default** : False
+       | **name** : Use absolute energy
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Use an absolute energy scale for the results. If False, the energy scale will be created in channel numbers.
+   * - :py:data:`energy_offset`
+     - | **type** : float
+       | **default** : 0.0
+       | **name** : Energy offset
+       | **choices** : None
+       | **unit** : eV
+       | **allow_None** : False
+       | **tooltip** : The absolute offset in energy for the zeroth channel.
+   * - :py:data:`energy_delta`
+     - | **type** : float
+       | **default** : 1.0
+       | **name** : Channel energy delta
+       | **choices** : None
+       | **unit** : eV
+       | **allow_None** : False
+       | **tooltip** : The width of each energy channels in eV.
 
 Scan
 ~~~~
@@ -1248,6 +1296,14 @@ Settings
        | **allow_None** : False
        | **unit** : s
        | **tooltip** : The delay before any plot updates will be processed. This will prevent multiple frequent update of plots.
+   * - :py:data:`max_number_curves`
+     - | **type** : int
+       | **default** : 40
+       | **name** : Maximum number of curves
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The maximum number of curves to plot. Increasing this number will allow more curves to be plotted simultaneously, but at the cost of significant performance decrease.
    * - :py:data:`histogram_outlier_fraction_high`
      - | **type** : float
        | **default** : 0.07

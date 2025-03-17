@@ -1733,6 +1733,78 @@ available:</p>
 </div>
 </td>
 </tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">files_per_directory</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : -1</div>
+<div class="line"><strong>name</strong> : Images per directory</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of files in the directory.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_counted_files_per_directory</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Processed images per directory</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The counted number of images per directory.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fio_suffix</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : _mca_s#.fio</div>
+<div class="line"><strong>name</strong> : FIO file suffix</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The file suffix for teh individual MCA files.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_absolute_energy</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Use absolute energy</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Use an absolute energy scale for the results. If False, the energy scale will be created in channel numbers.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">energy_offset</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0.0</div>
+<div class="line"><strong>name</strong> : Energy offset</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : eV</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The absolute offset in energy for the zeroth channel.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">energy_delta</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1.0</div>
+<div class="line"><strong>name</strong> : Channel energy delta</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : eV</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The width of each energy channels in eV.</div>
+</div>
+</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -2298,7 +2370,19 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_high</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_number_curves</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 40</div>
+<div class="line"><strong>name</strong> : Maximum number of curves</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The maximum number of curves to plot. Increasing this number will allow more curves to be plotted simultaneously, but at the cost of significant performance decrease.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_high</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0.07</div>
@@ -2310,7 +2394,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_low</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_low</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0.02</div>
@@ -2322,7 +2406,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_name</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_name</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : Gray</div>
@@ -2334,7 +2418,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_nan_color</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_nan_color</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : #9AFEFF</div>

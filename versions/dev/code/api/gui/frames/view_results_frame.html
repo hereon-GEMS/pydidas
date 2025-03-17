@@ -501,12 +501,6 @@ document.write(`
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.frames.ViewResultsFrame.finalize_ui">
-<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.ViewResultsFrame.finalize_ui" title="Link to this definition">#</a></dt>
-<dd><p>Connect the export functions to the results widget data.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.ViewResultsFrame.frame_activated">
 <span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.ViewResultsFrame.frame_activated" title="Link to this definition">#</a></dt>
 <dd><p>Received a signal that a new frame has been selected.</p>
@@ -667,6 +661,12 @@ subclasses full control over args and kwargs.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Build the frame and populate it with widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">build_view_results_mixin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Build the widgets required for the ViewResultsMixin functionality.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1221,7 +1221,7 @@ frame’s state.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Connect the export functions to the results widget data.</p>
+<dd><p>finalize the UI initialization.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2500,6 +2500,18 @@ Parameter with default value.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_displayed_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Set the data to display.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>update</strong> (<em>bool</em>) – Flag to update the data without updating the DataViewer metadata.
+The default is False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Set a parameter value.</p>
 <dl class="field-list simple">
@@ -2755,7 +2767,13 @@ parameter referenced with &lt;key&gt;.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">update_choices_of_selected_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Update the “selected_results” Parameter choices based on the WorkflowResults.</p>
+<dd><p>Update the choices of the selected results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">update_displayed_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Update the data to display</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2784,32 +2802,6 @@ parameter referenced with &lt;key&gt;.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>*args</strong> (<em>Tuple</em>) – The input arguments.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Dict</em>) – The input keyword arguments.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">update_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Update the plot.</p>
-<p>This method will get the latest result (subset) from the
-WorkflowResults and update the plot.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">update_result_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_timeline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_plot_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Update the selection of results to show in the plot.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>use_timeline</strong> (<em>bool</em>) – Flag whether to use a timeline and collapse all scan dimensions
-or not.</p></li>
-<li><p><strong>active_plot_dims</strong> (<em>list</em>) – The dimensions of the plot results.</p></li>
-<li><p><strong>node_id</strong> (<em>int</em>) – The result node ID.</p></li>
-<li><p><strong>slices</strong> (<em>tuple</em>) – The tuple with the slices which select the data for plotting.</p></li>
-<li><p><strong>plot_type</strong> (<em>str</em>) – The type of plot to be shown.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2989,7 +2981,6 @@ or not.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.build_frame"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.build_frame</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.connect_signals"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.connect_signals</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.finalize_ui"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.finalize_ui</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.frame_activated"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.frame_activated</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.import_data_to_workflow_results"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.import_data_to_workflow_results</span></code></a></li>
 </ul>

@@ -11,7 +11,7 @@ name: Release new version
 on:
   push:
     branches:
-      - "main"
+      - "master"
 
 jobs:
   check_if_new_version:

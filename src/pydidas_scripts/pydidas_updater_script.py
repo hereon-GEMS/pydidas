@@ -109,8 +109,8 @@ def check_update_necessary_and_wanted(local_version: str, remote_version: str) -
     """
     if local_version >= remote_version:
         print_status(
-            f" === The local version {local_version} is up to date"
-            "\n === with the remote repository.\n === No update required.\n",
+            f"The local version {local_version} is up to date"
+            "\n=== with the remote repository.\n=== No update required.",
         )
         input("Press <Enter> to continue.")
         return False
@@ -131,9 +131,9 @@ def print_status(status: str):
         The status message to be printed.
     """
     print("\n")
-    print("=" * 80)
-    print("=== " + status)
     print("=" * 80 + "\n")
+    print("=== " + status)
+    print("\n" + "=" * 80 + "\n")
 
 
 def download_wheel(version: str, path: Path) -> Path:

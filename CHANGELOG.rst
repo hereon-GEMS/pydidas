@@ -2,6 +2,17 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v25.mm.dd
+=========
+
+Improvements
+------------
+- Added a plugin to save 2d data in ASCII format.
+
+Bugfixes
+--------
+
+
 v25.03.17
 =========
 

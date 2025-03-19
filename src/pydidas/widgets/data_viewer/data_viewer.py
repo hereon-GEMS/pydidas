@@ -243,6 +243,8 @@ class DataViewer(WidgetWithParameterCollection):
             if self._active_view is None:
                 return
             view_id = self._active_view
+        if self._button_group.checkedButton() != self._widgets[f"button_{view_id}"]:
+            self._widgets[f"button_{view_id}"].click()
         _view = self._view_objects[view_id]
         if not self._metadata_updated:
             self._widgets["axes_selector"].set_metadata_from_dataset(self._data)

@@ -13,6 +13,8 @@ Improvements
 
 Bugfixes
 --------
+- Fixed an issue in the DataViewer where the selected button was not updated 
+  when the view was changed due to the data dimensionality.
 
 
 v25.03.17

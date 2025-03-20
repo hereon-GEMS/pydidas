@@ -77,7 +77,7 @@ class DspacingSin_2chi(ProcPlugin):
     plugin_group = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = 2
     output_data_dim = 2
-    #TODO: to be decided
+    
     output_data_label = "0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg"
     new_dataset=True
     

@@ -844,22 +844,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         # Aim for a complete common s2c_mean_pos/neg without NaN values
         s2c_mean = np.nanmean(np.vstack((s2c_mean_pos, s2c_mean_neg)), axis=0)
         
-        
-        # The x-axis values are given by 0..max(s2c_labels) because of the way how the matrices are populated.
-        # This has also the advantage of automatic sorting in ascending order.
-        # Hence, I think s2c_mean = s2c[s2c_unique_labels] is correct
-        # print('Comparison of s2c selection:', np.allclose(s2c_mean, s2c[s2c_unique_labels]))
-        # If we want s2c[s2c_unique_labels] for the axis_ranges for sin2chi,
-        # we don't need to populate the matrixes for s2c_pos_slope_matrix like this
-        # If we don't use s2c_mean, sometimes one of the s2c_mean_pos or s2c_mean_neg has np.nan, for example, if chi = [0,90] only.
-        # This is due to the fact, that the matrices are prepopulated with np.nan.
-        # A way around is to use s2c_mean=s2c[s2c_unique_labels] and this could reduce code above.
-        # print('s2c_mean', s2c_mean)
-        # print( 's2c_mean_pos', s2c_mean_pos)
-        # print('s2c_mean_neg', s2c_mean_neg)
-
+       
         # create Datasets for output
-        # If wished, later to be changed to s2c[s2c_unique_labels] for s2c_mean
         d_spacing_pos = Dataset(
             d_spacing_mean_pos,
             axis_ranges={0: s2c_mean},

@@ -77,7 +77,7 @@ class DspacingSin_2chi(ProcPlugin):
     plugin_group = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = 2
     output_data_dim = 2
-    
+
     output_data_label = "0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg"
     new_dataset=True
     
@@ -168,7 +168,7 @@ class DspacingSin_2chi(ProcPlugin):
         ds[2,:] = delta_d_diff.data
         ds.data_label: str = "Difference of d(+) - d(-)" 
         ds.axis_labels: Dict[int, str] = {0: '0: d-, 1: d+, 2: d(+)-d(-)', 1: LABELS_SIN_2CHI} 
-        #TODO: needs adjustment for the low energy case in second dimension
+        
         ds.axis_ranges: Dict[int, np.ndarray] = { 0:np.arange(3) , 1: self._calculate_sin_2chi_values(ds.axis_ranges[1])} 
         
         return ds

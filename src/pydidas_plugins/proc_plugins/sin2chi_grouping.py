@@ -521,7 +521,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing = ds[*_slices]
         d_spacing = d_spacing.squeeze()
 
-        # TODO: Slicing does not work on the data_label
+        # Slicing does not work on the data_label
+        # This is a workaround 
         d_spacing.data_label = key_at_pos_idx
         d_spacing.data_unit = unit_at_pos_idx
 

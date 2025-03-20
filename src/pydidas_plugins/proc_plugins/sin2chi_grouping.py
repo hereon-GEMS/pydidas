@@ -843,7 +843,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_mean_neg = np.nanmean(d_spacing_neg_slope_matrix, axis=1)
         # Aim for a complete common s2c_mean_pos/neg without NaN values
         s2c_mean = np.nanmean(np.vstack((s2c_mean_pos, s2c_mean_neg)), axis=0)
-        # TODO:
+        
         # The x-axis values are given by 0..max(s2c_labels) because of the way how the matrices are populated.
         # This has also the advantage of automatic sorting in ascending order.
         # Hence, I think s2c_mean = s2c[s2c_unique_labels] is correct
@@ -858,7 +858,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         # print('s2c_mean_neg', s2c_mean_neg)
 
         # create Datasets for output
-        # TODO: if wished later to be changed to s2c[s2c_unique_labels] for s2c_mean
+        # If wished, later to be changed to s2c[s2c_unique_labels] for s2c_mean
         d_spacing_pos = Dataset(
             d_spacing_mean_pos,
             axis_ranges={0: s2c_mean},

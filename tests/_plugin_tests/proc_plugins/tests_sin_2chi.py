@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,26 +20,29 @@ Tests for the DspacingSin_2chi class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
-import pytest
+from dataclasses import dataclass
 
 import numpy as np
 import numpy.testing as npt
-from dataclasses import dataclass
+import pytest
 
-from pydidas.plugins import PluginCollection
-from pydidas.plugins import ProcPlugin
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas_plugins.proc_plugins.sin_2chi import (
+    LABELS_DIM0,
+    LABELS_SIN2CHI,
+    LABELS_SIN_2CHI,
+    PARAMETER_KEEP_RESULTS,
+    UNITS_ANGSTROM,
+    UNITS_NANOMETER,
+)
 
 from pydidas.core import Dataset, UserConfigError
-
-from pydidas_plugins.proc_plugins.sin_2chi import (PARAMETER_KEEP_RESULTS, LABELS_SIN2CHI, LABELS_SIN_2CHI, LABELS_SIN2CHI,
-                                                            LABELS_DIM0, UNITS_NANOMETER, UNITS_ANGSTROM)
-
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas.plugins import PluginCollection, ProcPlugin
 
 
 def test_plugin_inheritance():  
@@ -317,14 +320,14 @@ def test_DspacingSin_2chi_params(plugin_fixture):
     
     assert plugin.plugin_name == 'Difference in d-spacing vs sin(2*chi)'
     assert plugin.plugin_type == PROC_PLUGIN
-    assert plugin.basic_plugin == False
+    assert not plugin.basic_plugin
     assert plugin.plugin_group == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == 2
     assert plugin.output_data_dim == 2
     assert plugin.output_data_label == '0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg'
-    assert plugin.new_dataset == True   
+    assert plugin.new_dataset   
     
-    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value == True
+    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value
     assert plugin.generic_params[PARAMETER_KEEP_RESULTS].choices == [True]
     
     

@@ -308,9 +308,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         `fit_labels` should be a semicolon-separated list of parameter names, formatted as "index: name". The function matches
         parameters based on these indices and extracts corresponding units.
         """
-       
-        
-        # Ensure ds is an instance of Dataset
+
         self._ensure_dataset_instance(ds)
 
         chi_key, (pos_key, _) = self._chi_pos_verification(ds)
@@ -318,7 +316,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         data_label = ds.data_label
         fit_labels = ds.axis_labels[pos_key]
 
-        # Step 1: Extract parameter names from fit_labels using dictionary comprehension
+        # Step 1: Extract parameter names from fit_labels
         fit_labels_dict = {
             int(item.split(":")[0].strip()): item.split(":")[1].strip()
             for item in fit_labels.split(";")
@@ -353,9 +351,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
             new_key = 0
         result[new_key] = [chi_label, chi_unit]
 
-        return result        
-            
-            
+        return result
             
     def _chi_pos_unit_verification(self, ds: Dataset):
         """
@@ -404,7 +400,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 if label == LABELS_CHI and unit not in chi_units_allowed:
                     raise UserConfigError(f"Unit {unit} not allowed for {label}.")
 
-       
     
     def _get_param_unit_at_index(self, ds_units: Dict[int, Tuple[str, str]], pos_idx: int) -> Tuple[str, str]:
         """
@@ -553,10 +548,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         if len(parts) != 2:
             raise ValueError("Invalid data_label format. Expected 'position / unit'.")
         
-        # Extract and strip the unit
         pos_unit = parts[1].strip()
         
-        # Compare with allowed units for position
         if pos_unit not in pos_units_allowed:
             raise UserConfigError(f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}.")
         
@@ -575,7 +568,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         chi = ds.axis_ranges[self.config._chi_key]
 
         return chi, ds
-
     
     def _ds_slicing(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
         """
@@ -620,10 +612,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         >>> print(chi)
         >>> print(d_spacing)
         """
-
         self._ensure_dataset_instance(ds)
         
-
         # Identification of chi and position
         if self.config._chi_key is None or self.config._pos_key is None or self.config._pos_idx is None:
             self.config._chi_key, (self.config._pos_key, self.config._pos_idx) = self._chi_pos_verification(ds)
@@ -635,7 +625,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         # Verification of units for chi and position
         # checks currently for each dataset 
         self._chi_pos_unit_verification(ds)
-          
 
         # select the chi values
         chi = ds.axis_ranges[self.config._chi_key]    
@@ -787,7 +776,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         zero_threshold = 1e-6
 
         # Categorize the values of the first_derivative
-    
         categories = np.zeros_like(first_derivative, dtype=int)
         categories[first_derivative > zero_threshold] = Category.POSITIVE.value
         categories[first_derivative < -zero_threshold] = Category.NEGATIVE.value
@@ -805,13 +793,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
         s2c_advanced_idx = (self.config._s2c_labels, np.arange(s2c.size))
         # expected shape for future matrices
         s2c_groups_matrix_shape = s2c_unique_labels.size, s2c.size
-        # print('s2c_groups_matrix_shape', s2c_groups_matrix_shape)
-
+    
         # s2c_label_matrix and d_spacing_matrix are useful for quality assurance via visual inspection
         s2c_labels_matrix = np.full(s2c_groups_matrix_shape, np.nan)
         s2c_labels_matrix[*s2c_advanced_idx] = self.config._s2c_labels
-        # print('s2c_labels_matrix\n', s2c_labels_matrix)
-
+        
         d_spacing_matrix = np.full(s2c_groups_matrix_shape, np.nan)
         d_spacing_matrix[*s2c_advanced_idx] = d_spacing
 
@@ -844,8 +830,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_mean_neg = np.nanmean(d_spacing_neg_slope_matrix, axis=1)
         # Aim for a complete common s2c_mean_pos/neg without NaN values
         s2c_mean = np.nanmean(np.vstack((s2c_mean_pos, s2c_mean_neg)), axis=0)
-        
-       
+               
         # create Datasets for output
         d_spacing_pos = Dataset(
             d_spacing_mean_pos,
@@ -985,7 +970,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 data_label='d_spacing'
             )
              
-    
         return result
     
     

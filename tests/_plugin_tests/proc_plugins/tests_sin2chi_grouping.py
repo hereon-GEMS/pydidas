@@ -92,6 +92,7 @@ def test_plugin_inheritance():
 
 # Testing of remaining methods
 
+
 def chi_gen(chi_start, chi_stop, delta_chi):
     if chi_start >= chi_stop:
         raise ValueError("chi_start has to be smaller than chi_stop")
@@ -498,18 +499,18 @@ def test__group_d_spacing_by_chi_result(plugin_fixture, case):
     assert nan_allclose(d_spacing_neg.axis_ranges[0], case.s2c_range, atol=1e-5)
     assert d_spacing_pos.array.size == case.d_mean_pos.size
     assert d_spacing_neg.array.size == case.d_mean_neg.size
-    assert np.sum(np.isnan(d_spacing_pos.array)) == np.sum(np.isnan(case.d_mean_pos)), (
-        f"Expected {np.sum(np.isnan(case.d_mean_pos))} NaN values, but got {np.sum(np.isnan(d_spacing_pos.array))}"
-    )
-    assert np.sum(np.isnan(d_spacing_neg.array)) == np.sum(np.isnan(case.d_mean_neg)), (
-        f"Expected {np.sum(np.isnan(case.d_mean_neg))} NaN values, but got {np.sum(np.isnan(d_spacing_neg.array))}"
-    )
-    assert d_spacing_pos.array.shape == case.d_mean_pos.shape, (
-        f"Expected shapes to match: {d_spacing_pos.array.shape} != {case.d_mean_pos.shape}"
-    )
-    assert d_spacing_neg.array.shape == case.d_mean_neg.shape, (
-        f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
-    )
+    assert np.sum(np.isnan(d_spacing_pos.array)) == np.sum(
+        np.isnan(case.d_mean_pos)
+    ), f"Expected {np.sum(np.isnan(case.d_mean_pos))} NaN values, but got {np.sum(np.isnan(d_spacing_pos.array))}"
+    assert np.sum(np.isnan(d_spacing_neg.array)) == np.sum(
+        np.isnan(case.d_mean_neg)
+    ), f"Expected {np.sum(np.isnan(case.d_mean_neg))} NaN values, but got {np.sum(np.isnan(d_spacing_neg.array))}"
+    assert (
+        d_spacing_pos.array.shape == case.d_mean_pos.shape
+    ), f"Expected shapes to match: {d_spacing_pos.array.shape} != {case.d_mean_pos.shape}"
+    assert (
+        d_spacing_neg.array.shape == case.d_mean_neg.shape
+    ), f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
 
 
 @pytest.fixture()
@@ -733,9 +734,9 @@ def test_chi_pos_verification_wrong_input_type(plugin_fixture):
 
     with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification([])  # Pass a list instead of a Dataset
-    assert "Input must be an instance of Dataset." in str(excinfo.value), (
-        "Error message should indicate wrong type for Dataset."
-    )
+    assert "Input must be an instance of Dataset." in str(
+        excinfo.value
+    ), "Error message should indicate wrong type for Dataset."
 
 
 def test__chi_pos_verification_all_labels_missing(plugin_fixture):
@@ -770,9 +771,9 @@ def test__multiple_chis_in_labels(plugin_fixture):
     with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification(ds)
 
-    assert 'Multiple "chi" found' in str(excinfo.value), (
-        "Error message should indicate multiple 'chi' were found"
-    )
+    assert 'Multiple "chi" found' in str(
+        excinfo.value
+    ), "Error message should indicate multiple 'chi' were found"
 
 
 def test__position_not_at_zero(plugin_fixture):
@@ -815,9 +816,9 @@ def test__ds_slicing_type_error(plugin_fixture):
 
     with pytest.raises(UserConfigError) as excinfo:
         plugin._ds_slicing([])  # Pass an empty list instead of a Dataset
-    assert "Input must be an instance of Dataset." in str(excinfo.value), (
-        "Error message should indicate wrong type for Dataset."
-    )
+    assert "Input must be an instance of Dataset." in str(
+        excinfo.value
+    ), "Error message should indicate wrong type for Dataset."
 
 
 def test__ds_slicing_valid(plugin_fixture):
@@ -876,9 +877,9 @@ def test__ds_slicing_beyond_bounds_v2(plugin_fixture):
 
     with pytest.raises(ValueError) as excinfo:
         plugin._ds_slicing(ds2)
-    assert "Array is empty, slicing out of bounds." in str(excinfo.value), (
-        "Error message should indicate that slicing beyond bounds."
-    )
+    assert "Array is empty, slicing out of bounds." in str(
+        excinfo.value
+    ), "Error message should indicate that slicing beyond bounds."
 
 
 def test__ds_slicing_dimension_mismatch(plugin_fixture):
@@ -900,9 +901,9 @@ def test__ds_slicing_dimension_mismatch(plugin_fixture):
 
     with pytest.raises(ValueError) as excinfo:
         plugin._ds_slicing(ds)
-    assert "Dimension mismatch" in str(excinfo.value), (
-        "Error message should indicate that d_spacing has a larger dimension."
-    )
+    assert "Dimension mismatch" in str(
+        excinfo.value
+    ), "Error message should indicate that d_spacing has a larger dimension."
 
 
 def test__ds_slicing_dimension_mismatch_3d(plugin_fixture):
@@ -923,9 +924,9 @@ def test__ds_slicing_dimension_mismatch_3d(plugin_fixture):
     )
     with pytest.raises(ValueError) as excinfo:
         plugin._ds_slicing(ds_3d)
-    assert "Dimension mismatch" in str(excinfo.value), (
-        "Error message should indicate that d_spacing has a larger dimension."
-    )
+    assert "Dimension mismatch" in str(
+        excinfo.value
+    ), "Error message should indicate that d_spacing has a larger dimension."
 
 
 def test__extract_d_spacing_valid(plugin_fixture):
@@ -1069,18 +1070,18 @@ def test__group_d_spacing_by_chi_len_unique_groups(plugin_fixture):
     )
 
     # Check the lengths of the output arrays
-    assert len(s2c_unique_labels) == d_spacing_pos.size, (
-        f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.size}"
-    )
-    assert len(s2c_unique_labels) == d_spacing_pos.axis_ranges[0].size, (
-        f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.axis_ranges[0].size}"
-    )
-    assert len(s2c_unique_labels) == d_spacing_neg.size, (
-        f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.size}"
-    )
-    assert len(s2c_unique_labels) == d_spacing_neg.axis_ranges[0].size, (
-        f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.axis_ranges[0].size}"
-    )
+    assert (
+        len(s2c_unique_labels) == d_spacing_pos.size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.size}"
+    assert (
+        len(s2c_unique_labels) == d_spacing_pos.axis_ranges[0].size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.axis_ranges[0].size}"
+    assert (
+        len(s2c_unique_labels) == d_spacing_neg.size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.size}"
+    assert (
+        len(s2c_unique_labels) == d_spacing_neg.axis_ranges[0].size
+    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.axis_ranges[0].size}"
 
 
 test_cases = [case9]
@@ -1239,16 +1240,16 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
     res_pos_combined = np.logical_and(res_pos_1, res_pos_2)
 
     # Assertions to ensure all elements are close
-    assert np.all(res_pos_1), (
-        f"data_pos_mean and d_spacing_pos are not close: {res_pos_1}"
-    )
-    assert np.all(res_pos_2), (
-        f"d_spacing_pos and case.d_mean_pos are not close: {res_pos_2}"
-    )
+    assert np.all(
+        res_pos_1
+    ), f"data_pos_mean and d_spacing_pos are not close: {res_pos_1}"
+    assert np.all(
+        res_pos_2
+    ), f"d_spacing_pos and case.d_mean_pos are not close: {res_pos_2}"
     # Assertions to ensure all elements are close
-    assert np.all(res_pos_combined), (
-        f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not close: {res_pos_combined}"
-    )
+    assert np.all(
+        res_pos_combined
+    ), f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not close: {res_pos_combined}"
 
     # Same for negative slopes
     res_neg_1 = np.isclose(
@@ -1259,15 +1260,15 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
     )
     res_neg_combined = np.logical_and(res_neg_1, res_neg_2)
 
-    assert np.all(res_neg_1), (
-        f"data_neg_mean and d_spacing_neg are not close: {res_neg_1}"
-    )
-    assert np.all(res_neg_2), (
-        f"d_spacing_neg and case.d_mean_neg are not close: {res_neg_2}"
-    )
-    assert np.all(res_neg_combined), (
-        f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not close: {res_neg_combined}"
-    )
+    assert np.all(
+        res_neg_1
+    ), f"data_neg_mean and d_spacing_neg are not close: {res_neg_1}"
+    assert np.all(
+        res_neg_2
+    ), f"d_spacing_neg and case.d_mean_neg are not close: {res_neg_2}"
+    assert np.all(
+        res_neg_combined
+    ), f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not close: {res_neg_combined}"
 
 
 @dataclass
@@ -1652,19 +1653,19 @@ def test__create_final_result_sin2chi_method_valid_input(
 
     # Verify the shape and content of the returned datasets
     assert result.shape == (3, 3), "Average dataset shape is incorrect"
-    assert result.axis_labels[0] == "0: d-, 1: d+, 2: d_mean", (
-        "Expected axis_labels[0] is '0: d-, 1: d+, 2: d_mean'."
-    )
+    assert (
+        result.axis_labels[0] == "0: d-, 1: d+, 2: d_mean"
+    ), "Expected axis_labels[0] is '0: d-, 1: d+, 2: d_mean'."
 
-    assert result.axis_labels[1] == LABELS_SIN2CHI, (
-        f"Expected axis_labels[1] dataset axis label is {LABELS_SIN2CHI}."
-    )
-    assert result.data_unit == d_spacing_combined_fixture.data_unit, (
-        f"Resulting dataset data unit is incorrect. Expected unit: {d_spacing_combined_fixture.data_unit}"
-    )
-    assert result.data_label == d_spacing_combined_fixture.data_label, (
-        f"Resulting dataset data label is incorrect. Expected data label: {d_spacing_combined_fixture.data_label}"
-    )
+    assert (
+        result.axis_labels[1] == LABELS_SIN2CHI
+    ), f"Expected axis_labels[1] dataset axis label is {LABELS_SIN2CHI}."
+    assert (
+        result.data_unit == d_spacing_combined_fixture.data_unit
+    ), f"Resulting dataset data unit is incorrect. Expected unit: {d_spacing_combined_fixture.data_unit}"
+    assert (
+        result.data_label == d_spacing_combined_fixture.data_label
+    ), f"Resulting dataset data label is incorrect. Expected data label: {d_spacing_combined_fixture.data_label}"
 
 
 def test__create_final_result_sin2chi_method_accuracy(
@@ -3050,12 +3051,12 @@ def test_array_mean_base(array_mean_fixture):
 
     # Check that base is None for mean operations
     assert arr.mean().base is None, "Expected base to be None for np.ndarray.mean()"
-    assert arr.mean(axis=0).base is None, (
-        "Expected base to be None for np.ndarray.mean(axis=0)"
-    )
-    assert arr.mean(axis=1).base is None, (
-        "Expected base to be None for np.ndarray.mean(axis=1)"
-    )
+    assert (
+        arr.mean(axis=0).base is None
+    ), "Expected base to be None for np.ndarray.mean(axis=0)"
+    assert (
+        arr.mean(axis=1).base is None
+    ), "Expected base to be None for np.ndarray.mean(axis=1)"
     assert np.mean(arr).base is None, "Expected base to be None for np.mean()"
 
 

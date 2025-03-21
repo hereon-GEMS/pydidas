@@ -27,12 +27,11 @@ __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 __all__ = ["DspacingSin_2chi"]
 
+from typing import Any, Dict, Tuple
 
 import numpy as np
-from typing import Dict, Any, Tuple
 
 from pydidas.core import Dataset, UserConfigError
-
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import ProcPlugin
 

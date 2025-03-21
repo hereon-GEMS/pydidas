@@ -44,7 +44,7 @@ from pydidas_plugins.proc_plugins.stress_strain import (
     idx_s2c_grouping,
     pre_regression_calculation,
     create_final_result_sin2chi_method,
-    Labels
+    Labels,
 )
 
 
@@ -451,18 +451,18 @@ def test_group_d_spacing_by_chi_result(case):
     assert nan_allclose(d_spacing_neg.axis_ranges[0], case.s2c_range, atol=1e-5)
     assert d_spacing_pos.array.size == case.d_mean_pos.size
     assert d_spacing_neg.array.size == case.d_mean_neg.size
-    assert (
-        np.sum(np.isnan(d_spacing_pos.array)) == np.sum(np.isnan(case.d_mean_pos))
-    ), f"Expected {np.sum(np.isnan(case.d_mean_pos))} NaN values, but got {np.sum(np.isnan(d_spacing_pos.array))}"
-    assert (
-        np.sum(np.isnan(d_spacing_neg.array)) == np.sum(np.isnan(case.d_mean_neg))
-    ), f"Expected {np.sum(np.isnan(case.d_mean_neg))} NaN values, but got {np.sum(np.isnan(d_spacing_neg.array))}"
-    assert (
-        d_spacing_pos.array.shape == case.d_mean_pos.shape
-    ), f"Expected shapes to match: {d_spacing_pos.array.shape} != {case.d_mean_pos.shape}"
-    assert (
-        d_spacing_neg.array.shape == case.d_mean_neg.shape
-    ), f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
+    assert np.sum(np.isnan(d_spacing_pos.array)) == np.sum(np.isnan(case.d_mean_pos)), (
+        f"Expected {np.sum(np.isnan(case.d_mean_pos))} NaN values, but got {np.sum(np.isnan(d_spacing_pos.array))}"
+    )
+    assert np.sum(np.isnan(d_spacing_neg.array)) == np.sum(np.isnan(case.d_mean_neg)), (
+        f"Expected {np.sum(np.isnan(case.d_mean_neg))} NaN values, but got {np.sum(np.isnan(d_spacing_neg.array))}"
+    )
+    assert d_spacing_pos.array.shape == case.d_mean_pos.shape, (
+        f"Expected shapes to match: {d_spacing_pos.array.shape} != {case.d_mean_pos.shape}"
+    )
+    assert d_spacing_neg.array.shape == case.d_mean_neg.shape, (
+        f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
+    )
 
 
 def test_chi_pos_verification_success():
@@ -476,12 +476,10 @@ def test_chi_pos_verification_success():
 
     ds = Dataset(result_array_spatial, axis_labels=axis_labels)
     chi_key, (pos_key, pos_idx) = chi_pos_verification(ds)
-    
+
     assert chi_key == 2
     assert pos_key == 3
-    assert pos_idx == 0 
-    
-
+    assert pos_idx == 0
 
 
 def test_chi_pos_verification_missing_chi():
@@ -518,9 +516,9 @@ def test_chi_pos_verification_missing_position():
 def test_chi_pos_verification_wrong_input_type():
     with pytest.raises(TypeError) as excinfo:
         chi_pos_verification([])  # Pass a list instead of a Dataset
-    assert "Input has to be of type Dataset." in str(
-        excinfo.value
-    ), "Error message should indicate wrong type for Dataset."
+    assert "Input has to be of type Dataset." in str(excinfo.value), (
+        "Error message should indicate wrong type for Dataset."
+    )
 
 
 def test_chi_pos_verification_all_labels_missing():
@@ -551,9 +549,9 @@ def test_multiple_chis_in_labels():
     with pytest.raises(KeyError) as excinfo:
         chi_pos_verification(ds)
 
-    assert 'Multiple "chi" found' in str(
-        excinfo.value
-    ), "Error message should indicate multiple 'chi' were found"
+    assert 'Multiple "chi" found' in str(excinfo.value), (
+        "Error message should indicate multiple 'chi' were found"
+    )
 
 
 def test_position_not_at_zero():
@@ -590,9 +588,9 @@ def test_position_not_at_zero_3d():
 def test_ds_slicing_type_error():
     with pytest.raises(TypeError) as excinfo:
         ds_slicing([])  # Pass an empty list instead of a Dataset
-    assert "Input has to be of type Dataset." in str(
-        excinfo.value
-    ), "Error message should indicate wrong type for Dataset."
+    assert "Input has to be of type Dataset." in str(excinfo.value), (
+        "Error message should indicate wrong type for Dataset."
+    )
 
 
 def test_ds_slicing_valid():
@@ -635,9 +633,9 @@ def test_ds_slicing_beyond_bounds():
     )
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds)
-    assert "Array is empty, slicing out of bounds." in str(
-        excinfo.value
-    ), "Error message should indicate that slicing beyond bounds."
+    assert "Array is empty, slicing out of bounds." in str(excinfo.value), (
+        "Error message should indicate that slicing beyond bounds."
+    )
 
 
 def test_ds_slicing_beyond_bounds_v2():
@@ -669,9 +667,9 @@ def test_ds_slicing_beyond_bounds_v2():
     assert pos_idx == 5
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds2)
-    assert "Array is empty, slicing out of bounds." in str(
-        excinfo.value
-    ), "Error message should indicate that slicing beyond bounds."
+    assert "Array is empty, slicing out of bounds." in str(excinfo.value), (
+        "Error message should indicate that slicing beyond bounds."
+    )
 
 
 def test_ds_slicing_dimension_mismatch():
@@ -691,9 +689,9 @@ def test_ds_slicing_dimension_mismatch():
 
     with pytest.raises(ValueError) as excinfo:
         test = ds_slicing(ds)
-    assert "Dimension mismatch" in str(
-        excinfo.value
-    ), "Error message should indicate that d_spacing has a larger dimension."
+    assert "Dimension mismatch" in str(excinfo.value), (
+        "Error message should indicate that d_spacing has a larger dimension."
+    )
 
 
 def test_ds_slicing_dimension_mismatch_3d():
@@ -712,9 +710,9 @@ def test_ds_slicing_dimension_mismatch_3d():
     )
     with pytest.raises(ValueError) as excinfo:
         ds_slicing(ds_3d)
-    assert "Dimension mismatch" in str(
-        excinfo.value
-    ), "Error message should indicate that d_spacing has a larger dimension."
+    assert "Dimension mismatch" in str(excinfo.value), (
+        "Error message should indicate that d_spacing has a larger dimension."
+    )
 
 
 def test_extract_d_spacing_valid():
@@ -792,8 +790,8 @@ def test_group_d_spacing_by_chi_basic():
     assert d_spacing_pos.size > 0
     assert d_spacing_neg.size > 0
     assert d_spacing_pos.axis_ranges[0].size == d_spacing_neg.axis_ranges[0].size
-    assert d_spacing_pos.data_label == f"{ d_spacing.data_label}_pos"
-    assert d_spacing_neg.data_label == f"{ d_spacing.data_label}_neg"
+    assert d_spacing_pos.data_label == f"{d_spacing.data_label}_pos"
+    assert d_spacing_neg.data_label == f"{d_spacing.data_label}_neg"
     assert d_spacing_pos.axis_labels[0] == Labels.SIN2CHI
     assert d_spacing_neg.axis_labels[0] == Labels.SIN2CHI
 
@@ -835,18 +833,18 @@ def test_group_d_spacing_by_chi_len_unique_groups():
     )
 
     # Check the lengths of the output arrays
-    assert (
-        len(s2c_unique_labels) == d_spacing_pos.size
-    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.size}"
-    assert (
-        len(s2c_unique_labels) == d_spacing_pos.axis_ranges[0].size
-    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.axis_ranges[0].size}"
-    assert (
-        len(s2c_unique_labels) == d_spacing_neg.size
-    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.size}"
-    assert (
-        len(s2c_unique_labels) == d_spacing_neg.axis_ranges[0].size
-    ), f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.axis_ranges[0].size}"
+    assert len(s2c_unique_labels) == d_spacing_pos.size, (
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.size}"
+    )
+    assert len(s2c_unique_labels) == d_spacing_pos.axis_ranges[0].size, (
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_pos.axis_ranges[0].size}"
+    )
+    assert len(s2c_unique_labels) == d_spacing_neg.size, (
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.size}"
+    )
+    assert len(s2c_unique_labels) == d_spacing_neg.axis_ranges[0].size, (
+        f"Expected {len(s2c_unique_labels)}, got {d_spacing_neg.axis_ranges[0].size}"
+    )
 
 
 test_cases = [case9]
@@ -1009,16 +1007,16 @@ def test_group_d_spacing_by_chi_second_validation_method(case):
     res_pos_combined = np.logical_and(res_pos_1, res_pos_2)
 
     # Assertions to ensure all elements are close
-    assert np.all(
-        res_pos_1
-    ), f"data_pos_mean and d_spacing_pos are not close: {res_pos_1}"
-    assert np.all(
-        res_pos_2
-    ), f"d_spacing_pos and case.d_mean_pos are not close: {res_pos_2}"
+    assert np.all(res_pos_1), (
+        f"data_pos_mean and d_spacing_pos are not close: {res_pos_1}"
+    )
+    assert np.all(res_pos_2), (
+        f"d_spacing_pos and case.d_mean_pos are not close: {res_pos_2}"
+    )
     # Assertions to ensure all elements are close
-    assert np.all(
-        res_pos_combined
-    ), f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not close: {res_pos_combined}"
+    assert np.all(res_pos_combined), (
+        f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not close: {res_pos_combined}"
+    )
 
     # Same for negative slopes
     res_neg_1 = np.isclose(
@@ -1029,15 +1027,15 @@ def test_group_d_spacing_by_chi_second_validation_method(case):
     )
     res_neg_combined = np.logical_and(res_neg_1, res_neg_2)
 
-    assert np.all(
-        res_neg_1
-    ), f"data_neg_mean and d_spacing_neg are not close: {res_neg_1}"
-    assert np.all(
-        res_neg_2
-    ), f"d_spacing_neg and case.d_mean_neg are not close: {res_neg_2}"
-    assert np.all(
-        res_neg_combined
-    ), f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not close: {res_neg_combined}"
+    assert np.all(res_neg_1), (
+        f"data_neg_mean and d_spacing_neg are not close: {res_neg_1}"
+    )
+    assert np.all(res_neg_2), (
+        f"d_spacing_neg and case.d_mean_neg are not close: {res_neg_2}"
+    )
+    assert np.all(res_neg_combined), (
+        f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not close: {res_neg_combined}"
+    )
 
 
 @dataclass
@@ -1228,6 +1226,7 @@ def test_combine_sort_d_spacing_pos_neg_with_nan():
         err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values, especially with NaN values.",
     )
 
+
 @pytest.fixture
 def d_spacing_datasets():
     d_spacing_pos = Dataset(
@@ -1394,7 +1393,10 @@ def d_spacing_combined_fixture():
     # Mocking a Dataset instance with sample data
     data = np.array([[1, 2, np.nan], [4, 5, 6]])  # Example data
     d_spacing_combined = Dataset(
-        axis_ranges={0:  np.arange(2), 1: np.array([0.1, 0.2, 0.3])},  # Example sin^2(chi) values
+        axis_ranges={
+            0: np.arange(2),
+            1: np.array([0.1, 0.2, 0.3]),
+        },  # Example sin^2(chi) values
         axis_labels={0: "0: d-, 1: d+", 1: Labels.SIN2CHI},
         axis_units={0: "", 1: ""},
         data_unit="nm",
@@ -1412,26 +1414,26 @@ def test_pre_regression_calculation_valid_input(d_spacing_combined_fixture):
 
     # Verify the shape and content of the returned datasets
     assert d_spacing_avg.shape == (3,), "Average dataset shape is incorrect"
-    assert (
-        d_spacing_avg.axis_labels[0] == Labels.SIN2CHI
-    ), "Average dataset axis label is incorrect"
-    assert (
-        d_spacing_avg.data_unit == d_spacing_combined_fixture.data_unit
-    ), "Average dataset data unit is incorrect"
-    assert (
-        d_spacing_avg.data_label == "Mean of 0: position_neg, 1: position_pos"
-    ), "Average dataset data label is incorrect"
+    assert d_spacing_avg.axis_labels[0] == Labels.SIN2CHI, (
+        "Average dataset axis label is incorrect"
+    )
+    assert d_spacing_avg.data_unit == d_spacing_combined_fixture.data_unit, (
+        "Average dataset data unit is incorrect"
+    )
+    assert d_spacing_avg.data_label == "Mean of 0: position_neg, 1: position_pos", (
+        "Average dataset data label is incorrect"
+    )
 
     assert d_spacing_diff.shape == (3,), "Difference dataset shape is incorrect"
-    assert (
-        d_spacing_diff.axis_labels[0] == "sin(2*chi)"
-    ), "Difference dataset axis label is incorrect"
-    assert (
-        d_spacing_diff.data_unit == d_spacing_combined_fixture.data_unit
-    ), "Difference dataset data unit is incorrect"
-    assert (
-        d_spacing_diff.data_label == "Difference of d(+) - d(-)"
-    ), "Difference dataset data label is incorrect"
+    assert d_spacing_diff.axis_labels[0] == "sin(2*chi)", (
+        "Difference dataset axis label is incorrect"
+    )
+    assert d_spacing_diff.data_unit == d_spacing_combined_fixture.data_unit, (
+        "Difference dataset data unit is incorrect"
+    )
+    assert d_spacing_diff.data_label == "Difference of d(+) - d(-)", (
+        "Difference dataset data label is incorrect"
+    )
 
 
 def test_pre_regression_calculation_accuracy(d_spacing_combined_fixture):
@@ -1572,30 +1574,30 @@ def test_pre_regression_calculation_precision(d_spacing_datasets):
     assert np.allclose(d_spacing_diff.axis_ranges[0], expected_diff.axis_ranges[0])
 
 
-
 @pytest.fixture
 def results_sin2chi_method_fixture():
     d_spacing_combined = Dataset(
-        np.array([[1, 2, 3, 4], [5, 6, 7, 8]]), 
-        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]}, 
-        axis_labels={0: '0: d-, 1: d+', 1: Labels.SIN2CHI.value}, 
-        data_unit='nm', 
-        data_label='0: position_neg, 1: position_pos'
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8]]),
+        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]},
+        axis_labels={0: "0: d-, 1: d+", 1: Labels.SIN2CHI.value},
+        data_unit="nm",
+        data_label="0: position_neg, 1: position_pos",
     )
-    
+
     d_spacing_result = Dataset(
         np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]]),
-        axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]}, 
-        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI},
-        data_unit='nm', 
-        data_label='d_spacing'
+        axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]},
+        axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: Labels.SIN2CHI},
+        data_unit="nm",
+        data_label="d_spacing",
     )
-    
+
     return d_spacing_combined, d_spacing_result
+
 
 def test_create_final_result_sin2chi_method_validation(results_sin2chi_method_fixture):
     d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
-    
+
     result = create_final_result_sin2chi_method(d_spacing_combined)
 
     assert np.array_equal(result.array, d_spacing_result.array)
@@ -1604,95 +1606,112 @@ def test_create_final_result_sin2chi_method_validation(results_sin2chi_method_fi
         assert key in d_spacing_result.axis_ranges.keys()
         assert np.array_equal(value, d_spacing_result.axis_ranges[key])
     assert result.axis_labels == d_spacing_result.axis_labels
-    assert result.data_label == 'd_spacing'
+    assert result.data_label == "d_spacing"
     assert result.data_unit == d_spacing_result.data_unit
+
 
 def test_create_final_result_sin2chi_method_type_error(results_sin2chi_method_fixture):
     d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
 
     with pytest.raises(TypeError, match="Input must be an instance of Dataset"):
         create_final_result_sin2chi_method([])
-       
-        
+
+
 def test_create_final_result_sin2chi_method_shape():
     invalid_d_spacing_combined = Dataset(
-        np.array([1, 2, 3, 4]), 
-        axis_ranges={0: [0, 1, 2, 3]}, 
-        axis_labels={0: Labels.SIN2CHI}, 
-        data_unit='nm', 
-        data_label='0: position_neg'
+        np.array([1, 2, 3, 4]),
+        axis_ranges={0: [0, 1, 2, 3]},
+        axis_labels={0: Labels.SIN2CHI},
+        data_unit="nm",
+        data_label="0: position_neg",
     )
-    with pytest.raises(ValueError, match=r"Dataset d_spacing_combined must have a shape of \(2, N\)."):
+    with pytest.raises(
+        ValueError, match=r"Dataset d_spacing_combined must have a shape of \(2, N\)."
+    ):
         create_final_result_sin2chi_method(invalid_d_spacing_combined)
-    
+
 
 def test_create_final_result_sin2chi_method_label_1(results_sin2chi_method_fixture):
     d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
-    d_spacing_combined.update_axis_label(0, 'blub')
-    
-    with pytest.raises(ValueError, match=r"axis_labels\[0\] does not match '0: d-, 1: d\+'."):
+    d_spacing_combined.update_axis_label(0, "blub")
+
+    with pytest.raises(
+        ValueError, match=r"axis_labels\[0\] does not match '0: d-, 1: d\+'."
+    ):
         create_final_result_sin2chi_method(d_spacing_combined)
 
 
-def test_create_final_result_sin2chi_method_label_2(results_sin2chi_method_fixture):    
+def test_create_final_result_sin2chi_method_label_2(results_sin2chi_method_fixture):
     d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
-    d_spacing_combined.update_axis_label(1, 'blub')
+    d_spacing_combined.update_axis_label(1, "blub")
 
-    with pytest.raises(ValueError, match=r'axis_labels\[1\] does not match sin\^2\(chi\).'):
-        create_final_result_sin2chi_method(d_spacing_combined)  
-
+    with pytest.raises(
+        ValueError, match=r"axis_labels\[1\] does not match sin\^2\(chi\)."
+    ):
+        create_final_result_sin2chi_method(d_spacing_combined)
 
 
 # Testing for various Dataset modifications for create_final_result_sin2chi_method
 @pytest.fixture
 def base_dataset():
     return Dataset(
-        np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=float), 
-        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]}, 
-        axis_labels={0: '0: d-, 1: d+', 1: Labels.SIN2CHI.value}, 
-        data_unit='nm', 
-        data_label='0: position_neg, 1: position_pos'
+        np.array([[1, 2, 3, 4], [5, 6, 7, 8]], dtype=float),
+        axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]},
+        axis_labels={0: "0: d-, 1: d+", 1: Labels.SIN2CHI.value},
+        data_unit="nm",
+        data_label="0: position_neg, 1: position_pos",
     )
 
-@pytest.mark.parametrize("modifications, expected_array", [
-    # No modifications
-    ([], np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]])),
-    # Set first value of d- to np.nan
-    ([(0, 0, np.nan)], np.array([[np.nan, 2, 3, 4], [5, 6, 7, 8], [np.nan, 4, 5, 6]])),
-    # Set second value of d+ to np.nan
-    ([(1, 1, np.nan)], np.array([[1, 2, 3, 4], [5, np.nan, 7, 8], [3, np.nan, 5, 6]])),
-])
-def test_create_final_result_sin2chi_method(base_dataset, modifications, expected_array):
+
+@pytest.mark.parametrize(
+    "modifications, expected_array",
+    [
+        # No modifications
+        ([], np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]])),
+        # Set first value of d- to np.nan
+        (
+            [(0, 0, np.nan)],
+            np.array([[np.nan, 2, 3, 4], [5, 6, 7, 8], [np.nan, 4, 5, 6]]),
+        ),
+        # Set second value of d+ to np.nan
+        (
+            [(1, 1, np.nan)],
+            np.array([[1, 2, 3, 4], [5, np.nan, 7, 8], [3, np.nan, 5, 6]]),
+        ),
+    ],
+)
+def test_create_final_result_sin2chi_method(
+    base_dataset, modifications, expected_array
+):
     # Apply modifications
     for i, j, value in modifications:
         base_dataset.array[i, j] = value
-    
+
     result = create_final_result_sin2chi_method(base_dataset)
-    
+
     # Expected attributes for the resulting Dataset
     expected = Dataset(
         expected_array,
         axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]},
-        axis_labels={0: '0: d-, 1: d+, 2: d_mean', 1: Labels.SIN2CHI.value},
-        data_unit='nm',
-        data_label='d_spacing'
+        axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: Labels.SIN2CHI.value},
+        data_unit="nm",
+        data_label="d_spacing",
     )
-    
+
     # Compare array data
     assert np.array_equal(result.array, expected.array, equal_nan=True)
-    
+
     # Compare axis ranges
     for key in expected.axis_ranges:
         assert key in result.axis_ranges
         assert np.array_equal(result.axis_ranges[key], expected.axis_ranges[key])
-    
+
     # Compare axis labels
     assert result.axis_labels == expected.axis_labels
-    
+
     # Compare data labels and units
     assert result.data_label == expected.data_label
     assert result.data_unit == expected.data_unit
-
 
 
 # Test the Dataset against the expected values
@@ -1808,38 +1827,40 @@ def test_numpy_indexing_with_ndarray():
 # Regression test to document partially wrong behaviour of  __reimplement_numpy_method
 @pytest.fixture
 def array_mean_fixture():
-    arr=np.ones ( (4,4))
-    arr[::2,::2] = 0
-    arr[:,1::2]=3
+    arr = np.ones((4, 4))
+    arr[::2, ::2] = 0
+    arr[:, 1::2] = 3
     return arr
 
 
 @pytest.fixture
 def dataset_mean_fixture():
-    arr=np.ones ((4,4))
-    arr[::2,::2] = 0
-    arr[:,1::2]=3
+    arr = np.ones((4, 4))
+    arr[::2, ::2] = 0
+    arr[:, 1::2] = 3
 
-    ds = Dataset(
-        arr.copy()
-        )
-    
+    ds = Dataset(arr.copy())
+
     return ds
 
 
 def test_array_mean_base(array_mean_fixture):
     arr = array_mean_fixture
-    
+
     # Check that base is None for mean operations
     assert arr.mean().base is None, "Expected base to be None for np.ndarray.mean()"
-    assert arr.mean(axis=0).base is None, "Expected base to be None for np.ndarray.mean(axis=0)"
-    assert arr.mean(axis=1).base is None, "Expected base to be None for np.ndarray.mean(axis=1)"
+    assert arr.mean(axis=0).base is None, (
+        "Expected base to be None for np.ndarray.mean(axis=0)"
+    )
+    assert arr.mean(axis=1).base is None, (
+        "Expected base to be None for np.ndarray.mean(axis=1)"
+    )
     assert np.mean(arr).base is None, "Expected base to be None for np.mean()"
 
+
 def test_Dataset_mean_base(dataset_mean_fixture):
-    ds = dataset_mean_fixture  
-    
+    ds = dataset_mean_fixture
+
     # Check that base is None for mean operations
     assert np.mean(ds).base is None, "Expected base to be None for np.mean(Dataset)"
     assert ds.mean().base is None, "Expected base to be None for Dataset.mean()"
-    

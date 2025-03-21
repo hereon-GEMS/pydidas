@@ -158,7 +158,7 @@ class DspacingSin_2chi(ProcPlugin):
         if not ds.shape[0] == 3:
             raise UserConfigError(f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. Please verify your Dataset.")                   
         
-        if not ds.data_unit in [UNITS_NANOMETER, UNITS_ANGSTROM]:
+        if ds.data_unit not in [UNITS_NANOMETER, UNITS_ANGSTROM]:
             raise UserConfigError(f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset.")
     
     

@@ -155,7 +155,7 @@ class DspacingSin_2chi(ProcPlugin):
         
         self._ensure_dataset_instance(ds)
         self._ensure_axis_labels(ds)
-        if not ds.shape[0] == 3:
+        if ds.shape[0] != 3:
             raise UserConfigError(f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. Please verify your Dataset.")                   
         
         if ds.data_unit not in [UNITS_NANOMETER, UNITS_ANGSTROM]:

@@ -103,7 +103,6 @@ class DefineScanFrame(BaseFrame):
         ):
             _method = getattr(self, _name)
             _method(*_args, **_kwargs)
-            # print(_args[0], self._widgets[_args[0]].geometry())
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
 
@@ -207,7 +206,6 @@ class DefineScanFrame(BaseFrame):
         )
         if len(_fnames) > 0:
             _return = ScanIo.check_multiple_files(_fnames, scan=SCAN)
-            print("Return:", _return)
             if _return[0] == "::no_error::":
                 _return = ScanIo.import_from_multiple_files(_fnames, scan=SCAN)
             elif _return[0] == "::multiple_motors::":

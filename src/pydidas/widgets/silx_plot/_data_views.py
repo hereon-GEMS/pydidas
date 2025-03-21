@@ -24,21 +24,26 @@ __copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PydidasImageDataView"]
+__all__ = ["PydidasImageDataView", "Pydidas_Plot1dView", "Pydidas_Plot1dGroupView"]
 
 
 from functools import partialmethod
+from typing import Optional
 
 import silx.gui.data
+from qtpy import QtWidgets
 from silx.gui import icons
 from silx.gui.data.DataViews import (
     IMAGE_MODE,
     CompositeDataView,
     _ComplexImageView,
+    _Plot1dView,
     _Plot2dView,
 )
 from silx.gui.utils import blockSignals
 
+from pydidas.core import Dataset, PydidasQsettings, UserConfigError
+from pydidas.widgets.silx_plot.pydidas_plot1d import PydidasPlot1D
 from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
@@ -50,6 +55,7 @@ DATA_VIEW_AXES_NAMES = {
     "_StackView": ["depth", "use as image y-axis", "use as image x-axis"],
     "_NXdataScalarView": ["use as column", "use as row"],
 }
+_QSETTINGS = PydidasQsettings()
 
 
 class PydidasImageDataView(CompositeDataView):
@@ -68,10 +74,10 @@ class PydidasImageDataView(CompositeDataView):
             icon=icons.getQIcon("view-2d"),
         )
         self.addView(_ComplexImageView(parent))
-        self.addView(_PydidasPlot2dView(parent))
+        self.addView(Pydidas_Plot2dView(parent))
 
 
-class _PydidasPlot2dView(_Plot2dView):
+class Pydidas_Plot2dView(_Plot2dView):
     """
     View data using a PydidasPlot2d widget.
     """
@@ -88,6 +94,112 @@ class _PydidasPlot2dView(_Plot2dView):
 
     def axesNames(self, data, info):
         return ["use as image y-axis", "use as image x-axis"]
+
+
+class Pydidas_Plot1dView(_Plot1dView):
+    def createWidget(self, parent: Optional[QtWidgets.QWidget] = None):
+        widget = PydidasPlot1D(parent=parent)
+        widget.setGraphGrid(True)
+        return widget
+
+    def setData(self, data: Dataset):
+        """
+        Set the data to display.
+
+        Parameters
+        ----------
+        data : Dataset
+            The data to display.
+        """
+        if not isinstance(data, Dataset):
+            data = Dataset(data)
+        _xlabel = (
+            data.get_axis_description(0)
+            if len(data.get_axis_description(0)) > 0
+            else "x"
+        )
+        _ylabel = data.data_description if len(data.data_description) > 0 else "y"
+        _widget = self.getWidget()
+
+        _widget.addCurve(
+            legend="data",
+            x=data.axis_ranges[0],
+            y=data.array,
+            xlabel=_xlabel,
+            ylabel=_ylabel,
+        )
+        _widget.setActiveCurve("data")
+
+
+class Pydidas_Plot1dGroupView(Pydidas_Plot1dView):
+    def setData(self, data: Dataset):
+        """
+        Set the data to display.
+
+        Parameters
+        ----------
+        data : Dataset
+            The data to display.
+        """
+        self._check_data_dimensions(data)
+        self.clear()
+        if not isinstance(data, Dataset):
+            data = Dataset(data)
+        _xlabel = (
+            data.get_axis_description(1)
+            if len(data.get_axis_description(1)) > 0
+            else "x"
+        )
+        _ylabel = data.data_description if len(data.data_description) > 0 else "y"
+        _widget = self.getWidget()
+        _x = data.axis_ranges[1]
+        _label = data.axis_labels[0] + " = {value:.4f} " + data.axis_units[0]
+        for _index, _pos in enumerate(data.axis_ranges[0]):
+            _widget.addCurve(
+                legend=_label.format(value=_pos),
+                x=_x,
+                y=data.array[_index],
+                xlabel=_xlabel,
+                ylabel=_ylabel,
+            )
+        _widget.setActiveCurve(_label.format(value=_pos))
+
+    def set_title(self, title: str):
+        """
+        Set the title of the plot.
+
+        Parameters
+        ----------
+        title : str
+            The title to set.
+        """
+        self.getWidget().setGraphTitle(title)
+
+    def _check_data_dimensions(self, data: Dataset):
+        """
+        Check the data dimensions.
+
+        Parameters
+        ----------
+        data : Dataset
+            The data to display.
+        """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition:\n The input data has {data.ndim} "
+                "dimensions."
+            )
+        _nmax = _QSETTINGS.value("user/max_number_curves", int)
+        if data.shape[0] > _nmax:
+            raise UserConfigError(
+                f"The number of given curves ({data.shape[0]}) exceeds the maximum "
+                f"number of curves allowed ({_nmax}). \n"
+                "Please limit the data range to be displayed or increase the maximum "
+                "number of curves in the user settings (Options -> User config). "
+                "Please note that displaying a large number of curves will slow down "
+                "the plotting performance."
+            )
 
 
 def _DataView_axes_names(self, label, data, info):
@@ -134,7 +246,7 @@ def _Axis_setAxisNames(self, axesNames):
     """
     self._Axis__axes.clear()
     with blockSignals(self._Axis__axes):
-        self._Axis__axes.addItem("use slice:", "")
+        self._Axis__axes.addItem("use for slicing", "")
         for axis in axesNames:
             self._Axis__axes.addItem(axis, axis)
 

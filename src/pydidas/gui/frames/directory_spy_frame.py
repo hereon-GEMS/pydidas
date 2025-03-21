@@ -44,11 +44,11 @@ from pydidas.gui.frames.builders.directory_spy_frame_builder import (
 )
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets.framework import BaseFrameWithApp
-from pydidas.workflow import WorkflowResultsContext, WorkflowTree
+from pydidas.workflow import WorkflowResults, WorkflowTree
 
 
 SCAN = ScanContext()
-RESULTS = WorkflowResultsContext()
+RESULTS = WorkflowResults()
 TREE = WorkflowTree()
 logger = pydidas_logger()
 

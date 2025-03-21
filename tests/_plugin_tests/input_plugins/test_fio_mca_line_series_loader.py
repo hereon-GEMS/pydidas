@@ -98,6 +98,7 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
     def test_creation(self):
         plugin = COLLECTION.get_plugin_by_name("FioMcaLineScanSeriesLoader")()
         self.assertIsInstance(plugin, BasePlugin)
+        self.assertFalse(plugin.get_param_value("live_processing"))
 
     def test_update_filename_string(self):
         plugin = self.create_standard_plugin()
@@ -234,11 +235,6 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         self.assertTrue(
             np.allclose(_data.axis_ranges[0], np.arange(128, 256) * _delta + _offset)
         )
-
-    def test_get_raw_input_size(self):
-        plugin = self.create_standard_plugin()
-        _n = plugin.get_raw_input_size()
-        self.assertEqual(_n, self._n_channels)
 
 
 if __name__ == "__main__":

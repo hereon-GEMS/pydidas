@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["CreateWidgetsMixIn"]
 
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 from qtpy import QtWidgets
 from qtpy.QtWidgets import QWidget
@@ -60,15 +60,15 @@ class CreateWidgetsMixIn:
         self._widgets = {}
         self.__index_unreferenced = 0
 
-    def create_spacer(self, ref: Union[str, None], **kwargs: Dict):
+    def create_spacer(self, ref: Optional[str], **kwargs: Dict):
         """
         Create a QSpacerItem and set its properties.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The widget reference string. If None, an internal reference will be
-            used.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs: dict
             Any attributes supported by QSpacerItem with a setAttribute method
             are valid kwargs. In addition, the gridPos key allows to specify
@@ -93,14 +93,15 @@ class CreateWidgetsMixIn:
             self.__index_unreferenced += 1
         self._widgets[ref] = _spacer
 
-    def create_label(self, ref: Union[str, None], text: str, **kwargs: dict):
+    def create_label(self, ref: Optional[str], text: str, **kwargs: dict):
         """
         Create a PydidasLabel and store the widget.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         text : str
             The label's displayed text.
         **kwargs : dict
@@ -112,7 +113,7 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, PydidasLabel, text, **kwargs)
 
-    def create_line(self, ref: Union[str, None], **kwargs: Dict):
+    def create_line(self, ref: Optional[str], **kwargs: Dict):
         """
         Create a line widget.
 
@@ -121,6 +122,9 @@ class CreateWidgetsMixIn:
 
         Parameters
         ----------
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs : dict
             Any additional keyword arguments. All QFrame attributes with setAttribute
             implementation are valid kwargs.
@@ -131,14 +135,37 @@ class CreateWidgetsMixIn:
         kwargs["fixedHeight"] = kwargs.get("fixedHeight", 3)
         self.create_any_widget(ref, QtWidgets.QFrame, **kwargs)
 
-    def create_lineedit(self, ref: Union[str, None], **kwargs: Dict):
+    def create_vertical_line(self, ref: Optional[str], **kwargs: Dict):
+        """
+        Create a vertical line widget.
+
+        This method creates a vertical line widget (implemented as flat QFrame) as
+        separator and adds it to the parent widget.
+
+        Parameters
+        ----------
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
+        **kwargs : dict
+            Any additional keyword arguments. All QFrame attributes with setAttribute
+            implementation are valid kwargs.
+        """
+        kwargs["frameShape"] = kwargs.get("frameShape", QtWidgets.QFrame.HLine)
+        kwargs["frameShadow"] = kwargs.get("frameShadow", QtWidgets.QFrame.Sunken)
+        kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
+        kwargs["fixedWidth"] = kwargs.get("fixedWidth", 3)
+        self.create_any_widget(ref, QtWidgets.QFrame, **kwargs)
+
+    def create_lineedit(self, ref: Optional[str], **kwargs: Dict):
         """
         Create a PydidasLineEdit and store the widget.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by QLineEdit with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
@@ -148,14 +175,15 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, PydidasLineEdit, **kwargs)
 
-    def create_button(self, ref: Union[str, None], text: str, **kwargs: Dict):
+    def create_button(self, ref: Optional[str], text: str, **kwargs: Dict):
         """
         Create a QPushButton and store the widget.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by QPushButton with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
@@ -169,14 +197,15 @@ class CreateWidgetsMixIn:
         if "clicked" in kwargs and ref is not None:
             self._widgets[ref].clicked.connect(kwargs.get("clicked"))
 
-    def create_spin_box(self, ref: Union[str, None], **kwargs: Dict):
+    def create_spin_box(self, ref: Optional[str], **kwargs: Dict):
         """
-        Create a QSpinBox and store the widget.
+        Create a QSpinBox for integer values and store the widget.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by QSpinBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
@@ -187,14 +216,34 @@ class CreateWidgetsMixIn:
         kwargs["range"] = kwargs.get("range", (0, 1))
         self.create_any_widget(ref, QtWidgets.QSpinBox, **kwargs)
 
-    def create_progress_bar(self, ref: Union[str, None], **kwargs: Dict):
+    def create_double_spin_box(self, ref: Optional[str], **kwargs: Dict):
+        """
+        Create a QDoubleSpinBox for floating point values and store the widget.
+
+        Parameters
+        ----------
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
+        **kwargs : dict
+            Any attributes supported by QSpinBox with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the SpinBox's position in its parent's layout. The
+            default range is set to (0, 1), if it is not overridden with the
+            'range' keyword.
+        """
+        kwargs["range"] = kwargs.get("range", (0, 1))
+        self.create_any_widget(ref, QtWidgets.QDoubleSpinBox, **kwargs)
+
+    def create_progress_bar(self, ref: Optional[str], **kwargs: Dict):
         """
         Create a QProgressBar and store the widget.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by QProgressBar with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
@@ -202,14 +251,15 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, QtWidgets.QProgressBar, **kwargs)
 
-    def create_check_box(self, ref: Union[str, None], text, **kwargs: Dict):
+    def create_check_box(self, ref: Optional[str], text, **kwargs: Dict):
         """
         Create a PydidasCheckBox and store the widget.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         text : str
             The CheckBox's descriptive text.
         **kwargs : dict
@@ -221,14 +271,15 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, PydidasCheckBox, text, **kwargs)
 
-    def create_combo_box(self, ref: Union[str, None], **kwargs: Dict):
+    def create_combo_box(self, ref: Optional[str], **kwargs: Dict):
         """
         Create a PydidasComboBox and store the widget.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by QComboBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
@@ -239,15 +290,16 @@ class CreateWidgetsMixIn:
         self.create_any_widget(ref, PydidasComboBox, **kwargs)
 
     def create_radio_button_group(
-        self, ref: Union[str, None], entries: List, **kwargs: Dict
+        self, ref: Optional[str], entries: List, **kwargs: Dict
     ):
         """
         Create a RadioButtonGroup widget and set its properties.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         text : str
             The CheckBox's descriptive text.
         **kwargs : dict
@@ -262,14 +314,15 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, RadioButtonGroup, entries, **kwargs)
 
-    def create_empty_widget(self, ref: Union[str, None], **kwargs: Dict):
+    def create_empty_widget(self, ref: Optional[str], **kwargs: Dict):
         """
         Create an ampty QWidget with a agrid layout.
 
         Parameters
         ----------
-        ref : Union[str, None]
-            The reference string for storing the widget.
+        ref : str, optional
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by the generic QWidget with a setAttribute
             method are valid kwargs. In addition, the 'gridPos' keyword can be used
@@ -278,7 +331,7 @@ class CreateWidgetsMixIn:
         self.create_any_widget(ref, EmptyWidget, **kwargs)
 
     def create_any_widget(
-        self, ref: Union[str, None], widget_class: type, *args: Tuple, **kwargs: Dict
+        self, ref: Optional[str], widget_class: type, *args: Tuple, **kwargs: Dict
     ):
         """
         Create any widget with any settings and add it to the layout.
@@ -291,7 +344,7 @@ class CreateWidgetsMixIn:
 
         Parameters
         ----------
-        ref : Union[str, None]
+        ref : Optional[str]
             The reference name in the _widgets dictionary.
         widget_class : type
             The class type of the widget.
@@ -316,14 +369,14 @@ class CreateWidgetsMixIn:
         self.add_any_widget(ref, _widget, **kwargs)
 
     def add_any_widget(
-        self, ref: Union[str, None], widget_instance: QWidget, **kwargs: dict
+        self, ref: Optional[str], widget_instance: QWidget, **kwargs: dict
     ):
         """
         Add any existing widget to the layout and apply settings to it.
 
         Parameters
         ----------
-        ref : Union[str, None]
+        ref : Optional[str]
             The widget reference key.
         widget_instance : QWidget
             The widget instance.
@@ -337,7 +390,7 @@ class CreateWidgetsMixIn:
         _parent = kwargs.pop("parent_widget", self)
         _layout_kwargs = kwargs.pop("layout_kwargs", None)
         if isinstance(_parent, str):
-            _parent = self._widgets[_parent]
+            _parent = self if _parent == "::self::" else self._widgets[_parent]
 
         apply_qt_properties(widget_instance, **kwargs)
         if _layout_kwargs is not None:

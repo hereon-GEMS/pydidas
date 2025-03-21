@@ -31,6 +31,7 @@ from . import result_io, processing_tree_io  # noqa : I001
 from .generic_node import *
 from .generic_tree import *
 from .plugin_position_node import *
+from .processing_results import *
 from .processing_tree import *
 from .workflow_node import *
 from .workflow_results import *
@@ -42,6 +43,7 @@ __all__ = ["result_io", "processing_tree_io"] + (
     generic_node.__all__
     + generic_tree.__all__
     + plugin_position_node.__all__
+    + processing_results.__all__
     + processing_tree.__all__
     + workflow_node.__all__
     + workflow_results.__all__
@@ -53,6 +55,7 @@ del (
     generic_node,
     generic_tree,
     plugin_position_node,
+    processing_results,
     processing_tree,
     workflow_node,
     workflow_results,

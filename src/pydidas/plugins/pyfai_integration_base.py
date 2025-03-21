@@ -31,7 +31,7 @@ __all__ = ["pyFAIintegrationBase"]
 import multiprocessing as mp
 import os
 import pathlib
-from typing import Literal, Optional, Union
+from typing import Literal
 
 import numpy as np
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
@@ -161,7 +161,7 @@ class pyFAIintegrationBase(ProcPlugin):
             _method = _method + ((_platform.id, _device),)
             self._config["method"] = _method
 
-    def get_azimuthal_range_in_rad(self) -> Union[None, tuple[float, float]]:
+    def get_azimuthal_range_in_rad(self) -> None | tuple[float, float]:
         """
         Get the azimuthal range from the Parameters in radians.
 
@@ -171,7 +171,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
         Returns
         -------
-        Union[None, tuple[float, float]]
+        None | tuple[float, float]
             The azimuthal range for the pyFAI integration in radian.
         """
         _range = self.get_azimuthal_range_native()
@@ -180,7 +180,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
         return _range
 
-    def get_azimuthal_range_in_deg(self) -> Union[None, tuple[float, float]]:
+    def get_azimuthal_range_in_deg(self) -> None | tuple[float, float]:
         """
         Get the azimuthal range from the Parameters in degree.
 
@@ -190,7 +190,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
         Returns
         -------
-        Union[None, tuple[float, float]]
+        None | tuple[float, float]
             The azimuthal range for the pyFAI integration in degrees.
         """
         _range = self.get_azimuthal_range_native()
@@ -213,10 +213,12 @@ class pyFAIintegrationBase(ProcPlugin):
         tuple[float, float]
             The azimuthal range for the pyFAI integration.
         """
+        _value = np.pi if "rad" in self.get_param_value("azi_unit", "deg") else 180
+
         if self._ai is None:
-            _default = (-180, 180)
+            _default = (-_value, _value)
         else:
-            _default = (-180, 180) if self._ai.chiDiscAtPi else (0, 360)
+            _default = (-_value, _value) if self._ai.chiDiscAtPi else (0, 2 * _value)
         if self.get_param_value("azi_use_range", False) == "Specify azimuthal range":
             self.modulate_and_store_azi_range()
             _low = self.get_param_value("azi_range_lower")
@@ -229,10 +231,7 @@ class pyFAIintegrationBase(ProcPlugin):
         return _default
 
     def _adjust_integration_discontinuity(self):
-        """
-        Check the position of the integration discontinuity and adjust it according
-        to the integration bounds.
-        """
+        """Check and adjust the position of the integration discontinuity."""
         _range = self.get_azimuthal_range_in_rad()
         if _range is None:
             return
@@ -254,9 +253,7 @@ class pyFAIintegrationBase(ProcPlugin):
             self._raise_range_error(_low, _high)
 
     def modulate_and_store_azi_range(self):
-        """
-        Try to modulate the azimuthal range to be compatible with pyFAI.
-        """
+        """Try to modulate the azimuthal range to be compatible with pyFAI."""
         _factor = 1 if "rad" in self.get_param_value("azi_unit") else np.pi / 180
         _lower = _factor * self.get_param_value("azi_range_lower")
         _upper = _factor * self.get_param_value("azi_range_upper")
@@ -371,7 +368,7 @@ class pyFAIintegrationBase(ProcPlugin):
             for _ai in self._ais:
                 _ai.set_mask(_mask)
 
-    def _check_mask_shape(self, mask: Optional[np.ndarray] = None):
+    def _check_mask_shape(self, mask: np.ndarray | None = None):
         """
         Compare the shape of the mask and the AzimuthalIntegrator's detector.
 
@@ -391,9 +388,7 @@ class pyFAIintegrationBase(ProcPlugin):
             )
 
     def execute(self, data: np.ndarray, **kwargs: dict):
-        """
-        To be implemented by the concrete subclass.
-        """
+        """To be implemented by the concrete subclass."""
         raise NotImplementedError
 
     def get_parameter_config_widget(self) -> QtWidgets.QWidget:
@@ -409,7 +404,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
         return PyfaiIntegrationConfigWidget(self)
 
-    def get_radial_range(self) -> Union[tuple[float, float, None]]:
+    def get_radial_range(self) -> None | tuple[float, float]:
         """
         Get the radial range from the Parameters.
 
@@ -419,7 +414,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
         Returns
         -------
-        Union[tuple[float, float, None]]
+        None | tuple[float, float]
             The radial range for the pyFAI integration.
         """
         if self.get_param_value("rad_use_range", False) == "Specify radial range":
@@ -432,13 +427,13 @@ class pyFAIintegrationBase(ProcPlugin):
             )
         return None
 
-    def get_radial_range_as_r(self) -> Union[tuple[float, float, None]]:
+    def get_radial_range_as_r(self) -> None | tuple[float, float]:
         """
         Get the radial range as radius in mm.
 
         Returns
         -------
-        range : Union[None, tuple[float, float]]
+        range :  None | tuple[float, float]
             If no range has been set, returns None. Otherwise, the range limits are
             given as tuple.
         """
@@ -448,13 +443,13 @@ class pyFAIintegrationBase(ProcPlugin):
         _dist = self._EXP.get_param_value("detector_dist") * 1e3
         return (_dist * np.tan(_range[0]), _dist * np.tan(_range[1]))
 
-    def get_radial_range_as_q(self) -> Union[tuple[float, float, None]]:
+    def get_radial_range_as_q(self) -> None | tuple[float, float]:
         """
         Get the radial range as q in nm^-1.
 
         Returns
         -------
-        range : Union[None, tuple[float, float]]
+        range :  None | tuple[float, float]
             If no range has been set, returns None. Otherwise, the range limits are
             given as tuple.
         """
@@ -467,7 +462,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
     def get_radial_range_as_2theta(
         self, unit: Literal["deg", "rad"] = "deg"
-    ) -> Union[tuple[float, float, None]]:
+    ) -> None | tuple[float, float]:
         """
         Get the radial range converted to 2 theta.
 
@@ -478,7 +473,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
         Returns
         -------
-        range : Union[None, tuple[float, float]]
+        range :  None | tuple[float, float]
             If no range has been set, returns None. Otherwise, the range limits are
             given as tuple.
         """

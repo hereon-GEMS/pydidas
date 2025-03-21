@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pydidas.core import Hdf5key
+from pydidas.core import Hdf5key, UserConfigError
 from pydidas.core.parameter import Parameter, _get_base_class
 from pydidas.core.utils import get_random_string
 
@@ -53,41 +53,21 @@ class TestParameter(unittest.TestCase):
 
     def tearDown(self): ...
 
-    def test_get_base_class__None(self):
-        _cls = _get_base_class(None)
-        self.assertEqual(_cls, None)
-
-    def test_get_base_class__generic_int(self):
-        _cls = _get_base_class(int)
-        self.assertEqual(_cls, Integral)
-
-    def test_get_base_class__np_int32(self):
-        _cls = _get_base_class(np.int32)
-        self.assertEqual(_cls, Integral)
-
-    def test_get_base_class__np_int16(self):
-        _cls = _get_base_class(np.int16)
-        self.assertEqual(_cls, Integral)
-
-    def test_get_base_class__np_uint32(self):
-        _cls = _get_base_class(np.uint32)
-        self.assertEqual(_cls, Integral)
-
-    def test_get_base_class__np_uint8(self):
-        _cls = _get_base_class(np.uint8)
-        self.assertEqual(_cls, Integral)
-
-    def test_get_base_class__generic_float(self):
-        _cls = _get_base_class(float)
-        self.assertEqual(_cls, Real)
-
-    def test_get_base_class__np_float32(self):
-        _cls = _get_base_class(np.float32)
-        self.assertEqual(_cls, Real)
-
-    def test_get_base_class__np_float64(self):
-        _cls = _get_base_class(np.float64)
-        self.assertEqual(_cls, Real)
+    def test_get_base_class(self):
+        test_cases = [
+            (None, None),
+            (int, Integral),
+            (np.int32, Integral),
+            (np.int16, Integral),
+            (np.uint32, Integral),
+            (np.uint8, Integral),
+            (float, Real),
+            (np.float32, Real),
+            (np.float64, Real),
+        ]
+        for dtype, expected in test_cases:
+            with self.subTest(dtype=dtype):
+                self.assertEqual(_get_base_class(dtype), expected)
 
     def test_creation(self):
         obj = Parameter("Test0", int, 12)
@@ -116,6 +96,10 @@ class TestParameter(unittest.TestCase):
     def test_creation__wrong_datatype(self):
         with self.assertRaises(TypeError):
             Parameter("Test0", int, "12b")
+
+    def test_creation__w_choices_and_range(self):
+        with self.assertRaises(UserConfigError):
+            Parameter("Test0", int, 12, choices=[0, 6, 12], range=(0, 12))
 
     def test_creation__with_allow_None(self):
         param = Parameter("Test0", int, 12, allow_None=True)
@@ -279,6 +263,31 @@ class TestParameter(unittest.TestCase):
         self.assertEqual(obj.value, _val)
         self.assertEqual(type(obj.value), float)
 
+    def test_set_value__w_valid_range(self):
+        _val = 24.0
+        for _type in [int, float, np.float64, np.uint8]:
+            with self.subTest(datatype=_type):
+                obj = Parameter("Test0", _type, 12, range=(0, 42))
+                obj.value = np.float64(_val)
+                self.assertEqual(obj.value, _val)
+                self.assertEqual(
+                    type(obj.value), int if _type in [int, np.uint8] else float
+                )
+
+    def test_set_value__float_w_invalid_range(self):
+        _val = 24.0
+        for _type in [int, float, np.float64, np.uint8]:
+            with self.subTest(datatype=_type):
+                obj = Parameter("Test0", _type, 12, range=(0, 12))
+                with self.assertRaises(UserConfigError):
+                    obj.value = _val
+
+    def test_set_value__w_range_to_None(self):
+        _val = 24.0
+        obj = Parameter("Test0", float, 12, range=(0, 12), allow_None=True)
+        obj.value = None
+        self.assertIsNone(obj.value)
+
     def test_set_value__tuple_w_subtype(self):
         _vals = ((1, 2, 3), (12, 24.0), (12, "42"))
         for _val in _vals:
@@ -293,6 +302,46 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", tuple, (1, 2), subtype=int)
         with self.assertRaises(ValueError):
             obj.value = _val
+
+    def test_get_range(self):
+        obj = Parameter("Test0", int, 12)
+        for _key in ["123", (1, 54, 4), [1, 2, 3], {1: "a", "b": 42}]:
+            with self.subTest(range=_key):
+                obj._Parameter__meta["range"] = _key
+                self.assertEqual(obj.range, _key)
+
+    def test_set_range(self):
+        for _type in [int, float, np.float64, np.uint8]:
+            for _range in [[0, 12], (3, 42), np.array((3, 2))]:
+                with self.subTest(datatype=_type, range=_range):
+                    obj = Parameter("Test0", _type, 12)
+                    obj.range = _range
+                    self.assertEqual(obj.range, tuple(_range))
+
+    def test_set_range__no_number_type(self):
+        obj = Parameter("Test0", str, "12")
+        with self.assertRaises(UserConfigError):
+            obj.range = (4, 42)
+
+    def test_set_range__with_choices(self):
+        obj = Parameter("Test0", int, 12, choices=[0, 12])
+        with self.assertRaises(UserConfigError):
+            obj.range = (4, 42)
+
+    def test_set_range__set_to_None(self):
+        obj = Parameter("Test0", int, 12, range=(4, 42))
+        obj.range = None
+        self.assertIsNone(obj.range)
+
+    def test_set_range__wrong_length(self):
+        obj = Parameter("Test0", int, 12)
+        with self.assertRaises(UserConfigError):
+            obj.range = (4, 42, 12)
+
+    def test_set_range__wrong_dtype(self):
+        obj = Parameter("Test0", int, 12)
+        with self.assertRaises(ValueError):
+            obj.range = (4, "b")
 
     def test_restore_default(self):
         obj = Parameter("Test0", int, 12)
@@ -366,6 +415,11 @@ class TestParameter(unittest.TestCase):
         with self.assertRaises(ValueError):
             obj.update_value_and_choices(3, [12, 14])
 
+    def test_update_value_and_choices__w_range_set(self):
+        obj = Parameter("Test0", float, 27.7, range=(0, 42))
+        with self.assertRaises(UserConfigError):
+            obj.update_value_and_choices(12, [12, 14])
+
     def test_update_value_and_choices__valid(self):
         _val = 3.12
         _choices = [3.12, 34.2, 42.1]
@@ -395,6 +449,7 @@ class TestParameter(unittest.TestCase):
                         "allow_None": False,
                         "choices": None,
                         "subtype": None,
+                        "range": None,
                         "value": _val,
                     },
                 )

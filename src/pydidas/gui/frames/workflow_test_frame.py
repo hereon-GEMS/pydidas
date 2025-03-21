@@ -41,7 +41,8 @@ from pydidas.core import (
     get_generic_param_collection,
     utils,
 )
-from pydidas.gui.frames.builders import WorkflowTestFrameBuilder
+from pydidas.core.utils import apply_qt_properties
+from pydidas.gui.frames.builders import get_WorkflowTestFrame_build_config
 from pydidas.widgets.dialogues import WarningBox
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.windows import (
@@ -136,6 +137,11 @@ def _create_str_description_of_node_result(
     return _str
 
 
+class _ResultsMock:
+    def __init__(self):
+        self.result_titles = {}
+
+
 class WorkflowTestFrame(BaseFrame):
     """
     The ProcessingSinglePluginFrame allows to run / test single plugins on a
@@ -160,10 +166,8 @@ class WorkflowTestFrame(BaseFrame):
             "scan_index2",
             "scan_index3",
             "detector_image_index",
-            "selected_results",
         ),
     )
-    params_not_to_restore = ["selected_results"]
 
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
@@ -171,6 +175,7 @@ class WorkflowTestFrame(BaseFrame):
         self._tree = None
         self._active_node = -1
         self._results = {}
+        self._local_results_mock = _ResultsMock()
         self._config.update(
             {
                 "shapes": {},
@@ -188,7 +193,15 @@ class WorkflowTestFrame(BaseFrame):
         """
         Build the frame and create all necessary widgets.
         """
-        WorkflowTestFrameBuilder.build_frame(self)
+        for _method, _args, _kwargs in get_WorkflowTestFrame_build_config(self):
+            if _args == ("config_terminal_spacer",):
+                _nrow = self._widgets["config"].layout().rowCount()
+                self._widgets["config"].layout().setRowStretch(_nrow, 10)
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
+        self._widgets["config_area"].setWidget(self._widgets["config"])
+
+        apply_qt_properties(self.layout(), columnStretch=((1, 10)))
 
     def connect_signals(self):
         """
@@ -197,9 +210,7 @@ class WorkflowTestFrame(BaseFrame):
         self.param_widgets["image_selection"].io_edited.connect(
             self.__update_image_selection_visibility
         )
-        self.param_widgets["selected_results"].currentIndexChanged.connect(
-            self.__selected_new_node
-        )
+        self._widgets["result_table"].sig_new_selection.connect(self._selected_new_node)
         self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)
         self._widgets["but_reload_tree"].clicked.connect(self.reload_workflow)
         self._widgets["but_show_details"].clicked.connect(self.show_plugin_details)
@@ -308,7 +319,6 @@ class WorkflowTestFrame(BaseFrame):
         to global settings.
         """
         self._tree = TREE.deepcopy()
-        self.param_widgets["selected_results"].setCurrentIndex(0)
         self._config["plugin_res_titles"] = {}
         self.__update_selection_choices()
 
@@ -405,20 +415,18 @@ class WorkflowTestFrame(BaseFrame):
         _index = (_num - _i0) // _delta
         if not 0 <= _index < SCAN.n_points:
             if SCAN.n_points <= 3:
-                _text = (
-                    "["
-                    + ", ".join(str(_i0 + _delta * _i) for _i in range(SCAN.n_points))
-                    + "]."
+                _points = ", ".join(
+                    str(_i0 + _delta * _i) for _i in range(SCAN.n_points)
                 )
             else:
-                _text = (
-                    "["
+                _points = (
                     f"{_i0}, {_i0 + _delta}, ..., {_i0 + (SCAN.n_points - 1) * _delta}"
-                    "]."
                 )
             raise UserConfigError(
                 f"The selected number {_num} is not included in the images of the scan "
-                + _text
+                + "["
+                + _points
+                + "]."
             )
         return _index
 
@@ -433,6 +441,7 @@ class WorkflowTestFrame(BaseFrame):
         self._config["plugin_names"] = _meta["names"]
         self._config["plugin_data_labels"] = _meta["data_labels"]
         self._config["plugin_res_titles"] = _meta["result_titles"]
+        self._local_results_mock.result_titles = _meta["result_titles"]
         for _node_id, _node in self._tree.nodes.items():
             _data = _node.results
             if _data is not None:
@@ -441,52 +450,31 @@ class WorkflowTestFrame(BaseFrame):
                 self._results[_node_id] = _data
 
     def __update_selection_choices(self):
-        """
-        Update the "selected_results" Parameter.
-
-        A neutral entry of "No selection" is also added.
-        """
-        param = self.get_param("selected_results")
-        _curr_choice = param.value
-        _new_choices = ["No selection"]
-        _new_choices.extend(self._config["plugin_res_titles"].values())
-        if _curr_choice in _new_choices:
-            param.choices = _new_choices
-        else:
-            _new_choices.append(_curr_choice)
-            param.choices = _new_choices
-            param.value = _new_choices[0]
-            param.choices = _new_choices[:-1]
-            self._active_node = -1
-            self._config["plot_active"] = False
-        with QtCore.QSignalBlocker(self.param_widgets["selected_results"]):
-            self.param_widgets["selected_results"].update_choices(param.choices)
-            self.param_widgets["selected_results"].setCurrentText(param.value)
+        """Update the choice of results to display"""
+        self._widgets["result_table"].update_choices_from_workflow_results(
+            self._local_results_mock
+        )
 
     @QtCore.Slot(int)
-    def __selected_new_node(self, index: int):
+    def _selected_new_node(self, index: int):
         """
         Handle the selection of a new node.
 
         Parameters
         ----------
         index : int
-            The new QComboBox selection index.
+            The node_id of the selected results.
         """
-        if index == 0:
-            self._active_node = -1
+        self._active_node = index
+        if index == -1:
             self._config["has_details"] = False
-            self.__set_derived_widget_visibility(False)
-            self._widgets["plot"].clear_plots()
             return
-        self._active_node = int(
-            self.param_widgets["selected_results"].currentText()[-4:-1]
-        )
-        self._config["plot_active"] = True
-        self._config["has_details"] = hasattr(
-            self._tree.nodes[self._active_node].plugin, "detailed_results"
-        )
-        self.__set_derived_widget_visibility(True)
+        else:
+            self._config["plot_active"] = True
+            self._config["has_details"] = hasattr(
+                self._tree.nodes[self._active_node].plugin, "detailed_results"
+            )
+        self.__set_derived_widget_visibility(index != -1)
         self.__update_text_description_of_node_results()
         self.__plot_results()
 
@@ -502,9 +490,8 @@ class WorkflowTestFrame(BaseFrame):
         visible : bool
             Keyword to toggle visibility.
         """
-        self._config["widget_visibility"] = visible
-        self._widgets["result_info"].setVisible(visible)
-        self._widgets["but_tweak_params"].setVisible(visible)
+        for _key in ["result_info", "but_tweak_params", "label_select_header", "plot"]:
+            self._widgets[_key].setVisible(visible)
         self._widgets["but_show_details"].setVisible(
             self._config["has_details"] and visible
         )
@@ -513,6 +500,8 @@ class WorkflowTestFrame(BaseFrame):
         """
         Update the text description of the currently selected node's results.
         """
+        if self._active_node == -1:
+            return
         _str = _create_str_description_of_node_result(
             self._tree.nodes[self._active_node], self._results[self._active_node]
         )
@@ -523,17 +512,11 @@ class WorkflowTestFrame(BaseFrame):
         Update the plot.
 
         This method will get the latest result (subset) from the
-        WorkflowResults and update the plot.
+        ProcessingResults and update the plot.
         """
-        if not self._config["plot_active"]:
+        if self._active_node == -1 or not self._config["plot_active"]:
             return
-        _data = self._results[self._active_node]
-        if _data.ndim in [1, 2]:
-            _title = self._config["plugin_res_titles"][self._active_node]
-            self._widgets["plot"].plot_data(_data, title=_title)
-        else:
-            self._widgets["plot"].clear_plots()
-            return
+        self._widgets["plot"].set_data(self._results[self._active_node])
         if self._config["details_active"] and self._config["has_details"]:
             self.show_plugin_details(set_focus=False)
 
@@ -553,12 +536,7 @@ class WorkflowTestFrame(BaseFrame):
         self._config["details_active"] = True
         _plugin = self._tree.nodes[self._active_node].plugin
         _details = _plugin.detailed_results
-        _title = (
-            _plugin.plugin_name
-            + ' "'
-            + self.param_widgets["selected_results"].currentText()
-            + '"'
-        )
+        _title = _plugin.plugin_name + ' "' + _plugin.result_title + '"'
         self.__details_window.update_results(_details, title=_title)
         self.__details_window.raise_()
         self.__details_window.show()

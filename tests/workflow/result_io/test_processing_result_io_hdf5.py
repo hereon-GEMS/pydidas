@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,20 +38,20 @@ from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_random_string, read_and_decode_hdf5_dataset
 from pydidas.unittest_objects import create_hdf5_results_file
-from pydidas.workflow import WorkflowResults, WorkflowTree
-from pydidas.workflow.result_io import WorkflowResultIoMeta
-from pydidas.workflow.result_io.workflow_result_io_hdf5 import WorkflowResultIoHdf5
+from pydidas.workflow import ProcessingResults, WorkflowTree
+from pydidas.workflow.result_io import ProcessingResultIoMeta
+from pydidas.workflow.result_io.processing_result_io_hdf5 import ProcessingResultIoHdf5
 
 
 TREE = WorkflowTree()
 SCAN = ScanContext()
 EXP = DiffractionExperimentContext()
-RESULTS = WorkflowResults()
-META = WorkflowResultIoMeta
-H5SAVER = WorkflowResultIoHdf5
+RESULTS = ProcessingResults()
+META = ProcessingResultIoMeta
+H5SAVER = ProcessingResultIoHdf5
 
 
-class TestWorkflowResultIoHdf5(unittest.TestCase):
+class TestProcessingResultIoHdf5(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._dir = tempfile.mkdtemp()
@@ -152,6 +152,8 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             _key: random.random() * np.arange(_len) + random.random()
             for _key, _len in enumerate(dataset.shape)
         }
+        dataset.data_label = get_random_string(12)
+        dataset.data_unit = get_random_string(3)
         for _axis in _labels:
             dataset.update_axis_label(_axis, _labels[_axis])
             dataset.update_axis_unit(_axis, _units[_axis])
@@ -162,6 +164,14 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
             with h5py.File(_fname, "r") as _file:
+                self.assertEqual(
+                    read_and_decode_hdf5_dataset(_file["entry/data_label"]),
+                    metadata[_node_id]["data_label"],
+                )
+                self.assertEqual(
+                    read_and_decode_hdf5_dataset(_file["entry/data_unit"]),
+                    metadata[_node_id]["data_unit"],
+                )
                 for _ax in range(3, data[_node_id].ndim):
                     _axentry = _file[f"entry/data/axis_{_ax}"]
                     self.assertEqual(
@@ -212,6 +222,8 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
                 axis_units=_item.axis_units,
                 axis_labels=_item.axis_labels,
                 axis_ranges=_item.axis_ranges,
+                data_label=_data[_key].data_label,
+                data_unit=_data[_key].data_unit,
             )
             for _key, _item in _data.items()
         }

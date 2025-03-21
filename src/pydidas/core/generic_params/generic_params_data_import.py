@@ -309,4 +309,61 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "allow a rolling average over the frames."
         ),
     },
+    "files_per_directory": {
+        "type": int,
+        "default": -1,
+        "name": "Images per directory",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The number of files in the directory.",
+    },
+    "_counted_files_per_directory": {
+        "type": int,
+        "default": 1,
+        "name": "Processed images per directory",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The counted number of images per directory.",
+    },
+    "fio_suffix": {
+        "type": str,
+        "default": "_mca_s#.fio",
+        "name": "FIO file suffix",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The file suffix for teh individual MCA files.",
+    },
+    "use_absolute_energy": {
+        "type": bool,
+        "default": False,
+        "name": "Use absolute energy",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "Use an absolute energy scale for the results. If False, the energy "
+            "scale will be created in channel numbers."
+        ),
+    },
+    "energy_offset": {
+        "type": float,
+        "default": 0.0,
+        "name": "Energy offset",
+        "choices": None,
+        "unit": "eV",
+        "allow_None": False,
+        "tooltip": "The absolute offset in energy for the zeroth channel.",
+    },
+    "energy_delta": {
+        "type": float,
+        "default": 1.0,
+        "name": "Channel energy delta",
+        "choices": None,
+        "unit": "eV",
+        "allow_None": False,
+        "tooltip": "The width of each energy channels in eV.",
+    },
 }

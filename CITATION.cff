@@ -1,4 +1,4 @@
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
 cff-version: 1.2.0
@@ -11,10 +11,12 @@ authors:
     email: malte.storm@hereon.de
     affiliation: Helmholtz-Zentrum Hereon
     orcid: 'https://orcid.org/0000-0002-1602-781X'
+    date-start: "2021-02-15"
   - given-names: Gudrun
     family-names: Lotze
     email: gudrun.lotze@hereon.de
     affiliation: Helmholtz-Zentrum Hereon
+    date-start: "2024-04-08"
 url: 'https://pydidas.hereon.de/'
 keywords:
   - X-ray diffraction
@@ -24,5 +26,8 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-date-released: 2024-09-19
-version: 24.09.19
+date-released: 2025-03-17
+version: 25.03.17
+funding:
+  - funder: Deutsche Forschungsgemeinschaft (DFG)
+    grant: 460248799

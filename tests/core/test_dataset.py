@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -215,6 +215,15 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(_new, Dataset)
         self.assertNotEqual(id(obj), id(_new))
         self.assertEqual(obj.shape, _new.shape)
+
+    def test_T(self):
+        obj = self.create_large_dataset()
+        _new = obj.T
+        self.assertEqual(_new.shape, tuple(reversed(obj.shape)))
+        for _dim, _new_range in _new.axis_ranges.items():
+            self.assertTrue(
+                np.allclose(_new_range, obj.axis_ranges[obj.ndim - 1 - _dim])
+            )
 
     def test_property_dict(self):
         obj = self.create_large_dataset()

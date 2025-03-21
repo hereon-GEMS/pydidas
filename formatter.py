@@ -43,16 +43,16 @@ Formatting checks for pydidas
 =============================
 
 Supported python modules are:
-1. ruff `format` for automatic code re-formatting.
-2. ruff `check` for style guide checks.
+1. ruff `format` for automatic code re-formatting (use ruff-format).
+2. ruff `check` for style guide checks (use ruff-check).
 3. reuse for copyright information checking.
 4. black for automatic code re-formatting.
 5. isort for automatic import sorting.
 6. flake8 for style guide checks.
 
-
-In addition, a function to update the copyright in changed files to be consistent
-with the year of the change is included.
+In addition, functionality to check the correct copyright years and the version
+numbers are available by using the `--copyright` and `--version` arguments,
+respectively. These two are also included in the `--all` argument.
 
 Usage
 -----

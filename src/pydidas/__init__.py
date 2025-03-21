@@ -39,6 +39,7 @@ import h5py as __h5py  # noqa: F401
 import hdf5plugin as __hdf5plugin  # noqa: F401
 import qtpy as __qtpy
 import qtpy.QtCore as __QtCore
+import qtpy.QtGui as __QtGui
 import qtpy.QtWidgets as __QtWidgets
 
 

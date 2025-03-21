@@ -104,8 +104,14 @@ class PydidasPlot1D(Plot1D):
 
         self._plot_config = {
             "ax_label_x": data.get_axis_description(0),
-            "ax_label_y": self._y_label(
-                data.axis_labels[0], data.axis_units[0], data.data_label, data.data_unit
+            "ax_label_y": kwargs.get(
+                "ylabel",
+                self._y_label(
+                    data.axis_labels[0],
+                    data.axis_units[0],
+                    data.data_label,
+                    data.data_unit,
+                ),
             ),
             "kwargs": {
                 "linewidth": 1.5,
@@ -116,8 +122,8 @@ class PydidasPlot1D(Plot1D):
                 if _key in self._allowed_kwargs
             },
         }
-        self.setGraphXLabel(self._plot_config["ax_label_x"])
-        self.setGraphYLabel(self._plot_config["ax_label_y"])
+        self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
+        self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
         self._current_raw_data[kwargs.get("legend", "Unnamed curve 1.1")] = (
             data,
             self._plot_config["kwargs"],
@@ -155,10 +161,10 @@ class PydidasPlot1D(Plot1D):
         _xarr, _yarr, _, _ = _curve.getData()
         _title = self.getGraphTitle()
         self.getBackend().fig.gca().cla()
-        self.addCurve(_xarr, _yarr, **self._plot_config["kwargs"])
+        self.addCurve(_xarr, _yarr, **self._plot_config.get("kwargs", {}))
         self.setGraphTitle(_title)
-        self.setGraphXLabel(self._plot_config["ax_label_x"])
-        self.setGraphYLabel(self._plot_config["ax_label_y"])
+        self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
+        self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
 
     def _activeItemChanged(self, type_):
         """

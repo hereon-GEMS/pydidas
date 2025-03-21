@@ -48,15 +48,15 @@ from pydidas.core import (
 )
 from pydidas.core.utils import pydidas_logger
 from pydidas.core.utils.dataset_utils import get_default_property_dict
-from pydidas.workflow import WorkflowResultsContext, WorkflowTree
-from pydidas.workflow.result_io import WorkflowResultIoMeta
+from pydidas.workflow import WorkflowResults, WorkflowTree
+from pydidas.workflow.result_io import ProcessingResultIoMeta
 
 
 TREE = WorkflowTree()
 SCAN = ScanContext()
 EXP = DiffractionExperimentContext()
-RESULTS = WorkflowResultsContext()
-RESULT_SAVER = WorkflowResultIoMeta
+RESULTS = WorkflowResults()
+RESULT_SAVER = ProcessingResultIoMeta
 
 logger = pydidas_logger()
 

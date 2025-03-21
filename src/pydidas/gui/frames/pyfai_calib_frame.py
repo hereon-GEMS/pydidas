@@ -241,7 +241,6 @@ class PyfaiCalibFrame(BaseFrame):
             _menu_item = MenuItem(self._widgets["task_list"])
             _menu_item.setText(task.windowTitle())
             _menu_item.setIcon(_inverted_icon)
-            print(task.windowIcon())
             task.warningUpdated.connect(
                 functools.partial(self._update_task_state, task, _menu_item)
             )

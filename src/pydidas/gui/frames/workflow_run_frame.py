@@ -33,9 +33,12 @@ import time
 from qtpy import QtCore, QtWidgets
 
 from pydidas.apps import ExecuteWorkflowApp
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.core import UserConfigError
 from pydidas.core.utils import ShowBusyMouse, pydidas_logger
-from pydidas.gui.frames.builders import WorkflowRunFrameBuilder
+from pydidas.gui.frames.builders import (
+    get_WorkflowRunFrame_build_config,
+)
 from pydidas.gui.mixins import ViewResultsMixin
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets.dialogues import WarningBox
@@ -56,14 +59,14 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     menu_title = "Run full workflow"
     menu_entry = "Workflow processing/Run full workflow"
 
-    default_params = get_generic_param_collection(
-        "selected_results", "saving_format", "enable_overwrite"
-    )
-    params_not_to_restore = ["selected_results"]
     sig_processing_running = QtCore.Signal(bool)
 
     def __init__(self, **kwargs: dict):
+        self._EXP = DiffractionExperimentContext()
+        self._SCAN = ScanContext()
+        self._TREE = WorkflowTree()
         BaseFrameWithApp.__init__(self, **kwargs)
+        ViewResultsMixin.__init__(self)
         _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
@@ -72,6 +75,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
                 "data_use_timeline": False,
                 "plot_last_update": 0,
                 "plot_update_time": _global_plot_update_time,
+                "source_hash": self._RESULTS.source_hash,
             }
         )
         self._axlabels = lambda i: ""
@@ -83,7 +87,10 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Populate the frame with widgets.
         """
-        WorkflowRunFrameBuilder.build_frame(self)
+        for _method, _args, _kwargs in get_WorkflowRunFrame_build_config(self):
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
+        self.build_view_results_mixin()
 
     def connect_signals(self):
         """
@@ -94,15 +101,28 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
-        self._widgets["plot"].sig_get_more_info_for_data.connect(
-            self._widgets["result_selector"].show_info_popup
-        )
+        self.connect_view_results_mixin_signals()
 
-    def finalize_ui(self):
+    def _verify_result_shapes_uptodate(self):
         """
-        Connect the export functions to the widget data.
+        Verify the consistency of the underlying information.
+
+        The information for the WorkflowResults is defined by the Singletons
+        (i.e. the ScanContext and WorkflowTree) and must be checked to detect
+        any changes.
         """
-        ViewResultsMixin.__init__(self)
+        _hash = self._RESULTS.source_hash
+        if _hash != self._config["source_hash"]:
+            self._config["source_hash"] = self._RESULTS.source_hash
+            self._clear_results()
+            self.update_choices_of_selected_results()
+
+    def _clear_results(self):
+        """
+        Clear the selected results entries.
+        """
+        self._widgets["result_table"].remove_all_rows()
+        self._widgets["data_viewer"].setVisible(False)
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int):
@@ -118,9 +138,6 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
             The index of the newly activated frame.
         """
         super().frame_activated(index)
-        if index == self.frame_index:
-            self.update_choices_of_selected_results()
-            self.update_export_button_activation()
         self._config["frame_active"] = index == self.frame_index
 
     def __abort_execution(self):
@@ -152,12 +169,27 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         logger.debug("WorkflowRunFrame: Clicked execute")
         self._verify_result_shapes_uptodate()
+        self._selected_new_node(-1)
+        self._check_autosaving()
         self.sig_processing_running.emit(True)
         try:
             self._run_app()
         except:
             self.sig_processing_running.emit(False)
             raise
+
+    def _check_autosaving(self):
+        """Check that the target directory is empty if autosaving has been enabled."""
+        if not self.get_param_value("autosave_results"):
+            return
+        _path = self.get_param_value("autosave_directory")
+        if _path.is_dir():
+            _items = [_item for _item in _path.iterdir()]
+            if len(_items) > 0:
+                raise UserConfigError(
+                    "The selected directory for autosaving of results is not empty.\n"
+                    "Please select another directory or remove the existing files."
+                )
 
     def _run_app(self):
         """
@@ -213,8 +245,8 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         self.set_status("Started processing of full workflow.")
         self._widgets["progress"].setValue(0)
-        self._clear_selected_results_entries()
-        self._clear_plot()
+        self._clear_results()
+        self.update_export_button_activation()
 
     @QtCore.Slot()
     def _apprunner_finished(self):
@@ -232,7 +264,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         logger.debug("WorkflowRunFrame: AppRunner successfully shut down.")
         self.set_status("WorkflowRunFrame: Finished processing of full workflow.")
         self._finish_processing()
-        self.update_plot()
+        self.update_displayed_data()
 
     @QtCore.Slot()
     def __update_result_node_information(self):
@@ -240,7 +272,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         Update the information about the nodes' results after the AppRunner
         has sent the first results.
         """
-        self._widgets["result_selector"].get_and_store_result_node_labels()
+        self.update_choices_of_selected_results()
         if self._config["update_node_information_connected"]:
             self._runner.sig_results.disconnect(self.__update_result_node_information)
             self._config["update_node_information_connected"] = False
@@ -250,7 +282,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         _dt = time.time() - self._config["plot_last_update"]
         if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
             self._config["plot_last_update"] = time.time()
-            self.update_plot()
+            self.update_displayed_data()
 
     @QtCore.Slot(str)
     def __process_messages(self, message: str):
@@ -268,6 +300,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Perform finishing touches after the processing has terminated.
         """
+        self.update_export_button_activation()
         self.__set_proc_widget_visibility_for_running(False)
         self.sig_processing_running.emit(False)
         QtWidgets.QApplication.instance().processEvents()

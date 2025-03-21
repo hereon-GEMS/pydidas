@@ -174,13 +174,18 @@ class ParameterWidget(EmptyWidget):
         """
         Create a widget with the Parameter's name.
         """
-        _text = convert_special_chars_to_unicode(self.param.name) + ":"
-        self._widgets["name_label"] = PydidasLabel(_text, margin=0)
-        self._widgets["name_container"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
-        self.layout().addWidget(
-            self._widgets["name_container"], *self._config["layout_text"]
+        self._widgets["name_label"] = PydidasLabel(
+            convert_special_chars_to_unicode(self.param.name) + ":",
+            margin=0,
+            font_metric_width_factor=(
+                None
+                if self._font_metric_width_factor is None
+                else self._config["width_text"] * self._font_metric_width_factor
+            ),
         )
-        self._widgets["name_container"].layout().addWidget(self._widgets["name_label"])
+        self.layout().addWidget(
+            self._widgets["name_label"], *self._config["layout_text"]
+        )
         if not self._config["linebreak"]:
             self.layout().setColumnStretch(0, int(self._config["width_text"] * 100))
 
@@ -188,13 +193,18 @@ class ParameterWidget(EmptyWidget):
         """
         Create a widget with the Parameter's unit text.
         """
-        _text = convert_special_chars_to_unicode(self.param.unit)
-        self._widgets["unit_label"] = PydidasLabel(_text, margin=3)
-        self._widgets["unit_container"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
-        self.layout().addWidget(
-            self._widgets["unit_container"], *self._config["layout_unit"]
+        self._widgets["unit_label"] = PydidasLabel(
+            convert_special_chars_to_unicode(self.param.unit),
+            margin=3,
+            font_metric_width_factor=(
+                None
+                if self._font_metric_width_factor is None
+                else self._config["width_unit"] * self._font_metric_width_factor
+            ),
         )
-        self._widgets["unit_container"].layout().addWidget(self._widgets["unit_label"])
+        self.layout().addWidget(
+            self._widgets["unit_label"], *self._config["layout_unit"]
+        )
         self.layout().setColumnStretch(2, int(self._config["width_unit"] * 100))
 
     def __create_param_io_widget(self):
@@ -271,6 +281,6 @@ class ParameterWidget(EmptyWidget):
         _new_value = self._widgets["io"].get_value()
         try:
             self.param.value = _new_value
-        except ValueError:
+        except (ValueError, UserConfigError):
             self._widgets["io"].set_value(self.param.value)
             raise

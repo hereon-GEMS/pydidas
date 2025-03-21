@@ -27,76 +27,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["FioMcaLineScanSeriesLoader"]
 
+
 import os
 from pathlib import Path
-
-import numpy as np
 
 from pydidas.contexts import ScanContext
 from pydidas.core import (
     Dataset,
     FileReadError,
-    Parameter,
-    ParameterCollection,
     UserConfigError,
-    get_generic_parameter,
+    get_generic_param_collection,
 )
-from pydidas.core.utils import CatchFileErrors, copy_docstring
+from pydidas.core.utils import copy_docstring
+from pydidas.core.utils import fio_utils as fio
 from pydidas.plugins import InputPlugin, InputPlugin1d
-
-
-FIO_MCA_READER_DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter("live_processing"),
-    Parameter(
-        "files_per_directory",
-        int,
-        -1,
-        name="Files per directory",
-        tooltip=(
-            "The number of files in each directory. A value of "
-            "'-1' will take the number of present files in the "
-            "first directory."
-        ),
-    ),
-    Parameter(
-        "_counted_files_per_directory",
-        int,
-        -1,
-        name="Files per directory",
-        tooltip="The counted number of files in each directory.",
-    ),
-    Parameter(
-        "fio_suffix",
-        str,
-        "_mca_s#.fio",
-        name="FIO-file suffix",
-        tooltip=("The file suffix for the individual MCA files."),
-    ),
-    Parameter(
-        "use_absolute_energy",
-        int,
-        0,
-        choices=[True, False],
-        name="Use absolute energy scale",
-        tooltip=("Use an absolute energy scale for the results."),
-    ),
-    Parameter(
-        "energy_offset",
-        float,
-        0,
-        name="Energy offset",
-        unit="eV",
-        tooltip=("The absolute offset in energy for the zeroth channel."),
-    ),
-    Parameter(
-        "energy_delta",
-        float,
-        1,
-        name="Channel energy Delta",
-        unit="eV",
-        tooltip=("The width of each energy channels in eV."),
-    ),
-)
 
 
 SCAN = ScanContext()
@@ -106,8 +50,30 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     """
     Load data frames from a series of Fio files with MCA data.
 
-    This plugin is designed to allow loading .fio files written by DESY's
-    SPOCK for a number of line scans.
+    This plugin is designed to allow loading .fio files written by Sardana which
+    include a single row of data with the MCA spectrum.
+
+    Data is expected in a series of directories with an identical number of
+    files in each. The names of the directories and file prefixes in the
+    directories are defined by the filename_pattern in the Scan settings whereas
+    the suffix is defined by the fio_suffix parameter.
+
+    For example, for loading a series of files with the following names
+    /data/path/scan_0001/scan_0001_mca_s1.fio,
+    /data/path/scan_0001/scan_0001_mca_s2.fio,
+    ...
+    /data/path/scan_0001/scan_0010_mca_s20.fio,
+
+    to
+    /data/path/scan_0010/scan_0010_mca_s1.fio,
+    /data/path/scan_0010/scan_0010_mca_s2.fio,
+    ...
+    /data/path/scan_0010/scan_0010_mca_s20.fio,
+
+    use the following settings:
+    - Scan base directory: /data/path
+    - Scan name pattern: scan_####
+    - Fio file suffix: _mca_s#.fio (set by default)
 
     Please note that each instrument might have different data defined in the
     fio file format and not all data might be readable.
@@ -117,11 +83,11 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     directory_path : Union[str, pathlib.Path]
         The base path to the directory with all the scan subdirectories.
     filename_pattern : str
-        The name and pattern of the sub-directories and the prefixes in the
+        The name and pattern of the subdirectories and the prefixes in the
         filename.
     live_processing : bool, optional
         Flag to toggle file system checks. In live_processing mode, checks
-        for the size and existance of files are disabled. The default is False.
+        for the size and existence of files are disabled. The default is False.
     file_stepping : int, optional
         The stepping width through all files in the file list, determined
         by fist and last file. The default is 1.
@@ -143,7 +109,15 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     """
 
     plugin_name = "Fio MCA line scan series loader"
-    default_params = FIO_MCA_READER_DEFAULT_PARAMS.copy()
+    default_params = get_generic_param_collection(
+        "live_processing",
+        "files_per_directory",
+        "_counted_files_per_directory",
+        "fio_suffix",
+        "use_absolute_energy",
+        "energy_offset",
+        "energy_delta",
+    )
 
     def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)
@@ -156,9 +130,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         """
         InputPlugin1d.pre_execute(self)
         self._check_files_per_directory()
-        self._determine_header_size()
+        fio.update_config_from_fio_file(self.get_filename(0), self._config, self.params)
         self._config["roi"] = self._get_own_roi()
-        self._config["energy_scale"] = None
 
     def update_filename_string(self):
         """
@@ -181,16 +154,16 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         correctly.
         """
         if self.get_param_value("files_per_directory") == -1:
-            _nstart = self._SCAN.get_param_value("scan_start_index")
-            _path = Path(self.filename_string.format(index0=_nstart, index1=1)).parent
+            _i_start = self._SCAN.get_param_value("scan_start_index")
+            _path = Path(self.filename_string.format(index0=_i_start, index1=1)).parent
             if not _path.is_dir():
                 raise FileReadError(
                     "The given directory for the first batch of fio files does not "
                     "exist. Please check the scan base directory and naming "
                     f"pattern. \n\nDirectory name not found:\n{str(_path)}"
                 )
-            _nfiles = sum(1 for _name in _path.iterdir() if _name.is_file())
-            self.set_param_value("_counted_files_per_directory", _nfiles)
+            _n_files = sum(1 for _name in _path.iterdir() if _name.is_file())
+            self.set_param_value("_counted_files_per_directory", _n_files)
             if self.get_param_value("_counted_files_per_directory") == 0:
                 raise UserConfigError(
                     "There are no files in the given first directory. Please check the "
@@ -206,18 +179,9 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         """
         Determine the size of the header in lines.
         """
-        _fname = self.get_filename(0)
-        with CatchFileErrors(_fname):
-            with open(_fname, "r") as _f:
-                _lines = _f.readlines()
-        _lines_total = len(_lines)
-        _n_header = _lines.index("! Data \n") + 2
-        _lines = _lines[_n_header:]
-        while _lines[0].strip().startswith("Col"):
-            _lines.pop(0)
-            _n_header += 1
+        _n_header, _n_data = fio.determine_header_and_data_lines(self.get_filename(0))
         self._config["header_lines"] = _n_header
-        self._config["data_lines"] = _lines_total - _n_header
+        self._config["data_lines"] = _n_data
 
     def get_frame(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -237,38 +201,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         kwargs : dict
             The updated kwargs.
         """
-        _fname = self.get_filename(index)
-        with CatchFileErrors(_fname):
-            _data = np.loadtxt(_fname, skiprows=self._config["header_lines"])
-        if self._config["energy_scale"] is None:
-            self._create_energy_scale()
-        _dataset = Dataset(
-            _data,
-            axis_labels=["energy"],
-            axis_units=[self._config["energy_unit"]],
-            axis_ranges=[self._config["energy_scale"]],
-        )
-        if self._config["roi"] is not None:
-            _dataset = _dataset[self._config["roi"]]
+        _dataset = fio.load_fio_energy_spectrum(self.get_filename(index), self._config)
         return _dataset, kwargs
-
-    def _create_energy_scale(self):
-        """
-        Create the energy scale to be applied to the return Dataset.
-
-        Parameters
-        ----------
-        num_bins : int
-            The number of bins of the detector.
-        """
-        if not self.get_param_value("use_absolute_energy"):
-            self._config["energy_unit"] = "channels"
-            self._config["energy_scale"] = np.arange(self._config["data_lines"])
-            return
-        self._config["energy_unit"] = "eV"
-        self._config["energy_scale"] = np.arange(
-            self._config["data_lines"]
-        ) * self.get_param_value("energy_delta") + self.get_param_value("energy_offset")
 
     @copy_docstring(InputPlugin)
     def get_filename(self, index: int) -> str:
@@ -280,24 +214,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         <InputPlugin>` class.
         """
         _n_per_dir = self.get_param_value("_counted_files_per_directory")
-        _pathindex = index // _n_per_dir + self._SCAN.get_param_value(
+        _path_index = index // _n_per_dir + self._SCAN.get_param_value(
             "scan_start_index"
         )
-        _fileindex = index % _n_per_dir + 1
-        return self.filename_string.format(index0=_pathindex, index1=_fileindex)
-
-    def get_raw_input_size(self) -> int:
-        """
-        Get the raw input size.
-
-        Returns
-        -------
-        int
-            The number of bins in the input data.
-        """
-        self.update_filename_string()
-        if self.get_param_value("_counted_files_per_directory") < 1:
-            self._check_files_per_directory()
-        if self._config.get("data_lines", None) is None:
-            self._determine_header_size()
-        return self._config["data_lines"]
+        _file_index = index % _n_per_dir + 1
+        return self.filename_string.format(index0=_path_index, index1=_file_index)

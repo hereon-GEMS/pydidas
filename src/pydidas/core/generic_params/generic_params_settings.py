@@ -44,6 +44,19 @@ GENERIC_PARAMS_SETTINGS = {
             "performance increases for multiple parallel processes."
         ),
     },
+    "data_buffer_size": {
+        "type": float,
+        "default": 1500,
+        "name": "Data buffer size",
+        "choices": None,
+        "unit": "MB",
+        "allow_None": False,
+        "tooltip": (
+            "The maximum size of the data buffer (for each display widget). "
+            "Any data which is smaller than the buffer size will be stored in "
+            "memory. Larger data will be read from disk in chunks."
+        ),
+    },
     "shared_buffer_size": {
         "type": float,
         "default": 100,
@@ -156,6 +169,19 @@ GENERIC_PARAMS_SETTINGS = {
         "tooltip": (
             "The delay before any plot updates will be processed. This"
             " will prevent multiple frequent update of plots."
+        ),
+    },
+    "max_number_curves": {
+        "type": int,
+        "default": 40,
+        "name": "Maximum number of curves",
+        "choices": None,
+        "allow_None": False,
+        "unit": "",
+        "tooltip": (
+            "The maximum number of curves to plot. Increasing this number will "
+            "allow more curves to be plotted simultaneously, but at the cost of "
+            "significant performance decrease."
         ),
     },
     "histogram_outlier_fraction_high": {

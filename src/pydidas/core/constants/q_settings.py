@@ -39,6 +39,7 @@ __all__ = [
 
 QSETTINGS_GLOBAL_KEYS = [
     "mp_n_workers",
+    "data_buffer_size",
     "shared_buffer_size",
     "shared_buffer_max_n",
     "max_image_size",
@@ -48,6 +49,7 @@ QSETTINGS_GLOBAL_KEYS = [
 QSETTINGS_USER_KEYS = [
     "mosaic_border_width",
     "mosaic_border_value",
+    "max_number_curves",
     "histogram_outlier_fraction_low",
     "histogram_outlier_fraction_high",
     "plugin_path",

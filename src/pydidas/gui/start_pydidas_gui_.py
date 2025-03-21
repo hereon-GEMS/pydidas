@@ -30,12 +30,15 @@ __all__ = ["start_pydidas_gui"]
 import multiprocessing as mp
 import signal
 import warnings
+from pathlib import Path
+from typing import Optional, Type
 
 from qtpy.QtWidgets import QApplication
 
 from pydidas.core import UserConfigError
 from pydidas.gui import MainWindow
 from pydidas.gui.frames import DEFAULT_FRAMES
+from pydidas.resources import icons
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
@@ -44,6 +47,8 @@ def start_pydidas_gui(
     *frames: tuple[BaseFrame],
     use_default_frames: bool = True,
     restore_state: str = "exit",
+    custom_mainwindow: Optional[Type[MainWindow]] = None,
+    custom_splash_image: Optional[Path] = None,
 ):
     """
     Open the pydidas GUI with the given frames and run the QEventLoop.
@@ -58,20 +63,26 @@ def start_pydidas_gui(
         Flag to restore the state of the pydidas GUI. Flags can be either "None" to
         start fresh, "exit" to restore the exit state or "saved" to restore the last
         saved state.
+    custom_mainwindow : MainWindow, optional
+        Custom MainWindow class to be used. If not provided, the default MainWindow
+        class will be used.
+    custom_splash_image : Path, optional
+        The path to a custom splash image to be used. If not provided, the
+        default splash image will be used.
     """
-    # need to import here to prevent crash on Debian
-
+    main_window_cls = MainWindow if custom_mainwindow is None else custom_mainwindow
+    restore_state = "None" if restore_state is None else restore_state
     _prepare_interpreter()
     if use_default_frames:
         frames = DEFAULT_FRAMES + frames
     _check_frames(frames)
-    _splash = PydidasSplashScreen()
+    _splash = PydidasSplashScreen(custom_splash_image=custom_splash_image)
     try:
         _splash.show_aligned_message("Starting QApplication")
         _app = _get_pydidas_qapplication()
         _app.sig_gui_exception_occurred.connect(_splash.close)
         _splash.show_aligned_message("Creating objects")
-        _gui = MainWindow()
+        _gui = main_window_cls()
         for frame in frames:
             _gui.register_frame(frame)
         _splash.show_aligned_message("Creating widgets")
@@ -87,6 +98,7 @@ def start_pydidas_gui(
             pass
         _splash.finish(_gui)
         _gui.check_for_updates(auto_check=True)
+        _gui.setWindowIcon(icons.pydidas_icon_with_bg())
         _gui.raise_()
         _ = _app.exec_()
     except Exception:

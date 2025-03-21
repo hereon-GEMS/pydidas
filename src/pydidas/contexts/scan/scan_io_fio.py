@@ -26,9 +26,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ScanIoFio"]
 
+
 import os
 from pathlib import Path
-from typing import Optional, Union
 
 import numpy as np
 
@@ -59,7 +59,7 @@ class ScanIoFio(ScanIoBase):
     import_only = True
 
     @staticmethod
-    def _get_default_values(filepath: Path, ndim: int) -> dict[str, Union[int, str]]:
+    def _get_default_values(filepath: Path, ndim: int) -> dict[str, int | str]:
         """
         Get the default Parameter values for a 1D scan.
 
@@ -136,10 +136,30 @@ class ScanIoFio(ScanIoBase):
             ]
         )
 
+    @staticmethod
+    def _line_starts_with_scan_cmd(line: str) -> bool:
+        """
+        Check if a line starts with a scan command.
+
+        Parameters
+        ----------
+        line : str
+            The line to check.
+
+        Returns
+        -------
+        bool
+            True if the line starts with a scan command, False otherwise.
+        """
+        return (
+            line.startswith("ascan")
+            or line.startswith("dscan")
+            or line.startswith("mesh")
+            or line.startswith("dmesh")
+        )
+
     @classmethod
-    def import_from_file(
-        cls, filenames: Union[Path, str, list[Union[Path, str]]], **kwargs: dict
-    ):
+    def import_from_file(cls, filenames: Path | str | list[Path | str], **kwargs: dict):
         """
         Import scan metadata from a single or multiple fio files.
 
@@ -164,7 +184,10 @@ class ScanIoFio(ScanIoBase):
         if isinstance(filenames, (Path, str)):
             cls._import_single_fio(filenames, scan=scan)
         elif isinstance(filenames, (list, tuple)):
-            cls._import_multiple_fio(filenames, **kwargs)
+            if len(filenames) == 1:
+                cls._import_single_fio(filenames[0], scan=scan)
+            else:
+                cls._import_multiple_fio(filenames, **kwargs)
         else:
             raise UserConfigError(
                 "The input for the fio importer must be a single filename or "
@@ -175,9 +198,7 @@ class ScanIoFio(ScanIoBase):
         cls._write_to_scan_settings(scan=scan)
 
     @classmethod
-    def _import_single_fio(
-        cls, filename: Union[Path, str], scan: Optional[Scan] = None
-    ):
+    def _import_single_fio(cls, filename: Path | str, scan: Scan | None = None):
         """
         Import scan metadata from a single fio file.
 
@@ -196,31 +217,22 @@ class ScanIoFio(ScanIoBase):
             file_lines = stream.readlines()
         try:
             for _i_line, _line in enumerate(file_lines):
-                if _line.startswith("ascan") or _line.startswith("dscan"):
+                if cls._line_starts_with_scan_cmd(_line):
                     if _scan_command_found:
                         cls._process_duplicate_scan_command()
-                    _cmd, _motor, *_scan_pars = _line.split()
-                    _start = float(_scan_pars[0])
-                    _end = float(_scan_pars[1])
-                    # The scan defines the number of intervals, not the number of points
-                    _n_points = int(_scan_pars[2]) + 1
-                    _delta = (_end - _start) / (_n_points - 1)
-                    if _line.startswith("dscan"):
-                        for _l in file_lines[_i_line + 1 :]:
-                            if _l.startswith(_motor):
-                                _start += float(_l.split("= ")[1])
-
-                    cls.imported_params[f"{_D0}_delta"] = _delta
-                    cls.imported_params[f"{_D0}_n_points"] = _n_points
-                    cls.imported_params[f"{_D0}_offset"] = _start
-                    cls.imported_params[f"{_D0}_label"] = _motor
+                    if _line.startswith("ascan") or _line.startswith("dscan"):
+                        cls._process_1dscan_cmd(_i_line, _line, file_lines)
+                        _scan_dim = 1
+                    elif _line.startswith("mesh") or _line.startswith("dmesh"):
+                        cls._process_mesh_cmd(_i_line, _line, file_lines)
+                        _scan_dim = 2
                     _scan_command_found = True
             if not _scan_command_found:
                 raise UserConfigError("No scan command found.")
         except (FileNotFoundError, OSError, ValueError) as error:
             cls.imported_params = {}
             raise UserConfigError from error
-        cls.imported_params.update(cls._get_default_values(Path(filename), 1))
+        cls.imported_params.update(cls._get_default_values(Path(filename), _scan_dim))
 
     @classmethod
     def _process_duplicate_scan_command(cls):
@@ -231,9 +243,81 @@ class ScanIoFio(ScanIoBase):
         raise UserConfigError(_ERROR_TEXT_MULTIPLE_SCAN_COMMANDS)
 
     @classmethod
-    def check_file_list(
-        cls, filenames: list[Union[Path, str]], **kwargs: dict
-    ) -> list[str]:
+    def _process_1dscan_cmd(cls, i_line: int, cmd_line: str, file_lines: list[str]):
+        """
+        Processs a 1D scan command from  the fio file.
+
+        Parameters
+        ----------
+        i_line : int
+            The index of the line containing the scan command.
+        cmd_line : str
+            The line of the fio file containing the scan command.
+        file_lines : list[str]
+            The list of all lines in the fio file.
+        """
+        _cmd, _motor, *_scan_pars = cmd_line.split()
+        _start = float(_scan_pars[0])
+        _end = float(_scan_pars[1])
+        # The scan defines the number of intervals, not the number of points
+        _n_points = int(_scan_pars[2]) + 1
+        _delta = (_end - _start) / (_n_points - 1)
+        if cmd_line.startswith("dscan"):
+            for _l in file_lines[i_line + 1 :]:
+                if _l.startswith(_motor):
+                    _start += float(_l.split("= ")[1])
+        cls.imported_params[f"{_D0}_label"] = _motor
+        cls.imported_params[f"{_D0}_delta"] = _delta
+        cls.imported_params[f"{_D0}_n_points"] = _n_points
+        cls.imported_params[f"{_D0}_offset"] = _start
+        cls.imported_params["scan_dim"] = 1
+
+    @classmethod
+    def _process_mesh_cmd(cls, i_line: int, cmd_line: str, file_lines: list[str]):
+        """
+        Process a mesh command from the fio file.
+
+        Parameters
+        ----------
+        i_line : int
+            The index of the line containing the scan command.
+        cmd_line : str
+            The line of the fio file containing the scan command.
+        file_lines : list[str]
+            The list of all lines in the fio file.
+        """
+        _cmd, *_scan_pars = cmd_line.split()
+        _motor1_name = _scan_pars[0]
+        _motor1_start = float(_scan_pars[1])
+        _motor1_end = float(_scan_pars[2])
+        _motor1_n_points = int(_scan_pars[3]) + 1
+        _motor1_delta = (_motor1_end - _motor1_start) / (_motor1_n_points - 1)
+        # in the sardana syntax, the first motor is the fast motor and runs
+        # a nested loop inside the second motor scan. In pydidas nomenclature,
+        # the fast motor is the second motor, so we need to swap the motor names
+        _motor0_name = _scan_pars[4]
+        _motor0_start = float(_scan_pars[5])
+        _motor0_end = float(_scan_pars[6])
+        _motor0_n_points = int(_scan_pars[7]) + 1
+        _motor0_delta = (_motor0_end - _motor0_start) / (_motor0_n_points - 1)
+        if cmd_line.startswith("dmesh"):
+            for _l in file_lines[i_line + 1 :]:
+                if _l.startswith(_motor1_name):
+                    _motor1_start += float(_l.split("= ")[1])
+                if _l.startswith(_motor0_name):
+                    _motor0_start += float(_l.split("= ")[1])
+
+        cls.imported_params[f"{_D0}_label"] = _motor0_name
+        cls.imported_params[f"{_D0}_delta"] = _motor0_delta
+        cls.imported_params[f"{_D0}_n_points"] = _motor0_n_points
+        cls.imported_params[f"{_D0}_offset"] = _motor0_start
+        cls.imported_params[f"{_D1}_label"] = _motor1_name
+        cls.imported_params[f"{_D1}_delta"] = _motor1_delta
+        cls.imported_params[f"{_D1}_n_points"] = _motor1_n_points
+        cls.imported_params[f"{_D1}_offset"] = _motor1_start
+
+    @classmethod
+    def check_file_list(cls, filenames: list[Path | str], **kwargs: dict) -> list[str]:
         """
         Check if the given list of files is valid for import.
 
@@ -252,6 +336,8 @@ class ScanIoFio(ScanIoBase):
         list[str]
             The error message and additional information.
         """
+        if len(filenames) == 1:
+            return ["::no_error::"]
         _scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
         _motor_pos, _motor_names = cls._process_fio_file_list(filenames, _scan)
         _index_moved_motors = cls._get_moved_motor_indices(_motor_pos, _motor_names)
@@ -265,7 +351,7 @@ class ScanIoFio(ScanIoBase):
             ]
 
     @classmethod
-    def _import_multiple_fio(cls, filenames: list[Union[Path, str]], **kwargs: dict):
+    def _import_multiple_fio(cls, filenames: list[Path | str], **kwargs: dict):
         """
         Import scan metadata from multiple fio files.
 
@@ -326,7 +412,7 @@ class ScanIoFio(ScanIoBase):
         cls.imported_params["scan_name_pattern"] = _common
 
     @classmethod
-    def _process_fio_file_list(cls, filenames: list[Union[Path, str]], scan: Scan):
+    def _process_fio_file_list(cls, filenames: list[Path | str], scan: Scan):
         """
         Read the content of multiple fio files.
 
@@ -384,7 +470,6 @@ class ScanIoFio(ScanIoBase):
             _name for _i, _name in enumerate(_motor_names) if _index_not_nan[_i]
         ]
         _motor_pos = _motor_pos[_index_not_nan]
-
         return _motor_pos, _motor_names
 
     @classmethod

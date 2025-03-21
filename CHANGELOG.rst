@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v24.mm.dd
+v25.03.17
 =========
 
 Improvements
@@ -40,12 +40,30 @@ Improvements
 	- Restructured the layout of the __init__ files for more clarity.
 	- Added a second category of importers named 'beamline file formats'
 	 to Scan and added a second registry in the ScanIo.
+	- Changed the creation of generic toolbar menus to use a dictionary which 
+	  can easily be extended by 3rd parties.
+	- Added widgets to select axes for data display also based on metadata.
 - Improved the formatting when displaying Plugin information.
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.
 - Added support for pytest tests in the CI pipeline. 
 - Added import functionality for Sardana FIO files to the Scan import.
+- Added a range property to the Parameter to limit the allowed range of Parameters
+  for numerical values.
 - Pydidas result exports in hdf5 format writes metadata neXus-compatible
+- Added a new interface for browsing and slicing data based on its metadata.
+- Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
+  (for the general class) and WorkflowResults (for the singleton instance)
+  for consistency, similarly to ProcessingTree and WorkflowTree.
+- Modified the ViewResultsFrame to use the new DataViewer for more 
+  convenient data exploration.
+- Modified the WorkflowRunFrame to use the new DataViewer for more convenient
+  data exploration.
+- Added a new plugin to load a series of MCA data from file files located in 
+  a single directory.
+- Added a new plugin to crop data by either its indices or data values.
+- Modified the TestWorkflowFrame to use the new DataViewer for more convenient
+  data exploration.
 
 
 Bugfixes
@@ -74,7 +92,13 @@ Bugfixes
 - Fixed a bug where WorkflowResults could not be exported again after import.
 - Fixed an issue where the Fit plugin would not store the background at the peak
   positions correctly.
-
+- Fixed an issue where a given y label in a Plot1D was overwritten by Dataset
+  metadata.
+- Fixed an issue in Dataset where calling .T would not transpose the axis metadata.
+- Fixed an issue in PydidasPlot1D where optional dictionary entries were queried
+  directly without a get call.
+- Fixed an issue in pyFAI integration base when using radians as azimuthal unit
+  and the full detector
 
 
 v24.09.19

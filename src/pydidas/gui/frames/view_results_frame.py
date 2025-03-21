@@ -28,49 +28,45 @@ __status__ = "Production"
 __all__ = ["ViewResultsFrame"]
 
 
-from typing import Self
-
 from qtpy import QtCore
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
-from pydidas.core import get_generic_param_collection
 from pydidas.gui.frames.builders.view_results_frame_builder import (
-    ViewResultsFrameBuilder,
+    get_ViewResultsFrame_build_config,
 )
 from pydidas.gui.mixins import ViewResultsMixin
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.framework import BaseFrame
-from pydidas.workflow import ProcessingTree, WorkflowResults, result_io
+from pydidas.workflow import ProcessingResults, ProcessingTree, result_io
 
 
-SAVER = result_io.WorkflowResultIoMeta
+SAVER = result_io.ProcessingResultIoMeta
 
 
 class ViewResultsFrame(BaseFrame, ViewResultsMixin):
     """
-    The ViewResultsFrame is used to import and visualize the pydidas WorkflowResults.
+    The ViewResultsFrame is used to import and visualize the pydidas ProcessingResults.
     """
 
     menu_icon = "pydidas::frame_icon_workflow_results"
     menu_title = "Import and display workflow results"
     menu_entry = "Workflow processing/View workflow results"
 
-    default_params = get_generic_param_collection(
-        "selected_results", "saving_format", "enable_overwrite"
-    )
-    params_not_to_restore = ["selected_results"]
-
-    def __init__(self, **kwargs: dict) -> Self:
+    def __init__(self, **kwargs: dict):
         self._SCAN = Scan()
         self._TREE = ProcessingTree()
         self._EXP = DiffractionExperiment()
-        self._RESULTS = WorkflowResults(
-            diffraction_exp_context=self._EXP,
-            scan_context=self._SCAN,
-            workflow_tree=self._TREE,
-        )
         BaseFrame.__init__(self, **kwargs)
+        ViewResultsMixin.__init__(
+            self,
+            workflow_results=ProcessingResults(
+                diffraction_exp_context=self._EXP,
+                scan_context=self._SCAN,
+                workflow_tree=self._TREE,
+            ),
+        )
+
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog()
 
@@ -78,19 +74,14 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
         """
         Build the frame and populate it with widgets.
         """
-        ViewResultsFrameBuilder.build_frame(self)
-
-    def finalize_ui(self):
-        """
-        Connect the export functions to the results widget data.
-        """
-        ViewResultsMixin.__init__(self, workflow_results=self._RESULTS)
+        for _method, _args, _kwargs in get_ViewResultsFrame_build_config(self):
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
+        self.build_view_results_mixin()
 
     def connect_signals(self):
         self._widgets["but_load"].clicked.connect(self.import_data_to_workflow_results)
-        self._widgets["plot"].sig_get_more_info_for_data.connect(
-            self._widgets["result_selector"].show_info_popup
-        )
+        self.connect_view_results_mixin_signals()
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int):

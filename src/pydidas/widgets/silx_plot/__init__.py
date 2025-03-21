@@ -25,7 +25,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
 from . import silx_actions as actions
 from ._silx_data_viewer import *
 from .pydidas_masktools_widget import *
@@ -37,6 +36,7 @@ from .pydidas_plot_stack import *
 
 __all__ = ["actions", "utilities"] + (
     pydidas_masktools_widget.__all__
+    + _silx_data_viewer.__all__
     + pydidas_plot1d.__all__
     + pydidas_plot2d.__all__
     + pydidas_plot_stack.__all__

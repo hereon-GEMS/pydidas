@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -241,6 +241,26 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         )
         _newrange = plugin.get_azimuthal_range_native()
         self.assertEqual(_range, _newrange)
+
+    def test_get_azimuthal_range_native__full_det_in_rad(self):
+        plugin = pyFAIintegrationBase(
+            azi_use_range="Full detector", azi_unit="chi / rad"
+        )
+        _newrange = plugin.get_azimuthal_range_native()
+        self.assertAlmostEqual(_newrange[0], -np.pi)
+        self.assertAlmostEqual(_newrange[1], np.pi)
+
+    def test_get_azimuthal_range_native__in_rad(self):
+        _range = (0.132, 1.543)
+        plugin = pyFAIintegrationBase(
+            azi_use_range="Specify azimuthal range",
+            azi_range_lower=_range[0],
+            azi_range_upper=_range[1],
+            azi_unit="chi / rad",
+        )
+        _newrange = plugin.get_azimuthal_range_native()
+        self.assertAlmostEqual(_newrange[0], _range[0])
+        self.assertAlmostEqual(_newrange[1], _range[1])
 
     def test_get_azimuthal_range_in_deg__empty(self):
         plugin = pyFAIintegrationBase(azi_use_range="Full detector")

@@ -38,7 +38,6 @@ from pathlib import Path
 
 import requests
 
-import build
 from pydidas_scripts.remove_local_files import (
     remove_pydidas_log_files,
     remove_pydidas_stored_gui_states,

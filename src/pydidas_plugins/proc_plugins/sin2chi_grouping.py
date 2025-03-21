@@ -39,6 +39,7 @@ from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import ProcPlugin
 
+
 LABELS_CHI = "chi"
 LABELS_SIN2CHI = "sin^2(chi)"
 LABELS_POSITION = "position"

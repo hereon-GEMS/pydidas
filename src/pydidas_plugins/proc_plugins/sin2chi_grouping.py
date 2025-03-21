@@ -28,14 +28,14 @@ __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 __all__ = ["DspacingSin2chiGrouping"]
 
-import numpy as np
 from enum import IntEnum
+from typing import Dict, List, Tuple
+
+import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
 from pydidas.core import Dataset, UserConfigError
-from typing import List, Tuple, Dict
-
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import ProcPlugin
 
@@ -767,7 +767,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # both are ordered in ascending order of increasing sin2chi
         s2c_unique_labels = np.unique(self.config._s2c_labels)
-        s2c_unique_values = s2c[s2c_unique_labels]
 
         # Calculate first derivative
         first_derivative = np.gradient(s2c, edge_order=2)
@@ -917,6 +916,10 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         d_spacing_combi_arr = np.vstack((d_spacing_neg_sorted, d_spacing_pos_sorted))
         
+        if not np.allclose(s2c_axis_pos_sorted, s2c_axis_neg_sorted):
+            diff = np.abs(s2c_axis_pos_sorted - s2c_axis_neg_sorted)
+            raise ValueError(f"Arrays differ. Max absolute difference: {np.max(diff)}")
+                     
         d_spacing_combined = Dataset(
             d_spacing_combi_arr,
             axis_ranges={0: np.arange(2), 1: s2c_axis_pos_sorted},
@@ -956,7 +959,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
             raise ValueError("Dataset d_spacing_combined must have a shape of (2, N).")
         
         if d_spacing_combined.axis_labels[0] != '0: d-, 1: d+':
-            raise ValueError(f"axis_labels[0] does not match '0: d-, 1: d+'.")
+            raise ValueError("axis_labels[0] does not match '0: d-, 1: d+'.")
         
         if d_spacing_combined.axis_labels[1] != LABELS_SIN2CHI:
             raise ValueError(f'axis_labels[1] does not match {LABELS_SIN2CHI}.')

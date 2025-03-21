@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,28 +20,35 @@ Tests for the DspacingSin2chiGrouping class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
-import pytest
+from dataclasses import dataclass
+from numbers import Real
+from typing import Callable
 
 import numpy as np
 import numpy.testing as npt
-from typing import Callable
-from numbers import Real
-from dataclasses import dataclass
+import pytest
 
-from pydidas.plugins import PluginCollection
-from pydidas.plugins import ProcPlugin
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas_plugins.proc_plugins.sin2chi_grouping import (
+    LABELS_CHI,
+    LABELS_POSITION,
+    LABELS_SIN2CHI,
+    NPT_AZIM_LIMIT,
+    PARAMETER_KEEP_RESULTS,
+    S2C_TOLERANCE,
+    UNITS_ANGSTROM,
+    UNITS_DEGREE,
+    UNITS_NANOMETER,
+)
 
 from pydidas.core import Dataset, UserConfigError
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas.plugins import PluginCollection, ProcPlugin
 
-from pydidas_plugins.proc_plugins.sin2chi_grouping import ( PARAMETER_KEEP_RESULTS, 
-    LABELS_SIN2CHI, LABELS_CHI, LABELS_POSITION, UNITS_NANOMETER, UNITS_ANGSTROM, UNITS_DEGREE,
-    NPT_AZIM_LIMIT, S2C_TOLERANCE)
 
 @pytest.fixture
 def plugin_fixture():
@@ -53,16 +60,16 @@ def test_plugin_initialization(plugin_fixture):
     plugin = plugin_fixture
       
     assert plugin.plugin_name == "Group d-spacing according to sin^2(chi) method"
-    assert plugin.basic_plugin == False
+    assert not plugin.basic_plugin
     assert plugin.plugin_type == PROC_PLUGIN
     assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == -1
     assert plugin.output_data_dim == 2
     assert plugin.output_data_label == "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
-    assert plugin.new_dataset == True
+    assert plugin.new_dataset
     
     #check plugin is initialised with autosave option (True or 1)
-    assert plugin.params.get_value(PARAMETER_KEEP_RESULTS) == True
+    assert plugin.params.get_value(PARAMETER_KEEP_RESULTS)
     assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value == 1
     
     
@@ -174,7 +181,7 @@ def generate_spatial_fit_res(
 def generate_result_array_spatial(x=np.arange(0, 5), fit_labels=None):
     y = np.arange(2, 8)  # y-range is always given
 
-    if fit_labels == None:
+    if fit_labels is None:
         fit_labels = "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
 
     return generate_spatial_fit_res(
@@ -848,7 +855,7 @@ def test__ds_slicing_dimension_mismatch(plugin_fixture):
     )
 
     with pytest.raises(ValueError) as excinfo:
-        test = plugin._ds_slicing(ds)
+        plugin._ds_slicing(ds)
     assert "Dimension mismatch" in str(
         excinfo.value
     ), "Error message should indicate that d_spacing has a larger dimension."
@@ -1034,7 +1041,7 @@ test_cases = [case9]
 @pytest.mark.parametrize("case", test_cases)
 def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
     """
-    A test function to validate the `group_d_spacing_by_chi` function via the via a different approach.
+    A test function to validate the `group_d_spacing_by_chi` function via a different approach.
 
     This test performs the following steps:
     1. Initializes chi values and a Dataset instance for d_spacing using the provided case configuration.
@@ -1087,7 +1094,6 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
 
         n_components, s2c_labels = plugin._idx_s2c_grouping(chi, tolerance=tolerance)
         s2c = np.sin(np.deg2rad(chi)) ** 2
-        s2c_unique_labels = np.unique(s2c_labels)
         unique_groups = np.unique(s2c_labels)
 
         # Calculate first derivative
@@ -1130,15 +1136,9 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
         data_neg = np.full((n_components, max_len + 2), np.nan)
         data = np.full((n_components, 2 * max_len + 1), np.nan)
 
-        # Chi indices
-        idx_chi = np.arange(0, len(chi), 1)
-
         for group in unique_groups:
             mask_pos = (s2c_labels == group) & ((categories == 2) | (categories == 1))
             mask_neg = (s2c_labels == group) & ((categories == 0) | (categories == 1))
-
-            chi_combi_pos = chi[mask_pos]
-            chi_combi_neg = chi[mask_neg]
 
             d_pos = d_spacing[mask_pos]
             d_neg = d_spacing[mask_neg]
@@ -1565,7 +1565,7 @@ def test_combine_sort_d_spacing_pos_neg_explicit(plugin_fixture, d_spacing_datas
         np.array([[1.0, 2.0]]),  # 2D numpy array input
     ],
 )
-def test__create_final_result_sin2chi_method_type_error(plugin_fixture, invalid_input):
+def test__create_final_result_sin2chi_method_invalid_input(plugin_fixture, invalid_input):
     plugin = plugin_fixture
     
     with pytest.raises(

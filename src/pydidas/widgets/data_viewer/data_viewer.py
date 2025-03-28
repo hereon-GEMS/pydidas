@@ -297,12 +297,12 @@ class DataViewer(WidgetWithParameterCollection):
         _preferred_view = self._data.metadata.get("preferred_view", None)
         if _preferred_view is not None:
             self._select_view(DATA_VIEW_TITLES[_preferred_view])
-        elif self._data.ndim == 0:
-            self._select_view(4)
+        elif self._data.ndim == 0 or self._data.size == 1:
+            self._select_view(DATA_VIEW_TITLES["Table"])
         elif self._data.ndim == 1:
-            self._select_view(1)
+            self._select_view(DATA_VIEW_TITLES["Curve"])
         elif self._data.ndim >= 2 and self._active_view is None:
-            self._select_view(3)
+            self._select_view(DATA_VIEW_TITLES["Image"])
         else:
             self._update_view()
 

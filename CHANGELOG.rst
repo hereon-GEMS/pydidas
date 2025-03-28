@@ -15,6 +15,8 @@ Bugfixes
 --------
 - Fixed an issue in the DataViewer where the selected button was not updated 
   when the view was changed due to the data dimensionality.
+- Fixed an issue in the WorkflowTestFrame when switching the dataset with active
+  selection based on data values.
 
 
 v25.03.17

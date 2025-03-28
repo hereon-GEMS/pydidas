@@ -248,7 +248,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         if data_range is None:
             if npoints is None:
                 raise ValueError("npoints must be given if data_range is None")
-            label, unit = None, None
+            label, unit = "", ""
             self._npoints = npoints
         else:
             self._npoints = data_range.size
@@ -328,7 +328,10 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         with QtCore.QSignalBlocker(self):
             self._widgets["combo_axis_use"].setCurrentText(_ax_use)
             self._widgets["combo_range"].setCurrentText(_range_choice)
-            if _slice.stop - _slice.start == 1:
+            if (
+                _slice.stop - _slice.start == 1
+                and _ax_use in GENERIC_AXIS_SELECTOR_CHOICES
+            ):
                 self._move_to_index(_slice.start)
             else:
                 self._current_slice = _slice
@@ -406,6 +409,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         elif (
             self._widgets["combo_range"].currentText() == "select range by data values"
         ):
+            if self._data_range is None:
+                self._widgets["combo_range"].setCurrentText("use full axis")
+                return
             _range = self._widgets["edit_range_data"].text().split(":")
             if len(_range) != 2:
                 raise UserConfigError("Invalid range syntax")

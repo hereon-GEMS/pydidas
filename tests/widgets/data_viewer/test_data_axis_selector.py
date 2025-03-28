@@ -431,5 +431,15 @@ def test_handle_new_data_range_selection__incorrect_input(
         selector._handle_new_data_range_selection()
 
 
+def test_update_slice_from_non_generic_choice__no_data_range_set(selector, data_range):
+    selector.set_axis_metadata(data_range, "dummy", "unit")
+    selector.define_additional_choices("choice1;;choice2")
+    selector.display_choice = "choice1"
+    selector._widgets["combo_range"].setCurrentText("select range by data values")
+    selector.set_axis_metadata(None, "test", "u", npoints=15)
+    selector._update_slice_from_non_generic_choice()
+    assert selector._current_slice == slice(0, 15)
+
+
 if __name__ == "__main__":
     pytest.main()

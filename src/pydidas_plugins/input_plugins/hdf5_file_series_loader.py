@@ -36,9 +36,9 @@ from pydidas.plugins import InputPlugin
 
 class Hdf5fileSeriesLoader(InputPlugin):
     """
-    Load data frames from Hdf5 data files.
+    Load 2d data frames from Hdf5 data files.
 
-    This class is designed to load data from a series of hdf5 file. The file
+    This class is designed to load image data from a series of hdf5 file. The file
     series is defined through the SCAN's base directory, filename pattern and
     start index.
 
@@ -95,6 +95,8 @@ class Hdf5fileSeriesLoader(InputPlugin):
         self._standard_kwargs = {
             "dataset": self.get_param_value("hdf5_key"),
             "binning": self.get_param_value("binning"),
+            "forced_dimension": 2,
+            "import_pydidas_metadata": False,
         }
         self._index_func = lambda i: (
             None if _slice_ax is None else ((None,) * _slice_ax + (i,))
@@ -124,13 +126,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
         kwargs = kwargs | self._standard_kwargs
         kwargs["indices"] = self._index_func(_hdf_index)
 
-        _data = import_data(
-            _fname,
-            forced_dimension=2,
-            import_pydidas_metadata=False,
-            roi=self._get_own_roi(),
-            **kwargs,
-        )
+        _data = import_data(_fname, roi=self._get_own_roi(), **kwargs)
         _data.axis_units = ["pixel", "pixel"]
         _data.axis_labels = ["detector y", "detector x"]
         return _data, kwargs

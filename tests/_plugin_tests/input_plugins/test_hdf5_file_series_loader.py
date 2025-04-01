@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,20 +18,21 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+
 
 import os
 import pickle
 import shutil
 import tempfile
-import unittest
 from pathlib import Path
 
 import h5py
 import numpy as np
+import pytest
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Parameter, UserConfigError
@@ -41,171 +42,144 @@ from pydidas.unittest_objects import LocalPluginCollection
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()
-
 SCAN = ScanContext()
 
 
-class TestHdf5FileSeriesLoader(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
-        cls._img_shape = (10, 10)
-        cls._n_per_file = 13
-        cls._n_files = 11
-        cls._fname_i0 = 2
-        cls._n = cls._n_files * cls._n_per_file
-        cls._hdf5key = "/entry/data/data"
-        cls._data = np.repeat(
-            np.arange(cls._n, dtype=np.uint16), np.prod(cls._img_shape)
-        ).reshape((cls._n,) + cls._img_shape)
+@pytest.fixture(scope="module")
+def config():
+    _config = type("Config", (object,), {})()
+    _config._path = tempfile.mkdtemp()
+    _config._img_shape = (10, 10)
+    _config._n_per_file = 13
+    _config._n_files = 11
+    _config._fname_i0 = 2
+    _config._n = _config._n_files * _config._n_per_file
+    _config._hdf5key = "/entry/data/data"
+    _config._data = np.repeat(
+        np.arange(_config._n, dtype=np.uint16), np.prod(_config._img_shape)
+    ).reshape((_config._n,) + _config._img_shape)
 
-        cls._hdf5_fnames = []
-        for i in range(cls._n_files):
-            _fname = Path(os.path.join(cls._path, f"test_{i + cls._fname_i0:05d}.h5"))
-            cls._hdf5_fnames.append(_fname)
-            _slice = slice(i * cls._n_per_file, (i + 1) * cls._n_per_file, 1)
-            with h5py.File(_fname, "w") as f:
-                f[cls._hdf5key] = cls._data[_slice]
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls._path)
-
-    def setUp(self):
-        SCAN.restore_all_defaults(True)
-        SCAN.set_param_value("scan_name_pattern", "test_#####.h5")
-        SCAN.set_param_value("scan_base_directory", self._path)
-        SCAN.set_param_value("scan_start_index", self._fname_i0)
-
-    def tearDown(self):
-        SCAN.restore_all_defaults(True)
-
-    def create_plugin(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-        plugin.set_param_value("images_per_file", self._n_per_file)
-        plugin.set_param_value("hdf5_key", self._hdf5key)
-        return plugin
-
-    def get_index_in_file(self, index):
-        return index % self._n_per_file
-
-    def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-        self.assertIsInstance(plugin, BasePlugin)
-
-    def test_pre_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-        plugin.pre_execute()
-        self.assertIn("dataset", plugin._standard_kwargs.keys())
-        self.assertIn("binning", plugin._standard_kwargs.keys())
-
-    def test_pre_execute__no_images_per_file_set(self):
-        plugin = self.create_plugin()
-        plugin.set_param_value("images_per_file", -1)
-        plugin.pre_execute()
-        self.assertEqual(
-            plugin.get_param_value("_counted_images_per_file"), self._n_per_file
+    _config._hdf5_fnames = []
+    for i in range(_config._n_files):
+        _fname = Path(
+            os.path.join(_config._path, f"test_{i + _config._fname_i0:05d}.h5")
         )
+        _config._hdf5_fnames.append(_fname)
+        _slice = slice(i * _config._n_per_file, (i + 1) * _config._n_per_file, 1)
+        with h5py.File(_fname, "w") as f:
+            f[_config._hdf5key] = _config._data[_slice]
+    yield _config
+    shutil.rmtree(_config._path)
 
-    def test_execute__no_input(self):
-        plugin = self.create_plugin()
-        with self.assertRaises(UserConfigError):
-            plugin.execute(0)
 
-    def test_execute__simple(self):
-        plugin = self.create_plugin()
-        _index = 0
-        plugin.pre_execute()
+@pytest.fixture
+def setup_scan(config):
+    SCAN.restore_all_defaults(True)
+    SCAN.set_param_value("scan_name_pattern", "test_#####.h5")
+    SCAN.set_param_value("scan_base_directory", config._path)
+    SCAN.set_param_value("scan_start_index", config._fname_i0)
+
+
+@pytest.fixture
+def plugin(config):
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
+    plugin.set_param_value("images_per_file", config._n_per_file)
+    plugin.set_param_value("hdf5_key", config._hdf5key)
+    return plugin
+
+
+def get_index_in_file(config, index):
+    return index % config._n_per_file
+
+
+def test_creation():
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
+    assert isinstance(plugin, BasePlugin)
+
+
+def test_pre_execute__no_input(setup_scan):
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
+    plugin.pre_execute()
+    assert "dataset" in plugin._standard_kwargs.keys()
+    assert "binning" in plugin._standard_kwargs.keys()
+
+
+def test_pre_execute__no_images_per_file_set(config, setup_scan, plugin):
+    plugin.set_param_value("images_per_file", -1)
+    plugin.pre_execute()
+    assert plugin.get_param_value("_counted_images_per_file") == config._n_per_file
+
+
+def test_execute__no_input(plugin):
+    with pytest.raises(UserConfigError):
+        plugin.execute(0)
+
+
+def test_execute__simple(config, setup_scan, plugin):
+    _index = 0
+    plugin.pre_execute()
+    _data, kwargs = plugin.execute(_index)
+    assert (_data == _index).all()
+    assert kwargs["indices"] == (get_index_in_file(config, _index),)
+    assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
+
+
+def test_execute__slicing_ax_1(config, setup_scan, plugin):
+    plugin.set_param_value("hdf5_slicing_axis", 1)
+    _index = 0
+    plugin.pre_execute()
+    _data, kwargs = plugin.execute(_index)
+    assert np.allclose(_data, config._data[: config._n_per_file, _index])
+    assert kwargs["indices"] == (None, get_index_in_file(config, _index))
+    assert _data.metadata["indices"] == f"[:, {get_index_in_file(config, _index)}]"
+
+
+@pytest.mark.parametrize("roi", [[0, 5, 0, None], [1, 5, 1, 5]])
+def test_execute__with_roi(config, setup_scan, plugin, roi):
+    plugin.set_param_value("use_roi", True)
+    plugin.set_param_value("roi_ylow", roi[0])
+    plugin.set_param_value("roi_yhigh", roi[1])
+    plugin.set_param_value("roi_xlow", roi[2])
+    plugin.set_param_value("roi_xhigh", roi[3])
+    _index = 0
+    plugin.pre_execute()
+    _data, kwargs = plugin.execute(_index)
+    _roi = plugin._get_own_roi()
+    assert (_data == _index).all()
+    assert kwargs["indices"] == (get_index_in_file(config, _index),)
+    assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
+    assert _roi == (slice(roi[0], roi[1]), slice(roi[2], roi[3]))
+    for _dim in [0, 1]:
+        if _roi[_dim] == slice(0, None):
+            assert _data.shape[_dim] == config._img_shape[_dim]
+        else:
+            assert _data.shape[_dim] == _roi[_dim].stop - _roi[_dim].start
+
+
+def test_get_frame__wrong_dim(config, setup_scan, plugin):
+    plugin.set_param_value("hdf5_slicing_axis", None)
+    plugin.pre_execute()
+    with pytest.raises(UserConfigError):
+        plugin.execute(0)
+
+
+def test_execute__get_all_frames(config, setup_scan, plugin):
+    plugin.pre_execute()
+    for _index in range(config._n):
         _data, kwargs = plugin.execute(_index)
-        self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
-        self.assertEqual(
-            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
-        )
+        assert (_data == _index).all()
+        assert kwargs["indices"] == (get_index_in_file(config, _index),)
+        assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
 
-    def test_execute__slicing_ax_1(self):
-        plugin = self.create_plugin()
-        plugin.set_param_value("hdf5_slicing_axis", 1)
-        _index = 0
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue(np.allclose(_data, self._data[: self._n_per_file, _index]))
-        self.assertEqual(
-            kwargs["indices"],
-            (
-                None,
-                self.get_index_in_file(_index),
-            ),
-        )
-        self.assertEqual(
-            _data.metadata["indices"], f"[:, {self.get_index_in_file(_index)}]"
-        )
 
-    def test_execute__with_roi(self):
-        plugin = self.create_plugin()
-        plugin.set_param_value("use_roi", True)
-        plugin.set_param_value("roi_ylow", 0)
-        plugin.set_param_value("roi_yhigh", 5)
-        _index = 0
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
-        self.assertEqual(
-            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
-        )
-        self.assertEqual(
-            _data.shape, (plugin.get_param_value("roi_yhigh"), self._img_shape[1])
-        )
-
-    def test_execute__w_full_roi(self):
-        plugin = self.create_plugin()
-        plugin.set_param_value("use_roi", True)
-        plugin.set_param_value("roi_ylow", 1)
-        plugin.set_param_value("roi_yhigh", 5)
-        plugin.set_param_value("roi_xlow", 1)
-        plugin.set_param_value("roi_xhigh", 5)
-        _index = 0
-        plugin.pre_execute()
-        _roi = plugin._get_own_roi()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
-        self.assertEqual(
-            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
-        )
-        self.assertEqual(_data.shape, (4, 4))
-        self.assertEqual(_roi, (slice(1, 5), slice(1, 5)))
-
-    def test_get_frame__wrong_dim(self):
-        plugin = self.create_plugin()
-        plugin.set_param_value("hdf5_slicing_axis", None)
-        plugin.pre_execute()
-        with self.assertRaises(UserConfigError):
-            plugin.execute(0)
-
-    def test_execute__get_all_frames(self):
-        plugin = self.create_plugin()
-        plugin.pre_execute()
-        for _index in range(self._n):
-            _data, kwargs = plugin.execute(_index)
-            self.assertTrue((_data == _index).all())
-            self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
-            self.assertEqual(
-                _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
-            )
-
-    def test_pickle(self):
-        plugin = self.create_plugin()
-        _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
-        for _key, _val in _new_params.items():
-            plugin.add_param(Parameter(_key, str, _val))
-        plugin2 = pickle.loads(pickle.dumps(plugin))
-        for _key in plugin.params:
-            self.assertEqual(
-                plugin.get_param_value(_key), plugin2.get_param_value(_key)
-            )
+def test_pickle(config, setup_scan, plugin):
+    _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
+    for _key, _val in _new_params.items():
+        plugin.add_param(Parameter(_key, str, _val))
+    plugin2 = pickle.loads(pickle.dumps(plugin))
+    for _key in plugin.params:
+        assert plugin.get_param_value(_key) == plugin2.get_param_value(_key)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

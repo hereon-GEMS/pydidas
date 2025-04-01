@@ -10,6 +10,7 @@ Improvements
 - Added a plugin to save 2d data in ASCII format.
 - Improved the behaviour of the WorkflowTestFrame to display only results from the 
   current WorkflowTree.
+- Improved the fio input plugins to allow more generic metadata definitions.
 
 Bugfixes
 --------

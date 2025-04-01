@@ -27,8 +27,8 @@ __status__ = "Production"
 __all__ = [
     "update_config_from_fio_file",
     "determine_header_and_data_lines",
-    "create_energy_scale",
-    "load_fio_energy_spectrum",
+    "create_x_scale",
+    "load_fio_spectrum",
 ]
 
 
@@ -49,8 +49,8 @@ def update_config_from_fio_file(
     This function will add/replace the following keys to the dictionary:
 
     - header_rows
-    - energy_unit
-    - energy_scale
+    - x_unit
+    - x_scale
 
     Parameters
     ----------
@@ -61,16 +61,18 @@ def update_config_from_fio_file(
     params : ParameterCollection
         The ParameterCollection with the relevant parameters to be used.
         It must include the following keys:
-        - use_absolute_energy
-        - energy_delta
-        - energy_offset
+        - use_absolute_xscale
+        - x_delta
+        - x_unit
+        - x0_offset
     """
     _n_header, _n_data = determine_header_and_data_lines(filename)
-    _unit, _scale = create_energy_scale(_n_data, params)
+    _unit, _scale = create_x_scale(_n_data, params)
     config["header_lines"] = _n_header
     config["data_lines"] = _n_data
-    config["energy_unit"] = _unit
-    config["energy_scale"] = _scale
+    config["x_unit"] = _unit
+    config["x_label"] = params.get_value("x_label")
+    config["x_scale"] = _scale
 
 
 def determine_header_and_data_lines(filename: Path | str) -> tuple[int, int]:
@@ -101,7 +103,7 @@ def determine_header_and_data_lines(filename: Path | str) -> tuple[int, int]:
     return _n_header, _lines_total - _n_header
 
 
-def create_energy_scale(
+def create_x_scale(
     n_points: int, params: ParameterCollection
 ) -> tuple[str, np.ndarray]:
     """
@@ -114,29 +116,30 @@ def create_energy_scale(
     params : ParameterCollection
        The ParameterCollection with the relevant parameters. It must include the
        following keys:
-       - use_absolute_energy
-       - energy_delta
-       - energy_offset
+       - use_absolute_xscale
+       - x_delta
+       - x_unit
+       - x0_offset
 
     Returns
     -------
-    energy_unit : str
-        The unit of the energy scale.
-    energy_scale : np.ndarray
-        The energy scale.
+    x_unit : str
+        The unit of the x-scale.
+    x_scale : np.ndarray
+        The x-scale.
     """
-    if params.get_value("use_absolute_energy"):
-        _energy_unit = "eV"
-        _energy_scale = np.arange(n_points) * params.get_value(
-            "energy_delta"
-        ) + params.get_value("energy_offset")
-        return _energy_unit, _energy_scale
-    return "channels", np.arange(n_points)
+    if params.get_value("use_absolute_xscale"):
+        _unit = params.get_value("x_unit")
+        _scale = np.arange(n_points) * params.get_value("x_delta") + params.get_value(
+            "x0_offset"
+        )
+        return _unit, _scale
+    return "channel", np.arange(n_points)
 
 
-def load_fio_energy_spectrum(filename: Path | str, config: dict) -> Dataset:
+def load_fio_spectrum(filename: Path | str, config: dict) -> Dataset:
     """
-    Load an energy spectrum from a fio file.
+    Load a spectrum from a fio file.
 
     Parameters
     ----------
@@ -148,10 +151,10 @@ def load_fio_energy_spectrum(filename: Path | str, config: dict) -> Dataset:
 
             header_rows : int
                 The number of header rows in the file.
-            energy_unit : str
-                The unit of the energy scale.
-            energy_scale : np.ndarray
-                The energy scale.
+            x_unit : str
+                The unit of the x-scale.
+            x_scale : np.ndarray
+                The x-scale.
             roi : slice | None
                 The region of interest to be used. If None, the whole dataset is
                 returned.
@@ -165,9 +168,9 @@ def load_fio_energy_spectrum(filename: Path | str, config: dict) -> Dataset:
         _data = np.loadtxt(filename, skiprows=config["header_lines"])
     _dataset = Dataset(
         _data,
-        axis_labels=["energy"],
-        axis_units=[config["energy_unit"]],
-        axis_ranges=[config["energy_scale"]],
+        axis_labels=[config["x_label"]],
+        axis_units=[config["x_unit"]],
+        axis_ranges=[config["x_scale"]],
     )
     if config["roi"] is not None:
         _dataset = _dataset[config["roi"]]

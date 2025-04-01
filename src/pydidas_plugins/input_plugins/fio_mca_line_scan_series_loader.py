@@ -48,7 +48,7 @@ SCAN = ScanContext()
 
 class FioMcaLineScanSeriesLoader(InputPlugin1d):
     """
-    Load data frames from a series of Fio files with MCA data.
+    Load 1d data from a series of Fio files with MCA data.
 
     This plugin is designed to allow loading .fio files written by Sardana which
     include a single row of data with the MCA spectrum.
@@ -114,9 +114,11 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         "files_per_directory",
         "_counted_files_per_directory",
         "fio_suffix",
-        "use_absolute_energy",
-        "energy_offset",
-        "energy_delta",
+        "use_absolute_xscale",
+        "x0_offset",
+        "x_delta",
+        "x_label",
+        "x_unit",
     )
 
     def __init__(self, *args: tuple, **kwargs: dict):
@@ -175,14 +177,6 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
                 self.get_param_value("files_per_directory"),
             )
 
-    def _determine_header_size(self):
-        """
-        Determine the size of the header in lines.
-        """
-        _n_header, _n_data = fio.determine_header_and_data_lines(self.get_filename(0))
-        self._config["header_lines"] = _n_header
-        self._config["data_lines"] = _n_data
-
     def get_frame(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Get the frame for the given index.
@@ -201,7 +195,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         kwargs : dict
             The updated kwargs.
         """
-        _dataset = fio.load_fio_energy_spectrum(self.get_filename(index), self._config)
+        _dataset = fio.load_fio_spectrum(self.get_filename(index), self._config)
         return _dataset, kwargs
 
     @copy_docstring(InputPlugin)

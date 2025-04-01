@@ -46,7 +46,7 @@ SCAN = ScanContext()
 
 class FioMcaLoader(InputPlugin1d):
     """
-    Load data from a series of .fio files with MCA data (in a single directory).
+    Load 1d data from a series of .fio files with MCA data (in a single directory).
 
     This plugin is designed to allow loading .fio files written by Sardana which
     include a single row of data with the MCA spectrum.
@@ -72,20 +72,25 @@ class FioMcaLoader(InputPlugin1d):
         by fist and last file. The default is 1.
     filename_suffix : str, optional
         The end of the filename. The default is ".fio"
-    use_absolute_energy : bool, optional
+    use_absolute_xscale : bool, optional
         Keyword to toggle an absolute energy scale for the channels. If False,
         pydidas will simply use the channel number. The default is False.
-    energy_offset : float, optional
+    x0_offset : float, optional
         The offset for channel zero, if the absolute energy scale is used.
         This value must be given in eV. The default is 0.
-    energy_delta : float, optional
-        The width of each energy channel. This value is given in eV and only
-        used when the absolute energy scale is enabled. The default is 1.
+    x_delta : float, optional
+        The width of each energy channel. This value is given in units and only
+        used when the absolute x-scale is enabled. The default is 1.
     """
 
     plugin_name = "Fio MCA loader"
     default_params = get_generic_param_collection(
-        "live_processing", "use_absolute_energy", "energy_offset", "energy_delta"
+        "live_processing",
+        "use_absolute_xscale",
+        "x0_offset",
+        "x_delta",
+        "x_label",
+        "x_unit",
     )
 
     def __init__(self, *args: tuple, **kwargs: dict):
@@ -130,7 +135,7 @@ class FioMcaLoader(InputPlugin1d):
         kwargs : dict
             The updated kwargs.
         """
-        _dataset = fio.load_fio_energy_spectrum(self.get_filename(index), self._config)
+        _dataset = fio.load_fio_spectrum(self.get_filename(index), self._config)
         return _dataset, kwargs
 
     @copy_docstring(InputPlugin)
@@ -142,5 +147,5 @@ class FioMcaLoader(InputPlugin1d):
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
         <InputPlugin>` class.
         """
-        _index = self._SCAN.get_param_value("scan_start_index") + index + 1
+        _index = self._SCAN.get_param_value("scan_start_index") + index
         return self.filename_string.format(index0=_index)

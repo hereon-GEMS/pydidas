@@ -18,6 +18,7 @@ Bugfixes
   when the view was changed due to the data dimensionality.
 - Fixed an issue in the WorkflowTestFrame when switching the dataset with active
   selection based on data values.
+- Fixed the error message when user select a HDF5 dataset which does not exist.
 
 
 v25.03.17

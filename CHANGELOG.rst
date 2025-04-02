@@ -2,6 +2,19 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v25.mm.dd
+=========
+
+Improvements
+------------
+- Moved calculation of radial unit conversions to core.utils.scattering_geometry
+  module.
+
+Bugfixes
+--------
+- Fixed an issue when graphically selecting integration regions using "Q / A^-1"
+  or "2theta / rad" as units.
+
 v25.03.17
 =========
 

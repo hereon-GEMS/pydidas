@@ -41,6 +41,9 @@ from pydidas.core import (
 from pydidas.core.utils import copy_docstring
 from pydidas.core.utils import fio_utils as fio
 from pydidas.plugins import InputPlugin, InputPlugin1d
+from pydidas.widgets.plugin_config_widgets.plugin_config_widget_with_custom_xscale import (
+    PluginConfigWidgetWithCustomXscale,
+)
 
 
 SCAN = ScanContext()
@@ -114,7 +117,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         "files_per_directory",
         "_counted_files_per_directory",
         "fio_suffix",
-        "use_absolute_xscale",
+        "use_custom_xscale",
         "x0_offset",
         "x_delta",
         "x_label",
@@ -213,3 +216,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         )
         _file_index = index % _n_per_dir + 1
         return self.filename_string.format(index0=_path_index, index1=_file_index)
+
+    def get_parameter_config_widget(self):
+        """Get the parameter config widget for the plugin."""
+        return PluginConfigWidgetWithCustomXscale

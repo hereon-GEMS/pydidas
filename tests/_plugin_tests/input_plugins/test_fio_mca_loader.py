@@ -152,7 +152,7 @@ def test_get_frame__w_x_scale(setup_scan, plugin):
     _i_image = 42
     _delta = 2.5
     _offset = 150
-    plugin.set_param_value("use_absolute_xscale", True)
+    plugin.set_param_value("use_custom_xscale", True)
     plugin.set_param_value("x0_offset", _offset)
     plugin.set_param_value("x_delta", _delta)
     plugin.pre_execute()
@@ -165,7 +165,7 @@ def test_get_frame__w_x_scale_and_roi(setup_scan, plugin):
     _i_image = 87
     _delta = 2.5
     _offset = 150
-    plugin.set_param_value("use_absolute_xscale", True)
+    plugin.set_param_value("use_custom_xscale", True)
     plugin.set_param_value("x0_offset", _offset)
     plugin.set_param_value("x_delta", _delta)
     plugin.set_param_value("use_roi", True)

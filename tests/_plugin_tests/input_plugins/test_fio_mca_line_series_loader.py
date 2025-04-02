@@ -190,7 +190,7 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         _delta = 2.5
         _offset = 150
         plugin = self.create_standard_plugin()
-        plugin.set_param_value("use_absolute_xscale", True)
+        plugin.set_param_value("use_custom_xscale", True)
         plugin.set_param_value("x0_offset", _offset)
         plugin.set_param_value("x_delta", _delta)
         plugin.pre_execute()
@@ -206,7 +206,7 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         _offset = 150
 
         plugin = self.create_standard_plugin()
-        plugin.set_param_value("use_absolute_xscale", True)
+        plugin.set_param_value("use_custom_xscale", True)
         plugin.set_param_value("x0_offset", _offset)
         plugin.set_param_value("x_delta", _delta)
         plugin.set_param_value("use_roi", True)

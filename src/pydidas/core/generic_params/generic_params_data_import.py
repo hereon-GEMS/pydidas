@@ -349,15 +349,15 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "allow_None": False,
         "tooltip": "The file suffix for teh individual MCA files.",
     },
-    "use_absolute_xscale": {
+    "use_custom_xscale": {
         "type": bool,
         "default": False,
-        "name": "Use absolute scale for x-axis",
+        "name": "Use custom scale for x-axis",
         "choices": [True, False],
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Use an absolute scale for the x-axis. If False, the scale will be "
+            "Use a custom scale for the x-axis. If False, the scale will be "
             "created in channel numbers."
         ),
     },

@@ -39,6 +39,9 @@ from pydidas.core import (
 from pydidas.core.utils import copy_docstring
 from pydidas.core.utils import fio_utils as fio
 from pydidas.plugins import InputPlugin, InputPlugin1d
+from pydidas.widgets.plugin_config_widgets.plugin_config_widget_with_custom_xscale import (
+    PluginConfigWidgetWithCustomXscale,
+)
 
 
 SCAN = ScanContext()
@@ -72,7 +75,7 @@ class FioMcaLoader(InputPlugin1d):
         by fist and last file. The default is 1.
     filename_suffix : str, optional
         The end of the filename. The default is ".fio"
-    use_absolute_xscale : bool, optional
+    use_custom_xscale : bool, optional
         Keyword to toggle an absolute energy scale for the channels. If False,
         pydidas will simply use the channel number. The default is False.
     x0_offset : float, optional
@@ -86,12 +89,13 @@ class FioMcaLoader(InputPlugin1d):
     plugin_name = "Fio MCA loader"
     default_params = get_generic_param_collection(
         "live_processing",
-        "use_absolute_xscale",
+        "use_custom_xscale",
         "x0_offset",
         "x_delta",
         "x_label",
         "x_unit",
     )
+    has_unique_parameter_config_widget = True
 
     def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)
@@ -149,3 +153,7 @@ class FioMcaLoader(InputPlugin1d):
         """
         _index = self._SCAN.get_param_value("scan_start_index") + index
         return self.filename_string.format(index0=_index)
+
+    def get_parameter_config_widget(self):
+        """Get the parameter config widget for the plugin."""
+        return PluginConfigWidgetWithCustomXscale

@@ -61,7 +61,7 @@ def update_config_from_fio_file(
     params : ParameterCollection
         The ParameterCollection with the relevant parameters to be used.
         It must include the following keys:
-        - use_absolute_xscale
+        - use_custom_xscale
         - x_delta
         - x_unit
         - x0_offset
@@ -116,7 +116,7 @@ def create_x_scale(
     params : ParameterCollection
        The ParameterCollection with the relevant parameters. It must include the
        following keys:
-       - use_absolute_xscale
+       - use_custom_xscale
        - x_delta
        - x_unit
        - x0_offset
@@ -128,7 +128,7 @@ def create_x_scale(
     x_scale : np.ndarray
         The x-scale.
     """
-    if params.get_value("use_absolute_xscale"):
+    if params.get_value("use_custom_xscale"):
         _unit = params.get_value("x_unit")
         _scale = np.arange(n_points) * params.get_value("x_delta") + params.get_value(
             "x0_offset"

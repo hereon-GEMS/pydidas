@@ -29,7 +29,7 @@ from typing import Literal
 
 import numpy as np
 
-from pydidas.core import UserConfigError
+from pydidas.core.exceptions import UserConfigError
 
 
 def q_to_2theta(q: Real | np.ndarray, lambda_x: Real) -> Real | np.ndarray:

@@ -402,7 +402,7 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         from pydidas.widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
 
-        return PyfaiIntegrationConfigWidget(self)
+        return PyfaiIntegrationConfigWidget
 
     def get_radial_range(self) -> None | tuple[float, float]:
         """

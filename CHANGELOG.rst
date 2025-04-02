@@ -11,6 +11,8 @@ Improvements
 - Improved the behaviour of the WorkflowTestFrame to display only results from the 
   current WorkflowTree.
 - Improved the fio input plugins to allow more generic metadata definitions.
+- Modifed the way custom plugin widgets are handles and create a base class
+  for custom widgets to inherit from.
 
 Bugfixes
 --------

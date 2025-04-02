@@ -25,19 +25,22 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+from .edit_plugin_parameters_widget import *
 from .fit_plugin_config_widget import *
+from .generic_plugin_config_widget import *
 from .pyfai_integration_config_widget import *
-from .subtract_bg_image_config_widget import *
 
 
 __all__ = (
-    fit_plugin_config_widget.__all__
+    edit_plugin_parameters_widget.__all__
+    + generic_plugin_config_widget.__all__
+    + fit_plugin_config_widget.__all__
     + pyfai_integration_config_widget.__all__
-    + subtract_bg_image_config_widget.__all__
 )
 
 del (
+    edit_plugin_parameters_widget,
+    generic_plugin_config_widget,
     fit_plugin_config_widget,
     pyfai_integration_config_widget,
-    subtract_bg_image_config_widget,
 )

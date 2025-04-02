@@ -32,34 +32,27 @@ from functools import partial
 from typing import NewType
 
 from qtpy import QtCore
-from qtpy.QtWidgets import QStyle
 
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_EXP_FIX
 from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
-from pydidas.core.utils import apply_qt_properties
-from pydidas.widgets.factory import CreateWidgetsMixIn
-from pydidas.widgets.parameter_config import ParameterEditCanvas
+from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
+    GenericPluginConfigWidget,
+)
 
 
 BaseFitPlugin = NewType("BaseFitPlugin", type)
 
 
-class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
+class FitPluginConfigWidget(GenericPluginConfigWidget):
     """
     A custom widget to modify the Parameters for peak fitting plugins.
 
     The widget adds a list of tickboxes to select the fit output.
     """
 
-    def __init__(self, plugin: BaseFitPlugin, *args: tuple, **kwargs: dict):
-        ParameterEditCanvas.__init__(self, **kwargs)
-        CreateWidgetsMixIn.__init__(self)
-        apply_qt_properties(
-            self.layout(), contentsMargins=(0, 0, 0, 0), horizontalSpacing=0
-        )
-        self.plugin = plugin
+    def create_param_config_widgets(self):
         self._params_already_added = ["fit_output"]
-        _plugin_output = plugin.get_param_value("fit_output").split("; ")
+        _plugin_output = self.plugin.get_param_value("fit_output").split("; ")
         self._fit_output = {
             _key: (_key in _plugin_output) for _key in FIT_OUTPUT_OPTIONS
         }
@@ -99,21 +92,10 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             ):
                 self.create_param_widget(_param)
 
-        self.__advanced_hidden = True
-        self.create_button(
-            "but_toggle_advanced_params",
-            "Display advanced Parameters",
-            clicked=self.__toggle_advanced_params,
-            icon="qt-std::SP_TitleBarUnshadeButton",
-        )
-        for _key in self.plugin.advanced_parameters:
-            _param = self.plugin.get_param(_key)
-            self.create_param_widget(_param, visible=False)
-
     @QtCore.Slot(int)
     def _box_checked(self, name: str, state: int):
         """
-        Handle the signal that the check box for the fit output has been edited.
+        Handle the signal that the checkbox for the fit output has been edited.
 
         Parameters
         ----------
@@ -135,30 +117,11 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         else:
             self.plugin.set_param_value("fit_output", "; ".join(_active))
 
-    @QtCore.Slot()
-    def __toggle_advanced_params(self):
-        """
-        Toggle the visiblity of the advanced Parameters.
-        """
-        self.__advanced_hidden = not self.__advanced_hidden
-        for _key in self.plugin.advanced_parameters:
-            self.toggle_param_widget_visibility(_key, not self.__advanced_hidden)
-        self._widgets["but_toggle_advanced_params"].setText(
-            "Display advanced Parameters"
-            if self.__advanced_hidden
-            else "Hide advanced Parameters"
-        )
-        self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(
-                QStyle.SP_TitleBarUnshadeButton
-                if self.__advanced_hidden
-                else QStyle.SP_TitleBarShadeButton
-            )
-        )
-
     def update_edits(self):
         """
         Update the configuration fields of the plugin.
+
+        This method is used restore the default parameter values.
         """
         for param in self.plugin.params.values():
             if param.refkey != "fit_output":

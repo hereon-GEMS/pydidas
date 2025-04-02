@@ -573,7 +573,7 @@ class BaseFitPlugin(ProcPlugin):
         """
         from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
 
-        return FitPluginConfigWidget(self)
+        return FitPluginConfigWidget
 
 
 BaseFitPlugin.register_as_base_class()

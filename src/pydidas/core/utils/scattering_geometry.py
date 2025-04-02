@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""
+The scattering_geometry module includes calculations required for conversions to/from Q.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
@@ -23,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["q_to_2theta", "convert_radial_value"]
+
 
 from numbers import Real
 from typing import Literal

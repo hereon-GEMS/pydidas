@@ -14,6 +14,7 @@ Improvements
 - Modifed the way custom plugin widgets are handles and create a base class
   for custom widgets to inherit from.
 - Added a generic xscale to fio plugins to have a more generalized use case covered.
+- Added a plugin to load 1d profiles from HDF5 files.
 
 Bugfixes
 --------

@@ -166,6 +166,30 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             and self.get_param_value("detector_npixy") > 0
         )
 
+    @property
+    def xray_wavelength_in_m(self) -> float:
+        """
+        Get the X-ray wavelength in meters.
+
+        Returns
+        -------
+        float
+            The wavelength in meters.
+        """
+        return self.get_param_value("xray_wavelength") * 1e-10
+
+    @property
+    def det_dist_in_m(self) -> float:
+        """
+        Get the detector distance in meters.
+
+        Returns
+        -------
+        float
+            The detector distance in meters.
+        """
+        return self.get_param_value("detector_dist")
+
     def as_pyfai_geometry(self) -> Geometry:
         """
         Get an equivalent pyFAI Geometry object.

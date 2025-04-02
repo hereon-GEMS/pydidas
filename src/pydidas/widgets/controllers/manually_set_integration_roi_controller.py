@@ -38,6 +38,7 @@ from qtpy.QtWidgets import QWidget
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.utils import get_chi_from_x_and_y
+from pydidas.core.utils.scattering_geometry import convert_radial_value
 from pydidas.plugins import BasePlugin
 
 
@@ -247,7 +248,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         kind = ["azimuthal", "radial", "roi"] if "all" in kind else kind
         if "radial" in kind:
             _pxsize = self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
-            _range = self._plugin.get_radial_range_as_r()
+            _range = self._plugin.get_radial_range_in_units("r / mm")
             if _range is not None:
                 self._plot.draw_circle(_range[0] * 1e-3 / _pxsize, "radial_lower")
                 self._plot.draw_circle(_range[1] * 1e-3 / _pxsize, "radial_upper")
@@ -333,7 +334,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         Show the integration region in the plot.
         """
         _pxsize = self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
-        _rad_range = self._plugin.get_radial_range_as_r()
+        _rad_range = self._plugin.get_radial_range_in_units("r / mm")
         if _rad_range is not None:
             _rad_range = (
                 _rad_range[0] * 1e-3 / _pxsize,
@@ -376,15 +377,14 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         _cx, _cy = self._config["beamcenter"]
         _r_px = ((xpos - _cx) ** 2 + (ypos - _cy) ** 2) ** 0.5
         _r = _r_px * self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
-        _2theta = np.arctan(_r / self._config["det_dist"])
-
-        if self._plugin.get_param_value("rad_unit") == "r / mm":
-            _val = _r * 1e3
-        elif self._plugin.get_param_value("rad_unit") == "Q / nm^-1":
-            _lambda = self._config["exp"].get_param_value("xray_wavelength") * 1e-10
-            _val = (4 * np.pi / _lambda) * np.sin(_2theta / 2) * 1e-9
-        elif self._plugin.get_param_value("rad_unit") == "2theta / deg":
-            _val = 180 / np.pi * _2theta
+        _r_in_mm = _r * 1e3
+        _val = convert_radial_value(
+            _r_in_mm,
+            "r / mm",
+            self._plugin.get_param_value("rad_unit"),
+            self._config["exp"].xray_wavelength_in_m,
+            self._config["exp"].det_dist_in_m,
+        )
         _bounds = "lower" if self._config["radial_n"] == 0 else "upper"
         self._editor.toggle_param_widget_visibility(f"rad_range_{_bounds}", True)
         self.set_param_value_and_widget(f"rad_range_{_bounds}", np.round(_val, 5))

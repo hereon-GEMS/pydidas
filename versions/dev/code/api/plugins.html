@@ -1366,13 +1366,13 @@ label.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.convert_radial_range_values">
-<span class="sig-name descname"><span class="pre">convert_radial_range_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'2theta</span> <span class="pre">/</span> <span class="pre">deg'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Q</span> <span class="pre">/</span> <span class="pre">nm^-1'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'r</span> <span class="pre">/</span> <span class="pre">mm'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'2theta</span> <span class="pre">/</span> <span class="pre">deg'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Q</span> <span class="pre">/</span> <span class="pre">nm^-1'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'r</span> <span class="pre">/</span> <span class="pre">mm'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.convert_radial_range_values" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convert_radial_range_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'2theta</span> <span class="pre">/</span> <span class="pre">deg'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'2theta</span> <span class="pre">/</span> <span class="pre">rad'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Q</span> <span class="pre">/</span> <span class="pre">A^-1'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Q</span> <span class="pre">/</span> <span class="pre">nm^-1'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'r</span> <span class="pre">/</span> <span class="pre">mm'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'2theta</span> <span class="pre">/</span> <span class="pre">deg'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'2theta</span> <span class="pre">/</span> <span class="pre">rad'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Q</span> <span class="pre">/</span> <span class="pre">A^-1'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Q</span> <span class="pre">/</span> <span class="pre">nm^-1'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'r</span> <span class="pre">/</span> <span class="pre">mm'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.convert_radial_range_values" title="Link to this definition">#</a></dt>
 <dd><p>Convert and store the radial range values from the given unit to the given unit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>from_unit</strong> (<em>Literal</em><em>[</em><em>&quot;2theta / deg&quot;</em><em>, </em><em>&quot;Q / nm^-1&quot;</em><em>, </em><em>&quot;r / mm&quot;</em><em>]</em>) – The previous unit.</p></li>
-<li><p><strong>to_unit</strong> (<em>Literal</em><em>[</em><em>&quot;2theta / deg&quot;</em><em>, </em><em>&quot;Q / nm^-1&quot;</em><em>, </em><em>&quot;r / mm&quot;</em><em>]</em>) – The new unit.</p></li>
+<li><p><strong>from_unit</strong> (<em>Literal</em><em>[</em><em>&quot;2theta / deg&quot;</em><em>, </em><em>&quot;2theta / rad&quot;</em><em>, </em><em>&quot;Q / A^-1&quot;</em><em>, </em><em>&quot;Q / nm^-1&quot;</em><em>, </em><em>&quot;r / mm&quot;</em><em>]</em>) – The previous unit.</p></li>
+<li><p><strong>to_unit</strong> (<em>Literal</em><em>[</em><em>&quot;2theta / deg&quot;</em><em>, </em><em>&quot;2theta / rad&quot;</em><em>, </em><em>&quot;Q / A^-1&quot;</em><em>, </em><em>&quot;Q / nm^-1&quot;</em><em>, </em><em>&quot;r / mm&quot;</em><em>]</em>) – The new unit.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1485,49 +1485,12 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_2theta">
-<span class="sig-name descname"><span class="pre">get_radial_range_as_2theta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'deg'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'rad'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'deg'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_2theta" title="Link to this definition">#</a></dt>
-<dd><p>Get the radial range converted to 2 theta.</p>
+<dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range_in_units">
+<span class="sig-name descname"><span class="pre">get_radial_range_in_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_in_units" title="Link to this definition">#</a></dt>
+<dd><p>Get the radial range converted to the given unit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>&quot;deg&quot;</em><em>, </em><em>&quot;rad&quot;</em><em>]</em><em>, </em><em>optional</em>) – The unit of the range. Must be either “rad” or “deg”. The default is “deg”.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>range</strong> – If no range has been set, returns None. Otherwise, the range limits are
-given as tuple.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None | tuple[float, float]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_q">
-<span class="sig-name descname"><span class="pre">get_radial_range_as_q</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_q" title="Link to this definition">#</a></dt>
-<dd><p>Get the radial range as q in nm^-1.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>range</strong> – If no range has been set, returns None. Otherwise, the range limits are
-given as tuple.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None | tuple[float, float]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_r">
-<span class="sig-name descname"><span class="pre">get_radial_range_as_r</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_r" title="Link to this definition">#</a></dt>
-<dd><p>Get the radial range as radius in mm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>range</strong> – If no range has been set, returns None. Otherwise, the range limits are
-given as tuple.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None | tuple[float, float]</p>
+<dd class="field-odd"><p><strong>unit</strong> (<em>str</em>) – The new unit of the range.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1706,9 +1669,7 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.get_parameter_config_widget"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.get_parameter_config_widget</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.get_pyFAI_unit_from_param"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.get_pyFAI_unit_from_param</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.get_radial_range</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_2theta"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.get_radial_range_as_2theta</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_q"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.get_radial_range_as_q</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_as_r"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.get_radial_range_as_r</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range_in_units"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.get_radial_range_in_units</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.is_range_valid"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.is_range_valid</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.load_and_set_mask"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.load_and_set_mask</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.pyFAIintegrationBase.modulate_and_store_azi_range"><code class="docutils literal notranslate"><span class="pre">pyFAIintegrationBase.modulate_and_store_azi_range</span></code></a></li>

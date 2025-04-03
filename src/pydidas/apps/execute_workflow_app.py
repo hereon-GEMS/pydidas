@@ -380,8 +380,8 @@ class ExecuteWorkflowApp(BaseApp):
                 self.mp_manager["metadata_dict"][_node_id] = get_default_property_dict(
                     _res.shape
                 )
-            self.mp_manager["shapes_available"].set()
-            RESULTS.store_frame_metadata(dict(self.mp_manager["metadata_dict"]))
+        self.mp_manager["shapes_available"].set()
+        RESULTS.store_frame_metadata(dict(self.mp_manager["metadata_dict"]))
 
     def _create_shared_memory(self):
         """

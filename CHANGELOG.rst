@@ -27,6 +27,7 @@ Bugfixes
 - Fixed an issue in the WorkflowTestFrame when switching the dataset with active
   selection based on data values.
 - Fixed the error message when user select a HDF5 dataset which does not exist.
+- Fixed an issue which occured when running workflows with no nodes with results.
 
 
 v25.03.17

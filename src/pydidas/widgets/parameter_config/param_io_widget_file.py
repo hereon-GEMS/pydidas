@@ -45,17 +45,18 @@ from pydidas.widgets.parameter_config.param_io_widget_with_button import (
 
 class ParamIoWidgetFile(ParamIoWidgetWithButton):
     """
-    Widgets for I/O during plugin parameter for filepaths.
-    (Includes a small button to select a filepath from a dialogue.)
+    Widget to select a Path entry for a Parameter.
+
+    This widget includes a small button to select a filepath from a dialogue.
     """
 
     io_edited = QtCore.Signal(str)
 
     def __init__(self, param, **kwargs):
         """
-        Setup the widget.
+        Set up the widget.
 
-        Init method to setup the widget and set the links to the parameter
+        Init method to set up the widget and set the links to the parameter
         and Qt parent widget.
 
         Parameters
@@ -66,7 +67,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             A Parameter instance.
         **kwargs : dict
             Optional keyword arguments. Supported kwargs are "width" (in pixels) for
-            the with of the I/O widget and "persistent_qsettings_ref" for the
+            the width of the I/O widget and "persistent_qsettings_ref" for the
             persistent reference label of the open directory.
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
@@ -103,14 +104,14 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
 
     def get_value(self) -> Path:
         """
-        Get the current value from the combobox to update the Parameter value.
+        Get the current value from the QLineEdit to update the Parameter value.
 
         Returns
         -------
         Path
             The text converted to a Path to update the Parameter value.
         """
-        text = self._io_lineedit.text()
+        text = self._io_lineedit.text().strip()
         _value = self.get_value_from_text(text)
         if _value in [None, True, False, nan]:
             _value = "."
@@ -121,10 +122,10 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         Set the input field's value.
 
-        This method changes the combobox selection to the specified value.
+        This method changes the QLineEdit selection to the specified value.
         """
         self._old_value = self.get_value()
-        self._io_lineedit.setText(f"{value}")
+        self._io_lineedit.setText(f"{value}".strip())
         if not self._flag_pattern and value != Path() and os.path.exists(value):
             self.io_dialog.set_curr_dir(id(self), value)
 
@@ -184,3 +185,23 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             The path to the new directory.
         """
         self.io_dialog.set_curr_dir(id(self), path)
+
+
+    def emit_signal(self, force_update: bool = False):
+        """
+        Emit a signal that the value has been edited.
+
+        This method emits a signal that the combobox selection has been
+        changed and the Parameter value needs to be updated.
+
+        Parameters
+        ----------
+        force_update : bool
+            Force an update even if the value has not changed.
+        """
+        _curr_value = self._io_lineedit.text().strip()
+        if _curr_value != self._io_lineedit.text():
+            self._io_lineedit.setText(_curr_value)
+        if _curr_value != self._old_value or force_update:
+            self._old_value = _curr_value
+            self.io_edited.emit(_curr_value)

@@ -34,6 +34,46 @@ from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import OutputPlugin
 
 
+HEADER_PARAM = Parameter(
+    "header",
+    str,
+    "Spreadsheet (.spr)",
+    choices=["Spreadsheet (.spr)", "CSV (.csv)"],
+    name="Output header",
+    tooltip=(
+        "The output file format and header. A generic header is created "
+        "based on the file type selection."
+    ),
+)
+SIG_DIGIT_PARAM = Parameter(
+    "significant_digits",
+    int,
+    5,
+    choices=None,
+    name="Significant digits",
+    tooltip=("The number of significant digits to be used in the output file."),
+)
+DELIMITER_PARAM = Parameter(
+    "delimiter",
+    str,
+    "Double space",
+    choices=[
+        "Single space",
+        "Double space",
+        "Tabulator",
+        "Comma",
+        "Comma and space",
+        "Semicolon",
+        "Semicolon and space",
+    ],
+    name="Delimiter",
+    tooltip=(
+        "The delimiter to be used in the output file to separate entries. Note that "
+        "the delimiter is not used in the header."
+    ),
+)
+
+
 class SpreadsheetSaver(OutputPlugin):
     """
     A saver to export two-dimensional data to ASCII format.
@@ -56,21 +96,33 @@ class SpreadsheetSaver(OutputPlugin):
     plugin_name = "Spreadsheet Saver"
     input_data_dim = 2
     generic_params = OutputPlugin.generic_params.copy()
-    generic_params.add_param(
-        Parameter(
-            "header",
-            str,
-            "Spreadsheet (.spr)",
-            choices=[
-                "Spreadsheet (.spr)",
-            ],
-            name="Output header",
-            tooltip=(
-                "The output file format and header. A generic header is created "
-                "based on the file type selection."
-            ),
-        )
-    )
+    generic_params.add_params(HEADER_PARAM, SIG_DIGIT_PARAM, DELIMITER_PARAM)
+
+    def pre_execute(self):
+        """Prepare the execution"""
+        OutputPlugin.pre_execute(self)
+        _sig_digits = self.get_param_value("significant_digits")
+        if _sig_digits < 1:
+            raise UserConfigError(
+                "The number of significant digits must be at least 1."
+            )
+        self._format = f"%.{self.get_param_value('significant_digits')}e"
+        _delimiter = self.get_param_value("delimiter")
+        match _delimiter:
+            case "Single space":
+                self._delimiter = " "
+            case "Double space":
+                self._delimiter = "  "
+            case "Tabulator":
+                self._delimiter = "\t"
+            case "Comma":
+                self._delimiter = ","
+            case "Comma and space":
+                self._delimiter = ", "
+            case "Semicolon":
+                self._delimiter = ";"
+            case "Semicolon and space":
+                self._delimiter = "; "
 
     def execute(self, data: Dataset | np.ndarray, **kwargs: dict):
         """
@@ -107,6 +159,8 @@ class SpreadsheetSaver(OutputPlugin):
             self.get_output_filename(_ext),
             data.array,
             header=_header,
+            delimiter=self._delimiter,
+            fmt=self._format,
             comments="",
         )
         return data, kwargs
@@ -123,6 +177,8 @@ class SpreadsheetSaver(OutputPlugin):
         _header_type = self.get_param_value("header")
         if _header_type == "Spreadsheet (.spr)":
             return "spr", self._get_spr_header()
+        if _header_type == "CSV (.csv)":
+            return "csv", "#"
         raise ValueError("The header type is not supported.")
 
     def _get_spr_header(self) -> str:

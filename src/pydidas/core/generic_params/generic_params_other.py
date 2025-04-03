@@ -365,6 +365,17 @@ GENERIC_PARAMS_OTHER = {
         "allow_None": False,
         "tooltip": "The output filename for the data export.",
     },
+    "output_fname_digits": {
+        "type": int,
+        "default": 6,
+        "name": "Number of digits in filenames",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The number of digits to be used for the index of the output filename. "
+        ),
+    },
     ############################
     # Result selection settings
     ############################

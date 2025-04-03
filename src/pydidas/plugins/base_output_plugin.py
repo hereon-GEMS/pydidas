@@ -44,9 +44,12 @@ class OutputPlugin(BasePlugin):
     output_data_dim = None
     generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
-        get_generic_param_collection("directory_path", "enable_overwrite")
+        get_generic_param_collection(
+            "directory_path", "enable_overwrite", "output_fname_digits"
+        )
     )
     default_params = BasePlugin.default_params.copy()
+    advanced_parameters = ["output_fname_digits"]
 
     def pre_execute(self):
         """
@@ -65,6 +68,24 @@ class OutputPlugin(BasePlugin):
             )
         if not os.path.exists(self._path) and not self.test_mode:
             os.makedirs(self._path)
+        _label = self.get_param_value("label")
+        _ndigits = self.get_param_value("output_fname_digits")
+        if _ndigits < 1:
+            raise UserConfigError(
+                f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
+                "is invalid:\n"
+                "The number of digits for the output filenames must be at least 1."
+            )
+        if self.node_id is None:
+            raise UserConfigError(
+                f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
+                "is invalid:\n"
+                "The node ID is None. Please check the plugin configuration."
+            )
+        if _label == "":
+            self._base_name = f"node_{self.node_id:02d}_" + "{:0" + str(_ndigits) + "d}"
+        else:
+            self._base_name = f"{_label}_" + "{:0" + str(_ndigits) + "d}"
 
     def get_output_filename(self, extension: str = "txt") -> str:
         """
@@ -84,16 +105,11 @@ class OutputPlugin(BasePlugin):
         if self._config["global_index"] is None:
             raise KeyError(
                 'The "global_index" keyword has not been set. '
-                "The plugin does not know how to get the filename."
+                "The plugin does not know how to assemble the filename."
             )
-        _label = self.get_param_value("label")
-        if _label == "":
-            _name = f"node_{self.node_id:02d}_" + "{:06d}"
-        else:
-            _name = f"{_label}_" + "{:06d}"
         return str(
             self._path.joinpath(
-                _name.format(self._config["global_index"]) + f".{extension}"
+                self._base_name.format(self._config["global_index"]) + f".{extension}"
             )
         )
 

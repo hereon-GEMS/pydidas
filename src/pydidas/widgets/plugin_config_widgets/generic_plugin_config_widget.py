@@ -34,7 +34,7 @@ from qtpy import QtCore
 from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Hdf5key
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, OUTPUT_PLUGIN
 from pydidas.core.utils import apply_qt_properties
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.factory import CreateWidgetsMixIn
@@ -130,6 +130,8 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                     or param.refkey == "label"
                 }
                 self.create_param_widget(param, **_kwargs)
+        if self.plugin.plugin_type == OUTPUT_PLUGIN:
+            self.param_widgets["keep_results"].setVisible(False)
 
     def create_advanced_param_config_widgets(self):
         """Create the widgets for the advanced parameters."""

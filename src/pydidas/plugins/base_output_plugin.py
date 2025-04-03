@@ -45,11 +45,14 @@ class OutputPlugin(BasePlugin):
     generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
         get_generic_param_collection(
-            "directory_path", "enable_overwrite", "output_fname_digits"
+            "directory_path",
+            "enable_overwrite",
+            "output_fname_digits",
+            "output_index_offset",
         )
     )
     default_params = BasePlugin.default_params.copy()
-    advanced_parameters = ["output_fname_digits"]
+    advanced_parameters = ["output_fname_digits", "output_index_offset"]
 
     def pre_execute(self):
         """
@@ -102,16 +105,14 @@ class OutputPlugin(BasePlugin):
         str
             The full filename and path.
         """
-        if self._config["global_index"] is None:
-            raise KeyError(
-                'The "global_index" keyword has not been set. '
+        _index = self._config["global_index"]
+        if _index is None:
+            raise UserConfigError(
+                "The `global_index` keyword has not been set. "
                 "The plugin does not know how to assemble the filename."
             )
-        return str(
-            self._path.joinpath(
-                self._base_name.format(self._config["global_index"]) + f".{extension}"
-            )
-        )
+        _index = _index + self.get_param_value("output_index_offset")
+        return str(self._path / (self._base_name.format(_index) + f".{extension}"))
 
 
 OutputPlugin.register_as_base_class()

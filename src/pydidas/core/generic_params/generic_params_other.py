@@ -376,6 +376,18 @@ GENERIC_PARAMS_OTHER = {
             "The number of digits to be used for the index of the output filename. "
         ),
     },
+    "output_index_offset": {
+        "type": bool,
+        "default": False,
+        "name": "Count output file numbers from 1 instead of 0",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "If True, the output files will be numbered starting from 1. If False, "
+            "the numbering will start from 0 as is the python default."
+        ),
+    },
     ############################
     # Result selection settings
     ############################

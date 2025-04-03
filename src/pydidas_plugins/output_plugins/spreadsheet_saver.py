@@ -79,7 +79,7 @@ class SpreadsheetSaver(OutputPlugin):
     A saver to export two-dimensional data to ASCII format.
 
     This class is designed to store data passed down from other processing
-    plugins into Ascii files with different headers.
+    plugins into ASCII files with different headers.
 
     Warning: This plugin will create one file for each input image and is not
     recommended at all unless other processing tools specifically require

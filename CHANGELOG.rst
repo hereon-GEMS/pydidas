@@ -29,6 +29,7 @@ Bugfixes
 - Fixed the error message when user select a HDF5 dataset which does not exist.
 - Fixed an issue which occured when running workflows with no nodes with results.
 - Fixed an issue where selecting a filename would introduce a trailing space.
+- Fixed missing Parameters for output formats and overwriting in WorkflowRunFrame
 
 
 v25.03.17

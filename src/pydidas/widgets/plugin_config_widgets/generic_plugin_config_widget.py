@@ -131,7 +131,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 }
                 self.create_param_widget(param, **_kwargs)
         if self.plugin.plugin_type == OUTPUT_PLUGIN:
-            self.param_widgets["keep_results"].setVisible(False)
+            self.param_composite_widgets["keep_results"].setVisible(False)
 
     def create_advanced_param_config_widgets(self):
         """Create the widgets for the advanced parameters."""

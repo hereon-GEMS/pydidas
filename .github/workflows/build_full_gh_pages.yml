@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024-2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC-BY-4.0
 #
 # This workflow will check the formatting of the newly pushed commits
@@ -14,6 +14,13 @@ on:
       - "master"
     tags:
       - "v*"
+    workflow_dispatch:
+
+
+concurrency:
+  group: build-github-pages
+  cancel-in-progress: false
+
 
 jobs:
   create_docs:
@@ -26,6 +33,8 @@ jobs:
       with:
         fetch-depth: 0
         ref: ${{ github.ref }}
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$(pwd)/src:$PYTHONPATH" >> $GITHUB_ENV
     - name: Echo fetched ref
       run: |
         echo "Fetched ref: ${{ github.ref }}"
@@ -58,6 +67,9 @@ jobs:
         else
           exit 1
         fi
+    - name: Display version
+      run: |
+        echo "Version: ${{ steps.extract_version.outputs.THIS_VERSION }}"
     - name: Fetch stable_version
       id: fetch_stable_version
       run: |

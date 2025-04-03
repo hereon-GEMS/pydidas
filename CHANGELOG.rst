@@ -15,9 +15,13 @@ Improvements
   for custom widgets to inherit from.
 - Added a generic xscale to fio plugins to have a more generalized use case covered.
 - Added a plugin to load 1d profiles from HDF5 files.
+- Moved calculation of radial unit conversions to core.utils.scattering_geometry
+  module.
 
 Bugfixes
 --------
+- Fixed an issue when graphically selecting integration regions using "Q / A^-1"
+  or "2theta / rad" as units.
 - Fixed an issue in the DataViewer where the selected button was not updated 
   when the view was changed due to the data dimensionality.
 - Fixed an issue in the WorkflowTestFrame when switching the dataset with active

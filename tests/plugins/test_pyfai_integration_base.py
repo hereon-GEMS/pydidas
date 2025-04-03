@@ -36,6 +36,7 @@ import pyFAI
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import UserConfigError, get_generic_parameter
+from pydidas.core.utils.scattering_geometry import q_to_2theta
 from pydidas.plugins import BasePlugin, pyFAIintegrationBase
 
 
@@ -361,7 +362,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _range = plugin.get_radial_range()
         self.assertIsNone(_range)
 
-    def test_get_radial_range__correct(self):
+    def test_get_radial_range__identical(self):
         _range = (12, 37)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
@@ -371,7 +372,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _newrange = plugin.get_radial_range()
         self.assertEqual(_range, _newrange)
 
-    def test_get_radial_range_as_2theta(self):
+    def test_get_radial_range__as_2theta(self):
         _input_low, _input_high = (12, 37)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
@@ -379,11 +380,11 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             rad_range_lower=_input_low,
             rad_range_upper=_input_high,
         )
-        _low, _high = plugin.get_radial_range_as_2theta()
+        _low, _high = plugin.get_radial_range_in_units("2theta / deg")
         self.assertAlmostEqual(_input_low, _low)
         self.assertAlmostEqual(_input_high, _high)
 
-    def test_get_radial_range_as_2theta__input_r(self):
+    def test_get_radial_range__as_2theta__input_r(self):
         _input_low, _input_high = (12, 37)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
@@ -391,31 +392,28 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             rad_range_lower=_input_low,
             rad_range_upper=_input_high,
         )
-        _low, _high = plugin.get_radial_range_as_2theta()
+        _low, _high = plugin.get_radial_range_in_units("2theta / deg")
         _low_target = 180 / np.pi * np.arctan(_input_low * 1e-3 / self._det_dist)
         _high_target = 180 / np.pi * np.arctan(_input_high * 1e-3 / self._det_dist)
         self.assertAlmostEqual(_low_target, _low)
         self.assertAlmostEqual(_high_target, _high)
 
-    def test_get_radial_range_as_2theta__input_q(self):
+    def test_get_radial_range__as_2theta__input_q(self):
         _input_low, _input_high = (12, 37)
+        _target_low = q_to_2theta(_input_low * 1e9, self._lambda * 1e-10)
+        _target_high = q_to_2theta(_input_high * 1e9, self._lambda * 1e-10)
+        print(_target_low, _target_high)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
             rad_unit="Q / nm^-1",
             rad_range_lower=_input_low,
             rad_range_upper=_input_high,
         )
-        _low, _high = plugin.get_radial_range_as_2theta()
-        _low_target = (
-            180 / np.pi * 2 * np.arcsin(0.1 * _input_low * self._lambda / 4 / np.pi)
-        )
-        _high_target = (
-            180 / np.pi * 2 * np.arcsin(0.1 * _input_high * self._lambda / 4 / np.pi)
-        )
-        self.assertAlmostEqual(_low_target, _low)
-        self.assertAlmostEqual(_high_target, _high)
+        _low, _high = plugin.get_radial_range_in_units("2theta / rad")
+        self.assertAlmostEqual(_target_low, _low)
+        self.assertAlmostEqual(_target_high, _high)
 
-    def test_get_radial_range_as_2theta__rad(self):
+    def test_get_radial_range__as_2theta__rad(self):
         _input_low, _input_high = (12, 37)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
@@ -423,11 +421,11 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             rad_range_lower=_input_low,
             rad_range_upper=_input_high,
         )
-        _low, _high = plugin.get_radial_range_as_2theta(unit="rad")
+        _low, _high = plugin.get_radial_range_in_units("2theta / rad")
         self.assertAlmostEqual(_input_low * np.pi / 180, _low)
         self.assertAlmostEqual(_input_high * np.pi / 180, _high)
 
-    def test_get_radial_range_as_r(self):
+    def test_get_radial_range__as_r(self):
         _input_low, _input_high = (12, 37)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
@@ -435,13 +433,13 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             rad_range_lower=_input_low,
             rad_range_upper=_input_high,
         )
-        _low, _high = plugin.get_radial_range_as_r()
+        _low, _high = plugin.get_radial_range_in_units("r / mm")
         _target_low = self._det_dist * np.tan(_input_low * np.pi / 180) * 1e3
         _target_high = self._det_dist * np.tan(_input_high * np.pi / 180) * 1e3
         self.assertAlmostEqual(_low, _target_low)
         self.assertAlmostEqual(_high, _target_high)
 
-    def test_get_radial_range_as_q(self):
+    def test_get_radial_range__as_q(self):
         _input_low, _input_high = (12, 37)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
@@ -449,13 +447,20 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             rad_range_lower=_input_low,
             rad_range_upper=_input_high,
         )
-        _low, _high = plugin.get_radial_range_as_q()
-        # factor 10 is 1e-9 from q in nm times 1e10 from lambda in A
+        _low, _high = plugin.get_radial_range_in_units("Q / A^-1")
         _target_low = (
-            4 * np.pi / self._lambda * np.sin(_input_low * np.pi / 180 / 2) * 10
+            4
+            * np.pi
+            / EXP.xray_wavelength_in_m
+            * np.sin(np.deg2rad(_input_low) / 2)
+            * 1e-10
         )
         _target_high = (
-            4 * np.pi / self._lambda * np.sin(_input_high * np.pi / 180 / 2) * 10
+            4
+            * np.pi
+            / EXP.xray_wavelength_in_m
+            * np.sin(np.deg2rad(_input_high) / 2)
+            * 1e-10
         )
         self.assertAlmostEqual(_low, _target_low)
         self.assertAlmostEqual(_high, _target_high)

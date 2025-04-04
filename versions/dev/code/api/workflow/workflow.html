@@ -556,7 +556,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.ProcessingResults.frozen_tree">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f4809d0e660&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.ProcessingResults.frozen_tree" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_tree</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;pydidas.core.singleton_factory.SingletonFactory</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x7f6e08107020&gt;</span></em><a class="headerlink" href="#pydidas.workflow.workflow_results.ProcessingResults.frozen_tree" title="Link to this definition">#</a></dt>
 <dd><p>Get the frozen instance of the WorkflowTree context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1484,7 +1484,7 @@ will be returned.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.create_and_add_node">
-<span class="sig-name descname"><span class="pre">create_and_add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.create_and_add_node" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">create_and_add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.workflow.WorkflowNode" title="pydidas.workflow.workflow_node.WorkflowNode"><span class="pre">WorkflowNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.create_and_add_node" title="Link to this definition">#</a></dt>
 <dd><p>Create a new node and add it to the tree.</p>
 <p>If the tree is empty, the new node is set as root node. If no parent
 is given, the node will be created as child of the latest node in
@@ -1493,12 +1493,12 @@ the tree.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>plugin</strong> (<em>pydidas.Plugin</em>) – The plugin to be added to the tree.</p></li>
-<li><p><strong>parent</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><em>WorkflowNode</em></a><em>, </em><em>int</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The parent node of the newly created node. If an integer, this will
+<li><p><strong>parent</strong> (<a class="reference internal" href="#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><em>WorkflowNode</em></a><em> | </em><em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – The parent node of the newly created node. If an integer, this will
 be interpreted as the node_id of the parent and the respective
 parent will be selected. If None, this will select the latest node
 in the tree. The default is None.</p></li>
-<li><p><strong>node_id</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The node ID of the newly created node, used for referencing the
-node in the WorkflowTree. If not specified(ie. None), the
+<li><p><strong>node_id</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – The node ID of the newly created node, used for referencing the
+node in the WorkflowTree. If not specified (i.e. None), the
 WorkflowTree will create a new node ID. The default is None.</p></li>
 </ul>
 </dd>
@@ -1574,11 +1574,11 @@ be a single value or an array.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.export_to_file">
-<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.export_to_file" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Export the WorkflowTree to a file using any of the registered exporters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The filename of the file with the export.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Path</em><em> | </em><em>str</em>) – The filename of the file with the export.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1648,7 +1648,7 @@ node_ids of type int and shapes of type tuple.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.get_complete_plugin_metadata">
 <span class="sig-name descname"><span class="pre">get_complete_plugin_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.get_complete_plugin_metadata" title="Link to this definition">#</a></dt>
-<dd><p>Get the metadata (e.g. shapes, labels, names) for all of the tree’s plugins.</p>
+<dd><p>Get the metadata (e.g. shapes, labels, names) for all the tree’s plugins.</p>
 <p>Note that the shapes are only available after running the plugin chain at
 least once. Otherwise, the shapes will be set to None.</p>
 <dl class="field-list simple">
@@ -1668,8 +1668,8 @@ least once. Otherwise, the shapes will be set to None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><em>list</em> – List with the ID of consistent node</p></li>
-<li><p><em>list</em> – List with the IDs of nodes with inconsistent data</p></li>
+<li><p><em>list</em> – The IDs of consistent nodes</p></li>
+<li><p><em>list</em> – The IDs of nodes with inconsistent data.</p></li>
 </ul>
 </p>
 </dd>
@@ -1692,11 +1692,11 @@ least once. Otherwise, the shapes will be set to None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.import_from_file">
-<span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.import_from_file" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.import_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Import the ProcessingTree from a configuration file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The filename which holds the ProcessingTree configuration.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Path</em><em> | </em><em>str</em>) – The filename which holds the ProcessingTree configuration.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1745,7 +1745,7 @@ is False.</p>
 information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>list_of_nodes</strong> (<em>list</em>) – A list of nodes with a dictionary entry for each node holding all
+<dd class="field-odd"><p><strong>list_of_nodes</strong> (<em>list</em><em> | </em><em>tuple</em>) – A list of nodes with a dictionary entry for each node holding all
 the required information (plugin_class, node_id and plugin
 Parameters).</p>
 </dd>

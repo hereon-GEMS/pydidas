@@ -479,37 +479,6 @@ document.write(`
 <span id="the-widgets-parameter-config-sub-package"></span><h1>The widgets.parameter_config sub-package<a class="headerlink" href="#module-pydidas.widgets.parameter_config" title="Link to this heading">#</a></h1>
 <p>Package with individual QWidgets used for displaying and editing pydidas Parameters.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.EditPluginParametersWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">EditPluginParametersWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.EditPluginParametersWidget" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code>, <a class="reference internal" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn" title="pydidas.widgets.parameter_config.parameter_widgets_mixin.ParameterWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a>, <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a></p>
-<p>The EditPluginParametersWidget widget creates the composite widget for
-updating and changing values of all Parameters in a Plugin.</p>
-<p>Depending on the Parameter types, automatic typechecks are implemented.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.EditPluginParametersWidget.clear_layout">
-<span class="sig-name descname"><span class="pre">clear_layout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.EditPluginParametersWidget.clear_layout" title="Link to this definition">#</a></dt>
-<dd><p>Clear all items from the layout and generate a new layout.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.EditPluginParametersWidget.configure_plugin">
-<span class="sig-name descname"><span class="pre">configure_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.EditPluginParametersWidget.configure_plugin" title="Link to this definition">#</a></dt>
-<dd><p>Update the panel to show the Parameters of a different Plugin.</p>
-<p>This method clears the widget and populates it again with the
-Parameters of the new Plugin, defined by the Plugin node_id</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node_id</strong> (<em>int</em>) – The node_id in the workflow edit tree.</p></li>
-<li><p><strong>plugin</strong> (<a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><em>BasePlugin</em></a>) – The instance of the Plugin to be edited.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterEditCanvas">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">ParameterEditCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterEditCanvas" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn" title="pydidas.widgets.parameter_config.parameter_widgets_mixin.ParameterWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></p>
@@ -686,11 +655,6 @@ parameter referenced with &lt;key&gt;.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.EditPluginParametersWidget"><code class="docutils literal notranslate"><span class="pre">EditPluginParametersWidget</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.EditPluginParametersWidget.clear_layout"><code class="docutils literal notranslate"><span class="pre">EditPluginParametersWidget.clear_layout</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.EditPluginParametersWidget.configure_plugin"><code class="docutils literal notranslate"><span class="pre">EditPluginParametersWidget.configure_plugin</span></code></a></li>
-</ul>
-</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterEditCanvas"><code class="docutils literal notranslate"><span class="pre">ParameterEditCanvas</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a><ul class="nav section-nav flex-column">

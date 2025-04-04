@@ -908,9 +908,9 @@ None if the plugin does not create any output data. The default is -1.</p>
 <dt>new_dataset<span class="classifier">bool</span></dt><dd><p>Keyword that the Plugin creates a new dataset. This will trigger a
 re-evaluation of the output data shape.</p>
 </dd>
-<dt>has_unique_parameter_config_widget<span class="classifier">bool, optional</span></dt><dd><p>Flag to use a unique ParameterConfigWidget for this plugin. The widget must be
-made accessible through the “get_parameter_config_widget” method. the default
-is False.</p>
+<dt>has_unique_parameter_config_widget<span class="classifier">bool, optional</span></dt><dd><p>Flag to use a unique ParameterConfigWidget for this plugin. The widget class
+must be made accessible through the “get_parameter_config_widget” method.
+The default is False.</p>
 </dd>
 <dt>advanced_parameters<span class="classifier">list[str, …], optional</span></dt><dd><p>A list with the keys of “advanced parameters”. These Parameters are hidden in
 the plugin’s Parameter configuration widget be default and can be accessed
@@ -939,7 +939,7 @@ users with too many options. The default is an empty list [].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a><em>]</em>) – The input data to be processed.</p></li>
+<li><p><strong>data</strong> (<em>int</em><em> | </em><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a>) – The input data to be processed.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em>) – Keyword arguments passed to the processing.</p></li>
 </ul>
 </dd>

@@ -491,6 +491,22 @@ Other
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The output filename for the data export.
+   * - :py:data:`output_fname_digits`
+     - | **type** : int
+       | **default** : 6
+       | **name** : Number of digits in filenames
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of digits to be used for the index of the output filename. 
+   * - :py:data:`output_index_offset`
+     - | **type** : bool
+       | **default** : False
+       | **name** : Count output file numbers from 1 instead of 0
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : If True, the output files will be numbered starting from 1. If False, the numbering will start from 0 as is the python default.
    * - :py:data:`selected_results`
      - | **type** : str
        | **default** : No selection
@@ -799,6 +815,14 @@ Data import
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The number of images in the file. For hdf5 files, this corresponds to the number of frames in the hdf5 dataset. A value -1 auto-discovers the number of images per file.
+   * - :py:data:`profiles_per_file`
+     - | **type** : int
+       | **default** : -1
+       | **name** : Profiles per file
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of 1d profiles in the file. For hdf5 files, this corresponds to the number of frames in the hdf5 dataset. A value -1 auto-discovers the number of profiles per file.
    * - :py:data:`_counted_images_per_file`
      - | **type** : int
        | **default** : 1
@@ -895,30 +919,62 @@ Data import
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The file suffix for teh individual MCA files.
-   * - :py:data:`use_absolute_energy`
+   * - :py:data:`use_custom_xscale`
      - | **type** : bool
        | **default** : False
-       | **name** : Use absolute energy
+       | **name** : Use custom scale for x-axis
        | **choices** : [True, False]
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : Use an absolute energy scale for the results. If False, the energy scale will be created in channel numbers.
-   * - :py:data:`energy_offset`
+       | **tooltip** : Use a custom scale for the x-axis. If False, the scale will be created in channel numbers.
+   * - :py:data:`x0_offset`
      - | **type** : float
        | **default** : 0.0
-       | **name** : Energy offset
+       | **name** : x0 offset
        | **choices** : None
-       | **unit** : eV
+       | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The absolute offset in energy for the zeroth channel.
-   * - :py:data:`energy_delta`
+       | **tooltip** : The offset for the zeroth channel.
+   * - :py:data:`x_delta`
      - | **type** : float
        | **default** : 1.0
-       | **name** : Channel energy delta
+       | **name** : Channel Delta x
        | **choices** : None
-       | **unit** : eV
+       | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The width of each energy channels in eV.
+       | **tooltip** : The width of each channel.
+   * - :py:data:`x_unit`
+     - | **type** : str
+       | **default** : a.u.
+       | **name** : x-axis unit
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit of the x-axis.
+   * - :py:data:`x_label`
+     - | **type** : str
+       | **default** : x
+       | **name** : x-axis label
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The label for the x-axis.
+   * - :py:data:`data_dimensionality`
+     - | **type** : int
+       | **default** : 2
+       | **name** : Data dimensionality
+       | **choices** : [1, 2, 3]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The dimensionality of the data to be loaded.
+   * - :py:data:`detector_axis_label`
+     - | **type** : str
+       | **default** : detector
+       | **name** : Detector axis label
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The label for the detector axis.
 
 Scan
 ~~~~

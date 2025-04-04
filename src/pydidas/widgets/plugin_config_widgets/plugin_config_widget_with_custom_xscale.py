@@ -71,7 +71,7 @@ class PluginConfigWidgetWithCustomXscale(GenericPluginConfigWidget):
         input : str
             The value of the custom xscale parameter.
         """
-        _show = input == "True"
+        _show = input in [True, "True"]
         for param in CUSTOM_X_PARAMS:
             self.toggle_param_widget_visibility(param, _show)
 

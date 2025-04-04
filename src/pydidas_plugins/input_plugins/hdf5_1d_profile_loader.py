@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Hdf51dProfileLoader"]
 
+import numpy as np
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
@@ -90,6 +91,17 @@ class Hdf51dProfileLoader(InputPlugin1d):
         Prepare loading images from a file series.
         """
         InputPlugin1d.pre_execute(self)
+        self._prepare_hdf5_reading()
+        self._standard_kwargs = {
+            "dataset": self.get_param_value("hdf5_key"),
+            "binning": self.get_param_value("binning"),
+            "forced_dimension": 1,
+            "import_pydidas_metadata": False,
+        }
+        self._config["xrange"] = None
+
+    def _prepare_hdf5_reading(self):
+        """Prepare reading the hdf5 files ."""
         _i_per_file = self.get_param_value("profiles_per_file")
         _slice_ax = self.get_param_value("hdf5_slicing_axis")
         if _i_per_file == -1:
@@ -101,17 +113,9 @@ class Hdf51dProfileLoader(InputPlugin1d):
                 )[_slice_ax]
             )
         self.set_param_value("_counted_images_per_file", _i_per_file)
-        self._standard_kwargs = {
-            "dataset": self.get_param_value("hdf5_key"),
-            "binning": self.get_param_value("binning"),
-            "forced_dimension": 1,
-            "import_pydidas_metadata": False,
-        }
         self._index_func = lambda i: (
             None if _slice_ax is None else ((None,) * _slice_ax + (i,))
         )
-        self._config["axis_units"] = ["pixel"]
-        self._config["axis_labels"] = ["detector x"]
 
     def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -142,9 +146,28 @@ class Hdf51dProfileLoader(InputPlugin1d):
             roi=self._get_own_roi(),
             **kwargs,
         )
+        if self._config["xrange"] is None:
+            self.calculate_xrange(_data.size)
         _data.axis_units = self._config["axis_units"]
         _data.axis_labels = self._config["axis_labels"]
+        _data.axis_ranges = self._config["xrange"]
         return _data, kwargs
+
+    def calculate_xrange(self, n_points: int):
+        """
+        Calculate the x-range for the data.
+        """
+        if self.params.get_value("use_custom_xscale"):
+            self._config["axis_units"] = [self.params.get_value("x_unit")]
+            self._config["axis_labels"] = [self.params.get_value("x_label")]
+            self._config["xrange"] = [
+                np.arange(n_points) * self.params.get_value("x_delta")
+                + self.params.get_value("x0_offset")
+            ]
+        else:
+            self._config["axis_units"] = ["channel"]
+            self._config["axis_labels"] = ["detector x"]
+            self._config["xrange"] = [np.arange(n_points)]
 
     @copy_docstring(InputPlugin1d)
     def get_filename(self, frame_index: int) -> str:

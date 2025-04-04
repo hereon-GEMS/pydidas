@@ -186,7 +186,6 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         self.io_dialog.set_curr_dir(id(self), path)
 
-
     def emit_signal(self, force_update: bool = False):
         """
         Emit a signal that the value has been edited.

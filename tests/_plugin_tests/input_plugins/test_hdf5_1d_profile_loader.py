@@ -34,7 +34,7 @@ import numpy as np
 import pytest
 
 from pydidas.contexts import ScanContext
-from pydidas.core import Parameter, UserConfigError
+from pydidas.core import Dataset, Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
@@ -48,15 +48,15 @@ SCAN = ScanContext()
 def config():
     _config = type("Config", (object,), {})()
     _config._path = tempfile.mkdtemp()
-    _config._img_shape = (10, 10)
+    _config._size = 42
     _config._n_per_file = 13
     _config._n_files = 11
     _config._fname_i0 = 2
     _config._n = _config._n_files * _config._n_per_file
     _config._hdf5key = "/entry/data/data"
     _config._data = np.repeat(
-        np.arange(_config._n, dtype=np.uint16), np.prod(_config._img_shape)
-    ).reshape((_config._n,) + _config._img_shape)
+        np.arange(_config._n, dtype=np.uint16), _config._size
+    ).reshape((_config._n, _config._size))
 
     _config._hdf5_fnames = []
     for i in range(_config._n_files):
@@ -81,8 +81,8 @@ def setup_scan(config):
 
 @pytest.fixture
 def plugin(config):
-    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-    plugin.set_param_value("images_per_file", config._n_per_file)
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf51dProfileLoader")()
+    plugin.set_param_value("profiles_per_file", config._n_per_file)
     plugin.set_param_value("hdf5_key", config._hdf5key)
     return plugin
 
@@ -92,106 +92,36 @@ def get_index_in_file(config, index):
 
 
 def test_creation():
-    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf51dProfileLoader")()
     assert isinstance(plugin, BasePlugin)
 
 
 def test_pre_execute__no_input(setup_scan):
-    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf51dProfileLoader")()
     plugin.pre_execute()
     assert "dataset" in plugin._standard_kwargs.keys()
     assert "binning" in plugin._standard_kwargs.keys()
+    assert plugin._standard_kwargs["forced_dimension"] == 1
+    assert not plugin._standard_kwargs["import_pydidas_metadata"]
+    assert plugin._config["xrange"] is None
 
 
-def test_pre_execute__no_images_per_file_set(config, setup_scan, plugin):
-    plugin.set_param_value("images_per_file", -1)
+@pytest.mark.parametrize("index", [0, 5, 12, 37, 55])
+def test_get_filename(config, setup_scan, plugin, index):
     plugin.pre_execute()
-    assert plugin.get_param_value("_counted_images_per_file") == config._n_per_file
+    _fname = Path(plugin.get_filename(index))
+    _target_i = index // config._n_per_file
+    _target_fname = config._hdf5_fnames[_target_i]
+    assert _fname == _target_fname
 
 
-def test_execute__no_input(plugin):
-    with pytest.raises(UserConfigError):
-        plugin.execute(0)
-
-
-def test_execute__simple(config, setup_scan, plugin):
-    _index = 0
+@pytest.mark.parametrize("index", [0, 5, 12, 37, 55])
+def test_get_frame(config, setup_scan, plugin, index):
     plugin.pre_execute()
-    _data, kwargs = plugin.execute(_index)
-    assert (_data == _index).all()
-    assert kwargs["indices"] == (get_index_in_file(config, _index),)
-    assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
-
-
-def test_execute__slicing_ax_1(config, setup_scan, plugin):
-    plugin.set_param_value("hdf5_slicing_axis", 1)
-    _index = 0
-    plugin.pre_execute()
-    _data, kwargs = plugin.execute(_index)
-    assert np.allclose(_data, config._data[: config._n_per_file, _index])
-    assert kwargs["indices"] == (None, get_index_in_file(config, _index))
-    assert _data.metadata["indices"] == f"[:, {get_index_in_file(config, _index)}]"
-
-
-@pytest.mark.parametrize("roi", [[0, 5, 0, None], [1, 5, 1, 5]])
-def test_execute__with_roi(config, setup_scan, plugin, roi):
-    plugin.set_param_value("use_roi", True)
-    plugin.set_param_value("roi_ylow", roi[0])
-    plugin.set_param_value("roi_yhigh", roi[1])
-    plugin.set_param_value("roi_xlow", roi[2])
-    plugin.set_param_value("roi_xhigh", roi[3])
-    _index = 0
-    plugin.pre_execute()
-    _data, kwargs = plugin.execute(_index)
-    _roi = plugin._get_own_roi()
-    assert (_data == _index).all()
-    assert kwargs["indices"] == (get_index_in_file(config, _index),)
-    assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
-    assert _roi == (slice(roi[0], roi[1]), slice(roi[2], roi[3]))
-    for _dim in [0, 1]:
-        if _roi[_dim] == slice(0, None):
-            assert _data.shape[_dim] == config._img_shape[_dim]
-        else:
-            assert _data.shape[_dim] == _roi[_dim].stop - _roi[_dim].start
-
-
-def test_get_frame__wrong_dim(config, setup_scan, plugin):
-    plugin.set_param_value("hdf5_slicing_axis", None)
-    plugin.pre_execute()
-    with pytest.raises(UserConfigError):
-        plugin.execute(0)
-
-
-def test_execute__get_all_frames(config, setup_scan, plugin):
-    plugin.pre_execute()
-    for _index in range(config._n):
-        _data, kwargs = plugin.execute(_index)
-        assert (_data == _index).all()
-        assert kwargs["indices"] == (get_index_in_file(config, _index),)
-        assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
-
-
-# @pytest.mark.parametrize("dim", [1, 2, 3])
-# @pytest.mark.parametrize("use_roi", [True, False])
-# def test_excecute__w_data_dimensionality(config, setup_scan, plugin, dim, use_roi):
-#     plugin.set_param_value("use_roi", use_roi)
-#     plugin.set_param_value("roi_ylow", 1)
-#     plugin.set_param_value("roi_yhigh", 5)
-#     plugin.set_param_value("roi_xlow", 2)
-#     plugin.set_param_value("roi_xhigh", 7)
-#     _data = np.repeat(np.arange(config._n), 10**dim).reshape((config._n,) + (10,) * dim)
-#     for _i, _fname in enumerate(config._hdf5_fnames):
-#         _slice = slice(config._n_per_file * _i, config._n_per_file * (_i + 1), 1)
-#         with h5py.File(_fname, "w") as f:
-#             f[config._hdf5key] = _data[_slice]
-#     plugin.set_param_value("data_dimensionality", dim)
-#     plugin.pre_execute()
-#     for _index in range(config._n):
-#         _new_data, kwargs = plugin.execute(_index)
-#         assert (_new_data == _index).all()
-#         assert kwargs["indices"] == (get_index_in_file(config, _index),)
-#         assert _new_data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
-#         assert _new_data.shape == (10,) * dim
+    _data, _kwargs = plugin.get_frame(index)
+    assert isinstance(_data, Dataset)
+    assert _data.shape == (config._size,)
+    assert _data.mean() == index
 
 
 def test_pickle(config, setup_scan, plugin):

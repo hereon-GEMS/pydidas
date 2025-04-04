@@ -31,7 +31,7 @@ __all__ = ["BasePlugin"]
 
 import copy
 from numbers import Integral
-from typing import Self, Union
+from typing import Self
 
 from qtpy import QtCore
 
@@ -113,9 +113,9 @@ class BasePlugin(ObjectWithParameterCollection):
         Keyword that the Plugin creates a new dataset. This will trigger a
         re-evaluation of the output data shape.
     has_unique_parameter_config_widget : bool, optional
-        Flag to use a unique ParameterConfigWidget for this plugin. The widget must be
-        made accessible through the "get_parameter_config_widget" method. the default
-        is False.
+        Flag to use a unique ParameterConfigWidget for this plugin. The widget class
+        must be made accessible through the "get_parameter_config_widget" method.
+        The default is False.
     advanced_parameters : list[str, ...], optional
         A list with the keys of "advanced parameters". These Parameters are hidden in
         the plugin's Parameter configuration widget be default and can be accessed
@@ -405,13 +405,13 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         return copy.copy(self)
 
-    def execute(self, data: Union[int, Dataset], **kwargs: dict):
+    def execute(self, data: int | Dataset, **kwargs: dict):
         """
         Execute the processing step.
 
         Parameters
         ----------
-        data : Union[int, Dataset]
+        data : int | Dataset
             The input data to be processed.
         kwargs : dict
             Keyword arguments passed to the processing.
@@ -468,7 +468,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["test_mode"] = bool(value)
 
     @property
-    def input_data(self) -> Union[int, Dataset]:
+    def input_data(self) -> int | Dataset:
         """
         Get the current input data.
 
@@ -525,7 +525,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["input_data"] = copy.deepcopy(data)
         self._config["input_kwargs"] = copy.deepcopy(kwargs)
 
-    def _get_own_roi(self) -> Union[slice, tuple[slice, slice], None]:
+    def _get_own_roi(self) -> slice | tuple[slice, slice] | None:
         """
         Get the ROI defined within the plugin.
 

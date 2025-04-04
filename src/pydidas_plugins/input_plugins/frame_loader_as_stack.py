@@ -42,7 +42,7 @@ from pydidas.plugins import InputPlugin
 
 class FrameLoaderAsStack(InputPlugin):
     """
-    Load a series of data frames from files with a single image in each.
+    Load a series of 2d data frames from files with a single image in each.
 
     This plugin can be used to apply a rolling average on input data.
 

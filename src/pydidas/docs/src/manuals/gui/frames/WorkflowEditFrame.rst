@@ -166,10 +166,10 @@ plugin's Parameters to their defaults.
 Below, all of the Plugin's Parameters are listed. Please refer to the
 :ref:`gui_editing_parameters` manual on how to change these.
 
-All Plugins have two generic Parameters: :py:data:`always_store_results` and
+All Plugins have two generic Parameters: :py:data:`keep_results` and
 :py:data:`label`. By default, pydidas only stores results of workflow leaves,
 i.e. if a :py:class:`WorkflowNode <pydidas.workflow.WorkflowNode>` does not
-have any children. When :py:data:`always_store_results` is set to
+have any children. When :py:data:`keep_results` is set to
 :py:data:`True`, pydidas will store this node's results irrespective of its
 position in the WorkflowTree.
 

@@ -42,7 +42,7 @@ NUMPY_EXTENSIONS = ["npy"]
 
 BINARY_EXTENSIONS = ["raw", "bin", "dat"]
 
-TIFF_EXTENSIONS = ["tif", "tiff"]
+TIFF_EXTENSIONS = ["tif", "tiff", "TIF", "TIFF"]
 
 JPG_EXTENSIONS = ["jpg", "jpeg"]
 

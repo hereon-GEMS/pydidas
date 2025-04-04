@@ -35,7 +35,7 @@ from pydidas.core.constants import FONT_METRIC_HALF_CONSOLE_WIDTH
 from pydidas.core.utils import update_size_policy
 from pydidas.widgets import ScrollArea
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config import EditPluginParametersWidget
+from pydidas.widgets.plugin_config_widgets import EditPluginParametersWidget
 from pydidas.widgets.workflow_edit import PluginCollectionBrowser, WorkflowTreeCanvas
 
 

@@ -288,7 +288,7 @@ def get_data_axis_widget_creation_args(
             "create_lineedit",
             ["edit_data"],
             {
-                "font_metric_width_factor": 10,
+                "font_metric_width_factor": 10 if multiline else 15,
                 "gridPos": (0, -1, 1, 1),
                 "parent_widget": "point_selection_container"
                 if multiline
@@ -302,7 +302,7 @@ def get_data_axis_widget_creation_args(
             "create_label",
             ["label_unit", ""],
             {
-                "font_metric_width_factor": 8,
+                "font_metric_width_factor": 8 if multiline else 12,
                 "gridPos": (0, -1, 1, 1),
                 "parent_widget": "point_selection_container"
                 if multiline

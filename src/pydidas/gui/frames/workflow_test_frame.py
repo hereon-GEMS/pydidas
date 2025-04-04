@@ -186,6 +186,7 @@ class WorkflowTestFrame(BaseFrame):
                 "details_active": False,
                 "exp_hash": -1,
                 "context_hash": -1,
+                "has_details": False,
             }
         )
 
@@ -319,8 +320,7 @@ class WorkflowTestFrame(BaseFrame):
         to global settings.
         """
         self._tree = TREE.deepcopy()
-        self._config["plugin_res_titles"] = {}
-        self.__update_selection_choices()
+        self.clear_results()
 
     @staticmethod
     def _check_tree_is_populated() -> bool:
@@ -435,12 +435,6 @@ class WorkflowTestFrame(BaseFrame):
         Store the WorkflowTree results in a local dictionary.
         """
         _meta = self._tree.get_complete_plugin_metadata()
-
-        self._config["plugin_res_shapes"] = _meta["shapes"]
-        self._config["plugin_labels"] = _meta["labels"]
-        self._config["plugin_names"] = _meta["names"]
-        self._config["plugin_data_labels"] = _meta["data_labels"]
-        self._config["plugin_res_titles"] = _meta["result_titles"]
         self._local_results_mock.result_titles = _meta["result_titles"]
         for _node_id, _node in self._tree.nodes.items():
             _data = _node.results
@@ -477,6 +471,13 @@ class WorkflowTestFrame(BaseFrame):
         self.__set_derived_widget_visibility(index != -1)
         self.__update_text_description_of_node_results()
         self.__plot_results()
+
+    def clear_results(self):
+        """Clear all stored results."""
+        self._results = {}
+        self._local_results_mock.result_titles = {}
+        self.__update_selection_choices()
+        self.__set_derived_widget_visibility(False)
 
     def __set_derived_widget_visibility(self, visible: bool):
         """

@@ -31,10 +31,10 @@ __all__ = ["ProcessingTree"]
 import ast
 from numbers import Integral
 from pathlib import Path
-from typing import Self, Union
+from typing import Self
 
 from pydidas.core import UserConfigError
-from pydidas.plugins import BasePlugin, PluginCollection
+from pydidas.plugins import BasePlugin, OutputPlugin, PluginCollection
 from pydidas.workflow.generic_tree import GenericTree
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
 from pydidas.workflow.workflow_node import WorkflowNode
@@ -74,8 +74,8 @@ class ProcessingTree(GenericTree):
     def create_and_add_node(
         self,
         plugin: BasePlugin,
-        parent: Union[None, int, BasePlugin] = None,
-        node_id: Union[None, int] = None,
+        parent: WorkflowNode | int | None = None,
+        node_id: int | None = None,
     ) -> int:
         """
         Create a new node and add it to the tree.
@@ -88,14 +88,14 @@ class ProcessingTree(GenericTree):
         ----------
         plugin : pydidas.Plugin
             The plugin to be added to the tree.
-        parent : Union[WorkflowNode, int, None], optional
+        parent : WorkflowNode | int | None, optional
             The parent node of the newly created node. If an integer, this will
             be interpreted as the node_id of the parent and the respective
             parent will be selected. If None, this will select the latest node
             in the tree. The default is None.
-        node_id : Union[int, None], optional
+        node_id : int | None, optional
             The node ID of the newly created node, used for referencing the
-            node in the WorkflowTree. If not specified(ie. None), the
+            node in the WorkflowTree. If not specified (i.e. None), the
             WorkflowTree will create a new node ID. The default is None.
 
         Returns
@@ -152,9 +152,9 @@ class ProcessingTree(GenericTree):
         Returns
         -------
         list
-            List with the ID of consistent node
+            The IDs of consistent nodes
         list
-            List with the IDs of nodes with inconsistent data
+            The IDs of nodes with inconsistent data.
         """
         _consistent = []
         _inconsistent = []
@@ -263,13 +263,13 @@ class ProcessingTree(GenericTree):
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
 
-    def import_from_file(self, filename: Union[str, Path]):
+    def import_from_file(self, filename: Path | str):
         """
         Import the ProcessingTree from a configuration file.
 
         Parameters
         ----------
-        filename : Union[str, pathlib.Path]
+        filename : Path | str
             The filename which holds the ProcessingTree configuration.
         """
         _new_tree = ProcessingTreeIoMeta.import_from_file(filename)
@@ -277,13 +277,13 @@ class ProcessingTree(GenericTree):
             setattr(self, _att, getattr(_new_tree, _att))
         self._config["tree_changed"] = True
 
-    def export_to_file(self, filename: Union[str, Path], **kwargs: dict):
+    def export_to_file(self, filename: Path | str, **kwargs: dict):
         """
         Export the WorkflowTree to a file using any of the registered exporters.
 
         Parameters
         ----------
-        filename : Union[str, pathlib.Path]
+        filename : Path | str
             The filename of the file with the export.
         """
         ProcessingTreeIoMeta.export_to_file(filename, self, **kwargs)
@@ -347,14 +347,14 @@ class ProcessingTree(GenericTree):
         """
         self.restore_from_string(tree.export_to_string())
 
-    def restore_from_list_of_nodes(self, list_of_nodes: Union[list, tuple]):
+    def restore_from_list_of_nodes(self, list_of_nodes: list | tuple):
         """
         Restore the ProcessingTree from a list of Nodes with the required
         information.
 
         Parameters
         ----------
-        list_of_nodes : list
+        list_of_nodes : list | tuple
             A list of nodes with a dictionary entry for each node holding all
             the required information (plugin_class, node_id and plugin
             Parameters).
@@ -448,13 +448,16 @@ class ProcessingTree(GenericTree):
         _nodes_w_results = [
             _node
             for _node in self.nodes.values()
-            if (_node.is_leaf or _node.plugin.get_param_value("keep_results"))
+            if (
+                (_node.is_leaf or _node.plugin.get_param_value("keep_results"))
+                and not isinstance(_node.plugin, OutputPlugin)
+            )
         ]
         return _nodes_w_results
 
     def get_complete_plugin_metadata(self) -> dict:
         """
-        Get the metadata (e.g. shapes, labels, names) for all of the tree's plugins.
+        Get the metadata (e.g. shapes, labels, names) for all the tree's plugins.
 
         Note that the shapes are only available after running the plugin chain at
         least once. Otherwise, the shapes will be set to None.

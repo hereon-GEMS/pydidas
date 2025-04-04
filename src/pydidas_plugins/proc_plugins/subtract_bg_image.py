@@ -32,12 +32,16 @@ import os
 from typing import Union
 
 import numpy as np
+from qtpy import QtCore
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN_IMAGE
+from pydidas.core.constants import HDF5_EXTENSIONS, PROC_PLUGIN_IMAGE
+from pydidas.core.utils import get_extension
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
-from pydidas.widgets.plugin_config_widgets import SubtractBackgroundImageConfigWidget
+from pydidas.widgets.plugin_config_widgets import (
+    GenericPluginConfigWidget,
+)
 
 
 class SubtractBackgroundImage(ProcPlugin):
@@ -155,4 +159,44 @@ class SubtractBackgroundImage(ProcPlugin):
         QtWidgets.QWidget
             The unique ParameterConfig widget
         """
-        return SubtractBackgroundImageConfigWidget(self)
+        return SubtractBackgroundImageConfigWidget
+
+
+class SubtractBackgroundImageConfigWidget(GenericPluginConfigWidget):
+    """
+    Configuration widget to subtract a background image from the data.
+
+    This widget displays or hides the configuration fields of the hdf5
+    dataset based on the file extension of the selected file.
+    """
+
+    def connect_signals(self):
+        """Connect the signals of the widgets to the appropriate slots."""
+        GenericPluginConfigWidget.connect_signals(self)
+        self.param_composite_widgets["bg_file"].io_edited.connect(
+            self._toggle_hdf5_plugin_visibility
+        )
+
+    def finalize_init(self):
+        self._toggle_hdf5_plugin_visibility(self.plugin.get_param_value("bg_file"))
+
+    @QtCore.Slot(str)
+    def _toggle_hdf5_plugin_visibility(self, new_file: str):
+        """
+        Toggle the visibility of the plugins for Hdf5 dataset and frame number.
+
+        Parameters
+        ----------
+        new_file : str
+            The filename of the newly selected file.
+        """
+        _visibility = get_extension(new_file) in HDF5_EXTENSIONS
+        self.toggle_param_widget_visibility("bg_hdf5_key", _visibility)
+        self.toggle_param_widget_visibility("bg_hdf5_frame", _visibility)
+
+    def update_edits(self):
+        """
+        Update the configuration fields of the plugin.
+        """
+        GenericPluginConfigWidget.update_edits(self)
+        self._toggle_hdf5_plugin_visibility(self.plugin.get_param_value("bg_file"))

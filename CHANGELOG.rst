@@ -7,6 +7,14 @@ v25.mm.dd
 
 Improvements
 ------------
+- Added a plugin to save 2d data in ASCII format.
+- Improved the behaviour of the WorkflowTestFrame to display only results from the 
+  current WorkflowTree.
+- Improved the fio input plugins to allow more generic metadata definitions.
+- Modifed the way custom plugin widgets are handles and create a base class
+  for custom widgets to inherit from.
+- Added a generic xscale to fio plugins to have a more generalized use case covered.
+- Added a plugin to load 1d profiles from HDF5 files.
 - Moved calculation of radial unit conversions to core.utils.scattering_geometry
   module.
 
@@ -14,6 +22,15 @@ Bugfixes
 --------
 - Fixed an issue when graphically selecting integration regions using "Q / A^-1"
   or "2theta / rad" as units.
+- Fixed an issue in the DataViewer where the selected button was not updated 
+  when the view was changed due to the data dimensionality.
+- Fixed an issue in the WorkflowTestFrame when switching the dataset with active
+  selection based on data values.
+- Fixed the error message when user select a HDF5 dataset which does not exist.
+- Fixed an issue which occured when running workflows with no nodes with results.
+- Fixed an issue where selecting a filename would introduce a trailing space.
+- Fixed missing Parameters for output formats and overwriting in WorkflowRunFrame
+
 
 v25.03.17
 =========

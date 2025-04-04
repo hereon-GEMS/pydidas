@@ -201,6 +201,19 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "the number of images per file."
         ),
     },
+    "profiles_per_file": {
+        "type": int,
+        "default": -1,
+        "name": "Profiles per file",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The number of 1d profiles in the file. For hdf5 files, this corresponds "
+            "to the number of frames in the hdf5 dataset. A value -1 auto-discovers "
+            "the number of profiles per file."
+        ),
+    },
     "_counted_images_per_file": {
         "type": int,
         "default": 1,
@@ -336,34 +349,70 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "allow_None": False,
         "tooltip": "The file suffix for teh individual MCA files.",
     },
-    "use_absolute_energy": {
+    "use_custom_xscale": {
         "type": bool,
         "default": False,
-        "name": "Use absolute energy",
+        "name": "Use custom scale for x-axis",
         "choices": [True, False],
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Use an absolute energy scale for the results. If False, the energy "
-            "scale will be created in channel numbers."
+            "Use a custom scale for the x-axis. If False, the scale will be "
+            "created in channel numbers."
         ),
     },
-    "energy_offset": {
+    "x0_offset": {
         "type": float,
         "default": 0.0,
-        "name": "Energy offset",
+        "name": "x0 offset",
         "choices": None,
-        "unit": "eV",
+        "unit": "",
         "allow_None": False,
-        "tooltip": "The absolute offset in energy for the zeroth channel.",
+        "tooltip": "The offset for the zeroth channel.",
     },
-    "energy_delta": {
+    "x_delta": {
         "type": float,
         "default": 1.0,
-        "name": "Channel energy delta",
+        "name": "Channel Delta x",
         "choices": None,
-        "unit": "eV",
+        "unit": "",
         "allow_None": False,
-        "tooltip": "The width of each energy channels in eV.",
+        "tooltip": "The width of each channel.",
+    },
+    "x_unit": {
+        "type": str,
+        "default": "a.u.",
+        "name": "x-axis unit",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The unit of the x-axis.",
+    },
+    "x_label": {
+        "type": str,
+        "default": "x",
+        "name": "x-axis label",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The label for the x-axis.",
+    },
+    "data_dimensionality": {
+        "type": int,
+        "default": 2,
+        "name": "Data dimensionality",
+        "choices": [1, 2, 3],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The dimensionality of the data to be loaded.",
+    },
+    "detector_axis_label": {
+        "type": str,
+        "default": "detector",
+        "name": "Detector axis label",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The label for the detector axis.",
     },
 }

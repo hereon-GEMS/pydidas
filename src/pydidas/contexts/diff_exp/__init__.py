@@ -32,7 +32,7 @@ __status__ = "Production"
 # import __all__ items from modules:
 # even though not explicitly used, the import is necessary for python to read
 # the code and to register the classes in the metaclass registry
-from . import diff_exp_io_poni, diff_exp_io_yaml
+from . import diff_exp_io_hdf5, diff_exp_io_poni, diff_exp_io_yaml
 from .diff_exp import *
 from .diff_exp_context import *
 from .diff_exp_io import *
@@ -54,4 +54,5 @@ del (
     diff_exp_io_base,
     diff_exp_io_yaml,
     diff_exp_io_poni,
+    diff_exp_io_hdf5,
 )

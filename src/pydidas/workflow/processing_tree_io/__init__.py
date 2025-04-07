@@ -28,11 +28,16 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from . import processing_tree_io_yaml
+from . import processing_tree_io_hdf5, processing_tree_io_yaml
 from .processing_tree_io_base import *
 from .processing_tree_io_meta import *
 
 
 __all__ = processing_tree_io_meta.__all__ + processing_tree_io_base.__all__
 
-del (processing_tree_io_base, processing_tree_io_meta, processing_tree_io_yaml)
+del (
+    processing_tree_io_base,
+    processing_tree_io_meta,
+    processing_tree_io_yaml,
+    processing_tree_io_hdf5,
+)

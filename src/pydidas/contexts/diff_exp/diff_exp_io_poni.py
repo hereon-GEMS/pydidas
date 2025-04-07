@@ -52,7 +52,7 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
     @classmethod
     def export_to_file(cls, filename: str, **kwargs: dict):
         """
-        Write the ExperimentalTree to a pyFAI style poni file.
+        Write the DiffractionExperiment to a pyFAI style poni file.
 
         Parameters
         ----------

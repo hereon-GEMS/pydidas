@@ -52,7 +52,7 @@ EXP = DiffractionExperimentContext()
 
 class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
     """
-    Base class for WorkflowTree exporters.
+    Importer / Exporter for DiffractionExperiment metadata from HDF5 files
     """
 
     extensions = HDF5_EXTENSIONS
@@ -61,7 +61,7 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
     @classmethod
     def export_to_file(cls, filename: Path | str, **kwargs: dict):
         """
-        Write the ExperimentalTree to a pyFAI style poni file.
+        Write the ExperimentalTree to a HDF5 file.
 
         Parameters
         ----------
@@ -82,7 +82,7 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
         diffraction_exp: Union[DiffractionExperiment, None] = None,
     ):
         """
-        Restore the DiffractionExperimentContext from a YAML file.
+        Restore the DiffractionExperimentContext from a HDF5 file.
 
         Parameters
         ----------

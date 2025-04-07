@@ -49,7 +49,7 @@ SCAN = ScanContext()
 
 class ScanIoHdf5(ScanIoBase):
     """
-    YAML importer/exporter for Scan objects.
+    HDF5 importer/exporter for Scan objects.
     """
 
     extensions = HDF5_EXTENSIONS
@@ -72,7 +72,7 @@ class ScanIoHdf5(ScanIoBase):
     @classmethod
     def import_from_file(cls, filename: str, scan: Union[Scan, None] = None):
         """
-        Restore the ScanContext from a YAML file.
+        Restore the ScanContext from a HDF5 file.
 
         Parameters
         ----------

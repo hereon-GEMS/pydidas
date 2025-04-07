@@ -30,9 +30,7 @@ __all__ = ["ProcessingResultIoHdf5"]
 
 import os
 from functools import partial
-from numbers import Integral, Real
 from pathlib import Path
-from typing import Union
 
 import h5py
 
@@ -46,7 +44,10 @@ from pydidas.core.utils import (
     create_nx_entry_groups,
     read_and_decode_hdf5_dataset,
 )
-from pydidas.core.utils.hdf5_dataset_utils import _create_nxdata_axis_entry
+from pydidas.core.utils.hdf5_dataset_utils import (
+    _create_nxdata_axis_entry,
+    get_nx_class_for_param,
+)
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -64,27 +65,6 @@ _DEFAULT_GROUPS = [
     ["entry/pydidas_config/diffraction_exp", "NXcollection"],
     ["entry/pydidas_config/scan", "NXcollection"],
 ]
-
-
-def _get_nx_class_for_param(param: str) -> str:
-    """
-    Get the NX class for a parameter.
-
-    Parameters
-    ----------
-    param : str
-        The parameter name.
-
-    Returns
-    -------
-    str
-        The NX class.
-    """
-    if param.dtype == Integral:
-        return "NX_INT"
-    if param.dtype == Real:
-        return "NX_FLOAT"
-    return "NX_CHAR"
 
 
 def _get_pydidas_context_config_entries(
@@ -114,7 +94,7 @@ def _get_pydidas_context_config_entries(
                 "entry/pydidas_config/scan",
                 _key,
                 {"data": _param.value_for_export},
-                {"NX_class": _get_nx_class_for_param(_param), "units": _param.unit},
+                {"NX_class": get_nx_class_for_param(_param), "units": _param.unit},
             ]
         )
     for _key, _param in exp.params.items():
@@ -123,7 +103,7 @@ def _get_pydidas_context_config_entries(
                 "entry/pydidas_config/diffraction_exp",
                 _key,
                 {"data": _param.value_for_export},
-                {"NX_class": _get_nx_class_for_param(_param), "units": _param.unit},
+                {"NX_class": get_nx_class_for_param(_param), "units": _param.unit},
             ]
         )
     _dsets += [
@@ -181,14 +161,14 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     @classmethod
     def prepare_files_and_directories(
-        cls, save_dir: Union[Path, str], node_information: dict, **kwargs: dict
+        cls, save_dir: Path | str, node_information: dict, **kwargs: dict
     ):
         """
         Prepare the hdf5 files with the metadata.
 
         Parameters
         ----------
-        save_dir : Union[Path, str]
+        save_dir : Path | Str
             The full path for the data to be saved.
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
@@ -335,7 +315,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         cls,
         index: int,
         frame_result_dict: dict,
-        scan_context: Union[None, Scan] = None,
+        scan_context: Scan | None = None,
         **kwargs: dict,
     ):
         """
@@ -347,8 +327,9 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             The frame index.
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Union[Scan, None], optional
-            The scan context to be used for exporting to file.
+        scan_context : Scan |None, optional
+            The scan context to be used for exporting to file. If None, the
+            global scan context will be use. The default is None.
         kwargs : dict
             Any kwargs which should be passed to the underlying exporter.
         """
@@ -364,7 +345,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
     def export_full_data_to_file(
         cls,
         full_data: dict,
-        scan_context: Union[Scan, None] = None,
+        scan_context: Scan | None = None,
     ):
         """
         Export the full dataset to disk.
@@ -373,7 +354,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         ----------
         full_data : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Union[Scan, None], optional
+        scan_context : Scan |None, optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
         """
@@ -384,7 +365,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
-    def update_metadata(cls, metadata: dict[int, Union[Dataset, dict]]):
+    def update_metadata(cls, metadata: dict[int, Dataset | dict]):
         """
         Update the frame metadata with a separately supplied metadata
         dictionary.
@@ -420,14 +401,14 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     @classmethod
     def import_results_from_file(
-        cls, filename: Union[Path, str]
+        cls, filename: Path | str
     ) -> tuple[Dataset, dict, Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import results from a file and store them as a Dataset.
 
         Parameters
         ----------
-        filename : Union[Path, str]
+        filename : Path | Str
             The full filename of the file to be imported.
 
         Returns
@@ -448,22 +429,10 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         _scan = Scan()
         _exp = DiffractionExperiment()
         _data = import_data(filename, auto_squeeze=False)
+        _scan.import_from_file(filename)
+        _exp.import_from_file(filename)
         with h5py.File(filename, "r") as _file:
             try:
-                for _key, _param in _exp.params.items():
-                    _exp.set_param_value(
-                        _key,
-                        read_and_decode_hdf5_dataset(
-                            _file[f"entry/pydidas_config/diffraction_exp/{_key}"]
-                        ),
-                    )
-                for _key, _param in _scan.params.items():
-                    _scan.set_param_value(
-                        _key,
-                        read_and_decode_hdf5_dataset(
-                            _file[f"entry/pydidas_config/scan/{_key}"]
-                        ),
-                    )
                 _tree.restore_from_string(
                     read_and_decode_hdf5_dataset(_file["entry/pydidas_config/workflow"])
                 )

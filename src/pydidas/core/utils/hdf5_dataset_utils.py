@@ -52,6 +52,8 @@ import numpy as np
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.dataset import Dataset
 from pydidas.core.exceptions import FileReadError
+from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
+from pydidas.core.parameter import Parameter
 from pydidas.core.utils.file_utils import CatchFileErrors, get_extension
 
 
@@ -614,6 +616,8 @@ def create_nx_dataset(
     **attributes : dict
         The attributes to be set for the dataset.
     """
+    if name in group:
+        del group[name]
     if isinstance(data, dict):
         _dataset = group.create_dataset(name, **data)
     else:
@@ -621,3 +625,53 @@ def create_nx_dataset(
     for key, value in attributes.items():
         _dataset.attrs[key] = value
     return _dataset
+
+
+def get_nx_class_for_param(param: Parameter) -> str:
+    """
+    Get the NX class for a parameter.
+
+    Parameters
+    ----------
+    param : str
+        The parameter name.
+
+    Returns
+    -------
+    str
+        The NX class.
+    """
+    if param.dtype == Integral:
+        return "NX_INT"
+    if param.dtype == Real:
+        return "NX_FLOAT"
+    return "NX_CHAR"
+
+
+def export_context_to_hdf5(
+    filename: str | Path, context_object: ObjectWithParameterCollection, key: str
+):
+    """
+    Export a context object to a HDF5 file.
+
+    This function can be used to export Context objects like Scan or
+    DiffractionExperiment to HDF5 files. The function overwrites any
+    existing entries in the file.
+
+    Parameters
+    ----------
+    filename : str | Path
+        The filename of the HDF5 file to export to.
+    context_object : ObjectWithParameterCollection
+        The context object to export.
+    key : str
+        The key where the context object will be stored in the HDF5 file.
+    """
+    with h5py.File(filename, "a") as file:
+        create_nx_entry_groups(file, key, group_type="NXcollection")
+        _group = file[key]
+        for _key, _param in context_object.params.items():
+            _attributes = {"NX_class": get_nx_class_for_param(_param)}
+            if len(_param.unit) > 0:
+                _attributes["units"] = _param.unit
+            create_nx_dataset(_group, _key, _param.value_for_export, **_attributes)

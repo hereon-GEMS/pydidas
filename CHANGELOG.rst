@@ -18,6 +18,9 @@ Improvements
 - Moved calculation of radial unit conversions to core.utils.scattering_geometry
   module.
 - Added plugins for sin^2(chi) residual stress calculations.
+- Added importers/exporters for HDF5 formats for Scan, DiffractionExp and 
+  ProcessingTree.
+
 
 Bugfixes
 --------

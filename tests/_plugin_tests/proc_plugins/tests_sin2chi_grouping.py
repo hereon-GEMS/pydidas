@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,10 +20,11 @@ Tests for the DspacingSin2chiGrouping class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
+
 
 from dataclasses import dataclass
 from numbers import Real
@@ -50,6 +51,22 @@ from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import PluginCollection, ProcPlugin
 
 
+GENERIC_FIT_OUTPUT_LABEL = (
+    "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
+)
+GENERIC_DATA_LABEL = (
+    "position / nm; area / (cts * nm); FWHM / nm; background at peak / cts; "
+    "total count intensity / cts"
+)
+ALTERNATE_FIT_OUTPUT_LABEL = (
+    "1: area; 2: position; 3: FWHM; 4: background at peak; 0: total count intensity"
+)
+ALTERNATE_FIT_DATA_LABEL = (
+    "area / (cts * nm-1); position / nm; FWHM / nm; background at peak / cts; "
+    "total count intensity / cts"
+)
+
+
 @pytest.fixture
 def plugin_fixture():
     return PluginCollection().get_plugin_by_name("DspacingSin2chiGrouping")()
@@ -67,7 +84,7 @@ def test_plugin_initialization(plugin_fixture):
     assert plugin.output_data_dim == 2
     assert (
         plugin.output_data_label
-        == "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
+        == "0: position_neg; 1: position_pos; 2: Mean of (position_neg, position_pos)"
     )
     assert plugin.new_dataset
 
@@ -100,7 +117,11 @@ def chi_gen(chi_start, chi_stop, delta_chi):
 
 
 def predefined_metric_calculation(metric_name, chi, x, y, d0, spatial_var, phase_shift):
-    """Calculate predefined metric based on name, applying spatial variation even if x is not provided."""
+    """
+    Calculate predefined metric based on metric name.
+
+    This function appiles  spatial variation even if x is not provided.
+    """
     # Handle spatial variation by introducing a default or random x if none is provided
     if x is None and spatial_var:
         x = np.random.uniform(0, 1)  # A random x between 0 and 5
@@ -139,7 +160,7 @@ def generate_spatial_fit_res(
     """
 
     if fit_labels is None:
-        fit_labels = "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
+        fit_labels = GENERIC_FIT_OUTPUT_LABEL
     fit_labels_dict = {
         int(k.split(":")[0].strip()): k.split(":")[1].strip()
         for k in fit_labels.replace(", ", ";").split(";")
@@ -175,7 +196,7 @@ def generate_spatial_fit_res(
             else:
                 result_array[j, :, :] = (
                     fit_results.T
-                )  # Ensure dimensionality matches expected (len(chi), len(fit_labels_dict))
+                )  # Ensure dimensionality matches (len(chi), len(fit_labels_dict))
 
     return result_array
 
@@ -184,7 +205,7 @@ def generate_result_array_spatial(x=np.arange(0, 5), fit_labels=None):
     y = np.arange(2, 8)  # y-range is always given
 
     if fit_labels is None:
-        fit_labels = "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
+        fit_labels = GENERIC_FIT_OUTPUT_LABEL
 
     return generate_spatial_fit_res(
         y,
@@ -500,16 +521,21 @@ def test__group_d_spacing_by_chi_result(plugin_fixture, case):
     assert d_spacing_pos.array.size == case.d_mean_pos.size
     assert d_spacing_neg.array.size == case.d_mean_neg.size
     assert np.sum(np.isnan(d_spacing_pos.array)) == np.sum(np.isnan(case.d_mean_pos)), (
-        f"Expected {np.sum(np.isnan(case.d_mean_pos))} NaN values, but got {np.sum(np.isnan(d_spacing_pos.array))}"
+        f"Expected {np.sum(np.isnan(case.d_mean_pos))} NaN values, but got "
+        f"{np.sum(np.isnan(d_spacing_pos.array))}"
     )
+
     assert np.sum(np.isnan(d_spacing_neg.array)) == np.sum(np.isnan(case.d_mean_neg)), (
-        f"Expected {np.sum(np.isnan(case.d_mean_neg))} NaN values, but got {np.sum(np.isnan(d_spacing_neg.array))}"
+        f"Expected {np.sum(np.isnan(case.d_mean_neg))} NaN values, but got "
+        f"{np.sum(np.isnan(d_spacing_neg.array))}"
     )
     assert d_spacing_pos.array.shape == case.d_mean_pos.shape, (
-        f"Expected shapes to match: {d_spacing_pos.array.shape} != {case.d_mean_pos.shape}"
+        f"Expected shapes to match: {d_spacing_pos.array.shape} "
+        f"!= {case.d_mean_pos.shape}"
     )
     assert d_spacing_neg.array.shape == case.d_mean_neg.shape, (
-        f"Expected shapes to match: {d_spacing_neg.array.shape} != {case.d_mean_neg.shape}"
+        f"Expected shapes to match: {d_spacing_neg.array.shape} "
+        f"!= {case.d_mean_neg.shape}"
     )
 
 
@@ -663,7 +689,7 @@ def base_dataset_with_fit_labels_factory():
     "fit_label_input, expected_chi_pos_values",
     [
         (
-            "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity",
+            GENERIC_FIT_OUTPUT_LABEL,
             (1, (2, 0)),
         ),
         ("0: position", (1, (2, 0))),
@@ -682,8 +708,6 @@ def test__chi_pos_verification_success(
     plugin = plugin_fixture
     test_ds = base_dataset_with_fit_labels_factory(fit_label_input)
 
-    print(test_ds.shape)
-
     (chi_pos_res, (pos_idx_res, pos_key_res)) = plugin._chi_pos_verification(test_ds)
 
     assert chi_pos_res == expected_chi_pos_values[0]
@@ -695,9 +719,7 @@ def test__chi_pos_verification_success(
 def test__chi_pos_verification_success_4d_array(plugin_fixture):
     plugin = plugin_fixture
 
-    fit_labels = (
-        "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
-    )
+    fit_labels = GENERIC_FIT_OUTPUT_LABEL
 
     result_array_spatial = generate_result_array_spatial()
 
@@ -754,9 +776,7 @@ def test__chi_pos_verification_all_labels_missing(plugin_fixture):
 def test__multiple_chis_in_labels(plugin_fixture):
     plugin = plugin_fixture
 
-    fit_labels = (
-        "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
-    )
+    fit_labels = GENERIC_FIT_OUTPUT_LABEL
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {
         0: "y",
@@ -764,7 +784,7 @@ def test__multiple_chis_in_labels(plugin_fixture):
         2: "chi",
         3: fit_labels,
     }  # 'chi' appears twice, simulated by the same value at different keys
-    data_labels = "position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts"
+    data_labels = GENERIC_DATA_LABEL
 
     ds = Dataset(result_array_spatial, axis_labels=axis_labels, data_label=data_labels)
 
@@ -779,10 +799,8 @@ def test__multiple_chis_in_labels(plugin_fixture):
 def test__position_not_at_zero(plugin_fixture):
     plugin = plugin_fixture
 
-    fit_labels = (
-        "1: area; 2: position; 3: FWHM; 4: background at peak; 0: total count intensity"
-    )
-    data_labels = "area / (cts * nm-1); position / nm; FWHM / nm; background at peak / cts; total count intensity / cts"
+    fit_labels = ALTERNATE_FIT_OUTPUT_LABEL
+    data_labels = ALTERNATE_FIT_DATA_LABEL
 
     result_array_spatial = generate_result_array_spatial(fit_labels=fit_labels)
     axis_labels = {0: "y", 1: "x", 2: "chi", 3: fit_labels}
@@ -795,10 +813,8 @@ def test__position_not_at_zero(plugin_fixture):
 def test__position_not_at_zero_3d(plugin_fixture):
     plugin = plugin_fixture
 
-    fit_labels = (
-        "1: area; 2: position; 3: FWHM; 4: background at peak; 0: total count intensity"
-    )
-    data_labels = "area / (cts * nm-1); position / nm; FWHM / nm; background at peak / cts; total count intensity / cts"
+    fit_labels = ALTERNATE_FIT_OUTPUT_LABEL
+    data_labels = ALTERNATE_FIT_DATA_LABEL
 
     results_array_spatial_3d = generate_result_array_spatial(
         None, fit_labels=fit_labels
@@ -824,10 +840,8 @@ def test__ds_slicing_type_error(plugin_fixture):
 def test__ds_slicing_valid(plugin_fixture):
     plugin = plugin_fixture
 
-    fit_labels = (
-        "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
-    )
-    data_labels = "position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts"
+    fit_labels = GENERIC_FIT_OUTPUT_LABEL
+    data_labels = GENERIC_DATA_LABEL
 
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: "y", 1: "x", 2: "chi", 3: fit_labels}
@@ -848,8 +862,13 @@ def test__ds_slicing_valid(plugin_fixture):
 def test__ds_slicing_beyond_bounds_v2(plugin_fixture):
     plugin = plugin_fixture
 
-    """fit_label is 5: position. Shape of Dataset is 5 in the last dimension. Expected error: "Array is empty, slicing out of bounds." because 5 is out of range.
-    Slice: slices [slice(None, None, None), slice(None, None, None), slice(None, None, None), slice(5, 6, None)]
+    """
+    fit_label is 5: position. Shape of Dataset is 5 in the last dimension. 
+    Expected error: "Array is empty, slicing out of bounds." because 5 is out of range.
+    Slice: slices 
+        [slice(None, None, None), slice(None, None, None), slice(None, None, None), 
+        slice(5, 6, None)
+    ]
     Allowed incides in last dimension range from 0 to 4.
     """
     ones_array = np.ones((3, 2, 1, 5))
@@ -858,7 +877,10 @@ def test__ds_slicing_beyond_bounds_v2(plugin_fixture):
     # Multiply using broadcasting
     result_array = ones_array * arange_array
     axis_units = ["um", "um", "deg", ""]
-    data_label = "area / (cts * nm); FWHM / nm; background at peak / cts; total count intensity / cts; position / nm"
+    data_label = (
+        "area / (cts * nm); FWHM / nm; background at peak / cts; "
+        "total count intensity / cts; position / nm"
+    )
     axis_labels = ["y", "x", "chi", "fit_labels"]
     fit_labels = (
         "1: area; 2: FWHM; 3: background at peak; 4: total count intensity; 5: position"
@@ -885,10 +907,8 @@ def test__ds_slicing_beyond_bounds_v2(plugin_fixture):
 def test__ds_slicing_dimension_mismatch(plugin_fixture):
     plugin = plugin_fixture
 
-    fit_labels = (
-        "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
-    )
-    data_labels = "position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts"
+    fit_labels = GENERIC_FIT_OUTPUT_LABEL
+    data_labels = GENERIC_DATA_LABEL
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: "y", 1: "x", 2: "chi", 3: fit_labels}
     axis_units = ["um", "um", "deg", ""]
@@ -932,10 +952,8 @@ def test__ds_slicing_dimension_mismatch_3d(plugin_fixture):
 def test__extract_d_spacing_valid(plugin_fixture):
     plugin = plugin_fixture
 
-    fit_labels = (
-        "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
-    )
-    data_labels = "position / nm; area / (cts * nm-1); FWHM / nm; background at peak / cts; total count intensity / cts"
+    fit_labels = GENERIC_FIT_OUTPUT_LABEL
+    data_labels = GENERIC_DATA_LABEL
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: "y", 1: "x", 2: "chi", 3: fit_labels}
     axis_units = ["um", "um", "deg", ""]
@@ -1090,25 +1108,32 @@ test_cases = [case9]
 @pytest.mark.parametrize("case", test_cases)
 def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
     """
-    A test function to validate the `group_d_spacing_by_chi` function via a different approach.
+    A test function to validate the `group_d_spacing_by_chi` function via a different
+    approach.
 
     This test performs the following steps:
-    1. Initializes chi values and a Dataset instance for d_spacing using the provided case configuration.
-    2. Uses the second validation method to calculate mean d_spacing values for positive and negative slopes.
-    3. Uses the original `group_d_spacing_by_chi` function to calculate mean d_spacing values for positive and negative slopes.
-    4. Compares the results from both methods with each other and with the expected mean values provided in the case configuration.
-    5. Asserts that all elements in the comparisons are close within the specified tolerances.
+    1. Initializes chi values and a Dataset instance for d_spacing using the
+       provided case configuration.
+    2. Uses the second validation method to calculate mean d_spacing values for
+       positive and negative slopes.
+    3. Uses the original `group_d_spacing_by_chi` function to calculate mean d_spacing
+       values for positive and negative slopes.
+    4. Compares the results from both methods with each other and with the expected
+       mean values provided in the case configuration.
+    5. Asserts that all elements in the comparisons are close within the specified
+       tolerances.
 
     Parameters
     ----------
     case : S2cTestConfig
-        The test configuration containing the parameters and expected values for the test case.
+        The test configuration containing the parameters and expected values for
+        the test case.
 
     Raises
     ------
     AssertionError
-        If any of the comparisons fail, indicating that the methods do not produce close results.
-
+        If any of the comparisons fail, indicating that the methods do not produce
+        close results.
     """
 
     def group_d_spacing_by_chi_second_validation(d_spacing, chi, tolerance=1e-4):
@@ -1127,7 +1152,8 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
         Returns
         -------
         tuple
-            A tuple containing two arrays: mean d_spacing values for positive slopes and negative slopes.
+            A tuple containing two arrays: mean d_spacing values for positive slopes
+            and negative slopes.
 
         Raises
         ------
@@ -1199,7 +1225,6 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
             # Check the length of d_pos to see if it should be assigned
             if len(d_pos) > 0:
                 data_pos[group, 1 : len(d_pos) + 1] = d_pos
-                # print(d_pos.array, np.nanmean(data_pos[group, 1:len(d_pos)+1]))
                 data_pos[group, -1] = np.nanmean(data_pos[group, 1 : len(d_pos) + 1])
                 data[group, 1 : len(d_pos) + 1] = d_pos
 
@@ -1248,7 +1273,8 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
     )
     # Assertions to ensure all elements are close
     assert np.all(res_pos_combined), (
-        f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not close: {res_pos_combined}"
+        f"data_pos_mean, d_spacing_pos.array, and expected case.d_mean_pos are not "
+        f"close: {res_pos_combined}"
     )
 
     # Same for negative slopes
@@ -1267,7 +1293,8 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
         f"d_spacing_neg and case.d_mean_neg are not close: {res_neg_2}"
     )
     assert np.all(res_neg_combined), (
-        f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not close: {res_neg_combined}"
+        f"data_neg_mean, d_spacing_neg.array, and expected case.d_mean_neg are not "
+        f" close: {res_neg_combined}"
     )
 
 
@@ -1411,12 +1438,16 @@ def test_combine_sort_d_spacing_pos_neg_stablesort(plugin_fixture):
         err_msg="sin2chi values are not correctly sorted in ascending order.",
     )
 
-    # Check that the d_spacing values have been sorted according to the sorted sin2chi values
+    # Check that the d_spacing values have been sorted according to the sorted
+    # sin2chi values
     expected_d_spacing_combined = np.array([[3.0, 1.0, 2.0], [1.0, 2.0, 3.0]])
     np.testing.assert_array_equal(
         result.array,
         expected_d_spacing_combined,
-        err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values.",
+        err_msg=(
+            "d_spacing values are not correctly sorted according to sorted "
+            "sin2chi values."
+        ),
     )
 
 
@@ -1447,12 +1478,16 @@ def test_combine_sort_d_spacing_pos_neg_with_nan(plugin_fixture):
         err_msg="sin2chi values are not correctly sorted in ascending order.",
     )
 
-    # Check that the d_spacing values have been sorted according to the sorted sin2chi values
+    # Check that the d_spacing values have been sorted according to the sorted
+    # sin2chi values
     expected_d_spacing_combined = np.array([[3.0, np.nan, 2.0], [np.nan, 2.0, 3.0]])
     np.testing.assert_array_equal(
         result.array,
         expected_d_spacing_combined,
-        err_msg="d_spacing values are not correctly sorted according to sorted sin2chi values, especially with NaN values.",
+        err_msg=(
+            "d_spacing values are not correctly sorted according to sorted sin2chi "
+            "values, especially with NaN values.",
+        ),
     )
 
 
@@ -1645,7 +1680,8 @@ def test__create_final_result_sin2chi_method_valid_input(
 ):
     plugin = plugin_fixture
     # dummy input shape: 3 chi-values and 5 fit results
-    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    # This is currently required due to pre-allocation requirements in pydidas,
+    # dynamic allocation is not yet supported
     plugin._config["input_shape"] = (3, 5)
 
     # Calculation
@@ -1661,10 +1697,12 @@ def test__create_final_result_sin2chi_method_valid_input(
         f"Expected axis_labels[1] dataset axis label is {LABELS_SIN2CHI}."
     )
     assert result.data_unit == d_spacing_combined_fixture.data_unit, (
-        f"Resulting dataset data unit is incorrect. Expected unit: {d_spacing_combined_fixture.data_unit}"
+        "Resulting dataset data unit is incorrect. Expected unit: "
+        f"{d_spacing_combined_fixture.data_unit}"
     )
     assert result.data_label == d_spacing_combined_fixture.data_label, (
-        f"Resulting dataset data label is incorrect. Expected data label: {d_spacing_combined_fixture.data_label}"
+        "Resulting dataset data label is incorrect. Expected data label: "
+        f"{d_spacing_combined_fixture.data_label}"
     )
 
 
@@ -1672,7 +1710,8 @@ def test__create_final_result_sin2chi_method_accuracy(
     plugin_fixture, d_spacing_combined_fixture
 ):
     plugin = plugin_fixture
-    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    # This is currently required due to pre-allocation requirements in pydidas,
+    # dynamic allocation is not yet supported
     plugin._config["input_shape"] = (3, 5)
 
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
@@ -1695,12 +1734,12 @@ def test__create_final_result_sin2chi_method_with_nan_explicit(
     plugin_fixture, d_spacing_combined_fixture
 ):
     plugin = plugin_fixture
-    # This is currently required due to pre-allocation requirements in pydidas, dynamic allocation is not yet supported
+    # This is currently required due to pre-allocation requirements in pydidas,
+    # dynamic allocation is not yet supported
     plugin._config["input_shape"] = (3, 5)
 
     d_spacing_combined_fixture.array[0, 1] = np.nan
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
-    print(result.array)
 
     expected_avg = np.vstack(
         (d_spacing_combined_fixture.array, [2.5, np.nan, np.nan])
@@ -2287,7 +2326,10 @@ ds_case10_exe = Ds2cTestConfig(
     azimuth_name=LABELS_CHI,
     chi_unit=UNITS_DEGREE,
     d_unit=UNITS_NANOMETER,
-    description="A more realistic case with chi ranging from 0 to 360 and noise added; noise with scale 0.03",
+    description=(
+        "A more realistic case with chi ranging from 0 to 360 and noise added; "
+        "noise with scale 0.03",
+    ),
 )
 
 ds_case11_exe = Ds2cTestConfig(
@@ -2495,11 +2537,6 @@ def test_execute_with_various_cases(plugin_fixture, case):
 
     result, _ = plugin.execute(ds_in)
 
-    print("In the test")
-    print(case.description)
-    print("ds_in", ds_in)
-    print("ds_out", result)
-
     npt.assert_allclose(
         result.array,
         expected_ds.array,
@@ -2632,13 +2669,16 @@ def base_execute_dataset():
         np.random.default_rng(seed=42).random((6, 5)),
         axis_labels={
             0: "chi",
-            1: "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity",
+            1: GENERIC_FIT_OUTPUT_LABEL,
         },
         axis_units={0: "deg", 1: ""},
         axis_ranges={0: np.arange(6), 1: np.arange(5)},
         metadata={},
         data_unit="",
-        data_label="position / nm; area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts",
+        data_label=(
+            "position / nm; area / (cts * nm); FWHM / nm;background at peak / cts; "
+            "total count intensity / cts"
+        ),
     )
 
 
@@ -2669,9 +2709,15 @@ def test_execute_with_missing_field(
         test_ds.update_axis_label(
             1, "0: area; 1: FWHM; 2: background at peak; 3: total count intensity"
         )
-        test_ds.data_label = "area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts"
+        test_ds.data_label = (
+            "area / (cts * nm); FWHM / nm;background at peak / cts; "
+            "total count intensity / cts"
+        )
     elif removal_key == 3:
-        test_ds.data_label = "area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts"
+        test_ds.data_label = (
+            "area / (cts * nm); FWHM / nm;background at peak / cts; "
+            "total count intensity / cts"
+        )
     elif removal_key == 4:
         test_ds.update_axis_unit(0, "dummy")
 
@@ -2683,8 +2729,8 @@ def test_execute_with_missing_field(
     "fit_label, data_label, expected_units_dict",
     [
         (
-            "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity",
-            "position / nm; area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts",
+            GENERIC_FIT_OUTPUT_LABEL,
+            GENERIC_DATA_LABEL,
             {
                 0: ["position", "nm"],
                 1: ["area", "(cts * nm)"],
@@ -2732,8 +2778,11 @@ def test__extract_units_validation(
     "fit_label, data_label, expected_error_message",
     [
         (
-            "0: position; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity",
-            "position / nmm; area / (cts * nm); FWHM / nm;background at peak / cts; total count intensity / cts",
+            GENERIC_FIT_OUTPUT_LABEL,
+            (
+                "position / nmm; area / (cts * nm); FWHM / nm; "
+                "background at peak / cts; total count intensity / cts"
+            ),
             "Unit nmm not allowed for position.",
         ),
         (
@@ -2941,13 +2990,9 @@ def test_unsorted(data_values):
 def test_sort(data_values):
     data_val, axis_val, ds = data_values
     # inplace sorting
-    ds.sort(
-        axis=0
-    )  # sorts only the values in the array, but not the metadata (axis values). Metadata not aligned with sorted array
+    ds.sort(axis=0)
 
     sorted_arr_idx = np.argsort(data_val)
-
-    print("comparison", ds.array, np.sort(data_val))
     assert np.allclose(ds.array, np.sort(data_val))
     assert np.allclose(ds.axis_ranges[0], axis_val[sorted_arr_idx])
 
@@ -2964,7 +3009,7 @@ def test_sort_explicit():
 
     assert np.allclose(ds.array, np.array([3, 2, 1, 5, 4]))
     assert np.allclose(ds.axis_ranges[0], np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
-    ds.sort(axis=0)  # in place sorting does not work on metadata
+    ds.sort(axis=0)
     assert np.allclose(ds.array, np.array([1, 2, 3, 4, 5]))
     assert np.allclose(ds.axis_ranges[0], [0.3, 0.4, 0.5, 0.1, 0.2])
 

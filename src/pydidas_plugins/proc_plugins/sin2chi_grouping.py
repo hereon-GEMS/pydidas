@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -17,19 +17,22 @@
 
 
 """
-A module for grouping d-spacing values according the sin^2(chi) values, a necessary step for the sin^2(chi) method.
-This module expects a pydidas Dataset with d-spacing values [nm, A] and chi values [deg]. Label for d-spacing is `position`.
+A module for grouping d-spacing values according the sin^2(chi) values.
+
+This data grouping is a necessary step for the sin^2(chi) method.
+This module expects a pydidas Dataset with d-spacing values [nm, A] and
+chi values [deg]. Label for d-spacing is `position`.
 """
 
-__author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__author__ = "Gudrun Lotze, Malte Storm"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 __all__ = ["DspacingSin2chiGrouping"]
 
+
 from enum import IntEnum
-from typing import Dict, List, Tuple
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -67,8 +70,12 @@ class Category(IntEnum):
 
 
 class DictViaAttrs:
-    """Access a dict via attributes. This class will enhance the dict for self._config to support IDE functionalities.
-    A (data)class offers comfort and reduction of errors due to the code-analysis feature of an IDE.
+    """
+    Access a dict via attributes.
+
+    This class will enhance the dict for self._config to support IDE functionalities.
+    A (data)class offers comfort and reduction of errors due to the code-analysis
+    feature of an IDE.
     """
 
     def __init__(self, d):
@@ -94,32 +101,42 @@ class DictViaAttrs:
 
 class DspacingSin2chiGrouping(ProcPlugin):
     """
-    Grouping of d-spacing values according to the slopes in sin^2(chi) and similarity in sin^2(chi) values.
+    Grouping of d-spacing values according to the slopes in sin^2(chi)
+    and similarity in sin^2(chi) values.
 
     chi is the azimuthal angle of one diffraction image.
 
-    PLEASE NOTE:
-    Using chi instead of psi for the sin^2(psi) method is an approximation in the high-energy X-ray regime.
-    Psi is the angle between between the scattering vector q and the sample normal
-    The geometry of the experiment requires that the sample normal is parallel to the z-axis, i.e. the
-    incoming beam is parallel to the sample surface.
+    Note: Using chi instead of psi for the sin^2(psi) method is an approximation in the
+    high-energy X-ray regime. Psi is the angle between the scattering vector q
+    and the sample normal. The geometry of the experiment requires that the sample
+    normal is parallel to the z-axis, i.e. the incoming beam is parallel to the
+    sample surface.
+
     Results will be stored.
 
-    Output:
-    - Mean of d-spacing branches (d(+), d(-))
-    - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
+    Output: Both d-spacing branches (d(-), d(+)) and their mean vs. sin^2(chi)
 
     Steps:
-    1. A clustering algorithm groups chi values based on similar sin^2(chi) values. The tolerance level for similarity between sin^2(chi) values is set to 1e-6. Chi values with similar sin^2(chi) values are grouped.
-    2. The algorithm separates the d-spacing values into groups based on the similarity of sin^2(chi) values
-       and their slope sign (positive or negative).
-    3. After grouping, d-spacing values are categorized by their group labels and the slope sign.
-    4. In each d-spacing branch, positive (d(+)) or negative (d(-)), multiple groups can be identified.
-    5. Finally, the mean of positive and negative d-spacing values vs. sin^2(chi) is calculated for each group.
+
+    1. A clustering algorithm groups chi values based on similar sin^2(chi) values.
+       The tolerance level for similarity between sin^2(chi) values is set to 1e-6.
+       Chi values with similar sin^2(chi) values are grouped.
+
+    2. The algorithm separates the d-spacing values into groups based on the
+       similarity of sin^2(chi) values and their slope sign (positive or negative).
+
+    3. After grouping, d-spacing values are categorized by their group labels
+       and the slope sign.
+
+    4. In each d-spacing branch, positive (d(+)) or negative (d(-)), multiple groups
+       can be identified.
+
+    5. Finally, the mean of positive and negative d-spacing values vs. sin^2(chi)
+       is calculated for each group.
 
 
-    NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg] as input data. The limit for azimuthal points is set to 3000.
-
+    NOTE: This plugin expects position (d-spacing) in [nm, A] and chi in [deg]
+    as input data. The limit for azimuthal points is set to 3000.
     """
 
     plugin_name = "Group d-spacing according to sin^2(chi) method"
@@ -129,7 +146,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     input_data_dim = -1
     output_data_dim = 2
     output_data_label = (
-        "0: position_neg, 1: position_pos, 2: Mean of 0: position_neg, 1: position_pos"
+        "0: position_neg; 1: position_pos; 2: Mean of (position_neg, position_pos)"
     )
     new_dataset = True
 
@@ -138,6 +155,161 @@ class DspacingSin2chiGrouping(ProcPlugin):
     _generics[PARAMETER_KEEP_RESULTS].value = True
     _generics[PARAMETER_KEEP_RESULTS].choices = [True]
     generic_params = _generics
+
+    @staticmethod
+    def _ensure_dataset_instance(ds: Dataset) -> None:
+        """
+        Ensure the input is an instance of Dataset.
+
+        Parameters
+        ----------
+        ds : Dataset
+            The input to check.
+
+        Raises
+        ------
+        UserConfigError
+            If ds is not an instance of Dataset.
+        """
+        if not isinstance(ds, Dataset):
+            raise UserConfigError("Input must be an instance of Dataset.")
+
+    @staticmethod
+    def _ensure_npt_azim_limit(chi: np.ndarray) -> None:
+        """
+        Ensure the number of azimuthal angles is below a certain limit.
+
+        The limit is hardcoded in the value for the NPT_AZIM_LIMIT constant. The limit
+        is defined to work with the default tolerance value for grouping similar
+        chi positions.
+
+        Parameters
+        ----------
+        chi : np.ndarray
+            The array of azimuthal angles.
+
+        Raises
+        ------
+        UserConfigError
+            If the number of azimuthal angles exceeds the limit.
+        """
+        if chi.size > NPT_AZIM_LIMIT:
+            raise UserConfigError(
+                f"Number of azimuthal angles exceeds the limit of {NPT_AZIM_LIMIT}."
+            )
+
+    @staticmethod
+    def _get_param_unit_at_index(
+        ds_units: dict[int, tuple[str, str]], pos_idx: int
+    ) -> tuple[str, str]:
+        """
+        Retrieve the parameter name and unit from the dictionary `ds_units`
+        at a specified index `pos_idx`.
+
+        This function is designed to extract the parameter name and its
+        corresponding unit from a dictionary where each entry is keyed by an index.
+        It specifically checks that the parameter name at the given index is
+        'position', ensuring consistency for applications that require this
+        specific parameter. If the parameter at `pos_idx` is not 'position', or
+        if `pos_idx` is not a valid key in the dictionary, appropriate exceptions
+        are raised.
+
+        Parameters
+        ----------
+        ds_units : dict
+            A dictionary with integer keys, where each key-value pair consists of
+            an index (key) and a tuple (value) containing a parameter name and its unit.
+        self._pos_idx : int
+            The index for which the parameter name and unit are to be retrieved.
+
+        Returns
+        -------
+        name : str
+            The parameter name (str) at the specified index.
+        unit : str
+            The unit associated with the parameter name.
+
+        Raises
+        ------
+        IndexError
+            If `pos_idx` is not a valid key within `ds_units`, indicating that
+            the index is out of range.
+        ValueError
+            If the parameter name at the specified `pos_idx` is not 'position',
+            indicating a mismatch in expected parameter naming.
+
+        Examples
+        --------
+        >>> ds_units = {0: ('time', 's'), 1: ('position', 'm'), 2: ('temperature', 'K')}
+        >>> get_param_unit_at_index(ds_units, 1)
+        ('position', 'm')
+
+        Notes
+        -----
+        This function is particularly useful in contexts where specific parameters
+        and their units are critical, such as in scientific experiments or data
+        analysis tasks. It enforces the presence of a 'position' parameter at the
+        specified index, aiding in data validation and consistency checks.
+        """
+        if pos_idx not in ds_units:
+            raise IndexError(
+                f"pos_idx {pos_idx} is out of range for the dictionary keys"
+            )
+        param_info = ds_units[pos_idx]
+        param_name, unit = param_info
+
+        if param_name != LABELS_POSITION:
+            raise ValueError(
+                f"The parameter name at pos_idx {pos_idx} is not 'position'"
+            )
+        return param_name, unit
+
+    @staticmethod
+    def _extract_and_verify_units(ds: Dataset) -> None:
+        """
+        Extract and verify the units for chi and position in the dataset.
+
+        Note that this method modifies the input dataset in place.
+
+        Parameters
+        ----------
+        ds : Dataset
+            The dataset to extract and verify units from.
+        """
+        chi_units_allowed: list[str] = [UNITS_DEGREE]
+
+        if (
+            ds.axis_labels[0] not in [LABELS_CHI]
+            or ds.axis_units[0] not in chi_units_allowed
+        ):
+            raise UserConfigError(
+                "The input dataset does not contain chi values in the axis and/or "
+                "the chi values are given in an unsupported unit. Supported units "
+                f"are [{', '.join(chi_units_allowed)}]."
+            )
+
+        # position/pos contains the unit for d_spacing
+        pos_units_allowed: list[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
+
+        # Ensure 'position' is in the data_label
+        if LABELS_POSITION not in ds.data_label:
+            raise UserConfigError(f"Key '{LABELS_POSITION}' not found in data_label.")
+
+        parts = ds.data_label.split("/")
+
+        if len(parts) != 2:
+            raise ValueError("Invalid data_label format. Expected 'position / unit'.")
+
+        pos_unit = parts[1].strip()
+
+        if pos_unit not in pos_units_allowed:
+            raise UserConfigError(
+                f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}."
+            )
+
+        # Update the dataset with the verified unit
+        ds.data_label = parts[0].strip()
+        ds.data_unit = pos_unit
 
     def __init__(self):
         super().__init__()
@@ -163,36 +335,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return d_output_sin2chi_method, kwargs
 
-    def _ensure_dataset_instance(self, ds: Dataset) -> None:
-        """
-        Ensure the input is an instance of Dataset.
-
-        Parameters:
-        ds (Dataset): The input to check.
-
-        Raises:
-        UserConfigError: If ds is not an instance of Dataset.
-        """
-        if not isinstance(ds, Dataset):
-            raise UserConfigError("Input must be an instance of Dataset.")
-
-    def _ensure_npt_azim_limit(self, chi: np.ndarray) -> None:
-        """
-        Ensure the number of azimuthal angles is below a certain limit. The limit is given by NPT_AZIM_LIMIT.
-        The S2C_TOLERANCE works for all NPT_AZIM_LIMITs below 3000.
-
-        Parameters:
-        chi (np.ndarray): The array of azimuthal angles.
-
-        Raises:
-        UserConfigError: If the number of azimuthal angles exceeds the limit.
-        """
-        if chi.size > NPT_AZIM_LIMIT:
-            raise UserConfigError(
-                f"Number of azimuthal angles exceeds the limit of {NPT_AZIM_LIMIT}."
-            )
-
-    def _chi_pos_verification(self, ds: Dataset) -> Tuple[int, Tuple[int, int]]:
+    def _chi_pos_verification(self, ds: Dataset) -> tuple[int, tuple[int, int]]:
         """
         Verify if the dataset `ds` contains 'chi' and 'position' for d-spacing.
 
@@ -203,10 +346,12 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         Returns
         -------
-        tuple
-            A tuple containing two elements:
-            - self._chi_key (int): The index associated with 'chi'.
-            - position_key (tuple): A tuple where the first element is the index in `axis_labels` where 'position' descriptor is found, and the second element is the key in the structured string resembling a dict.
+        chi_key : int
+            The index associated with 'chi'.
+        position_key : tuple
+            A tuple where the first element is the index in `axis_labels` where
+            'position' descriptor is found, and the second element is the key in
+             the structured string resembling a dict.
 
         Raises
         ------
@@ -217,16 +362,12 @@ class DspacingSin2chiGrouping(ProcPlugin):
         UserConfigError
             If 'chi' or the key containing 'position' is missing in the dataset.
 
-        Examples
-        --------
-        >>> ds = Dataset()
-        >>> ds.axis_labels = {0: 'x', 1: 'y', 2: 'chi', 3: '0: position; 2: amplitude'}
-        >>> chi_pos_verification(ds)
-        (2, (3, 0))
-
         Notes
         -----
-        This function checks the `axis_labels` of the dataset for the presence of 'chi' and 'position'. It ensures that there is exactly one 'chi' and at least one 'position' descriptor. The function raises errors if the conditions are not met, ensuring the dataset's structure is as expected for further processing.
+        This function checks the `axis_labels` of the dataset for the presence of
+        'chi' and 'position'. It ensures that there is exactly one 'chi' and at least
+        one 'position' descriptor. The function raises errors if the conditions are
+        not met, ensuring the dataset's structure is as expected for further processing.
         """
 
         self._ensure_dataset_instance(ds)
@@ -236,11 +377,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
         # Collect indices where 'chi' is found
         chi_indices = [key for key, value in axis_labels.items() if value == LABELS_CHI]
 
-        # Check for multiple 'chi'
         if len(chi_indices) > 1:
             raise UserConfigError('Multiple "chi" found. Check your dataset.')
 
-        # Check for absence of 'chi'
         if not chi_indices:
             raise UserConfigError("chi is missing. Check your dataset.")
 
@@ -272,51 +411,45 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 'Key containing "position" is missing. Check your dataset.'
             )
 
-        return (chi_key, position_key)
+        return chi_key, position_key
 
-    def _extract_units(self, ds: Dataset) -> Dict[int, List[str]]:
+    def _extract_units(self, ds: Dataset) -> dict[int, list[str]]:
         """
-        Extract units from `data_label` in a `Dataset`, corresponding to parameters in `fit_labels`.
+        Extract units from `data_label` in a `Dataset`.
 
-        This function parses the `data_label` string of a `Dataset` to extract units associated with each parameter
-        specified in the `fit_labels`. It constructs a dictionary where each key-value pair corresponds to a parameter and its
-        unit. The function ensures that the dataset is a valid instance of `Dataset` and raises appropriate errors if
-        units for specified fit labels are not found.
+        The `data_label` corresponds to the written parameters in `fit_labels`.
+
+        This function parses the `data_label` string of a `Dataset` to extract
+        units associated with each parameter specified in the `fit_labels`. It
+        constructs a dictionary where each key-value pair corresponds to a
+        parameter and its unit. The function ensures that the dataset is a valid
+        instance of `Dataset` and raises appropriate errors if units for specified
+        fit labels are not found.
 
         Parameters
         ----------
         ds : Dataset
-            The dataset from which units are to be extracted. It must contain `fit_labels` and `data_label` attributes.
-
+            The dataset from which units are to be extracted.
         Returns
         -------
         dict
-            A dictionary mapping each parameter (specified by its index in `fit_labels`) to a list containing the parameter name
-            and its extracted unit.
+            A dictionary mapping each parameter (specified by its index in `fit_labels`)
+            to a list containing the parameter name and its extracted unit.
 
         Raises
         ------
         UserConfigError
             If `ds` is not an instance of `Dataset`.
         UserConfigError
-            If a unit for any parameter specified in `fit_labels` is not found in `data_label`.
-
-        Examples
-        --------
-        >>> ds = Dataset()
-        >>> ds.data_label = "1: Force/N; 2: Displacement/mm"
-        >>> ds.fit_labels = "1: Force; 2: Displacement"
-        >>> extract_units(ds)
-        {1: ['Force', 'N'], 2: ['Displacement', 'mm']}
+            If a unit for any parameter specified in `fit_labels` is not found in
+            `data_label`.
 
         Notes
         -----
-        The function relies on the structure of `data_label` and `fit_labels` in the `Dataset`. `data_label` should be
-        a semicolon-separated list of parameter descriptions, where each description is formatted as "index: name/unit". Similarly,
-        `fit_labels` should be a semicolon-separated list of parameter names, formatted as "index: name". The function matches
-        parameters based on these indices and extracts corresponding units.
+        The function relies on the structure of `data_label` in the `Dataset`.
+        `data_label` should be a semicolon-separated list of parameter descriptions,
+        where each description is formatted as "index: name/unit".
         """
-
         self._ensure_dataset_instance(ds)
 
         chi_key, (pos_key, _) = self._chi_pos_verification(ds)
@@ -340,7 +473,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 unit = unit.strip()
                 data_label_dict[name] = unit
 
-        # Step 3: Create a mapping of fit_labels (with their indices) to their corresponding units
+        # Step 3: Create a mapping of fit_labels (with their indices) to their
+        # corresponding units
         result = {}
         for index, param in fit_labels_dict.items():
             try:
@@ -364,36 +498,41 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
         Verifies that the units for 'chi' and 'position' in a dataset are correct.
 
-        This function checks a Pydidas Dataset to ensure that the units for 'chi' and 'position' are within the allowed
-        parameters. 'Position' is expected to contain d_spacing values. The function raises exceptions if the dataset is not a Pydidas Dataset or if the units for 'chi' or 'position' do not meet the specified criteria.
+        This function checks a Pydidas Dataset to ensure that the units for 'chi'
+        and 'position' are within the allowed parameters. 'Position' is expected
+        to contain d_spacing values. The function raises exceptions if the dataset is
+        not a Pydidas Dataset or if the units for 'chi' or 'position' do not meet
+        the specified criteria.
 
         Parameters
         ----------
         ds : Dataset
-            A Pydidas Dataset object containing fitting results. It is expected that 'position' contains d_spacing values.
-
+            A Pydidas Dataset object containing fitting results. It is expected
+            that 'position' contains d_spacing values.
 
         Raises
         ------
         UserConfigError
             Raised if the input `ds` is not an instance of Dataset.
         UserConfigError
-            Raised if the units for 'chi' or 'position' are not within the allowed parameters. The allowed units for
-            'position' are 'nm' (nanometers) and 'A' (angstroms). For 'chi', the allowed unit is 'deg' (degrees).
+            Raised if the units for 'chi' or 'position' are not within the allowed
+            parameters. The allowed units for 'position' are 'nm' (nanometers) and
+            'A' (angstroms). For 'chi', the allowed unit is 'deg' (degrees).
 
         Notes
         -----
-        - The function currently only allows 'chi' to be in degrees ('deg'). If there is a need to allow 'chi' in radians
-        ('rad'), adjustments will be necessary in the calculation of sin^2(chi).
+        The function currently only allows 'chi' to be in degrees ('deg').
+        If there is a need to allow 'chi' in radians ('rad'), adjustments will
+        be necessary in the calculation of sin^2(chi).
         """
         self._ensure_dataset_instance(ds)
 
-        ds_units: Dict[str, List[str]] = self._extract_units(ds)
+        ds_units: dict[int, list[str]] = self._extract_units(ds)
 
         # position/pos contains the unit for d_spacing
-        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
+        pos_units_allowed: list[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
         # Only chi in degree is allowed.
-        chi_units_allowed: List[str] = [UNITS_DEGREE]
+        chi_units_allowed: list[str] = [UNITS_DEGREE]
 
         params_to_check = [LABELS_POSITION, LABELS_CHI]
 
@@ -409,96 +548,48 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 if label == LABELS_CHI and unit not in chi_units_allowed:
                     raise UserConfigError(f"Unit {unit} not allowed for {label}.")
 
-    def _get_param_unit_at_index(
-        self, ds_units: Dict[int, Tuple[str, str]], pos_idx: int
-    ) -> Tuple[str, str]:
-        """
-        Retrieve the parameter name and unit from the dictionary `ds_units` at a specified index `pos_idx`.
-
-        This function is designed to extract the parameter name and its corresponding unit from a dictionary where each entry is keyed by an index. It specifically checks that the parameter name at the given index is 'position', ensuring consistency for applications that require this specific parameter. If the parameter at `pos_idx` is not 'position', or if `pos_idx` is not a valid key in the dictionary, appropriate exceptions are raised.
-
-        Parameters
-        ----------
-        ds_units : dict
-            A dictionary with integer keys, where each key-value pair consists of an index (key) and a tuple (value) containing
-            a parameter name and its unit.
-        self._pos_idx : int
-            The index for which the parameter name and unit are to be retrieved.
-
-        Returns
-        -------
-        tuple
-            A tuple containing two elements:
-            - The parameter name (str) at the specified index.
-            - The unit (str) associated with the parameter name.
-
-        Raises
-        ------
-        IndexError
-            If `pos_idx` is not a valid key within `ds_units`, indicating that the index is out of range.
-        ValueError
-            If the parameter name at the specified `pos_idx` is not 'position', indicating a mismatch in expected parameter naming.
-
-        Examples
-        --------
-        >>> ds_units = {0: ('time', 's'), 1: ('position', 'm'), 2: ('temperature', 'K')}
-        >>> get_param_unit_at_index(ds_units, 1)
-        ('position', 'm')
-
-        Notes
-        -----
-        This function is particularly useful in contexts where specific parameters and their units are critical, such as in
-        scientific experiments or data analysis tasks. It enforces the presence of a 'position' parameter at the specified
-        index, aiding in data validation and consistency checks.
-        """
-
-        if pos_idx not in ds_units:
-            raise IndexError(
-                f"pos_idx {pos_idx} is out of range for the dictionary keys"
-            )
-
-        param_info = ds_units[pos_idx]
-        param_name, unit = param_info
-
-        if param_name != LABELS_POSITION:
-            raise ValueError(
-                f"The parameter name at pos_idx {pos_idx} is not 'position'"
-            )
-
-        return param_name, unit
-
     def _extract_d_spacing(self, ds: Dataset, pos_key: int, pos_idx: int) -> Dataset:
         """
-        Extracts the d-spacing value from a multidimensional dataset at a specified position.
+        Extracts the d-spacing value from a ndim Dataset at a specified position.
 
-        This function is designed to extract a specific d-spacing value from a dataset, given the dimension (pos_key) and the index within that dimension (pos_idx) where 'position' information is stored. It utilizes slicing to isolate the desired d-spacing value and adjusts the metadata (data_label and data_unit) of the returned d-spacing to reflect the parameter name and unit at the specified index.
+        This function is designed to extract a specific d-spacing value from
+        a Dataset, given the dimension (pos_key) and the index within that
+        dimension (pos_idx) where 'position' information is stored. It utilizes
+        slicing to isolate the desired d-spacing value and adjusts the metadata
+        (data_label and data_unit) of the returned d-spacing to reflect the
+        parameter name and unit at the specified index.
 
         Parameters
         ----------
         ds : Dataset
             A Dataset object representing a multidimensional array
         pos_key : int
-            The key (dimension) within the dataset that contains 'position' information relevant to d-spacing.
+            The key (dimension) within the dataset that contains 'position'
+            information relevant to d-spacing.
         pos_idx : int
-            The index within the dimension specified by self._pos_key that contains the specific 'position' information for which
-            d-spacing is to be extracted.
+            The index within the dimension specified by self._pos_key that
+            contains the specific 'position' information for which d-spacing
+            is to be extracted.
 
         Returns
         -------
         Dataset
-            A Dataset object containing the extracted d-spacing value. The data_label and data_unit of this object are set
-            to the parameter name and unit at the specified index, respectively.
+            A Dataset object containing the extracted d-spacing value. The
+            data_label and data_unit of this object are set to the parameter name
+            and unit at the specified index, respectively.
 
         Raises
         ------
         IndexError
             If `pos_key` or `pos_idx` are out of bounds for the dimensions of `ds`.
         ValueError
-            If the parameter at `pos_idx` is not 'position', indicating a mismatch in expected parameter naming.
+            If the parameter at `pos_idx` is not 'position', indicating a mismatch
+            in expected parameter naming.
 
         Examples
         --------
-        Assuming `ds` is a Dataset object with dimensions representing different parameters, including 'position':
+        Assuming `ds` is a Dataset object with dimensions representing different
+        parameters, including 'position':
 
         >>> ds = Dataset(...)
         >>> pos_key = 1  # Assuming 'position' information is in the second dimension
@@ -509,19 +600,22 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         Notes
         -----
-        - The function assumes that the input Dataset `ds` includes a method `extract_units` that returns a dictionary
-        mapping dimension indices to (parameter name, unit) tuples.
-        - The slicing operation is performed in a way that isolates the d-spacing value at the specified 'position', and
-        the result is squeezed to remove any singleton dimensions.
+        - The function assumes that the input Dataset `ds` includes a method
+          `extract_units` that returns a dictionary mapping dimension indices
+          to (parameter name, unit) tuples.
+        - The slicing operation is performed in a way that isolates the d-spacing
+          value at the specified 'position', and the result is squeezed to remove
+          any singleton dimensions.
         """
-
         ds_units = self._extract_units(ds)
 
         key_at_pos_idx, unit_at_pos_idx = self._get_param_unit_at_index(
             ds_units, pos_idx
         )
 
-        # slice(None, None, None) is equivalent to "":"" in one dimension of the array. Explicit representation of the slice object shows all three parameters, even if the step parameter is not explicitly provided.
+        # slice(None, None, None) is equivalent to "":"" in one dimension of the
+        # array. Explicit representation of the slice object shows all three
+        # parameters, even if the step parameter is not explicitly provided.
         _slices = []
         for _dim in range(ds.ndim):
             if _dim != pos_key:
@@ -539,43 +633,22 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return d_spacing
 
-    def _extract_and_verify_units(self, ds: Dataset) -> None:
-        chi_units_allowed: List[str] = [UNITS_DEGREE]
+    def _ds_slicing_1d(self, ds: Dataset) -> tuple[np.ndarray, Dataset]:
+        """
+        Get the chi values and d-spacing values from a 1D dataset.
 
-        if (
-            ds.axis_labels[0] not in [LABELS_CHI]
-            or ds.axis_units[0] not in chi_units_allowed
-        ):
-            raise UserConfigError(
-                "The input dataset does not contain chi values in the axis and/or "
-                "the chi values are given in an unsupported unit. Supported units "
-                f"are [{', '.join(chi_units_allowed)}]."
-            )
+        Parameters
+        ----------
+        ds : Dataset
+            The dataset to extract chi and d-spacing values from.
 
-        # position/pos contains the unit for d_spacing
-        pos_units_allowed: List[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
-
-        # Ensure 'position' is in the data_label
-        if LABELS_POSITION not in ds.data_label:
-            raise UserConfigError(f"Key '{LABELS_POSITION}' not found in data_label.")
-
-        parts = ds.data_label.split("/")
-
-        if len(parts) != 2:
-            raise ValueError("Invalid data_label format. Expected 'position / unit'.")
-
-        pos_unit = parts[1].strip()
-
-        if pos_unit not in pos_units_allowed:
-            raise UserConfigError(
-                f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}."
-            )
-
-        # Update the dataset with the verified unit
-        ds.data_label = parts[0].strip()
-        ds.data_unit = pos_unit
-
-    def _ds_slicing_1d(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
+        Returns
+        -------
+        chi : np.ndarray
+            The chi values (i.e. the x-axis values) from the dataset.
+        d_spacing : Dataset
+            The d-spacing values (i.e. the y data) from the dataset.
+        """
         self._ensure_dataset_instance(ds)
         self._extract_and_verify_units(ds)
 
@@ -585,48 +658,54 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return chi, ds
 
-    def _ds_slicing(self, ds: Dataset) -> Tuple[np.ndarray, Dataset]:
+    def _ds_slicing(self, ds: Dataset) -> tuple[np.ndarray, Dataset]:
         """
-        Extracts d-spacing values and associated chi values from a Dataset object for one scan position.
+        Extracts d-spacing values and associated chi values from a Dataset.
+
         The slicing targets chi and d-spacing values of input Dataset.
 
-        This function is designed to work with a Dataset object that contains multidimensional data representing different physical parameters, including d-spacing and chi values. It identifies the relevant dimensions for chi and d-spacing based on predefined criteria, verifies the units of these dimensions, and then extracts the chi values and d-spacing values for a specific scan position. The function ensures that the extracted d-spacing values are one-dimensional, raising an error if this condition is not met. It also checks for and handles potential errors related to the input data type and the slicing of empty arrays.
+        This function is designed to work with a Dataset object that contains
+        multidimensional data representing different physical parameters, including
+        d-spacing and chi values. It identifies the relevant dimensions for chi and
+        d-spacing based on predefined criteria, verifies the units of these
+        dimensions, and then extracts the chi values and d-spacing values for a
+        specific scan position. The function ensures that the extracted d-spacing
+        values are one-dimensional, raising an error if this condition is not met.
+        It also checks for and handles potential errors related to the input data
+        type and the slicing of empty arrays.
 
         Parameters
         ----------
         ds : Dataset
-            A Dataset object containing multidimensional data of one scan position from which d-spacing and chi values are to be extracted.
+            A Dataset object containing multidimensional data of one scan position
+            from which d-spacing and chi values are to be extracted.
 
         Returns
         -------
         chi : array-like
             An array of chi values associated with the extracted d-spacing values.
         d_spacing : array-like
-            An array of d-spacing values extracted from the Dataset object for a specific scan position.
+            An array of d-spacing values extracted from the Dataset object for a
+            specific scan position.
 
         Raises
         ------
         UserConfigError
-            If the input `ds` is not of type Dataset, indicating an incorrect data type was passed.
+            If the input `ds` is not of type Dataset, indicating an incorrect
+            data type was passed.
         ValueError
-            If the dimension of the extracted d_spacing is not 1, indicating a mismatch in expected data structure.
-            If the array of d_spacing values is empty, indicating slicing out of bounds or an empty dataset.
+            If the dimension of the extracted d_spacing is not 1, indicating a
+            mismatch in expected data structure. If the array of d_spacing values
+            is empty, indicating slicing out of bounds or an empty dataset.
 
         Notes
         -----
-        - The function relies on two other functions: `chi_pos_verification` to identify the relevant dimensions for chi and
-        d-spacing, and `chi_pos_unit_verification` to verify the units of these dimensions.
-        - It is essential that the Dataset object `ds` follows a specific structure where chi and d-spacing values can be
-        identified and extracted based on their dimensions and units.
-
-        Examples
-        --------
-        Assuming `ds` is a properly structured Dataset object:
-
-        >>> ds = Dataset(...)
-        >>> chi, d_spacing = ds_slicing(ds)
-        >>> print(chi)
-        >>> print(d_spacing)
+        - The method relies on two other functions: `chi_pos_verification` to
+          identify the relevant dimensions for chi and d-spacing, and
+          `chi_pos_unit_verification` to verify the units of these dimensions.
+        - It is essential that the Dataset object `ds` follows a specific
+          structure where chi and d-spacing values can be identified and extracted
+          based on their dimensions and units.
         """
         self._ensure_dataset_instance(ds)
 
@@ -649,9 +728,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 raise ValueError(
                     "Chi and position keys do not match with previous dataset."
                 )
-
-        # Verification of units for chi and position
-        # checks currently for each dataset
+        # Verification of units for chi and position. Checks currently for each dataset
         self._chi_pos_unit_verification(ds)
 
         # select the chi values
@@ -662,8 +739,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
             ds, self.config._pos_key, self.config._pos_idx
         )
 
-        # Slicing out of indeces/bounds returns an empty array
-        # Check for empty array
+        # Slicing out of indices/bounds returns an empty array. Check for empty array
         if d_spacing.size == 0:
             # Should check for empty arrays in case of slicing beyond bounds
             raise ValueError("Array is empty, slicing out of bounds.")
@@ -675,12 +751,15 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
     def _idx_s2c_grouping(
         self, chi: np.ndarray, tolerance: float = S2C_TOLERANCE
-    ) -> Tuple[int, np.ndarray]:
+    ) -> tuple[int, np.ndarray]:
         """
-        Groups chi angles based on the similarity of their sin^2(chi) values within a specified tolerance.
+        Groups chi angles based on the similarity of their sin^2(chi) values
+        within a specified tolerance.
 
-        This function takes an array of chi angles in degrees and groups them based on the similarity of their sin^2(chi) values.
-        Two chi values belong to the same group if the absolute difference between their sin^2(chi) values is less than the specified tolerance.
+        This function takes an array of chi angles in degrees and groups them
+        based on the similarity of their sin^2(chi) values.
+        Two chi values belong to the same group if the absolute difference between
+        their sin^2(chi) values is less than the specified tolerance.
 
         Parameters
         ----------
@@ -692,10 +771,11 @@ class DspacingSin2chiGrouping(ProcPlugin):
         Returns
         -------
         n_components : int
-            The number of unique groups formed based on the similarity of sin^2(chi) values.
+            The number of unique groups formed based on the similarity of
+            sin^2(chi) values.
         s2c_labels : np.ndarray
-            An array of the same shape as `chi`, where each element is an integer label corresponding to the group of its
-            sin^2(chi) value.
+            An array of the same shape as `chi`, where each element is an
+            integer label corresponding to the group of its sin^2(chi) value.
 
         Raises
         ------
@@ -713,7 +793,10 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         Notes
         -----
-        The function internally computes the sin^2(chi) for each angle in `chi`, then creates a similarity matrix to identify groups of angles with sin^2(chi) values within the specified tolerance. It uses sparse matrix techniques to efficiently handle large arrays of angles.
+        The function internally computes the sin^2(chi) for each angle in `chi`,
+        then creates a similarity matrix to identify groups of angles with
+        sin^2(chi) values within the specified tolerance. It uses sparse matrix
+        techniques to efficiently handle large arrays of angles.
         """
         if not isinstance(chi, np.ndarray):
             raise TypeError("Chi needs to be an np.ndarray.")
@@ -735,47 +818,64 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
     def _group_d_spacing_by_chi(
         self, d_spacing: Dataset, chi: np.ndarray, tolerance: float = S2C_TOLERANCE
-    ) -> Tuple[Dataset, Dataset]:
+    ) -> tuple[Dataset, Dataset]:
         """
-        Groups d-spacing values based on the chi angles and categorize them by the slope of their sin^2(chi) values.
+        Groups d-spacing values based on the chi angles and categorize them by
+        the slope of their sin^2(chi) values.
 
-        This function processes d-spacing values associated with different chi angles. It categorizes these values based on the slope (positive, negative, or near-zero) of their sin^2(chi) function.
-        The function returns two datasets, one for positive slopes and another for negative slopes, each containing the mean d-spacing values for their respective categories.
+        This function processes d-spacing values associated with different chi
+        angles. It categorizes these values based on the slope
+        (positive, negative, or near-zero) of their sin^2(chi) function.
+        The function returns two datasets, one for positive slopes and another
+        for negative slopes, each containing the mean d-spacing values for their
+        respective categories.
 
         Parameters
         ----------
         d_spacing : Dataset
-            A dataset of d-spacing values. This should be an instance of the pydidas Dataset class.
+            A dataset of d-spacing values.
         chi : np.ndarray
             A 1D numpy array of chi angles in degrees.
         tolerance : float, optional
-            The tolerance level for grouping sin^2(chi) values. Defaults to 1e-6. This parameter ensures that all different groups are accurately identified
+            The tolerance level for grouping sin^2(chi) values. Defaults to 1e-6.
+            This parameter ensures that all different groups are accurately identified
             with this tight tolerance.
 
         Returns
         -------
-        tuple
-            A tuple containing two Dataset objects:
-            - The first dataset contains the mean d-spacing values for groups with a positive slope in their sin^2(chi) values.
-            - The second dataset contains the mean d-spacing values for groups with a negative slope in their sin^2(chi) values.
-            Each dataset is associated with sin^2(chi) values as their axis range and labeled accordingly.
+        mean_pos : Dataset
+            A dataset which contains the mean d-spacing values for groups with a
+            positive slope in their sin^2(chi) values.
+        mean_neg : Dataset
+            A dataset contains the mean d-spacing values for groups with a negative
+            slope in their sin^2(chi) values.
 
         Raises
         ------
         TypeError
-            If `chi` is not a numpy ndarray or if `d_spacing` is not an instance of Dataset.
+            If `chi` is not a numpy ndarray or if `d_spacing` is not an instance
+            of Dataset.
 
         Notes
         -----
-        The function internally calculates the sin^2(chi) values and uses them to group the d-spacing values. It identifies the slope of the sin^2(chi) function for each group and categorizes them into positive, negative, or near-zero slopes based on a specified threshold. This categorization is crucial for analyzing the mechanical strain effects in materials science and engineering.
+        The function internally calculates the sin^2(chi) values and uses them to
+        group the d-spacing values. It identifies the slope of the sin^2(chi)
+        function for each group and categorizes them into positive, negative,
+        or near-zero slopes based on a specified threshold. This categorization
+        is crucial for analyzing the mechanical strain effects in materials
+        science and engineering.
 
         Examples
         --------
         >>> import numpy as np
-        >>> from pydidas import Dataset
+        >>> from pydidas.core import Dataset
         >>> chi = np.array([0, 30, 45, 60, 90])
         >>> d_spacing_values = np.array([1.0, 1.1, 1.2, 1.3, 1.4])
-        >>> d_spacing = Dataset(d_spacing_values, axis_ranges={0: chi}, axis_labels={0: 'chi'}, data_label='position', data_unit='nm')
+        >>> d_spacing = Dataset(
+        ...     d_spacing_values,
+        ...     axis_ranges={0: chi}, axis_labels={0: 'chi'},
+        ...     data_label='position', data_unit='nm'
+        ... )
         >>> d_spacing_pos, d_spacing_neg = group_d_spacing_by_chi(d_spacing, chi)
         >>> print(d_spacing_pos, d_spacing_neg)
         """
@@ -822,7 +922,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
         ] = Category.ZERO.value
 
         # Filter
-        # values close to zero (categories == 1) are added to both sides of the maximum or minimum
+        # values close to zero (categories == 1) are added to both sides of the
+        # maximum or minimum
         mask_pos = (categories == Category.POSITIVE.value) | (
             categories == Category.ZERO.value
         )
@@ -831,12 +932,14 @@ class DspacingSin2chiGrouping(ProcPlugin):
         )
 
         # Advanced indexing
-        # Here, s2c_labels specifies the row indices, and np.arange(s2c_num_elements) specifies the column indices.
+        # Here, s2c_labels specifies the row indices, and np.arange(s2c_num_elements)
+        # specifies the column indices.
         s2c_advanced_idx = (self.config._s2c_labels, np.arange(s2c.size))
         # expected shape for future matrices
         s2c_groups_matrix_shape = s2c_unique_labels.size, s2c.size
 
-        # s2c_label_matrix and d_spacing_matrix are useful for quality assurance via visual inspection
+        # s2c_label_matrix and d_spacing_matrix are useful for quality assurance
+        # via visual inspection
         s2c_labels_matrix = np.full(s2c_groups_matrix_shape, np.nan)
         s2c_labels_matrix[*s2c_advanced_idx] = self.config._s2c_labels
 
@@ -889,27 +992,38 @@ class DspacingSin2chiGrouping(ProcPlugin):
             data_unit=d_spacing.data_unit,
         )
 
-        return (d_spacing_pos, d_spacing_neg)
+        return d_spacing_pos, d_spacing_neg
 
     def _combine_sort_d_spacing_pos_neg(
         self, d_spacing_pos: Dataset, d_spacing_neg: Dataset
     ) -> Dataset:
         """
-        Combines and sorts d-spacing datasets with positive and negative slopes based on sin^2(chi) values.
+        Combines and sorts d-spacing datasets with positive and negative slopes
+        based on sin^2(chi) values.
 
-        This function takes two datasets, one representing d-spacing values with positive slopes and the other with negative slopes, with respect to their sin^2(chi) values. It combines these datasets and sorts the combined dataset in ascending order of sin^2(chi) values.
+        This function takes two datasets, one representing d-spacing values with
+        positive slopes and the other with negative slopes, with respect to their
+        sin^2(chi) values. It combines these datasets and sorts the combined
+        dataset in ascending order of sin^2(chi) values.
 
         Parameters
         ----------
         d_spacing_pos : Dataset
-            A Dataset instance containing d-spacing values for positive slope values of sin^2(chi). The dataset must have 'sin^2(chi)' as one of its axis labels.
+            A Dataset instance containing d-spacing values for positive slope
+            values of sin^2(chi). The dataset must have 'sin^2(chi)' as one of
+            its axis labels.
         d_spacing_neg : Dataset
-            A Dataset instance containing d-spacing values for negative slope values of sin^2(chi). Must have the same axis labels and units as `d_spacing_pos`.
+            A Dataset instance containing d-spacing values for negative slope
+            values of sin^2(chi). Must have the same axis labels and units as
+            `d_spacing_pos`.
 
         Returns
         -------
         d_spacing_combined : Dataset
-            A Dataset instance containing the combined and sorted d-spacing values from both input datasets. The combined dataset will have a new axis label distinguishing between positive and negative slopes ('0: d-, 1: d+') and will be sorted based on 'sin^2(chi)' values.
+            A Dataset instance containing the combined and sorted d-spacing values
+            from both input datasets. The combined dataset will have a new axis
+            label distinguishing between positive and negative slopes
+            ('0: d-, 1: d+') and will be sorted based on 'sin^2(chi)' values.
 
         Raises
         ------
@@ -920,14 +1034,27 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         Notes
         -----
-        The function ensures that the input datasets have matching axis labels and ranges for 'sin^2(chi)', which is crucial for the correct combination and sorting of the datasets. The sorting is stable, meaning that the relative order of records with equal values in 'sin^2(chi)' is preserved from the input datasets to the output dataset.
+        The function ensures that the input datasets have matching axis labels and
+        ranges for 'sin^2(chi)', which is crucial for the correct combination and
+        sorting of the datasets. The sorting is stable, meaning that the relative
+        order of records with equal values in 'sin^2(chi)' is preserved from the
+        input datasets to the output dataset.
 
         Examples
         --------
-        >>> d_spacing_pos = Dataset(np.array([1.0, 1.1, 1.2]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: Labels.SIN2CHI})
-        >>> d_spacing_neg = Dataset(np.array([0.9, 0.95, 1.05]), axis_ranges={0: np.array([0.1, 0.2, 0.3])}, axis_labels={0: Labels.SIN2CHI})
-        >>> d_spacing_combined = combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
-        >>> print(d_spacing_combined)
+        >>> d_spacing_pos = Dataset(
+        ...     np.array([1.0, 1.1, 1.2]),
+        ...     axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        ...     axis_labels={0: Labels.SIN2CHI}
+        ... )
+        >>> d_spacing_neg = Dataset(
+        ...     np.array([0.9, 0.95, 1.05]),
+        ...     axis_ranges={0: np.array([0.1, 0.2, 0.3])},
+        ...     axis_labels={0: Labels.SIN2CHI}
+        ... )
+        >>> d_spacing_combined = combine_sort_d_spacing_pos_neg(
+        ...     d_spacing_pos, d_spacing_neg
+        ... )
         """
         # Check if the input is of type Dataset
         if not isinstance(d_spacing_pos, Dataset) or not isinstance(
@@ -981,25 +1108,35 @@ class DspacingSin2chiGrouping(ProcPlugin):
         self, d_spacing_combined: Dataset
     ) -> Dataset:
         """
-        Calculates the mean of d-spacing values and combines them into a final result Dataset.
+        Calculates the mean of d-spacing values and combines them into a single Dataset.
 
-        This function takes a Dataset object containing combined d-spacing values (d-, d+), calculates
-        the average d-spacing values, and combines them into a new Dataset object. The resulting
-        Dataset includes updated axis ranges and labels.
+        This function takes a Dataset object containing combined d-spacing values
+        (d-, d+), calculates the average d-spacing values, and combines them into a
+        new Dataset object. The resulting Dataset includes updated axis ranges and
+        labels.
 
-        Parameters:
-        - d_spacing_combined (Dataset): A Dataset object containing combined d-spacing values (d-, d+).
+        Parameters
+        ----------
+        d_spacing_combined : Dataset
+            A Dataset object containing combined d-spacing values (d-, d+).
 
-        Returns:
-        - Dataset: A new Dataset object that combines the input dataset with the calculated mean of d-spacing values.
+        Returns
+        -------
+        Dataset :
+            A new Dataset object that combines the input dataset with the
+            calculated mean of d-spacing values.
 
-        Raises:
-        - TypeError: If the input is not an instance of Dataset.
-        - ValueError: If the shape of d_spacing_combined is not (2, N).
-        - ValueError: If axis_labels[0] does not match '0: d-, 1: d+'.
-        - ValueError: If axis_labels[1] does not match 'sin^2(chi)'.
+        Raises
+        ------
+        TypeError :
+            If the input is not an instance of Dataset.
+        ValueError :
+            If the shape of d_spacing_combined is not (2, N).
+        ValueError :
+            If axis_labels[0] does not match '0: d-, 1: d+'.
+        ValueError :
+            If axis_labels[1] does not match 'sin^2(chi)'.
         """
-
         if not isinstance(d_spacing_combined, Dataset):
             raise TypeError("Input must be an instance of Dataset.")
 

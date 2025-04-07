@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,18 +16,19 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-A module for calculating the difference in d_spacing of both branches (d(+) - d(-)) vs sin(2*chi) values.
-This module expects the output from the DspacingSin2chiGrouping plugin.
+A module for calculating the difference in d_spacing of the branches d(+) and d(-).
+
+This plugin expects the output from the DspacingSin2chiGrouping plugin as input.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 __all__ = ["DspacingSin_2chi"]
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -47,29 +48,31 @@ PARAMETER_KEEP_RESULTS = "keep_results"
 
 class DspacingSin_2chi(ProcPlugin):
     """
-    This plugin calculates the difference between both d-spacing branches of the psi-splitting method and the corresponding sin(2*chi) values.
+    This plugin calculates the difference between both d-spacing branches of the
+    psi-splitting method and the corresponding sin(2*chi) values.
 
     chi is the azimuthal angle of one diffraction image.
-    The difference in d-spacing is given by d(+) - d(-). sin(2*chi) is calculated directly from sin^2(chi).
 
-    PLEASE NOTE:
-    Using chi instead of psi for the sin^2(psi) method is an approximation in the high-energy X-ray regime.
-    Psi is the angle between between the scattering vector q and the sample normal
-    The geometry of the experiment requires that the sample normal is parallel to the z-axis, i.e. the
-    incoming beam is parallel to the sample surface.
+    The difference in d-spacing is given by d(+) - d(-). sin(2*chi) is calculated
+    directly from sin^2(chi).
 
-    This plugin expects position (d-spacing) in [nm, A].  The expected input data is the result of the DspacingSin2chiGrouping plugin.
-    Results will be stored.
+    PLEASE NOTE: Using chi instead of psi for the sin^2(psi) method is an
+    approximation in the high-energy X-ray regime. Psi is the angle between the
+    scattering vector q and the sample normal. The geometry of the experiment
+    requires that the sample normal is parallel to the z-axis, i.e. the incoming
+    beam is parallel to the sample surface.
 
-    Input:
-    - Output of the DspacingSin2chiGrouping plugin, which groups d-spacing according to the sin^2(chi) method.
-    - The dataset should have three rows corresponding to d(-), d(+), and d_mean.
-    - The d-spacing units should be either nanometers (nm) or angstroms (A)
+    This plugin expects position (d-spacing) in [nm, A]. The expected input data
+    is the result of the DspacingSin2chiGrouping plugin.
+
+    Input must be provided in the format as given by the DspacingSin2chiGrouping plugin:
+
+    - The input dataset should have three rows corresponding to d(-), d(+), and d_mean.
+    - The d-spacing units should be either nanometers (nm) or angstroms (A).
 
     Output:
     - Difference of d-spacing branches (d(+), d(-))
     - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
-
     """
 
     plugin_name = "Difference in d-spacing vs sin(2*chi)"
@@ -79,7 +82,10 @@ class DspacingSin_2chi(ProcPlugin):
     input_data_dim = 2
     output_data_dim = 2
 
-    output_data_label = "0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg"
+    output_data_label = (
+        "0: position_neg; 1: position_pos; "
+        "2: Difference of (position_pos, position_neg)"
+    )
     new_dataset = True
 
     # modification of the keep_results parameter to ensure results are always stored
@@ -88,23 +94,10 @@ class DspacingSin_2chi(ProcPlugin):
     _generics[PARAMETER_KEEP_RESULTS].choices = [True]
     generic_params = _generics
 
-    def execute(self, ds: Dataset, **kwargs: Dict[str, Any]) -> Tuple[Dataset, dict]:
+    def execute(self, ds: Dataset, **kwargs: dict[str, Any]) -> tuple[Dataset, dict]:
         d_output_sin_2chi_method = self._calculate_diff_d_spacing_vs_sin_2chi(ds)
 
         return d_output_sin_2chi_method, kwargs
-
-    def _ensure_dataset_instance(self, ds: Dataset) -> None:
-        """
-        Ensure the input is an instance of Dataset.
-
-        Parameters:
-        ds (Dataset): The input to check.
-
-        Raises:
-        TypeError: If ds is not an instance of Dataset.
-        """
-        if not isinstance(ds, Dataset):
-            raise UserConfigError("Input must be an instance of Dataset.")
 
     def _ensure_axis_labels(self, ds: Dataset) -> None:
         """
@@ -128,41 +121,47 @@ class DspacingSin_2chi(ProcPlugin):
 
     def _calculate_diff_d_spacing_vs_sin_2chi(self, ds: Dataset) -> Dataset:
         """
-        Calculate the difference between d-spacing branches (d(+) - d(-)) and the corresponding sin(2*chi) values.
+        Calculate the difference between d-spacing branches (d(+) - d(-)).
 
-        This method processes the input dataset to compute the difference between the d-spacing branches
-        (d(+) - d(-)) and updates the dataset with the calculated values. The input dataset is expected to
-        have three rows corresponding to d(-), d(+), and d_mean, and the units should be either nanometers (nm)
-        or angstroms (A). The method ensures the input dataset is correctly formatted and labeled.
 
-        Parameters:
-        ds (Dataset): The input dataset containing d-spacing values and corresponding sin^2(chi) values.
+        This method processes the input dataset to compute the difference between
+        the d-spacing branches (d(+) - d(-)) and updates the dataset with the
+        calculated values. The input dataset is expected to have three rows
+        corresponding to d(-), d(+), and d_mean, and the units should be either
+        nanometers (nm) or angstroms (A). The method ensures the input dataset is
+        correctly formatted and labeled.
 
-        Returns:
-        Dataset: The updated dataset with the calculated difference between d-spacing branches and the
-                corresponding sin(2*chi) values.
+        Parameters
+        ----------
+        ds : Dataset
+            The input dataset containing d-spacing values and corresponding
+            sin^2(chi) values.
 
-        Raises:
-        UserConfigError: If the input dataset is not correctly formatted, labeled, or if the units are not
-                        in nanometers (nm) or angstroms (A).
+        Returns
+        -------
+        Dataset:
+            The updated dataset with the calculated difference between d-spacing
+            branches and the corresponding sin(2*chi) values.
+
+        Raises
+        ------
+        UserConfigError
+            If the input dataset is not correctly formatted, labeled, or if the
+            units are not in nanometers (nm) or angstroms (A).
         """
-        # d-, d+
-        # d[1,1]-d[0,1]
-        # vs sin(2*chi)
-        # (d(+) - d(-) ) vs sin(2*psi)"
-        # currently:
-        # (d(+) - d(-) ) vs sin(2*chi)"
-
-        self._ensure_dataset_instance(ds)
+        if not isinstance(ds, Dataset):
+            raise UserConfigError("Input must be an instance of Dataset.")
         self._ensure_axis_labels(ds)
         if ds.shape[0] != 3:
             raise UserConfigError(
-                f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. Please verify your Dataset."
+                f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. "
+                "Please verify your Dataset."
             )
 
         if ds.data_unit not in [UNITS_NANOMETER, UNITS_ANGSTROM]:
             raise UserConfigError(
-                f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset."
+                f"Incoming dataset expected to have units in {UNITS_NANOMETER} "
+                f"or {UNITS_ANGSTROM}. Please verify your Dataset."
             )
 
         delta_d_diff: Dataset = np.diff(ds[:2, :], axis=0)
@@ -170,12 +169,12 @@ class DspacingSin_2chi(ProcPlugin):
         # Overwrite the incoming dataset
         ds[2, :] = delta_d_diff.data
         ds.data_label: str = "Difference of d(+) - d(-)"
-        ds.axis_labels: Dict[int, str] = {
+        ds.axis_labels: dict[int, str] = {
             0: "0: d-, 1: d+, 2: d(+)-d(-)",
             1: LABELS_SIN_2CHI,
         }
 
-        ds.axis_ranges: Dict[int, np.ndarray] = {
+        ds.axis_ranges: dict[int, np.ndarray] = {
             0: np.arange(3),
             1: self._calculate_sin_2chi_values(ds.axis_ranges[1]),
         }
@@ -186,11 +185,15 @@ class DspacingSin_2chi(ProcPlugin):
         """
         Calculate the sin(2*chi) value directly s from the sin^2(chi) values.
 
-        Parameters:
-        s2c_values (np.ndarray): The sin^2(chi) values.
+        Parameters
+        ----------
+        s2c_values : np.ndarray
+            The sin^2(chi) values.
 
-        Returns:
-        np.ndarray: The sin(2*chi) values.
+        Returns
+        -------
+        np.ndarray :
+            The sin(2*chi) values.
         """
         if not isinstance(s2c_values, np.ndarray):
             raise UserConfigError("Input must be an instance of np.ndarray.")

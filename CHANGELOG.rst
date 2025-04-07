@@ -17,6 +17,7 @@ Improvements
 - Added a plugin to load 1d profiles from HDF5 files.
 - Moved calculation of radial unit conversions to core.utils.scattering_geometry
   module.
+- Added plugins for sin^2(chi) residual stress calculations.
 
 Bugfixes
 --------

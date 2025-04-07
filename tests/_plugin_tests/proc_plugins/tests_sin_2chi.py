@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Tests for the DspacingSin_2chi class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
@@ -62,7 +62,7 @@ def base_dataset_factory():
 
         # For x =np.arctan(2) [rad], it is sin^2(x) =  sin(2*x)
         # This simplfies this test case.
-        # Needs probably adjusment in the low energy regime, where psi is used instead of chi.
+        # Needs adjustment in the low energy regime, where psi is used instead of chi.
 
         return Dataset(
             data_array,
@@ -88,8 +88,6 @@ def test_execute_validation_basic(
 ):
     dataset = base_dataset_factory(unit)
     result, _ = plugin_fixture.execute(dataset)
-
-    print("Result axis_ranges[1]", result.axis_ranges[1].shape)
 
     assert result is not None
     assert result.data_unit == expected_unit
@@ -238,31 +236,6 @@ def test_execute_validation(plugin_fixture, case):
     assert result.shape[1] == ds.shape[1]
 
 
-def test__ensure_dataset_instance_valid_input(plugin_fixture):
-    ds = Dataset(
-        np.array([[1, 2, 3], [4, 5, 6], [2.5, 3.5, 4.5]]),
-        axis_labels={0: LABELS_DIM0, 1: LABELS_SIN2CHI},
-        axis_ranges={0: np.arange(3), 1: np.arange(3)},
-        data_label="d_spacing",
-        data_unit=UNITS_NANOMETER,
-    )
-    plugin_fixture._ensure_dataset_instance(ds)
-
-
-@pytest.mark.parametrize(
-    "invalid_input",
-    [
-        [0, 0.25, 0.5, 1],  # list input
-        "0.25",  # string input
-        0.25,  # scalar input
-        None,  # NoneType input
-    ],
-)
-def test__ensure_dataset_instance_invalid_input(plugin_fixture, invalid_input):
-    with pytest.raises(UserConfigError, match="Input must be an instance of Dataset."):
-        plugin_fixture._ensure_dataset_instance(invalid_input)
-
-
 @pytest.fixture
 def valid_ds():
     ds = Dataset(
@@ -360,14 +333,20 @@ def create_dataset():
             {0: LABELS_DIM0, 1: LABELS_SIN2CHI},
             {0: np.arange(2), 1: np.full((3,), 0.5)},
             UNITS_NANOMETER,
-            f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. Please verify your Dataset.",
+            (
+                f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. "
+                "Please verify your Dataset."
+            ),
         ),
         (
             np.array([[1, 2, 3], [4, 5, 6], [2.5, 3.5, 4.5]]),
             {0: LABELS_DIM0, 1: LABELS_SIN2CHI},
             {0: np.arange(3), 1: np.full((3,), 0.5)},
             "invalid_unit",
-            f"Incoming dataset expected to have units in {UNITS_NANOMETER} or {UNITS_ANGSTROM}. Please verify your Dataset.",
+            (
+                f"Incoming dataset expected to have units in {UNITS_NANOMETER} "
+                f"or {UNITS_ANGSTROM}. Please verify your Dataset."
+            ),
         ),
     ],
 )
@@ -380,7 +359,6 @@ def test_calculate_diff_d_spacing_vs_sin_2chi_invalid_input(
     data_unit,
     expected_error_message,
 ):
-    print("Error message:", expected_error_message)
     ds = create_dataset(data, axis_labels, axis_ranges, data_unit)
     with pytest.raises(UserConfigError) as excinfo:
         plugin_fixture._calculate_diff_d_spacing_vs_sin_2chi(ds)
@@ -396,9 +374,9 @@ def test_DspacingSin_2chi_params(plugin_fixture):
     assert plugin.plugin_group == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == 2
     assert plugin.output_data_dim == 2
-    assert (
-        plugin.output_data_label
-        == "0: position_neg, 1: position_pos, 2: Difference of 1: position_pos, 0: position_neg"
+    assert plugin.output_data_label == (
+        "0: position_neg; 1: position_pos; "
+        "2: Difference of (position_pos, position_neg)"
     )
     assert plugin.new_dataset
 

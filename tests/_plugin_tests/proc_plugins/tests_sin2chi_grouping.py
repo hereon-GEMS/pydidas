@@ -98,18 +98,6 @@ def test_plugin_inheritance():
     assert issubclass(plugin_obj, ProcPlugin), "Plugin is not a subclass of ProcPlugin"
 
 
-@pytest.mark.parametrize(
-    "input_shape, result_shape",
-    [
-        ((10, 20), (3, 10)),  # Test case 1
-        ((20, 40), (3, 20)),  # Test case 2
-        ((15, 30), (3, 15)),  # Test case 3
-    ],
-)
-
-# Testing of remaining methods
-
-
 def chi_gen(chi_start, chi_stop, delta_chi):
     if chi_start >= chi_stop:
         raise ValueError("chi_start has to be smaller than chi_stop")

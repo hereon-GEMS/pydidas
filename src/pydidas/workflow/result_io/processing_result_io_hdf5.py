@@ -168,7 +168,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        save_dir : Path | Str
+        save_dir : Path | str
             The full path for the data to be saved.
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
@@ -329,7 +329,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             The result dictionary with nodeID keys and result values.
         scan_context : Scan |None, optional
             The scan context to be used for exporting to file. If None, the
-            global scan context will be use. The default is None.
+            global scan context will be used. The default is None.
         kwargs : dict
             Any kwargs which should be passed to the underlying exporter.
         """
@@ -408,7 +408,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        filename : Path | Str
+        filename : Path | str
             The full filename of the file to be imported.
 
         Returns

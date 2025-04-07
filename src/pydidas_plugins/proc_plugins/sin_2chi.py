@@ -78,7 +78,7 @@ class DspacingSin_2chi(ProcPlugin):
     plugin_name = "Difference in d-spacing vs sin(2*chi)"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    plugin_group = PROC_PLUGIN_STRESS_STRAIN
+    plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = 2
     output_data_dim = 2
 

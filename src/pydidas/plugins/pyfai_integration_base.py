@@ -48,6 +48,7 @@ from pydidas.core.constants import (
     pyFAI_UNITS,
 )
 from pydidas.core.utils import pydidas_logger
+from pydidas.core.utils.scattering_geometry import convert_radial_value
 from pydidas.data_io import import_data
 from pydidas.plugins.base_proc_plugin import ProcPlugin
 
@@ -402,7 +403,7 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         from pydidas.widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
 
-        return PyfaiIntegrationConfigWidget(self)
+        return PyfaiIntegrationConfigWidget
 
     def get_radial_range(self) -> None | tuple[float, float]:
         """
@@ -427,113 +428,58 @@ class pyFAIintegrationBase(ProcPlugin):
             )
         return None
 
-    def get_radial_range_as_r(self) -> None | tuple[float, float]:
+    def get_radial_range_in_units(self, unit: str) -> None | tuple[float, float]:
         """
-        Get the radial range as radius in mm.
-
-        Returns
-        -------
-        range :  None | tuple[float, float]
-            If no range has been set, returns None. Otherwise, the range limits are
-            given as tuple.
-        """
-        _range = self.get_radial_range_as_2theta(unit="rad")
-        if _range is None:
-            return None
-        _dist = self._EXP.get_param_value("detector_dist") * 1e3
-        return (_dist * np.tan(_range[0]), _dist * np.tan(_range[1]))
-
-    def get_radial_range_as_q(self) -> None | tuple[float, float]:
-        """
-        Get the radial range as q in nm^-1.
-
-        Returns
-        -------
-        range :  None | tuple[float, float]
-            If no range has been set, returns None. Otherwise, the range limits are
-            given as tuple.
-        """
-        _range = self.get_radial_range_as_2theta(unit="rad")
-        if _range is None:
-            return None
-        _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
-        _q = (4 * np.pi / _lambda) * np.sin(np.asarray(_range) / 2) * 1e-9
-        return tuple(_q)
-
-    def get_radial_range_as_2theta(
-        self, unit: Literal["deg", "rad"] = "deg"
-    ) -> None | tuple[float, float]:
-        """
-        Get the radial range converted to 2 theta.
+        Get the radial range converted to the given unit.
 
         Parameters
         ----------
-        unit : Literal["deg", "rad"], optional
-            The unit of the range. Must be either "rad" or "deg". The default is "deg".
-
-        Returns
-        -------
-        range :  None | tuple[float, float]
-            If no range has been set, returns None. Otherwise, the range limits are
-            given as tuple.
+        unit : str
+            The new unit of the range.
         """
-        if self.get_param_value("rad_use_range", "Full detector") == "Full detector":
+        _range = self.get_radial_range()
+        if _range is None:
             return None
-        _low = self.get_param_value("rad_range_lower")
-        _high = self.get_param_value("rad_range_upper")
-        _unit = self.get_param_value("rad_unit")
-        _factor = np.pi / 180 if unit == "rad" else 1
-        if _unit == "Q / nm^-1":
-            _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
-            _low = 180 / np.pi * 2 * np.arcsin((_low * 1e9 * _lambda) / (4 * np.pi))
-            _high = 180 / np.pi * 2 * np.arcsin((_high * 1e9 * _lambda) / (4 * np.pi))
-        elif _unit == "r / mm":
-            _dist = self._EXP.get_param_value("detector_dist")
-            _low = 180 / np.pi * np.arctan(_low * 1e-3 / _dist)
-            _high = 180 / np.pi * np.arctan(_high * 1e-3 / _dist)
-        return _low * _factor, _high * _factor
+        _range = convert_radial_value(
+            np.asarray(_range),
+            self.get_param_value("rad_unit"),
+            unit,
+            self._EXP.xray_wavelength_in_m,
+            self._EXP.det_dist_in_m,
+        )
+        return tuple(_range)
 
     def convert_radial_range_values(
         self,
-        from_unit: Literal["2theta / deg", "Q / nm^-1", "r / mm"],
-        to_unit: Literal["2theta / deg", "Q / nm^-1", "r / mm"],
+        from_unit: Literal[
+            "2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"
+        ],
+        to_unit: Literal[
+            "2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"
+        ],
     ):
         """
         Convert and store the radial range values from the given unit to the given unit.
 
         Parameters
         ----------
-        from_unit : Literal["2theta / deg", "Q / nm^-1", "r / mm"]
+        from_unit : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"]
             The previous unit.
-        to_unit : Literal["2theta / deg", "Q / nm^-1", "r / mm"]
+        to_unit : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"]
             The new unit.
         """
-        if from_unit == to_unit:
+        _range = self.get_radial_range()
+        if from_unit == to_unit or _range is None:
             return
-        _low = self.get_param_value("rad_range_lower")
-        _high = self.get_param_value("rad_range_upper")
-        _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
-        _dist = self._EXP.get_param_value("detector_dist") * 1e3
-        if from_unit == "2theta / deg" and to_unit == "Q / nm^-1":
-            _low = (4 * np.pi / _lambda) * np.sin(_low * np.pi / 180 / 2) * 1e-9
-            _high = (4 * np.pi / _lambda) * np.sin(_high * np.pi / 180 / 2) * 1e-9
-        elif from_unit == "2theta / deg" and to_unit == "r / mm":
-            _low = _dist * np.tan(_low * np.pi / 180)
-            _high = _dist * np.tan(_high * np.pi / 180)
-        elif from_unit == "Q / nm^-1" and to_unit == "2theta / deg":
-            _low = 180 / np.pi * 2 * np.arcsin(1e9 * _low * _lambda / 4 / np.pi)
-            _high = 180 / np.pi * 2 * np.arcsin(1e9 * _high * _lambda / 4 / np.pi)
-        elif from_unit == "Q / nm^-1" and to_unit == "r / mm":
-            _low = _dist * np.tan(2 * np.arcsin(1e9 * _low * _lambda / 4 / np.pi))
-            _high = _dist * np.tan(2 * np.arcsin(1e9 * _high * _lambda / 4 / np.pi))
-        elif from_unit == "r / mm" and to_unit == "2theta / deg":
-            _low = 180 / np.pi * np.arctan(_low / _dist)
-            _high = 180 / np.pi * np.arctan(_high / _dist)
-        elif from_unit == "r / mm" and to_unit == "Q / nm^-1":
-            _low = (4 * np.pi / _lambda) * np.sin(np.arctan(_low / _dist) / 2) * 1e-9
-            _high = (4 * np.pi / _lambda) * np.sin(np.arctan(_high / _dist) / 2) * 1e-9
-        self.set_param_value("rad_range_lower", _low)
-        self.set_param_value("rad_range_upper", _high)
+        _range = convert_radial_value(
+            np.asarray(_range),
+            from_unit,
+            to_unit,
+            self._EXP.xray_wavelength_in_m,
+            self._EXP.det_dist_in_m,
+        )
+        self.set_param_value("rad_range_lower", _range[0])
+        self.set_param_value("rad_range_upper", _range[1])
 
 
 pyFAIintegrationBase.register_as_base_class()

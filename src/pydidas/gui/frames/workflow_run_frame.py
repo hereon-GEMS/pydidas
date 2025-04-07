@@ -323,6 +323,8 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)
+        self.param_composite_widgets["saving_format"].setVisible(not running)
+        self.param_composite_widgets["enable_overwrite"].setVisible(not running)
 
     def __update_autosave_widget_visibility(self):
         """

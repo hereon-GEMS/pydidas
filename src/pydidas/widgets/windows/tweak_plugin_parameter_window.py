@@ -37,9 +37,9 @@ from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.parameter_config import (
-    EditPluginParametersWidget,
     ParameterEditCanvas,
 )
+from pydidas.widgets.plugin_config_widgets import EditPluginParametersWidget
 from pydidas.widgets.scroll_area import ScrollArea
 from pydidas.widgets.silx_plot import PydidasPlotStack
 from pydidas.widgets.windows.show_detailed_plugin_results_window import (
@@ -161,9 +161,8 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.__plugin = plugin
         self.__original_plugin_params = copy.deepcopy(plugin.params)
         self._config["initial_results"] = results
-        self._widgets["plugin_param_edit"].configure_plugin(plugin.node_id, plugin)
-        self._widgets["plugin_param_edit"]._widgets["restore_defaults"].setVisible(
-            False
+        self._widgets["plugin_param_edit"].configure_plugin(
+            plugin.node_id, plugin, allow_restore_defaults=False
         )
         self._widgets["plot"].plot_data(
             results, title=f"{self.__plugin.plugin_name} results", replace=True

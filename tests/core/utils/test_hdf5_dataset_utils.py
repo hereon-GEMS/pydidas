@@ -33,7 +33,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from pydidas.core import Dataset
+from pydidas.core import Dataset, FileReadError
 from pydidas.core.utils import get_random_string
 from pydidas.core.utils.hdf5_dataset_utils import (
     _get_hdf5_file_and_dataset_names,
@@ -155,7 +155,7 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         self.assertEqual(nbytes, self._data.nbytes)
 
     def test_get_hdf5_metadata_meta__wrong_key(self):
-        with self.assertRaises(KeyError):
+        with self.assertRaises(FileReadError):
             get_hdf5_metadata(self._ref + "/more", "dtype")
 
     def test_get_hdf5_metadata_meta__multiples(self):

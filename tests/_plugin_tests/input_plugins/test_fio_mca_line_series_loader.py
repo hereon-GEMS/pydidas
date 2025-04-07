@@ -131,23 +131,6 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
             plugin.get_param_value("_counted_files_per_directory"), _new_n_files
         )
 
-    def test_determine_header_size(self):
-        plugin = self.create_standard_plugin()
-        plugin.update_filename_string()
-        plugin._check_files_per_directory()
-        plugin._determine_header_size()
-        with open(plugin.get_filename(0), "r") as f:
-            _n_header_lines = len(f.readlines()) - self._n_channels
-        self.assertEqual(_n_header_lines, plugin._config["header_lines"])
-
-    def test_determine_header_size__file_does_not_exist(self):
-        plugin = self.create_standard_plugin()
-        plugin.set_param_value("fio_suffix", "_something_s#.fio")
-        plugin.update_filename_string()
-        plugin._check_files_per_directory()
-        with self.assertRaises(FileReadError):
-            plugin._determine_header_size()
-
     def test_get_filename__start(self):
         plugin = self.create_standard_plugin()
         plugin.update_filename_string()
@@ -207,9 +190,9 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         _delta = 2.5
         _offset = 150
         plugin = self.create_standard_plugin()
-        plugin.set_param_value("use_absolute_energy", True)
-        plugin.set_param_value("energy_offset", _offset)
-        plugin.set_param_value("energy_delta", _delta)
+        plugin.set_param_value("use_custom_xscale", True)
+        plugin.set_param_value("x0_offset", _offset)
+        plugin.set_param_value("x_delta", _delta)
         plugin.pre_execute()
         _data, _ = plugin.get_frame(_i_image)
         self.assertTrue(np.all(_data == _i_image))
@@ -223,9 +206,9 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         _offset = 150
 
         plugin = self.create_standard_plugin()
-        plugin.set_param_value("use_absolute_energy", True)
-        plugin.set_param_value("energy_offset", _offset)
-        plugin.set_param_value("energy_delta", _delta)
+        plugin.set_param_value("use_custom_xscale", True)
+        plugin.set_param_value("x0_offset", _offset)
+        plugin.set_param_value("x_delta", _delta)
         plugin.set_param_value("use_roi", True)
         plugin.set_param_value("roi_xlow", 128)
         plugin.set_param_value("roi_xhigh", 256)

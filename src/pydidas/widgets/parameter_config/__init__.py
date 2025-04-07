@@ -25,8 +25,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
-from .edit_plugin_parameters_widget import *
 from .parameter_edit_canvas import *
 from .parameter_widget import *
 from .parameter_widgets_mixin import *
@@ -36,12 +34,10 @@ __all__ = (
     parameter_widget.__all__
     + parameter_edit_canvas.__all__
     + parameter_widgets_mixin.__all__
-    + edit_plugin_parameters_widget.__all__
 )
 
 del (
     parameter_widget,
     parameter_edit_canvas,
     parameter_widgets_mixin,
-    edit_plugin_parameters_widget,
 )

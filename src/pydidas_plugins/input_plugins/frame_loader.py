@@ -35,7 +35,7 @@ from pydidas.plugins import InputPlugin
 
 class FrameLoader(InputPlugin):
     """
-    Load data frames from files with a single image in each, for example tif files.
+    Load 2d data frames from files with a single image in each, for example tif files.
 
     This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.

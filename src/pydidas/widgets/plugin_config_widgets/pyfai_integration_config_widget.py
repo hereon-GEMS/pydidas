@@ -32,33 +32,46 @@ from functools import partial
 from typing import Literal, NewType
 
 from qtpy import QtCore
-from qtpy.QtWidgets import QStyle
 
-from pydidas.core.utils import apply_qt_properties
-from pydidas.widgets.factory import CreateWidgetsMixIn
-from pydidas.widgets.parameter_config import ParameterEditCanvas
+from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
+    GenericPluginConfigWidget,
+)
 from pydidas.widgets.windows import SelectIntegrationRegionWindow
 
 
 BasePlugin = NewType("BasePlugin", type)
 
 
-class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
+class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
     """
     The PyfaiIntegrationConfigWidget is the custom widget to modify the Parameters for
     pyFAI integration plugins.
     """
 
-    def __init__(self, plugin: BasePlugin, *args: tuple, **kwargs: dict):
-        ParameterEditCanvas.__init__(self, **kwargs)
-        CreateWidgetsMixIn.__init__(self)
-        apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
-        self.plugin = plugin
+    def create_all_widgets(self):
+        """
+        Create all widgets for the plugin configuration.
+        """
         self._window_edit = None
         self._window_show = None
-        for _key, _param in self.plugin.params.items():
-            if _key not in self.plugin.advanced_parameters:
-                self.create_param_widget(_param, linebreak=_key == "label")
+        self.create_header()
+        self.create_param_config_widgets()
+        self.create_button(
+            "but_show_integration_region",
+            "Show selected integration region",
+            clicked=partial(self._select_integration_region, allow_edit=False),
+        )
+        self.create_button(
+            "but_select_integration_region",
+            "Select integration region in image",
+            clicked=partial(self._select_integration_region, allow_edit=True),
+        )
+        if self._use_advanced_params:
+            self.create_advanced_param_config_widgets()
+
+    def connect_signals(self):
+        """Connect the signals of the widgets."""
+        GenericPluginConfigWidget.connect_signals(self)
         if "azi_use_range" in self.param_composite_widgets:
             self.param_composite_widgets["azi_use_range"].io_edited.connect(
                 self._toggle_azimuthal_ranges_visibility
@@ -70,29 +83,9 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             self.param_composite_widgets["rad_use_range"].io_edited.connect(
                 self._toggle_radial_ranges_visibility
             )
-        self._toggle_radial_ranges_visibility(
-            self.plugin.get_param_value("rad_use_range")
-        )
-        self.create_button(
-            "but_show_integration_region",
-            "Show selected integration region",
-            clicked=partial(self._select_integration_region, allow_edit=False),
-        )
-        self.create_button(
-            "but_select_integration_region",
-            "Select integration region in image",
-            clicked=partial(self._select_integration_region, allow_edit=True),
-        )
-        self.__advanced_hidden = True
-        self.create_button(
-            "but_toggle_advanced_params",
-            "Display advanced Parameters",
-            clicked=self.__toggle_advanced_params,
-            icon="qt-std::SP_TitleBarUnshadeButton",
-        )
-        for _key in self.plugin.advanced_parameters:
-            _param = self.plugin.get_param(_key)
-            self.create_param_widget(_param, visible=False)
+            self._toggle_radial_ranges_visibility(
+                self.plugin.get_param_value("rad_use_range")
+            )
 
     @QtCore.Slot(str)
     def _toggle_azimuthal_ranges_visibility(
@@ -125,27 +118,6 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         _visibility = new_selection == "Specify radial range"
         self.toggle_param_widget_visibility("rad_range_lower", _visibility)
         self.toggle_param_widget_visibility("rad_range_upper", _visibility)
-
-    @QtCore.Slot()
-    def __toggle_advanced_params(self):
-        """
-        Toggle the visiblity of the advanced Parameters.
-        """
-        self.__advanced_hidden = not self.__advanced_hidden
-        for _key in self.plugin.advanced_parameters:
-            self.toggle_param_widget_visibility(_key, not self.__advanced_hidden)
-        self._widgets["but_toggle_advanced_params"].setText(
-            "Display advanced Parameters"
-            if self.__advanced_hidden
-            else "Hide advanced Parameters"
-        )
-        self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(
-                QStyle.SP_TitleBarUnshadeButton
-                if self.__advanced_hidden
-                else QStyle.SP_TitleBarShadeButton
-            )
-        )
 
     @QtCore.Slot()
     def _select_integration_region(self, allow_edit: bool = True):

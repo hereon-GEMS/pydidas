@@ -28,6 +28,7 @@ __status__ = "Production"
 
 
 # import __all__ items from modules:
+from . import scattering_geometry
 from .clipboard_ import *
 from .decorators import *
 from .file_checks import *

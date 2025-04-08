@@ -56,10 +56,10 @@ pyFAI_METHOD = {
     "CSR OpenCL": ("bbox", "csr", "opencl"),
     "CSR full": ("full", "csr", "cython"),
     "CSR full OpenCL": ("full", "csr", "opencl"),
-    "CSC": ("bbox", "csc", "cython"),
-    "CSC OpenCL": ("bbox", "csc", "opencl"),
-    "CSC full": ("full", "csc", "cython"),
-    "CSC full OpenCL": ("full", "csc", "opencl"),
+    "LUT": ("bbox", "lut", "cython"),
+    "LUT OpenCL": ("bbox", "lut", "opencl"),
+    "LUT full": ("full", "lut", "cython"),
+    "LUT full OpenCL": ("full", "lut", "opencl"),
 }
 
 

@@ -139,7 +139,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     as input data. The limit for azimuthal points is set to 3000.
     """
 
-    plugin_name = "Group d-spacing according to sin^2(chi) method"
+    plugin_name = "sin^2(chi) grouping"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN

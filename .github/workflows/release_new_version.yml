@@ -161,7 +161,7 @@ jobs:
     if: needs.check_if_new_version.outputs.is_new_version == 'true'
     environment:
       name: pypi
-      url: https:/pypi.org/p/pydidas
+      url: https://pypi.org/p/pydidas
     permissions:
       id-token: write
     steps:

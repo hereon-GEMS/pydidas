@@ -106,7 +106,7 @@ platformdirs==4.3.2
     #   pytools
 pydata-sphinx-theme==0.15.4
     # via -r requirements.in
-pyfai==2024.9.0
+pyfai==2025.3.0
     # via -r requirements.in
 pygments==2.18.0
     # via

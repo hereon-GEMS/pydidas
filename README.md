@@ -48,6 +48,11 @@ There is no need to prepare the environment further.
 You will require a pydidas wheel file to install it using pip. If you have not
 downloaded a build wheel file, you need to prepare one prior to installation.
 
+### Using pip
+Pydidas is available on PyPI and can be installed simply with 
+
+    python -m pip install pydidas
+
 #### Using a python wheel
 
 Wheels for pydidas are available on the 

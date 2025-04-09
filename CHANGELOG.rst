@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v25.mm.dd
+v25.04.08
 =========
 
 Improvements
@@ -34,7 +34,7 @@ Bugfixes
 - Fixed an issue which occured when running workflows with no nodes with results.
 - Fixed an issue where selecting a filename would introduce a trailing space.
 - Fixed missing Parameters for output formats and overwriting in WorkflowRunFrame
-
+- Fixed an issue in the pyFAI names where the LUT entries were missing.
 
 v25.03.17
 =========

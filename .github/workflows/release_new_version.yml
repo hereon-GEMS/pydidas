@@ -153,15 +153,15 @@ jobs:
             ref: "refs/tags/v${{ needs.check_if_new_version.outputs.version_number }}",
           });
 
-  publish_to_pypi_test:
+  publish_to_pypi:
     runs-on: ubuntu-latest
     needs:
       - check_if_new_version
       - add_python_wheel_to_release
     if: needs.check_if_new_version.outputs.is_new_version == 'true'
     environment:
-      name: testpypi
-      url: https:/test.pypi.org/p/pydidas
+      name: pypi
+      url: https://pypi.org/p/pydidas
     permissions:
       id-token: write
     steps:
@@ -179,7 +179,5 @@ jobs:
         with:
           name: python-package-distribution
           path: dist/
-      - name: Publish package distributions to TestPyPI
+      - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/

@@ -1,0 +1,876 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The widgets.workflow_edit sub-package &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=4307831b"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/widgets/workflow_edit';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The widgets.windows sub-package" href="windows.html" />
+    <link rel="prev" title="The widgets.silx_plot sub-package" href="silx_plot.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <script>document.write(`<img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../concepts.html">Key concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../package_structure.html">Package structure</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.workflow_edit sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../code_documentation.html" class="nav-link">Code documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../widgets.html" class="nav-link">The widgets sub-package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">The...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pydidas.widgets.workflow_edit">
+<span id="the-widgets-workflow-edit-sub-package"></span><h1>The widgets.workflow_edit sub-package<a class="headerlink" href="#module-pydidas.widgets.workflow_edit" title="Link to this heading">#</a></h1>
+<p>Package with widgets required for editing the workflow and selecting plugins.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginCollectionBrowser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">PluginCollectionBrowser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginCollectionBrowser" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></p>
+<p>A widget allows to browse through the list of available plugins.</p>
+<p>The PluginCollectionBrowser includes both a QTreeView to browse through
+the list of available plugins as well as a QTextEdit to show a description
+of the plugin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>QWidget</em><em>, </em><em>optional</em>) – The parent widget. The default is None.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments. Supported keywords are generic keywords and
+“collection” to set the linked plugin collection. By default, this should
+not be changed and will default to the PluginCollection singleton.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginCollectionBrowser.display_plugin_description">
+<span class="sig-name descname"><span class="pre">display_plugin_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginCollectionBrowser.display_plugin_description" title="Link to this definition">#</a></dt>
+<dd><p>Display the plugin description of the selected plugin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the plugin.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">PluginInWorkflowBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFrame</span></code></p>
+<p>Widget to represent a Plugin in the WorkflowTree.</p>
+<p>The widget displays plugin name, title and includes a delete button to remove the
+Plugin or the full branch from the workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plugin_name</strong> (<em>str</em>) – The name of the Plugin class.</p></li>
+<li><p><strong>widget_id</strong> (<em>int</em>) – The widget ID. This is the same as the corresponding node ID.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Additional supported keyword arguments are:</p>
+<dl class="simple">
+<dt>parent<span class="classifier">Union[QtWidgets.QWidget, None], optional</span></dt><dd><p>The widget’s parent. The default is None.</p>
+</dd>
+<dt>label<span class="classifier">str, optional</span></dt><dd><p>The node’s label. The default is an empty string.</p>
+</dd>
+<dt>standard_size<span class="classifier">tuple[int, int]</span></dt><dd><p>The standard size in pixel.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.delete" title="Link to this definition">#</a></dt>
+<dd><p>Send the delete request to the WorkflowTreeEditManager.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.dragEnterEvent">
+<span class="sig-name descname"><span class="pre">dragEnterEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.dragEnterEvent" title="Link to this definition">#</a></dt>
+<dd><p>Enable dragging of this widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The drag event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.dropEvent">
+<span class="sig-name descname"><span class="pre">dropEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.dropEvent" title="Link to this definition">#</a></dt>
+<dd><p>Allow dropping the widget on other WorkflowNode widgets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The drop event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.mouseMoveEvent">
+<span class="sig-name descname"><span class="pre">mouseMoveEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.mouseMoveEvent" title="Link to this definition">#</a></dt>
+<dd><p>Implement a mouse move event to drag the plugins to a new position in the
+WorkflowTree.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.mousePressEvent">
+<span class="sig-name descname"><span class="pre">mousePressEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QMouseEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.mousePressEvent" title="Link to this definition">#</a></dt>
+<dd><p>Extend the generic mousePressEvent by an activation signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The original event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.new_widget_selected">
+<span class="sig-name descname"><span class="pre">new_widget_selected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.new_widget_selected" title="Link to this definition">#</a></dt>
+<dd><p>Select or deselect the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>selection</strong> (<em>bool</em>) – Flag whether the widget has been selected (True) or deselected
+(False).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.receive_consistent_signal">
+<span class="sig-name descname"><span class="pre">receive_consistent_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.receive_consistent_signal" title="Link to this definition">#</a></dt>
+<dd><p>Handle the node consistent signal set the stylesheets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>widget_ids</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – The widget node ID.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.receive_inconsistent_signal">
+<span class="sig-name descname"><span class="pre">receive_inconsistent_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.receive_inconsistent_signal" title="Link to this definition">#</a></dt>
+<dd><p>Handle the node inconsistent signal set the stylesheets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*widget_ids</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – The widget node IDs which are inconsistent.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_plugin">
+<span class="sig-name descname"><span class="pre">update_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_plugin" title="Link to this definition">#</a></dt>
+<dd><p>Update the plugin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plugin_name</strong> (<em>str</em>) – The type of the new plugin.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_text">
+<span class="sig-name descname"><span class="pre">update_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_text" title="Link to this definition">#</a></dt>
+<dd><p>Update the text for node label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node_id</strong> (<em>int</em>) – The unique node ID.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – The new label for the workflow node.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginRegistryTreeWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">PluginRegistryTreeWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_registry.PluginRegistry"><span class="pre">PluginRegistry</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginRegistryTreeWidget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QTreeView</span></code></p>
+<p>A QTreeView which displays all registered plugins sorted according to plugin type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>Union</em><em>[</em><em>QWidget</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The Qt parent widget. The default is None.</p></li>
+<li><p><strong>collection</strong> (<em>Union</em><em>[</em><em>pydidas.PluginCollection</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The plugin collection. Normally, this defaults to the generic
+plugin collection and should not be changed by the user.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional keyword arguments for widget modifications.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginRegistryTreeWidget.update_collection">
+<span class="sig-name descname"><span class="pre">update_collection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginRegistryTreeWidget.update_collection" title="Link to this definition">#</a></dt>
+<dd><p>Update the model based on the PluginCollection.</p>
+<p>This method/slot is called for example after changing the available plugins.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginRegistryTreeWidget.update_filter">
+<span class="sig-name descname"><span class="pre">update_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginRegistryTreeWidget.update_filter" title="Link to this definition">#</a></dt>
+<dd><p>Update the Plugin search filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter_text</strong> (<em>str</em>) – The new search filter.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.SelectNewPluginWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">SelectNewPluginWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_registry.PluginRegistry"><span class="pre">PluginRegistry</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.SelectNewPluginWidget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></p>
+<p>A widget for displaying all available Plugins and to allow the user to select one.</p>
+<p>SelectNewPluginWidget includes a search filter field and a QTreeView which
+displays all the available plugins.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.SelectNewPluginWidget.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.SelectNewPluginWidget.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Adjust the window based on the new font metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>char_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>char_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.WorkflowTreeCanvas">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">WorkflowTreeCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFrame</span></code></p>
+<p>The WorkflowTreeCanvas is the widget to draw the workflow tree and hold
+the individual plugin widgets. It is also responsible to draw the lines
+between plugins, if required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> (<em>QtWidget</em><em>, </em><em>optional</em>) – The parent widget. The default is None.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.WorkflowTreeCanvas.draw_connections">
+<span class="sig-name descname"><span class="pre">draw_connections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.draw_connections" title="Link to this definition">#</a></dt>
+<dd><p>Draw connections between plugins.</p>
+<p>This method will draw connections between all parent and child plugins.
+Relationships must be supplied through the
+self.update_widget_connections method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.WorkflowTreeCanvas.paintEvent">
+<span class="sig-name descname"><span class="pre">paintEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.paintEvent" title="Link to this definition">#</a></dt>
+<dd><p>Overload the paintEvent to also draw lines connecting parent and child plugins.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The calling event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.WorkflowTreeCanvas.sizeHint">
+<span class="sig-name descname"><span class="pre">sizeHint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QSize</span></span></span><a class="headerlink" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.sizeHint" title="Link to this definition">#</a></dt>
+<dd><p>Set the Qt sizeHint to be the widget’s size.</p>
+<p>Note that the sizeHint is arbitrary large because it limits the QScrollArea’s
+size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The size of the widget.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QtCore.QSize</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.WorkflowTreeCanvas.update_widget_connections">
+<span class="sig-name descname"><span class="pre">update_widget_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget_conns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.update_widget_connections" title="Link to this definition">#</a></dt>
+<dd><p>Store updated widget connections.</p>
+<p>This method will store updated widget connections internally and
+call the update method to draw these connections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>widget_conns</strong> (<em>list</em>) – A list with coordinate pairs to draw connections.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="silx_plot.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The widgets.silx_plot sub-package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="windows.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The widgets.windows sub-package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginCollectionBrowser"><code class="docutils literal notranslate"><span class="pre">PluginCollectionBrowser</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginCollectionBrowser.display_plugin_description"><code class="docutils literal notranslate"><span class="pre">PluginCollectionBrowser.display_plugin_description</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.delete"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.delete</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.dragEnterEvent"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.dragEnterEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.dropEvent"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.dropEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.mouseMoveEvent"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.mouseMoveEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.mousePressEvent"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.mousePressEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.new_widget_selected"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.new_widget_selected</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.receive_consistent_signal"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.receive_consistent_signal</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.receive_inconsistent_signal"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.receive_inconsistent_signal</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_plugin"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.update_plugin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_text"><code class="docutils literal notranslate"><span class="pre">PluginInWorkflowBox.update_text</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginRegistryTreeWidget"><code class="docutils literal notranslate"><span class="pre">PluginRegistryTreeWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginRegistryTreeWidget.update_collection"><code class="docutils literal notranslate"><span class="pre">PluginRegistryTreeWidget.update_collection</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.PluginRegistryTreeWidget.update_filter"><code class="docutils literal notranslate"><span class="pre">PluginRegistryTreeWidget.update_filter</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.SelectNewPluginWidget"><code class="docutils literal notranslate"><span class="pre">SelectNewPluginWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.SelectNewPluginWidget.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">SelectNewPluginWidget.process_new_font_metrics</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas"><code class="docutils literal notranslate"><span class="pre">WorkflowTreeCanvas</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.draw_connections"><code class="docutils literal notranslate"><span class="pre">WorkflowTreeCanvas.draw_connections</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.paintEvent"><code class="docutils literal notranslate"><span class="pre">WorkflowTreeCanvas.paintEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.sizeHint"><code class="docutils literal notranslate"><span class="pre">WorkflowTreeCanvas.sizeHint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas.update_widget_connections"><code class="docutils literal notranslate"><span class="pre">WorkflowTreeCanvas.update_widget_connections</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/widgets/workflow_edit.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/code/api/widgets/workflow_edit.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

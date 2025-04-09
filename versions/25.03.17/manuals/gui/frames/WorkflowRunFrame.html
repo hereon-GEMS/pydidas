@@ -1,0 +1,1074 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Run full workflow frame &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=4307831b"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'manuals/gui/frames/WorkflowRunFrame';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="View workflow results frame" href="ViewResultsFrame.html" />
+    <link rel="prev" title="Workflow test frame" href="WorkflowTestFrame.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <script>document.write(`<img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../commandline_start.html">Command line manuals</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../menu.html">The menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../editing_parameters.html">Editing Parameters in the GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../silx/plots.html">Plots</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="frames_main.html">Frames</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DefineDiffractionExpFrame.html">Define diffraction experiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DefineScanFrame.html">Define scan frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Run full workflow frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../windows/windows_main.html">Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recipes/pydidas_processing.html">Using the pydidas processing pipeline</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../manuals_main.html" class="nav-link">User manuals</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="frames_main.html" class="nav-link">Frames</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Run full...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="run-full-workflow-frame">
+<span id="workflow-run-frame"></span><h1>Run full workflow frame<a class="headerlink" href="#run-full-workflow-frame" title="Link to this heading">#</a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#control-elements" id="id3">Control elements</a></p>
+<ul>
+<li><p><a class="reference internal" href="#automatic-saving" id="id4">Automatic saving</a></p></li>
+<li><p><a class="reference internal" href="#running-the-workflow" id="id5">Running the workflow</a></p></li>
+<li><p><a class="reference internal" href="#workflow-result-selection" id="id6">Workflow result selection</a></p></li>
+<li><p><a class="reference internal" href="#export-of-results" id="id7">Export of results</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#data-display" id="id8">Data display</a></p>
+<ul>
+<li><p><a class="reference internal" href="#pydidas-1d-plot" id="id9">Pydidas 1D plot</a></p></li>
+<li><p><a class="reference internal" href="#pydidas-2d-plot" id="id10">Pydidas 2D plot</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<p>The <em>Run full workflow</em> frame allows to execute the current workflow with the
+current scan and experiment configurations.</p>
+<p>The “Run full workflow” frame is split in two main parts. On the left are the
+controls for the configuration of running the Workflow, the automatic saving
+as well as for manual data export. The right part of the frame is taken by a
+visualization widget for 1d plots or 2d images, depending on the result
+selection.</p>
+<a class="reference internal image-reference" href="../../../_images/overview6.png"><img alt="../../../_images/overview6.png" class="align-center" src="../../../_images/overview6.png" style="width: 600px;" />
+</a>
+<p>The configuration on the left holds four different functionalities which will be
+described in more detail below:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Configuration of the automatic result saving</p></li>
+<li><p>Running the workflow</p></li>
+<li><p>Selecting the results to be plotted</p></li>
+<li><p>Manually exporting results</p></li>
+</ul>
+</div></blockquote>
+<p>In addition, the data display allows to visualize one-dimensional and
+two-dimensional results on the fly.</p>
+<section id="control-elements">
+<h2>Control elements<a class="headerlink" href="#control-elements" title="Link to this heading">#</a></h2>
+<section id="automatic-saving">
+<h3>Automatic saving<a class="headerlink" href="#automatic-saving" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/no_autosave.png" class="align-left" src="../../../_images/no_autosave.png" />
+<p>The configuration of the automatic saving is the topmost item on the left of the
+frame. By default, autosaving the results is disabled and only the toggle
+Parameter to enable it is visible. Enabling the autosave will show two
+additional Parameter configuration widgets to select the saving directory and
+the type of files.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The autosave directory must be an empty directory at the start of the
+processing, even though this condition is not enforced at the time of
+selection.</p>
+</div>
+<img alt="../../../_images/autosave_active.png" class="align-left" src="../../../_images/autosave_active.png" />
+<p>Files will be automatically created based on different autosave formats selected
+in the Parameter.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Automatic saving is fairly slow because of the required disk write access
+for every processed scan point and is only advisable for workflows which
+have very long processing times.</p>
+</div>
+</section>
+<section id="running-the-workflow">
+<h3>Running the workflow<a class="headerlink" href="#running-the-workflow" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/to_start.png" class="align-left" src="../../../_images/to_start.png" />
+<p>The processing can be started with a click on the corresponding button. This
+will show a progress bar and an “Abort” button.</p>
+<img alt="../../../_images/active.png" class="align-left" src="../../../_images/active.png" />
+<p>The “Abort” button will let the user send termination signals to the worker
+processes and - depending on the type of calculations - may take a while to take
+effect because the current process might not accept the termination signal
+until it starts a new job.</p>
+</section>
+<section id="workflow-result-selection">
+<h3>Workflow result selection<a class="headerlink" href="#workflow-result-selection" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/no_selection.png" class="align-left" src="../../../_images/no_selection.png" />
+<p>Results from individual nodes can be selected from the drop-down menu. Opening
+it will show a list of all nodes in the WorkflowTree with stored results (see
+image below).</p>
+<img alt="../../../_images/dropdown1.png" class="align-right" src="../../../_images/dropdown1.png" />
+<img alt="../../../_images/overview4.png" class="align-left" src="../../../_images/overview4.png" />
+<p>Once a node has been selected, additional information for these node’s results
+will be displayed, see the image to the left.</p>
+<section id="result-arrangement">
+<h4>Result Arrangement<a class="headerlink" href="#result-arrangement" title="Link to this heading">#</a></h4>
+<img alt="../../../_images/timeline.png" class="align-left" src="../../../_images/timeline.png" />
+<p>For some applications, it can be interesting to arrange the results not by
+scan shape but as a timeline, effictively collapsing all scan dimensions to a
+single frame index dimension. Changing between the two is done by selecting the
+corrsponding radio button item. This will also trigger an update of the results
+metadata, as seen on the image to the left. Note that the first dimension is
+now labelled <em>Chronological scan points</em>.</p>
+</section>
+<section id="result-metadata">
+<h4>Result metadata<a class="headerlink" href="#result-metadata" title="Link to this heading">#</a></h4>
+<p>The name of the plugin and the data label and unit are shown at the top of the
+metadata, followed by descriptions of the different data axes. The axes are
+labelled with <em>scan</em> or <em>data</em>, depending on whether the respective data axis
+has been defined in the scan or is an axis from the processed data. In addition,
+the label (either from the scan definition or from the plugin data
+dimension) is given with the number of points in this axis and the axis range.</p>
+</section>
+<section id="select-plot-type">
+<h4>Select plot type<a class="headerlink" href="#select-plot-type" title="Link to this heading">#</a></h4>
+<p>The user can select between 1-dimensional line plots or 2-dimensional images.
+Use <em>1D plot</em> to plot a single line or <em>group of 1D plots</em> to plot multiple
+lines at once. <em>2D full axes</em> and <em>2D data subset</em> will display data in image
+form.</p>
+</section>
+<section id="result-subset-selection">
+<h4>Result subset selection<a class="headerlink" href="#result-subset-selection" title="Link to this heading">#</a></h4>
+<figure class="align-right" id="id2" style="width: 302px">
+<img alt="../../../_images/data_selection.png" src="../../../_images/data_selection.png" />
+<figcaption>
+<p><span class="caption-text">Data selection. In this example, the axes 1 will be used for the line
+plot. The axis zero is sliced at the index corresponding to the data value
+0 and the axis two is sliced at the value 0.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The <em>Data selection</em> radio buttons allow to toggle the selection of data
+between data values and axis indices. If axis indices are toggled, integer
+values must be used for the selection. Data values must be given in the
+respective unit for each dimension (unit and range are given for each axis in
+the metadata window). Any data value will be converted to the closest matching
+index.</p>
+<p>Depending on the selection, up to two drop-down menus are shown which allow
+to select the dimensions to be used in the plot. In addition, the slice points
+for additional dimensions must be specified (either as <em>index</em> or <em>data value</em>)
+to show the correct data subset. Multiple selections are possible when items
+are separated by commas. Ranges can be selected following the Python slicing
+syntax. Any duplicate entries will be discarded.</p>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 25.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>example</p></th>
+<th class="head"><p>python equivalent</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1,2,4,5</p></td>
+<td><p>[1, 2, 4, 5]</p></td>
+<td><p>The four individual points 1, 2, 4, 5 will be used.</p></td>
+</tr>
+<tr class="row-odd"><td><p>1:5</p></td>
+<td><p>slice(1, 5)</p></td>
+<td><p>The slice includes all the values from 1..4 (note that the end point is
+not included).</p></td>
+</tr>
+<tr class="row-even"><td><p>1,2,1:8:2</p></td>
+<td><p>[1, 2, slice(4, 10, 2)]</p></td>
+<td><p>The numbers 1, 2 and a slice object which takes every second value from
+3 to 10, i.e. 3, 5, 7, 9.</p></td>
+</tr>
+<tr class="row-odd"><td><p>:</p></td>
+<td><p>slice(0, <em>n</em>)</p></td>
+<td><p>The slice of the full dimension.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The default data dimensions are zero (and one in case of a 2D image) and the
+default slices are all zero. These values usually need to be modified to
+show a useful plot or image.</p>
+</div>
+</section>
+<section id="confirmation">
+<h4>Confirmation<a class="headerlink" href="#confirmation" title="Link to this heading">#</a></h4>
+<p>The “Confirm selection” button will process the inputs given above and will
+select the corresponding data subset and pass it to the plot widget.</p>
+</section>
+</section>
+<section id="export-of-results">
+<h3>Export of results<a class="headerlink" href="#export-of-results" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/results_export.png" class="align-left" src="../../../_images/results_export.png" />
+<p>The data export section allows users to export results either for the current
+node or for all nodes. The current node is the selected node for visualization.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The export will always export the full node dataset, not just the subset
+which has been selected for display.</p>
+</div>
+<p>The first Parameter allows to select the export format(s). The second Parameter
+controls overwriting of results. If True, existing data files will be
+overwritten without any additional warning. If False and an existing file is
+detected, an Exception will be raised.</p>
+<p>Clicking either the “Export current node results” or the “Export all results”
+button will open a dialogue to select the folder.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To achieve naming consistency, it is not possible for the user to change
+the filenames of exported data, only the directory.</p>
+</div>
+</section>
+</section>
+<section id="data-display">
+<h2>Data display<a class="headerlink" href="#data-display" title="Link to this heading">#</a></h2>
+<section id="pydidas-1d-plot">
+<h3>Pydidas 1D plot<a class="headerlink" href="#pydidas-1d-plot" title="Link to this heading">#</a></h3>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot1d</span></code> is a
+subclassed <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot1D">silx Plot1d</a>
+with additional features useful in pydidas.</p>
+<a class="reference internal image-reference" href="../../../_images/standard_plot1d.png"><img alt="../../../_images/standard_plot1d.png" class="align-center" src="../../../_images/standard_plot1d.png" style="width: 600px;" />
+</a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
+functionality. The detailed menu icons and actions are described below
+in the menu entries description.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The plot display</dt><dd><p>This plot shows the data. Depending on the zoom level, this is either
+the full image or a sub-region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
+the mouse cursor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="menu-entries-description">
+<h4>menu entries description<a class="headerlink" href="#menu-entries-description" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>menu icon</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
+</td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
+of the data to be visualized.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
+</td>
+<td><p>Panning mode: clicking with the mouse and dragging moves the data on the
+canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_unzoom.png" class="align-center" src="../../../_images/menu_unzoom.png" />
+</td>
+<td><p>Unzoom: Reset the display region to the full data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_x_autoscale.png" class="align-center" src="../../../_images/menu_x_autoscale.png" />
+</td>
+<td><p>Activate autoscaling of the x-axis. If enabled, the x-axis will be
+matched to the data range upon activation or upon using the “Unzoom”
+button.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_y_autoscale.png" class="align-center" src="../../../_images/menu_y_autoscale.png" />
+</td>
+<td><p>Activate autoscaling of the y-axis. If enabled, the y-axis will be
+matched to the data range upon activation or upon using the “Unzoom”
+button.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_x_log.png" class="align-center" src="../../../_images/menu_x_log.png" />
+</td>
+<td><p>Switch between a linear and a logarithmic x-axis.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_y_log.png" class="align-center" src="../../../_images/menu_y_log.png" />
+</td>
+<td><p>Switch between a linear and a logarithmic y-axis.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_grid.png" class="align-center" src="../../../_images/menu_grid.png" />
+</td>
+<td><p>Toggle a grid in the main plotting canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_style.png" class="align-center" src="../../../_images/menu_style.png" />
+</td>
+<td><p>Change the drawing style. Repeatedly using this button will cycle
+through lines, dots, and lines &amp; dots styles for the curve.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_plot_type_generic.png" class="align-center" src="../../../_images/menu_plot_type_generic.png" />
+</td>
+<td><p>Change the plotted data to the generic y vs. x plot without any special
+operations.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_plot_type_kratky.png" class="align-center" src="../../../_images/menu_plot_type_kratky.png" />
+</td>
+<td><p>Plot data in a Kratky-type plot using y * x^2 vs. x for the y and
+x-axis, respectively. This plot allows, for example, to correct for the
+q-dependence of the scattering intensity in small angle scattering.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+</td>
+<td><p>Copy the currently visible figure to the clipboard.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+</td>
+<td><p>Save the currently loaded full data to file, ignoring any zooming. This
+function will open a dialogue to select the file type and filename.
+Depending on the selected file type, the colormap and scaling will be
+retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+</td>
+<td><p>Print the currently visible figure. This will print the current canvas
+(and therefore only the data visible on the canvas).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="pydidas-2d-plot">
+<h3>Pydidas 2D plot<a class="headerlink" href="#pydidas-2d-plot" title="Link to this heading">#</a></h3>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot2d</span></code> is a
+subclassed <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D">silx Plot2d</a>
+with additional features useful in pydidas.</p>
+<a class="reference internal image-reference" href="../../../_images/standard_plot2d.png"><img alt="../../../_images/standard_plot2d.png" class="align-center" src="../../../_images/standard_plot2d.png" style="width: 600px;" />
+</a>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
+functionality. The detailed menu icons and actions are described below
+in the menu entries description.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The image display</dt><dd><p>This widget shows the image data. Depending on the zoom level, this is
+either the full image or a sub-region.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The colorbar</dt><dd><p>The colorbar shows the reference for the used colormap to map data levels to
+colors.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
+the mouse cursor.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Two-dimensional plots are presented in a <a class="reference external" href="http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D">silx Plot2D widget</a>.
+The toolbar options will be explained in detail below. Moving the mouse over the
+canvas will update the labels for x/y position and data value at the bottom of
+the canvas. Note that the x and y axis positions for each pixel are defined at
+the pixel center and the given values must be treated carefully with respect to
+the pixel shape, especially for coarse pixels.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The scaling of the results can be achieved by modifying the colormap
+settings.</p>
+</div>
+<section id="id1">
+<h4>menu entries description<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>menu icon</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
+</td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
+of the data to be visualized.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
+</td>
+<td><p>Panning mode: clicking with the mouse and dragging moves the data on the
+canvas.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_unzoom.png" class="align-center" src="../../../_images/menu_unzoom.png" />
+</td>
+<td><p>Unzoom: Reset the display region to the full data.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_match_canvas.png" class="align-center" src="../../../_images/menu_match_canvas.png" />
+</td>
+<td><p>Match canvas: Set the aspect ratio to 1 and match the canvas size to
+the data to allow a tight fit.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_expand_canvas.png" class="align-center" src="../../../_images/menu_expand_canvas.png" />
+</td>
+<td><p>Expand canvas: Reset the canvas size to take up all available space.
+This option does also change the data aspect to make use of the full
+canvas.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_palette.png" class="align-center" src="../../../_images/menu_palette.png" />
+</td>
+<td><p>Open the colormap editor. This button opens a window with selections
+for the colormap and scaling of the displayed minimum and maximum
+values.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_crop_histogram_outliers.png" class="align-center" src="../../../_images/menu_crop_histogram_outliers.png" />
+</td>
+<td><p>Crop histogram outliers: Calculate the histogram of the image and set
+the colormap to ignore the low <em>x% and the top *y%</em> of the image
+histogram. The levels of <em>x</em> and <em>y</em> can be adjusted in the pydidas
+user settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_cmap_autoscale.png" class="align-center" src="../../../_images/menu_cmap_autoscale.png" />
+</td>
+<td><p>Autoscale the colormap to the image mean value +/- 3 standard
+deviations.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_aspect.png" class="align-center" src="../../../_images/menu_aspect.png" />
+</td>
+<td><p>This action allows to control the aspect of the displayed data and
+allows to stretch the data to fill the available canvas or keep its
+original aspect ratio.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_orientation.png" class="align-center" src="../../../_images/menu_orientation.png" />
+</td>
+<td><p>Control the position of the origin in the image: Select between the top
+left and bottom left corner.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_colorbar.png" class="align-center" src="../../../_images/menu_colorbar.png" />
+</td>
+<td><p>Display or hide the colorbar on the drawing canvas.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_mask.png" class="align-center" src="../../../_images/menu_mask.png" />
+</td>
+<td><p>Mask tools: This button opens an additional widget at the bottom of the
+canvas with tools for importing or setting a mask to mask certain
+data regions.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_coordinate_system.png" class="align-center" src="../../../_images/menu_coordinate_system.png" />
+</td>
+<td><p>Set coordinate system: This button will open a submenu which allows to
+select the coordinate system (cartesian or cylindrical). Note that the
+cylindrical coordinate system use the global <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
+calibration to determine the beam center. Therefore, looking at data
+with a different calibration will display a wrong center and therefore
+also wrong coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_get_data_info.png" class="align-center" src="../../../_images/menu_get_data_info.png" />
+</td>
+<td><p>Get information for selected datapoint: This button will allow the user
+to click on a point in the image and show a window with additional
+information about this point (specifically: all indices / data values).</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+</td>
+<td><p>Copy the currently visible figure to the clipboard. This will only copy
+the main figure and not the colorbar.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+</td>
+<td><p>Save the currently loaded full data to file, ignoring any zooming. This
+function will open a dialogue to select the file type and filename.
+Depending on the selected file type, the colormap and scaling will be
+retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+</td>
+<td><p>Print the currently visible figure. This will print only the data
+visible on the canvas and it will retain colormap and scaling settings.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/menu_profile.png" class="align-center" src="../../../_images/menu_profile.png" />
+</td>
+<td><p>Create and delete line profiles. This function allows the selection and
+editing of line profiles. The line profiles are shown in the histograms
+plots for the vertical and horizontal, respectively.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="WorkflowTestFrame.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Workflow test frame</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ViewResultsFrame.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">View workflow results frame</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-elements">Control elements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-saving">Automatic saving</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-workflow">Running the workflow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-result-selection">Workflow result selection</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#result-arrangement">Result Arrangement</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#result-metadata">Result metadata</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#select-plot-type">Select plot type</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#result-subset-selection">Result subset selection</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#confirmation">Confirmation</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export-of-results">Export of results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-display">Data display</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas-1d-plot">Pydidas 1D plot</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#menu-entries-description">menu entries description</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas-2d-plot">Pydidas 2D plot</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">menu entries description</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/manuals/gui/frames/WorkflowRunFrame.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/manuals/gui/frames/WorkflowRunFrame.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

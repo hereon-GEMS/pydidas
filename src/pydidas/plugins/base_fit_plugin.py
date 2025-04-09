@@ -181,6 +181,8 @@ class BaseFitPlugin(ProcPlugin):
         kwargs = kwargs | {
             "fit_params": self._fit_params,
             "fit_func": self._fitter.name,
+            "fitted_axis_label": self._data.axis_labels[0],
+            "fitted_axis_unit": self._data.axis_units[0],
         }
         _results = self.create_result_dataset()
         if kwargs.get("store_details", False):
@@ -232,6 +234,8 @@ class BaseFitPlugin(ProcPlugin):
             "fit_func": self._fitter.name,
             "fit_params": self._fit_params,
             "fit_residual_std": _residual,
+            "fitted_axis_label": self._data.axis_labels[0],
+            "fitted_axis_unit": self._data.axis_units[0],
         }
         return _result_dataset
 

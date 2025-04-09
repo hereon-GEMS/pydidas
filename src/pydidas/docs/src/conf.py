@@ -43,6 +43,7 @@ with open(Path(__file__).parents[2].joinpath("version.py"), "r") as f:
 
 release = pydidas_version.strip("\"'")
 version = release
+current_dir = Path(__file__).parent
 
 spec = importlib.util.spec_from_file_location(
     "generic_params", "../../core/generic_params/generic_params.py"
@@ -119,7 +120,7 @@ if os.getenv("GITHUB_ACTIONS", "false") == "true":
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = [str(current_dir / "_static")]
 html_show_sourcelink = True
 html_logo = "./images/logo/pydidas_snakes_circ_bg.png"
 html_title = "pydidas"

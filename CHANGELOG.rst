@@ -2,6 +2,19 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v25.mm.dd
+=========
+
+Improvements
+------------
+
+
+Bugfixes
+--------
+- Fixed an issue when deploying locally where the pydidas-custom.css for the documentation
+  was not included in the wheel.
+
+
 v25.04.08
 =========
 

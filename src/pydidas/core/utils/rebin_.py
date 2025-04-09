@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["rebin2d", "rebin"]
+__all__ = ["rebin2d", "rebin", "get_cropping_slices"]
 
 
 import numpy as np

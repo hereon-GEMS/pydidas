@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Tests for the DspacingSin2chiGrouping class / plugin.
+Tests for the SinSquareChiGrouping class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
@@ -69,14 +69,14 @@ ALTERNATE_FIT_DATA_LABEL = (
 
 @pytest.fixture
 def plugin_fixture():
-    return PluginCollection().get_plugin_by_name("DspacingSin2chiGrouping")()
+    return PluginCollection().get_plugin_by_name("SinSquareChiGrouping")()
 
 
 def test_plugin_initialization(plugin_fixture):
     # Test if the plugin is initialized correctly
     plugin = plugin_fixture
 
-    assert plugin.plugin_name == "Group d-spacing according to sin^2(chi) method"
+    assert plugin.plugin_name == "sin^2(chi) grouping"
     assert not plugin.basic_plugin
     assert plugin.plugin_type == PROC_PLUGIN
     assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
@@ -94,7 +94,7 @@ def test_plugin_initialization(plugin_fixture):
 
 
 def test_plugin_inheritance():
-    plugin_obj = PluginCollection().get_plugin_by_name("DspacingSin2chiGrouping")
+    plugin_obj = PluginCollection().get_plugin_by_name("SinSquareChiGrouping")
     assert issubclass(plugin_obj, ProcPlugin), "Plugin is not a subclass of ProcPlugin"
 
 

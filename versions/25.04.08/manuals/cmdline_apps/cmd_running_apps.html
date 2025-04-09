@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Running pydidas applications &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=b38044db"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'manuals/cmdline_apps/cmd_running_apps';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tutorial for the CompositeCreatorApp" href="cmd_composite_creator_app.html" />
+    <link rel="prev" title="Command line applications" href="cmd_apps.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <script>document.write(`<img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../commandline_start.html">Command line manuals</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cmdline_global/cmd_global.html">pydidas general command line tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmdline_global/cmd_diffraction_exp_context.html">The DiffractionExperimentContext class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmdline_global/cmd_scan_context.html">The ScanContext class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmdline_global/cmd_workflow_tree.html">The WorkflowTree class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmdline_global/cmd_workflow_results.html">The WorkflowResults class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmdline_global/cmd_running_workflows.html">Running pydidas workflows from the command line</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="cmd_apps.html">Command line applications</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Running pydidas applications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_composite_creator_app.html">Tutorial for the CompositeCreatorApp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_execute_workflow_app.html">Tutorial for the ExecuteWorkflowApp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cmd_directory_spy_app.html">Tutorial for the DirectorySpyApp</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/graphical_user_interface.html">Graphical user interface</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../manuals_main.html" class="nav-link">User manuals</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="cmd_apps.html" class="nav-link">Command line applications</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Running...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="running-pydidas-applications">
+<span id="id1"></span><h1>Running pydidas applications<a class="headerlink" href="#running-pydidas-applications" title="Link to this heading">#</a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#configuring-an-application" id="id2">Configuring an application</a></p></li>
+<li><p><a class="reference internal" href="#running-an-application-serially" id="id3">Running an application serially</a></p></li>
+<li><p><a class="reference internal" href="#running-an-application-using-parallelization" id="id4">Running an application using parallelization</a></p></li>
+</ul>
+</nav>
+<p>Pydidas applications are designed to be runnable both in serial and parallel
+modes. This requires a different syntax from the user which will be presented
+below.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a detailed description of the internal workings of applications
+please refer to the <a class="reference internal" href="../../dev_guide/dev_guide_apps.html#developer-guide-to-apps"><span class="std std-ref">Developers guide to pydidas applications</span></a> section.</p>
+</div>
+<section id="configuring-an-application">
+<h2>Configuring an application<a class="headerlink" href="#configuring-an-application" title="Link to this heading">#</a></h2>
+<p>pydidas applications are standard pydidas objects and their configuration is
+handled using pydidas <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>. A
+short usage guide has already been given in <a class="reference internal" href="../cmdline_global/cmd_global.html#accessing-parameters"><span class="std std-ref">Accessing Parameters</span></a>.</p>
+<p>Some applications might have additional properties or methods to further
+interact with the user, but these will be covered in the specific manuals.</p>
+<p>As an example, let us use a <code class="xref py py-class docutils literal notranslate"><span class="pre">DummyApp</span></code> which creates a list with
+random strings and takes two parameters for the length of each string and the
+total number of strings.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The DummyApp is not a real object in pydidas. This example cannot be
+run in a real python console.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DummyApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">get_param_keys</span><span class="p">()</span>
+<span class="go">[&#39;number_of_strings&#39;, &#39;length_of_string&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;number_of_strings&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;length_of_string&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="running-an-application-serially">
+<h2>Running an application serially<a class="headerlink" href="#running-an-application-serially" title="Link to this heading">#</a></h2>
+<p>To run an app serially, simply call the <a class="reference internal" href="../../code/api/core/base_app.html#pydidas.core.BaseApp.run" title="pydidas.core.BaseApp.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method of the app. Note that this will be a
+blocking call until the application is finished with its processing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DummyApp</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;number_of_strings&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;length_of_string&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">get_results</span><span class="p">()</span>
+<span class="go">[&#39;yeOhsEodCq&#39;,</span>
+<span class="go"> &#39;gnqZKRxHcK&#39;,</span>
+<span class="go"> &#39;SbEbVlyjgx&#39;,</span>
+<span class="go"> &#39;gcrNYzGUQY&#39;,</span>
+<span class="go"> &#39;NnfLeTcXbS&#39;,</span>
+<span class="go"> &#39;xoweEcFgqs&#39;,</span>
+<span class="go"> &#39;ujHXTPsWyh&#39;,</span>
+<span class="go"> &#39;XoOkaRqvIv&#39;,</span>
+<span class="go"> &#39;ewrMXWBpdG&#39;,</span>
+<span class="go"> &#39;TurPkkywwJ&#39;]</span>
+</pre></div>
+</div>
+</section>
+<section id="running-an-application-using-parallelization">
+<h2>Running an application using parallelization<a class="headerlink" href="#running-an-application-using-parallelization" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a detailed description of how the pydidas multiprocessing works,
+please refer to the <a class="reference internal" href="../../code/api/multiprocessing.html#multiprocessing-package"><span class="std std-ref">The multiprocessing sub-package</span></a> or to the
+<a class="reference internal" href="../../dev_guide/dev_guide_multiprocessing.html#developer-guide-to-multiprocessing"><span class="std std-ref">Developers guide to pydidas multiprocessing</span></a>.</p>
+</div>
+<p>To run an application using parallel processing, an additional object is needed
+to control the parallelization. This is the
+<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>. Usage is
+straightforward and happens through only a few commands. The AppRunner starts
+in a separate thread and is non-blocking. It launches multiple independent
+processes and can run in the background.</p>
+<p>To run an application, first configure the application as usually. Then,
+create an <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> instance
+with the configured application as calling argument. The app instance in the
+<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> is not directly
+accessible but the user can use the runner’s
+<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner.call_app_method" title="pydidas.multiprocessing.AppRunner.call_app_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">call_app_method</span></code></a>
+method to call a method of the app or the
+<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner.set_app_param" title="pydidas.multiprocessing.AppRunner.set_app_param"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_app_param</span></code></a>
+method to modify one of the application’s parameters.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Starting the <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> will
+create a new instance of the application and any changes made to the local
+instance will not be mirrored in the
+<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>’s app instance.</p>
+</div>
+<p>Running an application with the
+:py:class`AppRunner &lt;pydidas.multiprocessing.AppRunner&gt;` requires to call the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">start</span></code> method. This will start the thread and create the worker
+processes.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Running apps which rely on Qt’s Signals and Slots (like the
+<a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a>) will
+require a running QApplication event loop.
+Also do not forget to stop the event loop when finished.</p>
+</div>
+<p>An example with a custom application is given below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">qtpy</span> <span class="kn">import</span> <span class="n">QtWidgets</span>
+
+<span class="kn">import</span> <span class="nn">pydidas</span>
+
+
+<span class="c1">#define CHARS to create random strings</span>
+<span class="n">CHARS</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span>
+
+
+<span class="k">class</span> <span class="nc">DummyApp</span><span class="p">(</span><span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">BaseApp</span><span class="p">):</span>
+    <span class="n">default_params</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">ParameterCollection</span><span class="p">(</span>
+        <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;number_of_strings&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;length_of_strings&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">BaseApp</span><span class="o">.</span><span class="n">multiprocessing_pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_get_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the dummy tasks.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;number_of_strings&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a random string.&quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;length_of_strings&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">CHARS</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">multiprocessing_store_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">qtapp</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">DummyApp</span><span class="p">()</span>
+    <span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+    <span class="c1"># Now connect the AppRunner&#39;s emitted results to our local app:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">sig_results</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">multiprocessing_store_results</span><span class="p">)</span>
+
+    <span class="c1"># Also make sure to terminate the QApplication event loop after</span>
+    <span class="c1"># finishing the calculations:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">qtapp</span><span class="o">.</span><span class="n">quit</span><span class="p">)</span>
+
+    <span class="c1"># Start the runner and the QApplication event loop:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">qtapp</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Resulting random strings:&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_val</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">_key</span><span class="si">:</span><span class="s1">02d</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">_val</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Running this script will create an output like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Resulting</span> <span class="n">random</span> <span class="n">strings</span><span class="p">:</span>
+  <span class="mi">00</span><span class="p">:</span> <span class="n">EgLDoQCBto</span>
+  <span class="mi">01</span><span class="p">:</span> <span class="n">tbE07t910T</span>
+  <span class="mi">02</span><span class="p">:</span> <span class="n">JpmZZJ6QjL</span>
+  <span class="mi">03</span><span class="p">:</span> <span class="n">YTgKKtLWqP</span>
+  <span class="mi">04</span><span class="p">:</span> <span class="n">vvFAuJ8W9d</span>
+  <span class="mi">05</span><span class="p">:</span> <span class="n">HFLVkWt1Gm</span>
+  <span class="mi">06</span><span class="p">:</span> <span class="n">kPjP2pWA6Z</span>
+  <span class="mi">07</span><span class="p">:</span> <span class="n">AHiPGRADWa</span>
+  <span class="mi">08</span><span class="p">:</span> <span class="mi">1</span><span class="n">vFmmMM2mZ</span>
+  <span class="mi">09</span><span class="p">:</span> <span class="n">BSrpoTxzOg</span>
+</pre></div>
+</div>
+<p>For status updates, one could use the <code class="xref py py-data docutils literal notranslate"><span class="pre">AppRunner.sig_process</span></code>
+Signal. An example with a new printing slot and an updated <code class="xref py py-data docutils literal notranslate"><span class="pre">main</span></code>
+function is given below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_progress</span><span class="p">(</span><span class="n">progress</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print the current progress repeatedly in the same line.&quot;&quot;&quot;</span>
+    <span class="n">_n_chars</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="n">progress</span><span class="p">)</span>
+    <span class="n">_txt</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\u2588</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="n">_n_chars</span>
+        <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="mi">60</span> <span class="o">-</span> <span class="n">_n_chars</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;|&quot;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">progress</span><span class="si">:</span><span class="s2">05.2f</span><span class="si">}</span><span class="s2">%: &quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">_txt</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">qtapp</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">DummyApp</span><span class="p">()</span>
+    <span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+    <span class="c1"># Now connect the AppRunner&#39;s emitted results to our local app:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">sig_results</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">multiprocessing_store_results</span><span class="p">)</span>
+
+    <span class="c1"># Also make sure to terminate the QApplication event loop after</span>
+    <span class="c1"># finishing the calculations:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">qtapp</span><span class="o">.</span><span class="n">quit</span><span class="p">)</span>
+
+    <span class="c1"># Connect also the AppRunner.sig_progress to the print_progress</span>
+    <span class="c1"># function:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">sig_progress</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">print_progress</span><span class="p">)</span>
+
+    <span class="c1"># Start the runner and the QApplication event loop:</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">qtapp</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Resulting random strings:&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_val</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">_key</span><span class="si">:</span><span class="s1">02d</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">_val</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="cmd_apps.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Command line applications</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cmd_composite_creator_app.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorial for the CompositeCreatorApp</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuring-an-application">Configuring an application</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-an-application-serially">Running an application serially</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-an-application-using-parallelization">Running an application using parallelization</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/manuals/cmdline_apps/cmd_running_apps.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/manuals/cmdline_apps/cmd_running_apps.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

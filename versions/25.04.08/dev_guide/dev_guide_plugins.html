@@ -1,0 +1,1230 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Developers guide to pydidas Plugins &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=b38044db"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'dev_guide/dev_guide_plugins';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developers guide to pydidas applications" href="dev_guide_apps.html" />
+    <link rel="prev" title="Developer guide" href="developer_guide.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <script>document.write(`<img src="../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Developers guide to pydidas Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide_apps.html">Developers guide to pydidas applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide_multiprocessing.html">Developers guide to pydidas multiprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide_list_of_signals.html">Developers guide to pydidas signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide_list_of_generic_params.html">Generic Parameters</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="developer_guide.html" class="nav-link">Developer guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Developers...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="developers-guide-to-pydidas-plugins">
+<span id="developer-guide-to-plugins"></span><h1>Developers guide to pydidas Plugins<a class="headerlink" href="#developers-guide-to-pydidas-plugins" title="Link to this heading">#</a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#plugin-structure" id="id3">Plugin structure</a></p></li>
+<li><p><a class="reference internal" href="#plugin-class-attributes" id="id4">Plugin class attributes</a></p></li>
+<li><p><a class="reference internal" href="#generic-plugin-attributes-and-methods" id="id5">Generic plugin attributes and methods</a></p>
+<ul>
+<li><p><a class="reference internal" href="#generic-attributes" id="id6">Generic attributes</a></p></li>
+<li><p><a class="reference internal" href="#plugin-classmethods" id="id7">Plugin classmethods</a></p></li>
+<li><p><a class="reference internal" href="#generic-properties" id="id8">Generic properties</a></p></li>
+<li><p><a class="reference internal" href="#generic-methods" id="id9">Generic methods</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#defining-plugin-parameters" id="id10">Defining plugin Parameters</a></p></li>
+<li><p><a class="reference internal" href="#handling-dynamic-data-dimensionality" id="id11">Handling dynamic data dimensionality</a></p></li>
+<li><p><a class="reference internal" href="#intermediate-and-detailed-results" id="id12">Intermediate and detailed results</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id13">Examples</a></p>
+<ul>
+<li><p><a class="reference internal" href="#plugin-default-parameter-definition-examples" id="id14">Plugin default parameter definition examples</a></p></li>
+<li><p><a class="reference internal" href="#handling-dynamic-data-dimensionality-example" id="id15">Handling dynamic data dimensionality example</a></p></li>
+<li><p><a class="reference internal" href="#intermediate-and-detailed-results-example" id="id16">Intermediate and detailed results example</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<p>Pydidas plugins are separated into three categories:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugins</span></code></a> are used to load data from the filesystem.</p></li>
+<li><p><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcPlugins</span></code></a> (short for ProcessingPlugins) are used for processing data. They
+ingest a <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and return a <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcPlugins</span></code></a> can either modify the
+input data
+or create new data.</p></li>
+<li><p><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutputPlugins</span></code></a> can be used to export additional data or data in specific formats.
+Usually, data export is handled through the generic infrastructure and need not be
+handled py plugins.</p></li>
+</ul>
+<p>All pydidas plugins must inherit from one these base classes to be discoverable:
+Pydidas searches for plugins automatically in the custom plugin paths.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>These custom plugin path can be modified by the user (please see
+<a class="reference internal" href="../manuals/cmdline_global/cmd_global.html#pydidas-qsettings"><span class="std std-ref">pydidas QSettings</span></a> for a guide on how to update the <code class="docutils literal notranslate"><span class="pre">user/plugin_path</span></code>
+manually or use the <a class="reference internal" href="../manuals/gui/windows/_UserConfigWindow.html#user-config-window"><span class="std std-ref">The User config window</span></a> to update the paths in the GUI).</p>
+<p>Multiple paths need to be separated by a double semicolon “<strong>;;</strong>”.</p>
+</div>
+<section id="plugin-structure">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Plugin structure</a><a class="headerlink" href="#plugin-structure" title="Link to this heading">#</a></h2>
+<p>Plugins include a number of class attributes for permanent configuration (which will be
+discussed in detail later) and uses the <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> class to handle dynamic
+configurations.</p>
+<p>The two main methods are the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.pre_execute" title="pydidas.plugins.BasePlugin.pre_execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pre_execute</span></code></a> which is called once at the start of
+processing and which can handle computationally expensive tasks which need to be
+performed once. The <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> method is called repeatedly with the processing data
+and ingests one input <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and returns one <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The figure below shows a
+sketch.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/plugin_processing_diagram.png"><img alt="../_images/plugin_processing_diagram.png" src="../_images/plugin_processing_diagram.png" style="width: 495px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The simplified Plugin processing diagram. The <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> data processing method
+can be called as often as necessary while the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.pre_execute" title="pydidas.plugins.BasePlugin.pre_execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pre_execute</span></code></a> method will be called
+exactly once.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="plugin-class-attributes">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Plugin class attributes</a><a class="headerlink" href="#plugin-class-attributes" title="Link to this heading">#</a></h2>
+<p>The following class attributes are used by pydidas to define the generic behaviour of
+the plugin.</p>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 65.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>class attribute</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_type</span></code></p></td>
+<td><p>int</p></td>
+<td><p>A key to discriminate between the different types of plugins (input,
+processing, output). Please use one of
+<code class="docutils literal notranslate"><span class="pre">INPUT_PLUGIN,</span> <span class="pre">PROC_PLUGIN,</span> <span class="pre">OUTPUT_PLUGIN</span></code> which can be imported from
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydidas.core.constants</span></code>. Typically, this attribute should be set by inheriting from the
+<a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugin</span></code></a>, <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcPlugin</span></code></a>, or <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutputPlugin</span></code></a> classes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_subtype</span></code></p></td>
+<td><p>int</p></td>
+<td><p>Processing plugins are further differentiated into plugins for generic data,
+image data or for integrated data. This differentiation is just for plugin
+organisation to simplify finding plugins for users. Leave this field empty
+for <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugins</span></code></a> or <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutputPlugins</span></code></a>. The <code class="docutils literal notranslate"><span class="pre">PROC_PLUGIN_GENERIC</span></code>,
+<code class="docutils literal notranslate"><span class="pre">PROC_PLUGIN_IMAGE</span></code>, and <code class="docutils literal notranslate"><span class="pre">PROC_PLUGIN_INTEGRATED</span></code> constants can be imported
+from the <code class="xref py py-mod docutils literal notranslate"><span class="pre">pydidas.core.constants</span></code> module.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p>The plugin name key in human-readable form for referencing the plugin. Usually,
+this should be similar to the class name but with inserted spaces and correct
+capitalization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code></p></td>
+<td><p><a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a></p></td>
+<td><p>A ParameterCollection with the class parameters which are required to use the
+plugin. The default is an empty <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">input_data_dim</span></code></p></td>
+<td><p>int</p></td>
+<td><p>The dimensionality of the input data. Use -1 for arbitrary dimensionality.
+The default is -1.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_dim</span></code></p></td>
+<td><p>int</p></td>
+<td><p>The dimensionality of the output data. Use -1 for arbitrary dimensionality.
+The default is -1.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_label</span></code></p></td>
+<td><p>str</p></td>
+<td><p>The data label for the output <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The default is an empty string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_data_unit</span></code></p></td>
+<td><p>str</p></td>
+<td><p>The data unit of the output <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The default is an empty string.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">new_dataset</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Keyword that the Plugin creates a new <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. The default is False.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">advanced_parameters</span></code></p></td>
+<td><p>list[str, …]</p></td>
+<td><p>A list with the keys of “advanced parameters”. These Parameters are hidden in
+the plugin’s Parameter configuration widget be default and can be accessed
+through the associated button for “advances parameters” not to overwhelm
+users with too many options. The default is an empty list [].</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
+</section>
+<section id="generic-plugin-attributes-and-methods">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Generic plugin attributes and methods</a><a class="headerlink" href="#generic-plugin-attributes-and-methods" title="Link to this heading">#</a></h2>
+<p>This section describes the generic attributes and plugin methods and classmethods
+which all plugins inherit and use.</p>
+<section id="generic-attributes">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Generic attributes</a><a class="headerlink" href="#generic-attributes" title="Link to this heading">#</a></h3>
+<p>Plugins have a number of attributes which are used to store and modify the plugin’s
+state. The following attributes are used by all plugins:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">_config</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">dict</span></code>):</dt><dd><p>The plugin’s configuration dictionary. This dictionary is used to store all
+plugin-specific data which is not stored in the Parameters. Using a dictionary
+allows to easily copy the plugin and its configuration without needing to consider
+which attributes must be copied.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">node_id</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">int</span></code>):</dt><dd><p>The plugin’s unique node ID. This ID is used to identify the plugin in the
+workflow.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">params</span></code> (type: <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>):</dt><dd><p>The plugin’s ParameterCollection. This collection is used to store all the
+plugin’s Parameters.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
+</section>
+<section id="plugin-classmethods">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Plugin classmethods</a><a class="headerlink" href="#plugin-classmethods" title="Link to this heading">#</a></h3>
+<p>Multiple class methods have been defined for the basic plugin to manage the
+representation of the plugin class in the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_registry.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a>. For details, please
+refer to the API documentation of the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></a>.</p>
+</section>
+<section id="generic-properties">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Generic properties</a><a class="headerlink" href="#generic-properties" title="Link to this heading">#</a></h3>
+<p>The following properties are used to access the plugin’s configuration. <strong>Note that
+there are no setter methods defined for these properties.</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">input_data</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union[int,</span> <span class="pre">Dataset</span></code>]):</dt><dd><p>The stored input data. Note that the input data is only available after it
+has been stored by the
+:py:meth`store_input_data_copy &lt;pydidas.plugins.BasePlugin.store_input_data_copy`
+method.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">result_data_label</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">str</span></code>):</dt><dd><p>The data label for the output <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>. This property gives a formatted string
+including the output data unit.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">result_title</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">str</span></code>):</dt><dd><p>The plugin’s title. This property gives a formatted string including the plugin
+name and the node ID.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
+</section>
+<section id="generic-methods">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Generic methods</a><a class="headerlink" href="#generic-methods" title="Link to this heading">#</a></h3>
+<p>The following generic methods are defined and used by all plugins. The default behaviour
+is described as well to know when to overload these methods.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.pre_execute" title="pydidas.plugins.BasePlugin.pre_execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pre_execute</span></code></a>:</dt><dd><p>The <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.pre_execute" title="pydidas.plugins.BasePlugin.pre_execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pre_execute</span></code></a> method is called once at the start of the
+processing. This method can be used to perform computationally expensive tasks
+which need to be performed once. It does not accept any arguments.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a>:</dt><dd><p>The <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> method is called repeatedly with the processing data.
+Required arguments are exactly one input <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and the <code class="xref py py-data docutils literal notranslate"><span class="pre">kwargs</span></code> input
+keyword arguments. It must also return exactly one <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">kwargs</span></code>, possibly modified by the plugin.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.get_parameter_config_widget" title="pydidas.plugins.BasePlugin.get_parameter_config_widget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_parameter_config_widget</span></code></a>:</dt><dd><p>This method returns a widget instance for the plugin’s parameter configuration.
+The default implementation raises a <code class="xref py py-data docutils literal notranslate"><span class="pre">NotImplementedError</span></code>. This method is
+only used if the class attribute <code class="xref py py-data docutils literal notranslate"><span class="pre">has_unique_parameter_config_widget</span></code> is
+set to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>. The plugin is responsible for passing itself / its
+<a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects to the <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code> instance.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.store_input_data_copy" title="pydidas.plugins.BasePlugin.store_input_data_copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">store_input_data_copy</span></code></a>:</dt><dd><p>This method stores a copy of the input data and input kwargs in the plugin. This
+might be required, for example, to use the input data later, for example when
+calculating intermediate results.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
+</section>
+</section>
+<section id="defining-plugin-parameters">
+<span id="id1"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">Defining plugin Parameters</a><a class="headerlink" href="#defining-plugin-parameters" title="Link to this heading">#</a></h2>
+<p>The plugin’s <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a> with access to all <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects is defined in
+the <code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code> class attribute. The type of the <code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code>
+attribute is a <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>.
+A number of generic parameters is defined in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">pydidas.core.generic_params</span></code> module.
+A generic <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> can be created by using the
+<code class="xref py py-func docutils literal notranslate"><span class="pre">get_generic_parameter</span> <span class="pre">&lt;pydidas.core.get_generic_parameter</span></code> function, for
+example <code class="docutils literal notranslate"><span class="pre">get_generic_parameter(&quot;filename&quot;)</span></code>.
+Multiple generic <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects can be created at once by using the
+<code class="xref py py-func docutils literal notranslate"><span class="pre">get_generic_param_collection</span> <span class="pre">&lt;pydidas.core.get_generic_param_collection</span></code>
+function.</p>
+<p>It is worth noting that each plugin instance, will be initialized with a copy of the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code> <a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>. Therefore, plugins do not share
+any <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects with other plugins.</p>
+<p>For further examples of how to define the <code class="xref py py-data docutils literal notranslate"><span class="pre">default_params</span></code>, please have a
+look at the <a class="reference internal" href="#plugin-default-params-examples"><span class="std std-ref">Plugin default parameter definition examples</span></a>.</p>
+<p>Please also see <a class="reference internal" href="dev_guide_list_of_generic_params.html#generic-params"><span class="std std-ref">Generic Parameters</span></a> for a complete list of all available generic
+<a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>.</p>
+<p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
+</section>
+<section id="handling-dynamic-data-dimensionality">
+<span id="handle-dynamic-data-dimensionality"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">Handling dynamic data dimensionality</a><a class="headerlink" href="#handling-dynamic-data-dimensionality" title="Link to this heading">#</a></h2>
+<p>Some plugins should always handle 1-dimensional data but can be supplied
+with multi-dimensional input data. For example, a plugin can be designed to work with
+an integrated azimuthal line profile, but should also work with a series of line
+profiles which are generated from a two-dimensional integration.</p>
+<p>Pydidas provides a mechanism to handle this situation by using the <code class="xref py py-func docutils literal notranslate"><span class="pre">process_1d_with_multi_input_dims</span></code>
+decorator on the <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> method. This decorator will requires the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">process_data_dim</span></code> <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> which is defined in the generic parameters.</p>
+<p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">process_1d_with_multi_input_dims</span></code> decorator will automatically handle all necessary steps and the
+<a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> method must be written as if it handled 1-dimensional data only.</p>
+<p>Please see the <a class="reference internal" href="#examples-handle-dynamic-data-dimensionality"><span class="std std-ref">Handling dynamic data dimensionality example</span></a> for further details.</p>
+<p><a class="reference internal" href="#developer-guide-to-plugins"><span class="std std-ref">(go back to top of the page)</span></a></p>
+</section>
+<section id="intermediate-and-detailed-results">
+<span id="intermediate-results"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">Intermediate and detailed results</a><a class="headerlink" href="#intermediate-and-detailed-results" title="Link to this heading">#</a></h2>
+<p>For some applications, it is useful for the user to have access to intermediate results
+of the processing, for example for fitting or automatic classifications. The
+intermediate results are used for automatic visualization and therefore require a
+specific form.
+Pydidas provides an automatic mechanism to access intermediate results. The plugin’s
+<code class="xref py py-data docutils literal notranslate"><span class="pre">_details</span></code> attribute is used to store the intermediate results as a
+<code class="xref py py-data docutils literal notranslate"><span class="pre">dict</span></code> with a <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code> key and a <code class="xref py py-data docutils literal notranslate"><span class="pre">dict</span></code> value. The
+<code class="xref py py-data docutils literal notranslate"><span class="pre">detailed_results_dict</span></code> details will be laid out below.</p>
+<p>A <code class="xref py py-data docutils literal notranslate"><span class="pre">detailed_results</span></code> property must also be defined to access the detailed
+results.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+    <span class="c1"># Do some processing</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;store_details&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="p">{</span><span class="kc">None</span><span class="p">:</span> <span class="n">detailed_results_dict</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">kwargs</span>
+
+<span class="nd">@property</span>
+<span class="k">def</span> <span class="nf">detailed_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_details</span>
+</pre></div>
+</div>
+<p>The rationale behind this is that detailed results must also be available for plugins
+which allow dynamic data dimensionality. In this case, the <code class="xref py py-func docutils literal notranslate"><span class="pre">process_1d_with_multi_input_dims</span></code>
+decorator stores the detailed results with the correct keys and <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code> was
+selected as generic key because no data will use the :py:data`None` key.</p>
+<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">detailed_results_dict</span></code> also has a defined structure. The following
+keys are required:</p>
+<blockquote>
+<div><ul>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">n_plots</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">int</span></code>):</dt><dd><p>The number of plots used by this Plugin.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_titles</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">dict</span></code>):</dt><dd><p>A dictionary with the plot titles. The keys are the plot indices and the values
+are the plot titles. Example <code class="docutils literal notranslate"><span class="pre">&quot;plot_titles&quot;</span> <span class="pre">:</span> <span class="pre">{0:</span> <span class="pre">&quot;Title</span> <span class="pre">A&quot;,</span> <span class="pre">1:</span> <span class="pre">&quot;Title</span> <span class="pre">B&quot;}</span></code>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">metadata</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">str</span></code>):</dt><dd><p>Additional metadata to be given to the user. The metadata must be in string
+format and if a specific formatting is required for readability, the plugin
+must provide this formatting.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">items</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">list[dict]</span></code>):</dt><dd><p>A list with the individual items to be plotted. Each item must be a dictionary
+with the following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">plot</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">int</span></code>):</dt><dd><p>The index of the plot to which the item belongs.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">label</span></code> (type: <code class="xref py py-data docutils literal notranslate"><span class="pre">str</span></code>):</dt><dd><p>The label of the plot item for the legend.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="xref py py-data docutils literal notranslate"><span class="pre">data</span></code> (type: <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>):</dt><dd><p>The data to be plotted.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>For an example, please see the <a class="reference internal" href="#examples-intermediate-results"><span class="std std-ref">Intermediate and detailed results example</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Detailed results are only available if the user has selected to store them.
+This can be by using the <code class="docutils literal notranslate"><span class="pre">store_details=True</span></code> keyword argument in the
+<a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> method. Because <code class="xref py py-data docutils literal notranslate"><span class="pre">kwargs</span></code> are passed down through the
+<a class="reference internal" href="../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> to all the plugins,
+the <code class="docutils literal notranslate"><span class="pre">store_details=True</span></code> can be called in the <a class="reference internal" href="../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.execute_process" title="pydidas.workflow.ProcessingTree.execute_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_process</span></code></a> method of the <a class="reference internal" href="../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
+</div>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<section id="plugin-default-parameter-definition-examples">
+<span id="plugin-default-params-examples"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">Plugin default parameter definition examples</a><a class="headerlink" href="#plugin-default-parameter-definition-examples" title="Link to this heading">#</a></h3>
+<section id="example-1-a-plugin-with-a-only-generic-parameter-objects">
+<h4>Example 1: A plugin with a only generic <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-1-a-plugin-with-a-only-generic-parameter-objects" title="Link to this heading">#</a></h4>
+<p>The following example shows an incomplete class definition of a plugin with only
+four generic <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydidas.core.generic_params</span> <span class="kn">import</span> <span class="n">get_generic_param_collection</span>
+<span class="kn">from</span> <span class="nn">pydidas.plugins</span> <span class="kn">import</span> <span class="n">BasePlugin</span>
+
+<span class="k">class</span> <span class="nc">MyPlugin</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">):</span>
+
+    <span class="n">default_params</span> <span class="o">=</span> <span class="n">get_generic_param_collection</span><span class="p">(</span>
+        <span class="s2">&quot;filename&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;threshold_low&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;threshold_high&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;multiplicator&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p class="align-references">
+<a href="#defining-plugin-parameters">Back to "Defining plugin Parameters" section</a>
+<a href="#developer-guide-to-plugins">(go back to top of the page)</a>
+</p><br><br></section>
+<section id="example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects">
+<h4>Example 2: A plugin with a mix of generic and custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects" title="Link to this heading">#</a></h4>
+<p>The following example shows an incomplete class definition of a plugin with a mix
+of generic and custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydidas.core</span> <span class="kn">import</span> <span class="n">Parameter</span>
+<span class="kn">from</span> <span class="nn">pydidas.core.generic_params</span> <span class="kn">import</span> <span class="n">get_generic_param_collection</span>
+<span class="kn">from</span> <span class="nn">pydidas.plugins</span> <span class="kn">import</span> <span class="n">BasePlugin</span>
+
+<span class="n">offset_param</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span>
+    <span class="s2">&quot;offset&quot;</span><span class="p">,</span>
+    <span class="nb">float</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Data offset&quot;</span><span class="p">,</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;A constant data offset which is applied to the input data.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">MyPlugin</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">):</span>
+
+    <span class="n">default_params</span> <span class="o">=</span> <span class="n">get_generic_param_collection</span><span class="p">(</span>
+        <span class="s2">&quot;filename&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;threshold_low&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;threshold_high&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">default_params</span><span class="o">.</span><span class="n">add_param</span><span class="p">(</span><span class="n">offset_param</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="align-references">
+<a href="#defining-plugin-parameters">Back to "Defining plugin Parameters" section</a>
+<a href="#developer-guide-to-plugins">(go back to top of the page)</a>
+</p><br><br></section>
+<section id="example-3-a-plugin-with-mostly-custom-parameter-objects">
+<h4>Example 3: A plugin with mostly custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects<a class="headerlink" href="#example-3-a-plugin-with-mostly-custom-parameter-objects" title="Link to this heading">#</a></h4>
+<p>The following example shows an incomplete class definition of a plugin with
+<a class="reference internal" href="../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a> including generic and custom <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> objects defined outside
+the plugin.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydidas.core</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">ParameterCollection</span>
+<span class="kn">from</span> <span class="nn">pydidas.core.generic_params</span> <span class="kn">import</span> <span class="n">get_generic_parameter</span>
+<span class="kn">from</span> <span class="nn">pydidas.plugins</span> <span class="kn">import</span> <span class="n">BasePlugin</span>
+
+<span class="k">class</span> <span class="nc">MyPlugin</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">):</span>
+
+    <span class="n">default_params</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">(</span>
+        <span class="n">Parameter</span><span class="p">(</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Data offset&quot;</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;A constant data offset which is applied to the input data.&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Parameter</span><span class="p">(</span>
+            <span class="s2">&quot;noise&quot;</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Random noise level&quot;</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;The random noise level which is added to each input data point.&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">get_generic_parameter</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p class="align-references">
+<a href="#defining-plugin-parameters">Back to "Defining plugin Parameters" section</a>
+<a href="#developer-guide-to-plugins">(go back to top of the page)</a>
+</p><br><br></section>
+</section>
+<section id="handling-dynamic-data-dimensionality-example">
+<span id="examples-handle-dynamic-data-dimensionality"></span><h3><a class="toc-backref" href="#id15" role="doc-backlink">Handling dynamic data dimensionality example</a><a class="headerlink" href="#handling-dynamic-data-dimensionality-example" title="Link to this heading">#</a></h3>
+<p>This example shows a fully functional plugin which can handle multi-dimensional input.
+The plugin adds a one-dimensional <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code> to the input data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pydidas.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Dataset</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">ParameterCollection</span><span class="p">,</span> <span class="n">UserConfigError</span><span class="p">,</span> <span class="n">get_generic_parameter</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pydidas.core.utils</span> <span class="kn">import</span> <span class="n">process_1d_with_multi_input_dims</span>
+<span class="kn">from</span> <span class="nn">pydidas.core.constants</span> <span class="kn">import</span> <span class="n">PROC_PLUGIN</span>
+<span class="kn">from</span> <span class="nn">pydidas.plugins</span> <span class="kn">import</span> <span class="n">ProcPlugin</span>
+
+
+<span class="k">class</span> <span class="nc">AddOneDimensionalData</span><span class="p">(</span><span class="n">ProcPlugin</span><span class="p">):</span>
+
+    <span class="n">default_params</span> <span class="o">=</span> <span class="n">ParameterCollection</span><span class="p">(</span>
+        <span class="n">get_generic_parameter</span><span class="p">(</span><span class="s2">&quot;process_data_dim&quot;</span><span class="p">),</span>
+        <span class="n">Parameter</span><span class="p">(</span>
+            <span class="s2">&quot;offset_array&quot;</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">5</span><span class="p">)),</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;1D offset array&quot;</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;The offset array to be added to the 1d input data&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">plugin_name</span> <span class="o">=</span> <span class="s2">&quot;Add one-dimensional data&quot;</span>
+    <span class="n">plugin_type</span> <span class="o">=</span> <span class="n">PROC_PLUGIN</span>
+    <span class="n">basic_plugin</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">input_data_dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">output_data_dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="nd">@process_1d_with_multi_input_dims</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+        <span class="n">_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;offset_array&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UserConfigError</span><span class="p">(</span>
+                <span class="s2">&quot;The offset array must have the same shape as the input data.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">data</span> <span class="o">+=</span> <span class="n">_arr</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">kwargs</span>
+</pre></div>
+</div>
+<p>Now, when testing the plugin with 1-dimensional data, the plugin will simple process
+the input data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">AddOneDimensionalData</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s2">&quot;offset_array&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_1d</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">axis_ranges</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)],</span>
+<span class="gp">... </span>    <span class="n">axis_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">axis_units</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;px&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">data_label</span><span class="o">=</span><span class="s2">&quot;Test data&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;a.u.&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data_1d</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
+<span class="go">Dataset(</span>
+<span class="go">axis_labels: {</span>
+<span class="go">    0: &#39;x&#39;},</span>
+<span class="go">axis_ranges: {</span>
+<span class="go">    0: array([ 0, 5, 10, 15, 20])},</span>
+<span class="go">axis_units: {</span>
+<span class="go">    0: &#39;px&#39;},</span>
+<span class="go">metadata: {},</span>
+<span class="go">data_unit: a.u.,</span>
+<span class="go">data_label: Test data,</span>
+<span class="go">array([0., 1., 2., 3., 4.])</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+<p>When testing the plugin with multi-dimensional data, the plugin will automatically
+apply the algorithm in the decorated <a class="reference internal" href="../code/api/plugins.html#pydidas.plugins.BasePlugin.execute" title="pydidas.plugins.BasePlugin.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute</span></code></a> method to one-dimensional slices of the
+input data. By default, the processed dimension is the last dimension (see first part
+of the example below) . When the <code class="xref py py-data docutils literal notranslate"><span class="pre">process_data_dim</span></code> <a class="reference internal" href="../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> is set to 0,
+the first dimension will be processed (compare second part of the example).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">AddOneDimensionalData</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s2">&quot;offset_array&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_2d</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)),</span>
+<span class="gp">... </span>    <span class="n">axis_ranges</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="mi">12</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)],</span>
+<span class="gp">... </span>    <span class="n">axis_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">axis_units</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;px&quot;</span><span class="p">,</span> <span class="s2">&quot;px&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">data_label</span><span class="o">=</span><span class="s2">&quot;Test data&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;a.u.&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data_2d</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+<span class="go"># Note: For brevity, only the numerical data of the output Dataset is printed.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 1. 2. 3. 4.]</span>
+<span class="go"> [0. 1. 2. 3. 4.]</span>
+<span class="go"> [0. 1. 2. 3. 4.]</span>
+<span class="go"> [0. 1. 2. 3. 4.]</span>
+<span class="go"> [0. 1. 2. 3. 4.]]</span>
+<span class="go"># Now, we change the processing dimension:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s2">&quot;process_data_dim&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data_2d</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+<span class="go">[[0. 0. 0. 0. 0.]</span>
+<span class="go"> [2. 2. 2. 2. 2.]</span>
+<span class="go"> [1. 1. 1. 1. 1.]</span>
+<span class="go"> [3. 3. 3. 3. 3.]</span>
+<span class="go"> [4. 4. 4. 4. 4.]]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The plugin modifies the input <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> in place. Therefore, the input dataset
+will also be changed. Copying of the data in the input is only necessary in
+this example. In a proper pydidas Workflow, the framework will automatically
+pass a copy of the input data to the plugin if the input data is passed to more
+than one plugin.</p>
+</div>
+<p class="align-references">
+<a href="#handle-dynamic-data-dimensionality">Back to "Handling dynamic data dimensionality" section</a>
+<a href="#developer-guide-to-plugins">(go back to top of the page)</a>
+</p><br><br></section>
+<section id="intermediate-and-detailed-results-example">
+<span id="examples-intermediate-results"></span><h3><a class="toc-backref" href="#id16" role="doc-backlink">Intermediate and detailed results example</a><a class="headerlink" href="#intermediate-and-detailed-results-example" title="Link to this heading">#</a></h3>
+<p>This example uses the <code class="xref py py-data docutils literal notranslate"><span class="pre">AddOneDimensionalData</span></code> plugin from the previous example
+(see <a class="reference internal" href="#examples-handle-dynamic-data-dimensionality"><span class="std std-ref">Handling dynamic data dimensionality example</span></a>) and adds functionality to
+handle intermediate results.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AddOneDimensionalDataWithDetails</span><span class="p">(</span><span class="n">AddOneDimensionalData</span><span class="p">):</span>
+    <span class="n">plugin_name</span> <span class="o">=</span> <span class="s2">&quot;Add one-dimensional data with details&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">detailed_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_details</span>
+
+    <span class="nd">@process_1d_with_multi_input_dims</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_input_data_copy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">new_data</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">AddOneDimensionalData</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;store_details&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="p">{</span><span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_detailed_results</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">new_data</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">new_data</span><span class="p">,</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">_create_detailed_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;n_plots&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;plot_titles&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Input and Output&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Offset array&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;plot_ylabels&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;intensity / a.u.&quot;</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;intensity / a.u.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;plot&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;input data&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;plot&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;output data&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">output</span><span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;plot&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;offset&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s2">&quot;offset_array&quot;</span><span class="p">))</span>
+                <span class="p">},</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<p>Now, when testing the plugin, the detailed results can be accessed through the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">detailed_results</span></code> property or automatically in the <a class="reference internal" href="../manuals/gui/frames/WorkflowTestFrame.html#workflow-test-frame"><span class="std std-ref">Workflow test frame</span></a>
+when using the GUI.</p>
+<p>As example, the following code snippet shows how to access the detailed results, first
+for a one-dimensional input <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>, then for a two-dimensional input <a class="reference internal" href="../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">AddOneDimensionalDataWithDetails</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s2">&quot;offset_array&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_1d</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">axis_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_2d</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+<span class="gp">... </span>    <span class="n">axis_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># First, we test the plugin with a one-dimensional input Dataset:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_data_1d</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data_1d</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">store_details</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">new_data_1d</span> <span class="o">-</span> <span class="n">data_1d</span><span class="p">)</span><span class="o">.</span><span class="n">array</span>
+<span class="go">array([4, 2, 0, 1, 3])</span>
+<span class="go"># Detailed results will now be stored using the generic key `None`:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">detailed_results</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">dict_keys([None])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">detailed_results</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">dict_keys([&#39;n_plots&#39;, &#39;plot_titles&#39;, &#39;plot_ylabels&#39;, &#39;metadata&#39;, &#39;items&#39;])</span>
+
+<span class="go"># Now, we test the plugin with a two-dimensional input Dataset:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">data_2d</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">store_details</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">new_data</span> <span class="o">-</span> <span class="n">data_2d</span><span class="p">)</span><span class="o">.</span><span class="n">array</span>
+<span class="go">array([[4., 2., 0., 1., 3.],</span>
+<span class="go">       [4., 2., 0., 1., 3.],</span>
+<span class="go">       [4., 2., 0., 1., 3.],</span>
+<span class="go">       [4., 2., 0., 1., 3.],</span>
+<span class="go">       [4., 2., 0., 1., 3.]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">detailed_results</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">dict_keys([&#39;x: 0.0000 &#39;, &#39;x: 1.0000 &#39;, &#39;x: 2.0000 &#39;, &#39;x: 3.0000 &#39;, &#39;x: 4.0000 &#39;])</span>
+</pre></div>
+</div>
+<p>The representation in the GUI looks like the following:</p>
+<a class="reference internal image-reference" href="../_images/plugin_detailed_results.png"><img alt="../_images/plugin_detailed_results.png" class="align-center" src="../_images/plugin_detailed_results.png" style="width: 800px;" />
+</a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p class="align-references">
+<a href="#intermediate-results">Back to "Intermediate and detailed results" section</a>
+<a href="#developer-guide-to-plugins">(go back to top of the page)</a>
+</p><br><br></section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="developer_guide.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Developer guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="dev_guide_apps.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Developers guide to pydidas applications</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-structure">Plugin structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-class-attributes">Plugin class attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-plugin-attributes-and-methods">Generic plugin attributes and methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-attributes">Generic attributes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-classmethods">Plugin classmethods</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-properties">Generic properties</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-methods">Generic methods</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-plugin-parameters">Defining plugin Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-dynamic-data-dimensionality">Handling dynamic data dimensionality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intermediate-and-detailed-results">Intermediate and detailed results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-default-parameter-definition-examples">Plugin default parameter definition examples</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-1-a-plugin-with-a-only-generic-parameter-objects">Example 1: A plugin with a only generic <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-2-a-plugin-with-a-mix-of-generic-and-custom-parameter-objects">Example 2: A plugin with a mix of generic and custom <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-3-a-plugin-with-mostly-custom-parameter-objects">Example 3: A plugin with mostly custom <code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code> objects</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-dynamic-data-dimensionality-example">Handling dynamic data dimensionality example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intermediate-and-detailed-results-example">Intermediate and detailed results example</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/dev_guide/dev_guide_plugins.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/dev_guide/dev_guide_plugins.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

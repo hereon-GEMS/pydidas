@@ -143,9 +143,7 @@ class SinSquareChiGrouping(ProcPlugin):
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = -1
     output_data_dim = 2
-    output_data_label = (
-        "0: position_neg; 1: position_pos; 2: Mean of (position_neg, position_pos)"
-    )
+    output_data_label = "invalid - must be set based on input data"
     new_dataset = True
 
     # modification of the keep_results parameter to ensure results are always stored
@@ -306,6 +304,7 @@ class SinSquareChiGrouping(ProcPlugin):
             chi, d_spacing = self._ds_slicing_1d(data)
         else:
             self.raise_UserConfigError("The input dataset has to be 1D or 2D.")
+        self._update_data_labels_from_extracted_units(d_spacing)
 
         self._ensure_npt_azim_limit(chi)
         d_spacing_pos, d_spacing_neg = self._group_d_spacing_by_chi(d_spacing, chi)
@@ -313,7 +312,7 @@ class SinSquareChiGrouping(ProcPlugin):
             d_spacing_pos, d_spacing_neg
         )
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(
-            d_spacing_combined, data
+            d_spacing_combined
         )
 
         return d_output_sin2chi_method, kwargs
@@ -391,7 +390,9 @@ class SinSquareChiGrouping(ProcPlugin):
         # Check if 'position' is found
         if position_key is None:
             self.raise_UserConfigError(
-                'Key containing "position" is missing. Check your dataset.'
+                "Key containing `position` is missing in input data axis labels. "
+                "The SinSquareChiGrouping expects the output of a FitPlugin as input. "
+                "Please check your workflow and input dataset."
             )
 
         return chi_key, position_key
@@ -724,6 +725,20 @@ class SinSquareChiGrouping(ProcPlugin):
 
         return chi, d_spacing
 
+    def _update_data_labels_from_extracted_units(self, data_w_units: Dataset) -> None:
+        """
+        Update the output labels of the plugin based on the extracted units.
+
+        Parameters
+        ----------
+        data_w_units : Dataset
+            The dataset containing the extracted units.
+        """
+        self.output_data_label = data_w_units.metadata.get(
+            "fitted_axis_label", "undefined"
+        )
+        self.output_data_unit = data_w_units.data_unit
+
     def _idx_s2c_grouping(
         self, chi: np.ndarray, tolerance: float = S2C_TOLERANCE
     ) -> tuple[int, np.ndarray]:
@@ -965,9 +980,8 @@ class SinSquareChiGrouping(ProcPlugin):
 
         return d_spacing_pos, d_spacing_neg
 
-    @staticmethod
     def _combine_sort_d_spacing_pos_neg(
-        d_spacing_pos: Dataset, d_spacing_neg: Dataset
+        self, d_spacing_pos: Dataset, d_spacing_neg: Dataset
     ) -> Dataset:
         """
         Combines and sorts d-spacing datasets with positive and negative slopes
@@ -1070,15 +1084,14 @@ class SinSquareChiGrouping(ProcPlugin):
             d_spacing_combi_arr,
             axis_ranges={0: np.arange(2), 1: s2c_axis_pos_sorted},
             axis_labels={0: "0: d-, 1: d+", 1: "sin^2(chi)"},
-            data_label=f"0: {d_spacing_neg.data_label}, 1: {d_spacing_pos.data_label}",
-            data_unit=d_spacing_pos.data_unit,
+            data_unit=self.output_data_unit,
+            data_label=self.output_data_label,
         )
 
         return d_spacing_combined
 
-    @staticmethod
     def _create_final_result_sin2chi_method(
-        d_spacing_combined: Dataset, input_data: Dataset | None = None
+        self, d_spacing_combined: Dataset
     ) -> Dataset:
         """
         Calculates the mean of d-spacing values and combines them into a single Dataset.
@@ -1092,9 +1105,6 @@ class SinSquareChiGrouping(ProcPlugin):
         ----------
         d_spacing_combined : Dataset
             A Dataset object containing combined d-spacing values (d-, d+).
-        input_data : Dataset, optional
-            The input Dataset. This data is required to extract the data labels.
-            If not given, the function will default to the generic d_spacing label.
 
         Returns
         -------
@@ -1127,10 +1137,6 @@ class SinSquareChiGrouping(ProcPlugin):
 
         d_spacing_avg = d_spacing_combined.mean(axis=0).reshape(1, -1)
         arr = np.vstack((d_spacing_combined, d_spacing_avg))
-        if input_data is None:
-            _label = "d_spacing"
-        else:
-            _label = input_data.metadata.get("fitted_axis_label", "d_spacing")
 
         # Create the final result Dataset, when dynamic array allocation is implemented
         result = Dataset(
@@ -1140,8 +1146,8 @@ class SinSquareChiGrouping(ProcPlugin):
                 1: d_spacing_combined.axis_ranges[1],
             },
             axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
-            data_unit=d_spacing_combined.data_unit,
-            data_label=_label,
+            data_unit=self.output_data_unit,
+            data_label=self.output_data_label,
         )
 
         return result

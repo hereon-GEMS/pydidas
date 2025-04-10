@@ -47,7 +47,6 @@ from pydidas_plugins.proc_plugins.sin_square_chi_grouping import (
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import PluginCollection, ProcPlugin
-from pydidas.unittest_objects import create_dataset
 
 
 GENERIC_FIT_OUTPUT_LABEL = (
@@ -66,11 +65,15 @@ ALTERNATE_FIT_DATA_LABEL = (
 )
 UNITS_ANGSTROM = "A"
 UNITS_NANOMETER = "nm"
+OUTPUT_LABEL = "d-spacing"
 
 
 @pytest.fixture
 def plugin():
-    return PluginCollection().get_plugin_by_name("SinSquareChiGrouping")()
+    _plugin = PluginCollection().get_plugin_by_name("SinSquareChiGrouping")()
+    _plugin.output_data_label = OUTPUT_LABEL
+    _plugin.output_data_unit = UNITS_NANOMETER
+    return _plugin
 
 
 @pytest.fixture(scope="module")
@@ -121,22 +124,25 @@ def d_spacing_datasets():
         _pos_array,
         axis_labels={0: LABELS_SIN2CHI},
         axis_ranges={0: _ax_array[:]},
-        data_unit="nm",
-        data_label="position_pos",
+        data_unit=UNITS_NANOMETER,
+        data_label=OUTPUT_LABEL,
+        metadata={"fitted_axis_label": OUTPUT_LABEL},
     )
     d_spacing_neg = Dataset(
         _neg_array,
         axis_labels={0: LABELS_SIN2CHI},
         axis_ranges={0: _ax_array[:]},
-        data_unit="nm",
-        data_label="position_neg",
+        data_unit=UNITS_NANOMETER,
+        data_label=OUTPUT_LABEL,
+        metadata={"fitted_axis_label": OUTPUT_LABEL},
     )
     d_spacing_combined = Dataset(
         np.array([_neg_array[_ax_array.argsort()], _pos_array[_ax_array.argsort()]]),
         axis_labels={0: "0: d-, 1: d+", 1: LABELS_SIN2CHI},
         axis_ranges={0: np.array([0, 1]), 1: np.sort(_ax_array)},
-        data_unit="nm",
-        data_label="0: position_neg, 1: position_pos",
+        data_unit=UNITS_NANOMETER,
+        data_label=OUTPUT_LABEL,
+        metadata={"fitted_axis_label": OUTPUT_LABEL},
     )
     return d_spacing_pos, d_spacing_neg, d_spacing_combined
 
@@ -151,8 +157,8 @@ def expected_results(d_spacing_datasets):
             1: _combined_data.axis_ranges[1],
         },
         axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
-        data_unit="nm",
-        data_label="d_spacing",
+        data_unit=UNITS_NANOMETER,
+        data_label=OUTPUT_LABEL,
         array=np.vstack((d_spacing_datasets[2], _mean)),
     )
 
@@ -165,10 +171,7 @@ def test_plugin_initialization(plugin):
     assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == -1
     assert plugin.output_data_dim == 2
-    assert (
-        plugin.output_data_label
-        == "0: position_neg; 1: position_pos; 2: Mean of (position_neg, position_pos)"
-    )
+    assert plugin.output_data_label == OUTPUT_LABEL
     assert plugin.new_dataset
 
     # check plugin is initialised with autosave option (True or 1)
@@ -576,7 +579,7 @@ def test__group_d_spacing_by_chi_result(plugin, case):
     d_spacing = Dataset(
         case.d_spacing_func(chi),
         axis_ranges={0: np.arange(0, len(chi))},
-        axis_labels={0: "d_spacing"},
+        axis_labels={0: OUTPUT_LABEL},
     )
 
     (d_spacing_pos, d_spacing_neg) = plugin._group_d_spacing_by_chi(
@@ -811,7 +814,7 @@ def test__chi_pos_verification_missing_position(plugin):
     ds = Dataset(result_array_spatial, axis_labels=axis_labels)
     with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification(ds)
-    assert 'Key containing "position" is missing' in str(excinfo.value)
+    assert "Key containing `position` is missing" in str(excinfo.value)
 
 
 def test_chi_pos_verification_wrong_input_type(plugin):
@@ -1097,7 +1100,7 @@ def test__group_d_spacing_by_chi_len_unique_groups(plugin):
         np.arange(0, len(chi), dtype=float),
         axis_ranges={0: np.arange(0, len(chi))},
         axis_labels={0: "chi"},
-        data_label="d_spacing",
+        data_label=OUTPUT_LABEL,
     )
 
     # unique groups:
@@ -1421,7 +1424,7 @@ def test_combine_sort_d_spacing_pos_neg_valid(plugin):
     assert np.array_equal(result.array, np.array([[3.0, 2.0, 1.0], [1.0, 2.0, 3.0]]))
     assert np.array_equal(result.axis_ranges[1], np.array([0.1, 0.2, 0.3]))
     assert result.axis_labels == {0: "0: d-, 1: d+", 1: LABELS_SIN2CHI}
-    assert result.data_label == "0: position_neg, 1: position_pos"
+    assert result.data_label == plugin.output_data_label
 
 
 def test_combine_sort_d_spacing_pos_neg_stablesort(plugin):
@@ -1505,8 +1508,6 @@ def test_combine_sort_d_spacing_pos_neg_explicit(plugin, d_spacing_datasets):
     d_spacing_combined_cal = plugin._combine_sort_d_spacing_pos_neg(
         d_spacing_pos, d_spacing_neg
     )
-    print(d_spacing_combined_cal.axis_ranges)
-    print(d_spacing_combined.axis_ranges)
     assert np.allclose(d_spacing_combined_cal.array, d_spacing_combined.array)
     assert np.allclose(
         d_spacing_combined_cal.axis_ranges[1], d_spacing_combined.axis_ranges[1]
@@ -1541,8 +1542,8 @@ def d_spacing_combined_fixture():
         },  # Example sin^2(chi) values
         axis_labels={0: "0: d-, 1: d+", 1: LABELS_SIN2CHI},
         axis_units={0: "", 1: ""},
-        data_unit="nm",
-        data_label="d_spacing",
+        data_unit=UNITS_NANOMETER,
+        data_label=OUTPUT_LABEL,
     )
     return d_spacing_combined
 
@@ -1633,10 +1634,9 @@ def test_create_final_result_sin2chi_method__w_input_data(
     plugin, d_spacing_datasets, expected_results
 ):
     test_label = "A dummy LABEL"
+    plugin.output_data_label = test_label
     _, _, d_spacing_combined = d_spacing_datasets
-    _input_data = create_dataset(4)
-    _input_data.metadata = _input_data.metadata | {"fitted_axis_label": test_label}
-    result = plugin._create_final_result_sin2chi_method(d_spacing_combined, _input_data)
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
     assert result.data_label == test_label
     assert np.allclose(result, expected_results, atol=1e-8)
 
@@ -1645,9 +1645,8 @@ def test_create_final_result_sin2chi_method__w_input_data__wo_fitted_axis_label(
     plugin, d_spacing_datasets, expected_results
 ):
     _, _, d_spacing_combined = d_spacing_datasets
-    _input_data = create_dataset(4)
-    result = plugin._create_final_result_sin2chi_method(d_spacing_combined, _input_data)
-    assert result.data_label == "d_spacing"
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
+    assert result.data_label == OUTPUT_LABEL
     assert np.allclose(result, expected_results, atol=1e-8)
 
 
@@ -1657,7 +1656,7 @@ def results_sin2chi_method_fixture():
         np.array([[1, 2, 3, 4], [5, 6, 7, 8]]),
         axis_ranges={0: [0, 1], 1: [0, 1, 2, 3]},
         axis_labels={0: "0: d-, 1: d+", 1: LABELS_SIN2CHI},
-        data_unit="nm",
+        data_unit=UNITS_NANOMETER,
         data_label="0: position_neg, 1: position_pos",
     )
 
@@ -1665,8 +1664,8 @@ def results_sin2chi_method_fixture():
         np.array([[1, 2, 3, 4], [5, 6, 7, 8], [3, 4, 5, 6]]),
         axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]},
         axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
-        data_unit="nm",
-        data_label="d_spacing",
+        data_unit=UNITS_NANOMETER,
+        data_label=OUTPUT_LABEL,
     )
 
     return d_spacing_combined, d_spacing_result
@@ -1709,7 +1708,7 @@ def test__create_final_result_sin2chi_method_shape(plugin):
         np.array([1, 2, 3, 4]),
         axis_ranges={0: [0, 1, 2, 3]},
         axis_labels={0: LABELS_SIN2CHI},
-        data_unit="nm",
+        data_unit=UNITS_NANOMETER,
         data_label="0: position_neg",
     )
     with pytest.raises(
@@ -1767,6 +1766,7 @@ class Ds2cTestConfig:
             axis_labels={0: self.azimuth_name, 1: "0: position"},
             axis_units={0: self.chi_unit, 1: ""},
             data_label=f"position / {self.d_unit}",
+            metadata={"fitted_axis_label": OUTPUT_LABEL},
         )
 
         return input_ds
@@ -1780,8 +1780,8 @@ class Ds2cTestConfig:
                 1: self.s2c_range_sorted,
             },
             axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
-            data_unit=f"{self.d_unit}",
-            data_label="d_spacing",
+            data_unit=UNITS_NANOMETER,
+            data_label=OUTPUT_LABEL,
         )
 
         return output_ds
@@ -1794,6 +1794,7 @@ class Ds2cTestConfig:
             axis_labels={0: self.azimuth_name},
             axis_units={0: self.chi_unit},
             data_label=f"position / {self.d_unit}",
+            metadata={"fitted_axis_label": OUTPUT_LABEL},
         )
         return input_ds
 
@@ -2415,14 +2416,13 @@ def test_execute_with_various_cases_1d(plugin, case):
     expected_ds = case.create_output_ds()
 
     result, _ = plugin.execute(ds_in)
-
     npt.assert_allclose(
         result.array,
         expected_ds.array,
         rtol=5e-10,
         atol=1e-15,
         equal_nan=True,
-        err_msg="Tolerance not matchend.",
+        err_msg="Tolerance not matched.",
         verbose=True,
     )
     npt.assert_allclose(
@@ -2431,7 +2431,7 @@ def test_execute_with_various_cases_1d(plugin, case):
         rtol=1e-5,
         atol=1e-8,
         equal_nan=True,
-        err_msg="Tolerance not matchend.",
+        err_msg="Tolerance not matched.",
         verbose=True,
     )
     npt.assert_allclose(
@@ -2510,7 +2510,7 @@ def base_execute_dataset():
 @pytest.mark.parametrize(
     "missing_field, removal_key, expected_error_message",
     [
-        ("position", 1, 'Key containing "position" is missing. Check your dataset.'),
+        ("position", 1, "Key containing `position` is missing in input"),
         ("chi", 0, "chi is missing. Check your dataset."),
         ("position / ", 3, "Unit not found for parameter: position"),
         ("chi_unit", 4, "Unit dummy not allowed for chi."),
@@ -2765,7 +2765,7 @@ def test__create_final_result_sin2chi_method(
         axis_ranges={0: [0, 1, 2], 1: [0, 1, 2, 3]},
         axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
         data_unit=UNITS_NANOMETER,
-        data_label="d_spacing",
+        data_label=OUTPUT_LABEL,
     )
 
     # Compare array data

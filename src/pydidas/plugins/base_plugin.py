@@ -31,7 +31,7 @@ __all__ = ["BasePlugin"]
 
 import copy
 from numbers import Integral
-from typing import Self, NoReturn
+from typing import NoReturn, Self
 
 from qtpy import QtCore
 

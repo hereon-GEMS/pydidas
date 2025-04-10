@@ -34,21 +34,20 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from pydidas_plugins.proc_plugins.sin2chi_grouping import (
+from pydidas_plugins.proc_plugins.sin_square_chi_grouping import (
     LABELS_CHI,
     LABELS_POSITION,
     LABELS_SIN2CHI,
     NPT_AZIM_LIMIT,
     PARAMETER_KEEP_RESULTS,
     S2C_TOLERANCE,
-    UNITS_ANGSTROM,
     UNITS_DEGREE,
-    UNITS_NANOMETER,
 )
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.plugins import PluginCollection, ProcPlugin
+from pydidas.unittest_objects import create_dataset
 
 
 GENERIC_FIT_OUTPUT_LABEL = (
@@ -65,17 +64,101 @@ ALTERNATE_FIT_DATA_LABEL = (
     "area / (cts * nm-1); position / nm; FWHM / nm; background at peak / cts; "
     "total count intensity / cts"
 )
+UNITS_ANGSTROM = "A"
+UNITS_NANOMETER = "nm"
 
 
 @pytest.fixture
-def plugin_fixture():
+def plugin():
     return PluginCollection().get_plugin_by_name("SinSquareChiGrouping")()
 
 
-def test_plugin_initialization(plugin_fixture):
-    # Test if the plugin is initialized correctly
-    plugin = plugin_fixture
+@pytest.fixture(scope="module")
+def d_spacing_datasets():
+    _ax_array = np.array(
+        [
+            0.75,
+            0.883022,
+            0.969846,
+            1.0,
+            0.586824,
+            0.413176,
+            0.25,
+            0.116978,
+            0.030154,
+            0.0,
+        ]
+    )
+    _pos_array = np.array(
+        [
+            26.201953,
+            26.151003,
+            26.102181,
+            26.063213,
+            26.249156,
+            26.267693,
+            26.324825,
+            26.323819,
+            26.311725,
+            26.281715,
+        ]
+    )
+    _neg_array = np.array(
+        [
+            26.041096,
+            26.037526,
+            26.036219,
+            26.063213,
+            26.074632,
+            26.099187,
+            26.171528,
+            26.206706,
+            26.238491,
+            26.281715,
+        ]
+    )
+    d_spacing_pos = Dataset(
+        _pos_array,
+        axis_labels={0: LABELS_SIN2CHI},
+        axis_ranges={0: _ax_array[:]},
+        data_unit="nm",
+        data_label="position_pos",
+    )
+    d_spacing_neg = Dataset(
+        _neg_array,
+        axis_labels={0: LABELS_SIN2CHI},
+        axis_ranges={0: _ax_array[:]},
+        data_unit="nm",
+        data_label="position_neg",
+    )
+    d_spacing_combined = Dataset(
+        np.array([_neg_array[_ax_array.argsort()], _pos_array[_ax_array.argsort()]]),
+        axis_labels={0: "0: d-, 1: d+", 1: LABELS_SIN2CHI},
+        axis_ranges={0: np.array([0, 1]), 1: np.sort(_ax_array)},
+        data_unit="nm",
+        data_label="0: position_neg, 1: position_pos",
+    )
+    return d_spacing_pos, d_spacing_neg, d_spacing_combined
 
+
+@pytest.fixture(scope="module")
+def expected_results(d_spacing_datasets):
+    _combined_data = d_spacing_datasets[2]
+    _mean = np.round((_combined_data[0] + _combined_data[1]) / 2, 6)
+    return Dataset(
+        axis_ranges={
+            0: np.arange(3),
+            1: _combined_data.axis_ranges[1],
+        },
+        axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
+        data_unit="nm",
+        data_label="d_spacing",
+        array=np.vstack((d_spacing_datasets[2], _mean)),
+    )
+
+
+def test_plugin_initialization(plugin):
+    # Test if the plugin is initialized correctly
     assert plugin.plugin_name == "sin^2(chi) grouping"
     assert not plugin.basic_plugin
     assert plugin.plugin_type == PROC_PLUGIN
@@ -488,9 +571,7 @@ test_cases = [case1, case2, case3, case4, case5, case6, case7, case8, case9, cas
 
 
 @pytest.mark.parametrize("case", test_cases)
-def test__group_d_spacing_by_chi_result(plugin_fixture, case):
-    plugin = plugin_fixture
-
+def test__group_d_spacing_by_chi_result(plugin, case):
     chi = chi_gen(case.chi_start, case.chi_stop, case.delta_chi)
     d_spacing = Dataset(
         case.d_spacing_func(chi),
@@ -546,9 +627,9 @@ def base_dataset_one_fit_parameter_factory():
     [(UNITS_ANGSTROM, UNITS_ANGSTROM), (UNITS_NANOMETER, UNITS_NANOMETER)],
 )
 def test__extract_and_verify_units_validation(
-    plugin_fixture, base_dataset_one_fit_parameter_factory, unit, expected_unit
+    plugin, base_dataset_one_fit_parameter_factory, unit, expected_unit
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(unit)
 
     plugin._extract_and_verify_units(test_ds)
@@ -560,9 +641,9 @@ def test__extract_and_verify_units_validation(
 
 
 def test__extract_and_verify_units_chi_missing(
-    plugin_fixture, base_dataset_one_fit_parameter_factory
+    plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.update_axis_label(0, "delta")
 
@@ -576,9 +657,9 @@ def test__extract_and_verify_units_chi_missing(
 
 
 def test__extract_and_verify_units_chi_unit_wrong(
-    plugin_fixture, base_dataset_one_fit_parameter_factory
+    plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.update_axis_unit(0, "rad")
 
@@ -592,9 +673,9 @@ def test__extract_and_verify_units_chi_unit_wrong(
 
 
 def test__extract_and_verify_units_position_missing(
-    plugin_fixture, base_dataset_one_fit_parameter_factory
+    plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.data_label = f"length / {UNITS_ANGSTROM}"
 
@@ -606,9 +687,9 @@ def test__extract_and_verify_units_position_missing(
 
 
 def test__extract_and_verify_units_position_unit_wrong(
-    plugin_fixture, base_dataset_one_fit_parameter_factory
+    plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.data_label = f"{LABELS_POSITION} / m"  # Set an invalid unit for position
 
@@ -619,10 +700,8 @@ def test__extract_and_verify_units_position_unit_wrong(
     assert f"Unit 'm' is not allowed for key '{LABELS_POSITION}." in str(excinfo.value)
 
 
-def test__ds_slicing_1d_validation(
-    plugin_fixture, base_dataset_one_fit_parameter_factory
-):
-    plugin = plugin_fixture
+def test__ds_slicing_1d_validation(plugin, base_dataset_one_fit_parameter_factory):
+    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
 
     chi, ds = plugin._ds_slicing_1d(test_ds)
@@ -644,15 +723,15 @@ def test__ds_slicing_1d_validation(
         (np.arange(3001), True),  # Invalid case, above the limit
     ],
 )
-def test__ensure_npt_azim_limit(plugin_fixture, chi, should_raise_error):
+def test__ensure_npt_azim_limit(plugin, chi, should_raise_error):
     if should_raise_error:
         with pytest.raises(
             UserConfigError,
             match=f"Number of azimuthal angles exceeds the limit of {NPT_AZIM_LIMIT}.",
         ):
-            plugin_fixture._ensure_npt_azim_limit(chi)
+            plugin._ensure_npt_azim_limit(chi)
     else:
-        plugin_fixture._ensure_npt_azim_limit(chi)  # Should not raise an error
+        plugin._ensure_npt_azim_limit(chi)  # Should not raise an error
 
 
 @pytest.fixture
@@ -688,12 +767,12 @@ def base_dataset_with_fit_labels_factory():
     ],
 )
 def test__chi_pos_verification_success(
-    plugin_fixture,
+    plugin,
     base_dataset_with_fit_labels_factory,
     fit_label_input,
     expected_chi_pos_values,
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_dataset_with_fit_labels_factory(fit_label_input)
 
     (chi_pos_res, (pos_idx_res, pos_key_res)) = plugin._chi_pos_verification(test_ds)
@@ -704,9 +783,7 @@ def test__chi_pos_verification_success(
     assert (chi_pos_res, (pos_idx_res, pos_key_res)) == expected_chi_pos_values
 
 
-def test__chi_pos_verification_success_4d_array(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__chi_pos_verification_success_4d_array(plugin):
     fit_labels = GENERIC_FIT_OUTPUT_LABEL
 
     result_array_spatial = generate_result_array_spatial()
@@ -722,9 +799,7 @@ def test__chi_pos_verification_success_4d_array(plugin_fixture):
     assert pos_idx == 0
 
 
-def test__chi_pos_verification_missing_position(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__chi_pos_verification_missing_position(plugin):
     fit_labels = (
         "0: energy; 1: area; 2: FWHM; 3: background at peak; 4: total count intensity"
     )
@@ -739,9 +814,7 @@ def test__chi_pos_verification_missing_position(plugin_fixture):
     assert 'Key containing "position" is missing' in str(excinfo.value)
 
 
-def test_chi_pos_verification_wrong_input_type(plugin_fixture):
-    plugin = plugin_fixture
-
+def test_chi_pos_verification_wrong_input_type(plugin):
     with pytest.raises(UserConfigError) as excinfo:
         plugin._chi_pos_verification([])  # Pass a list instead of a Dataset
     assert "Input must be an instance of Dataset." in str(excinfo.value), (
@@ -749,9 +822,7 @@ def test_chi_pos_verification_wrong_input_type(plugin_fixture):
     )
 
 
-def test__chi_pos_verification_all_labels_missing(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__chi_pos_verification_all_labels_missing(plugin):
     result_array_spatial = generate_result_array_spatial()
 
     # labels are missing while creating a Dataset
@@ -761,9 +832,7 @@ def test__chi_pos_verification_all_labels_missing(plugin_fixture):
     assert "chi is missing" in str(excinfo.value)
 
 
-def test__multiple_chis_in_labels(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__multiple_chis_in_labels(plugin):
     fit_labels = GENERIC_FIT_OUTPUT_LABEL
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {
@@ -784,9 +853,7 @@ def test__multiple_chis_in_labels(plugin_fixture):
     )
 
 
-def test__position_not_at_zero(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__position_not_at_zero(plugin):
     fit_labels = ALTERNATE_FIT_OUTPUT_LABEL
     data_labels = ALTERNATE_FIT_DATA_LABEL
 
@@ -798,9 +865,7 @@ def test__position_not_at_zero(plugin_fixture):
     assert position_key == (3, 2), "Expected position key to be (3, 2)"
 
 
-def test__position_not_at_zero_3d(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__position_not_at_zero_3d(plugin):
     fit_labels = ALTERNATE_FIT_OUTPUT_LABEL
     data_labels = ALTERNATE_FIT_DATA_LABEL
 
@@ -815,9 +880,7 @@ def test__position_not_at_zero_3d(plugin_fixture):
     assert position_key == (2, 2), "Expected position key to be (2, 2)"
 
 
-def test__ds_slicing_type_error(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__ds_slicing_type_error(plugin):
     with pytest.raises(UserConfigError) as excinfo:
         plugin._ds_slicing([])  # Pass an empty list instead of a Dataset
     assert "Input must be an instance of Dataset." in str(excinfo.value), (
@@ -825,9 +888,7 @@ def test__ds_slicing_type_error(plugin_fixture):
     )
 
 
-def test__ds_slicing_valid(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__ds_slicing_valid(plugin):
     fit_labels = GENERIC_FIT_OUTPUT_LABEL
     data_labels = GENERIC_DATA_LABEL
 
@@ -847,14 +908,12 @@ def test__ds_slicing_valid(plugin_fixture):
     assert isinstance(chi, np.ndarray) and isinstance(d_spacing, Dataset)
 
 
-def test__ds_slicing_beyond_bounds_v2(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__ds_slicing_beyond_bounds_v2(plugin):
     """
-    fit_label is 5: position. Shape of Dataset is 5 in the last dimension. 
+    fit_label is 5: position. Shape of Dataset is 5 in the last dimension.
     Expected error: "Array is empty, slicing out of bounds." because 5 is out of range.
-    Slice: slices 
-        [slice(None, None, None), slice(None, None, None), slice(None, None, None), 
+    Slice: slices
+        [slice(None, None, None), slice(None, None, None), slice(None, None, None),
         slice(5, 6, None)
     ]
     Allowed incides in last dimension range from 0 to 4.
@@ -892,9 +951,7 @@ def test__ds_slicing_beyond_bounds_v2(plugin_fixture):
     )
 
 
-def test__ds_slicing_dimension_mismatch(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__ds_slicing_dimension_mismatch(plugin):
     fit_labels = GENERIC_FIT_OUTPUT_LABEL
     data_labels = GENERIC_DATA_LABEL
     result_array_spatial = generate_result_array_spatial()
@@ -914,9 +971,7 @@ def test__ds_slicing_dimension_mismatch(plugin_fixture):
     )
 
 
-def test__ds_slicing_dimension_mismatch_3d(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__ds_slicing_dimension_mismatch_3d(plugin):
     fit_labels = "0: position"
     data_labels = "position / nm"
     results_array_spatial_3d = generate_result_array_spatial(
@@ -937,9 +992,7 @@ def test__ds_slicing_dimension_mismatch_3d(plugin_fixture):
     )
 
 
-def test__extract_d_spacing_valid(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__extract_d_spacing_valid(plugin):
     fit_labels = GENERIC_FIT_OUTPUT_LABEL
     data_labels = GENERIC_DATA_LABEL
     result_array_spatial = generate_result_array_spatial()
@@ -960,18 +1013,14 @@ def test__extract_d_spacing_valid(plugin_fixture):
     )
 
 
-def test__idx_s2c_grouping_basic(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__idx_s2c_grouping_basic(plugin):
     chi = np.arange(-175, 185, 10)
     n_components, s2c_labels = plugin._idx_s2c_grouping(chi, tolerance=1e-3)
     assert n_components > 0
     assert len(s2c_labels) == len(chi)
 
 
-def test__idx_s2c_grouping_tolerance_effectiveness(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__idx_s2c_grouping_tolerance_effectiveness(plugin):
     chi = np.array([0, 0.001, 0.002, 0.003])
     n_components, labels = plugin._idx_s2c_grouping(chi, tolerance=0.00001)
     assert (
@@ -979,42 +1028,32 @@ def test__idx_s2c_grouping_tolerance_effectiveness(plugin_fixture):
     )  # All should be in one group due to small variation and tight tolerance
 
 
-def test__idx_s2c_grouping_type_error(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__idx_s2c_grouping_type_error(plugin):
     with pytest.raises(TypeError):
         plugin._idx_s2c_grouping([0, 30, 60])  # Passing a list instead of np.ndarray
 
 
-def test__idx_s2c_grouping_empty_array(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__idx_s2c_grouping_empty_array(plugin):
     chi = np.array([])
     n_components, labels = plugin._idx_s2c_grouping(chi)
     assert n_components == 0  # No components should be found
     assert len(labels) == 0  # No labels should be assigned
 
 
-def test__idx_s2c_grouping_extreme_values(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__idx_s2c_grouping_extreme_values(plugin):
     chi = np.array([-360, 360])
     n_components, labels = plugin._idx_s2c_grouping(chi)
     assert n_components == 1  # Extreme but equivalent values should be grouped together
 
 
-def test__idx_s2c_grouping_very_small_array(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__idx_s2c_grouping_very_small_array(plugin):
     chi = np.array([0])
     n_components, labels = plugin._idx_s2c_grouping(chi)
     assert n_components == 1  # Single value should form one group
     assert len(labels) == 1  # One label for the one value
 
 
-def test__group_d_spacing_by_chi_basic(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__group_d_spacing_by_chi_basic(plugin):
     chi = np.arange(-175, 185, 10)
     d_spacing = Dataset(
         np.arange(0, len(chi)),
@@ -1035,9 +1074,7 @@ def test__group_d_spacing_by_chi_basic(plugin_fixture):
     assert d_spacing_neg.axis_labels[0] == LABELS_SIN2CHI
 
 
-def test__group_d_spacing_by_chi_type_error(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__group_d_spacing_by_chi_type_error(plugin):
     chi = np.arange(-175, 185, 10)
     d_spacing = Dataset(
         np.arange(0, len(chi)), axis_ranges={0: chi}, axis_labels={0: "chi"}
@@ -1051,9 +1088,7 @@ def test__group_d_spacing_by_chi_type_error(plugin_fixture):
     assert "d_spacing has to be of type Pydidas Dataset" in str(excinfo.value)
 
 
-def test__group_d_spacing_by_chi_len_unique_groups(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__group_d_spacing_by_chi_len_unique_groups(plugin):
     delta_chi = 10
     chi_start = -180
     chi_stop = 181
@@ -1094,7 +1129,7 @@ test_cases = [case9]
 
 
 @pytest.mark.parametrize("case", test_cases)
-def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
+def test__group_d_spacing_by_chi_second_validation_method(plugin, case):
     """
     A test function to validate the `group_d_spacing_by_chi` function via a different
     approach.
@@ -1226,8 +1261,6 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin_fixture, case):
 
     # Initialisation
 
-    plugin = plugin_fixture
-
     chi = chi_gen(case.chi_start, case.chi_stop, case.delta_chi)
     d_spacing = Dataset(
         case.d_spacing_func(chi),
@@ -1328,10 +1361,8 @@ ds_case1 = DSpacingTestConfig(
     ],
 )
 def test__combine_sort_d_spacing_pos_neg_type_error(
-    plugin_fixture, d_spacing_pos, d_spacing_neg, expect_error
+    plugin, d_spacing_pos, d_spacing_neg, expect_error
 ):
-    plugin = plugin_fixture
-
     if expect_error:
         with pytest.raises(TypeError):
             plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
@@ -1340,9 +1371,7 @@ def test__combine_sort_d_spacing_pos_neg_type_error(
         assert isinstance(result, Dataset), "Expected Dataset object as output"
 
 
-def test__combine_sort_d_spacing_pos_neg_axis_labels_mismatch(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__combine_sort_d_spacing_pos_neg_axis_labels_mismatch(plugin):
     d_spacing_pos = Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
@@ -1358,9 +1387,7 @@ def test__combine_sort_d_spacing_pos_neg_axis_labels_mismatch(plugin_fixture):
         plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
 
 
-def test__combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape(plugin):
     d_spacing_pos = Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
@@ -1376,9 +1403,7 @@ def test__combine_sort_d_spacing_pos_neg_axis_ranges_mismatch_shape(plugin_fixtu
         plugin._combine_sort_d_spacing_pos_neg(d_spacing_pos, d_spacing_neg)
 
 
-def test_combine_sort_d_spacing_pos_neg_valid(plugin_fixture):
-    plugin = plugin_fixture
-
+def test_combine_sort_d_spacing_pos_neg_valid(plugin):
     d_spacing_pos = Dataset(
         np.array([1.0, 2.0, 3.0]),
         axis_ranges={0: np.array([0.1, 0.2, 0.3])},
@@ -1399,9 +1424,7 @@ def test_combine_sort_d_spacing_pos_neg_valid(plugin_fixture):
     assert result.data_label == "0: position_neg, 1: position_pos"
 
 
-def test_combine_sort_d_spacing_pos_neg_stablesort(plugin_fixture):
-    plugin = plugin_fixture
-
+def test_combine_sort_d_spacing_pos_neg_stablesort(plugin):
     # Create datasets with the same sin2chi values but in different unsorted order
     sin2chi_values = np.array([0.3, 0.1, 0.2])
 
@@ -1439,9 +1462,7 @@ def test_combine_sort_d_spacing_pos_neg_stablesort(plugin_fixture):
     )
 
 
-def test_combine_sort_d_spacing_pos_neg_with_nan(plugin_fixture):
-    plugin = plugin_fixture
-
+def test_combine_sort_d_spacing_pos_neg_with_nan(plugin):
     # Create datasets with the same sin2chi values but with NaN values in d_spacing
     sin2chi_values = np.array([0.3, 0.1, 0.2])
 
@@ -1479,146 +1500,13 @@ def test_combine_sort_d_spacing_pos_neg_with_nan(plugin_fixture):
     )
 
 
-@pytest.fixture
-def d_spacing_datasets():
-    d_spacing_pos = Dataset(
-        axis_labels={0: LABELS_SIN2CHI},
-        axis_ranges={
-            0: np.array(
-                [
-                    0.75,
-                    0.883022,
-                    0.969846,
-                    1.0,
-                    0.586824,
-                    0.413176,
-                    0.25,
-                    0.116978,
-                    0.030154,
-                    0.0,
-                ]
-            )
-        },
-        axis_units={0: ""},
-        metadata={},
-        data_unit="nm",
-        data_label="position_pos",
-        array=np.array(
-            [
-                26.201953,
-                26.151003,
-                26.102181,
-                26.063213,
-                26.249156,
-                26.267693,
-                26.324825,
-                26.323819,
-                26.311725,
-                26.281715,
-            ]
-        ),
-    )
-    d_spacing_neg = Dataset(
-        axis_labels={0: LABELS_SIN2CHI},
-        axis_ranges={
-            0: np.array(
-                [
-                    0.75,
-                    0.883022,
-                    0.969846,
-                    1.0,
-                    0.586824,
-                    0.413176,
-                    0.25,
-                    0.116978,
-                    0.030154,
-                    0.0,
-                ]
-            )
-        },
-        axis_units={0: ""},
-        metadata={},
-        data_unit="nm",
-        data_label="position_neg",
-        array=np.array(
-            [
-                26.041096,
-                26.037526,
-                26.036219,
-                26.063213,
-                26.074632,
-                26.099187,
-                26.171528,
-                26.206706,
-                26.238491,
-                26.281715,
-            ]
-        ),
-    )
-
-    d_spacing_combined = Dataset(
-        axis_labels={0: "0: d-, 1: d+", 1: LABELS_SIN2CHI},
-        axis_ranges={
-            0: np.array([0, 1]),
-            1: np.array(
-                [
-                    0.0,
-                    0.030154,
-                    0.116978,
-                    0.25,
-                    0.413176,
-                    0.586824,
-                    0.75,
-                    0.883022,
-                    0.969846,
-                    1.0,
-                ]
-            ),
-        },
-        axis_units={0: "", 1: ""},
-        metadata={},
-        data_unit="nm",
-        data_label="0: position_neg, 1: position_pos",
-        array=np.array(
-            [
-                [
-                    26.281715,
-                    26.238491,
-                    26.206706,
-                    26.171528,
-                    26.099187,
-                    26.074632,
-                    26.041096,
-                    26.037526,
-                    26.036219,
-                    26.063213,
-                ],
-                [
-                    26.281715,
-                    26.311725,
-                    26.323819,
-                    26.324825,
-                    26.267693,
-                    26.249156,
-                    26.201953,
-                    26.151003,
-                    26.102181,
-                    26.063213,
-                ],
-            ]
-        ),
-    )
-    return d_spacing_pos, d_spacing_neg, d_spacing_combined
-
-
-def test_combine_sort_d_spacing_pos_neg_explicit(plugin_fixture, d_spacing_datasets):
-    plugin = plugin_fixture
-
+def test_combine_sort_d_spacing_pos_neg_explicit(plugin, d_spacing_datasets):
     d_spacing_pos, d_spacing_neg, d_spacing_combined = d_spacing_datasets
     d_spacing_combined_cal = plugin._combine_sort_d_spacing_pos_neg(
         d_spacing_pos, d_spacing_neg
     )
-
+    print(d_spacing_combined_cal.axis_ranges)
+    print(d_spacing_combined.axis_ranges)
     assert np.allclose(d_spacing_combined_cal.array, d_spacing_combined.array)
     assert np.allclose(
         d_spacing_combined_cal.axis_ranges[1], d_spacing_combined.axis_ranges[1]
@@ -1635,11 +1523,7 @@ def test_combine_sort_d_spacing_pos_neg_explicit(plugin_fixture, d_spacing_datas
         np.array([[1.0, 2.0]]),  # 2D numpy array input
     ],
 )
-def test__create_final_result_sin2chi_method_invalid_input(
-    plugin_fixture, invalid_input
-):
-    plugin = plugin_fixture
-
+def test__create_final_result_sin2chi_method_invalid_input(plugin, invalid_input):
     with pytest.raises(TypeError, match="Input must be an instance of Dataset."):
         plugin._create_final_result_sin2chi_method(invalid_input)
 
@@ -1664,14 +1548,9 @@ def d_spacing_combined_fixture():
 
 
 def test__create_final_result_sin2chi_method_valid_input(
-    plugin_fixture, d_spacing_combined_fixture
+    plugin, d_spacing_combined_fixture
 ):
-    plugin = plugin_fixture
-    # dummy input shape: 3 chi-values and 5 fit results
-    # This is currently required due to pre-allocation requirements in pydidas,
-    # dynamic allocation is not yet supported
-    plugin._config["input_shape"] = (3, 5)
-
+    plugin = plugin
     # Calculation
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
 
@@ -1695,13 +1574,9 @@ def test__create_final_result_sin2chi_method_valid_input(
 
 
 def test__create_final_result_sin2chi_method_accuracy(
-    plugin_fixture, d_spacing_combined_fixture
+    plugin, d_spacing_combined_fixture
 ):
-    plugin = plugin_fixture
-    # This is currently required due to pre-allocation requirements in pydidas,
-    # dynamic allocation is not yet supported
-    plugin._config["input_shape"] = (3, 5)
-
+    plugin = plugin
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
 
     expected_avg = np.vstack(
@@ -1719,13 +1594,8 @@ def test__create_final_result_sin2chi_method_accuracy(
 
 
 def test__create_final_result_sin2chi_method_with_nan_explicit(
-    plugin_fixture, d_spacing_combined_fixture
+    plugin, d_spacing_combined_fixture
 ):
-    plugin = plugin_fixture
-    # This is currently required due to pre-allocation requirements in pydidas,
-    # dynamic allocation is not yet supported
-    plugin._config["input_shape"] = (3, 5)
-
     d_spacing_combined_fixture.array[0, 1] = np.nan
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
 
@@ -1739,7 +1609,7 @@ def test__create_final_result_sin2chi_method_with_nan_explicit(
 
 
 def test__create_final_result_sin2chi_method_precision(
-    plugin_fixture, d_spacing_datasets
+    plugin, d_spacing_datasets, expected_results
 ):
     """
     Test to check the precision in create_final_result_sin2chi_method
@@ -1747,59 +1617,38 @@ def test__create_final_result_sin2chi_method_precision(
 
     _, _, d_spacing_combined = d_spacing_datasets
 
-    plugin = plugin_fixture
-
-    expected = Dataset(
-        axis_ranges={
-            0: np.arange(3),
-            1: np.array(
-                [
-                    0.0,
-                    0.030154,
-                    0.116978,
-                    0.25,
-                    0.413176,
-                    0.586824,
-                    0.75,
-                    0.883022,
-                    0.969846,
-                    1.0,
-                ]
-            ),
-        },
-        axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
-        metadata={},
-        data_unit="nm",
-        data_label="d_spacing",
-        array=np.vstack(
-            (
-                d_spacing_combined,
-                np.array(
-                    [
-                        26.281715,
-                        26.275108,
-                        26.265263,
-                        26.248177,
-                        26.18344,
-                        26.161894,
-                        26.121524,
-                        26.094265,
-                        26.0692,
-                        26.063213,
-                    ]
-                ),
-            )
-        ),
-    )
-
     # Calculation for test
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined)
 
-    assert np.allclose(result.array, expected.array, atol=1e-8)
-    assert np.allclose(result.axis_ranges[1], expected.axis_ranges[1], atol=1e-8)
-    assert np.allclose(result.axis_ranges[0], expected.axis_ranges[0])
-    assert result.data_label == expected.data_label
-    assert result.data_unit == expected.data_unit
+    assert np.allclose(result.array, expected_results.array, atol=1e-8)
+    assert np.allclose(
+        result.axis_ranges[1], expected_results.axis_ranges[1], atol=1e-8
+    )
+    assert np.allclose(result.axis_ranges[0], expected_results.axis_ranges[0])
+    assert result.data_label == expected_results.data_label
+    assert result.data_unit == expected_results.data_unit
+
+
+def test_create_final_result_sin2chi_method__w_input_data(
+    plugin, d_spacing_datasets, expected_results
+):
+    test_label = "A dummy LABEL"
+    _, _, d_spacing_combined = d_spacing_datasets
+    _input_data = create_dataset(4)
+    _input_data.metadata = _input_data.metadata | {"fitted_axis_label": test_label}
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined, _input_data)
+    assert result.data_label == test_label
+    assert np.allclose(result, expected_results, atol=1e-8)
+
+
+def test_create_final_result_sin2chi_method__w_input_data__wo_fitted_axis_label(
+    plugin, d_spacing_datasets, expected_results
+):
+    _, _, d_spacing_combined = d_spacing_datasets
+    _input_data = create_dataset(4)
+    result = plugin._create_final_result_sin2chi_method(d_spacing_combined, _input_data)
+    assert result.data_label == "d_spacing"
+    assert np.allclose(result, expected_results, atol=1e-8)
 
 
 @pytest.fixture
@@ -1824,9 +1673,9 @@ def results_sin2chi_method_fixture():
 
 
 def test__create_final_result_sin2chi_method_validation(
-    plugin_fixture, results_sin2chi_method_fixture
+    plugin, results_sin2chi_method_fixture
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     plugin._config["input_shape"] = (
         4,
         5,
@@ -1847,19 +1696,15 @@ def test__create_final_result_sin2chi_method_validation(
 
 
 def test__create_final_result_sin2chi_method_type_error(
-    plugin_fixture, results_sin2chi_method_fixture
+    plugin, results_sin2chi_method_fixture
 ):
-    plugin = plugin_fixture
-
     d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
 
     with pytest.raises(TypeError, match="Input must be an instance of Dataset"):
         plugin._create_final_result_sin2chi_method([])
 
 
-def test__create_final_result_sin2chi_method_shape(plugin_fixture):
-    plugin = plugin_fixture
-
+def test__create_final_result_sin2chi_method_shape(plugin):
     invalid_d_spacing_combined = Dataset(
         np.array([1, 2, 3, 4]),
         axis_ranges={0: [0, 1, 2, 3]},
@@ -1874,10 +1719,8 @@ def test__create_final_result_sin2chi_method_shape(plugin_fixture):
 
 
 def test__create_final_result_sin2chi_method_label_1(
-    plugin_fixture, results_sin2chi_method_fixture
+    plugin, results_sin2chi_method_fixture
 ):
-    plugin = plugin_fixture
-
     d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
     d_spacing_combined.update_axis_label(0, "blub")
 
@@ -1888,10 +1731,8 @@ def test__create_final_result_sin2chi_method_label_1(
 
 
 def test__create_final_result_sin2chi_method_label_2(
-    plugin_fixture, results_sin2chi_method_fixture
+    plugin, results_sin2chi_method_fixture
 ):
-    plugin = plugin_fixture
-
     d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
     d_spacing_combined.update_axis_label(1, "blub")
 
@@ -2517,9 +2358,7 @@ test_cases = [
 
 # test_cases=[ds_case12_exe]
 @pytest.mark.parametrize("case", test_cases)
-def test_execute_with_various_cases(plugin_fixture, case):
-    plugin = plugin_fixture
-
+def test_execute_with_various_cases(plugin, case):
     ds_in = case.create_simple_input_ds()
     expected_ds = case.create_output_ds()
 
@@ -2571,9 +2410,7 @@ test_cases_1d = [ds_case13_exe, ds_case14_exe]
 
 
 @pytest.mark.parametrize("case", test_cases_1d)
-def test_execute_with_various_cases_1d(plugin_fixture, case):
-    plugin = plugin_fixture
-
+def test_execute_with_various_cases_1d(plugin, case):
     ds_in = case.create_simple_input_ds_1d()
     expected_ds = case.create_output_ds()
 
@@ -2629,8 +2466,8 @@ def test_execute_with_various_cases_1d(plugin_fixture, case):
         (1, 2, 3),  # Tuple input
     ],
 )
-def test_execute_with_invalid_input(plugin_fixture, invalid_input):
-    plugin = plugin_fixture
+def test_execute_with_invalid_input(plugin, invalid_input):
+    plugin = plugin
     with pytest.raises((AttributeError, UserConfigError)):
         plugin.execute(invalid_input)
 
@@ -2638,17 +2475,17 @@ def test_execute_with_invalid_input(plugin_fixture, invalid_input):
 @pytest.mark.parametrize(
     "data, expected_error_message",
     [
-        (np.array(1), "Dataset has to be 1D or 2D."),  # ndim = 0
+        (np.array(1), "The input dataset has to be 1D or 2D."),  # ndim = 0
         (
             np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]),
-            "Dataset has to be 1D or 2D.",
+            "The input dataset has to be 1D or 2D.",
         ),  # ndim = 3
     ],
 )
-def test_execute_invalid_ndim(plugin_fixture, data, expected_error_message):
+def test_execute_invalid_ndim(plugin, data, expected_error_message):
     ds = Dataset(data)
     with pytest.raises(UserConfigError, match=expected_error_message):
-        plugin_fixture.execute(ds)
+        plugin.execute(ds)
 
 
 @pytest.fixture
@@ -2680,14 +2517,14 @@ def base_execute_dataset():
     ],
 )
 def test_execute_with_missing_field(
-    plugin_fixture,
+    plugin,
     base_execute_dataset,
     missing_field,
     removal_key,
     expected_error_message,
 ):
     """Test the execute function with missing axis labels."""
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_execute_dataset
 
     # Modify axis_labels by removing or adjusting the necessary field
@@ -2748,9 +2585,9 @@ def test_execute_with_missing_field(
     ],
 )
 def test__extract_units_validation(
-    plugin_fixture, base_execute_dataset, fit_label, data_label, expected_units_dict
+    plugin, base_execute_dataset, fit_label, data_label, expected_units_dict
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_execute_dataset
 
     # overwrite the axis_labels and data_label
@@ -2784,8 +2621,6 @@ def test__extract_units_validation(
             "area / (cts * nm); FWHM / nm;background at peak / cts; position / nmm",
             "Unit nmm not allowed for position.",
         ),
-        ("0:position", "position / nm^-1", r"Unit nm\^\-1 not allowed for position."),
-        ("0:position", "position / A^-1", r"Unit A\^\-1 not allowed for position."),
         (
             "0:position",
             "position / 2th_deg",
@@ -2795,9 +2630,9 @@ def test__extract_units_validation(
     ],
 )
 def test__chi_pos_unit_verification_error_position_unit(
-    plugin_fixture, base_execute_dataset, fit_label, data_label, expected_error_message
+    plugin, base_execute_dataset, fit_label, data_label, expected_error_message
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_execute_dataset
     # overwrite the axis_labels and data_label
     test_ds.update_axis_label(1, fit_label)
@@ -2815,9 +2650,9 @@ def test__chi_pos_unit_verification_error_position_unit(
     ],
 )
 def test__chi_pos_unit_verification_valid_position_unit(
-    plugin_fixture, base_execute_dataset, fit_label, data_label
+    plugin, base_execute_dataset, fit_label, data_label
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_execute_dataset
     test_ds.update_axis_label(1, fit_label)
     test_ds.data_label = data_label
@@ -2827,10 +2662,8 @@ def test__chi_pos_unit_verification_valid_position_unit(
         pytest.fail(f"Function raised an unexpected exception: {e}")
 
 
-def test__chi_pos_unit_verification_valid_chi_unit(
-    plugin_fixture, base_execute_dataset
-):
-    plugin = plugin_fixture
+def test__chi_pos_unit_verification_valid_chi_unit(plugin, base_execute_dataset):
+    plugin = plugin
     test_ds = base_execute_dataset
     try:
         plugin._chi_pos_unit_verification(test_ds)
@@ -2847,9 +2680,9 @@ def test__chi_pos_unit_verification_valid_chi_unit(
     ],
 )
 def test__chi_pos_unit_verification_error_chi_unit(
-    plugin_fixture, base_execute_dataset, chi_unit, expected_error_message
+    plugin, base_execute_dataset, chi_unit, expected_error_message
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     test_ds = base_execute_dataset
     test_ds.update_axis_unit(0, chi_unit)
 
@@ -2874,10 +2707,8 @@ def test__chi_pos_unit_verification_error_chi_unit(
     ],
 )
 def test__get_param_unit_at_index_validation(
-    plugin_fixture, ds_units_dict, pos_index, expected_param_with_unit
+    plugin, ds_units_dict, pos_index, expected_param_with_unit
 ):
-    plugin = plugin_fixture
-
     result = plugin._get_param_unit_at_index(ds_units_dict, pos_index)
 
     assert result == expected_param_with_unit
@@ -2914,9 +2745,9 @@ def base_dataset():
     ],
 )
 def test__create_final_result_sin2chi_method(
-    plugin_fixture, base_dataset, modifications, expected_array
+    plugin, base_dataset, modifications, expected_array
 ):
-    plugin = plugin_fixture
+    plugin = plugin
     plugin._config["input_shape"] = (
         4,
         5,

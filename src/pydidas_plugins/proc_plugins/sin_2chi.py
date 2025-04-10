@@ -18,7 +18,7 @@
 """
 A module for calculating the difference in d_spacing of the branches d(+) and d(-).
 
-This plugin expects the output from the DspacingSin2chiGrouping plugin as input.
+This plugin expects the output from the SinSquareChiGrouping plugin as input.
 """
 
 __author__ = "Gudrun Lotze"
@@ -63,9 +63,9 @@ class DspacingSin_2chi(ProcPlugin):
     beam is parallel to the sample surface.
 
     This plugin expects position (d-spacing) in [nm, A]. The expected input data
-    is the result of the DspacingSin2chiGrouping plugin.
+    is the result of the SinSquareChiGrouping plugin.
 
-    Input must be provided in the format as given by the DspacingSin2chiGrouping plugin:
+    Input must be provided in the format as given by the SinSquareChiGrouping plugin:
 
     - The input dataset should have three rows corresponding to d(-), d(+), and d_mean.
     - The d-spacing units should be either nanometers (nm) or angstroms (A).

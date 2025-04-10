@@ -29,8 +29,8 @@ __status__ = "Deployment"
 __all__ = ["SinSquareChiAnalysis"]
 
 
-from pydidas_plugins.proc_plugins.sin_square_chi_grouping import SinSquareChiGrouping
 from pydidas_plugins.proc_plugins.sin_2chi import DspacingSin_2chi
+from pydidas_plugins.proc_plugins.sin_square_chi_grouping import SinSquareChiGrouping
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN

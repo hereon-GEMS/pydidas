@@ -29,7 +29,7 @@ __status__ = "Deployment"
 __all__ = ["SinSquareChiAnalysis"]
 
 
-from pydidas_plugins.proc_plugins.sin2chi_grouping import DspacingSin2chiGrouping
+from pydidas_plugins.proc_plugins.sin_square_chi_grouping import SinSquareChiGrouping
 from pydidas_plugins.proc_plugins.sin_2chi import DspacingSin_2chi
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
@@ -72,7 +72,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
 
     def __init__(self, *args: tuple, **kwargs: dict) -> None:
         OutputPlugin.__init__(self, *args, **kwargs)
-        self._group_in_sin_square_chi = DspacingSin2chiGrouping()
+        self._group_in_sin_square_chi = SinSquareChiGrouping()
         self._group_in_sin_2_chi = DspacingSin_2chi()
         self._config["flag_convert_to_d_spacing"] = None
 

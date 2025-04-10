@@ -26,7 +26,7 @@ __copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
-__all__ = ["DspacingSin_2chi"]
+__all__ = ["Sin_2chiGrouping"]
 
 from typing import Any
 
@@ -46,7 +46,7 @@ UNITS_ANGSTROM = "A"
 PARAMETER_KEEP_RESULTS = "keep_results"
 
 
-class DspacingSin_2chi(ProcPlugin):
+class Sin_2chiGrouping(ProcPlugin):
     """
     This plugin calculates the difference between both d-spacing branches of the
     psi-splitting method and the corresponding sin(2*chi) values.
@@ -103,11 +103,15 @@ class DspacingSin_2chi(ProcPlugin):
         """
         Ensure the axis labels for dimension 0 and 1 are as expected.
 
-        Parameters:
-        ds (Dataset): The input to check.
+        Parameters
+        ----------
+        ds : Dataset
+            The input to check.
 
-        Raises:
-        UserConfigError: If the axis labels are not as expected.
+        Raises
+        ------
+        UserConfigError
+            If the axis labels are not as expected.
         """
         if ds.axis_labels[0] != LABELS_DIM0:
             raise UserConfigError(

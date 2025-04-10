@@ -10,6 +10,7 @@ Improvements
 - Residual stress analysis plugins:
 	- Added support for inputs in geometry (i.e. 2theta, Q, r) to SinSquareChiGrouping
 	  plugin.
+	- The ConvertToDSpacing plugin can now also convert from d-spacing.
 
 Bugfixes
 --------

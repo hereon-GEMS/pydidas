@@ -38,6 +38,7 @@ __all__ = [
     "PROC_PLUGIN_TYPE_NAMES",
     "PLUGIN_TYPE_NAMES",
     "FLOAT_REGEX",
+    "INTEGRATION_RESULT_UNITS",
 ]
 
 
@@ -90,3 +91,10 @@ FLOAT_REGEX = re.compile(
     r"\s*[+-]?[0-9]*\.?[0-9]+(?:[e][+-]?[0-9]+)?\s*"
     r"|\s*[+-]?[0-9]+\.?[0-9]*(?:[e][+-]?[0-9]+)?\s*"
 )
+
+INTEGRATION_RESULT_UNITS = ["deg", "rad", "A^-1", "nm^-1", "nm", "A", "mm"]
+"""
+list[str] :
+    The list of units which are valid for integration results. These can be either
+    created directly from the integration or by conversion to d-spacing.
+"""

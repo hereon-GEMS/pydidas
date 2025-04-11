@@ -32,8 +32,12 @@ from typing import Any
 
 import numpy as np
 
-from pydidas.core import Dataset, UserConfigError
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas.core import Dataset
+from pydidas.core.constants import (
+    INTEGRATION_RESULT_UNITS,
+    PROC_PLUGIN,
+    PROC_PLUGIN_STRESS_STRAIN,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -114,19 +118,18 @@ class Sin_2chiGrouping(ProcPlugin):
             If the axis labels are not as expected.
         """
         if ds.axis_labels[0] != LABELS_DIM0:
-            raise UserConfigError(
-                f"Expected axis label '{LABELS_DIM0}', but got '{ds.axis_labels[0]}'"
+            self.raise_UserConfigError(
+                f"Expected axis label `{LABELS_DIM0}`, but got `{ds.axis_labels[0]}`"
             )
 
         if ds.axis_labels[1] != LABELS_SIN2CHI:
-            raise UserConfigError(
-                f"Expected axis label '{LABELS_SIN2CHI}', but got '{ds.axis_labels[1]}'"
+            self.raise_UserConfigError(
+                f"Expected axis label `{LABELS_SIN2CHI}`, but got `{ds.axis_labels[1]}`"
             )
 
     def _calculate_diff_d_spacing_vs_sin_2chi(self, ds: Dataset) -> Dataset:
         """
         Calculate the difference between d-spacing branches (d(+) - d(-)).
-
 
         This method processes the input dataset to compute the difference between
         the d-spacing branches (d(+) - d(-)) and updates the dataset with the
@@ -154,18 +157,21 @@ class Sin_2chiGrouping(ProcPlugin):
             units are not in nanometers (nm) or angstroms (A).
         """
         if not isinstance(ds, Dataset):
-            raise UserConfigError("Input must be an instance of Dataset.")
+            self.raise_UserConfigError("Input must be an instance of Dataset.")
         self._ensure_axis_labels(ds)
         if ds.shape[0] != 3:
-            raise UserConfigError(
+            self.raise_UserConfigError(
                 f"Incoming dataset expected to have 3 rows, {LABELS_DIM0}. "
                 "Please verify your Dataset."
             )
 
-        if ds.data_unit not in [UNITS_NANOMETER, UNITS_ANGSTROM]:
-            raise UserConfigError(
-                f"Incoming dataset expected to have units in {UNITS_NANOMETER} "
-                f"or {UNITS_ANGSTROM}. Please verify your Dataset."
+        if ds.data_unit not in INTEGRATION_RESULT_UNITS:
+            self.raise_UserConfigError(
+                "Incoming dataset does not have the expected units. Only the "
+                "following units are allowed: "
+                + ", ".join(INTEGRATION_RESULT_UNITS)
+                + ". Please verify that the Plugin is situated correctly in the "
+                + "workflow."
             )
 
         delta_d_diff: Dataset = np.diff(ds[:2, :], axis=0)
@@ -200,10 +206,10 @@ class Sin_2chiGrouping(ProcPlugin):
             The sin(2*chi) values.
         """
         if not isinstance(s2c_values, np.ndarray):
-            raise UserConfigError("Input must be an instance of np.ndarray.")
+            self.raise_UserConfigError("Input must be an instance of np.ndarray.")
 
         if np.any(s2c_values < 0) or np.any(s2c_values > 1):
-            raise UserConfigError(
+            self.raise_UserConfigError(
                 "Values in s2c_values must be between 0 and 1 inclusive."
             )
 

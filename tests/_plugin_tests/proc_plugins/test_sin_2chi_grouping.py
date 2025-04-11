@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
+import re
 from dataclasses import dataclass
 
 import numpy as np
@@ -271,11 +272,11 @@ def invalid_axis_labels_dataset():
     [
         (
             {0: "0: d-", 1: LABELS_SIN2CHI},
-            f"Expected axis label '{LABELS_DIM0}', but got '0: d-'",
+            f"Expected axis label `{LABELS_DIM0}`, but got `0: d-`",
         ),
         (
             {0: LABELS_DIM0, 1: "sin2chi"},
-            f"Expected axis label '{LABELS_SIN2CHI}', but got 'sin2chi'",
+            f"Expected axis label `{LABELS_SIN2CHI}`, but got `sin2chi`",
         ),
     ],
 )
@@ -283,9 +284,8 @@ def test__ensure_axis_labels_invalid_input(
     plugin_fixture, invalid_axis_labels_dataset, axis_labels, expected_error_message
 ):
     ds = invalid_axis_labels_dataset(axis_labels)
-    with pytest.raises(UserConfigError) as excinfo:
+    with pytest.raises(UserConfigError, match=re.escape(expected_error_message)):
         plugin_fixture._ensure_axis_labels(ds)
-    assert str(excinfo.value) == expected_error_message
 
 
 test_cases = [case1, case2, case3, case4]
@@ -343,10 +343,7 @@ def create_dataset():
             {0: LABELS_DIM0, 1: LABELS_SIN2CHI},
             {0: np.arange(3), 1: np.full((3,), 0.5)},
             "invalid_unit",
-            (
-                f"Incoming dataset expected to have units in {UNITS_NANOMETER} "
-                f"or {UNITS_ANGSTROM}. Please verify your Dataset."
-            ),
+            ("Incoming dataset does not have the expected units."),
         ),
     ],
 )
@@ -360,9 +357,8 @@ def test_calculate_diff_d_spacing_vs_sin_2chi_invalid_input(
     expected_error_message,
 ):
     ds = create_dataset(data, axis_labels, axis_ranges, data_unit)
-    with pytest.raises(UserConfigError) as excinfo:
+    with pytest.raises(UserConfigError, match=re.escape(expected_error_message)):
         plugin_fixture._calculate_diff_d_spacing_vs_sin_2chi(ds)
-    assert str(excinfo.value) == expected_error_message
 
 
 def test_Sin_2chiGrouping_params(plugin_fixture):

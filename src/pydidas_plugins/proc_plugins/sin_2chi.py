@@ -75,7 +75,7 @@ class Sin_2chiGrouping(ProcPlugin):
     - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
     """
 
-    plugin_name = "Difference in d-spacing vs sin(2*chi)"
+    plugin_name = "Group in d-spacing vs sin(2*chi)"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN

@@ -48,7 +48,7 @@ from pydidas.core.constants import (
     pyFAI_UNITS,
 )
 from pydidas.core.utils import pydidas_logger
-from pydidas.core.utils.scattering_geometry import convert_radial_value
+from pydidas.core.utils.scattering_geometry import convert_polar_value
 from pydidas.data_io import import_data
 from pydidas.plugins.base_proc_plugin import ProcPlugin
 
@@ -440,7 +440,7 @@ class pyFAIintegrationBase(ProcPlugin):
         _range = self.get_radial_range()
         if _range is None:
             return None
-        _range = convert_radial_value(
+        _range = convert_polar_value(
             np.asarray(_range),
             self.get_param_value("rad_unit"),
             unit,
@@ -471,7 +471,7 @@ class pyFAIintegrationBase(ProcPlugin):
         _range = self.get_radial_range()
         if from_unit == to_unit or _range is None:
             return
-        _range = convert_radial_value(
+        _range = convert_polar_value(
             np.asarray(_range),
             from_unit,
             to_unit,

@@ -11,6 +11,7 @@ Improvements
 	- Added support for inputs in geometry (i.e. 2theta, Q, r) to SinSquareChiGrouping
 	  plugin.
 	- The ConvertToDSpacing plugin can now also convert from d-spacing.
+- Added generic functions to convert scattering geometry and d-spacing.
 
 Bugfixes
 --------

@@ -38,7 +38,7 @@ from qtpy.QtWidgets import QWidget
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.utils import get_chi_from_x_and_y
-from pydidas.core.utils.scattering_geometry import convert_radial_value
+from pydidas.core.utils.scattering_geometry import convert_polar_value
 from pydidas.plugins import BasePlugin
 
 
@@ -378,7 +378,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         _r_px = ((xpos - _cx) ** 2 + (ypos - _cy) ** 2) ** 0.5
         _r = _r_px * self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
         _r_in_mm = _r * 1e3
-        _val = convert_radial_value(
+        _val = convert_polar_value(
             _r_in_mm,
             "r / mm",
             self._plugin.get_param_value("rad_unit"),

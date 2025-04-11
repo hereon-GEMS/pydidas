@@ -30,6 +30,8 @@ import tempfile
 import numpy as np
 import pytest
 
+from pydidas_plugins.proc_plugins.sin_square_chi_analysis import OUTPUT_UNIT_PARAM
+
 import pydidas
 from pydidas.core import Dataset, UserConfigError
 from pydidas.plugins import ProcPlugin
@@ -53,33 +55,35 @@ _RANGES = {
     "r_mm": (_DET_DIST_in_m * 1000) * np.tan(_RANGE_2THETA_RAD),
 }
 _CHI = np.linspace(5, 355, 36)
+
 _RAW_DATA = Dataset(
-    np.tile(
-        40 * np.exp(-0.5 * (np.arange(_RANGE_2THETA_RAD.size) - 75) ** 2 / 5**2),
-        _CHI.size,
-    ).reshape(_CHI.size, -1),
+    [
+        40
+        * np.exp(
+            -0.5
+            * (np.arange(_RANGE_2THETA_RAD.size) - 75 + 10 * np.sin(_DELTA)) ** 2
+            / 5**2
+        )
+        for _DELTA in np.deg2rad(_CHI)
+    ],
     axis_ranges=[_CHI, _RANGE_2THETA_RAD],
     axis_labels=["chi", "2theta"],
     axis_units=["deg", "rad"],
 )
 
 
-def test_prepare_data(plugin, fitted_data, d_spacing_unit, input_range):
-    plugin.set_param_value("d_spacing_unit", d_spacing_unit)
-    plugin.pre_execute()
-
-
 @pytest.fixture
 def fitted_data(request):
-    input_range = request.param
+    _input = request.param
+    _output = _input[2] if len(_input) == 3 else "position; amplitude; FWHM"
     _FIT_PLUGIN = _REGISTRY.get_plugin_by_name("FitSinglePeak")()
-    _FIT_PLUGIN.set_param_value("fit_output", "position; amplitude; FWHM")
+    _FIT_PLUGIN.set_param_value("fit_output", _output)
     _FIT_PLUGIN.pre_execute()
-    _label, _unit = input_range[0].split("_")
+    _label, _unit = _input[0].split("_")
     _data = _RAW_DATA.copy()
     _data.update_axis_unit(1, _unit)
     _data.update_axis_label(1, _label)
-    _data.update_axis_range(1, _RANGES[input_range[0]])
+    _data.update_axis_range(1, _RANGES[_input[0]])
     _data, _ = _FIT_PLUGIN.execute(_data)
     return _data
 
@@ -106,7 +110,6 @@ def plugin(temp_dir):
     _plugin = _plugin_class()
     _plugin.set_param_value("directory_path", temp_dir)
     _plugin.set_param_value("enable_overwrite", True)
-    _plugin.set_param_value("d_spacing_unit", "nm")
     _plugin.node_id = 42
     yield _plugin
 
@@ -115,58 +118,95 @@ def test_init(plugin):
     assert isinstance(plugin, ProcPlugin)
 
 
-@pytest.mark.parametrize("d_spacing_unit", ["nm", "Angstrom"])
-def test_pre_execute(plugin, d_spacing_unit):
-    plugin.set_param_value("d_spacing_unit", d_spacing_unit)
+def test_pre_execute(plugin):
+    plugin._converter = lambda x: x
     plugin.pre_execute()
-    assert isinstance(plugin._base_name, str)
-    assert (
-        plugin._convert_to_d_spacing._config["unit"] == "nm"
-        if d_spacing_unit == "nm"
-        else "A"
-    )
-    for _key in ["ax_index", "new_range", "ax_indices"]:
-        assert plugin._convert_to_d_spacing._config[_key] is None
+    assert not plugin._config["flag_input_data_check"]
+    assert not plugin._config["flag_conversion_set_up"]
+    assert plugin._converter is None
 
 
-@pytest.mark.parametrize("d_spacing_unit", ["nm", "Angstrom"])
+@pytest.mark.parametrize("ndim", [1, 3])
+def test_check_input_data__invalid_ndim(plugin, ndim):
+    fitted_data = create_dataset(ndim)
+    plugin.pre_execute()
+    with pytest.raises(UserConfigError, match="The input data must be two-dimensional"):
+        plugin._check_input_data(fitted_data)
+
+
+@pytest.mark.parametrize(
+    "fitted_data",
+    [("2theta_deg", np.rad2deg(_RANGE_2THETA_RAD))],
+    indirect=True,
+)
+def test_check_input_data__invalid_ax0_label(plugin, fitted_data):
+    fitted_data.update_axis_label(0, "not chi")
+    plugin.pre_execute()
+    with pytest.raises(UserConfigError, match="The data does not appear to be "):
+        plugin._check_input_data(fitted_data)
+
+
+@pytest.mark.parametrize(
+    "fitted_data",
+    [("2theta_deg", np.rad2deg(_RANGE_2THETA_RAD), "FWHM")],
+    indirect=True,
+)
+def test_check_input_data__invalid_fit_output(plugin, fitted_data):
+    plugin.pre_execute()
+    with pytest.raises(UserConfigError, match="The data does not appear to be "):
+        plugin._check_input_data(fitted_data)
+
+
+@pytest.mark.parametrize(
+    "fitted_data",
+    [("2theta_deg", np.rad2deg(_RANGE_2THETA_RAD), "position")],
+    indirect=True,
+)
+def test_check_input_data__fit_only_position(plugin, fitted_data):
+    plugin.pre_execute()
+    plugin._check_input_data(fitted_data)
+    assert plugin._config["flag_input_data_check"]
+
+
 @pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
-def test_prepare_data(plugin, fitted_data, d_spacing_unit):
-    # _label, _unit = input_range[0].split("_")
-    # print(fitted_data)
-    plugin.set_param_value("d_spacing_unit", d_spacing_unit)
+def test_check_input_data__valid(plugin, fitted_data):
     plugin.pre_execute()
-    # fitted_data.update_axis_unit(1, _unit)
-    # fitted_data.update_axis_label(1, _label)
-    # fitted_data.update_axis_range(1, _RANGES[input_range[0]])
-    # new_data = plugin._prepare_data(fitted_data)
-    # _ref = fitted_data.axis_ranges[1] if _unit in ["nm", "A"] else _RANGES["d-spacing_" + ("nm" if d_spacing_unit == "nm" else "A")]
-    # assert new_data.axis_labels[1] == "d-spacing"
-    # if _unit not in ["nm", "A"]:
-    #     assert new_data.axis_units[1] == "nm" if d_spacing_unit == "nm" else "A"
-    # assert np.allclose(new_data.axis_ranges[1], _ref)
-
-
-def test_prepare_data__invalid_data_dim(plugin):
-    data = create_dataset(3)
-    plugin.pre_execute()
-    with pytest.raises(UserConfigError):
-        plugin._prepare_data(data)
-
-
-@pytest.mark.parametrize("modifier", [[0, "omega"], [1, "invalid_label"]])
-def test_prepare_data__invalid_labels(plugin, fitted_data, modifier):
-    fitted_data.update_axis_label(*modifier)
-    plugin.pre_execute()
-    with pytest.raises(UserConfigError):
-        plugin._prepare_data(fitted_data)
+    plugin._check_input_data(fitted_data)
+    assert plugin._config["flag_input_data_check"]
 
 
 @pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
-def test_execute(plugin, fitted_data):
+@pytest.mark.parametrize("output_type", OUTPUT_UNIT_PARAM.choices)
+def test_set_up_converter(plugin, fitted_data, output_type):
+    plugin.set_param_value("output_type", output_type)
     plugin.pre_execute()
-    _new_data, _ = plugin.execute(fitted_data)
-    print(_new_data)
+    plugin._set_up_converter(fitted_data)
+    assert plugin._config["flag_conversion_set_up"]
+    assert isinstance(plugin._config["converter_args"], tuple)
+    assert callable(plugin._converter)
+
+
+# @pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
+@pytest.mark.parametrize(
+    "fitted_data",
+    [("2theta_deg", np.rad2deg(_RANGE_2THETA_RAD), "position")],
+    indirect=True,
+)
+# @pytest.mark.parametrize("output_type", OUTPUT_UNIT_PARAM.choices)
+@pytest.mark.parametrize("output_type", ["d-spacing / A"])
+def test_regroup_data_w_sin_chi(plugin, fitted_data, output_type):
+    plugin.set_param_value("output_type", output_type)
+    plugin.pre_execute()
+    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(fitted_data)
+    print(_sin_square_chi_data)
+    print(_sin_2chi_data)
+
+#
+# @pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
+# def test_execute(plugin, fitted_data):
+#     plugin.pre_execute()
+#     _new_data, _ = plugin.execute(fitted_data)
+#     print(_new_data)
 
 
 if __name__ == "__main__":

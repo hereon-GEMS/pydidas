@@ -28,16 +28,59 @@ __maintainer__ = "Malte Storm"
 __status__ = "Deployment"
 __all__ = ["SinSquareChiAnalysis"]
 
+from typing import Any, Callable
 
-from pydidas_plugins.proc_plugins.sin_2chi import DspacingSin_2chi
+from pydidas_plugins.proc_plugins.sin_2chi_grouping import Sin_2chiGrouping
 from pydidas_plugins.proc_plugins.sin_square_chi_grouping import SinSquareChiGrouping
 
-from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.core import (
+    Dataset,
+    Parameter,
+    ParameterCollection,
+    UserConfigError,
+)
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas.core.utils.scattering_geometry import convert_integration_result
 from pydidas.plugins import OutputPlugin, ProcPlugin
 
 
 _VALID_DATA_AXIS_1_LABELS = ("2theta", "d-spacing", "Q", "r")
+_VALID_UNITS = ("nm", "A", "nm^-1", "A^-1", "deg", "rad", "mm")
+
+OUTPUT_UNIT_PARAM = Parameter(
+    "output_type",
+    str,
+    "Same as input",
+    name="Output data type",
+    choices=[
+        "Same as input",
+        "2theta / deg",
+        "2theta / rad",
+        "d-spacing / nm",
+        "d-spacing / A",
+        "Q / nm^-1",
+        "Q / A^-1",
+        "r / mm",
+    ],
+    tooltip=(
+        "The unit of the output data. The default is `Same as input`, which "
+        "means that the output data will have the same unit as the input data. "
+        "Choosing a different unit will convert the data to the selected unit."
+    ),
+)
+EXPORT_IMAGES_PARAM = Parameter(
+    "export_images",
+    bool,
+    False,
+    name="Export results as image for each data point",
+    choices=[True, False],
+    tooltip=(
+        "If selected, the plugin will export images of the results for each "
+        "data point. Please keep in mind that this will slow down processing "
+        "and potentially create a large number of files."
+    ),
+)
 
 
 class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
@@ -58,7 +101,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
     NOTE: This plugin currently only allows chi to given in degrees.
     """
 
-    plugin_name = "Sin^2 chi analysis"
+    plugin_name = "Sin^2(chi) analysis"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
@@ -66,23 +109,26 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
     output_data_dim = 2
     new_dataset = True
     generic_params = OutputPlugin.generic_params.copy()
-    default_params = get_generic_param_collection(
-        "d_spacing_unit",
-    )
+    default_params = ParameterCollection(OUTPUT_UNIT_PARAM, EXPORT_IMAGES_PARAM)
+    has_unique_parameter_config_widget = False  # TODO : implement custom widget
 
     def __init__(self, *args: tuple, **kwargs: dict) -> None:
+        self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         OutputPlugin.__init__(self, *args, **kwargs)
-        self._group_in_sin_square_chi = SinSquareChiGrouping()
-        self._group_in_sin_2_chi = DspacingSin_2chi()
-        self._config["flag_convert_to_d_spacing"] = None
+        self._plugin_group_in_sin_square_chi = SinSquareChiGrouping()
+        self._plugin_group_in_sin_2_chi = Sin_2chiGrouping()
+        self._converter: Callable | None = None
 
     def pre_execute(self):
         """
         Prepare the plugin for execution.
         """
         OutputPlugin.pre_execute(self)
+        self._config["flag_conversion_set_up"] = False
+        self._config["flag_input_data_check"] = False
+        self._converter = None
 
-    def execute(self, data: Dataset, **kwargs: dict):
+    def execute(self, data: Dataset, **kwargs: dict[str, Any]) -> tuple[Dataset, dict]:
         """
         Execute the plugin.
 
@@ -90,42 +136,38 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         ----------
         data : Dataset
             The input data to be processed.
+        **kwargs : dict
+            Any calling keyword arguments.
 
         Returns
         -------
-        tuple
+        tuple[Dataset, dict]
             The processed data and additional information.
         """
-        data = self._prepare_data(data)
-        new_data = self._group_in_sin_square_chi.execute(data)
-        return new_data, kwargs
-
-    def _prepare_data(self, data: Dataset) -> Dataset:
-        """
-        Prepare the input data for processing.
-
-        Parameters
-        ----------
-        data : Dataset
-            The input data to be processed.
-
-        Returns
-        -------
-        Dataset
-            The processed data.
-        """
-        if self._config["flag_convert_to_d_spacing"] is None:
+        if not self._config["flag_input_data_check"]:
             self._check_input_data(data)
-        # if self._config["flag_convert_to_d_spacing"]:
-        #     data, _ = self._convert_to_d_spacing.execute(data)
-        return data
+        _sin_square_chi_data, _sin_2chi_data = self._regroup_data_w_sin_chi(data)
+
+    def _regroup_data_w_sin_chi(self, data: Dataset) -> tuple[Dataset, Dataset]:
+        """
+        Regroup the data with sin^2(chi) and sin(2*chi).
+        """
+        _sin_square_chi_data, _ = self._plugin_group_in_sin_square_chi.execute(data)
+        if not self._config["flag_conversion_set_up"]:
+            self._set_up_converter(_sin_square_chi_data)
+        _sin_square_chi_data = self._converter(
+            _sin_square_chi_data,
+            *self._config["converter_args"],
+        )
+        _sin_2chi_data = self._plugin_group_in_sin_2_chi.execute(_sin_square_chi_data)
+        return _sin_square_chi_data, _sin_2chi_data
 
     def _check_input_data(self, data: Dataset):
         """
         Run basic checks on the input data.
 
-        This method checks the dimensionality and whether the input data must
-        be converted to d-spacing values.
+        This method checks the dimensionality and whether the input data
+        can be understood as fitted data.
 
         Parameters
         ----------
@@ -136,12 +178,10 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             raise UserConfigError(
                 f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
                 "is invalid:\n"
-                "The input data must be 2D integration result."
+                "The input data must be two-dimensional array "
+                "(from a FitSinglePeak plugin)."
             )
-        if (
-            data.axis_labels[0] != "chi"
-            #            or data.axis_labels[1] not in _VALID_DATA_AXIS_1_LABELS
-        ):
+        if data.axis_labels[0] != "chi" or "position" not in data.data_label:
             raise UserConfigError(
                 f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
                 "is invalid:\n"
@@ -150,4 +190,26 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
                 + ", ".join(f"`{_item}`" for _item in _VALID_DATA_AXIS_1_LABELS)
                 + "."
             )
-        self._config["flag_convert_to_d_spacing"] = data.axis_labels[1] != "d-spacing"
+        self._config["flag_input_data_check"] = True
+
+    def _set_up_converter(self, input_data: Dataset):
+        """
+        Set up the conversion method based on the input data.
+        """
+        if self.get_param_value("output_type") == "Same as input":
+            self._converter = self._converter_identity
+            self._config["converter_args"] = ()
+        else:
+            _input_type = input_data.data_label + " / " + input_data.data_unit
+            self._converter = convert_integration_result
+            self._config["converter_args"] = (
+                _input_type,
+                self.get_param_value("output_type"),
+                self._EXP.xray_wavelength_in_m,
+                self._EXP.detector_dist_in_m,
+            )
+        self._config["flag_conversion_set_up"] = True
+
+    def _converter_identity(self, data: Dataset, *args: tuple) -> Dataset:
+        """Identity conversion function."""
+        return data

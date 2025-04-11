@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "q_to_2theta",
-    "convert_polar_value",
+    "convert_integration_result",
     "convert_d_spacing_to_2theta",
     "convert_polar_to_d_spacing",
 ]
@@ -41,7 +41,13 @@ from pydidas.core.exceptions import UserConfigError
 
 
 ALLOWED_UNITS = Literal[
-    "2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"
+    "2theta / deg",
+    "2theta / rad",
+    "Q / A^-1",
+    "Q / nm^-1",
+    "r / mm",
+    "d-spacing / nm",
+    "d-spacing / A",
 ]
 
 
@@ -89,7 +95,7 @@ def q_to_2theta(
     return 2 * np.arcsin(lambda_xray * q / (4 * np.pi))
 
 
-def convert_polar_value(
+def convert_integration_result(  # noqa: C901
     value: Real | np.ndarray,
     in_type: ALLOWED_UNITS,
     out_type: ALLOWED_UNITS,
@@ -97,15 +103,25 @@ def convert_polar_value(
     det_dist: Real,
 ) -> Real:
     """
-    Convert a value from one unit to another.
+    Convert an integration result from one type and/or unit to another.
+
+    This function supports conversion between the following types:
+
+    - 2theta / deg
+    - 2theta / rad
+    - Q / A^-1
+    - Q / nm^-1
+    - r / mm
+    - d-spacing / nm
+    - d-spacing / A
 
     Parameters
     ----------
     value : Real
         The value to be converted.
-    in_type : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"]
+    in_type : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm", "d-spacing / nm", "d-spacing / A"]
         The type of input, including the unit.
-    out_type : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"]
+    out_type : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm", "d-spacing / nm", "d-spacing / A"]
         The type of output, including the unit.
     lambda_xray : Real
         The X-ray wavelength in meters.
@@ -124,11 +140,19 @@ def convert_polar_value(
         case "2theta/rad":
             value_in_2theta_rad = value
         case "Q/A^-1":
-            value_in_2theta_rad = q_to_2theta(value * 1e10, lambda_xray)
+            value_in_2theta_rad = 2 * np.arcsin(
+                lambda_xray * (value * 1e10) / (4 * np.pi)
+            )
         case "Q/nm^-1":
-            value_in_2theta_rad = q_to_2theta(value * 1e9, lambda_xray)
+            value_in_2theta_rad = 2 * np.arcsin(
+                lambda_xray * (value * 1e9) / (4 * np.pi)
+            )
         case "r/mm":
             value_in_2theta_rad = np.arctan(value * 1e-3 / det_dist)
+        case "d-spacing/nm":
+            value_in_2theta_rad = 2 * np.arcsin(lambda_xray / (2 * value * 1e-9))
+        case "d-spacing/A":
+            value_in_2theta_rad = 2 * np.arcsin(lambda_xray / (2 * value * 1e-10))
         case _:
             raise UserConfigError(
                 f"The input type `{in_type}` is not supported in the "
@@ -145,11 +169,46 @@ def convert_polar_value(
             return 4 * np.pi * np.sin(value_in_2theta_rad / 2) / lambda_xray * 1e-9
         case "r/mm":
             return det_dist * np.tan(value_in_2theta_rad) * 1e3
+        case "d-spacing/nm":
+            return lambda_xray / (2 * np.sin(value_in_2theta_rad / 2)) * 1e9
+        case "d-spacing/A":
+            return lambda_xray / (2 * np.sin(value_in_2theta_rad / 2)) * 1e10
         case _:
             raise UserConfigError(
                 f"The output type `{out_type}` is not supported in the "
                 "`convert_polar_value` function."
             )
+
+
+def convert_integration_result_to_2theta(
+    value: Real | np.ndarray, in_type: str, lambda_xray: Real, det_dist: Real
+) -> Real:
+    """
+    Convert an integration result to 2theta.
+
+    Parameters
+    ----------
+    value : Real | np.ndarray
+        The value to be converted.
+    in_type : str
+        The type of input, including the unit.
+    lambda_xray : Real
+        The X-ray wavelength in meters.
+    det_dist : Real
+        The detector distance in meters.
+
+    Returns
+    -------
+    Real | np.ndarray
+        The converted 2theta value.
+    """
+    return convert_integration_result(
+        value,
+        in_type,
+        "2theta / rad",
+        lambda_xray=1e-10,
+        det_dist=1.0,
+    )
 
 
 def convert_d_spacing_to_q(
@@ -230,7 +289,15 @@ def convert_d_spacing_to_2theta(
 
 def convert_polar_to_d_spacing(
     value: Real | np.ndarray,
-    in_type: Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"],
+    in_type: Literal[
+        "2theta / deg",
+        "2theta / rad",
+        "Q / A^-1",
+        "Q / nm^-1",
+        "r / mm",
+        "d-spacing / nm",
+        "d-spacing / A",
+    ],
     out_unit: Literal["nm", "A"],
     lambda_xray: Real,
     det_dist: Real,
@@ -242,7 +309,7 @@ def convert_polar_to_d_spacing(
     ----------
     value : Real | np.ndarray
         The value to be converted.
-    in_type :  Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"]
+    in_type :  Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm", "d-spacing / nm", "d-spacing / A"]
         The type of input, including the unit.
     out_unit : Literal["nm", "A", "Angstrom"]
         The unit to convert the value to.
@@ -257,7 +324,15 @@ def convert_polar_to_d_spacing(
         The converted d-spacing value.
     """
     _in_type = in_type.replace(" ", "").replace("_", "/")
-    if _in_type not in ["2theta/deg", "2theta/rad", "Q/A^-1", "Q/nm^-1", "r/mm"]:
+    if _in_type not in [
+        "2theta/deg",
+        "2theta/rad",
+        "Q/A^-1",
+        "Q/nm^-1",
+        "r/mm",
+        "d-spacing/nm",
+        "d-spacing/A",
+    ]:
         raise UserConfigError(
             f"The input type `{in_type}` is not supported in the "
             "`convert_polar_to_d_spacing` function."
@@ -283,4 +358,8 @@ def convert_polar_to_d_spacing(
             _range = lambda_xray / (2 * np.sin(np.deg2rad(value) / 2)) * _out_factor
         case "2theta/rad":
             _range = lambda_xray / (2 * np.sin(value / 2)) * _out_factor
+        case "d-spacing/nm":
+            _range = value * 1e-9 * _out_factor
+        case "d-spacing/A":
+            _range = value * 1e-10 * _out_factor
     return _range

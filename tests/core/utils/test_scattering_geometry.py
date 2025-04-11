@@ -31,8 +31,8 @@ import pydidas
 from pydidas.core import UserConfigError
 from pydidas.core.utils.scattering_geometry import (
     convert_d_spacing_to_2theta,
+    convert_integration_result,
     convert_polar_to_d_spacing,
-    convert_polar_value,
     q_to_2theta,
 )
 
@@ -62,6 +62,10 @@ _FORMATTED_ALLOWED_POLAR_TYPES = [
     "Q_A^-1",
     "r / mm",
     "r_mm",
+    "d-spacing / nm",
+    "d-spacing_nm",
+    "d-spacing / A",
+    "d-spacing_A",
 ]
 
 
@@ -89,19 +93,19 @@ def test_q_to_2theta_invalid_unit(prepare_exp):
 
 @pytest.mark.parametrize("type_in", _FORMATTED_ALLOWED_POLAR_TYPES)
 @pytest.mark.parametrize("type_out", _FORMATTED_ALLOWED_POLAR_TYPES)
-def test_convert_radial_value(prepare_exp, type_in, type_out):
+def test_convert_integration_result(prepare_exp, type_in, type_out):
     _in_range = _RANGES[type_in.replace(" / ", "_")]
     _ref_range = _RANGES[type_out.replace(" / ", "_")]
-    _out_range = convert_polar_value(
+    _out_range = convert_integration_result(
         _in_range, type_in, type_out, _EXP.xray_wavelength_in_m, _EXP.detector_dist_in_m
     )
     assert np.allclose(_out_range, _ref_range, rtol=1e-5)
 
 
-def test_convert_radial_value_invalid_input_unit(prepare_exp):
+def test_convert_integration_result_invalid_input_unit(prepare_exp):
     _in_range = _RANGES["Q_A^-1"]
     with pytest.raises(UserConfigError):
-        convert_polar_value(
+        convert_integration_result(
             _in_range,
             "invalid_unit",
             "Q_A^-1",
@@ -110,10 +114,10 @@ def test_convert_radial_value_invalid_input_unit(prepare_exp):
         )
 
 
-def test_convert_radial_value_invalid_output_unit(prepare_exp):
+def test_convert_integration_result_invalid_output_unit(prepare_exp):
     _in_range = _RANGES["Q_A^-1"]
     with pytest.raises(UserConfigError):
-        convert_polar_value(
+        convert_integration_result(
             _in_range,
             "Q_A^-1",
             "invalid_unit",

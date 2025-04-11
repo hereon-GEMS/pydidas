@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Tests for the DspacingSin_2chi class / plugin.
+Tests for the Sin_2chiGrouping class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
@@ -31,7 +31,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from pydidas_plugins.proc_plugins.sin_2chi import (
+from pydidas_plugins.proc_plugins.sin_2chi_grouping import (
     LABELS_DIM0,
     LABELS_SIN2CHI,
     LABELS_SIN_2CHI,
@@ -46,13 +46,13 @@ from pydidas.plugins import PluginCollection, ProcPlugin
 
 
 def test_plugin_inheritance():
-    plugin_obj = PluginCollection().get_plugin_by_name("DspacingSin_2chi")
+    plugin_obj = PluginCollection().get_plugin_by_name("Sin_2chiGrouping")
     assert issubclass(plugin_obj, ProcPlugin), "Plugin is not a subclass of ProcPlugin"
 
 
 @pytest.fixture
 def plugin_fixture():
-    return PluginCollection().get_plugin_by_name("DspacingSin_2chi")()
+    return PluginCollection().get_plugin_by_name("Sin_2chiGrouping")()
 
 
 @pytest.fixture()
@@ -365,13 +365,13 @@ def test_calculate_diff_d_spacing_vs_sin_2chi_invalid_input(
     assert str(excinfo.value) == expected_error_message
 
 
-def test_DspacingSin_2chi_params(plugin_fixture):
+def test_Sin_2chiGrouping_params(plugin_fixture):
     plugin = plugin_fixture
 
-    assert plugin.plugin_name == "Difference in d-spacing vs sin(2*chi)"
+    assert plugin.plugin_name == "Group in d-spacing vs sin(2*chi)"
     assert plugin.plugin_type == PROC_PLUGIN
     assert not plugin.basic_plugin
-    assert plugin.plugin_group == PROC_PLUGIN_STRESS_STRAIN
+    assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == 2
     assert plugin.output_data_dim == 2
     assert plugin.output_data_label == (

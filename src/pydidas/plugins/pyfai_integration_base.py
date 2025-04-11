@@ -34,7 +34,7 @@ import pathlib
 from typing import Literal
 
 import numpy as np
-from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+from pyFAI.integrator.azimuthal import AzimuthalIntegrator
 from qtpy import QtWidgets
 from silx.opencl.common import OpenCL
 

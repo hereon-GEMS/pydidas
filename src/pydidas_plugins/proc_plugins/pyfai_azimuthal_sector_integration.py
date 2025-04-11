@@ -29,7 +29,7 @@ __all__ = ["PyFAIazimuthalSectorIntegration"]
 
 
 import numpy as np
-from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+from pyFAI.integrator.azimuthal import AzimuthalIntegrator
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import (

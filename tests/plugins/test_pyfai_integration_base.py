@@ -599,7 +599,9 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 45)
         plugin.pre_execute()
-        self.assertIsInstance(plugin._ai, pyFAI.azimuthalIntegrator.AzimuthalIntegrator)
+        self.assertIsInstance(
+            plugin._ai, pyFAI.integrator.azimuthal.AzimuthalIntegrator
+        )
 
     def test_check_mask_shape__okay(self):
         _maskfilename, _mask = self.create_mask(shape=(3262, 3108))

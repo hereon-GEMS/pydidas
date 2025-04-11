@@ -39,7 +39,11 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
 from pydidas.core import Dataset
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas.core.constants import (
+    INTEGRATION_RESULT_UNITS,
+    PROC_PLUGIN,
+    PROC_PLUGIN_STRESS_STRAIN,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -49,7 +53,6 @@ LABELS_POSITION = "position"
 LABELS_DIM0 = "0: d-, 1: d+, 2: d_mean"
 
 UNITS_DEGREE = "deg"
-ALLOWED_UNITS = [UNITS_DEGREE, "rad", "A^-1", "nm^-1", "nm", "A", "mm"]
 
 S2C_TOLERANCE = 1e-6
 NPT_AZIM_LIMIT = 3000
@@ -268,9 +271,6 @@ class SinSquareChiGrouping(ProcPlugin):
                 f"are [{', '.join(chi_units_allowed)}]."
             )
 
-        # position/pos contains the unit for d_spacing
-        pos_units_allowed: list[str] = ALLOWED_UNITS
-
         # Ensure 'position' is in the data_label
         if LABELS_POSITION not in ds.data_label:
             self.raise_UserConfigError(
@@ -284,7 +284,7 @@ class SinSquareChiGrouping(ProcPlugin):
 
         pos_unit = parts[1].strip()
 
-        if pos_unit not in pos_units_allowed:
+        if pos_unit not in INTEGRATION_RESULT_UNITS:
             self.raise_UserConfigError(
                 f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}."
             )
@@ -510,8 +510,6 @@ class SinSquareChiGrouping(ProcPlugin):
 
         ds_units: dict[int, list[str, str]] = self._extract_units(ds)
 
-        # position/pos contains the unit for d_spacing
-        pos_units_allowed: list[str] = ALLOWED_UNITS
         # Only chi in degree is allowed.
         chi_units_allowed: list[str] = [UNITS_DEGREE]
 
@@ -519,7 +517,7 @@ class SinSquareChiGrouping(ProcPlugin):
             # First item in the value list is the label (e.g., 'position', 'chi')
             # Second item is the unit (e.g., 'nm', 'deg')
             label, unit = val
-            if label == LABELS_POSITION and unit not in pos_units_allowed:
+            if label == LABELS_POSITION and unit not in INTEGRATION_RESULT_UNITS:
                 self.raise_UserConfigError(f"Unit {unit} not allowed for {label}.")
             if label == LABELS_CHI and unit not in chi_units_allowed:
                 self.raise_UserConfigError(f"Unit {unit} not allowed for {label}.")

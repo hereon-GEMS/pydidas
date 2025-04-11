@@ -898,6 +898,7 @@ def test__ds_slicing_valid(plugin):
     result_array_spatial = generate_result_array_spatial()
     axis_labels = {0: "y", 1: "x", 2: "chi", 3: fit_labels}
     axis_units = ["um", "um", "deg", ""]
+    _expected_label, _expected_unit = data_labels.split(";")[0].split(" / ")
 
     ds = Dataset(
         result_array_spatial,
@@ -907,8 +908,10 @@ def test__ds_slicing_valid(plugin):
     )
     ds = ds[0, 0]
     chi, d_spacing = plugin._ds_slicing(ds)
-
-    assert isinstance(chi, np.ndarray) and isinstance(d_spacing, Dataset)
+    assert isinstance(chi, np.ndarray)
+    assert isinstance(d_spacing, Dataset)
+    assert d_spacing.data_label == _expected_label
+    assert d_spacing.data_unit == _expected_unit
 
 
 def test__ds_slicing_beyond_bounds_v2(plugin):

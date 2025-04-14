@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-noly"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -225,6 +225,30 @@ class TestScan(unittest.TestCase):
         SCAN.set_param_value("scan_multiplicity", 3)
         _index = SCAN.get_frame_from_indices(_indices)
         self.assertEqual(_index, _frame)
+
+    def test_axis_labels(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        _labels = [get_random_string(5) for _ in range(self._scan_dim)]
+        for _index in range(self._scan_dim):
+            SCAN.set_param_value(f"scan_dim{_index}_label", _labels[_index])
+        self.assertEqual(_labels, SCAN.axis_labels)
+
+    def test_axis_units(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        _units = [get_random_string(5) for _ in range(self._scan_dim)]
+        for _index in range(self._scan_dim):
+            SCAN.set_param_value(f"scan_dim{_index}_unit", _units[_index])
+        self.assertEqual(_units, SCAN.axis_units)
+
+    def test_axis_ranges(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        _ranges = SCAN.axis_ranges
+        for _index in range(self._scan_dim):
+            _ref = self.get_scan_range(_index)
+            self.assertTrue(np.allclose(_ref, _ranges[_index]))
 
     def test_update_from_scan(self):
         SCAN = Scan()

@@ -735,7 +735,7 @@ class SinSquareChiGrouping(ProcPlugin):
         self.output_data_label = data_w_units.metadata.get(
             "fitted_axis_label", "undefined"
         )
-        self.output_data_unit = data_w_units.data_unit
+        self.output_data_unit = data_w_units.metadata.get("fitted_axis_unit", "")
 
     def _idx_s2c_grouping(
         self, chi: np.ndarray, tolerance: float = S2C_TOLERANCE
@@ -914,7 +914,6 @@ class SinSquareChiGrouping(ProcPlugin):
         # maximum or minimum
         mask_pos = (categories == Category.POSITIVE) | (categories == Category.ZERO)
         mask_neg = (categories == Category.NEGATIVE) | (categories == Category.ZERO)
-
         # Advanced indexing
         # Here, s2c_labels specifies the row indices, and np.arange(s2c_num_elements)
         # specifies the column indices.
@@ -938,7 +937,6 @@ class SinSquareChiGrouping(ProcPlugin):
         d_spacing_neg_slope_matrix = np.full(s2c_groups_matrix_shape, np.nan)
         s2c_pos_slope_matrix = np.full(s2c_groups_matrix_shape, np.nan)
         s2c_neg_slope_matrix = np.full(s2c_groups_matrix_shape, np.nan)
-
         # Apply masks to create filtered matrices
         # Combination of advanced indexing and conditional assignment with np.where
         d_spacing_pos_slope_matrix[*s2c_advanced_idx] = np.where(
@@ -950,7 +948,6 @@ class SinSquareChiGrouping(ProcPlugin):
             mask_neg, d_spacing, np.nan
         )
         s2c_neg_slope_matrix[*s2c_advanced_idx] = np.where(mask_neg, s2c, np.nan)
-
         # Averaging, positive slope
         s2c_mean_pos = np.nanmean(s2c_pos_slope_matrix, axis=1)
         d_spacing_mean_pos = np.nanmean(d_spacing_pos_slope_matrix, axis=1)
@@ -959,7 +956,6 @@ class SinSquareChiGrouping(ProcPlugin):
         d_spacing_mean_neg = np.nanmean(d_spacing_neg_slope_matrix, axis=1)
         # Aim for a complete common s2c_mean_pos/neg without NaN values
         s2c_mean = np.nanmean(np.vstack((s2c_mean_pos, s2c_mean_neg)), axis=0)
-
         # create Datasets for output
         d_spacing_pos = Dataset(
             d_spacing_mean_pos,

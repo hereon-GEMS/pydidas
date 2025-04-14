@@ -222,6 +222,7 @@ test_cases = [case1, case2, case3, case4]
 def test_execute_validation(plugin_fixture, case):
     plugin = plugin_fixture
     ds = case.create_input_ds()
+    _input_ref = ds.copy()
     result, _ = plugin.execute(ds)
 
     # Validate the results
@@ -229,6 +230,7 @@ def test_execute_validation(plugin_fixture, case):
     np.testing.assert_array_almost_equal(
         result.axis_ranges[1], case.s_2c_values_expected
     )
+    assert np.allclose(ds, _input_ref, equal_nan=True)
     assert result.data_unit == UNITS_ANGSTROM
     assert result.data_label == "Difference of d(+) - d(-)"
     assert result.axis_labels[0] == "0: d-, 1: d+, 2: d(+)-d(-)"
@@ -286,9 +288,6 @@ def test__ensure_axis_labels_invalid_input(
     ds = invalid_axis_labels_dataset(axis_labels)
     with pytest.raises(UserConfigError, match=re.escape(expected_error_message)):
         plugin_fixture._ensure_axis_labels(ds)
-
-
-test_cases = [case1, case2, case3, case4]
 
 
 @pytest.mark.parametrize("case", test_cases)

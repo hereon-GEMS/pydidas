@@ -147,8 +147,9 @@ class Sin_2chiGrouping(ProcPlugin):
         Returns
         -------
         Dataset:
-            The updated dataset with the calculated difference between d-spacing
-            branches and the corresponding sin(2*chi) values.
+            A new dataset with the d-spacing for the two branches as well as
+            the calculated difference between d-spacing branches and the
+            corresponding sin(2*chi) values as axis range.
 
         Raises
         ------
@@ -173,23 +174,17 @@ class Sin_2chiGrouping(ProcPlugin):
                 + ". Please verify that the Plugin is situated correctly in the "
                 + "workflow."
             )
-
-        delta_d_diff: Dataset = np.diff(ds[:2, :], axis=0)
-
-        # Overwrite the incoming dataset
-        ds[2, :] = delta_d_diff.data
-        ds.data_label: str = "Difference of d(+) - d(-)"
-        ds.axis_labels: dict[int, str] = {
+        _results = Dataset(ds.array.copy(), **ds.property_dict)
+        _results[2, :] = np.diff(ds[:2, :], axis=0)
+        _results.data_label = "Difference of d(+) - d(-)"
+        _results.axis_labels: dict[int, str] = {
             0: "0: d-, 1: d+, 2: d(+)-d(-)",
             1: LABELS_SIN_2CHI,
         }
-
-        ds.axis_ranges: dict[int, np.ndarray] = {
-            0: np.arange(3),
-            1: self._calculate_sin_2chi_values(ds.axis_ranges[1]),
-        }
-
-        return ds
+        _results.update_axis_range(
+            1, self._calculate_sin_2chi_values(ds.axis_ranges[1])
+        )
+        return _results
 
     def _calculate_sin_2chi_values(self, s2c_values: np.ndarray) -> np.ndarray:
         """

@@ -28,7 +28,7 @@ import numpy as np
 import pytest
 
 import pydidas
-from pydidas.core import UserConfigError
+from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils.scattering_geometry import (
     convert_d_spacing_to_2theta,
     convert_integration_result,
@@ -100,6 +100,22 @@ def test_convert_integration_result(prepare_exp, type_in, type_out):
         _in_range, type_in, type_out, _EXP.xray_wavelength_in_m, _EXP.detector_dist_in_m
     )
     assert np.allclose(_out_range, _ref_range, rtol=1e-5)
+
+
+@pytest.mark.parametrize("type_in", _FORMATTED_ALLOWED_POLAR_TYPES)
+@pytest.mark.parametrize("type_out", _FORMATTED_ALLOWED_POLAR_TYPES)
+def test_convert_integration_result__w_Dataset(prepare_exp, type_in, type_out):
+    _in_range = Dataset(
+        _RANGES[type_in.replace(" / ", "_")],
+        data_label=type_in.split("/")[0].split("_")[0].strip(),
+        data_unit=type_in.split("/")[-1].split("_")[-1].strip(),
+    )
+    _ref_range = _RANGES[type_out.replace(" / ", "_")]
+    _out_range = convert_integration_result(
+        _in_range, type_in, type_out, _EXP.xray_wavelength_in_m, _EXP.detector_dist_in_m
+    )
+    assert np.allclose(_out_range, _ref_range, rtol=1e-5)
+    assert _out_range.data_description == type_out.replace("_", " / ")
 
 
 def test_convert_integration_result_invalid_input_unit(prepare_exp):

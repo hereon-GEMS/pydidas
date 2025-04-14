@@ -37,6 +37,7 @@ from typing import Literal
 
 import numpy as np
 
+from pydidas.core.dataset import Dataset
 from pydidas.core.exceptions import UserConfigError
 
 
@@ -158,6 +159,10 @@ def convert_integration_result(  # noqa: C901
                 f"The input type `{in_type}` is not supported in the "
                 "`convert_polar_value` function."
             )
+    if isinstance(value_in_2theta_rad, Dataset):
+        value_in_2theta_rad.data_label = _out_type.split("/")[0]
+        value_in_2theta_rad.data_unit = _out_type.split("/")[1]
+
     match _out_type:
         case "2theta/deg":
             return np.rad2deg(value_in_2theta_rad)

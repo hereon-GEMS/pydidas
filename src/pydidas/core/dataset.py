@@ -413,6 +413,20 @@ class Dataset(ndarray):
         self._meta["data_label"] = data_label
 
     @property
+    def data_description(self) -> str:
+        """
+        Get a descriptive string for the data.
+
+        Returns
+        -------
+        str
+            The descriptive string for the data.
+        """
+        return self.data_label + (
+            " / " + self.data_unit if len(self.data_unit) > 0 else ""
+        )
+
+    @property
     def metadata(self) -> dict:
         """
         Get the dataset metadata.
@@ -720,20 +734,6 @@ class Dataset(ndarray):
         _range = self._meta["axis_ranges"][index]
         _range_diff = np.diff(_range[np.isfinite(_range)])
         return abs(_range_diff.std() / _range_diff.mean()) > threshold
-
-    @property
-    def data_description(self) -> str:
-        """
-        Get a descriptive string for the data.
-
-        Returns
-        -------
-        str
-            The descriptive string for the data.
-        """
-        return self.data_label + (
-            " / " + self.data_unit if len(self.data_unit) > 0 else ""
-        )
 
     def get_description_of_point(self, indices: tuple[int] | list[int]) -> str:
         """

@@ -30,15 +30,15 @@ import tempfile
 import numpy as np
 import pytest
 
-from pydidas_plugins.proc_plugins.sin_square_chi_analysis import OUTPUT_UNIT_PARAM
-
 import pydidas
-from pydidas.core import Dataset, UserConfigError
+from pydidas.core import Dataset, UserConfigError, get_generic_parameter
+from pydidas.core.utils.scattering_geometry import convert_integration_result
 from pydidas.plugins import ProcPlugin
 from pydidas.unittest_objects import create_dataset
 from pydidas_qtcore import PydidasQApplication
 
 
+_OUTPUT_UNIT_PARAM = get_generic_parameter("output_type")
 _EXP = pydidas.contexts.DiffractionExperimentContext()
 _REGISTRY = pydidas.plugins.PluginCollection()
 
@@ -61,15 +61,31 @@ _RAW_DATA = Dataset(
         40
         * np.exp(
             -0.5
-            * (np.arange(_RANGE_2THETA_RAD.size) - 75 + 10 * np.sin(_DELTA)) ** 2
+            * (np.arange(_RANGE_2THETA_RAD.size) - 75 + 10 * np.sin(2 * _DELTA)) ** 2
             / 5**2
         )
-        for _DELTA in np.deg2rad(_CHI)
+        for _DELTA in np.deg2rad(_CHI + 20)
     ],
     axis_ranges=[_CHI, _RANGE_2THETA_RAD],
     axis_labels=["chi", "2theta"],
     axis_units=["deg", "rad"],
 )
+
+
+@pytest.fixture(scope="module")
+def sin_square_plugin():
+    _plugin_class = _REGISTRY.get_plugin_by_name("SinSquareChiGrouping")
+    _plugin = _plugin_class()
+    _plugin.node_id = 42
+    yield _plugin
+
+
+@pytest.fixture(scope="module")
+def sin_2chi_plugin():
+    _plugin_class = _REGISTRY.get_plugin_by_name("Sin_2chiGrouping")
+    _plugin = _plugin_class()
+    _plugin.node_id = 41
+    yield _plugin
 
 
 @pytest.fixture
@@ -176,7 +192,7 @@ def test_check_input_data__valid(plugin, fitted_data):
 
 
 @pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
-@pytest.mark.parametrize("output_type", OUTPUT_UNIT_PARAM.choices)
+@pytest.mark.parametrize("output_type", _OUTPUT_UNIT_PARAM.choices)
 def test_set_up_converter(plugin, fitted_data, output_type):
     plugin.set_param_value("output_type", output_type)
     plugin.pre_execute()
@@ -192,14 +208,30 @@ def test_set_up_converter(plugin, fitted_data, output_type):
     [("2theta_deg", np.rad2deg(_RANGE_2THETA_RAD), "position")],
     indirect=True,
 )
-# @pytest.mark.parametrize("output_type", OUTPUT_UNIT_PARAM.choices)
-@pytest.mark.parametrize("output_type", ["d-spacing / A"])
-def test_regroup_data_w_sin_chi(plugin, fitted_data, output_type):
+# @pytest.mark.parametrize("output_type", _OUTPUT_UNIT_PARAM.choices)
+@pytest.mark.parametrize("output_type", ["Same as input"])
+def test_regroup_data_w_sin_chi(
+    plugin, fitted_data, output_type, sin_square_plugin, sin_2chi_plugin
+):
     plugin.set_param_value("output_type", output_type)
+    input_type = (
+        fitted_data.metadata.get("fitted_axis_label")
+        + " / "
+        + fitted_data.metadata.get("fitted_axis_unit")
+    )
+    if output_type == "Same as input":
+        output_type = input_type
     plugin.pre_execute()
     _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(fitted_data)
-    print(_sin_square_chi_data)
-    print(_sin_2chi_data)
+    _ref_sin_square_chi_data = convert_integration_result(
+        sin_square_plugin.execute(fitted_data)[0],
+        input_type,
+        output_type,
+        _EXP.xray_wavelength_in_m,
+        _EXP.det_dist_in_m,
+    )
+    assert np.allclose(_sin_square_chi_data.data, _ref_sin_square_chi_data.data)
+
 
 #
 # @pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)

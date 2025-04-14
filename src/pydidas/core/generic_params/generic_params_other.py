@@ -388,6 +388,19 @@ GENERIC_PARAMS_OTHER = {
             "the numbering will start from 0 as is the python default."
         ),
     },
+    "output_export_images_flag": {
+        "type": bool,
+        "default": False,
+        "name": "Export results as image for each data point",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "If selected, the plugin will export images of the results for each "
+            "data point. Please keep in mind that this will slow down processing "
+            "and potentially create a large number of files."
+        ),
+    },
     ############################
     # Result selection settings
     ############################

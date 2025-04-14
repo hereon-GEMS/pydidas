@@ -36,9 +36,9 @@ from pydidas_plugins.proc_plugins.sin_square_chi_grouping import SinSquareChiGro
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import (
     Dataset,
-    Parameter,
     ParameterCollection,
     UserConfigError,
+    get_generic_param_collection,
 )
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
 from pydidas.core.utils.scattering_geometry import convert_integration_result
@@ -48,39 +48,18 @@ from pydidas.plugins import OutputPlugin, ProcPlugin
 _VALID_DATA_AXIS_1_LABELS = ("2theta", "d-spacing", "Q", "r")
 _VALID_UNITS = ("nm", "A", "nm^-1", "A^-1", "deg", "rad", "mm")
 
-OUTPUT_UNIT_PARAM = Parameter(
+_PARAM_KEY_ORDER = [
+    "keep_results",
+    "label",
     "output_type",
-    str,
-    "Same as input",
-    name="Output data type",
-    choices=[
-        "Same as input",
-        "2theta / deg",
-        "2theta / rad",
-        "d-spacing / nm",
-        "d-spacing / A",
-        "Q / nm^-1",
-        "Q / A^-1",
-        "r / mm",
-    ],
-    tooltip=(
-        "The unit of the output data. The default is `Same as input`, which "
-        "means that the output data will have the same unit as the input data. "
-        "Choosing a different unit will convert the data to the selected unit."
-    ),
-)
-EXPORT_IMAGES_PARAM = Parameter(
-    "export_images",
-    bool,
-    False,
-    name="Export results as image for each data point",
-    choices=[True, False],
-    tooltip=(
-        "If selected, the plugin will export images of the results for each "
-        "data point. Please keep in mind that this will slow down processing "
-        "and potentially create a large number of files."
-    ),
-)
+    "sin_square_chi_low_fit_limit",
+    "sin_square_chi_high_fit_limit",
+    "output_export_images_flag",
+    "directory_path",
+    "enable_overwrite",
+    "output_fname_digits",
+    "output_index_offset",
+]
 
 
 class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
@@ -109,7 +88,12 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
     output_data_dim = 2
     new_dataset = True
     generic_params = OutputPlugin.generic_params.copy()
-    default_params = ParameterCollection(OUTPUT_UNIT_PARAM, EXPORT_IMAGES_PARAM)
+    default_params = get_generic_param_collection(
+        "output_type",
+        "sin_square_chi_low_fit_limit",
+        "sin_square_chi_high_fit_limit",
+        "output_export_images_flag",
+    )
     has_unique_parameter_config_widget = False  # TODO : implement custom widget
 
     def __init__(self, *args: tuple, **kwargs: dict) -> None:
@@ -118,6 +102,10 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         self._plugin_group_in_sin_square_chi = SinSquareChiGrouping()
         self._plugin_group_in_sin_2_chi = Sin_2chiGrouping()
         self._converter: Callable | None = None
+        # re-order the parameters to allow a better presentation in the GUI
+        self.params = ParameterCollection(
+            *(self.params[_key] for _key in _PARAM_KEY_ORDER)
+        )
 
     def pre_execute(self):
         """
@@ -147,6 +135,10 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         if not self._config["flag_input_data_check"]:
             self._check_input_data(data)
         _sin_square_chi_data, _sin_2chi_data = self._regroup_data_w_sin_chi(data)
+        # TODO: implement fitting
+        # TODO: implement image export
+        # TODO: implement tests
+        return _sin_square_chi_data, kwargs
 
     def _regroup_data_w_sin_chi(self, data: Dataset) -> tuple[Dataset, Dataset]:
         """
@@ -160,6 +152,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             *self._config["converter_args"],
         )
         _sin_2chi_data = self._plugin_group_in_sin_2_chi.execute(_sin_square_chi_data)
+        # TODO: implement tests
         return _sin_square_chi_data, _sin_2chi_data
 
     def _check_input_data(self, data: Dataset):

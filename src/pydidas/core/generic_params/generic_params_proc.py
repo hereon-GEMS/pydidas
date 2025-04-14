@@ -44,4 +44,26 @@ GENERIC_PARAMS_PROC = {
             "and nm for nanometers."
         ),
     },
+    "output_type": {
+        "type": str,
+        "default": "Same as input",
+        "name": "Output data type",
+        "choices": [
+            "Same as input",
+            "2theta / deg",
+            "2theta / rad",
+            "d-spacing / nm",
+            "d-spacing / A",
+            "Q / nm^-1",
+            "Q / A^-1",
+            "r / mm",
+        ],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The unit of the output data. The default is `Same as input`, which "
+            "means that the output data will have the same unit as the input data. "
+            "Choosing a different unit will convert the data to the selected unit."
+        ),
+    },
 }

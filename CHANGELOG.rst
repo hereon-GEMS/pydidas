@@ -23,6 +23,7 @@ Bugfixes
 - Fixed an issue with displaying results which included a dimension of size 1.
 - Fixed an issue where the Scan metadata was not exported when using autosaving in the 
   WorkflowRunFrame.
+- Fixed an issue in AxesSelector widget when the data included dimensions of size 1
 
 
 v25.04.08

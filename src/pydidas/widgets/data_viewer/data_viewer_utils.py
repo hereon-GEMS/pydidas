@@ -204,6 +204,18 @@ def get_data_axis_widget_creation_args(
             },
         ],
         [
+            "create_label",
+            ["label_single_point", "This data dimension only includes a single point"],
+            {
+                "font_metric_width_factor": 48,
+                "gridPos": (0, -1, 1, 1),
+                "parent_widget": "point_selection_container"
+                if multiline
+                else "::self::",
+                "visible": False,
+            },
+        ],
+        [
             "create_lineedit",
             ["edit_range_index"],
             {

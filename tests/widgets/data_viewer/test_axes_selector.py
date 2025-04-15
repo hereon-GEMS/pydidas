@@ -85,27 +85,27 @@ def test_init(selector):
 
 
 def test_current_display_selection__empty(selector):
-    assert selector.current_display_selection == ()
+    assert selector.current_display_selection == []
 
 
 def test_current_display_selection__simple(selector):
     selector.set_data_shape((5, 7, 4))
-    assert selector.current_display_selection == (
+    assert selector.current_display_selection == [
         "slice at index",
         "slice at index",
         "slice at index",
-    )
+    ]
 
 
 def test_current_display_selection__w_change(selector):
     selector.set_data_shape((5, 7, 4))
     selector.set_axis_metadata(1, np.arange(12), "axis 1", "unit 1")
     selector._axwidgets[1].display_choice = "slice at data value"
-    assert selector.current_display_selection == (
+    assert selector.current_display_selection == [
         "slice at index",
         "slice at data value",
         "slice at index",
-    )
+    ]
 
 
 def test_transpose_required(selector):
@@ -153,6 +153,18 @@ def test_set_data_shape__valid(selector):
     for _dim in range(3):
         assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
         assert selector._axwidgets[_dim].npoints == _shape[_dim]
+
+
+def test_set_data_shape__w_len_dim_1(selector):
+    _shape = (5, 1, 7, 1, 4)
+    selector._stored_slicings = {1: "test", 2: "test"}
+    selector.set_data_shape(_shape)
+    assert selector._data_shape == _shape
+    assert selector._data_ndim == 5
+    for _dim in range(5):
+        assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
+        assert selector._axwidgets[_dim].npoints == _shape[_dim]
+        assert selector._axwidgets[_dim].isEnabled() == (_shape[_dim] > 1)
 
 
 def test_create_data_axis_selectors(selector):
@@ -440,7 +452,7 @@ def test__integration__swap_choices_case2(
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
     selector._axwidgets[1].display_choice = "choice1"
-    assert selector.current_display_selection == ("choice2", "choice1")
+    assert selector.current_display_selection == ["choice2", "choice1"]
     assert len(_get_spy_results(spy_new_slicing)) == 1
     assert len(_get_spy_results(spy_new_slicing_str)) == 1
 

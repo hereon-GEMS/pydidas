@@ -86,7 +86,7 @@ class Test_processor(unittest.TestCase):
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
-            "queue_finished": mp.Queue(),
+            "queue_shutting_down": mp.Queue(),
         }
         self.n_test = 20
 
@@ -127,7 +127,7 @@ class Test_processor(unittest.TestCase):
         _thread.start()
         with self.assertRaises(queue.Empty):
             self._queues["queue_output"].get(timeout=0.1)
-        self.assertEqual(self._queues["queue_finished"].get(), 1)
+        self.assertEqual(self._queues["queue_shutting_down"].get(), 1)
 
     def test_run__with_args(self):
         _args = (0, 1)
@@ -147,7 +147,7 @@ class Test_processor(unittest.TestCase):
         # Assert that the processor returned directly and did not wait for any
         # queue timeouts.
         self.assertTrue(len(mystdout.getvalue()) > 0)
-        self.assertEqual(self._queues["queue_finished"].get(), 1)
+        self.assertEqual(self._queues["queue_shutting_down"].get(), 1)
 
     def test_run__with_kwargs(self):
         _args = (0, 1)

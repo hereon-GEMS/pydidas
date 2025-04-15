@@ -26,6 +26,7 @@ Bugfixes
 - Fixed an issue where the Scan metadata was not exported when using autosaving in the 
   WorkflowRunFrame.
 - Fixed an issue in AxesSelector widget when the data included dimensions of size 1
+- Fixed an issue where workers would shut down before submitting the last results.
 
 
 v25.04.08

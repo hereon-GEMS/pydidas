@@ -36,7 +36,7 @@ class PydidasProcess(Process):
     A subclassed multiprocessing.Process which ignores the SIGINT signal.
 
     The PydidasProcess can be used to ignore KeyboardInterrupts in the main process.
-    However, the script takes responbisiblity to handle worker shutdown.
+    However, the script takes responsibility to handle worker shutdown.
     """
 
     def __init__(self, *args, **kwargs):

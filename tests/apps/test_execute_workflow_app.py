@@ -23,7 +23,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import logging
 import multiprocessing as mp
 import queue
 import shutil
@@ -679,14 +678,14 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             self.assertEqual(main_app.mp_manager[_key], _copy.mp_manager[_key])
 
     def test__run_in_processor_with_clone_worker(self):
-        logging.basicConfig(level=logging.DEBUG)
+        # logging.basicConfig(level=logging.DEBUG)
         self._main_app = self.get_exec_workflow_app(print_debug=True)
         _lock_manager = mp.Manager()
         _queues = {
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
-            "queue_finished": mp.Queue(),
+            "queue_shutting_down": mp.Queue(),
             "queue_signal": mp.Queue(),
         }
         _mp_kwargs = {

@@ -329,10 +329,9 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
             "squeeze_empty_dims",
             "enable_overwrite",
             "autosave_results",
-            "autosave_directory",
-            "autosave_format",
         ]:
             self.toggle_param_widget_visibility(_key, not running)
+        self.__update_autosave_widget_visibility()
 
     def __update_autosave_widget_visibility(self):
         """

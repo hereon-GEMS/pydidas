@@ -313,9 +313,15 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             else:
                 self.assertEqual(self._data.axis_ranges[_ax], _data.axis_ranges[_ax])
         for _key, _param in EXP.params.items():
-            self.assertEqual(_param.value, _exp.get_param_value(_key))
+            if _param.dtype == Real:
+                self.assertAlmostEqual(_param.value, _exp.get_param_value(_key))
+            else:
+                self.assertEqual(_param.value, _exp.get_param_value(_key))
         for _key, _param in SCAN.params.items():
-            self.assertEqual(_param.value, _scan.get_param_value(_key))
+            if _param.dtype == Real:
+                self.assertAlmostEqual(_param.value, _scan.get_param_value(_key))
+            else:
+                self.assertEqual(_param.value, _scan.get_param_value(_key))
 
     def test_import_results_from_file__with_missing_data(self):
         _new_name = os.path.join(self._dir, "import_test_with_None.h5")

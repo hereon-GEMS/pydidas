@@ -154,6 +154,11 @@ def get_ViewResultsMixin_build_config(
         ],
         [
             "create_param_widget",
+            (frame.get_param("squeeze_empty_dims"),),
+            {"parent_widget": "config", "visible": False},
+        ],
+        [
+            "create_param_widget",
             (frame.get_param("enable_overwrite"),),
             {"parent_widget": "config", "visible": False},
         ],
@@ -213,7 +218,10 @@ class ViewResultsMixin:
         self.default_params = ParameterCollection(
             self.default_params,
             get_generic_param_collection(
-                "saving_format", "enable_overwrite", "use_scan_timeline"
+                "saving_format",
+                "squeeze_empty_dims",
+                "enable_overwrite",
+                "use_scan_timeline",
             ),
         )
 
@@ -254,14 +262,14 @@ class ViewResultsMixin:
             self._RESULTS
         )
 
-    def update_export_button_activation(self):
+    def update_export_setting_visibility(self):
         """
         Update the enabled state of the export buttons based on available results.
         """
         _active = self._RESULTS.shapes != {}
         self._widgets["but_export_all"].setEnabled(_active)
-        for _key in ["saving_format", "enable_overwrite"]:
-            self.param_widgets[_key].setVisible(_active)
+        for _key in ["saving_format", "squeeze_empty_dims", "enable_overwrite"]:
+            self.toggle_param_widget_visibility(_key, _active)
         for _key in ["but_export_current", "but_export_all"]:
             self._widgets[_key].setVisible(_active)
 
@@ -305,10 +313,10 @@ class ViewResultsMixin:
             return
         if self.get_param_value("use_scan_timeline"):
             self._data = self._RESULTS.get_results_for_flattened_scan(
-                self._active_node_id
+                self._active_node_id, squeeze=True
             )
         else:
-            self._data = self._RESULTS.get_results(self._active_node_id)
+            self._data = self._RESULTS.get_results(self._active_node_id).squeeze()
         self._widgets["result_info"].setText(
             self._RESULTS.get_node_result_metadata_string(
                 self._active_node_id, self.get_param_value("use_scan_timeline")
@@ -389,6 +397,7 @@ class ViewResultsMixin:
                 ),
             )
             return
+        _squeeze_flag = self.get_param_value("squeeze_empty_dims")
         _overwrite = self.get_param_value("enable_overwrite")
         while True:
             _dirname = self.__export_dialog.get_existing_directory(
@@ -409,5 +418,9 @@ class ViewResultsMixin:
         if _dirname is None:
             return
         self._RESULTS.save_results_to_disk(
-            _dirname, _formats, overwrite=_overwrite, node_id=node
+            _dirname,
+            _formats,
+            overwrite=_overwrite,
+            node_id=node,
+            squeeze_results=_squeeze_flag,
         )

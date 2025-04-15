@@ -90,6 +90,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         for _method, _args, _kwargs in get_WorkflowRunFrame_build_config(self):
             _method = getattr(self, _method)
             _method(*_args, **_kwargs)
+        self.__update_autosave_widget_visibility()
         self.build_view_results_mixin()
 
     def connect_signals(self):
@@ -246,7 +247,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self.set_status("Started processing of full workflow.")
         self._widgets["progress"].setValue(0)
         self._clear_results()
-        self.update_export_button_activation()
+        self.update_export_setting_visibility()
 
     @QtCore.Slot()
     def _apprunner_finished(self):
@@ -300,7 +301,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Perform finishing touches after the processing has terminated.
         """
-        self.update_export_button_activation()
+        self.update_export_setting_visibility()
         self.__set_proc_widget_visibility_for_running(False)
         self.sig_processing_running.emit(False)
         QtWidgets.QApplication.instance().processEvents()
@@ -323,8 +324,15 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)
-        self.param_composite_widgets["saving_format"].setVisible(not running)
-        self.param_composite_widgets["enable_overwrite"].setVisible(not running)
+        for _key in [
+            "saving_format",
+            "squeeze_empty_dims",
+            "enable_overwrite",
+            "autosave_results",
+            "autosave_directory",
+            "autosave_format",
+        ]:
+            self.toggle_param_widget_visibility(_key, not running)
 
     def __update_autosave_widget_visibility(self):
         """

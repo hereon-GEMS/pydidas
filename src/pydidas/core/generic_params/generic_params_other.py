@@ -17,7 +17,7 @@
 
 """
 The generic_params_other module holds all the required data to create generic
-Parameters which are are not included in other specialized modules.
+Parameters which are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
@@ -235,7 +235,7 @@ GENERIC_PARAMS_OTHER = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": ("The detector image number, as files are written to disk."),
+        "tooltip": "The detector image number, as files are written to disk.",
     },
     ################
     # Generic limits
@@ -451,6 +451,18 @@ GENERIC_PARAMS_OTHER = {
         "tooltip": (
             "Keyword to toggle using a scan timeline with only one "
             "dimension instead of all scan dimensions."
+        ),
+    },
+    "squeeze_empty_dims": {
+        "type": bool,
+        "default": True,
+        "name": "Squeeze empty dimensions",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "Keyword to toggle squeezing empty dimensions from the result dataset."
+            "This will remove all dimensions with a size of 1."
         ),
     },
     "use_data_range": {

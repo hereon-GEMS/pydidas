@@ -26,3 +26,4 @@ include README.md
 include src/pydidas/docs/make.bat
 include src/pydidas/docs/Makefile
 include src/pydidas/docs/src/_static/_css/pydidas-custom.css
+include src/pydidas/sphinx/docs-built.yml

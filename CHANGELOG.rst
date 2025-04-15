@@ -14,6 +14,8 @@ Improvements
 - Added generic functions to convert scattering geometry and d-spacing.
 - Added axis_labels, axis_ranges and axis_units properties to Scan
 - Added an option to squeeze datasets when exporting results.
+- Overhauled the documentation build check to force a new build after updating
+  pydidas with pip.
 
 
 Bugfixes

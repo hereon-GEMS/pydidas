@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "DOC_BUILD_DIRECTORY",
+    "DOC_BUILD_PATH",
     "DOC_SOURCE_DIRECTORY",
     "DOC_HOME_FILENAME",
     "DOC_HOME_ADDRESS",
@@ -39,6 +40,7 @@ __all__ = [
 
 
 import os
+from pathlib import Path
 
 from qtpy import QtCore
 
@@ -189,6 +191,7 @@ def _get_doc_home_qurl() -> QtCore.QUrl:
 
 DOC_HOME_QURL = _get_doc_home_qurl()
 DOC_BUILD_DIRECTORY = _doc_make_directory()
+DOC_BUILD_PATH = Path(DOC_BUILD_DIRECTORY)
 DOC_SOURCE_DIRECTORY = _doc_source_directory()
 DOC_HOME_FILENAME = _doc_home_filename()
 DOC_HOME_ADDRESS = _doc_home_address()

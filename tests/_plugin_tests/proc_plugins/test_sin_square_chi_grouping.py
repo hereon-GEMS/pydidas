@@ -1769,7 +1769,10 @@ class Ds2cTestConfig:
             axis_labels={0: self.azimuth_name, 1: "0: position"},
             axis_units={0: self.chi_unit, 1: ""},
             data_label=f"position / {self.d_unit}",
-            metadata={"fitted_axis_label": OUTPUT_LABEL},
+            metadata={
+                "fitted_axis_label": OUTPUT_LABEL,
+                "fitted_axis_unit": self.d_unit,
+            },
         )
 
         return input_ds
@@ -1797,7 +1800,10 @@ class Ds2cTestConfig:
             axis_labels={0: self.azimuth_name},
             axis_units={0: self.chi_unit},
             data_label=f"position / {self.d_unit}",
-            metadata={"fitted_axis_label": OUTPUT_LABEL},
+            metadata={
+                "fitted_axis_label": OUTPUT_LABEL,
+                "fitted_axis_unit": self.d_unit,
+            },
         )
         return input_ds
 
@@ -2360,7 +2366,6 @@ test_cases = [
 ]
 
 
-# test_cases=[ds_case12_exe]
 @pytest.mark.parametrize("case", test_cases)
 def test_execute_with_various_cases(plugin, case):
     ds_in = case.create_simple_input_ds()

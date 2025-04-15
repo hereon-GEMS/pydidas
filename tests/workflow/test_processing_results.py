@@ -732,6 +732,27 @@ class TestProcessingResults(unittest.TestCase):
         self.assertEqual(_shape1, res.shapes[1])
         self.assertEqual(_shape2, res.shapes[2])
 
+    def test_save_results_to_disk__w_squeeze(self):
+        self._plugin_metadata[2] = {
+            "axis_units": {0: "m", 1: "", 2: "spam!"},
+            "axis_labels": {0: "dim1", 1: "dim #3", 2: "42"},
+            "axis_ranges": {
+                0: 12 + np.arange(self._new_shape[0]),
+                1: np.array([42]),
+                2: 4 + 0.5 * np.arange(self._new_shape[3]),
+            },
+            "data_label": "New dataset",
+            "data_unit": "u2",
+        }
+        res = self.create_standard_workflow_results()
+        res.save_results_to_disk(self._tmpdir, "HDF5", squeeze_results=True)
+        with h5py.File(self.get_node_output_path(1), "r") as f:
+            _shape1 = f["entry/data/data"].shape
+        with h5py.File(self.get_node_output_path(2), "r") as f:
+            _shape2 = f["entry/data/data"].shape
+        self.assertEqual(_shape1, tuple(n for n in res.shapes[1] if n > 1))
+        self.assertEqual(_shape2, tuple(n for n in res.shapes[2] if n > 1))
+
     def test_save_results_to_disk__single_node(self):
         res = self.create_standard_workflow_results()
         res.save_results_to_disk(self._tmpdir, "HDF5", node_id=1)

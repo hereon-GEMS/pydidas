@@ -12,12 +12,17 @@ Improvements
 	  plugin.
 	- The ConvertToDSpacing plugin can now also convert from d-spacing.
 - Added generic functions to convert scattering geometry and d-spacing.
+- Added axis_labels, axis_ranges and axis_units properties to Scan
+- Added an option to squeeze datasets when exporting results.
+
 
 Bugfixes
 --------
 - Fixed an issue when deploying locally where the pydidas-custom.css for the documentation
   was not included in the wheel.
 - Fixed an issue with displaying results which included a dimension of size 1.
+- Fixed an issue where the Scan metadata was not exported when using autosaving in the 
+  WorkflowRunFrame.
 
 
 v25.04.08

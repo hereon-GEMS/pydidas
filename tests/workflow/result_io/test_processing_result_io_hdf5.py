@@ -64,6 +64,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             )
             SCAN.set_param_value(f"scan_dim{d}_offset", random.choice([-0.1, 0.5, 1]))
             SCAN.set_param_value(f"scan_dim{d}_label", get_random_string(12))
+            SCAN.set_param_value(f"scan_dim{d}_unit", get_random_string(3))
         for _key in EXP.params:
             if EXP.params[_key].dtype == Integral:
                 EXP.set_param_value(_key, int(100 * np.random.random()))
@@ -208,6 +209,38 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             _data = _file["entry/data/data"]
             self.assertEqual(_data.shape, self._shapes[1])
             self.assertIsInstance(_data, h5py.Dataset)
+
+    def test_update_with_scan_metadata(self):
+        self.prepare_with_defaults()
+        _datasets = self.get_datasets()
+        for _key, _dataset in _datasets.items():
+            _dataset, _, _, _ = self.populate_metadata(_dataset)
+            _datasets[_key] = _dataset
+        _metadata = H5SAVER.update_with_scan_metadata(_datasets, SCAN)
+        for _key, _metadata in _metadata.items():
+            self.assertEqual(_metadata["data_label"], _datasets[_key].data_label)
+            self.assertEqual(_metadata["data_unit"], _datasets[_key].data_unit)
+            for _dim in range(SCAN.ndim):
+                self.assertEqual(_metadata["axis_labels"][_dim], SCAN.axis_labels[_dim])
+                self.assertEqual(_metadata["axis_units"][_dim], SCAN.axis_units[_dim])
+                self.assertTrue(
+                    np.allclose(_metadata["axis_ranges"][_dim], SCAN.axis_ranges[_dim])
+                )
+            for _dim in range(_datasets[_key].ndim - SCAN.ndim):
+                self.assertEqual(
+                    _metadata["axis_labels"][_dim + SCAN.ndim],
+                    _datasets[_key].axis_labels[_dim],
+                )
+                self.assertEqual(
+                    _metadata["axis_units"][_dim + SCAN.ndim],
+                    _datasets[_key].axis_units[_dim],
+                )
+                self.assertTrue(
+                    np.allclose(
+                        _metadata["axis_ranges"][_dim + SCAN.ndim],
+                        _datasets[_key].axis_ranges[_dim],
+                    )
+                )
 
     def test_update_metadata__standard(self):
         self.prepare_with_defaults()

@@ -186,9 +186,9 @@ class AxesSelector(WidgetWithParameterCollection):
             if self._multiline_layout and _dim > 0:
                 self._widgets[f"line_{_dim}"].setVisible(_dim < self._data_ndim)
 
-            if _dim >= self._data_ndim:
-                with QtCore.QSignalBlocker(self._axwidgets[_dim]):
-                    self._axwidgets[_dim].display_choice = "slice at index"
+            # if _dim >= self._data_ndim:
+            #     with QtCore.QSignalBlocker(self._axwidgets[_dim]):
+            #         self._axwidgets[_dim].display_choice = "slice at index"
 
     def set_axis_metadata(
         self,
@@ -297,7 +297,8 @@ class AxesSelector(WidgetWithParameterCollection):
 
             self._current_display_selection = []
             if self.current_display_selection.count(_choice) == 0:
-                for _dim, _axwidget in self._axwidgets.items():
+                for _dim in range(self._data_ndim):
+                    _axwidget = self._axwidgets[_dim]
                     if (
                         _dim != ignore_ax
                         and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES

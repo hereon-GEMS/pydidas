@@ -196,7 +196,8 @@ def test_create_data_axis_selectors__multiple_calls(selector):
             assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
             assert "choice1" in selector._axwidgets[_dim].available_choices
             assert "choice2" in selector._axwidgets[_dim].available_choices
-        for _dim, _item in selector._axwidgets.items():
+        for _dim in range(selector._data_ndim):
+            _item = selector._axwidgets[_dim]
             if _dim >= _ndim:
                 assert _item.display_choice == "slice at index"
 

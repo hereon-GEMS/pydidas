@@ -33,6 +33,7 @@ import numpy as np
 from pydidas.core import Dataset, PydidasConfigError, UserConfigError
 from pydidas.core.utils import rebin2d
 from pydidas.core.utils.dataset_utils import get_corresponding_dims
+from pydidas.unittest_objects import create_dataset
 
 
 _np_random_generator = np.random.default_rng()
@@ -165,11 +166,30 @@ class TestDataset(unittest.TestCase):
         obj[_mask == 0] = 1
         self.assertTrue((obj == 1).all())
 
-    def test_array_finalize__get_masked(self):
+    def test_array_finalize__get_full_masked(self):
         obj = self.create_large_dataset()
         _mask = np.zeros(obj.shape)
         _new = obj[_mask == 0]
         self.assertTrue(np.allclose(obj.flatten(), _new))
+
+    def test_array_finalize__get_masked(self):
+        obj = self.create_large_dataset()
+        _mask = np.zeros(obj.shape)
+        _mask[1, 1, 1, 1] = 1
+        _mask[2, 2, 2, 2] = 1
+        _new = obj[_mask == 1]
+        _ref = [obj[1, 1, 1, 1], obj[2, 2, 2, 2]]
+        self.assertTrue(np.allclose(_ref, _new))
+        self.assertEqual(_new.axis_ranges[0].size, 2)
+
+    def test_array_finalize__get_masked_1d(self):
+        _slice = slice(12, 18)
+        obj = create_dataset(1, float, shape=(42,))
+        _mask = np.zeros(obj.shape)
+        _mask[_slice] = 1
+        _new = obj[_mask == 1]
+        self.assertTrue(np.allclose(obj[_slice], _new))
+        self.assertEqual(_new.axis_ranges[0].size, 6)
 
     def test_new__from_array(self):
         _ndarray = np.random.random((10, 12))
@@ -364,6 +384,15 @@ class TestDataset(unittest.TestCase):
                 {i: k for i, k in enumerate(self._dset.get(_key))},
             )
 
+    def test_array_finalize__1d_array_w_array_mask(self):
+        obj = self.get_random_dataset(1)
+        indices = np.ones((obj.size), dtype=bool)
+        indices[1] = False
+        _new = obj[indices]
+        self.assertTrue(isinstance(_new, Dataset))
+        self.assertTrue(np.allclose(_new, np.append(obj[0], obj[2:])))
+        self.assertEqual(_new.axis_ranges[0].size, _new.size)
+
     def test_array_finalize__get_single_value(self):
         obj = self.create_simple_dataset()[0]
         _val = obj[0]
@@ -556,6 +585,23 @@ class TestDataset(unittest.TestCase):
         _new = np.take(obj, 2, 0)
         self.assertFalse(isinstance(_new, Dataset))
         self.assertEqual(_new, obj[2])
+
+    def test_take__1d_array_wo_axis(self):
+        obj = self.get_random_dataset(1)
+        indices = [i for i in range(obj.size) if i != 1]
+        _new = np.take(obj, indices)
+        self.assertTrue(isinstance(_new, Dataset))
+        self.assertTrue(np.allclose(_new, np.append(obj[0], obj[2:])))
+        self.assertEqual(_new.axis_ranges[0].size, _new.size)
+
+    def test_take__2d_array_wo_axis(self):
+        obj = self.get_random_dataset(2)
+        indices = [i for i in range(obj.size) if i != 1]
+        _new = np.take(obj, indices)
+        self.assertTrue(isinstance(_new, Dataset))
+        self.assertEqual(_new.size, obj.size - 1)
+        self.assertEqual(_new.ndim, 1)
+        self.assertEqual(_new.axis_ranges[0].size, _new.size)
 
     def test_getitem__simple(self):
         obj = self.create_large_dataset()

@@ -27,6 +27,8 @@ Bugfixes
   WorkflowRunFrame.
 - Fixed an issue in AxesSelector widget when the data included dimensions of size 1
 - Fixed an issue where workers would shut down before submitting the last results.
+- Fixed an issue in Dataset where slicing a 1d-array with an array would not update 
+  the axis metadata.
 
 
 v25.04.08

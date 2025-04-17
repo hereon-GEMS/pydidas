@@ -193,17 +193,21 @@ class Dataset(ndarray):
             _key: getattr(obj, _key, dataset_default_attribute(_key, self.shape))
             for _key in METADATA_KEYS
         }
+        _keys_require_shifting = False
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
             if (
                 isinstance(_slicer, ndarray)
                 and _slicer.dtype == np.bool_
-                and _slicer.size == obj.size
+                and _slicer.shape == obj.shape
+                and _slicer.ndim == obj.ndim
+                and _slicer.ndim > 1
             ):
-                # in the case of a masked array, keep all axis keys.
+                # in the case of a n-dim masked array, keep all axis keys.
                 break
             if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
                     del self._meta[_item][_dim]
+                _keys_require_shifting = True
             elif isinstance(_slicer, (slice, Iterable, ndarray)):
                 if isinstance(_slicer, tuple):
                     _slicer = list(_slicer)
@@ -212,6 +216,9 @@ class Dataset(ndarray):
                 ]
             elif _slicer is None:
                 self.__insert_axis_keys(_dim)
+                _keys_require_shifting = True
+        if not _keys_require_shifting:
+            return
         # finally, shift all keys to have a consistent numbering:
         for _item in ["axis_labels", "axis_units", "axis_ranges"]:
             self._meta[_item] = {
@@ -983,9 +990,13 @@ class Dataset(ndarray):
             The new dataset.
         """
         _new = ndarray.take(self, indices, axis, out, mode)
-        if not isinstance(_new, Dataset) or axis is None:
+        if not isinstance(_new, Dataset):
+            return _new
+        if axis is None and self.ndim > 1:
+            _new.__update_keys_from_object()
             return _new
         _nindices = get_number_of_entries(indices)
+        axis = axis if axis is not None else 0
         if _nindices == 1 and not isinstance(indices, Iterable):
             for _key in ["axis_labels", "axis_units", "axis_ranges"]:
                 _item = _new._meta[_key]

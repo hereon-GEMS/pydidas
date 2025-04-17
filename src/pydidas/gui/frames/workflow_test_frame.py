@@ -442,6 +442,8 @@ class WorkflowTestFrame(BaseFrame):
                 if 1 in set(_data.shape) and _data.shape != (1,):
                     _data = _data.squeeze()
                 self._results[_node_id] = _data
+        if self._active_node not in self._results:
+            self._active_node = -1
 
     def __update_selection_choices(self):
         """Update the choice of results to display"""

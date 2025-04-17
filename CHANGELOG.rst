@@ -30,6 +30,8 @@ Bugfixes
 - Fixed an issue where workers would shut down before submitting the last results.
 - Fixed an issue in Dataset where slicing a 1d-array with an array would not update 
   the axis metadata.
+- Fixed an issue in the WorkflowTestFrame where an invalid node was selected after the 
+  new workflow had fewer nodes
 
 
 v25.04.08

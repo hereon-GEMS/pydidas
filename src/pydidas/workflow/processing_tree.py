@@ -34,7 +34,8 @@ from pathlib import Path
 from typing import Self
 
 from pydidas.core import UserConfigError
-from pydidas.plugins import BasePlugin, OutputPlugin, PluginCollection
+from pydidas.core.constants import OUTPUT_PLUGIN
+from pydidas.plugins import BasePlugin, PluginCollection
 from pydidas.workflow.generic_tree import GenericTree
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
 from pydidas.workflow.workflow_node import WorkflowNode
@@ -450,7 +451,7 @@ class ProcessingTree(GenericTree):
             for _node in self.nodes.values()
             if (
                 (_node.is_leaf or _node.plugin.get_param_value("keep_results"))
-                and not isinstance(_node.plugin, OutputPlugin)
+                and not _node.plugin.plugin_type == OUTPUT_PLUGIN
             )
         ]
         return _nodes_w_results

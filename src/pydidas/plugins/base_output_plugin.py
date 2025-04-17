@@ -99,7 +99,7 @@ class OutputPlugin(BasePlugin):
         str
             The full filename and path.
         """
-        _index = self._config["global_index"]
+        _index = self._config.get("global_index", None)
         if _index is None:
             self.raise_UserConfigError(
                 "The `global_index` keyword has not been set. "

@@ -16,6 +16,7 @@ Improvements
 - Added an option to squeeze datasets when exporting results.
 - Overhauled the documentation build check to force a new build after updating
   pydidas with pip.
+- Added support for formatting (symbols, linewidth, linestyle) for plugin details.
 
 
 Bugfixes

@@ -378,18 +378,7 @@ class BaseFitPlugin(ProcPlugin):
                 self._config["param_bounds_high"][_index] = _xhigh
 
     def update_fit_param_bounds(self):
-        """
-        Update the fitting bounds from Parameters.
-
-        Dictionary keys can be any key given in the param_labels. Values must be tuple
-        pairs of low, high boundary values. None is allowed to ignore setting a
-        particular boundary.
-
-        Parameters
-        ----------
-        **kwargs : Dict
-            Dictionary with key, value pairs for the
-        """
+        """Update the fitting bounds from Parameters."""
         for _key in self.params:
             if _key.startswith("fit_peak") and (
                 _key.endswith("_xlow") or _key.endswith("_xhigh")
@@ -449,10 +438,10 @@ class BaseFitPlugin(ProcPlugin):
         This method will return detailed information to display for the user. The return
         format is a dictionary with four keys:
         First, "n_plots" which determines the number of plots. Second, "plot_titles"
-        gives a title for each subplot. Third, "plot_ylabels" gives a y axis label for
+        gives a title for each subplot. Third, "plot_ylabels" gives a y-axis label for
         each subplot. Fourth, "items" provides a list with the different items to be
         plotted. Each list entry must be a dictionary with the following keys: "plot"
-        [to detemine the plot number], "label" [for the legend label] and "data" with
+        [to determine the plot number], "label" [for the legend label] and "data" with
         the actual data.
 
         Parameters
@@ -472,6 +461,7 @@ class BaseFitPlugin(ProcPlugin):
         _xfit = np.linspace(
             self._data_x[0], self._data_x[-1], num=(self._data_x.size - 1) * 10 + 1
         )
+        _x_reduced = np.array([np.amin(_xfit), np.amax(_xfit)])
         _fit_param_vals = tuple(self._fit_params.values())
         _dset_kws = {
             "axis_ranges": [_xfit],
@@ -481,6 +471,7 @@ class BaseFitPlugin(ProcPlugin):
         }
         _datafit = Dataset(self._fitter.profile(_fit_param_vals, _xfit), **_dset_kws)
         _startfit = Dataset(self._fitter.profile(start_fit_params, _xfit), **_dset_kws)
+        _reference = Dataset([0, 0], axis_ranges=[_x_reduced])
         _residual = self._fitter.delta(_fit_param_vals, self._data_x, self._data)
 
         _details = {
@@ -504,9 +495,27 @@ class BaseFitPlugin(ProcPlugin):
                 + "\n}"
             ),
             "items": [
-                {"plot": 0, "label": "input data", "data": self._data},
-                {"plot": 0, "label": "fitted_data", "data": _datafit},
-                {"plot": 1, "label": "residual", "data": _residual},
+                {
+                    "plot": 0,
+                    "label": "input data",
+                    "data": self._data,
+                    "symbol": "o",
+                    "linewidth": 0,
+                },
+                {"plot": 0, "label": "fitted_data", "data": _datafit, "linewidth": 2.5},
+                {
+                    "plot": 1,
+                    "label": "reference",
+                    "data": _reference,
+                    "linestyle": "--",
+                },
+                {
+                    "plot": 1,
+                    "label": "residual",
+                    "data": _residual,
+                    "symbol": "o",
+                    "linewidth": 0,
+                },
                 {"plot": 2, "label": "input data", "data": self._data},
                 {"plot": 2, "label": "starting guess", "data": _startfit},
             ],
@@ -515,8 +524,13 @@ class BaseFitPlugin(ProcPlugin):
             _bg_poly = [self._fit_params["background_p0"]]
             if "background_p1" in self._fit_params:
                 _bg_poly.insert(0, self._fit_params["background_p1"])
-            _bg = Dataset(np.polyval(_bg_poly, _xfit), **_dset_kws)
-            _details["items"].append({"plot": 0, "label": "background", "data": _bg})
+            _bg = Dataset(
+                np.polyval(_bg_poly, _x_reduced),
+                **(_dset_kws | {"axis_ranges": [_x_reduced]}),
+            )
+            _details["items"].append(
+                {"plot": 0, "label": "background", "data": _bg, "linestyle": "--"}
+            )
         return _details
 
     def _create_details_for_invalid_peak(
@@ -556,7 +570,13 @@ class BaseFitPlugin(ProcPlugin):
             "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
             "metadata": "",
             "items": [
-                {"plot": 0, "label": "input data", "data": self._data},
+                {
+                    "plot": 0,
+                    "label": "input data",
+                    "data": self._data,
+                    "linewidth": 0,
+                    "symbol": "o",
+                },
                 {"plot": 0, "label": "background", "data": _bg},
                 {
                     "plot": 1,

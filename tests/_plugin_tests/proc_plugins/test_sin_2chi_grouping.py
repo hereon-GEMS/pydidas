@@ -92,8 +92,8 @@ def test_execute_validation_basic(
 
     assert result is not None
     assert result.data_unit == expected_unit
-    assert result.data_label == "Difference of d(+) - d(-)"
-    assert result.axis_labels[0] == "0: d-, 1: d+, 2: d(+)-d(-)"
+    assert result.data_label == "Difference between pos. and neg. branch"
+    assert result.axis_labels[0] == "0: neg. branch, 1: pos. branch, 2: difference"
     assert result.axis_labels[1] == LABELS_SIN_2CHI
     assert result.axis_units[0] == ""
     assert result.axis_units[1] == ""
@@ -232,8 +232,8 @@ def test_execute_validation(plugin_fixture, case):
     )
     assert np.allclose(ds, _input_ref, equal_nan=True)
     assert result.data_unit == UNITS_ANGSTROM
-    assert result.data_label == "Difference of d(+) - d(-)"
-    assert result.axis_labels[0] == "0: d-, 1: d+, 2: d(+)-d(-)"
+    assert result.data_label == "Difference between pos. and neg. branch"
+    assert result.axis_labels[0] == "0: neg. branch, 1: pos. branch, 2: difference"
     assert result.axis_labels[1] == LABELS_SIN_2CHI
     assert result.shape[0] == 3
     assert result.shape[1] == ds.shape[1]
@@ -303,8 +303,8 @@ def test__calculate_diff_d_spacing_vs_sin_2chi(plugin_fixture, case):
         result.axis_ranges[1], case.s_2c_values_expected
     )
     assert result.data_unit == UNITS_ANGSTROM
-    assert result.data_label == "Difference of d(+) - d(-)"
-    assert result.axis_labels[0] == "0: d-, 1: d+, 2: d(+)-d(-)"
+    assert result.data_label == "Difference between pos. and neg. branch"
+    assert result.axis_labels[0] == "0: neg. branch, 1: pos. branch, 2: difference"
     assert result.axis_labels[1] == LABELS_SIN_2CHI
     assert result.shape[0] == 3
     assert result.shape[1] == ds.shape[1]
@@ -363,7 +363,7 @@ def test_calculate_diff_d_spacing_vs_sin_2chi_invalid_input(
 def test_Sin_2chiGrouping_params(plugin_fixture):
     plugin = plugin_fixture
 
-    assert plugin.plugin_name == "Group in d-spacing vs sin(2*chi)"
+    assert plugin.plugin_name == "Grouping of results vs sin(2*chi)"
     assert plugin.plugin_type == PROC_PLUGIN
     assert not plugin.basic_plugin
     assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN

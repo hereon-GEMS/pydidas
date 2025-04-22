@@ -79,7 +79,7 @@ class Sin_2chiGrouping(ProcPlugin):
     - Both d-spacing branches (d(-), d(+)) vs. sin^2(chi)
     """
 
-    plugin_name = "Group in d-spacing vs sin(2*chi)"
+    plugin_name = "Grouping of results vs sin(2*chi)"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
@@ -176,9 +176,9 @@ class Sin_2chiGrouping(ProcPlugin):
             )
         _results = Dataset(ds.array.copy(), **ds.property_dict)
         _results[2, :] = np.diff(ds[:2, :], axis=0)
-        _results.data_label = "Difference of d(+) - d(-)"
+        _results.data_label = "Difference between pos. and neg. branch"
         _results.axis_labels: dict[int, str] = {
-            0: "0: d-, 1: d+, 2: d(+)-d(-)",
+            0: "0: neg. branch, 1: pos. branch, 2: difference",
             1: LABELS_SIN_2CHI,
         }
         _results.update_axis_range(

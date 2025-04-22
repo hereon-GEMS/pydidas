@@ -11,6 +11,7 @@ Improvements
 	- Added support for inputs in geometry (i.e. 2theta, Q, r) to SinSquareChiGrouping
 	  plugin.
 	- The ConvertToDSpacing plugin can now also convert from d-spacing.
+	- Added a new plugin for sin^2(chi) analysis for high-energy data.
 - Added generic functions to convert scattering geometry and d-spacing.
 - Added axis_labels, axis_ranges and axis_units properties to Scan
 - Added an option to squeeze datasets when exporting results.

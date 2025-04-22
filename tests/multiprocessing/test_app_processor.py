@@ -187,7 +187,7 @@ class Test_app_processor(unittest.TestCase):
         self._mp_config["queue_stop"].put(1)
         time.sleep(0.05)
         _tasks, _results = self.get_taskless_results()
-        time.sleep(0.01)
+        time.sleep(0.05)
         self.assertTrue(len(_tasks) > 0)
         self.assertEqual(self._mp_config["queue_shutting_down"].get_nowait(), 1)
 

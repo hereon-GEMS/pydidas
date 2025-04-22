@@ -32,6 +32,8 @@ Bugfixes
   the axis metadata.
 - Fixed an issue in the WorkflowTestFrame where an invalid node was selected after the 
   new workflow had fewer nodes
+- Fixed an issue with applying numpy ufuncs to dataset with axis arguments given in 
+  numpy datatypes (e.g. np.uint64)
 
 
 v25.04.08

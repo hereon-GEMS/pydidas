@@ -1063,7 +1063,7 @@ class Dataset(ndarray):
         if axis is not None:
             axis = tuple(
                 np.mod(_ax, self.ndim)
-                for _ax in ((axis,) if isinstance(axis, int) else axis)
+                for _ax in ((axis,) if isinstance(axis, Integral) else axis)
             )
         if has_dtype_arg:
             kwargs["dtype"] = dtype
@@ -1077,7 +1077,7 @@ class Dataset(ndarray):
         )
         _result.data_unit = self.data_unit
         if not kwargs.get("keepdims", False):
-            axis = (axis,) if isinstance(axis, int) else axis
+            axis = (axis,) if isinstance(axis, Integral) else axis
             for _key in ["axis_labels", "axis_units", "axis_ranges"]:
                 _items = [
                     _val for _i, _val in self._meta[_key].items() if _i not in axis

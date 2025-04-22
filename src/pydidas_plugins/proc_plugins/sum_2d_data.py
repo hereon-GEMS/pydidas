@@ -35,7 +35,7 @@ from pydidas.plugins import ProcPlugin
 
 class Sum2dData(ProcPlugin):
     """
-    Sum up datapoints in a 2D dataset.
+    Sum up datapoints in two dimensions.
 
     This plugin creates a single datapoint from the 2D input data. Limits
     can be given with the lower and upper limit parameters. The data can

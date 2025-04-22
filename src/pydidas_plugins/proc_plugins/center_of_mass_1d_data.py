@@ -30,31 +30,41 @@ __all__ = ["CenterOfMass1dData"]
 import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.utils import (
-    process_1d_with_multi_input_dims,
-)
 from pydidas.plugins import ProcPlugin
 
 
 class CenterOfMass1dData(ProcPlugin):
     """
-    Sum up datapoints in a 1D dataset.
+    Calculate the center of mass along the specified data dimension.
+
+    The mathematical formulation is:
+
+    COM = sum(x * data) / sum(data)
     """
 
-    plugin_name = "Center of mass 1d data"
+    plugin_name = "Calculate center of mass"
 
     default_params = get_generic_param_collection("process_data_dim")
 
     input_data_dim = -1
-    output_data_dim = 0
-    output_data_label = "Center of mass (1d)"
+    output_data_dim = -1
+    output_data_label = "Center of mass"
     output_data_unit = "a.u."
     new_dataset = True
 
-    @process_1d_with_multi_input_dims
+    def __init__(self, *args: tuple, **kwargs: dict):
+        super().__init__(*args, **kwargs)
+        self._config["slicer"] = None
+
+    def pre_execute(self):
+        """
+        Pre-execute method to set up the plugin before execution.
+        """
+        self._config["slicer"] = None
+
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Calculate the center of mass for 1d input data.
+        Calculate the center of mass for the input data along a single dimension.
 
         Parameters
         ----------
@@ -65,20 +75,36 @@ class CenterOfMass1dData(ProcPlugin):
 
         Returns
         -------
-        _new_data : pydidas.core.Dataset
-            The data sum in form of an array of shape (1,).
+        center_of_mass : Dataset
+            The center of mass calculated along the specified dimension.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        _x = data.axis_ranges[0]
-        self.output_data_unit = data.axis_units[0]
-        _com = np.sum(_x * data) / np.sum(data)
-        _new_data = Dataset(
-            [_com],
-            axis_labels=["Data center of mass"],
-            axis_units=[""],
-            metadata=data.metadata,
-            axis_label="Data center of mass",
-            axis_unit=data.data_unit,
+        _dim = np.mod(self.get_param_value("process_data_dim"), data.ndim)
+        if self._config["slicer"] is None:
+            self._calculate_slicer(data)
+        _x = data.axis_ranges[_dim][*self._config["slicer"]]
+        center_of_mass = np.sum(_x * data, axis=_dim) / np.sum(data, axis=_dim)
+        center_of_mass.data_label = "Center of mass of " + data.axis_labels[_dim]
+        center_of_mass.data_unit = data.axis_units[_dim]
+        return center_of_mass, kwargs
+
+    def _calculate_slicer(self, data: Dataset):
+        """
+        Calculate the slices for the x-axis range.
+
+        Parameters
+        ----------
+        data : Dataset
+            The input Dataset.
+        """
+        _dim_to_process = np.mod(self.get_param_value("process_data_dim"), data.ndim)
+        self._config["slicer"] = (
+            [np.newaxis] * _dim_to_process
+            + [slice(None)]
+            + max((data.ndim - _dim_to_process - 1), 0) * [np.newaxis]
         )
-        return _new_data, kwargs
+        self.output_data_label = (
+            "Center of mass of " + data.axis_labels[_dim_to_process]
+        )
+        self.output_data_unit = data.axis_units[_dim_to_process]

@@ -35,7 +35,7 @@ from pydidas.plugins import ProcPlugin
 
 class Sum1dData(ProcPlugin):
     """
-    Sum up data points in one dimensions dataset.
+    Sum up data points in one dimension.
 
     This plugin sums up the data values of the selected data points.
     Summation limits are defined using the 'lower_limit' and 'upper_limit'

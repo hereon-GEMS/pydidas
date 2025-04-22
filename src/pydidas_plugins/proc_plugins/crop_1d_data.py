@@ -72,7 +72,9 @@ CROP1D_PARAMS = ParameterCollection(
 
 class Crop1dData(ProcPlugin):
     """
-    Crop a 1D dataset by specifying bounds, either indices or in the data range.
+    Crop a dataset in one dimension by specifying bounds.
+
+    Boundaries can be given either as indices or in the data range.
 
     Single bounds can be disabled by setting their value to None.
 
@@ -82,7 +84,7 @@ class Crop1dData(ProcPlugin):
     """
 
     default_params = CROP1D_PARAMS
-    plugin_name = "Crop 1D data"
+    plugin_name = "Crop data in a single dimension"
 
     input_data_dim = -1
     output_data_dim = -1

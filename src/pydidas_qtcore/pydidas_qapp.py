@@ -31,7 +31,7 @@ import argparse
 import signal
 import sys
 import weakref
-from typing import Tuple
+from typing import Self, Tuple
 
 import matplotlib as mpl
 import matplotlib.font_manager as mpl_font_manager
@@ -168,7 +168,7 @@ class PydidasQApplication(QApplication):
     _instance = None
 
     @staticmethod
-    def instance():
+    def instance() -> Self:
         return PydidasQApplication._instance
 
     def __init__(self, args):

@@ -107,7 +107,7 @@ def _filter_nan_from_1d_dataset(data: Dataset) -> tuple[np.ndarray, np.ndarray]:
 
 class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
     """
-    Analyses the d-spacing values of a dataset using the sin^2(chi) method.
+    Analyzes the d-spacing values of a dataset using the sin^2(chi) method.
 
     This plugin is designed to work with datasets containing d-spacing values
     (or 2theta values) and chi values. It performs the following steps:
@@ -123,17 +123,17 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
 
     The output array has the following elements:
 
-        - [0] : slope of the sin^2(chi) fit
-        - [1] : slope error
-        - [2] : intercept of the sin^2(chi) fit
-        - [3] : intercept error
-        - [4] : slope of the sin(2*chi) fit
-        - [5] : slope error
+        - [0]: slope of the sin^2(chi) fit
+        - [1]: slope error
+        - [2]: intercept of the sin^2(chi) fit
+        - [3]: intercept error
+        - [4]: slope of the sin(2*chi) fit
+        - [5]: slope error
 
-    Optionally, this plugin also allows to export images of the fits for
+    Optionally, this plugin also allows exporting images of the fits for
     each data point.
 
-    NOTE: This plugin currently only allows chi to given in degrees.
+    NOTE: This plugin currently only allows chi to be given in degrees.
     """
 
     plugin_name = "sin^2(chi) analysis"
@@ -325,10 +325,10 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         np.ndarray[Real, ...]
             The fitted parameters and their errors. The array elements are:
 
-            [0] : slope
-            [1] : slope error
-            [2] : intercept
-            [3] : intercept error
+            [0]: slope
+            [1]: slope error
+            [2]: intercept
+            [3]: intercept error
         """
         if self._fit_slice is None:
             self._calculate_fit_slice(data[2])
@@ -351,7 +351,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         """
         Fit the sin(2*chi) data with a linear function.
 
-        the intercept is set to 0.
+        The intercept is set to 0.
 
         Parameters
         ----------
@@ -364,8 +364,8 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         np.ndarray[Real, Real]
             The fitted parameters and their errors. The array elements are:
 
-            [0] : slope
-            [1] : slope error
+            [0]: slope
+            [1]: slope error
         """
         _x, _y = _filter_nan_from_1d_dataset(data[2])
         if _y.size == 0:

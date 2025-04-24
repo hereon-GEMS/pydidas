@@ -35,6 +35,8 @@ Bugfixes
   new workflow had fewer nodes
 - Fixed an issue with applying numpy ufuncs to dataset with axis arguments given in 
   numpy datatypes (e.g. np.uint64)
+- Fixed an issue with getting a description of the slicing for Hdf5 files with integer 
+  indices.
 
 
 v25.04.08

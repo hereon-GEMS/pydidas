@@ -38,6 +38,7 @@ Bugfixes
   numpy datatypes (e.g. np.uint64)
 - Fixed an issue with getting a description of the slicing for Hdf5 files with integer 
   indices.
+- Fixed an issue when trying to load empty files with numpy
 
 
 v25.04.08

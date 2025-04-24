@@ -66,7 +66,7 @@ class Dataset(ndarray):
     - axis_units : The units of the axis ranges (in str format).
     - axis_labels : The descriptive labels for all array axes (in str format).
     - axis_ranges : The data values corresponding to the respective axes indices,
-      given in form of 1-d np.ndarrays, lists or tuples. All axis_ranges values
+      given in the form of 1-d np.ndarrays, lists, or tuples. All axis_ranges values
       will be internally converted to np.ndarrays. The axis_ranges keys are
       integers corresponding to the axis indices.
     - data_unit : The unit for the data values (in str format).
@@ -78,12 +78,12 @@ class Dataset(ndarray):
         transposing, units are not automatically converted. The operator is responsible
         for ensuring that the units are consistent.
         For example, if the data_unit is meters, Dataset**2 will still have the unit
-        meters which must be updated in the calling function
+        meters which must be updated in the calling function.
     2.  Metadata is **not** preserved when operating on two datasets. The second dataset
         will be interpreted as a numpy.ndarray and the metadata will be lost.
     3.  The ndarray.base property of Datasets is never None because the Dataset class
         is a subclass of ndarray. This means that the base property will always point to
-        an ndarray. However, Dataset views never share memory and each Dataset view
+        an ndarray. However, Dataset views never share memory, and each Dataset view
         will create a new memory object.
 
     The following numpy ufuncs are reimplemented to preserver the metadata:
@@ -104,9 +104,9 @@ class Dataset(ndarray):
         axis_ranges : Union[list, tuple, dict[int, Union[np.ndarray, list, tuple]]], optional
             The ranges for the axes. If a dictionary is provided, the keys must
             correspond to the axis indices, and the values must be sequences
-            (e.g., np.ndarray, list , or tuple ) with lengths matching the
+            (e.g., np.ndarray, list, or tuple) with lengths matching the
             dimension of the array. The length of each sequence must correspond
-            to the array dimension for that axis. Empty axis_ranges (e.g. None)
+            to the array dimension for that axis. Empty axis_ranges (e.g., None)
             will be converted to indices. The default is None.
         axis_ranges : Union[dict[int, Sequence], list, tuple], optional
             The ranges for the axes. The length for each range must correspond
@@ -122,7 +122,7 @@ class Dataset(ndarray):
             The description of the data. The default is an empty string.
     """
 
-    def __new__(cls, array: ArrayLike, **kwargs: dict[str, Any]) -> Self:
+    def __new__(cls, array: ArrayLike, **kwargs: Any) -> Self:
         """
         Create a new Dataset.
 
@@ -187,7 +187,7 @@ class Dataset(ndarray):
         ----------
         obj : ndarray
             The original object. This can be another Dataset, a numpy ndarray or any
-            acceptable object to create a ndarray, e.g. tuple, list.
+            acceptable object to create a ndarray, e.g., tuple, list.
         """
         self._meta = {
             _key: getattr(obj, _key, dataset_default_attribute(_key, self.shape))
@@ -202,7 +202,7 @@ class Dataset(ndarray):
                 and _slicer.ndim == obj.ndim
                 and _slicer.ndim > 1
             ):
-                # in the case of a n-dim masked array, keep all axis keys.
+                # in the case of an n-dim masked array, keep all axis keys.
                 break
             if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
@@ -249,7 +249,7 @@ class Dataset(ndarray):
         This method will reduce the dimensionality of the Dataset by len(args).
 
         Warning: Flattening distributed dimensions throughout the dataset will
-        destroy the data organisation and only adjacent dimensions can be
+        destroy the data organization, and only adjacent dimensions can be
         processed.
 
         Parameters
@@ -344,7 +344,7 @@ class Dataset(ndarray):
     @property
     def property_dict(self) -> dict:
         """
-        Get a copy of the properties dictionary.
+        Get a copy of the property dictionary.
 
         Returns
         -------
@@ -806,7 +806,7 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        order : {'C', 'F', 'A', 'K'}, optional
+        order: Literal['C', 'F', 'A', 'K'], optional
             'C' means to flatten in row-major (C-style) order.
             'F' means to flatten in column-major (Fortran-style) order.
             'A' means to flatten in column-major order if `a` is Fortran
@@ -818,7 +818,9 @@ class Dataset(ndarray):
         _new._update_keys_in_flattened_array()  # noqa
         return _new
 
-    def reshape(self, *new_shape: int | tuple[int], order="C"):
+    def reshape(
+        self, *new_shape: int | tuple[int], order: Literal["C", "F", "A", "K"] = "C"
+    ):
         """
         Overload the generic reshape method to update the metadata.
 
@@ -826,7 +828,7 @@ class Dataset(ndarray):
         ----------
         new_shape : int | tuple[int]
             The new shape of the array.
-        order : {'C', 'F', 'A', 'K'}, optional
+        order : Literal['C', 'F', 'A', 'K'] optional
             The order of the reshaping. The default is 'C'.
 
         Returns
@@ -912,7 +914,7 @@ class Dataset(ndarray):
 
     def _update_keys_in_flattened_array(self):
         """
-        Update the keys in flattened arrays i.e. if the new dimension is one.
+        Update the keys in flattened arrays i.e., if the new dimension is one.
 
         Note that the metadata keys are updated in place.
         """
@@ -1034,10 +1036,10 @@ class Dataset(ndarray):
             are summed. The default is None.
         out : ndarray, optional
             Alternative output array in which to place the result. It must have the
-            same shape as the expected output but the type will be cast if necessary.
+            same shape as the expected output, but the type will be cast if necessary.
             The default is None.
         **kwargs : dict
-            Additional keyword arguments which are only passed when specified.
+            Additional keyword arguments, which are only passed when specified.
             Supported keywords are:
 
             keepdims : bool, optional
@@ -1161,7 +1163,7 @@ class Dataset(ndarray):
         """
         return ndarray.argsort(
             self, axis=axis, kind=kind, order=order, stable=stable
-        ).array
+        ).__array__()
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
@@ -1232,7 +1234,7 @@ class Dataset(ndarray):
         """
         Get a string representation for a metadata entry.
 
-        Supported entries are 'axis_labels', 'axis_ranges', and 'axis_units'.
+        Supported entries are 'axis_labels', 'axis_ranges' and 'axis_units'.
 
         Parameters
         ----------
@@ -1320,7 +1322,7 @@ class Dataset(ndarray):
         -------
         Union[pydidas.core.Dataset, object]
             The output will be a new Dataset if the output has a dimension
-            greater zero or of the basic datatype for 0-d return values.
+            greater than zero or of the basic datatype for 0-d return values.
         """
         if obj.shape == ():
             return obj[()]

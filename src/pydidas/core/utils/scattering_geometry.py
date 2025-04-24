@@ -102,7 +102,7 @@ def convert_integration_result(  # noqa: C901
     out_type: ALLOWED_UNITS,
     lambda_xray: Real,
     det_dist: Real,
-) -> Real:
+) -> Real | np.ndarray:
     """
     Convert an integration result from one type and/or unit to another.
 
@@ -128,6 +128,11 @@ def convert_integration_result(  # noqa: C901
         The X-ray wavelength in meters.
     det_dist : Real
         The detector distance in meters.
+
+    Returns
+    -------
+    Real | np.ndarray
+        The converted value(s) in the same type as the input value.
     """
     _in_type = in_type.replace(" ", "").replace("_", "/")
     _out_type = out_type.replace(" ", "").replace("_", "/")
@@ -183,37 +188,6 @@ def convert_integration_result(  # noqa: C901
                 f"The output type `{out_type}` is not supported in the "
                 "`convert_polar_value` function."
             )
-
-
-def convert_integration_result_to_2theta(
-    value: Real | np.ndarray, in_type: str, lambda_xray: Real, det_dist: Real
-) -> Real:
-    """
-    Convert an integration result to 2theta.
-
-    Parameters
-    ----------
-    value : Real | np.ndarray
-        The value to be converted.
-    in_type : str
-        The type of input, including the unit.
-    lambda_xray : Real
-        The X-ray wavelength in meters.
-    det_dist : Real
-        The detector distance in meters.
-
-    Returns
-    -------
-    Real | np.ndarray
-        The converted 2theta value.
-    """
-    return convert_integration_result(
-        value,
-        in_type,
-        "2theta / rad",
-        lambda_xray=1e-10,
-        det_dist=1.0,
-    )
 
 
 def convert_d_spacing_to_q(

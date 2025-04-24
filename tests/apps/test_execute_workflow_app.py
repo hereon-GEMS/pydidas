@@ -272,28 +272,19 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = self.get_exec_workflow_app()
         self.assertTrue(app._config["run_prepared"])
 
-    def test_prepare_run__main_not_live_no_autosave(self):
+    def test_prepare_run__main_no_autosave(self):
         app = self.get_exec_workflow_app()
         app.set_param_value("autosave_results", False)
-        app.set_param_value("live_processing", False)
         app.prepare_run()
         self.assertTrue(app._config["run_prepared"])
 
-    def test_prepare_run__main_not_live_w_autosave(self):
+    def test_prepare_run__main_w_autosave(self):
         app = self.get_exec_workflow_app()
         app._config["export_files_prepared"] = True
         app.set_param_value("autosave_results", True)
         app.set_param_value("autosave_directory", self._path.joinpath("test"))
-        app.set_param_value("live_processing", False)
         app.prepare_run()
         self.assertFalse(app._config["export_files_prepared"])
-
-    def test_prepare_run__main_live_no_autosave(self):
-        app = self.get_exec_workflow_app()
-        app.set_param_value("autosave_results", False)
-        app.set_param_value("live_processing", True)
-        app.prepare_run()
-        self.assertTrue(TREE.root.plugin._config["carryon_checked"])
 
     def test_multiprocessing_pre_cycle(self):
         _index = int(np.ceil(np.random.random() * 1e5))

@@ -29,8 +29,9 @@ __all__ = ["get_ViewResultsMixin_build_config", "ViewResultsMixin"]
 
 
 import os
+from typing import Any
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import (
     ParameterCollection,
@@ -49,7 +50,7 @@ from pydidas.workflow import WorkflowResults
 
 def get_ViewResultsMixin_build_config(
     frame: BaseFrame,
-) -> list[list[str, tuple[str], dict]]:
+) -> list[list[str, tuple[str | QtWidgets.QWidget], dict[str, Any]]]:
     """
     Return the build configuration for the ViewResultsFrame.
 
@@ -60,9 +61,9 @@ def get_ViewResultsMixin_build_config(
 
     Returns
     -------
-    list[list[str, tuple[str], dict]]
-        The build configuration in form of a list. Each list entry consists of the
-        widget creation method name, the method arguments and the method keywords.
+    list[list[str, tuple[str], dict[str, Any]]]
+        The build configuration in the form of a list. Each list entry consists of
+        the widget creation method name, the method arguments and the method keywords.
     """
     return [
         [
@@ -208,6 +209,9 @@ class ViewResultsMixin:
     `get_ViewResultsMixin_build_config` function.
     """
 
+    _widgets: dict[str, QtWidgets.QWidget]
+    params_not_to_restore: list[str] = []
+
     def __init__(self, **kwargs: dict):
         _results = kwargs.get("workflow_results", None)
         self._RESULTS = _results if _results is not None else WorkflowResults()
@@ -224,6 +228,9 @@ class ViewResultsMixin:
                 "use_scan_timeline",
             ),
         )
+        if not hasattr(self, "_config"):
+            self._config = {}
+        self._config["enable_export"] = True
 
     def build_view_results_mixin(self):
         """Build the widgets required for the ViewResultsMixin functionality."""
@@ -286,7 +293,9 @@ class ViewResultsMixin:
             "label_details",
         ]:
             self._widgets[_key].setVisible(node_id != -1)
-        self._widgets["but_export_current"].setEnabled(node_id != -1)
+        self._widgets["but_export_current"].setEnabled(
+            node_id != -1 and self._config["enable_export"]
+        )
         if node_id == -1:
             return
         self.set_displayed_data()

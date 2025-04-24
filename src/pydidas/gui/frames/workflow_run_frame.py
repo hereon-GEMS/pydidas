@@ -318,12 +318,14 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
             Flag whether the AppRunner is running and widgets shall be shown
             accordingly or not.
         """
+        self.param_widgets["live_processing"].setEnabled(not running)
         self._widgets["but_exec"].setEnabled(not running)
         self._widgets["but_abort"].setVisible(running)
         self._widgets["but_abort"].setEnabled(running)
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)
+        self._config["enable_export"] = not running
         for _key in [
             "saving_format",
             "squeeze_empty_dims",

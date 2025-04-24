@@ -18,6 +18,7 @@ Improvements
 - Overhauled the documentation build check to force a new build after updating
   pydidas with pip.
 - Added support for formatting (symbols, linewidth, linestyle) for plugin details.
+- Added support for running workflows in live processing.
 
 
 Bugfixes

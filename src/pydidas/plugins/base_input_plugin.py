@@ -28,11 +28,12 @@ __all__ = ["InputPlugin"]
 
 
 import os
+import time
 
 import numpy as np
 
 from pydidas.contexts import ScanContext
-from pydidas.core import Dataset, UserConfigError, get_generic_parameter
+from pydidas.core import Dataset, FileReadError, UserConfigError, get_generic_parameter
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.plugins.base_plugin import BasePlugin
 
@@ -59,7 +60,6 @@ class InputPlugin(BasePlugin):
         get_generic_parameter("roi_ylow"),
         get_generic_parameter("roi_yhigh"),
         get_generic_parameter("binning"),
-        get_generic_parameter("live_processing"),
     )
     default_params = BasePlugin.default_params.copy()
     advanced_parameters = [
@@ -73,33 +73,11 @@ class InputPlugin(BasePlugin):
 
     def __init__(self, *args: tuple, **kwargs: dict):
         """
-        Create BasicPlugin instance.
+        Create a BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
-
-    def prepare_carryon_check(self):
-        """
-        Prepare the checks of the multiprocessing carryon.
-
-        By default, this gets and stores the file target size for live
-        processing.
-        """
-        self._config["file_size"] = self.get_first_file_size()
-
-    def get_first_file_size(self) -> int:
-        """
-        Get the size of the first file to be processed.
-
-        Returns
-        -------
-        int
-            The file size in bytes.
-        """
-        _fname = self.get_filename(0)
-        self._config["file_size"] = os.stat(_fname).st_size
-        return self._config["file_size"]
 
     def input_available(self, index: int) -> bool:
         """
@@ -120,7 +98,12 @@ class InputPlugin(BasePlugin):
         """
         _fname = self.get_filename(index)
         if os.path.exists(_fname):
-            return self._config["file_size"] == os.stat(_fname).st_size
+            try:
+                _ = self.get_frame(index)
+            except FileReadError:
+                time.sleep(0.05)
+                return False
+            return True
         return False
 
     def pre_execute(self):
@@ -200,7 +183,7 @@ class InputPlugin(BasePlugin):
 
     def handle_multi_image(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Handle frames with an image multiplicity.
+        Handle frames with image multiplicity.
 
         Parameters
         ----------

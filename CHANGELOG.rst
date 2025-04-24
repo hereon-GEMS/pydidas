@@ -19,6 +19,7 @@ Improvements
   pydidas with pip.
 - Added support for formatting (symbols, linewidth, linestyle) for plugin details.
 - Added support for running workflows in live processing.
+- Improved type hints and docstrings in a number of files.
 
 
 Bugfixes

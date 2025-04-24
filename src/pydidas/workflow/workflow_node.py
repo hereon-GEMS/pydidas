@@ -30,7 +30,7 @@ __all__ = ["WorkflowNode"]
 
 from copy import deepcopy
 from numbers import Integral, Real
-from typing import Self, Union
+from typing import Any, Self
 
 from pydidas.core import Dataset
 from pydidas.core.utils import LOGGING_LEVEL, TimerSaveRuntime, pydidas_logger
@@ -52,7 +52,7 @@ class WorkflowNode(GenericNode):
 
     kwargs_for_copy_creation = ["plugin", "node_id"]
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         self.__preprocess_kwargs(kwargs)
         GenericNode.__init__(self, **kwargs)
         self.__confirm_plugin_existence_and_type()
@@ -97,7 +97,7 @@ class WorkflowNode(GenericNode):
         self.plugin.node_id = self.__tmp_node_id
 
     @property
-    def node_id(self) -> Union[int, None]:
+    def node_id(self) -> Integral | None:
         """
         Get the node_id.
 
@@ -106,19 +106,19 @@ class WorkflowNode(GenericNode):
 
         Returns
         -------
-        node_id : Union[None, int]
+        node_id : Integral | None
             The node_id.
         """
         return self._node_id
 
     @node_id.setter
-    def node_id(self, new_id: Union[None, int]):
+    def node_id(self, new_id: Integral | None):
         """
         Set the node_id.
 
         Parameters
         ----------
-        new_id : Union[None, int]
+        new_id : Integral | None
             The new node ID.
 
         Raises
@@ -160,7 +160,7 @@ class WorkflowNode(GenericNode):
         Parameters
         ----------
         **kwargs : dict
-            Any keyword arguments which need to be passed to the plugin.
+            Any keyword arguments that need to be passed to the plugin.
             Supported keywords are:
 
             test : bool, optional
@@ -175,16 +175,16 @@ class WorkflowNode(GenericNode):
         for _child in self._children:
             _child.prepare_execution(**kwargs)
 
-    def execute_plugin(self, arg: Union[Dataset, int], **kwargs: dict):
+    def execute_plugin(self, arg: Dataset | Integral, **kwargs: dict):
         """
         Execute the plugin associated with the node.
 
         Parameters
         ----------
-        arg : Union[Dataset, int]
-            The argument which need to be passed to the plugin.
+        arg : Dataset | Integral
+            The argument which needs to be passed to the plugin.
         **kwargs : dict
-            Any keyword arguments which need to be passed to the plugin.
+            Any keyword arguments that need to be passed to the plugin.
 
         Returns
         -------
@@ -201,7 +201,7 @@ class WorkflowNode(GenericNode):
         self.runtime = _runtime()
         return _results, kwargs
 
-    def execute_plugin_chain(self, arg: Union[Dataset, int], **kwargs: dict):
+    def execute_plugin_chain(self, arg: Dataset | Integral, **kwargs: dict):
         """
         Execute the full plugin chain recursively.
 
@@ -212,17 +212,12 @@ class WorkflowNode(GenericNode):
 
         Parameters
         ----------
-        arg : Union[Dataset, int]
-            The argument which need to be passed to the plugin.
+        arg : Dataset | Integral
+            The argument which needs to be passed to the plugin.
         **kwargs : dict
-            Any keyword arguments which need to be passed to the plugin.
+            Any keyword arguments that need to be passed to the plugin.
         """
-        with TimerSaveRuntime() as _runtime:
-            if kwargs.get("store_input_data", False):
-                self.plugin.store_input_data_copy(arg, **kwargs)
-            res, reskws = self.plugin.execute(arg, **kwargs)
-        self._store_results_if_required(res, reskws)
-        self.runtime = _runtime()
+        res, reskws = self.execute_plugin(arg, **kwargs)
         for _child in self._children:
             if len(self._children) > 1:
                 _child.execute_plugin_chain(deepcopy(res), **reskws)
@@ -274,7 +269,7 @@ class WorkflowNode(GenericNode):
         """
         Dump the node to a savable format.
 
-        The dump includes information about the parent and children nodes but
+        The dump includes information about the parent and child nodes but
         not the nodes itself. References to the nodeIDs are stored to allow
         reconstruction of the tree.
         Note: This dump is *not* recursive and will only save references to
@@ -298,13 +293,13 @@ class WorkflowNode(GenericNode):
         }
 
     @property
-    def result_shape(self):
+    def result_shape(self) -> tuple[Integral] | None:
         """
-        Get the result shape of the plugin, if it has been calculated yet.
+        Get the result shape of the plugin if it has already been calculated.
 
         Returns
         -------
-        Union[tuple, None]
+        tuple[Integral] | None
             Returns the shape of the Plugin's results, if it has been
             calculated. Else, returns None.
         """

@@ -45,7 +45,7 @@ from pydidas.core.utils.iterable_utils import flatten
 
 
 _FILE_NAME_SCHEME_ERROR_STR = (
-    "Could not interprete the filenames. The filenames do not differ in exactly one "
+    "Could not interpret the filenames. The filenames do not differ in exactly one "
     "item, as determined by the delimiters. Delimiters considered are: "
     f"{FILENAME_DELIMITERS.split('|')}"
 ).replace("\\\\.", ".")
@@ -77,7 +77,7 @@ def get_extension(path: Union[Path, str], lowercase=False) -> str:
     path : Union[pathlib.Path, str]
         The full filename and path
     lowercase : bool, optional
-        Flag to get the extension as lower case string.
+        Flag to get the extension as a lower case string.
 
     Returns
     -------
@@ -98,9 +98,9 @@ def get_extension(path: Union[Path, str], lowercase=False) -> str:
 
 def find_valid_python_files(path: Path) -> List[Path]:
     """
-    Search for all python files in path and subdirectories.
+    Search for all python files in the path and subdirectories.
 
-    This method will search the specified path recursicely for all
+    This method will search the specified path recursively for all
     python files, defined as files with a .py extension.
     It will ignore protected files /directories (starting with "__")
     and hidden files / directories (starting with ".").
@@ -160,7 +160,7 @@ def get_file_naming_scheme(
     filename2 : Union[pathlib.Path, str]
         The second filename (including the path).
     ignore_leading_zeros : bool, optional
-        Keyword to ignore leading zeros, i.e. to allow entries like '_12' and '_1255'
+        Keyword to ignore leading zeros, i.e., to allow entries like '_12' and '_1255'
         to be compared. If False, the function will not accept the example above. The
         default is False.
 
@@ -204,9 +204,9 @@ def get_file_naming_scheme(
 
 class CatchFileErrors:
     """
-    A context manager which allows to catch generic file reading errors.
+    A context manager which allows catching generic file reading errors.
 
-    The CatchFileErrors context manager allows to raise file reading errors
+    The CatchFileErrors context manager allows raising file reading errors
     as pydidas' FileReadError exception. Additional
 
     Parameters
@@ -224,7 +224,7 @@ class CatchFileErrors:
     def __init__(
         self,
         filename: Union[Path, str],
-        *additional_exceptions: tuple,
+        *additional_exceptions: Exception,
         raise_file_read_error=True,
         error_suffix: str = "",
     ):
@@ -246,14 +246,14 @@ class CatchFileErrors:
         """
         return self
 
-    def __exit__(self, ex_type, ex_value, traceback):
+    def __exit__(self, ex_type, ex_value, traceback) -> bool | None:
         """
         Check the exception type and raise it as FileReadError.
         """
         self._raised_exception = ex_type is not None
         if ex_type is None:
             self._exception_msg = ""
-            return
+            return False
         if issubclass(ex_type, self._exceptions):
             _index = 1 if isinstance(ex_value.args[0], Integral) else 0
             if len(self._filename) > 60:

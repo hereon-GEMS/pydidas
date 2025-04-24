@@ -30,7 +30,6 @@ __status__ = "Production"
 __all__ = ["get_generic_parameter", "get_generic_param_collection"]
 
 
-from collections.abc import Iterable
 from pathlib import Path
 
 from pydidas.core.generic_params import GENERIC_PARAMS_METADATA
@@ -51,7 +50,7 @@ def get_generic_parameter(refkey: str) -> Parameter:
     Raises
     ------
     KeyError
-        If not description is provided for the given refkey.
+        If no description is provided for the given refkey.
 
     Returns
     -------
@@ -77,9 +76,7 @@ def get_generic_parameter(refkey: str) -> Parameter:
     return Parameter(refkey, _type, _default, **_config)
 
 
-def get_generic_param_collection(
-    *param_keys: Iterable[str, ...],
-) -> ParameterCollection:
+def get_generic_param_collection(*param_keys: str) -> ParameterCollection:
     """
     Get an initialized ParameterCollection from a number of generic Parameter keys.
 

@@ -65,7 +65,7 @@ class GenericTree:
         return self._config["tree_changed"]
 
     @property
-    def active_node(self) -> Union[GenericNode, None]:
+    def active_node(self) -> GenericNode | None:
         """
         Get the active node.
 
@@ -73,7 +73,7 @@ class GenericTree:
 
         Returns
         -------
-        Union[pydidas.workflow.GenericNode, None]
+        GenericNode | None
             The active node.
         """
         if self.active_node_id is None or self.root is None:

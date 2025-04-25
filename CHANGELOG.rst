@@ -20,6 +20,7 @@ Improvements
 - Added support for formatting (symbols, linewidth, linestyle) for plugin details.
 - Added support for running workflows in live processing.
 - Improved type hints and docstrings in a number of files.
+- Added new singleton factories which allow a direct subclassing.
 
 
 Bugfixes

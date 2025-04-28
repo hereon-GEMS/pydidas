@@ -318,6 +318,7 @@ class Parameter:
             - str input and Path type
             - str input and Hdf5key type
             - str input of list/tuple of numbers to list/tuple of numbers
+            - str of `True` or `False` to bool
             - list to tuple
             - tuple to list
             - "None" and "" to None
@@ -339,6 +340,12 @@ class Parameter:
                 value = Path(value)
             elif self.__type == Hdf5key:
                 value = Hdf5key(value)
+            elif (
+                self.__type == Integral
+                and value in ["True", "False"]
+                and set(self.__meta["choices"]) == {0, 1}
+            ):
+                value = value == "True"
             elif self.__type in _ITERATORS and self.__meta["subtype"] in _NUMBERS:
                 value = self.__get_as_numbers(value)
         if self.__type in _NUMBERS and not self.__meta["allow_None"]:

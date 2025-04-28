@@ -494,6 +494,13 @@ class TestParameter(unittest.TestCase):
         _new_val = obj._Parameter__convenience_type_conversion(_val)
         self.assertEqual(_val, _new_val)
 
+    def test_convenience_type_conversion__str_to_bool(self):
+        for _val in ["True", "False"]:
+            with self.subTest(input=_val):
+                obj = Parameter("Test0", int, 1, choices=[True, False])
+                _new_val = obj._Parameter__convenience_type_conversion(_val)
+                self.assertEqual(_new_val, _val == "True")
+
     def test_convenience_type_conversion__float_w_string_number_input(self):
         _val = "42"
         obj = Parameter("Test0", float, 12.2)

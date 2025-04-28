@@ -29,12 +29,15 @@ __all__ = ["IoManager"]
 
 
 from pathlib import Path
-from typing import Literal, Union
+from typing import Literal, NewType, Union
 
 import numpy as np
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_extension
+
+
+IoBase = NewType("IoBase", str)
 
 
 class IoManager(type):
@@ -45,16 +48,16 @@ class IoManager(type):
     registry_import = {}
     registry_export = {}
 
-    def __new__(cls, clsname: str, bases: list[type], attrs: dict):
+    def __new__(cls, clsname: str, bases: tuple[type], attrs: dict) -> IoBase:
         """
-        Call the class' (i.e. the WorkflowTree exporter) __new__ method
+        Call the class' (i.e., the WorkflowTree exporter) __new__ method
         and register the class with the registry.
 
         Parameters
         ----------
         clsname : str
             The name of the new class
-        bases : list[type]
+        bases : tuple[type]
             The list of class bases.
         attrs : dict
             The class attributes.
@@ -69,13 +72,13 @@ class IoManager(type):
         return _new_class
 
     @classmethod
-    def register_class(cls, new_class: type, update_registry: bool = False):
+    def register_class(cls, new_class: IoBase, update_registry: bool = False):
         """
-        Register a class as object for its native extensions.
+        Register a class as an object for its native extensions.
 
         Parameters
         ----------
-        new_class : type
+        new_class : IoBase
             The class to be registered.
         update_registry : bool, optional
             Keyword to allow updating / overwriting of registered extensions.
@@ -139,7 +142,7 @@ class IoManager(type):
             if ext == "":
                 raise UserConfigError(
                     f"No extension has been selected for data {mode}. Please set an "
-                    "extension to choose a fileformat."
+                    "extension to choose a file format."
                     + ("" if filename is None else f" (filename: {filename})")
                 )
             raise UserConfigError(
@@ -151,11 +154,11 @@ class IoManager(type):
         cls, extension: str, mode: Literal["import", "export"] = "import"
     ):
         """
-        Check if the extension of filename corresponds to a registered class.
+        Check if the extension of the filename corresponds to a registered class.
 
         The extension is stored without the leading dot. If the given extension
         includes a leading dot, it is stripped before checking the extension.
-        This behaviour allows to use pathlib.Path instances' suffix property to
+        This behavior allows using pathlib.Path instances' suffix property to
         be used directly.
 
         Parameters
@@ -246,7 +249,7 @@ class IoManager(type):
         Returns
         -------
         dict
-            A dictionary with <format name> : <extensions> entries.
+            A dictionary with <format name>: <extensions> entries.
         """
         if mode == "import":
             _reg = cls.registry_import
@@ -267,7 +270,7 @@ class IoManager(type):
         cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
     ):
         """
-        Export the data to file using the exporter based on the extension.
+        Export the data to a file using the exporter based on the extension.
 
         Parameters
         ----------
@@ -276,7 +279,7 @@ class IoManager(type):
         data : np.ndarray
             The data to be exported.
         **kwargs : dict
-            Any kwargs which should be passed to the underlying exporter.
+            Any kwargs that should be passed to the underlying exporter.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension, mode="export")

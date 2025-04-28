@@ -114,7 +114,9 @@ class PydidasPlot1D(Plot1D):
                 ),
             ),
             "kwargs": {
-                "linewidth": 1.5,
+                "linewidth": kwargs.get("linewidth", 1.5),
+                "linestyle": kwargs.get("linestyle", "-"),
+                "symbol": kwargs.get("symbol", None),
             }
             | {
                 _key: _val

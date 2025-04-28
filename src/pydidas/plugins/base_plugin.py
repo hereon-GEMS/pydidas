@@ -31,7 +31,7 @@ __all__ = ["BasePlugin"]
 
 import copy
 from numbers import Integral
-from typing import Self
+from typing import NoReturn, Self
 
 from qtpy import QtCore
 
@@ -141,11 +141,6 @@ class BasePlugin(ObjectWithParameterCollection):
     def register_as_base_class(cls):
         """
         Register a base class for the plugin.
-
-        Parameters
-        ----------
-        base_class : type
-            The base class to register.
         """
         if cls not in cls.base_classes:
             cls.base_classes.append(cls)
@@ -303,7 +298,8 @@ class BasePlugin(ObjectWithParameterCollection):
         for _kw, _item in kwargs.items():
             if _kw in self.params.keys():
                 self.set_param_value(_kw, _item)
-        self._config = {"test_mode": False, "input_data": None}
+        self._config["test_mode"]: bool = False
+        self._config["input_data"]: int | Dataset | None = None
 
         self.node_id = None
         self._roi_data_dim = None
@@ -468,13 +464,13 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["test_mode"] = bool(value)
 
     @property
-    def input_data(self) -> int | Dataset:
+    def input_data(self) -> int | Dataset | None:
         """
         Get the current input data.
 
         Returns
         -------
-        Union[int, pydidas.core.Dataset]
+        int | Dataset | None
             The input data passed to the plugin.
         """
         return self._config["input_data"]
@@ -562,6 +558,41 @@ class BasePlugin(ObjectWithParameterCollection):
         raise UserConfigError(
             "The Plugin does not have the correct data dimensionality to define a ROI."
         )
+
+    def error_string_with_header(self, error_str: str) -> str:
+        """
+        Raise a UserConfigError with the given error string.
+
+        Parameters
+        ----------
+        error_str : str
+            The error string to raise.
+
+        Returns
+        -------
+        str
+            The formatted error string with header.
+        """
+        return (
+            f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
+            "is invalid:\n" + error_str
+        )
+
+    def raise_UserConfigError(self, error_str: str) -> NoReturn:  # noqa
+        """
+        Raise a UserConfigError with the given error string.
+
+        Parameters
+        ----------
+        error_str : str
+            The error string to raise.
+
+        Raises
+        -------
+        UserConfigError
+            The UserConfigError with the formatted error string.
+        """
+        raise UserConfigError(self.error_string_with_header(error_str))
 
 
 BasePlugin.register_as_base_class()

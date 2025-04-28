@@ -17,7 +17,7 @@
 
 """
 The generic_params_other module holds all the required data to create generic
-Parameters which are are not included in other specialized modules.
+Parameters which are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
@@ -235,7 +235,7 @@ GENERIC_PARAMS_OTHER = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": ("The detector image number, as files are written to disk."),
+        "tooltip": "The detector image number, as files are written to disk.",
     },
     ################
     # Generic limits
@@ -388,6 +388,19 @@ GENERIC_PARAMS_OTHER = {
             "the numbering will start from 0 as is the python default."
         ),
     },
+    "output_export_images_flag": {
+        "type": bool,
+        "default": False,
+        "name": "Export results as image for each data point",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "If selected, the plugin will export images of the results for each "
+            "data point. Please keep in mind that this will slow down processing "
+            "and potentially create a large number of files."
+        ),
+    },
     ############################
     # Result selection settings
     ############################
@@ -438,6 +451,18 @@ GENERIC_PARAMS_OTHER = {
         "tooltip": (
             "Keyword to toggle using a scan timeline with only one "
             "dimension instead of all scan dimensions."
+        ),
+    },
+    "squeeze_empty_dims": {
+        "type": bool,
+        "default": True,
+        "name": "Squeeze empty dimensions",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "Keyword to toggle squeezing empty dimensions from the result dataset."
+            "This will remove all dimensions with a size of 1."
         ),
     },
     "use_data_range": {

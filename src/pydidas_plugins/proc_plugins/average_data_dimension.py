@@ -33,10 +33,11 @@ from pydidas.plugins import ProcPlugin
 
 class AverageDataDimension(ProcPlugin):
     """
-    Sum up datapoints in a 2D dataset.
+    Average over the specified data dimension.
 
-    This plugin creates a single datapoint from the 2D input data. It is not
-    designed to handle higher-dimensional input data and accepts only 2D inputs.
+    This plugin computes the mean over the specified data dimension. The output
+    data has the same shape as the input data, except for the dimension that
+    was averaged over.
     """
 
     plugin_name = "Average over data dimension"

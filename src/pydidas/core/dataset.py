@@ -33,7 +33,7 @@ from collections.abc import Iterable
 from copy import deepcopy
 from functools import partialmethod
 from numbers import Integral
-from typing import Callable, Literal, Optional, Self, Union
+from typing import Any, Callable, Literal, Self
 
 import numpy as np
 from numpy import ndarray
@@ -66,7 +66,7 @@ class Dataset(ndarray):
     - axis_units : The units of the axis ranges (in str format).
     - axis_labels : The descriptive labels for all array axes (in str format).
     - axis_ranges : The data values corresponding to the respective axes indices,
-      given in form of 1-d np.ndarrays, lists or tuples. All axis_ranges values
+      given in the form of 1-d np.ndarrays, lists, or tuples. All axis_ranges values
       will be internally converted to np.ndarrays. The axis_ranges keys are
       integers corresponding to the axis indices.
     - data_unit : The unit for the data values (in str format).
@@ -78,12 +78,12 @@ class Dataset(ndarray):
         transposing, units are not automatically converted. The operator is responsible
         for ensuring that the units are consistent.
         For example, if the data_unit is meters, Dataset**2 will still have the unit
-        meters which must be updated in the calling function
+        meters which must be updated in the calling function.
     2.  Metadata is **not** preserved when operating on two datasets. The second dataset
         will be interpreted as a numpy.ndarray and the metadata will be lost.
     3.  The ndarray.base property of Datasets is never None because the Dataset class
         is a subclass of ndarray. This means that the base property will always point to
-        an ndarray. However, Dataset views never share memory and each Dataset view
+        an ndarray. However, Dataset views never share memory, and each Dataset view
         will create a new memory object.
 
     The following numpy ufuncs are reimplemented to preserver the metadata:
@@ -104,9 +104,9 @@ class Dataset(ndarray):
         axis_ranges : Union[list, tuple, dict[int, Union[np.ndarray, list, tuple]]], optional
             The ranges for the axes. If a dictionary is provided, the keys must
             correspond to the axis indices, and the values must be sequences
-            (e.g., np.ndarray, list , or tuple ) with lengths matching the
+            (e.g., np.ndarray, list, or tuple) with lengths matching the
             dimension of the array. The length of each sequence must correspond
-            to the array dimension for that axis. Empty axis_ranges (e.g. None)
+            to the array dimension for that axis. Empty axis_ranges (e.g., None)
             will be converted to indices. The default is None.
         axis_ranges : Union[dict[int, Sequence], list, tuple], optional
             The ranges for the axes. The length for each range must correspond
@@ -114,7 +114,7 @@ class Dataset(ndarray):
         axis_units : Union[dict, list, tuple], optional
             The units for the axes. The length must correspond to the array
             dimensions. The default is None.
-        metadata : Union[dict, None], optional
+        metadata : dict[str, Any] | None, optional
             A dictionary with metadata. The default is None.
         data_unit : str, optional
             The description of the data unit. The default is an empty string.
@@ -122,7 +122,7 @@ class Dataset(ndarray):
             The description of the data. The default is an empty string.
     """
 
-    def __new__(cls, array: ArrayLike, **kwargs: dict) -> Self:
+    def __new__(cls, array: ArrayLike, **kwargs: Any) -> Self:
         """
         Create a new Dataset.
 
@@ -144,13 +144,13 @@ class Dataset(ndarray):
         update_dataset_properties_from_kwargs(obj, kwargs)
         return obj
 
-    def __getitem__(self, key: Union[tuple, int]):
+    def __getitem__(self, key: int | tuple[int | slice] | slice) -> Self:
         """
         Overwrite the generic __getitem__ method to catch the slicing keys.
 
         Parameters
         ----------
-        key : Union[int, tuple]
+        key : int | tuple[int | slice] | slice
             The slicing objects.
 
         Returns
@@ -179,31 +179,35 @@ class Dataset(ndarray):
             obj._meta["_get_item_key"] = ()
         self._meta["_get_item_key"] = ()
 
-    def __update_keys_from_object(self, obj: object):
+    def __update_keys_from_object(self, obj: ndarray):
         """
         Update the axis keys from the original object.
 
         Parameters
         ----------
-        obj : Union[Dataset, object]
+        obj : ndarray
             The original object. This can be another Dataset, a numpy ndarray or any
-            acceptable object to create a ndarray, e.g. tuple, list.
+            acceptable object to create a ndarray, e.g., tuple, list.
         """
         self._meta = {
             _key: getattr(obj, _key, dataset_default_attribute(_key, self.shape))
             for _key in METADATA_KEYS
         }
+        _keys_require_shifting = False
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
             if (
                 isinstance(_slicer, ndarray)
                 and _slicer.dtype == np.bool_
-                and _slicer.size == obj.size
+                and _slicer.shape == obj.shape
+                and _slicer.ndim == obj.ndim
+                and _slicer.ndim > 1
             ):
-                # in the case of a masked array, keep all axis keys.
+                # in the case of an n-dim masked array, keep all axis keys.
                 break
             if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
                     del self._meta[_item][_dim]
+                _keys_require_shifting = True
             elif isinstance(_slicer, (slice, Iterable, ndarray)):
                 if isinstance(_slicer, tuple):
                     _slicer = list(_slicer)
@@ -212,6 +216,9 @@ class Dataset(ndarray):
                 ]
             elif _slicer is None:
                 self.__insert_axis_keys(_dim)
+                _keys_require_shifting = True
+        if not _keys_require_shifting:
+            return
         # finally, shift all keys to have a consistent numbering:
         for _item in ["axis_labels", "axis_units", "axis_ranges"]:
             self._meta[_item] = {
@@ -242,7 +249,7 @@ class Dataset(ndarray):
         This method will reduce the dimensionality of the Dataset by len(args).
 
         Warning: Flattening distributed dimensions throughout the dataset will
-        destroy the data organisation and only adjacent dimensions can be
+        destroy the data organization, and only adjacent dimensions can be
         processed.
 
         Parameters
@@ -337,7 +344,7 @@ class Dataset(ndarray):
     @property
     def property_dict(self) -> dict:
         """
-        Get a copy of the properties dictionary.
+        Get a copy of the property dictionary.
 
         Returns
         -------
@@ -413,6 +420,20 @@ class Dataset(ndarray):
         self._meta["data_label"] = data_label
 
     @property
+    def data_description(self) -> str:
+        """
+        Get a descriptive string for the data.
+
+        Returns
+        -------
+        str
+            The descriptive string for the data.
+        """
+        return self.data_label + (
+            " / " + self.data_unit if len(self.data_unit) > 0 else ""
+        )
+
+    @property
     def metadata(self) -> dict:
         """
         Get the dataset metadata.
@@ -426,13 +447,13 @@ class Dataset(ndarray):
         return self._meta["metadata"].copy()
 
     @metadata.setter
-    def metadata(self, metadata: Union[dict, None]):
+    def metadata(self, metadata: dict[str, Any] | None):
         """
         Set the Dataset metadata.
 
         Parameters
         ----------
-        metadata : Union[dict, None]
+        metadata : dict[str, Any] | None
             The Dataset metadata.
 
         Raises
@@ -471,13 +492,13 @@ class Dataset(ndarray):
         return deepcopy(self._meta["_get_item_key"])
 
     @property
-    def axis_units(self) -> dict:
+    def axis_units(self) -> dict[int, str]:
         """
         Get the axis units.
 
         Returns
         -------
-        dict
+        dict[int, str]
             The axis units: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
@@ -485,13 +506,13 @@ class Dataset(ndarray):
         return self._meta["axis_units"].copy()
 
     @axis_units.setter
-    def axis_units(self, units: Union[Iterable, dict]):
+    def axis_units(self, units: Iterable[str] | dict[int, str]):
         """
         Set the axis_units metadata.
 
         Parameters
         ----------
-        units : Union[Iterable, dict]
+        units : Iterable[str] | dict[int, str]
             The new axis units. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
@@ -514,13 +535,13 @@ class Dataset(ndarray):
         return self._meta["axis_labels"].copy()
 
     @axis_labels.setter
-    def axis_labels(self, labels: Union[Iterable, dict]):
+    def axis_labels(self, labels: Iterable[str] | dict[int, str]):
         """
         Set the axis_labels metadata.
 
         Parameters
         ----------
-        labels : Union[Iterable, dict]
+        labels : Iterable[str] | dict[int, str]
             The new axis labels. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
@@ -546,9 +567,7 @@ class Dataset(ndarray):
         return self._meta["axis_ranges"].copy()
 
     @axis_ranges.setter
-    def axis_ranges(
-        self, ranges: Union[list, tuple, dict[int, Union[ndarray, list, tuple]]]
-    ):
+    def axis_ranges(self, ranges: Iterable[ArrayLike] | dict[int, ArrayLike]):
         """
         Set the axis_ranges metadata.
 
@@ -560,7 +579,7 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        ranges : Union[Iterable, dict]
+        ranges : Iterable[ArrayLike] | dict[int, ArrayLike]
             The new axis ranges. Both Iterables (of length ndim) as well as
             dictionaries (with keys [0, 1, ..., ndim -1]) are accepted.
         """
@@ -591,7 +610,7 @@ class Dataset(ndarray):
     # Update methods for the axis properties
     # ######################################
 
-    def update_axis_range(self, index: int, item: Union[ndarray, Iterable]):
+    def update_axis_range(self, index: int, item: ArrayLike):
         """
         Update a single axis range value.
 
@@ -599,7 +618,7 @@ class Dataset(ndarray):
         ----------
         index : int
             The dimension to be updated.
-        item : Union[ndarray, Iterable]
+        item : ArrayLike
             The new item for the range of the selected dimension.
 
         Raises
@@ -723,21 +742,7 @@ class Dataset(ndarray):
         _range_diff = np.diff(_range[np.isfinite(_range)])
         return abs(_range_diff.std() / _range_diff.mean()) > threshold
 
-    @property
-    def data_description(self) -> str:
-        """
-        Get a descriptive string for the data.
-
-        Returns
-        -------
-        str
-            The descriptive string for the data.
-        """
-        return self.data_label + (
-            " / " + self.data_unit if len(self.data_unit) > 0 else ""
-        )
-
-    def get_description_of_point(self, indices: Iterable) -> str:
+    def get_description_of_point(self, indices: tuple[int] | list[int]) -> str:
         """
         Get the metadata description of a single point in the array.
 
@@ -745,7 +750,7 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        indices : Iterable
+        indices : tuple[int] | list[int]
             The indices for each dimension.
 
         Returns
@@ -801,7 +806,7 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        order : {'C', 'F', 'A', 'K'}, optional
+        order: Literal['C', 'F', 'A', 'K'], optional
             'C' means to flatten in row-major (C-style) order.
             'F' means to flatten in column-major (Fortran-style) order.
             'A' means to flatten in column-major order if `a` is Fortran
@@ -810,18 +815,20 @@ class Dataset(ndarray):
             The default is 'C'.
         """
         _new = ndarray.flatten(self, order)
-        _new._update_keys_in_flattened_array()
+        _new._update_keys_in_flattened_array()  # noqa
         return _new
 
-    def reshape(self, *new_shape: Union[int, tuple[int]], order="C"):
+    def reshape(
+        self, *new_shape: int | tuple[int], order: Literal["C", "F", "A", "K"] = "C"
+    ):
         """
         Overload the generic reshape method to update the metadata.
 
         Parameters
         ----------
-        new_shape : Union[int, tuple[int]]
+        new_shape : int | tuple[int]
             The new shape of the array.
-        order : {'C', 'F', 'A', 'K'}, optional
+        order : Literal['C', 'F', 'A', 'K'] optional
             The order of the reshaping. The default is 'C'.
 
         Returns
@@ -855,7 +862,7 @@ class Dataset(ndarray):
         ]
         return _new
 
-    def repeat(self, repeats, axis: Optional[int] = None) -> Self:
+    def repeat(self, repeats, axis: int | None = None) -> Self:
         """
         Overload the generic repeat method to update the metadata.
 
@@ -874,7 +881,7 @@ class Dataset(ndarray):
         """
         _new = ndarray.repeat(self, repeats, axis)
         if axis is None:
-            _new._update_keys_in_flattened_array()
+            _new._update_keys_in_flattened_array()  # noqa
         else:
             _new._meta["axis_ranges"][axis] = np.repeat(self.axis_ranges[axis], repeats)
         return _new
@@ -907,7 +914,7 @@ class Dataset(ndarray):
 
     def _update_keys_in_flattened_array(self):
         """
-        Update the keys in flattened arrays i.e. if the new dimension is one.
+        Update the keys in flattened arrays i.e., if the new dimension is one.
 
         Note that the metadata keys are updated in place.
         """
@@ -920,13 +927,13 @@ class Dataset(ndarray):
             self._meta["axis_ranges"] = {0: np.arange(self.size)}
             self._meta["axis_units"] = {0: ""}
 
-    def squeeze(self, axis: Union[None, int] = None) -> Self:
+    def squeeze(self, axis: int | None = None) -> Self:
         """
         Squeeze the array and remove dimensions of length one.
 
         Parameters
         ----------
-        axis : Union[None, int], optional
+        axis : int, optional
             The axis to be squeezed. If None, all axes of length one will be
             squeezed. The default is None.
 
@@ -955,9 +962,9 @@ class Dataset(ndarray):
 
     def take(
         self,
-        indices: Union[int, ArrayLike],
-        axis: Optional[int] = None,
-        out: Optional[ndarray] = None,
+        indices: int | ArrayLike,
+        axis: int | None = None,
+        out: ndarray | None = None,
         mode: Literal["raise", "wrap", "clip"] = "raise",
     ) -> Self:
         """
@@ -968,7 +975,7 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        indices : Union[int, ArrayLike]
+        indices : int | ArrayLike
             The indices of the values to extract.
         axis : int, optional
             The axis to take the data from. If None, data will be taken from the
@@ -985,9 +992,13 @@ class Dataset(ndarray):
             The new dataset.
         """
         _new = ndarray.take(self, indices, axis, out, mode)
-        if not isinstance(_new, Dataset) or axis is None:
+        if not isinstance(_new, Dataset):
+            return _new
+        if axis is None and self.ndim > 1:
+            _new.__update_keys_from_object()
             return _new
         _nindices = get_number_of_entries(indices)
+        axis = axis if axis is not None else 0
         if _nindices == 1 and not isinstance(indices, Iterable):
             for _key in ["axis_labels", "axis_units", "axis_ranges"]:
                 _item = _new._meta[_key]
@@ -1004,9 +1015,9 @@ class Dataset(ndarray):
         self,
         numpy_method: Callable,
         has_dtype_arg: bool = True,
-        axis: Optional[Union[int, tuple[int]]] = None,
+        axis: int | tuple[int] | None = None,
         dtype: DTypeLike = None,
-        out: Optional[ArrayLike] = None,
+        out: ArrayLike | None = None,
         **kwargs: dict,
     ) -> Self:
         """
@@ -1025,10 +1036,10 @@ class Dataset(ndarray):
             are summed. The default is None.
         out : ndarray, optional
             Alternative output array in which to place the result. It must have the
-            same shape as the expected output but the type will be cast if necessary.
+            same shape as the expected output, but the type will be cast if necessary.
             The default is None.
         **kwargs : dict
-            Additional keyword arguments which are only passed when specified.
+            Additional keyword arguments, which are only passed when specified.
             Supported keywords are:
 
             keepdims : bool, optional
@@ -1054,7 +1065,7 @@ class Dataset(ndarray):
         if axis is not None:
             axis = tuple(
                 np.mod(_ax, self.ndim)
-                for _ax in ((axis,) if isinstance(axis, int) else axis)
+                for _ax in ((axis,) if isinstance(axis, Integral) else axis)
             )
         if has_dtype_arg:
             kwargs["dtype"] = dtype
@@ -1068,7 +1079,7 @@ class Dataset(ndarray):
         )
         _result.data_unit = self.data_unit
         if not kwargs.get("keepdims", False):
-            axis = (axis,) if isinstance(axis, int) else axis
+            axis = (axis,) if isinstance(axis, Integral) else axis
             for _key in ["axis_labels", "axis_units", "axis_ranges"]:
                 _items = [
                     _val for _i, _val in self._meta[_key].items() if _i not in axis
@@ -1083,10 +1094,10 @@ class Dataset(ndarray):
 
     def sort(
         self,
-        axis: Optional[int] = -1,
-        kind: Optional[str] = None,
-        order: Optional[Union[str, list[str]]] = None,
-        stable: Optional[bool] = None,
+        axis: int | None = -1,
+        kind: str | None = None,
+        order: str | list[str] | None = None,
+        stable: bool | None = None,
     ) -> None:
         """
         Sort the Dataset in place.
@@ -1098,7 +1109,7 @@ class Dataset(ndarray):
         kind : str, optional
             Please see the numpy.sort documentation for more information on the
             `kind` parameter.
-        order : Union[str, list[str]], optional
+        order : str | list[str], optional
             Please see the numpy.sort documentation for more information on the
             `order` parameter.
         stable : bool, optional
@@ -1128,10 +1139,10 @@ class Dataset(ndarray):
 
     def argsort(
         self,
-        axis: Optional[int] = -1,
-        kind: Optional[str] = None,
-        order: Optional[Union[str, list[str]]] = None,
-        stable: Optional[bool] = None,
+        axis: int | None = -1,
+        kind: str | None = None,
+        order: str | list[str] | None = None,
+        stable: bool | None = None,
     ) -> ndarray:
         """
         Get the indices which would sort the Dataset.
@@ -1143,7 +1154,7 @@ class Dataset(ndarray):
         kind : str, optional
             Please see the numpy.argsort documentation for more information on the
             `kind` parameter.
-        order : Union[str, list[str]], optional
+        order : str | list[str] | None, optional
             Please see the numpy.argsort documentation for more information on the
             `order` parameter.
         stable : bool, optional
@@ -1152,7 +1163,7 @@ class Dataset(ndarray):
         """
         return ndarray.argsort(
             self, axis=axis, kind=kind, order=order, stable=stable
-        ).array
+        ).__array__()
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
@@ -1223,7 +1234,7 @@ class Dataset(ndarray):
         """
         Get a string representation for a metadata entry.
 
-        Supported entries are 'axis_labels', 'axis_ranges', and 'axis_units'.
+        Supported entries are 'axis_labels', 'axis_ranges' and 'axis_units'.
 
         Parameters
         ----------
@@ -1292,7 +1303,7 @@ class Dataset(ndarray):
         ndarray.__setstate__(self, state[0:-1])
 
     def __array_wrap__(
-        self, obj: ndarray, context: Optional[object] = None, return_scalar=False
+        self, obj: ndarray, context: object | None = None, return_scalar=False
     ) -> Self:
         """
         Return 0-d results from ufuncs as single values.
@@ -1302,16 +1313,16 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        obj : Union[ndarray, pydidas.core.Dataset]
+        obj : ndarray | Dataset
             The output array from the ufunc call.
-        context : Union[None, object], optional
+        context : object, optional
             The calling context. The default is None.
 
         Returns
         -------
         Union[pydidas.core.Dataset, object]
             The output will be a new Dataset if the output has a dimension
-            greater zero or of the basic datatype for 0-d return values.
+            greater than zero or of the basic datatype for 0-d return values.
         """
         if obj.shape == ():
             return obj[()]

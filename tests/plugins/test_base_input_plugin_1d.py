@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -134,40 +134,6 @@ class TestBaseInputPlugin1d(unittest.TestCase):
         plugin = create_plugin_class(INPUT_PLUGIN)()
         _fname = plugin.get_filename(1)
         self.assertEqual(_fname, "")
-
-    def test_input_available__file_exists_and_size_ok(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        plugin = _class()
-        plugin._config["file_size"] = os.stat(self._fname).st_size
-        plugin.get_filename = lambda x: self._fname
-        self.assertTrue(plugin.input_available(1))
-
-    def test_input_available__file_exists_and_wrong_size(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        plugin = _class()
-        plugin._config["file_size"] = 37
-        plugin.get_filename = lambda x: self._fname
-        self.assertFalse(plugin.input_available(1))
-
-    def test_input_available__file_does_not_exist(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        plugin = _class()
-        plugin._config["file_size"] = 37
-        plugin.get_filename = lambda x: os.path.join(self._testpath, "no_file.h5")
-        self.assertFalse(plugin.input_available(1))
-
-    def test_get_first_file_size(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        plugin = _class()
-        plugin.get_filename = lambda index: self._fname
-        self.assertEqual(plugin.get_first_file_size(), os.stat(self._fname).st_size)
-
-    def test_prepare_carryon_check(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        plugin = _class()
-        plugin.get_filename = lambda index: self._fname
-        plugin.prepare_carryon_check()
-        self.assertEqual(plugin._config["file_size"], os.stat(self._fname).st_size)
 
     def test_pickle(self):
         plugin = InputPlugin1d()

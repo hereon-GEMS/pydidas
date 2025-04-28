@@ -277,7 +277,14 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self.define_additional_choices(
             self._external_display_choices, store_config=False
         )
-        self._update_slice_from_choice(self.display_choice)
+        with QtCore.QSignalBlocker(self):
+            if self._npoints == 1:
+                with QtCore.QSignalBlocker(self._widgets["edit_index"]):
+                    self._widgets["edit_index"].setText("0")
+                with QtCore.QSignalBlocker(self._widgets["combo_axis_use"]):
+                    self._widgets["combo_axis_use"].setCurrentText("slice at index")
+            self._handle_new_axis_use(self.display_choice)
+        self.setEnabled(self._npoints > 1)
 
     @QtCore.Slot(str)
     def define_additional_choices(self, choices: str, store_config: bool = True):
@@ -303,20 +310,21 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         _old_choice = self._widgets["combo_axis_use"].currentText()
         _new_choices = [_item for _item in choices.split(";;") if len(_item) > 0]
         self._all_choices = []
-        if self._ndim is None or self._ndim > len(_new_choices):
+        if self._ndim is None or self._ndim > len(_new_choices) or self._npoints == 1:
             self._all_choices.append("slice at index")
             if self._data_range is not None:
                 self._all_choices.append("slice at data value")
         self._all_choices.extend(_new_choices)
+
         with QtCore.QSignalBlocker(self._widgets["combo_axis_use"]):
             self._widgets["combo_axis_use"].clear()
             self._widgets["combo_axis_use"].addItems(self._all_choices)
-            if _old_choice in self._all_choices:
+            if self._npoints == 1:
+                self._widgets["combo_axis_use"].setCurrentText("slice at index")
+            elif _old_choice in self._all_choices:
                 self._widgets["combo_axis_use"].setCurrentText(_old_choice)
-        if _old_choice not in self._all_choices:
-            self._widgets["combo_axis_use"].currentTextChanged.emit(
-                self._widgets["combo_axis_use"].currentText()
-            )
+            elif _old_choice not in self._all_choices:
+                self._handle_new_axis_use(self.display_choice)
         if choices in self._stored_configs:
             self._restore_old_config(choices)
 
@@ -350,14 +358,18 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         use_selection : str
             The selected axis use case.
         """
-        self._widgets["edit_index"].setVisible(use_selection == "slice at index")
+        self._widgets["edit_index"].setVisible(
+            use_selection == "slice at index" and self.npoints > 1
+        )
         for _key in ["edit_data", "label_unit"]:
             self._widgets[_key].setVisible(use_selection == "slice at data value")
         if use_selection == "slice at data value":
             self._last_slicing_at_index = False
         elif use_selection == "slice at index":
             self._last_slicing_at_index = True
-        _show_slider = use_selection in GENERIC_AXIS_SELECTOR_CHOICES
+        _show_slider = (
+            use_selection in GENERIC_AXIS_SELECTOR_CHOICES and self.npoints > 1
+        )
         for _key in [
             "slider",
             "button_start",
@@ -367,7 +379,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         ]:
             self._widgets[_key].setVisible(_show_slider)
         _range_selection = self._widgets["combo_range"].currentText()
-        _show_range = use_selection not in GENERIC_AXIS_SELECTOR_CHOICES
+        _show_range = (
+            use_selection not in GENERIC_AXIS_SELECTOR_CHOICES and self.npoints > 1
+        )
         self._widgets["combo_range"].setVisible(_show_range)
         self._widgets["edit_range_index"].setVisible(
             _range_selection == "select range by indices" and _show_range
@@ -375,6 +389,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._widgets["edit_range_data"].setVisible(
             _range_selection == "select range by data values" and _show_range
         )
+        self._widgets["label_single_point"].setVisible(self.npoints == 1)
+        self._widgets["combo_axis_use"].setVisible(self.npoints > 1)
         self._update_slice_from_choice(use_selection)
         self.sig_display_choice_changed.emit(self._axis_index, use_selection)
 
@@ -394,6 +410,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 self._manual_data_value_changed()
             elif use_selection == "slice at index":
                 self._manual_index_changed()
+            else:
+                raise UserConfigError(f"Invalid axis use case: {use_selection}")
 
     def _update_slice_from_non_generic_choice(self):
         """

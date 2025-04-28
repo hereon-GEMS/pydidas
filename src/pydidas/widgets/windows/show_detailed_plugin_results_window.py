@@ -222,12 +222,18 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         for _item in _point_result.get("items", []):
             _i_plot = _item["plot"]
             _data = _item["data"]
+            _plot_kwargs = {
+                _key: _val
+                for _key, _val in _item.items()
+                if _key in ["symbol", "linewidth", "linestyle"]
+            }
             self._widgets[f"plot_{_i_plot}"].plot_data(
                 _data,
                 title=_titles.get(_i_plot, ""),
                 legend=_item.get("label", ""),
                 ylabel=_plot_ylabels.get(_i_plot, ""),
                 replace=False,
+                **_plot_kwargs,
             )
 
     def __clear_plots(self):

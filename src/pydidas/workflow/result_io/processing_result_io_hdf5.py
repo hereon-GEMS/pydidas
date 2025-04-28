@@ -336,7 +336,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         _scan = ScanContext() if scan_context is None else scan_context
         _indices = _scan.get_index_position_in_scan(index)
         if not cls._metadata_written:
-            cls.update_metadata(frame_result_dict)
+            _metadata = cls.update_with_scan_metadata(frame_result_dict, _scan)
+            cls.update_metadata(_metadata)
         for _node_id, _data in frame_result_dict.items():
             with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
                 _file["entry/data/data"][_indices] = _data
@@ -346,6 +347,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         cls,
         full_data: dict,
         scan_context: Scan | None = None,
+        squeeze: bool = False,
     ):
         """
         Export the full dataset to disk.
@@ -357,15 +359,74 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan_context : Scan |None, optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
+        squeeze: bool, optional
+            Flag to toggle squeezing of empty dimensions. If True, the data will
+            be squeezed to remove empty dimensions. The default is False.
         """
         if not cls._metadata_written:
-            cls.update_metadata(full_data)
+            cls.update_metadata(full_data, squeeze=squeeze)
         for _node_id, _data in full_data.items():
+            if squeeze:
+                _data = _data.squeeze()
             with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
-    def update_metadata(cls, metadata: dict[int, Dataset | dict]):
+    def update_with_scan_metadata(
+        cls, metadata: dict[int, Dataset | dict], scan: Scan
+    ) -> dict[int, dict]:
+        """
+        Update the frame metadata with the scan metadata.
+
+        This method updates the metadata of the frame with the scan metadata.
+
+        Parameters
+        ----------
+        metadata : dict[int, Dataset | dict]
+            The metadata in dictionary form with entries of the form
+            node_id: node_metadata.
+        scan : Scan
+            The scan context to be used for exporting to file. If None, the
+            global scan context will be used.
+
+        Returns
+        -------
+        dict[int, dict]
+            The updated metadata.
+        """
+        _ndim_scan = scan.ndim
+        _scan_dim_labels = scan.axis_labels
+        _scan_dim_units = scan.axis_units
+        _scan_dim_ranges = scan.axis_ranges
+        _new_metadata = {}
+        for _id, _metadata in metadata.items():
+            if isinstance(_metadata, Dataset):
+                _metadata = _metadata.property_dict
+            _metadata["axis_labels"] = {
+                _i: _label
+                for _i, _label in enumerate(
+                    _scan_dim_labels + list(_metadata["axis_labels"].values())
+                )
+            }
+            _metadata["axis_units"] = {
+                _i: _unit
+                for _i, _unit in enumerate(
+                    _scan_dim_units + list(_metadata["axis_units"].values())
+                )
+            }
+            _metadata["axis_ranges"] = {
+                _i: _range
+                for _i, _range in enumerate(
+                    _scan_dim_ranges + list(_metadata["axis_ranges"].values())
+                )
+            }
+            _new_metadata[_id] = _metadata
+        return _new_metadata
+
+    @classmethod
+    def update_metadata(
+        cls, metadata: dict[int, Dataset | dict], squeeze: bool = False
+    ):
         """
         Update the frame metadata with a separately supplied metadata
         dictionary.
@@ -375,9 +436,14 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         metadata : dict
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
+        squeeze: bool, optional
+            Flag to toggle squeezing of empty dimensions. If True, the data will
+            be squeezed to remove empty dimensions. The default is False.
         """
         for _id, _metadata in metadata.items():
             if isinstance(_metadata, Dataset):
+                if squeeze:
+                    _metadata = _metadata.squeeze()
                 _metadata = _metadata.property_dict
             _ndim = len(_metadata["axis_labels"])
             _shape = tuple(_range.size for _range in _metadata["axis_ranges"].values())
@@ -399,6 +465,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     )
         cls._metadata_written = True
 
+    @classmethod
     @classmethod
     def import_results_from_file(
         cls, filename: Path | str

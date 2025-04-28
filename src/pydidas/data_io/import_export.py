@@ -29,7 +29,7 @@ __all__ = ["import_data", "export_data"]
 
 
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 from numpy import ndarray
 
@@ -37,34 +37,34 @@ from pydidas.core import Dataset
 from pydidas.data_io.io_manager import IoManager
 
 
-def export_data(filename: Union[str, Path], data: ndarray, **kwargs: dict):
+def export_data(filename: Path | str, data: ndarray, **kwargs: Any):
     """
     Export data to a file using the pydidas.data_io.IoManager metaclass.
 
     Parameters
     ----------
-    filename : Union[str, pathlib.Path]
+    filename : Path | str
         The filename to be used for the exported data.
     data : Union[np.ndarray, pydidas.core.Dataset]
         The data to be exported.
     **kwargs : dict
-        Any keyword arguments. These will be passed to the implemented exporter
+        Any keyword arguments. These will be passed to the implemented exporter,
         and the supported keywords vary depending on the selected file
         extension.
     """
     IoManager.export_to_file(filename, data, **kwargs)
 
 
-def import_data(filename: Union[str, Path], **kwargs: dict) -> Dataset:
+def import_data(filename: Path | str, **kwargs: Any) -> Dataset:
     """
     Import data from a file using the pydidas.data_io.IoManager metaclass.
 
     Parameters
     ----------
-    filename : Union[str, pathlib.Path]
+    filename : Path | str
         The filename to be used for the exported data.
-    **kwargs : dict
-        Any keyword arguments. These will be passed to the implemented importer
+    **kwargs : Any
+        Any keyword arguments. These will be passed to the implemented importer,
         and the supported keywords vary depending on the selected file
         extension.
     """

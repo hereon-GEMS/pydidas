@@ -29,7 +29,7 @@ __copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
-__all__ = ["DspacingSin2chiGrouping"]
+__all__ = ["SinSquareChiGrouping"]
 
 
 from enum import IntEnum
@@ -38,8 +38,12 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
-from pydidas.core import Dataset, UserConfigError
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_STRESS_STRAIN
+from pydidas.core import Dataset
+from pydidas.core.constants import (
+    INTEGRATION_RESULT_UNITS,
+    PROC_PLUGIN,
+    PROC_PLUGIN_STRESS_STRAIN,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -48,13 +52,10 @@ LABELS_SIN2CHI = "sin^2(chi)"
 LABELS_POSITION = "position"
 LABELS_DIM0 = "0: d-, 1: d+, 2: d_mean"
 
-UNITS_NANOMETER = "nm"
-UNITS_ANGSTROM = "A"
 UNITS_DEGREE = "deg"
 
 S2C_TOLERANCE = 1e-6
 NPT_AZIM_LIMIT = 3000
-
 
 PARAMETER_KEEP_RESULTS = "keep_results"
 
@@ -99,7 +100,7 @@ class DictViaAttrs:
         self._dict[attr] = value
 
 
-class DspacingSin2chiGrouping(ProcPlugin):
+class SinSquareChiGrouping(ProcPlugin):
     """
     Grouping of d-spacing values according to the slopes in sin^2(chi)
     and similarity in sin^2(chi) values.
@@ -139,15 +140,13 @@ class DspacingSin2chiGrouping(ProcPlugin):
     as input data. The limit for azimuthal points is set to 3000.
     """
 
-    plugin_name = "Group d-spacing according to sin^2(chi) method"
+    plugin_name = "sin^2(chi) grouping"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = -1
     output_data_dim = 2
-    output_data_label = (
-        "0: position_neg; 1: position_pos; 2: Mean of (position_neg, position_pos)"
-    )
+    output_data_label = "invalid - must be set based on input data"
     new_dataset = True
 
     # modification of the keep_results parameter to ensure results are always stored
@@ -156,8 +155,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
     _generics[PARAMETER_KEEP_RESULTS].choices = [True]
     generic_params = _generics
 
-    @staticmethod
-    def _ensure_dataset_instance(ds: Dataset) -> None:
+    def _ensure_dataset_instance(self, ds: Dataset) -> None:
         """
         Ensure the input is an instance of Dataset.
 
@@ -172,10 +170,9 @@ class DspacingSin2chiGrouping(ProcPlugin):
             If ds is not an instance of Dataset.
         """
         if not isinstance(ds, Dataset):
-            raise UserConfigError("Input must be an instance of Dataset.")
+            self.raise_UserConfigError("Input must be an instance of Dataset.")
 
-    @staticmethod
-    def _ensure_npt_azim_limit(chi: np.ndarray) -> None:
+    def _ensure_npt_azim_limit(self, chi: np.ndarray) -> None:
         """
         Ensure the number of azimuthal angles is below a certain limit.
 
@@ -194,13 +191,13 @@ class DspacingSin2chiGrouping(ProcPlugin):
             If the number of azimuthal angles exceeds the limit.
         """
         if chi.size > NPT_AZIM_LIMIT:
-            raise UserConfigError(
+            self.raise_UserConfigError(
                 f"Number of azimuthal angles exceeds the limit of {NPT_AZIM_LIMIT}."
             )
 
     @staticmethod
     def _get_param_unit_at_index(
-        ds_units: dict[int, tuple[str, str]], pos_idx: int
+        ds_units: dict[int, list[str, str]], pos_idx: int
     ) -> tuple[str, str]:
         """
         Retrieve the parameter name and unit from the dictionary `ds_units`
@@ -218,7 +215,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         ----------
         ds_units : dict
             A dictionary with integer keys, where each key-value pair consists of
-            an index (key) and a tuple (value) containing a parameter name and its unit.
+            an index (key) and a list (value) containing a parameter name and its unit.
         self._pos_idx : int
             The index for which the parameter name and unit are to be retrieved.
 
@@ -237,19 +234,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         ValueError
             If the parameter name at the specified `pos_idx` is not 'position',
             indicating a mismatch in expected parameter naming.
-
-        Examples
-        --------
-        >>> ds_units = {0: ('time', 's'), 1: ('position', 'm'), 2: ('temperature', 'K')}
-        >>> get_param_unit_at_index(ds_units, 1)
-        ('position', 'm')
-
-        Notes
-        -----
-        This function is particularly useful in contexts where specific parameters
-        and their units are critical, such as in scientific experiments or data
-        analysis tasks. It enforces the presence of a 'position' parameter at the
-        specified index, aiding in data validation and consistency checks.
         """
         if pos_idx not in ds_units:
             raise IndexError(
@@ -264,8 +248,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
             )
         return param_name, unit
 
-    @staticmethod
-    def _extract_and_verify_units(ds: Dataset) -> None:
+    def _extract_and_verify_units(self, ds: Dataset) -> None:
         """
         Extract and verify the units for chi and position in the dataset.
 
@@ -282,18 +265,17 @@ class DspacingSin2chiGrouping(ProcPlugin):
             ds.axis_labels[0] not in [LABELS_CHI]
             or ds.axis_units[0] not in chi_units_allowed
         ):
-            raise UserConfigError(
+            self.raise_UserConfigError(
                 "The input dataset does not contain chi values in the axis and/or "
                 "the chi values are given in an unsupported unit. Supported units "
                 f"are [{', '.join(chi_units_allowed)}]."
             )
 
-        # position/pos contains the unit for d_spacing
-        pos_units_allowed: list[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
-
         # Ensure 'position' is in the data_label
         if LABELS_POSITION not in ds.data_label:
-            raise UserConfigError(f"Key '{LABELS_POSITION}' not found in data_label.")
+            self.raise_UserConfigError(
+                f"Key '{LABELS_POSITION}' not found in data_label."
+            )
 
         parts = ds.data_label.split("/")
 
@@ -302,8 +284,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         pos_unit = parts[1].strip()
 
-        if pos_unit not in pos_units_allowed:
-            raise UserConfigError(
+        if pos_unit not in INTEGRATION_RESULT_UNITS:
+            self.raise_UserConfigError(
                 f"Unit '{pos_unit}' is not allowed for key '{LABELS_POSITION}."
             )
 
@@ -315,20 +297,20 @@ class DspacingSin2chiGrouping(ProcPlugin):
         super().__init__()
         self.config = DictViaAttrs(self._config)
 
-    def execute(self, ds: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
-        if ds.ndim == 2:
-            chi, d_spacing = self._ds_slicing(ds)
-        elif ds.ndim == 1:
-            chi, d_spacing = self._ds_slicing_1d(ds)
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+        if data.ndim == 2:
+            chi, d_spacing = self._ds_slicing(data)
+        elif data.ndim == 1:
+            chi, d_spacing = self._ds_slicing_1d(data)
         else:
-            raise UserConfigError("Dataset has to be 1D or 2D.")
+            self.raise_UserConfigError("The input dataset has to be 1D or 2D.")
+        self._update_data_labels_from_extracted_units(d_spacing)
 
         self._ensure_npt_azim_limit(chi)
         d_spacing_pos, d_spacing_neg = self._group_d_spacing_by_chi(d_spacing, chi)
         d_spacing_combined = self._combine_sort_d_spacing_pos_neg(
             d_spacing_pos, d_spacing_neg
         )
-
         d_output_sin2chi_method = self._create_final_result_sin2chi_method(
             d_spacing_combined
         )
@@ -378,10 +360,10 @@ class DspacingSin2chiGrouping(ProcPlugin):
         chi_indices = [key for key, value in axis_labels.items() if value == LABELS_CHI]
 
         if len(chi_indices) > 1:
-            raise UserConfigError('Multiple "chi" found. Check your dataset.')
+            self.raise_UserConfigError('Multiple "chi" found. Check your dataset.')
 
         if not chi_indices:
-            raise UserConfigError("chi is missing. Check your dataset.")
+            self.raise_UserConfigError("chi is missing. Check your dataset.")
 
         # Assuming there's exactly one 'chi', get the index
         chi_key = chi_indices[0]
@@ -407,13 +389,15 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # Check if 'position' is found
         if position_key is None:
-            raise UserConfigError(
-                'Key containing "position" is missing. Check your dataset.'
+            self.raise_UserConfigError(
+                "Key containing `position` is missing in input data axis labels. "
+                "The SinSquareChiGrouping expects the output of a FitPlugin as input. "
+                "Please check your workflow and input dataset."
             )
 
         return chi_key, position_key
 
-    def _extract_units(self, ds: Dataset) -> dict[int, list[str]]:
+    def _extract_units(self, ds: Dataset) -> dict[int, list[str, str]]:
         """
         Extract units from `data_label` in a `Dataset`.
 
@@ -458,7 +442,7 @@ class DspacingSin2chiGrouping(ProcPlugin):
         fit_labels = ds.axis_labels[pos_key]
 
         # Step 1: Extract parameter names from fit_labels
-        fit_labels_dict = {
+        fit_labels_dict: dict[int, str] = {
             int(item.split(":")[0].strip()): item.split(":")[1].strip()
             for item in fit_labels.split(";")
         }
@@ -480,16 +464,13 @@ class DspacingSin2chiGrouping(ProcPlugin):
             try:
                 unit = data_label_dict[param]
             except KeyError:
-                raise UserConfigError(f"Unit not found for parameter: {param}")
+                self.raise_UserConfigError(f"Unit not found for parameter: {param}")
             result[index] = [param, unit]
 
         # Step 4: Append chi and its unit to the result as the highest key
         chi_label = ds.axis_labels[chi_key]
         chi_unit = ds.axis_units[chi_key]
-        if result:
-            new_key = max(result.keys()) + 1
-        else:
-            new_key = 0
+        new_key = max(result.keys()) + 1 if result else 0
         result[new_key] = [chi_label, chi_unit]
 
         return result
@@ -527,26 +508,19 @@ class DspacingSin2chiGrouping(ProcPlugin):
         """
         self._ensure_dataset_instance(ds)
 
-        ds_units: dict[int, list[str]] = self._extract_units(ds)
+        ds_units: dict[int, list[str, str]] = self._extract_units(ds)
 
-        # position/pos contains the unit for d_spacing
-        pos_units_allowed: list[str] = [UNITS_NANOMETER, UNITS_ANGSTROM]
         # Only chi in degree is allowed.
         chi_units_allowed: list[str] = [UNITS_DEGREE]
 
-        params_to_check = [LABELS_POSITION, LABELS_CHI]
-
         for _, val in ds_units.items():
-            label = val[
-                0
-            ]  # First item in the value list is the label (e.g., 'position', 'chi')
-            unit = val[1]  # Second item is the unit (e.g., 'nm', 'deg')
-
-            if label in params_to_check:
-                if label == LABELS_POSITION and unit not in pos_units_allowed:
-                    raise UserConfigError(f"Unit {unit} not allowed for {label}.")
-                if label == LABELS_CHI and unit not in chi_units_allowed:
-                    raise UserConfigError(f"Unit {unit} not allowed for {label}.")
+            # First item in the value list is the label (e.g., 'position', 'chi')
+            # Second item is the unit (e.g., 'nm', 'deg')
+            label, unit = val
+            if label == LABELS_POSITION and unit not in INTEGRATION_RESULT_UNITS:
+                self.raise_UserConfigError(f"Unit {unit} not allowed for {label}.")
+            if label == LABELS_CHI and unit not in chi_units_allowed:
+                self.raise_UserConfigError(f"Unit {unit} not allowed for {label}.")
 
     def _extract_d_spacing(self, ds: Dataset, pos_key: int, pos_idx: int) -> Dataset:
         """
@@ -749,6 +723,20 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         return chi, d_spacing
 
+    def _update_data_labels_from_extracted_units(self, data_w_units: Dataset) -> None:
+        """
+        Update the output labels of the plugin based on the extracted units.
+
+        Parameters
+        ----------
+        data_w_units : Dataset
+            The dataset containing the extracted units.
+        """
+        self.output_data_label = data_w_units.metadata.get(
+            "fitted_axis_label", "undefined"
+        )
+        self.output_data_unit = data_w_units.metadata.get("fitted_axis_unit", "")
+
     def _idx_s2c_grouping(
         self, chi: np.ndarray, tolerance: float = S2C_TOLERANCE
     ) -> tuple[int, np.ndarray]:
@@ -915,22 +903,17 @@ class DspacingSin2chiGrouping(ProcPlugin):
 
         # Categorize the values of the first_derivative
         categories = np.zeros_like(first_derivative, dtype=int)
-        categories[first_derivative > zero_threshold] = Category.POSITIVE.value
-        categories[first_derivative < -zero_threshold] = Category.NEGATIVE.value
+        categories[first_derivative > zero_threshold] = Category.POSITIVE
+        categories[first_derivative < -zero_threshold] = Category.NEGATIVE
         categories[
             (first_derivative >= -zero_threshold) & (first_derivative <= zero_threshold)
-        ] = Category.ZERO.value
+        ] = Category.ZERO
 
         # Filter
         # values close to zero (categories == 1) are added to both sides of the
         # maximum or minimum
-        mask_pos = (categories == Category.POSITIVE.value) | (
-            categories == Category.ZERO.value
-        )
-        mask_neg = (categories == Category.NEGATIVE.value) | (
-            categories == Category.ZERO.value
-        )
-
+        mask_pos = (categories == Category.POSITIVE) | (categories == Category.ZERO)
+        mask_neg = (categories == Category.NEGATIVE) | (categories == Category.ZERO)
         # Advanced indexing
         # Here, s2c_labels specifies the row indices, and np.arange(s2c_num_elements)
         # specifies the column indices.
@@ -954,7 +937,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_neg_slope_matrix = np.full(s2c_groups_matrix_shape, np.nan)
         s2c_pos_slope_matrix = np.full(s2c_groups_matrix_shape, np.nan)
         s2c_neg_slope_matrix = np.full(s2c_groups_matrix_shape, np.nan)
-
         # Apply masks to create filtered matrices
         # Combination of advanced indexing and conditional assignment with np.where
         d_spacing_pos_slope_matrix[*s2c_advanced_idx] = np.where(
@@ -966,7 +948,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
             mask_neg, d_spacing, np.nan
         )
         s2c_neg_slope_matrix[*s2c_advanced_idx] = np.where(mask_neg, s2c, np.nan)
-
         # Averaging, positive slope
         s2c_mean_pos = np.nanmean(s2c_pos_slope_matrix, axis=1)
         d_spacing_mean_pos = np.nanmean(d_spacing_pos_slope_matrix, axis=1)
@@ -975,7 +956,6 @@ class DspacingSin2chiGrouping(ProcPlugin):
         d_spacing_mean_neg = np.nanmean(d_spacing_neg_slope_matrix, axis=1)
         # Aim for a complete common s2c_mean_pos/neg without NaN values
         s2c_mean = np.nanmean(np.vstack((s2c_mean_pos, s2c_mean_neg)), axis=0)
-
         # create Datasets for output
         d_spacing_pos = Dataset(
             d_spacing_mean_pos,
@@ -1098,8 +1078,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
             d_spacing_combi_arr,
             axis_ranges={0: np.arange(2), 1: s2c_axis_pos_sorted},
             axis_labels={0: "0: d-, 1: d+", 1: "sin^2(chi)"},
-            data_label=f"0: {d_spacing_neg.data_label}, 1: {d_spacing_pos.data_label}",
-            data_unit=d_spacing_pos.data_unit,
+            data_unit=self.output_data_unit,
+            data_label=self.output_data_label,
         )
 
         return d_spacing_combined
@@ -1160,8 +1140,8 @@ class DspacingSin2chiGrouping(ProcPlugin):
                 1: d_spacing_combined.axis_ranges[1],
             },
             axis_labels={0: "0: d-, 1: d+, 2: d_mean", 1: LABELS_SIN2CHI},
-            data_unit=d_spacing_combined.data_unit,
-            data_label="d_spacing",
+            data_unit=self.output_data_unit,
+            data_label=self.output_data_label,
         )
 
         return result

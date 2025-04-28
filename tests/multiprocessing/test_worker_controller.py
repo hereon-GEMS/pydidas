@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -279,10 +279,10 @@ class TestWorkerController(unittest.TestCase):
         self._wc._workers = [1, 2, 3, 4]
         _nfinished = 3
         for i in range(_nfinished):
-            self._wc._queues["queue_finished"].put(1)
+            self._wc._queues["queue_shutting_down"].put(1)
         time.sleep(0.005)
         self._wc._check_if_workers_finished()
-        self.assertEqual(self._wc._workers_done, _nfinished)
+        self.assertEqual(self._wc._workers_shutdown, _nfinished)
 
     def test_wait_for_worker_finished_signals__not_running(self):
         self._wc = WorkerController(n_workers=2)
@@ -301,7 +301,7 @@ class TestWorkerController(unittest.TestCase):
         self._wc.flags["running"] = True
         self._wc._workers = [1, 2, 3, 4]
         for i in range(len(self._wc._workers)):
-            self._wc._queues["queue_finished"].put(1)
+            self._wc._queues["queue_shutting_down"].put(1)
         # assert: does not raise TimeoutError
         self._wc._wait_for_worker_finished_signals(0.2)
 

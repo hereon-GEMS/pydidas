@@ -32,6 +32,7 @@ import multiprocessing as mp
 import time
 import warnings
 from multiprocessing.shared_memory import SharedMemory
+from numbers import Integral
 from typing import Optional, Union
 
 import numpy as np
@@ -224,8 +225,6 @@ class ExecuteWorkflowApp(BaseApp):
                 self._config["export_files_prepared"] = False
         TREE.prepare_execution()
         self._config["run_prepared"] = True
-        if self.get_param_value("live_processing"):
-            TREE.root.plugin.prepare_carryon_check()
 
     def _recreate_context(self):
         """
@@ -304,9 +303,9 @@ class ExecuteWorkflowApp(BaseApp):
         bool
             Flag whether the processing can carry on or needs to wait.
         """
-        if not self.get_param_value("live_processing"):
-            return True
-        return TREE.root.plugin.input_available(self._index)
+        if self.get_param_value("live_processing"):
+            return TREE.root.plugin.input_available(self._index)
+        return True
 
     def signal_processed_and_can_continue(self) -> bool:
         """
@@ -552,25 +551,23 @@ class ExecuteWorkflowApp(BaseApp):
             self._create_shared_memory()
 
     @QtCore.Slot(object, object)
-    def multiprocessing_store_results(self, index: int, *data: tuple):
+    def multiprocessing_store_results(self, index: Integral, data_index: Integral):
         """
         Store the results of the multiprocessing operation.
 
         Parameters
         ----------
-        index : int
+        index : Integral
             The index of the processed task.
-        data : tuple
-            The results from multiprocessing_func. This can be either a tuple
-            with (buffer_pos, metadata) or the integer buffer_pos.
+        data_index : Integral
+            The index to retrieve the results from multiprocessing_func.
         """
         if self.clone_mode:
             return
         if self._shared_arrays == dict():
             self._initialize_arrays_from_shared_memory()
         # the ExecutiveWorkflowApp only uses the first argument of the variadict data:
-        buffer_pos = data[0]
-        if buffer_pos == -1:
+        if data_index == -1:
             _filename = TREE.root.plugin.get_filename(index)
             QtWidgets.QApplication.instance().set_status_message(
                 f"File reading error during processing of scan index #{index}."
@@ -582,11 +579,11 @@ class ExecuteWorkflowApp(BaseApp):
             self._config["result_metadata_set"] = True
         with self.mp_manager["lock"]:
             _new_results = {
-                _key: _arr[buffer_pos]
+                _key: _arr[data_index]
                 for _key, _arr in self._shared_arrays.items()
                 if _key != "in_use_flag"
             }
-            self._shared_arrays["in_use_flag"][buffer_pos] = 0
+            self._shared_arrays["in_use_flag"][data_index] = 0
         RESULTS.store_results(index, _new_results)
         if self.get_param_value("autosave_results"):
             if not self._config["export_files_prepared"]:

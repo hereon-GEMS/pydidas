@@ -44,7 +44,7 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
-from typing import List, Literal, NewType, Tuple, Union
+from typing import List, Literal, NewType, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -121,7 +121,7 @@ def get_default_property_dict(shape: tuple[int], full_properties: bool = False) 
     return _meta
 
 
-def dataset_default_attribute(key: str, shape: tuple[int]) -> Union[str, dict]:
+def dataset_default_attribute(key: str, shape: tuple[int]) -> str | dict | tuple:
     """
     Get the default value for a Dataset attribute.
 
@@ -134,7 +134,7 @@ def dataset_default_attribute(key: str, shape: tuple[int]) -> Union[str, dict]:
 
     Returns
     -------
-    Union[str, dict]
+    str | dict | tuple
         The default value for the given key.
     """
     if key in ["data_unit", "data_label"]:
@@ -193,13 +193,13 @@ def get_number_of_entries(obj: object) -> int:
         return obj.size
     if isinstance(obj, Integral):
         return 1
-    if isinstance(obj, Iterable) and not isinstance(obj, str):
+    if isinstance(obj, Sequence) and not isinstance(obj, str):
         return len(obj)
     raise TypeError(f"Cannot calculate the number of entries for type {type(obj)}.")
 
 
 def get_axis_item_representation(
-    key: Literal["axis_labels", "axis_ranges", "axis_units"],
+    key: Literal["axis_labels", "axis_ranges", "axis_units", "metadata"],
     item: object,
     use_key: bool = True,
 ) -> List[str]:
@@ -208,8 +208,8 @@ def get_axis_item_representation(
 
     Parameters
     ----------
-    key : Literal['axis_labels', 'axis_ranges', 'axis_units']
-        The key (i.e. reference name) for the item.
+    key : Literal['axis_labels', 'axis_ranges', 'axis_units', 'metadata']
+        The key (i.e., reference name) for the item.
     item : object
         The item to be represented as a string.
     use_key : bool, optional
@@ -236,28 +236,6 @@ def get_axis_item_representation(
             _repr, initial_indent="", width=75, subsequent_indent=" " * 3
         )
     return _lines
-
-
-def get_dict_with_array_entries(
-    entries: Union[Iterable, dict], shape: Tuple[int], name_reference: str
-) -> dict:
-    """
-    Get a dictionary with array entries.
-
-    Parameters
-    ----------
-    entries : Union[Iterable, dict]
-        The entries to be processed.
-    shape : Tuple[int]
-        The shape of the calling Dataset.
-    name_reference : str
-        The reference name from the calling method for a possible error message.
-
-    Returns
-    -------
-    dict
-        A dictionary with array entries.
-    """
 
 
 def get_dict_with_string_entries(
@@ -289,7 +267,7 @@ def get_dict_with_string_entries(
 
 
 def get_input_as_dict(
-    data: Union[dict, Iterable[float, ...]],
+    data: Union[dict, Sequence[float]],
     target_shape: Tuple[int],
     calling_method_name: str = "axis_labels",
 ) -> dict:
@@ -302,20 +280,18 @@ def get_input_as_dict(
 
     Parameters
     ----------
-    data : Union[dict, Iterable[float, ...]]
+    data : Union[dict, Sequence[float]]
         The keys for the axis metadata.
     target_shape: Tuple[int]
         The shape of the target Dataset. This number is needed to sanity-check that
         the input has the correct length.
-    entry_type : str, optional
-        The type of entries. Can be either 'str' or 'array'. The default is 'str'.
     calling_method_name : str
         The name of the calling method (for exception handling)
 
     Raises
     ------
     PydidasConfigError
-        If the entries is not Iterable or the length of the keys does not match the
+        If the entries are not Iterable or the length of the keys does not match the
         number of dimensions.
 
     Returns
@@ -375,7 +351,7 @@ def convert_ranges_and_check_length(
     """
     Convert ranges to ndarrays and check their length with respect to the shape.
 
-    Verify that all given true ranges (i.e. with more than one item) are of type
+    Verify that all given true ranges (i.e., with more than one item) are of type
     np.ndarray and that the length of all given ranges matches the data shape.
 
     Warning: This function modifies the input dictionary in place!

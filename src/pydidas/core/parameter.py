@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The parameter module includes the Parameter class which is used to have a
+The parameter module includes the Parameter class, which is used to have a
 consistent interface for various data types.
 """
 
@@ -33,7 +33,7 @@ import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, Self, Type, Union
+from typing import Any, Self, Sequence, Type, Union
 
 from numpy import asarray, ndarray
 
@@ -45,7 +45,7 @@ _ITERATORS = (list, set, tuple)
 _NUMBERS = [Integral, Real]
 
 
-def _get_base_class(cls: Any) -> Union[type, Real, Integral, None]:
+def _get_base_class(cls: Any) -> type | Real | Integral | None:
     """
     Filter numerical classes and return the corresponding abstract base class.
 
@@ -60,8 +60,9 @@ def _get_base_class(cls: Any) -> Union[type, Real, Integral, None]:
 
     Returns
     -------
-    object
-        The base class of the input class if the input.
+    type | Real | Integral | None
+        The base class of the input class if the input. If no class has been
+        defined, return None.
     """
     if cls is None:
         return None
@@ -72,7 +73,7 @@ def _get_base_class(cls: Any) -> Union[type, Real, Integral, None]:
     return cls
 
 
-def _outside_range_string(val: object, parameter: object) -> str:
+def _outside_range_string(val: object, parameter: "Parameter") -> str:
     if parameter.dtype == Integral:
         _range = (int(parameter.range[0]), int(parameter.range[1]))
     else:
@@ -90,7 +91,7 @@ def _invalid_choice_str(val: object, choices: list) -> str:
     )
 
 
-def _value_set_valueerror_str(parameter: object, val: object) -> str:
+def _value_set_valueerror_str(parameter: "Parameter", val: Any) -> str:
     _subtype = (
         f"[{parameter._Parameter__meta['subtype'].__name__}]"
         if parameter._Parameter__meta["subtype"]
@@ -148,7 +149,7 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | subtype    | False     | For Iterable datatypes, a subtype can be  |
     |            |           | defined to determine the data type inside |
-    |            |           | the iterating object, e.g. a list of int. |
+    |            |           | the iterating object, e.g., a list of int |
     +------------+-----------+-------------------------------------------+
 
     Parameters can be passed either as a complete meta_dict or as individual
@@ -179,7 +180,7 @@ class Parameter:
             The name of the parameter. The default is None.
         subtype : Optional[type]
             For Iterable datatypes, a subtype can be defined to determine the
-            data type inside the iterating object, e.g. a list of int. None does
+            data type inside the iterating object, e.g., a list of int. None does
             not enforce type checking. The default is None.
         optional : bool, optional
             Keyword to toggle optional parameters. The default is False.
@@ -228,13 +229,13 @@ class Parameter:
         if kwargs.get("range", None):
             self.range = kwargs["range"]
 
-    def __process_default_input(self, default: object):
+    def __process_default_input(self, default: Any):
         """
         Process the default value.
 
         Parameters
         ----------
-        default : object
+        default : Any
             The default attribute passed to init.
 
         Raises
@@ -261,7 +262,7 @@ class Parameter:
         Raises
         ------
         TypeError
-            If choices is not of an accepted type (None, list, tuple)
+            If choices are not of an accepted type (None, list, tuple)
         ValueError
             If the default has been set, and it is not in choices.
         """
@@ -292,7 +293,7 @@ class Parameter:
         -------
         bool
             Returns True if the type of val matches the defined data type
-            or if type is None.
+            or if the type is None.
 
         """
         if self.__type is None:
@@ -317,6 +318,7 @@ class Parameter:
             - str input and Path type
             - str input and Hdf5key type
             - str input of list/tuple of numbers to list/tuple of numbers
+            - str of `True` or `False` to bool
             - list to tuple
             - tuple to list
             - "None" and "" to None
@@ -338,6 +340,12 @@ class Parameter:
                 value = Path(value)
             elif self.__type == Hdf5key:
                 value = Hdf5key(value)
+            elif (
+                self.__type == Integral
+                and value in ["True", "False"]
+                and set(self.__meta["choices"]) == {0, 1}
+            ):
+                value = value == "True"
             elif self.__type in _ITERATORS and self.__meta["subtype"] in _NUMBERS:
                 value = self.__get_as_numbers(value)
         if self.__type in _NUMBERS and not self.__meta["allow_None"]:
@@ -372,9 +380,9 @@ class Parameter:
         return self.__meta["name"]
 
     @property
-    def allow_None(self) -> bool:
+    def allow_None(self) -> bool:  # noqa
         """
-        Returns the flag to allow "None" as value.
+        Returns the flag to allow "None" as a value.
 
         Returns
         -------
@@ -473,7 +481,7 @@ class Parameter:
         Raises
         ------
         TypeError
-            If the supplied choices are not of datatype list or tuple.
+            If the supplied choices are not of the datatype list or tuple.
         ValueError
             If any choice in choices does not pass the datatype check.
         ValueError
@@ -522,25 +530,25 @@ class Parameter:
         return self.__type
 
     @property
-    def value(self) -> object:
+    def value(self) -> Any:
         """
         Get the Parameter value.
 
         Returns
         -------
-        value
+        value : Any
             The value of the parameter.
         """
         return self.__value
 
     @value.setter
-    def value(self, val: object):
+    def value(self, val: Any):
         """
         set a new value for the parameter.
 
         Parameters
         ----------
-        val : type
+        val : Any
             The new value for the parameter.
 
         Raises
@@ -592,25 +600,25 @@ class Parameter:
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
     @property
-    def range(self) -> Union[None, tuple[Real, Real]]:
+    def range(self) -> None | tuple[Real, Real]:
         """
         Get the range of the Parameter.
 
         Returns
         -------
-        tuple[Real, Real]
+        None | tuple[Real, Real]
             The range of the Parameter.
         """
         return self.__meta["range"]
 
     @range.setter
-    def range(self, new_range: Union[None, tuple[Real, Real]]):
+    def range(self, new_range: None | tuple[Real, Real]):
         """
         Set a new range for the Parameter.
 
         Parameters
         ----------
-        new_range : Union[None, tuple[Real, Real]]
+        new_range : None | tuple[Real, Real]
             The new range for the Parameter.
 
         Raises
@@ -635,15 +643,15 @@ class Parameter:
         new_range = (float(new_range[0]), float(new_range[1]))
         self.__meta["range"] = new_range
 
-    def update_value_and_choices(self, value: object, choices: Iterable[object, ...]):
+    def update_value_and_choices(self, value: object, choices: Sequence[Any]):
         """
         Update the value and choices of the Parameter to prevent illegal selections.
 
         Parameters
         ----------
         value : object
-            The new Parameter values
-        choices : Iterable[object, ...]
+            The new Parameter values.
+        choices : Sequence[Any]
             The new choices for the Parameter.
         """
         if not self.__typecheck(value):
@@ -785,10 +793,11 @@ class Parameter:
         )
 
     def __get_as_numbers(
-        self, value: Union[str, Iterable]
-    ) -> Union[list[Real, Integral], tuple[Real, Integral], set[Real, Integral]]:
+        self, value: str | Sequence[str | Real]
+    ) -> Sequence[Real | Integral]:
         """
-        Get the input as an iterable of numbers of the specified type.
+        Get the input as iterable of numbers of the Parameter type.
+
         Parameters
         ----------
         value : Union[str, Iterable]
@@ -796,8 +805,8 @@ class Parameter:
 
         Returns
         -------
-        Union[list[Real, Integral], tuple[Real, Integral], set[Real, Integral]]
-            The input as an iterable of numbers.
+        Sequence[Real | Integral]
+            The input as iterable of numbers.
         """
         if self.__meta["subtype"] not in _NUMBERS:
             raise TypeError("The subtype must be either Real or Integral.")
@@ -846,8 +855,8 @@ class Parameter:
         The generated hash key depends on the reference key, type, value,
         default, name, unit and choices of the Parameter.
 
-        Warning: In case of non-hashable values, the Parameter will still
-        generate a hash value based on the other items but this value might
+        Warning: In the case of non-hashable values, the Parameter will still
+        generate a hash value based on the other items, but this value might
         not be representative because it cannot capture changing values.
 
         Returns

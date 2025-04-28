@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Tests for the DspacingSin_2chi class / plugin.
+Tests for the Sin_2chiGrouping class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
@@ -25,13 +25,14 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
+import re
 from dataclasses import dataclass
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 
-from pydidas_plugins.proc_plugins.sin_2chi import (
+from pydidas_plugins.proc_plugins.sin_2chi_grouping import (
     LABELS_DIM0,
     LABELS_SIN2CHI,
     LABELS_SIN_2CHI,
@@ -46,13 +47,13 @@ from pydidas.plugins import PluginCollection, ProcPlugin
 
 
 def test_plugin_inheritance():
-    plugin_obj = PluginCollection().get_plugin_by_name("DspacingSin_2chi")
+    plugin_obj = PluginCollection().get_plugin_by_name("Sin_2chiGrouping")
     assert issubclass(plugin_obj, ProcPlugin), "Plugin is not a subclass of ProcPlugin"
 
 
 @pytest.fixture
 def plugin_fixture():
-    return PluginCollection().get_plugin_by_name("DspacingSin_2chi")()
+    return PluginCollection().get_plugin_by_name("Sin_2chiGrouping")()
 
 
 @pytest.fixture()
@@ -91,8 +92,8 @@ def test_execute_validation_basic(
 
     assert result is not None
     assert result.data_unit == expected_unit
-    assert result.data_label == "Difference of d(+) - d(-)"
-    assert result.axis_labels[0] == "0: d-, 1: d+, 2: d(+)-d(-)"
+    assert result.data_label == "Difference between pos. and neg. branch"
+    assert result.axis_labels[0] == "0: neg. branch, 1: pos. branch, 2: difference"
     assert result.axis_labels[1] == LABELS_SIN_2CHI
     assert result.axis_units[0] == ""
     assert result.axis_units[1] == ""
@@ -221,6 +222,7 @@ test_cases = [case1, case2, case3, case4]
 def test_execute_validation(plugin_fixture, case):
     plugin = plugin_fixture
     ds = case.create_input_ds()
+    _input_ref = ds.copy()
     result, _ = plugin.execute(ds)
 
     # Validate the results
@@ -228,9 +230,10 @@ def test_execute_validation(plugin_fixture, case):
     np.testing.assert_array_almost_equal(
         result.axis_ranges[1], case.s_2c_values_expected
     )
+    assert np.allclose(ds, _input_ref, equal_nan=True)
     assert result.data_unit == UNITS_ANGSTROM
-    assert result.data_label == "Difference of d(+) - d(-)"
-    assert result.axis_labels[0] == "0: d-, 1: d+, 2: d(+)-d(-)"
+    assert result.data_label == "Difference between pos. and neg. branch"
+    assert result.axis_labels[0] == "0: neg. branch, 1: pos. branch, 2: difference"
     assert result.axis_labels[1] == LABELS_SIN_2CHI
     assert result.shape[0] == 3
     assert result.shape[1] == ds.shape[1]
@@ -271,11 +274,11 @@ def invalid_axis_labels_dataset():
     [
         (
             {0: "0: d-", 1: LABELS_SIN2CHI},
-            f"Expected axis label '{LABELS_DIM0}', but got '0: d-'",
+            f"Expected axis label `{LABELS_DIM0}`, but got `0: d-`",
         ),
         (
             {0: LABELS_DIM0, 1: "sin2chi"},
-            f"Expected axis label '{LABELS_SIN2CHI}', but got 'sin2chi'",
+            f"Expected axis label `{LABELS_SIN2CHI}`, but got `sin2chi`",
         ),
     ],
 )
@@ -283,12 +286,8 @@ def test__ensure_axis_labels_invalid_input(
     plugin_fixture, invalid_axis_labels_dataset, axis_labels, expected_error_message
 ):
     ds = invalid_axis_labels_dataset(axis_labels)
-    with pytest.raises(UserConfigError) as excinfo:
+    with pytest.raises(UserConfigError, match=re.escape(expected_error_message)):
         plugin_fixture._ensure_axis_labels(ds)
-    assert str(excinfo.value) == expected_error_message
-
-
-test_cases = [case1, case2, case3, case4]
 
 
 @pytest.mark.parametrize("case", test_cases)
@@ -304,8 +303,8 @@ def test__calculate_diff_d_spacing_vs_sin_2chi(plugin_fixture, case):
         result.axis_ranges[1], case.s_2c_values_expected
     )
     assert result.data_unit == UNITS_ANGSTROM
-    assert result.data_label == "Difference of d(+) - d(-)"
-    assert result.axis_labels[0] == "0: d-, 1: d+, 2: d(+)-d(-)"
+    assert result.data_label == "Difference between pos. and neg. branch"
+    assert result.axis_labels[0] == "0: neg. branch, 1: pos. branch, 2: difference"
     assert result.axis_labels[1] == LABELS_SIN_2CHI
     assert result.shape[0] == 3
     assert result.shape[1] == ds.shape[1]
@@ -343,10 +342,7 @@ def create_dataset():
             {0: LABELS_DIM0, 1: LABELS_SIN2CHI},
             {0: np.arange(3), 1: np.full((3,), 0.5)},
             "invalid_unit",
-            (
-                f"Incoming dataset expected to have units in {UNITS_NANOMETER} "
-                f"or {UNITS_ANGSTROM}. Please verify your Dataset."
-            ),
+            ("Incoming dataset does not have the expected units."),
         ),
     ],
 )
@@ -360,18 +356,17 @@ def test_calculate_diff_d_spacing_vs_sin_2chi_invalid_input(
     expected_error_message,
 ):
     ds = create_dataset(data, axis_labels, axis_ranges, data_unit)
-    with pytest.raises(UserConfigError) as excinfo:
+    with pytest.raises(UserConfigError, match=re.escape(expected_error_message)):
         plugin_fixture._calculate_diff_d_spacing_vs_sin_2chi(ds)
-    assert str(excinfo.value) == expected_error_message
 
 
-def test_DspacingSin_2chi_params(plugin_fixture):
+def test_Sin_2chiGrouping_params(plugin_fixture):
     plugin = plugin_fixture
 
-    assert plugin.plugin_name == "Difference in d-spacing vs sin(2*chi)"
+    assert plugin.plugin_name == "Grouping of results vs sin(2*chi)"
     assert plugin.plugin_type == PROC_PLUGIN
     assert not plugin.basic_plugin
-    assert plugin.plugin_group == PROC_PLUGIN_STRESS_STRAIN
+    assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == 2
     assert plugin.output_data_dim == 2
     assert plugin.output_data_label == (

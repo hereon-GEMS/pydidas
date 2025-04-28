@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Nonni Heere"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -76,6 +76,42 @@ class TestConvertToDSpacing(unittest.TestCase):
     def test_creation(self):
         plugin = self.get_standard_plugin()
         self.assertIsInstance(plugin, BasePlugin)
+
+    def test_execute__d_in_nm(self):
+        plugin = self.get_standard_plugin()
+        self._data.update_axis_unit(0, "nm")
+        self._data.update_axis_label(0, "d-spacing")
+        for _unit in ("nm", "A"):
+            _ref_ax = self._data.axis_ranges[0]
+            _ref_ax = _ref_ax * 10 if _unit == "A" else _ref_ax
+            with self.subTest(input_unit=_unit):
+                plugin.set_param_value(
+                    "d_spacing_unit", "nm" if _unit == "nm" else "Angstrom"
+                )
+                plugin.pre_execute()
+                _result, _kwargs = plugin.execute(self._data)
+                self.assertEqual(_result.axis_labels[0], "d-spacing")
+                self.assertEqual(_result.axis_units[0], _unit)
+                self.assertTrue(np.allclose(_result.axis_ranges[0], _ref_ax))
+                self.assertTrue(np.allclose(_result.array, self._data.array))
+
+    def test_execute__d_in_A(self):
+        plugin = self.get_standard_plugin()
+        self._data.update_axis_unit(0, "A")
+        self._data.update_axis_label(0, "d-spacing")
+        for _unit in ("nm", "A"):
+            _ref_ax = self._data.axis_ranges[0].copy()
+            _ref_ax = _ref_ax * 0.1 if _unit == "nm" else _ref_ax
+            with self.subTest(input_unit=_unit):
+                plugin.set_param_value(
+                    "d_spacing_unit", "nm" if _unit == "nm" else "Angstrom"
+                )
+                plugin.pre_execute()
+                _result, _kwargs = plugin.execute(self._data)
+                self.assertEqual(_result.axis_labels[0], "d-spacing")
+                self.assertEqual(_result.axis_units[0], _unit)
+                self.assertTrue(np.allclose(_result.axis_ranges[0], _ref_ax))
+                self.assertTrue(np.allclose(_result.array, self._data.array))
 
     def test_execute__q_in_nm(self):
         plugin = self.get_standard_plugin()

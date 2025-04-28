@@ -52,8 +52,8 @@ def export_frame_to_file(saver, index, frame_result_dict, **kwargs):
     }
 
 
-def export_full_data_to_file(saver, full_data, scan):
-    saver._exported = {"full_data": full_data}
+def export_full_data_to_file(saver, full_data, scan, squeeze: bool = False):
+    saver._exported = {"full_data": full_data, "squeeze": squeeze}
 
 
 def prepare_files_and_directories(
@@ -235,8 +235,8 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
         META.set_active_savers_and_title(["TEST"])
         META.export_full_data_to_active_savers(_results)
-        self.assertTrue(np.equal(_Saver._exported["full_data"][1], _results[1]).all())
-        self.assertTrue(np.equal(_Saver._exported["full_data"][2], _results[2]).all())
+        self.assertTrue(np.allclose(_Saver._exported["full_data"][1], _results[1]))
+        self.assertTrue(np.allclose(_Saver._exported["full_data"][2], _results[2]))
 
     def test_export_full_data_to_file(self):
         _frame_results = {
@@ -247,10 +247,10 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
         META.export_full_data_to_file("TEST", _frame_results)
         self.assertTrue(
-            np.equal(_Saver._exported["full_data"][1], _frame_results[1]).all()
+            np.allclose(_Saver._exported["full_data"][1], _frame_results[1])
         )
         self.assertTrue(
-            np.equal(_Saver._exported["full_data"][2], _frame_results[2]).all()
+            np.allclose(_Saver._exported["full_data"][2], _frame_results[2])
         )
 
     def test_prepare_active_savers(self):

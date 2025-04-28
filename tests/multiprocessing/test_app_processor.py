@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -78,7 +78,7 @@ class Test_app_processor(unittest.TestCase):
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
-            "queue_finished": mp.Queue(),
+            "queue_shutting_down": mp.Queue(),
             "queue_signal": mp.Queue(),
             "logging_level": 10,
             "lock": self._lock_manager.Lock(),
@@ -88,7 +88,7 @@ class Test_app_processor(unittest.TestCase):
         self._mp_config["queue_input"].close()
         self._mp_config["queue_output"].close()
         self._mp_config["queue_stop"].close()
-        self._mp_config["queue_finished"].close()
+        self._mp_config["queue_shutting_down"].close()
         self._mp_config["queue_signal"].close()
         self._lock_manager.shutdown()
 
@@ -170,7 +170,7 @@ class Test_app_processor(unittest.TestCase):
         self.assertTrue(_thread.is_alive())
         self._mp_config["queue_stop"].put(1)
         time.sleep(0.1)
-        self.assertEqual(self._mp_config["queue_finished"].get(), 1)
+        self.assertEqual(self._mp_config["queue_shutting_down"].get(), 1)
 
     def test_run__wo_tasks(self):
         self.app = MpTestAppWoTasks()
@@ -187,9 +187,9 @@ class Test_app_processor(unittest.TestCase):
         self._mp_config["queue_stop"].put(1)
         time.sleep(0.05)
         _tasks, _results = self.get_taskless_results()
-        time.sleep(0.01)
+        time.sleep(0.05)
         self.assertTrue(len(_tasks) > 0)
-        self.assertEqual(self._mp_config["queue_finished"].get_nowait(), 1)
+        self.assertEqual(self._mp_config["queue_shutting_down"].get_nowait(), 1)
 
     def test_run__stop_signal_wo_tasks(self):
         self.app = MpTestAppWoTasks()
@@ -205,7 +205,7 @@ class Test_app_processor(unittest.TestCase):
         time.sleep(0.05)
         self._mp_config["queue_stop"].put(1)
         time.sleep(0.05)
-        self.assertEqual(self._mp_config["queue_finished"].get(), 1)
+        self.assertEqual(self._mp_config["queue_shutting_down"].get(), 1)
         _thread.join()
 
 

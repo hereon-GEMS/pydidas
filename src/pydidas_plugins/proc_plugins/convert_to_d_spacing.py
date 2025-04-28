@@ -35,10 +35,16 @@ from pydidas.core import (
     Dataset,
     UserConfigError,
     get_generic_param_collection,
-    get_generic_parameter,
 )
 from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
+from pydidas.core.generic_params import GENERIC_PARAMS_METADATA
+from pydidas.core.utils.scattering_geometry import convert_polar_to_d_spacing
 from pydidas.plugins import ProcPlugin
+
+
+_AX_CHOICES = ["d-spacing / nm", "d-spacing / A"] + GENERIC_PARAMS_METADATA["rad_unit"][
+    "choices"
+]
 
 
 class ConvertToDSpacing(ProcPlugin):
@@ -57,11 +63,9 @@ class ConvertToDSpacing(ProcPlugin):
     def __init__(self, *args, **kwargs):
         self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         super().__init__(*args, **kwargs)
+        self._allowed_ax_choices = _AX_CHOICES
 
     def pre_execute(self):
-        self._lambda = self._EXP.get_param_value("xray_wavelength")
-        self._detector_dist = self._EXP.get_param_value("detector_dist")
-        self._allowed_ax_choices = get_generic_parameter("rad_unit").choices
         self._config["ax_index"] = None
         self._config["new_range"] = None
         self._config["ax_indices"] = None
@@ -114,6 +118,10 @@ class ConvertToDSpacing(ProcPlugin):
         """
         Calculate the new range for the d-spacing axis.
 
+        This method calculates the new range for the d-spacing axis
+        by converting it to Angstrom by default and then applying
+        a factor if necessary.
+
         Parameters
         ----------
         data : Dataset
@@ -121,25 +129,28 @@ class ConvertToDSpacing(ProcPlugin):
         """
         _axis = self._config["ax_index"]
         _slicer = [slice(None)] * data.ndim
-        _range = data.axis_ranges[_axis]
-        match data.axis_labels[_axis]:
-            case "Q":
-                if data.axis_units[_axis] == "nm^-1":
-                    _range = _range / 10
-                _range = (2 * np.pi) / _range
-            case "r":
-                _range = self._lambda / (
-                    2 * np.sin(np.arctan(_range / (self._detector_dist * 1e3)) / 2)
-                )
-            case "2theta":
-                if data.axis_units[_axis] == "deg":
-                    _range = np.radians(_range)
-                _range = self._lambda / (2 * np.sin(_range / 2))
-        if self.get_param_value("d_spacing_unit") == "nm":
-            _range /= 10
-        _valid = np.isfinite(_range)
-        if not np.all(_valid):
-            _range = _range[_valid]
-        _slicer[_axis] = np.where(_valid)[0][::-1]
-        self._config["new_range"] = _range[::-1]
+        _range = data.axis_ranges[_axis].copy()
+        _label_in = data.axis_labels[_axis]
+        _unit_in = data.axis_units[_axis]
+        _unit_out = self.get_param_value("d_spacing_unit")
+
+        if _label_in == "d-spacing":
+            if _unit_in == "nm" and _unit_out in ["A", "Angstrom"]:
+                _range *= 10
+            elif _unit_in == "A" and _unit_out == "nm":
+                _range /= 10
+            self._config["new_range"] = _range
+        else:
+            _range = convert_polar_to_d_spacing(
+                _range,
+                f"{_label_in} / {_unit_in}",
+                _unit_out,
+                self._EXP.xray_wavelength_in_m,
+                self._EXP.detector_dist_in_m,
+            )
+            _valid = np.isfinite(_range)
+            if not np.all(_valid):
+                _range = _range[_valid]
+            _slicer[_axis] = np.where(_valid)[0][::-1]
+            self._config["new_range"] = _range[::-1]
         self._slicer = tuple(_slicer)

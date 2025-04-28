@@ -545,6 +545,7 @@ class ProcessingResults(QtCore.QObject):
         save_dir: str | Path,
         *save_formats: tuple[str],
         overwrite: bool = False,
+        squeeze_results: bool = False,
         node_id: int | None = None,
     ):
         """
@@ -568,19 +569,27 @@ class ProcessingResults(QtCore.QObject):
             (","), ampersand ("&") or slash ("/") characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
+        squeeze_results : bool, optional
+            Flag to enable squeezing of empty dimensions. The default is False.
         node_id : int | None, optional
             The node ID for which data shall be saved. If None, this defaults
             to all nodes. The default is None.
         """
         self.prepare_files_for_saving(
-            save_dir, ",".join(save_formats), overwrite, single_node=node_id
+            save_dir,
+            ",".join(save_formats),
+            overwrite,
+            single_node=node_id,
+            squeeze_results=squeeze_results,
         )
         if node_id is None:
             _res = self._composites
         else:
             _res = {node_id: self._composites[node_id]}
         ResultSaver.export_full_data_to_active_savers(
-            _res, scan_context=self._config["frozen_SCAN"]
+            _res,
+            scan_context=self._config["frozen_SCAN"],
+            squeeze_results=squeeze_results,
         )
 
     def prepare_files_for_saving(
@@ -589,6 +598,7 @@ class ProcessingResults(QtCore.QObject):
         save_formats: str,
         overwrite: bool = False,
         single_node: int | None = None,
+        squeeze_results: bool = False,
     ):
         """
         Prepare the required files and directories for saving.
@@ -609,6 +619,8 @@ class ProcessingResults(QtCore.QObject):
         single_node: int | None, optional
             Keyword to select a single node. If None, all nodes will be
             selected. The default is None.
+        squeeze_results : bool, optional
+            Flag to enable squeezing of empty dimensions. The default is False.
 
         Raises
         ------
@@ -630,7 +642,11 @@ class ProcessingResults(QtCore.QObject):
             _keys = [single_node]
         _node_info = {
             _id: {
-                "shape": self._config["shapes"][_id],
+                "shape": (
+                    self._config["shapes"][_id]
+                    if not squeeze_results
+                    else tuple(_n for _n in self._config["shapes"][_id] if _n > 1)
+                ),
                 "node_label": self._config["node_labels"][_id],
                 "plugin_name": self._config["plugin_names"][_id],
             }

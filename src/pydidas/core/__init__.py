@@ -44,7 +44,9 @@ from .parameter_collection import *
 from .parameter_collection_mixin import *
 from .pydidas_q_settings import *
 from .pydidas_q_settings_mixin import *
+from .singleton_context_object import *
 from .singleton_factory import *
+from .singleton_qobject import *
 
 
 __all__ = ["constants", "generic_params", "io_registry", "utils"] + (
@@ -59,7 +61,9 @@ __all__ = ["constants", "generic_params", "io_registry", "utils"] + (
     + parameter_collection_mixin.__all__
     + pydidas_q_settings.__all__
     + pydidas_q_settings_mixin.__all__
+    + singleton_context_object.__all__
     + singleton_factory.__all__
+    + singleton_qobject.__all__
 )
 
 # Clean up the namespace

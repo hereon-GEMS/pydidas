@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import shutil
 import tempfile
+from numbers import Real
 from pathlib import Path
 from typing import Any
 
@@ -107,10 +108,16 @@ def test_export_to_file__w_diffraction_exp(temp_dir):
     with h5py.File(hdf5_file, "r") as file:
         _group = file["entry/pydidas_config/diffraction_exp"]
         for _key, _param in EXP.params.items():
-            assert (
-                read_and_decode_hdf5_dataset(_group[_key])
-                == local_EXP.params[_key].value_for_export
-            )
+            if _param.dtype == Real:
+                assert np.allclose(
+                    read_and_decode_hdf5_dataset(_group[_key]),
+                    local_EXP.params[_key].value_for_export,
+                )
+            else:
+                assert (
+                    read_and_decode_hdf5_dataset(_group[_key])
+                    == local_EXP.params[_key].value_for_export
+                )
 
 
 def test_import_from_file__empty_file(temp_dir):
@@ -127,7 +134,15 @@ def test_import_from_file(temp_dir, modify_diffraction_exp_context, create_hdf5_
     """Test the import_from_file method."""
     EXP_IO_HDF5.import_from_file(create_hdf5_file)
     for _key, _param in EXP.params.items():
-        assert EXP.params[_key].value_for_export == modify_diffraction_exp_context[_key]
+        if _param.dtype == Real:
+            assert np.allclose(
+                EXP.params[_key].value_for_export, modify_diffraction_exp_context[_key]
+            )
+        else:
+            assert (
+                EXP.params[_key].value_for_export
+                == modify_diffraction_exp_context[_key]
+            )
 
 
 def test_import_from_file__to_local_context(
@@ -137,7 +152,16 @@ def test_import_from_file__to_local_context(
     local_EXP = DiffractionExperiment()
     EXP_IO_HDF5.import_from_file(create_hdf5_file, diffraction_exp=local_EXP)
     for _key, _param in local_EXP.params.items():
-        assert EXP.params[_key].value_for_export == modify_diffraction_exp_context[_key]
+        if _param.dtype == Real:
+            assert np.allclose(
+                local_EXP.params[_key].value_for_export,
+                modify_diffraction_exp_context[_key],
+            )
+        else:
+            assert (
+                local_EXP.params[_key].value_for_export
+                == modify_diffraction_exp_context[_key]
+            )
 
 
 if __name__ == "__main__":

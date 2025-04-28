@@ -141,6 +141,29 @@ def test_set_axis_metadata__update_range(selector):
     assert selector.current_slice == slice(0, _range2.size)
 
 
+def test_set_axis_metadata__len_1(selector):
+    selector.show()
+    _range1 = np.arange(1)
+    selector.define_additional_choices("choice1;;choice2")
+    selector.display_choice = "choice1"
+    selector.set_axis_metadata(_range1, "", "")
+    assert selector.current_slice == slice(0, 1)
+    assert selector.display_choice == "slice at index"
+    assert not selector.isEnabled()
+    assert selector._widgets["label_single_point"].isVisible()
+    assert not selector._widgets["combo_axis_use"].isVisible()
+
+
+def test_set_axis_metadata__w_choices(selector):
+    _range1 = np.arange(5)
+    selector.define_additional_choices("choice1;;choice2")
+    selector.display_choice = "slice at index"
+    selector.set_axis_metadata(_range1, "label", "unit")
+    assert selector.current_slice == slice(0, 1)
+    assert selector.display_choice == "slice at index"
+    assert selector.isEnabled()
+
+
 def test_set_axis_metadata__no_data_range_no_npoints(selector):
     with pytest.raises(ValueError):
         selector.set_axis_metadata(None, "distance", "m")

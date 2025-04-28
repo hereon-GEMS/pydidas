@@ -16,3 +16,4 @@ PyQt5==5.15.11
 build>=1.0.3
 setuptools>69.0.0
 siphash24>=1.6
+imagecodecs>=2025.3

@@ -58,23 +58,26 @@ class TiffIo(IoBase):
         ----------
         filename : Union[pathlib.Path, str]
             The filename of the file with the data to be imported.
-        roi : Union[tuple, None], optional
-            A region of interest for cropping. Acceptable are both 4-tuples
-            of integers in the format (y_low, y_high, x_low, x_high) as well
-            as 2-tuples of integers or slice objects. If None, the full image
-            will be returned. The default is None.
-        returnType : Union[datatype, 'auto'], optional
-            If 'auto', the image will be returned in its native data type.
-            If a specific datatype has been selected, the image is converted
-            to this type. The default is 'auto'.
-        binning : int, optional
-            The rebinning factor to be applied to the image. The default
-            is 1.
+        **kwargs : dict
+            Supported arguments are:
+
+            roi : Union[tuple, None], optional
+                A region of interest for cropping. Acceptable are both 4-tuples
+                of integers in the format (y_low, y_high, x_low, x_high) and
+                2-tuples of integers or slice objects. If None, the full image
+                will be returned. The default is None.
+            returnType : Union[datatype, 'auto'], optional
+                If 'auto', the image will be returned in its native data type.
+                If a specific datatype has been selected, the image is converted
+                to this type. The default is 'auto'.
+            binning : int, optional
+                The rebinning factor to be applied to the image. The default
+                is 1.
 
         Returns
         -------
         data : pydidas.core.Dataset
-            The data in form of a pydidas Dataset (with embedded metadata)
+            The data in the form of a pydidas Dataset (with embedded metadata)
         """
         with CatchFileErrors(filename, TiffFileError):
             with warnings.catch_warnings():
@@ -93,10 +96,10 @@ class TiffIo(IoBase):
 
         Note
         ----
-        1. scikit-image only supports saving 32-bit float and all floating
+        1. scikit-image only supports saving 32-bit float, and all floating
            point numbers will be converted to 32 bit.
-        2. scikit-image will save tiff files in different bitdepths but it is
-           not guaranteed that thay can be opened by all programs.
+        2. scikit-image will save tiff files in different bit-depths, but it is
+           not guaranteed that they can be opened by all programs.
 
         Parameters
         ----------
@@ -104,8 +107,11 @@ class TiffIo(IoBase):
             The filename
         data : np.ndarray
             The data to be written to file.
-        overwrite : bool, optional
-            Flag to allow overwriting of existing files. The default is False.
+        **kwargs : dict
+            Supported arguments are:
+
+            overwrite : bool, optional
+                Flag to allow overwriting of existing files. The default is False.
 
         """
         cls.check_for_existing_file(filename, **kwargs)

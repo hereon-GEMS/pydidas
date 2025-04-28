@@ -112,4 +112,3 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
             self._RESULTS._TREE.root.plugin._SCAN = self._RESULTS._SCAN
             self._RESULTS._TREE.root.plugin.update_filename_string()
             self.update_choices_of_selected_results()
-            self.update_export_button_activation()

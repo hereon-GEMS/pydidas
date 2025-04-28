@@ -29,6 +29,7 @@ __all__ = [
     "create_default_grid_layout",
     "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
+    "get_widget_layout_args",
     "update_param_and_widget_choices",
     "icon_with_inverted_colors",
 ]
@@ -71,9 +72,9 @@ def create_default_grid_layout() -> QGridLayout:
 
     The default parameters are
 
-        - vertical spacing : 5
-        - horizontal spacing : 5
-        - alignment : left | top
+        - vertical spacing: 5
+        - horizontal spacing: 5
+        - alignment: left | top
 
     Returns
     -------
@@ -93,7 +94,7 @@ def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
 
     Four types of strings can be processed:
         1. A reference number of a QStandardIcon, preceded by a 'qt-std::'.
-        2. A reference to an image file in the file system. This must be
+        2. A reference to an image file in the file system. The filename must be
            preceded by 'path::'.
         3. A reference to an icon in pydidas.core.icons with the filename preceded
            by a 'pydidas::'

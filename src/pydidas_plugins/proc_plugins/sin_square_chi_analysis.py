@@ -109,6 +109,13 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
     """
     Analyzes the d-spacing values of a dataset using the sin^2(chi) method.
 
+    NOTE: This plugin uses approximations in the high-energy X-ray regime. Using
+    chi instead of psi for the sin^2(psi) method is an approximation in the
+    high-energy X-ray regime. Psi is the angle between the scattering vector Q
+    and the sample normal. The geometry of the experiment requires that the sample
+    normal is parallel to the z-axis, i.e. the incoming beam is parallel to the
+    sample surface.
+
     This plugin is designed to work with datasets containing d-spacing values
     (or 2theta values) and chi values. It performs the following steps:
 

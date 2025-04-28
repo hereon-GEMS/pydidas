@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -44,8 +44,8 @@ class Test_sphinx_html(unittest.TestCase):
         sys.argv = self._argv
 
     def test_check_sphinx_html_docs__generic_case(self):
-        with open(os.path.join(self._tmpdir, "index.html"), "w") as f:
-            f.write("0")
+        with open(os.path.join(self._tmpdir, "docs-built.yml"), "w") as f:
+            f.write("docs-built: true")
         self.assertTrue(sphinx_html.check_sphinx_html_docs(self._tmpdir))
 
     def test_check_sphinx_html_docs__empty_folder(self):

@@ -14,6 +14,7 @@ __*
 
 # local build files
 src/pydidas/sphinx
+!src/pydidas/sphinx/docs-built.yml
 *.html
 !versions/**/*.html
 dist/*

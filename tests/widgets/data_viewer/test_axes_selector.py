@@ -85,27 +85,27 @@ def test_init(selector):
 
 
 def test_current_display_selection__empty(selector):
-    assert selector.current_display_selection == ()
+    assert selector.current_display_selection == []
 
 
 def test_current_display_selection__simple(selector):
     selector.set_data_shape((5, 7, 4))
-    assert selector.current_display_selection == (
+    assert selector.current_display_selection == [
         "slice at index",
         "slice at index",
         "slice at index",
-    )
+    ]
 
 
 def test_current_display_selection__w_change(selector):
     selector.set_data_shape((5, 7, 4))
     selector.set_axis_metadata(1, np.arange(12), "axis 1", "unit 1")
     selector._axwidgets[1].display_choice = "slice at data value"
-    assert selector.current_display_selection == (
+    assert selector.current_display_selection == [
         "slice at index",
         "slice at data value",
         "slice at index",
-    )
+    ]
 
 
 def test_transpose_required(selector):
@@ -155,6 +155,18 @@ def test_set_data_shape__valid(selector):
         assert selector._axwidgets[_dim].npoints == _shape[_dim]
 
 
+def test_set_data_shape__w_len_dim_1(selector):
+    _shape = (5, 1, 7, 1, 4)
+    selector._stored_slicings = {1: "test", 2: "test"}
+    selector.set_data_shape(_shape)
+    assert selector._data_shape == _shape
+    assert selector._data_ndim == 5
+    for _dim in range(5):
+        assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
+        assert selector._axwidgets[_dim].npoints == _shape[_dim]
+        assert selector._axwidgets[_dim].isEnabled() == (_shape[_dim] > 1)
+
+
 def test_create_data_axis_selectors(selector):
     selector._data_shape = (5, 7, 4)
     selector._data_ndim = 3
@@ -184,7 +196,8 @@ def test_create_data_axis_selectors__multiple_calls(selector):
             assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
             assert "choice1" in selector._axwidgets[_dim].available_choices
             assert "choice2" in selector._axwidgets[_dim].available_choices
-        for _dim, _item in selector._axwidgets.items():
+        for _dim in range(selector._data_ndim):
+            _item = selector._axwidgets[_dim]
             if _dim >= _ndim:
                 assert _item.display_choice == "slice at index"
 
@@ -233,10 +246,41 @@ def test_set_metadata_from_dataset__new_shape(selector):
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(_data1)
     selector.set_metadata_from_dataset(_data2)
-    print(selector._axwidgets[1].current_slice)
     assert selector._data_shape == _data2.shape
     assert selector.current_slice == [slice(0, 10), slice(0, 14), slice(0, 1)]
     for _dim, _item in selector._axwidgets.items():
+        assert _item.npoints == _data2.shape[_dim]
+        assert _item.data_label == _data2.axis_labels[_dim]
+        assert _item.data_unit == _data2.axis_units[_dim]
+        assert selector.current_slice[_dim] != slice(None)
+
+
+def test_set_metadata_from_dataset__new_shape_w_fewer_dims(selector):
+    _data1 = create_dataset(3, dtype=float, shape=(10, 12, 14))
+    _data2 = create_dataset(2, dtype=float, shape=(14, 14))
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(_data1)
+    selector.set_metadata_from_dataset(_data2)
+    assert selector._data_shape == _data2.shape
+    assert selector.current_slice == [slice(0, 14), slice(0, 14)]
+    for _dim in range(_data2.ndim):
+        _item = selector._axwidgets[_dim]
+        assert _item.npoints == _data2.shape[_dim]
+        assert _item.data_label == _data2.axis_labels[_dim]
+        assert _item.data_unit == _data2.axis_units[_dim]
+        assert selector.current_slice[_dim] != slice(None)
+
+
+def test_set_metadata_from_dataset__new_shape_w_more_dims(selector):
+    _data1 = create_dataset(2, dtype=float, shape=(10, 12))
+    _data2 = create_dataset(3, dtype=float, shape=(5, 14, 14))
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(_data1)
+    selector.set_metadata_from_dataset(_data2)
+    assert selector._data_shape == _data2.shape
+    assert selector.current_slice == [slice(0, 5), slice(0, 14), slice(0, 1)]
+    for _dim in range(_data2.ndim):
+        _item = selector._axwidgets[_dim]
         assert _item.npoints == _data2.shape[_dim]
         assert _item.data_label == _data2.axis_labels[_dim]
         assert _item.data_unit == _data2.axis_units[_dim]
@@ -440,7 +484,7 @@ def test__integration__swap_choices_case2(
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
     selector._axwidgets[1].display_choice = "choice1"
-    assert selector.current_display_selection == ("choice2", "choice1")
+    assert selector.current_display_selection == ["choice2", "choice1"]
     assert len(_get_spy_results(spy_new_slicing)) == 1
     assert len(_get_spy_results(spy_new_slicing_str)) == 1
 

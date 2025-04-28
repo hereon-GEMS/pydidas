@@ -48,7 +48,7 @@ def _create_slice_object(entry: object):
     """
     Create a slice object from the entry.
 
-    The input can be None to disable slicing or slices can be given as individual
+    The input can be None to disable slicing, or slices can be given as individual
     slice or integer objects or tuples with (low, high) entries for the boundaries.
 
     Parameters
@@ -85,13 +85,13 @@ def _create_slice_object(entry: object):
     raise ValueError(f"Could not convert the entry `{entry}` to a slice object.")
 
 
-def _get_slice_repr(obj: tuple[slice]) -> str:
+def _get_slice_repr(obj: tuple[slice | Integral]) -> str:
     """
     Get a string representation of the tuple of slice objects
 
     Parameters
     ----------
-    obj : tuple[slice]
+    obj : tuple[slice | Integral]
         The tuple of slice objects.
 
     Returns
@@ -101,7 +101,9 @@ def _get_slice_repr(obj: tuple[slice]) -> str:
     """
     _repr = []
     for _slice in obj:
-        if _slice.start is None and _slice.stop is None:
+        if isinstance(_slice, Integral):
+            _repr.append(str(_slice))
+        elif _slice.start is None and _slice.stop is None:
             _repr.append(":")
         elif _slice.start is None and isinstance(_slice.stop, Integral):
             _repr.append(f":{_slice.stop}")
@@ -126,9 +128,9 @@ class Hdf5Io(IoBase):
     @classmethod
     def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
         """
-        Read data from a Hdf5 file.
+        Read data from an Hdf5 file.
 
-        A subset of a Hdf5 dataset can be imported with giving sli
+        A subset of an Hdf5 dataset can be imported with giving sli
 
         Parameters
         ----------
@@ -166,7 +168,7 @@ class Hdf5Io(IoBase):
         Returns
         -------
         data : pydidas.core.Dataset
-            The data in form of a pydidas Dataset (with embedded metadata)
+            The data in the form of a pydidas Dataset (with embedded metadata)
         """
         _input_indices = kwargs.get("indices", slice(None))
         _indices = (
@@ -255,7 +257,7 @@ class Hdf5Io(IoBase):
     @classmethod
     def export_to_file(cls, filename: Union[Path, str], data: ndarray, **kwargs: dict):
         """
-        Export data to a Hdf5 file.
+        Export data to an Hdf5 file.
 
         Parameters
         ----------

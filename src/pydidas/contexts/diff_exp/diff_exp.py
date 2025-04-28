@@ -190,6 +190,8 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         return self.get_param_value("detector_dist")
 
+    detector_dist_in_m = det_dist_in_m
+
     def as_pyfai_geometry(self) -> Geometry:
         """
         Get an equivalent pyFAI Geometry object.

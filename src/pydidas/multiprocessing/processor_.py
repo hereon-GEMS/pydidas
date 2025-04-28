@@ -63,13 +63,13 @@ def processor(
     input_queue = multiprocessing_config.get("queue_input")
     output_queue = multiprocessing_config.get("queue_output")
     stop_queue = multiprocessing_config.get("queue_stop")
-    _finished_queue = multiprocessing_config.get("queue_finished")
+    _shutting_down_queue = multiprocessing_config.get("queue_shutting_down")
 
     while True:
         # check for stop signal
         try:
             stop_queue.get_nowait()
-            _finished_queue.put(1)
+            _shutting_down_queue.put(1)
             break
         except queue.Empty:
             pass
@@ -86,7 +86,7 @@ def processor(
                 # For some arcane reason, sleep time required to stop queues from
                 # becoming corrupted.
                 time.sleep(0.02)
-                _finished_queue.put(1)
+                _shutting_down_queue.put(1)
                 break
             output_queue.put([_arg1, _results])
         except queue.Empty:

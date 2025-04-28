@@ -29,7 +29,7 @@ __all__ = ["OutputPlugin"]
 
 import os
 
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import OUTPUT_PLUGIN
 from pydidas.plugins.base_plugin import BasePlugin
 
@@ -61,9 +61,7 @@ class OutputPlugin(BasePlugin):
         self._path = self.get_param_value("directory_path")
         _overwrite = self.get_param_value("enable_overwrite")
         if self._path.is_dir() and len(os.listdir(self._path)) > 0 and (not _overwrite):
-            raise UserConfigError(
-                f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
-                "is invalid:\n"
+            self.raise_UserConfigError(
                 f"The given output path `{self._path}` (which resolves to "
                 f"`{str(self._path.absolute())}` is not empty and overwriting "
                 "was not enabled. Please check the path or enable overwriting of "
@@ -74,15 +72,11 @@ class OutputPlugin(BasePlugin):
         _label = self.get_param_value("label")
         _ndigits = self.get_param_value("output_fname_digits")
         if _ndigits < 1:
-            raise UserConfigError(
-                f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
-                "is invalid:\n"
+            self.raise_UserConfigError(
                 "The number of digits for the output filenames must be at least 1."
             )
         if self.node_id is None:
-            raise UserConfigError(
-                f"Configuration in `{self.plugin_name}` (node ID {self.node_id}) "
-                "is invalid:\n"
+            self.raise_UserConfigError(
                 "The node ID is None. Please check the plugin configuration."
             )
         if _label == "":
@@ -105,9 +99,9 @@ class OutputPlugin(BasePlugin):
         str
             The full filename and path.
         """
-        _index = self._config["global_index"]
+        _index = self._config.get("global_index", None)
         if _index is None:
-            raise UserConfigError(
+            self.raise_UserConfigError(
                 "The `global_index` keyword has not been set. "
                 "The plugin does not know how to assemble the filename."
             )

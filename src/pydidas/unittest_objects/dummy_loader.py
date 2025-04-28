@@ -82,27 +82,6 @@ class DummyLoader(InputPlugin):
 
         return dummy_getter, (self.__class__.__name__,), self.__getstate__()
 
-    def prepare_carryon_check(self):
-        """
-        Prepare the checks of the multiprocessing carryon.
-
-        By default, this gets and stores the file target size for live
-        processing.
-        """
-        self._config["file_size"] = self.get_first_file_size()
-        self._config["carryon_checked"] = True
-
-    def get_first_file_size(self) -> int:
-        """
-        Reimplement the "get_first_file_size" and return a dummy value.
-
-        Returns
-        -------
-        int
-            The dummy file size.
-        """
-        return 1
-
     def get_filename(self, index: int) -> int:
         """
         Get the filename associated with the input index.

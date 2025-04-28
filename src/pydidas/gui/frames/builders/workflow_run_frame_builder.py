@@ -90,6 +90,11 @@ def get_WorkflowRunFrame_build_config(
         ],
         ["create_line", ("line_autosave",), {"parent_widget": "workflow_run_config"}],
         [
+            "create_param_widget",
+            (frame.get_param("live_processing"),),
+            {"parent_widget": "workflow_run_config"},
+        ],
+        [
             "create_button",
             ("but_exec", "Start processing"),
             {"icon": "qt-std::SP_MediaPlay", "parent_widget": "workflow_run_config"},

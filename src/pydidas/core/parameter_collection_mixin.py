@@ -127,9 +127,9 @@ class ParameterCollectionMixIn:
         Add parameters to the object.
 
         This method adds Parameters to the ParameterCollection of the object.
-        Parameters can be either supplies as args or a ParameterCollection
+        Parameters can be either supplied as args or a ParameterCollection
         or dictionary in the form of <ref_key>: <Parameter>.
-        This method is explicitly separate from the __init__ method to allow
+        This method is explicitly separated from the __init__ method to allow
         subclasses full control over args and kwargs.
 
         Parameters
@@ -154,7 +154,7 @@ class ParameterCollectionMixIn:
 
         This method will go through the supplied defaults iterable.
         If there are no entries for the Parameter keys, it will add a
-        Parameter with default value.
+        Parameter with a default value.
         """
         for _key, _param in self.default_params.items():
             if _key not in self.params:
@@ -234,7 +234,7 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         return self.params[param_key]
 
-    def get_params(self, *param_keys: tuple[str, ...]) -> list[Parameter]:
+    def get_params(self, *param_keys: str) -> list[Parameter]:
         """
         Get multiple parameters based on their reference keys.
 
@@ -295,7 +295,7 @@ class ParameterCollectionMixIn:
         Parameters
         ----------
         filter_types_for_export : bool
-            Flag to return objects in types suitable for exporting (i.e. pickleable).
+            Flag to return objects in types suitable for exporting (i.e., pickleable).
 
         Returns
         -------
@@ -347,7 +347,7 @@ class ParameterCollectionMixIn:
         Get a Parameter value modulo another value.
 
         This method applies a modulo to a Parameter value, referenced by its
-        refkey, for example for converting image sizes of -1 to the actual
+        refkey, for example, for converting image sizes of -1 to the actual
         detector dimensions. None keys can be converted to zero or the modulo,
         depending on the settings of "none_low".
         Note: This method only returns the modulated value and does not update
@@ -360,7 +360,7 @@ class ParameterCollectionMixIn:
         modulo : float
             The mathematical modulo to be applied.
         none_low : bool, optional
-            Keyword to define the behaviour of None values. If True, None
+            Keyword to define the behavior of None values. If True, None
             will be interpreted as 0. If False, None will be interpreted as
             the modulo range.
 
@@ -395,7 +395,7 @@ class ParameterCollectionMixIn:
         Parameters
         ----------
         confirm : bool
-            Confirmation flag as safety feature.
+            Confirmation flag as a safety feature.
         """
         if not confirm:
             raise UserConfigError("Restoration of defaults not confirmed. Aborting.")

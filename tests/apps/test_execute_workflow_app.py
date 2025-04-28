@@ -23,7 +23,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import logging
 import multiprocessing as mp
 import queue
 import shutil
@@ -273,28 +272,19 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = self.get_exec_workflow_app()
         self.assertTrue(app._config["run_prepared"])
 
-    def test_prepare_run__main_not_live_no_autosave(self):
+    def test_prepare_run__main_no_autosave(self):
         app = self.get_exec_workflow_app()
         app.set_param_value("autosave_results", False)
-        app.set_param_value("live_processing", False)
         app.prepare_run()
         self.assertTrue(app._config["run_prepared"])
 
-    def test_prepare_run__main_not_live_w_autosave(self):
+    def test_prepare_run__main_w_autosave(self):
         app = self.get_exec_workflow_app()
         app._config["export_files_prepared"] = True
         app.set_param_value("autosave_results", True)
         app.set_param_value("autosave_directory", self._path.joinpath("test"))
-        app.set_param_value("live_processing", False)
         app.prepare_run()
         self.assertFalse(app._config["export_files_prepared"])
-
-    def test_prepare_run__main_live_no_autosave(self):
-        app = self.get_exec_workflow_app()
-        app.set_param_value("autosave_results", False)
-        app.set_param_value("live_processing", True)
-        app.prepare_run()
-        self.assertTrue(TREE.root.plugin._config["carryon_checked"])
 
     def test_multiprocessing_pre_cycle(self):
         _index = int(np.ceil(np.random.random() * 1e5))
@@ -679,14 +669,14 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             self.assertEqual(main_app.mp_manager[_key], _copy.mp_manager[_key])
 
     def test__run_in_processor_with_clone_worker(self):
-        logging.basicConfig(level=logging.DEBUG)
+        # logging.basicConfig(level=logging.DEBUG)
         self._main_app = self.get_exec_workflow_app(print_debug=True)
         _lock_manager = mp.Manager()
         _queues = {
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
-            "queue_finished": mp.Queue(),
+            "queue_shutting_down": mp.Queue(),
             "queue_signal": mp.Queue(),
         }
         _mp_kwargs = {

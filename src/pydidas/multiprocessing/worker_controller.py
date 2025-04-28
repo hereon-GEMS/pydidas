@@ -98,12 +98,13 @@ class WorkerController(QtCore.QThread):
         self._write_lock = QtCore.QReadWriteLock()
         self._workers = []
         self._workers_done = 0
+        self._workers_shutdown = 0
         self._lock_manager = mp.Manager()
         self._queues = {
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
             "queue_stop": mp.Queue(),
-            "queue_finished": mp.Queue(),
+            "queue_shutting_down": mp.Queue(),
             "queue_signal": mp.Queue(),
         }
         self._mp_kwargs = {
@@ -264,6 +265,7 @@ class WorkerController(QtCore.QThread):
         self._progress_target = len(self._to_process)
         self._progress_done = 0
         self._workers_done = 0
+        self._workers_shutdown = 0
         self.flags["must_restart"] = True
 
     def add_task(self, task: object):
@@ -340,6 +342,7 @@ class WorkerController(QtCore.QThread):
         _app = QtWidgets.QApplication.instance()
         _app.register_thread(self)
         self._workers_done = 0
+        self._workers_shutdown = 0
         self.flags["running"] = True
         while self.flags["thread_alive"]:
             if self.flags["running"] and not self.flags["active"]:
@@ -432,12 +435,12 @@ class WorkerController(QtCore.QThread):
             return
         try:
             for _worker in self._workers:
-                self._queues["queue_finished"].get_nowait()
-                self._workers_done += 1
-                logger.debug("WorkerController: Worker aborted processing.")
+                _val = self._queues["queue_shutting_down"].get_nowait()
+                self._workers_shutdown += 1
+                logger.debug("WorkerController: Worker shutting down.")
         except Empty:
             pass
-        if self._workers_done >= len(self._workers):
+        if max(self._workers_done, self._workers_shutdown) >= len(self._workers):
             self.flags["running"] = False
             logger.debug("WorkerController: Workers stopped running")
 
@@ -468,7 +471,7 @@ class WorkerController(QtCore.QThread):
             _worker.join()
         while True:
             try:
-                self._queues["queue_finished"].get_nowait()
+                self._queues["queue_shutting_down"].get_nowait()
             except Empty:
                 break
         self._workers = []

@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["CreateWidgetsMixIn"]
 
 
-from typing import Dict, List, Optional, Tuple
+from typing import Any
 
 from qtpy import QtWidgets
 from qtpy.QtWidgets import QWidget
@@ -49,7 +49,7 @@ class CreateWidgetsMixIn:
     A mixin class to allow easy widget creation in their host classes.
 
     The CreateWidgetsMixIn class includes methods for easy adding of widgets
-    to the layout. The create_something methods from the factories are called
+    to the layout. The create_something methods from the factories are called,
     and in addition, the layout and positions can be set.
 
     Use the "gridPos" keyword to define the widget position in the parent's
@@ -60,18 +60,18 @@ class CreateWidgetsMixIn:
         self._widgets = {}
         self.__index_unreferenced = 0
 
-    def create_spacer(self, ref: Optional[str], **kwargs: Dict):
+    def create_spacer(self, ref: str | None, **kwargs: Any):
         """
         Create a QSpacerItem and set its properties.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs: dict
+        **kwargs: Any
             Any attributes supported by QSpacerItem with a setAttribute method
-            are valid kwargs. In addition, the gridPos key allows to specify
+            are valid kwargs. In addition, the gridPos key allows specifying
             the spacer's position in its parent's layout.
         """
         _parent = kwargs.get("parent_widget", self)
@@ -85,7 +85,7 @@ class CreateWidgetsMixIn:
             _policy,
             kwargs.pop("vertical_policy", _policy),
         )
-        apply_qt_properties(self, **kwargs)
+        apply_qt_properties(_spacer, **kwargs)
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)
         if ref is None:
@@ -93,13 +93,13 @@ class CreateWidgetsMixIn:
             self.__index_unreferenced += 1
         self._widgets[ref] = _spacer
 
-    def create_label(self, ref: Optional[str], text: str, **kwargs: dict):
+    def create_label(self, ref: str | None, text: str, **kwargs: Any):
         """
         Create a PydidasLabel and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         text : str
@@ -113,16 +113,16 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, PydidasLabel, text, **kwargs)
 
-    def create_line(self, ref: Optional[str], **kwargs: Dict):
+    def create_line(self, ref: str | None, **kwargs: Any):
         """
         Create a line widget.
 
-        This method creates a line widget (implemented as flat QFrame) as separator
+        This method creates a line widget (implemented as flat QFrame) as a separator
         and adds it to the parent widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
@@ -135,16 +135,16 @@ class CreateWidgetsMixIn:
         kwargs["fixedHeight"] = kwargs.get("fixedHeight", 3)
         self.create_any_widget(ref, QtWidgets.QFrame, **kwargs)
 
-    def create_vertical_line(self, ref: Optional[str], **kwargs: Dict):
+    def create_vertical_line(self, ref: str | None, **kwargs: Any):
         """
         Create a vertical line widget.
 
         This method creates a vertical line widget (implemented as flat QFrame) as
-        separator and adds it to the parent widget.
+        a separator and adds it to the parent widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
@@ -157,13 +157,13 @@ class CreateWidgetsMixIn:
         kwargs["fixedWidth"] = kwargs.get("fixedWidth", 3)
         self.create_any_widget(ref, QtWidgets.QFrame, **kwargs)
 
-    def create_lineedit(self, ref: Optional[str], **kwargs: Dict):
+    def create_lineedit(self, ref: str | None, **kwargs: Any):
         """
         Create a PydidasLineEdit and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
@@ -175,73 +175,75 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, PydidasLineEdit, **kwargs)
 
-    def create_button(self, ref: Optional[str], text: str, **kwargs: Dict):
+    def create_button(self, ref: str | None, text: str, **kwargs: Any):
         """
         Create a QPushButton and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
+        text : str
+            The button's displayed text.
         **kwargs : dict
             Any attributes supported by QPushButton with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the button's position in its parent's layout.
             The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
             be used to control the font properties.
-            The button's clicked method can be connected directly, by specifing
+            The button's clicked method can be connected directly by specifying
             the slot through the 'clicked' kwarg.
         """
         self.create_any_widget(ref, PydidasPushButton, text, **kwargs)
         if "clicked" in kwargs and ref is not None:
             self._widgets[ref].clicked.connect(kwargs.get("clicked"))
 
-    def create_spin_box(self, ref: Optional[str], **kwargs: Dict):
+    def create_spin_box(self, ref: str | None, **kwargs: Any):
         """
         Create a QSpinBox for integer values and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by QSpinBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the SpinBox's position in its parent's layout. The
-            default range is set to (0, 1), if it is not overridden with the
+            default range is set to (0, 1) if it is not overridden with the
             'range' keyword.
         """
         kwargs["range"] = kwargs.get("range", (0, 1))
         self.create_any_widget(ref, QtWidgets.QSpinBox, **kwargs)
 
-    def create_double_spin_box(self, ref: Optional[str], **kwargs: Dict):
+    def create_double_spin_box(self, ref: str | None, **kwargs: Any):
         """
         Create a QDoubleSpinBox for floating point values and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
             Any attributes supported by QSpinBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the SpinBox's position in its parent's layout. The
-            default range is set to (0, 1), if it is not overridden with the
+            default range is set to (0, 1) if it is not overridden with the
             'range' keyword.
         """
         kwargs["range"] = kwargs.get("range", (0, 1))
         self.create_any_widget(ref, QtWidgets.QDoubleSpinBox, **kwargs)
 
-    def create_progress_bar(self, ref: Optional[str], **kwargs: Dict):
+    def create_progress_bar(self, ref: str | None, **kwargs: Any):
         """
         Create a QProgressBar and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
@@ -251,13 +253,13 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, QtWidgets.QProgressBar, **kwargs)
 
-    def create_check_box(self, ref: Optional[str], text, **kwargs: Dict):
+    def create_check_box(self, ref: str | None, text, **kwargs: Any):
         """
         Create a PydidasCheckBox and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         text : str
@@ -271,13 +273,13 @@ class CreateWidgetsMixIn:
         """
         self.create_any_widget(ref, PydidasCheckBox, text, **kwargs)
 
-    def create_combo_box(self, ref: Optional[str], **kwargs: Dict):
+    def create_combo_box(self, ref: str | None, **kwargs: Any):
         """
         Create a PydidasComboBox and store the widget.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
@@ -290,37 +292,37 @@ class CreateWidgetsMixIn:
         self.create_any_widget(ref, PydidasComboBox, **kwargs)
 
     def create_radio_button_group(
-        self, ref: Optional[str], entries: List, **kwargs: Dict
+        self, ref: str | None, entries: list[str], **kwargs: Any
     ):
         """
         Create a RadioButtonGroup widget and set its properties.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        text : str
-            The CheckBox's descriptive text.
+        entries : list[str]
+            The list of entries for the buttons.
         **kwargs : dict
             Any attributes supported by the generic QWidget with a setAttribute
             method are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the RadioButtonGroup's position in its parent's layout.
             The 'fontsize_offset', 'bold', 'italic', 'underline' can be used
             to control the font properties or generic Qt properties.
-            The 'entries' keyword takes a list of entries for the buttons and the
+            The 'entries' keyword takes a list of entries for the buttons, and the
             number of rows and columns can be specified with the 'rows' and
             'columns' keywords, respectively.
         """
         self.create_any_widget(ref, RadioButtonGroup, entries, **kwargs)
 
-    def create_empty_widget(self, ref: Optional[str], **kwargs: Dict):
+    def create_empty_widget(self, ref: str | None, **kwargs: Any):
         """
-        Create an ampty QWidget with a agrid layout.
+        Create an empty QWidget with a grid layout.
 
         Parameters
         ----------
-        ref : str, optional
+        ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
         **kwargs : dict
@@ -331,7 +333,7 @@ class CreateWidgetsMixIn:
         self.create_any_widget(ref, EmptyWidget, **kwargs)
 
     def create_any_widget(
-        self, ref: Optional[str], widget_class: type, *args: Tuple, **kwargs: Dict
+        self, ref: str | None, widget_class: type, *args: Any, **kwargs: Any
     ):
         """
         Create any widget with any settings and add it to the layout.
@@ -344,11 +346,11 @@ class CreateWidgetsMixIn:
 
         Parameters
         ----------
-        ref : Optional[str]
+        ref : str | None
             The reference name in the _widgets dictionary.
         widget_class : type
             The class type of the widget.
-        *args : args
+        *args : Any
             Any arguments for the widget creation.
         **kwargs : dict
             Keyword arguments for the widget creation.
@@ -368,15 +370,13 @@ class CreateWidgetsMixIn:
             _widget = widget_class(*args)
         self.add_any_widget(ref, _widget, **kwargs)
 
-    def add_any_widget(
-        self, ref: Optional[str], widget_instance: QWidget, **kwargs: dict
-    ):
+    def add_any_widget(self, ref: str | None, widget_instance: QWidget, **kwargs: Any):
         """
         Add any existing widget to the layout and apply settings to it.
 
         Parameters
         ----------
-        ref : Optional[str]
+        ref : str | None
             The widget reference key.
         widget_instance : QWidget
             The widget instance.
@@ -388,12 +388,12 @@ class CreateWidgetsMixIn:
         if not (isinstance(ref, str) or ref is None):
             raise TypeError("Widget reference must be None or a string.")
         _parent = kwargs.pop("parent_widget", self)
-        _layout_kwargs = kwargs.pop("layout_kwargs", None)
+        _layout_kwargs = kwargs.pop("layout_kwargs", {})
         if isinstance(_parent, str):
             _parent = self if _parent == "::self::" else self._widgets[_parent]
 
         apply_qt_properties(widget_instance, **kwargs)
-        if _layout_kwargs is not None:
+        if _layout_kwargs != {}:
             apply_qt_properties(widget_instance.layout(), **_layout_kwargs)
         if _parent is not None:
             _layout_args = get_widget_layout_args(_parent, **kwargs)

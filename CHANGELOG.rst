@@ -2,6 +2,47 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v25.mm.dd
+=========
+
+Improvements
+------------
+- Residual stress analysis plugins:
+	- Added support for inputs in geometry (i.e. 2theta, Q, r) to SinSquareChiGrouping
+	  plugin.
+	- The ConvertToDSpacing plugin can now also convert from d-spacing.
+	- Added a new plugin for sin^2(chi) analysis for high-energy data.
+- Added generic functions to convert scattering geometry and d-spacing.
+- Added axis_labels, axis_ranges and axis_units properties to Scan
+- Added an option to squeeze datasets when exporting results.
+- Overhauled the documentation build check to force a new build after updating
+  pydidas with pip.
+- Added support for formatting (symbols, linewidth, linestyle) for plugin details.
+- Added support for running workflows in live processing.
+- Improved type hints and docstrings in a number of files.
+- Added new singleton factories which allow a direct subclassing.
+
+
+Bugfixes
+--------
+- Fixed an issue when deploying locally where the pydidas-custom.css for the documentation
+  was not included in the wheel.
+- Fixed an issue with displaying results which included a dimension of size 1.
+- Fixed an issue where the Scan metadata was not exported when using autosaving in the 
+  WorkflowRunFrame.
+- Fixed an issue in AxesSelector widget when the data included dimensions of size 1
+- Fixed an issue where workers would shut down before submitting the last results.
+- Fixed an issue in Dataset where slicing a 1d-array with an array would not update 
+  the axis metadata.
+- Fixed an issue in the WorkflowTestFrame where an invalid node was selected after the 
+  new workflow had fewer nodes
+- Fixed an issue with applying numpy ufuncs to dataset with axis arguments given in 
+  numpy datatypes (e.g. np.uint64)
+- Fixed an issue with getting a description of the slicing for Hdf5 files with integer 
+  indices.
+- Fixed an issue when trying to load empty files with numpy
+
+
 v25.04.08
 =========
 

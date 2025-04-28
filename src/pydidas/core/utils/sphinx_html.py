@@ -35,11 +35,11 @@ import sys
 from pathlib import Path
 from typing import Union
 
+import yaml
 from qtpy import QtWidgets
 
 from pydidas.core.utils.get_documentation_targets import (
-    DOC_BUILD_DIRECTORY,
-    DOC_HOME_FILENAME,
+    DOC_BUILD_PATH,
     DOC_SOURCE_DIRECTORY,
 )
 
@@ -57,16 +57,16 @@ def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
     Returns
     -------
     bool :
-        Flag whether the Sphinx documentation exists or is being built. If
-        either of these cases is true, the function will return True. Else,
-        it will return a False which can trigger a call to build the
-        documentation.
+        Flag whether the Sphinx documentation exists.
     """
-    if doc_dir is None:
-        _index_file = DOC_HOME_FILENAME
-    else:
-        _index_file = os.path.join(doc_dir, "index.html")
-    return os.path.exists(_index_file)
+    doc_dir = Path(doc_dir) if doc_dir is not None else DOC_BUILD_PATH
+    _index_file = doc_dir / "docs-built.yml"
+    try:
+        with open(_index_file, "r") as f:
+            _content = yaml.safe_load(f)
+    except (FileNotFoundError, OSError, yaml.YAMLError):
+        _content = {}
+    return _content.get("docs-built", False)
 
 
 def run_sphinx_html_build(
@@ -92,7 +92,7 @@ def run_sphinx_html_build(
         if len(sys.argv) > _index and sys.argv[_index + 1] in ["unittest", "sphinx"]:
             return
     if build_dir is None:
-        build_dir = os.path.join(DOC_BUILD_DIRECTORY, "html")
+        build_dir = DOC_BUILD_PATH / "html"
     if verbose:
         print("=" * 60)
         print("-" * 60)
@@ -112,6 +112,14 @@ def run_sphinx_html_build(
                         "Building html documentation (required only once during first "
                         "startup)"
                     )
+    try:
+        with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:
+            yaml.dump({"docs-built": True}, f)
+    except (FileNotFoundError, OSError, PermissionError):
+        raise OSError(
+            "Could not create the docs-built.yml file in the documentation "
+            "directory. Please check the permissions of the directory."
+        )
     subprocess.run(
         [
             sys.executable,

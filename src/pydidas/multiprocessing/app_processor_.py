@@ -104,7 +104,7 @@ def app_processor(
     _input_queue = multiprocessing_config.get("queue_input")
     _output_queue = multiprocessing_config.get("queue_output")
     _stop_queue = multiprocessing_config.get("queue_stop")
-    _finished_queue = multiprocessing_config.get("queue_finished")
+    _shutting_down_queue = multiprocessing_config.get("queue_shutting_down")
     _signal_queue = multiprocessing_config.get("queue_signal")
     _io_lock = multiprocessing_config.get("lock")
 
@@ -168,5 +168,5 @@ def app_processor(
             _app_carryon = True
         time.sleep(0.005)
     _debug_message("Worker shutting down.")
-    _finished_queue.put(1)
+    _shutting_down_queue.put(1)
     _app.deleteLater()

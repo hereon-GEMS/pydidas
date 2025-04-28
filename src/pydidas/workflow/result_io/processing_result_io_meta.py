@@ -131,7 +131,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
             must have the following keys: shape, node_label, data_label, plugin_name
-            and the respecive values. The shape (tuple) detemines the shape of the
+            and the respective values. The shape (tuple) determines the shape of the
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
@@ -196,7 +196,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
         kwargs : dict
-            Any kwargs which should be passed to the udnerlying exporter.
+            Any kwargs which should be passed to the underlying exporter.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
@@ -204,7 +204,10 @@ class ProcessingResultIoMeta(GenericIoMeta):
 
     @classmethod
     def export_full_data_to_active_savers(
-        cls, data: dict[int, Dataset], scan_context: Union[Scan, None] = None
+        cls,
+        data: dict[int, Dataset],
+        scan_context: Union[Scan, None] = None,
+        squeeze_results: bool = False,
     ):
         """
         Export the full data to all active savers.
@@ -216,10 +219,13 @@ class ProcessingResultIoMeta(GenericIoMeta):
         scan_context : Union[Scan, None], optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
+        squeeze_results : bool, optional
+            Flag to toggle squeezing of the data. If True, any empty dimensions will
+            be squeezed from the data. The default is False.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
-            _saver.export_full_data_to_file(data, scan_context)
+            _saver.export_full_data_to_file(data, scan_context, squeeze=squeeze_results)
 
     @classmethod
     def export_full_data_to_file(
@@ -266,7 +272,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
         kwargs : dict
-            Any kwargs which should be passed to the udnerlying exporter.
+            Any kwargs which should be passed to the underlying exporter.
         """
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
@@ -274,7 +280,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
 
     @classmethod
     def import_data_from_directory(
-        cls, dirname: Union[Path, str]
+        cls, dir_name: Union[Path, str]
     ) -> tuple[dict[int, Dataset], dict, Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import data from files in a directory.
@@ -284,7 +290,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
 
         Parameters
         ----------
-        dirname : Union[Path, str]
+        dir_name : Union[Path, str]
             The name of the directory from which data shall be imported.
 
         Returns
@@ -308,9 +314,9 @@ class ProcessingResultIoMeta(GenericIoMeta):
         _tree = ProcessingTree()
         _files = [
             _file
-            for _file in os.listdir(dirname)
+            for _file in os.listdir(dir_name)
             if (
-                os.path.isfile(os.path.join(dirname, _file))
+                os.path.isfile(os.path.join(dir_name, _file))
                 and _file.startswith("node_")
             )
         ]
@@ -319,7 +325,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
             cls.verify_extension_is_registered(_ext)
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])
-            _path = os.path.join(dirname, _file)
+            _path = os.path.join(dir_name, _file)
             _data, _node_info, _scan, _exp, _tree = _importer.import_results_from_file(
                 _path
             )

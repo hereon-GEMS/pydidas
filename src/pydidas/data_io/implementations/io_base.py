@@ -65,6 +65,9 @@ class IoBase(metaclass=IoManager):
         ----------
         filename : str
             The filename of the file to be written.
+        data : ndarray
+            The data to be written to the file. Pydidas Dataset objects will
+            also export their metadata if the file format allows it.
         **kwargs : dict
             Any keyword arguments. Supported keywords must be specified by
             the specific implementation.
@@ -101,7 +104,7 @@ class IoBase(metaclass=IoManager):
         Raises
         ------
         FileExistsError
-            If a file with filename exists and the overwrite flag is not True.
+            If a file with a filename exists and the overwrite flag is not True.
         """
         _overwrite = kwargs.get("overwrite", False)
         if os.path.exists(filename) and not _overwrite:
@@ -145,8 +148,9 @@ class IoBase(metaclass=IoManager):
         **kwargs : dict
             A dictionary of keyword arguments. Supported keyword arguments
             are: "datatype", "binning", "roi".
+
             "datatype" can be either "auto" for the native datatype or the
-            specified type. "Binning" can be any integer number and "roi" can
+            specified type. "Binning" can be any integer number, and "roi" can
             be either None or a 4-tuple of float.
 
         Raises
@@ -157,7 +161,7 @@ class IoBase(metaclass=IoManager):
         Returns
         -------
         _data : pydidas.core.Dataset
-            The data in form of a pydidas Dataset (a subclassed numpy.ndarray).
+            The data in the form of a pydidas Dataset (a subclassed numpy.ndarray).
         """
         _return_type = kwargs.get("datatype", "auto")
         _local_roi = kwargs.get("roi", None)

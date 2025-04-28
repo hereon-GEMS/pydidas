@@ -28,7 +28,7 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 import numpy as np
 
@@ -39,7 +39,7 @@ from pydidas.data_io.implementations.io_base import IoBase
 
 
 class NumpyIo(IoBase):
-    """IObase implementation for numpy files."""
+    """The IObase implementation for numpy files."""
 
     extensions_export = NUMPY_EXTENSIONS
     extensions_import = NUMPY_EXTENSIONS
@@ -47,53 +47,57 @@ class NumpyIo(IoBase):
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict):
+    def import_from_file(cls, filename: Path | str, **kwargs: Any):
         """
         Read data from a numpy file.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path | str
             The filename of the file with the data to be imported.
-        roi : Union[tuple, None], optional
-            A region of interest for cropping. Acceptable are both 4-tuples
-            of integers in the format (y_low, y_high, x_low, x_high) as well
-            as 2-tuples of integers or slice objects. If None, the full image
-            will be returned. The default is None.
-        returnType : Union[datatype, 'auto'], optional
-            If 'auto', the image will be returned in its native data type.
-            If a specific datatype has been selected, the image is converted
-            to this type. The default is 'auto'.
-        binning : int, optional
-            The rebinning factor to be applied to the image. The default
-            is 1.
+        **kwargs : Any
+            Any keyword arguments. These will be passed to the implemented
+            importer. Supported arguments are:
+
+            roi : Union[tuple, None], optional
+                A region of interest for cropping. Acceptable are both 4-tuples
+                of integers in the format (y_low, y_high, x_low, x_high) and
+                2-tuples of integers or slice objects. If None, the full image
+                will be returned. The default is None.
+            returnType : Union[datatype, 'auto'], optional
+                If 'auto', the image will be returned in its native data type.
+                If a specific datatype has been selected, the image is converted
+                to this type. The default is 'auto'.
+            binning : int, optional
+                The rebinning factor to be applied to the image. The default
+                is 1.
 
         Returns
         -------
         data : pydidas.core.Dataset
-            The data in form of a pydidas Dataset (with embedded metadata)
+            The data in the form of a pydidas Dataset (with embedded metadata)
         """
-        with CatchFileErrors(filename):
+        with CatchFileErrors(filename, EOFError):
             _data = np.squeeze(np.load(filename))
         cls._data = Dataset(_data)
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
-    ):
+    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: Any):
         """
         Export data to a numpy file.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path | str
             The filename
         data : np.ndarray
             The data to be written to file.
-        overwrite : bool, optional
-            Flag to allow overwriting of existing files. The default is False.
+        **kwargs : Any
+            Supported keyword arguments are:
 
+            overwrite : bool, optional
+                Flag to allow overwriting of existing files. The default is False.
         """
         cls.check_for_existing_file(filename, **kwargs)
         np.save(filename, data)

@@ -32,14 +32,14 @@ __all__ = ["ParameterCollection"]
 
 from collections.abc import Iterable
 from itertools import chain
-from typing import List, Self, Union
+from typing import Any, Self
 
 from pydidas.core.parameter import Parameter
 
 
 class ParameterCollection(dict):
     """
-    Ordered collection of parameters, implemented as subclass of dict.
+    An ordered collection of parameters, implemented as subclass of dict.
 
     The ParameterCollection is a dictionary for Parameter instances
     with additional convenience routines to easily get and set Parameter
@@ -56,7 +56,7 @@ class ParameterCollection(dict):
         Any number of Parameters
     """
 
-    def __init__(self, *args: tuple):
+    def __init__(self, *args: Parameter | Self):
         super().__init__()
         self.add_params(*args)
 
@@ -130,7 +130,7 @@ class ParameterCollection(dict):
     @staticmethod
     def __raise_type_error(item: object):
         """
-        Raise a TypeError that item is of wrong type.
+        Raise a TypeError that item is of the wrong type.
 
         Parameters
         ----------
@@ -148,7 +148,7 @@ class ParameterCollection(dict):
         )
 
     def __check_key_available(
-        self, param: Parameter, keys: Union[Iterable[str, ...], None] = None
+        self, param: Parameter, keys: Iterable[str] | None = None
     ):
         """
         Check if the Parameter refkey is already a registered key.
@@ -157,7 +157,7 @@ class ParameterCollection(dict):
         ----------
         param : Parameter
             The Parameter to be compared.
-        keys : Union[Iterable[str, ...], None], optional
+        keys : Iterable[str] | None, optional
             The keys to be compared against. If None, the comparison will be
             performed against all dictionary keys. The default is None.
 
@@ -187,7 +187,7 @@ class ParameterCollection(dict):
         TypeError
             If the passed param argument is not a Parameter instance.
         KeyError
-            If an entry with param.refkey already exists.
+            If an entry with the param.refkey already exists.
         """
         if not isinstance(param, Parameter):
             self.__raise_type_error(param)
@@ -195,7 +195,7 @@ class ParameterCollection(dict):
         self.__check_key_available(param)
         self.__setitem__(param.refkey, param)
 
-    def __check_arg_types(self, *args: tuple):
+    def __check_arg_types(self, *args: Parameter | Self):
         """
         Check the types of input arguments.
 
@@ -204,7 +204,7 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *args : tuple
+        *args : Parameter | Self
             Any arguments.
         """
         for _param in args:
@@ -216,7 +216,7 @@ class ParameterCollection(dict):
         Add parameters to the ParameterCollection.
 
         This method adds Parameters to the ParameterCollection.
-        Parameters can be either supplies individually as arguments or as
+        Parameters can be either supplied individually as arguments or as
         ParameterCollections or dictionaries.
 
         Parameters
@@ -229,7 +229,7 @@ class ParameterCollection(dict):
         self.__check_duplicate_keys(*args)
         self.__add_arg_params(*args)
 
-    def __check_duplicate_keys(self, *args: tuple[Union[dict, Parameter, Self]]):
+    def __check_duplicate_keys(self, *args: dict | Parameter | Self):
         """
         Check for duplicate keys and raise an error if a duplicate key is found.
 
@@ -238,8 +238,9 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *args : tuple[Union[dict, Parameter, Self]
-            Any number of Parameters or ParameterCollections.
+        *args : dict | Parameter | Self
+            Any number of Parameters or ParameterCollections or dictionaries
+            with key: Parameter pairs.
 
         Raises
         ------
@@ -315,7 +316,7 @@ class ParameterCollection(dict):
         """
         return self.__copy__()
 
-    def get_value(self, param_key: str) -> object:
+    def get_value(self, param_key: str) -> Any:
         """
         Get the value of a stored parameter.
 
@@ -329,12 +330,12 @@ class ParameterCollection(dict):
 
         Returns
         -------
-        object
-            The value of the Parameter object in its native data type.
+        Any
+            The value of the Parameter in its native data type.
         """
         return self.__getitem__(param_key).value
 
-    def set_value(self, param_key: str, value: object):
+    def set_value(self, param_key: str, value: Any):
         """
         Update the value of a stored parameter.
 
@@ -345,7 +346,7 @@ class ParameterCollection(dict):
         ----------
         param_key : str
             The reference key to the parameter in the dictionary.
-        value : object
+        value : Any
              The new value for the Parameter. Note that type-checking is
              performed in the Parameter value setter.
 
@@ -373,18 +374,18 @@ class ParameterCollection(dict):
         """
         return self.__getitem__(param_key)
 
-    def get_params(self, *keys: tuple) -> List[Parameter]:
+    def get_params(self, *keys: str) -> list[Parameter]:
         """
-        Get multiple keys from an iterable.
+        Get a list of Parameters from multiple keys.
 
         Parameters
         ----------
-        keys : tuple
+        keys : str
             The reference keys for all Parameters to be returned.
 
         Returns
         -------
-        list
+        list[Parameter]
             A list of the Parameters.
         """
         _items = []
@@ -392,14 +393,14 @@ class ParameterCollection(dict):
             _items.append(self.__getitem__(_key))
         return _items
 
-    def values_equal(self, *args: tuple) -> bool:
+    def values_equal(self, *args: str) -> bool:
         """
         Compare all Parameters references by their keys in args and check
         if they have the same value.
 
         Parameters
         ----------
-        *args : tuple
+        *args : str
             Any number of Parameter keys.
 
         Raises

@@ -9,6 +9,7 @@ path = [
     "requirements.txt",
     "src/pydidas/docs/make.bat",
     "src/pydidas/docs/Makefile",
+	"src/pydidas/sphinx/docs-built.yml",
     "src/pydidas/docs/src/_static/_css/pydidas-custom.css",
     "tests/_data/**",
 ]

@@ -64,6 +64,7 @@ class AxesSelector(WidgetWithParameterCollection):
         self._axwidgets = {}
         self._data_shape = ()
         self._data_ndim = 0
+        self._data_ndim_gt_1 = 0
         self._additional_choices_str = ""
         self._additional_choices = []
         self._current_slice_strings = {}
@@ -77,19 +78,19 @@ class AxesSelector(WidgetWithParameterCollection):
         self.create_spacer("final_spacer", gridPos=(0, 1, 1, 1), fixedWidth=5)
 
     @property
-    def current_display_selection(self) -> tuple[str]:
+    def current_display_selection(self) -> list[str]:
         """
         Get the current display selection.
 
         Returns
         -------
-        tuple[str]
+        list[str]
             The current display selection.
         """
         if self._current_display_selection == []:
-            self._current_display_selection = tuple(
+            self._current_display_selection = [
                 self._axwidgets[_dim].display_choice for _dim in range(self._data_ndim)
-            )
+            ]
         return self._current_display_selection
 
     @property
@@ -128,7 +129,7 @@ class AxesSelector(WidgetWithParameterCollection):
         """The current slicing."""
         return self._current_slice
 
-    def set_data_shape(self, shape: tuple[int]):
+    def set_data_shape(self, shape: tuple[int], update_axwidgets: bool = True):
         """
         Set the shape of the data to be sliced.
 
@@ -136,6 +137,9 @@ class AxesSelector(WidgetWithParameterCollection):
         ----------
         shape : tuple[int]
             The shape of the data to be sliced.
+        update_axwidgets : bool, optional
+            Flag to update the axis widgets. This is not required in the case
+            of setting metadata from a Dataset. Default is True.
         """
         if not isinstance(shape, tuple):
             raise UserConfigError(
@@ -143,11 +147,15 @@ class AxesSelector(WidgetWithParameterCollection):
             )
         self._data_shape = shape
         self._data_ndim = len(shape)
+        self._data_ndim_gt_1 = sum(i > 1 for i in shape)
         self._create_data_axis_selectors()
-        for _dim, _npoints in enumerate(shape):
-            self._axwidgets[_dim].set_axis_metadata(
-                None, "", "", npoints=_npoints, ndim=self._data_ndim
-            )
+        if not update_axwidgets:
+            return
+        with QtCore.QSignalBlocker(self):
+            for _dim, _npoints in enumerate(shape):
+                self._axwidgets[_dim].set_axis_metadata(
+                    None, "", "", npoints=_npoints, ndim=self._data_ndim_gt_1
+                )
 
     def _create_data_axis_selectors(self):
         """
@@ -177,10 +185,6 @@ class AxesSelector(WidgetWithParameterCollection):
             self._axwidgets[_dim].setVisible(_dim < self._data_ndim)
             if self._multiline_layout and _dim > 0:
                 self._widgets[f"line_{_dim}"].setVisible(_dim < self._data_ndim)
-
-            if _dim >= self._data_ndim:
-                with QtCore.QSignalBlocker(self._axwidgets[_dim]):
-                    self._axwidgets[_dim].display_choice = "slice at index"
 
     def set_axis_metadata(
         self,
@@ -214,7 +218,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 "the data shape first."
             )
         self._axwidgets[axis].set_axis_metadata(
-            data_range, label, unit, npoints=npoints, ndim=self._data_ndim
+            data_range, label, unit, npoints=npoints, ndim=self._data_ndim_gt_1
         )
 
     def set_metadata_from_dataset(self, dataset: Dataset):
@@ -237,14 +241,15 @@ class AxesSelector(WidgetWithParameterCollection):
                 "The dataset has less dimensions than required for the display. "
                 "Please change the dataset or how to display the dataset."
             )
-        self.set_data_shape(dataset.shape)
+        self.set_data_shape(dataset.shape, update_axwidgets=False)
         for _dim in range(self._data_ndim):
-            self.set_axis_metadata(
-                _dim,
-                dataset.axis_ranges[_dim],
-                dataset.axis_labels[_dim],
-                dataset.axis_units[_dim],
-            )
+            with QtCore.QSignalBlocker(self._axwidgets[_dim]):
+                self._axwidgets[_dim].set_axis_metadata(
+                    dataset.axis_ranges[_dim],
+                    dataset.axis_labels[_dim],
+                    dataset.axis_units[_dim],
+                    ndim=self._data_ndim_gt_1,
+                )
         self._verify_additional_choices_selected(-1, block_signals=True)
         self.process_new_slicing(block_signals=True)
 
@@ -288,10 +293,12 @@ class AxesSelector(WidgetWithParameterCollection):
 
             self._current_display_selection = []
             if self.current_display_selection.count(_choice) == 0:
-                for _dim, _axwidget in self._axwidgets.items():
+                for _dim in range(self._data_ndim):
+                    _axwidget = self._axwidgets[_dim]
                     if (
                         _dim != ignore_ax
                         and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
+                        and self._data_shape[_dim] > 1
                     ):
                         with QtCore.QSignalBlocker(_axwidget):
                             _axwidget.display_choice = _choice
@@ -312,7 +319,9 @@ class AxesSelector(WidgetWithParameterCollection):
             The current choice to be replaced.
         """
         _dim_where_selected = [
-            _dim for _dim, _key in enumerate(self.current_display_selection)
+            _dim
+            for _dim, _key in enumerate(self.current_display_selection)
+            if _key == choice
         ]
         if ignore_ax in _dim_where_selected:
             _dim_where_selected.remove(ignore_ax)

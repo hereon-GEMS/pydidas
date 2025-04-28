@@ -373,9 +373,7 @@ class Scan(ObjectWithParameterCollection):
         list[np.ndarray]
             The axis ranges.
         """
-        return [
-            self.get_range_for_dim(_i) for _i in range(self.get_param_value("scan_dim"))
-        ]
+        return [self.get_range_for_dim(_i) for _i in range(self.ndim)]
 
     def import_from_file(self, filename: Union[str, Path]):
         """

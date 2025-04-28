@@ -17,7 +17,7 @@
 
 
 """
-Module with the DirectoryExplorer widget which is an implementation of a
+Module with the DirectoryExplorer widget, which is an implementation of a
 QTreeView with a file system model.
 """
 
@@ -30,52 +30,55 @@ __all__ = ["DirectoryExplorer"]
 
 
 import os
-import platform
+from pathlib import Path
+from typing import Any
 
 import qtpy
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import PydidasQsettings, PydidasQsettingsMixin
-from pydidas.core.constants import POLICY_EXP_EXP
-from pydidas.core.utils import apply_qt_properties
-from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
+from pydidas.core import (
+    get_generic_parameter,
+)
+from pydidas.widgets.selection.directory_explorer_filter_model import (
+    DirectoryExplorerFilterModel,
+)
+from pydidas.widgets.selection.directory_explorer_tree_view import (
+    DirectoryExplorerTreeView,
+)
+from pydidas.widgets.widget_with_parameter_collection import (
+    WidgetWithParameterCollection,
+)
 
 
 AscendingOrder = QtCore.Qt.AscendingOrder
 QSortFilterProxyModel = QtCore.QSortFilterProxyModel
 
 
-class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
+class DirectoryExplorer(WidgetWithParameterCollection):
     """
     The DirectoryExplorer is an implementation of a QTreeView widget with a
     file system model to display the contents of directories.
 
     Parameters
     ----------
-    parent : Union[QWidget, None], optional
-        The parent widget, if appplicable. The default is None.
-    current_path : str, optional
-        The default path in the file system. The default is ''.
-    **kwargs : dict
-        Any additional keyword arguments
+    **kwargs : Any
+        Supported keywords are any keywords that are supported by QTreeView
+        as well as:
+
+        parent : Union[QWidget, None], optional
+            The parent widget, if applicable. The default is None.
+        current_path : str, optional
+            The default path in the file system. The default is ''.
     """
 
     sig_new_file_selected = QtCore.Signal(str)
 
-    def __init__(self, **kwargs: dict):
-        EmptyWidget.__init__(self, parent=kwargs.get("parent", None), **kwargs)
-        CreateWidgetsMixIn.__init__(self)
-        PydidasQsettingsMixin.__init__(self)
+    def __init__(self, **kwargs: Any):
+        WidgetWithParameterCollection.__init__(self, **kwargs)
+        self.add_param(get_generic_parameter("current_directory"))
         self._create_widgets()
-        self._set_up_filemodel(**kwargs)
-        self._widgets["explorer"].clicked.connect(self.__file_highlighted)
-        self._widgets["explorer"].doubleClicked.connect(self.__file_selected)
-        self._widgets["map_network_drives"].stateChanged.connect(
-            self.__update_filesystem_network_drive_usage
-        )
-        self._widgets["case_sensitive"].stateChanged.connect(
-            self.__update_filter_case_sensitivity
-        )
+        self._set_up_file_model(**kwargs)
+        self._connect_signals()
 
     def _create_widgets(self):
         """
@@ -95,27 +98,65 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
                 "directory_explorer/is_case_sensitive", dtype=bool, default=True
             ),
         )
-        self.create_any_widget("explorer", _DirectoryExplorer)
+        self.create_param_widget(
+            self.params["current_directory"], linebreak=True, hide_button=True
+        )
+        self.param_composite_widgets["current_directory"]._widgets[
+            "io"
+        ]._button.setVisible(False)
+        self.create_empty_widget("option_container")
+        self.create_lineedit(
+            "filter_edit",
+            font_metric_width_factor=24,
+            parent_widget="option_container",
+            placeholderText="Search filter...",
+        )
+        self.create_spacer(
+            None, parent_widget="option_container", gridPos=(0, -1, 1, 1)
+        )
+        self.create_button(
+            "button_collapse",
+            "Collapse all",
+            font_metric_width_factor=24,
+            gridPos=(0, -1, 1, 1),
+            parent_widget="option_container",
+        )
+        self._widgets["option_container"].layout().setColumnStretch(1, 1)
+        self.create_any_widget("explorer", DirectoryExplorerTreeView)
 
-    def _set_up_filemodel(self, **kwargs: dict):
+    def _set_up_file_model(self, **kwargs: Any):
         """
         Set up the file model for the QTreeView.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             The calling kwargs.
         """
         _path = kwargs.get("current_path", None)
         if _path is None:
             _path = self.q_settings_get("directory_explorer/path", default="")
+        self.set_param_value_and_widget("current_directory", _path)
         self._file_model = QtWidgets.QFileSystemModel()
         self._file_model.setRootPath(_path)
         self._file_model.setReadOnly(True)
-        self._filter_model = _NetworkLocationFilterModel()
+        self._filter_model = DirectoryExplorerFilterModel()
         self._filter_model.setSourceModel(self._file_model)
         self._widgets["explorer"].setModel(self._filter_model)
         self._widgets["explorer"].expand_to_path(_path)
+
+    def _connect_signals(self):
+        """Connect the signals of the widgets to the slots."""
+        self._widgets["explorer"].clicked.connect(self.__file_highlighted)
+        self._widgets["explorer"].doubleClicked.connect(self.__file_selected)
+        self._widgets["map_network_drives"].stateChanged.connect(
+            self.__update_filesystem_network_drive_usage
+        )
+        self._widgets["case_sensitive"].stateChanged.connect(
+            self.__update_filter_case_sensitivity
+        )
+        self.param_widgets["current_directory"].io_edited.connect(self.__user_dir_input)
+        self._widgets["button_collapse"].clicked.connect(self.__collapse_all)
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -188,166 +229,34 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         _name = self._file_model.filePath(_index)
         if os.path.isfile(_name):
             self.sig_new_file_selected.emit(_name)
+        elif os.path.isdir(_name):
+            self.set_param_value_and_widget("current_directory", _name)
 
-
-class _DirectoryExplorer(QtWidgets.QTreeView):
-    """
-    The DirectoryExplorer is an implementation of a QTreeView widget with a
-    file system model to display the contents of directories.
-
-    Parameters
-    ----------
-    **kwargs : dict
-        Supported keywords are any keywords which are supported by QTreeView.
-    """
-
-    init_kwargs = ["parent"]
-
-    def __init__(self, **kwargs: dict):
-        QtWidgets.QTreeView.__init__(self, kwargs.get("parent", None))
-        apply_qt_properties(self, **kwargs)
-        self.raw_model = None
-
-    def setModel(self, model: QtCore.QAbstractItemModel):
+    @QtCore.Slot(str)
+    def __user_dir_input(self, directory: str):
         """
-        Set the model of the directory explorer.
+        Set the current directory to the given directory.
 
         Parameters
         ----------
-        model : QtCore.QAbstractItemModel
-            The model to be used.
+        directory : str
+            The directory to set as the current directory.
         """
-        if isinstance(model, QtCore.QSortFilterProxyModel):
-            self.raw_model = model.sourceModel()
-        else:
-            self.raw_model = model
-        QtWidgets.QTreeView.setModel(self, model)
-        self.setAnimated(False)
-        self.setIndentation(12)
-        self.setSortingEnabled(True)
-        self.setColumnWidth(0, 400)
-        self.setColumnWidth(1, 70)
-        self.setColumnWidth(2, 100)
-        self.setColumnWidth(3, 140)
-        self.setSizePolicy(*POLICY_EXP_EXP)
-        self.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-
-    def expand_to_path(self, path: str):
-        """
-        Expand the treeview to a given path.
-
-        Parameters
-        ----------
-        path : str
-            The full path to expand.
-        """
-        _index = self.raw_model.index(path)
-        _indices = []
-        while _index.isValid():
-            _indices.insert(0, _index)
-            _index = _index.parent()
-        for _ix in _indices:
-            self.setExpanded(self.model().mapFromSource(_ix), True)
-
-    def sizeHint(self) -> QtCore.QSize:
-        """
-        Overload the generic sizeHint.
-
-        Returns
-        -------
-        QtCore.QSize
-            The updated size hint.
-        """
-        return QtCore.QSize(400, 4000)
-
-
-class _NetworkLocationFilterModel(QtCore.QSortFilterProxyModel):
-    """
-    A proxy sort model which allows to hide network drives.
-    """
-
-    def __init__(self, parent=None):
-        QtCore.QSortFilterProxyModel.__init__(self, parent)
-        self.setRecursiveFilteringEnabled(True)
-        self.__accept_network_locations = PydidasQsettings().q_settings_get(
-            "directory_explorer/show_network_drives", dtype=bool, default=True
+        _path = Path(directory)
+        self._file_model.setRootPath(directory)
+        self._widgets["explorer"].expand_to_path(directory)
+        _proxy_index = self._filter_model.mapFromSource(
+            self._file_model.index(directory)
         )
-        __storage = QtCore.QStorageInfo()
-        if platform.system() == "Windows":
-            __prefix = "\\\\?\\Volume"
-        elif platform.system() in ["Unix", "Linux"]:
-            __prefix = "/dev/"
-        elif platform.system() == "Darwin":  # for macOS
-            __prefix = "/Volumes"
-        else:
-            raise SystemError(
-                "Only Windows, Linux, and macOS operating systems are supported!"
-            )
-        self.__network_drives = [
-            _vol.rootPath()
-            for _vol in __storage.mountedVolumes()
-            # if not _vol.device().toStdString().startswith(__prefix)
-            # because toStdString does not work with Qt 5.15.2, fall back :
-            if not bytes(_vol.device()).decode().startswith(__prefix)
-        ]
+        self._widgets["explorer"].selectionModel().select(
+            _proxy_index, QtCore.QItemSelectionModel.Select
+        )
+        self._widgets["explorer"].scrollToBottom()
+        self._widgets["explorer"].setCurrentIndex(_proxy_index)
 
-    @QtCore.Slot(bool)
-    def toggle_network_location_acceptance(self, acceptance: bool):
-        """
-        Toggle the acceptance of network locations.
-
-        Parameters
-        ----------
-        acceptance : bool
-            Flag whether to accept network drives in the filter or not.
-        """
-        self.__accept_network_locations = acceptance
-        self.invalidateFilter()
-
-    def filterAcceptsRow(
-        self, source_row: int, source_parent: QtCore.QModelIndex
-    ) -> bool:
-        """
-        Filter rows based on them being a network drive.
-
-        Parameters
-        ----------
-        source_row : int
-            The model source row.
-        source_parent : QtCore.QModelIndex
-            The parent index.
-        """
-        if self.__accept_network_locations:
-            return True
-        _index = self.sourceModel().index(source_row, 0, source_parent)
-        while _index.parent().isValid():
-            _index = _index.parent()
-        return self.sourceModel().filePath(_index) not in self.__network_drives
-
-    def lessThan(
-        self, entry_a: QtCore.QModelIndex, entry_b: QtCore.QModelIndex
-    ) -> bool:
-        """
-        Reimplement lessThan to sort directories and files separately.
-
-        Parameters
-        ----------
-        entry_a : QtCore.QModelIndex
-            The first entry to be compared.
-        entry_b : QtCore.QModelIndex
-            The second entry to be compared.
-
-        Returns
-        -------
-        bool
-            Flag whether entry_a should be displayed before entry_b.
-        """
-        _ascending = self.sortOrder() == AscendingOrder
-        _info_a = self.sourceModel().fileInfo(entry_a)
-        _info_b = self.sourceModel().fileInfo(entry_b)
-
-        if (not _info_a.isDir()) and _info_b.isDir():
-            return not _ascending
-        if _info_a.isDir() and not _info_b.isDir():
-            return _ascending
-        return QSortFilterProxyModel.lessThan(self, entry_a, entry_b)
+    @QtCore.Slot()
+    def __collapse_all(self):
+        """Collapse all directories in the explorer."""
+        for row in range(self._filter_model.rowCount()):
+            index = self._filter_model.index(row, 0)
+            self._widgets["explorer"].collapse(index)

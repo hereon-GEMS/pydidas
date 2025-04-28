@@ -232,6 +232,15 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "allow_None": False,
         "tooltip": "The absolute path of the directory to be used.",
     },
+    "current_directory": {
+        "type": "Path",
+        "default": "",
+        "name": "Current directory",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The name of the currently active directory.",
+    },
     "eiger_filename_suffix": {
         "type": str,
         "default": "_data_000001.h5",

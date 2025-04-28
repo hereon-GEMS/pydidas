@@ -340,37 +340,37 @@ class Scan(ObjectWithParameterCollection):
         return self.get_param_value("scan_dim")
 
     @property
-    def axis_labels(self) -> list[str, ...]:
+    def axis_labels(self) -> list[str]:
         """
         Get the axis labels of the scan.
 
         Returns
         -------
-        list[str, ...]
+        list[str]
             The axis labels.
         """
         return [self.get_param_value(f"scan_dim{_i}_label") for _i in range(self.ndim)]
 
     @property
-    def axis_units(self) -> list[str, ...]:
+    def axis_units(self) -> list[str]:
         """
         Get the axis units of the scan.
 
         Returns
         -------
-        list[str, ...]
+        list[str]
             The axis units.
         """
         return [self.get_param_value(f"scan_dim{_i}_unit") for _i in range(self.ndim)]
 
     @property
-    def axis_ranges(self) -> list[np.ndarray, ...]:
+    def axis_ranges(self) -> list[np.ndarray]:
         """
         Get the axis ranges of the scan.
 
         Returns
         -------
-        list[np.ndarray, ...]
+        list[np.ndarray]
             The axis ranges.
         """
         return [

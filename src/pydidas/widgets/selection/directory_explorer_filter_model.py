@@ -32,6 +32,7 @@ __all__ = ["DirectoryExplorerFilterModel"]
 import platform
 
 from qtpy import QtCore
+from qtpy.QtCore import QSortFilterProxyModel
 
 from pydidas.core import (
     PydidasQsettings,
@@ -39,16 +40,15 @@ from pydidas.core import (
 
 
 AscendingOrder = QtCore.Qt.AscendingOrder
-QSortFilterProxyModel = QtCore.QSortFilterProxyModel
 
 
-class DirectoryExplorerFilterModel(QtCore.QSortFilterProxyModel):
+class DirectoryExplorerFilterModel(QSortFilterProxyModel):
     """
     A proxy sort model which allows hiding network drives and filter for files.
     """
 
     def __init__(self, parent=None):
-        QtCore.QSortFilterProxyModel.__init__(self, parent)
+        QSortFilterProxyModel.__init__(self, parent)
         self.setRecursiveFilteringEnabled(True)
         self.__accept_network_locations = PydidasQsettings().q_settings_get(
             "directory_explorer/show_network_drives", dtype=bool, default=True
@@ -71,7 +71,7 @@ class DirectoryExplorerFilterModel(QtCore.QSortFilterProxyModel):
             # because toStdString does not work with Qt 5.15.2, fall back :
             if not bytes(_vol.device()).decode().startswith(__prefix)
         ]
-        self.__filter_string = ""
+        self.__filename_filter_active = False
 
     @QtCore.Slot(bool)
     def toggle_network_location_acceptance(self, acceptance: bool):
@@ -96,8 +96,10 @@ class DirectoryExplorerFilterModel(QtCore.QSortFilterProxyModel):
         filter_string : str
             The filter string to be used.
         """
-        self.__filter_string = filter_string
-        self.setFilterWildcard(filter_string)
+        self.__filename_filter_active = len(filter_string) > 0
+        self.__filter_pattern = QtCore.QRegularExpression(
+            filter_string.replace("*", ".*").replace("?", ".")
+        )
         self.invalidateFilter()
 
     def filterAcceptsRow(
@@ -113,12 +115,24 @@ class DirectoryExplorerFilterModel(QtCore.QSortFilterProxyModel):
         source_parent : QtCore.QModelIndex
             The parent index.
         """
-        if self.__accept_network_locations:
-            return True
         _index = self.sourceModel().index(source_row, 0, source_parent)
-        while _index.parent().isValid():
-            _index = _index.parent()
-        return self.sourceModel().filePath(_index) not in self.__network_drives
+        _filter_accepted = True
+        if self.__filename_filter_active:
+            _file_info = self.sourceModel().fileInfo(_index)
+            if _file_info.isFile():
+                _filter_accepted = self.__filter_pattern.match(
+                    _file_info.fileName()
+                ).hasMatch()
+
+        if self.__accept_network_locations:
+            _network_accepted = True
+        else:
+            while _index.parent().isValid():
+                _index = _index.parent()
+            _network_accepted = (
+                self.sourceModel().filePath(_index) not in self.__network_drives
+            )
+        return _filter_accepted and _network_accepted
 
     def lessThan(
         self, entry_a: QtCore.QModelIndex, entry_b: QtCore.QModelIndex

@@ -109,7 +109,14 @@ class DirectoryExplorer(WidgetWithParameterCollection):
             "filter_edit",
             font_metric_width_factor=24,
             parent_widget="option_container",
-            placeholderText="Search filter...",
+            placeholderText="Filename filter...",
+        )
+        self.create_button(
+            "button_reset_filter",
+            "Reset filter",
+            font_metric_width_factor=16,
+            gridPos=(0, -1, 1, 1),
+            parent_widget="option_container",
         )
         self.create_spacer(
             None, parent_widget="option_container", gridPos=(0, -1, 1, 1)
@@ -117,11 +124,11 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self.create_button(
             "button_collapse",
             "Collapse all",
-            font_metric_width_factor=24,
+            font_metric_width_factor=16,
             gridPos=(0, -1, 1, 1),
             parent_widget="option_container",
         )
-        self._widgets["option_container"].layout().setColumnStretch(1, 1)
+        self._widgets["option_container"].layout().setColumnStretch(2, 1)
         self.create_any_widget("explorer", DirectoryExplorerTreeView)
 
     def _set_up_file_model(self, **kwargs: Any):
@@ -157,6 +164,10 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         )
         self.param_widgets["current_directory"].io_edited.connect(self.__user_dir_input)
         self._widgets["button_collapse"].clicked.connect(self.__collapse_all)
+        self._widgets["button_reset_filter"].clicked.connect(self.__reset_filter)
+        self._widgets["filter_edit"].textChanged.connect(
+            self._filter_model.toggle_filter_string
+        )
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -233,26 +244,28 @@ class DirectoryExplorer(WidgetWithParameterCollection):
             self.set_param_value_and_widget("current_directory", _name)
 
     @QtCore.Slot(str)
-    def __user_dir_input(self, directory: str):
+    def __user_dir_input(self, path: str):
         """
-        Set the current directory to the given directory.
+        Process the user file / directory input.
 
         Parameters
         ----------
-        directory : str
-            The directory to set as the current directory.
+        path : str
+            The file or directory to be set as active.
         """
-        _path = Path(directory)
-        self._file_model.setRootPath(directory)
-        self._widgets["explorer"].expand_to_path(directory)
-        _proxy_index = self._filter_model.mapFromSource(
-            self._file_model.index(directory)
-        )
+        self._file_model.setRootPath(path)
+        self._widgets["explorer"].expand_to_path(path)
+        _proxy_index = self._filter_model.mapFromSource(self._file_model.index(path))
         self._widgets["explorer"].selectionModel().select(
             _proxy_index, QtCore.QItemSelectionModel.Select
         )
         self._widgets["explorer"].scrollToBottom()
         self._widgets["explorer"].setCurrentIndex(_proxy_index)
+        _path = Path(path)
+        if _path.is_file():
+            with QtCore.QSignalBlocker(self.param_widgets["current_directory"]):
+                self.set_param_value_and_widget("current_directory", _path.parent)
+            self.sig_new_file_selected.emit(path)
 
     @QtCore.Slot()
     def __collapse_all(self):
@@ -260,3 +273,8 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         for row in range(self._filter_model.rowCount()):
             index = self._filter_model.index(row, 0)
             self._widgets["explorer"].collapse(index)
+
+    @QtCore.Slot()
+    def __reset_filter(self):
+        """Reset the filter to show all files."""
+        self._widgets["filter_edit"].setText("")

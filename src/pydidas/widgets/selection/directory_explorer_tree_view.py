@@ -41,7 +41,7 @@ QSortFilterProxyModel = QtCore.QSortFilterProxyModel
 
 class DirectoryExplorerTreeView(QtWidgets.QTreeView):
     """
-    The DirectoryExplorer is an implementation of a QTreeView widget with a
+    The DirectoryExplorerTreeView is an implementation of a QTreeView widget with a
     file system model to display the contents of directories.
 
     Parameters

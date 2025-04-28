@@ -38,7 +38,7 @@
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="_static/documentation_options.js?v=b38044db"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
@@ -523,12 +523,24 @@ document.write(`
 </li>
       <li><a href="code/api/contexts.html#pydidas.contexts.DiffractionExperiment.as_pyfai_geometry">as_pyfai_geometry() (pydidas.contexts.DiffractionExperiment method)</a>
 </li>
-      <li><a href="code/api/core/dataset.html#pydidas.core.Dataset.axis_labels">axis_labels (pydidas.core.Dataset property)</a>
+      <li><a href="code/api/contexts.html#pydidas.contexts.Scan.axis_labels">axis_labels (pydidas.contexts.Scan property)</a>
+
+      <ul>
+        <li><a href="code/api/core/dataset.html#pydidas.core.Dataset.axis_labels">(pydidas.core.Dataset property)</a>
 </li>
-      <li><a href="code/api/core/dataset.html#pydidas.core.Dataset.axis_ranges">axis_ranges (pydidas.core.Dataset property)</a>
+      </ul></li>
+      <li><a href="code/api/contexts.html#pydidas.contexts.Scan.axis_ranges">axis_ranges (pydidas.contexts.Scan property)</a>
+
+      <ul>
+        <li><a href="code/api/core/dataset.html#pydidas.core.Dataset.axis_ranges">(pydidas.core.Dataset property)</a>
 </li>
-      <li><a href="code/api/core/dataset.html#pydidas.core.Dataset.axis_units">axis_units (pydidas.core.Dataset property)</a>
+      </ul></li>
+      <li><a href="code/api/contexts.html#pydidas.contexts.Scan.axis_units">axis_units (pydidas.contexts.Scan property)</a>
+
+      <ul>
+        <li><a href="code/api/core/dataset.html#pydidas.core.Dataset.axis_units">(pydidas.core.Dataset property)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -893,6 +905,8 @@ document.write(`
 </li>
       <li><a href="code/api/plugins.html#pydidas.plugins.BaseFitPlugin.detailed_results">detailed_results (pydidas.plugins.BaseFitPlugin property)</a>
 </li>
+      <li><a href="code/api/contexts.html#pydidas.contexts.DiffractionExperiment.detector_dist_in_m">detector_dist_in_m (pydidas.contexts.DiffractionExperiment property)</a>
+</li>
       <li><a href="code/api/contexts.html#pydidas.contexts.DiffractionExperiment.detector_is_valid">detector_is_valid (pydidas.contexts.DiffractionExperiment property)</a>
 </li>
       <li><a href="code/api/contexts.html#pydidas.contexts.DiffractionExperiment">DiffractionExperiment (class in pydidas.contexts)</a>
@@ -936,6 +950,8 @@ document.write(`
       <li><a href="code/api/widgets/silx_plot.html#pydidas.widgets.silx_plot.PydidasPlot2D.enable_cs_transform">enable_cs_transform() (pydidas.widgets.silx_plot.PydidasPlot2D method)</a>
 </li>
       <li><a href="code/api/widgets/controllers.html#pydidas.widgets.controllers.ManuallySetIntegrationRoiController.enabled">enabled (pydidas.widgets.controllers.ManuallySetIntegrationRoiController property)</a>
+</li>
+      <li><a href="code/api/plugins.html#pydidas.plugins.BasePlugin.error_string_with_header">error_string_with_header() (pydidas.plugins.BasePlugin method)</a>
 </li>
       <li><a href="code/api/widgets/dialogues.html#pydidas.widgets.dialogues.ErrorMessageBox">ErrorMessageBox (class in pydidas.widgets.dialogues)</a>
 </li>
@@ -1223,8 +1239,6 @@ document.write(`
 </li>
       <li><a href="code/api/workflow/result_io.html#pydidas.workflow.result_io.ProcessingResultIoBase.get_filenames_from_labels">get_filenames_from_labels() (pydidas.workflow.result_io.ProcessingResultIoBase class method)</a>
 </li>
-      <li><a href="code/api/plugins.html#pydidas.plugins.InputPlugin.get_first_file_size">get_first_file_size() (pydidas.plugins.InputPlugin method)</a>
-</li>
       <li><a href="code/api/plugins.html#pydidas.plugins.InputPlugin.get_frame">get_frame() (pydidas.plugins.InputPlugin method)</a>
 </li>
       <li><a href="code/api/contexts.html#pydidas.contexts.Scan.get_frame_from_indices">get_frame_from_indices() (pydidas.contexts.Scan method)</a>
@@ -1421,6 +1435,8 @@ document.write(`
 </li>
       <li><a href="code/api/gui/frames/builders.html#pydidas.gui.frames.builders.get_widget_creation_information">get_widget_creation_information() (in module pydidas.gui.frames.builders)</a>
 </li>
+      <li><a href="code/api/widgets/base.html#pydidas.widgets.get_widget_layout_args">get_widget_layout_args() (in module pydidas.widgets)</a>
+</li>
       <li><a href="code/api/gui/frames/builders.html#pydidas.gui.frames.builders.get_WorkflowRunFrame_build_config">get_WorkflowRunFrame_build_config() (in module pydidas.gui.frames.builders)</a>
 </li>
       <li><a href="code/api/gui/frames/builders.html#pydidas.gui.frames.builders.get_WorkflowTestFrame_build_config">get_WorkflowTestFrame_build_config() (in module pydidas.gui.frames.builders)</a>
@@ -1513,6 +1529,12 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="code/api/core/others.html#pydidas.core.SingletonContextObject.initialize">initialize() (pydidas.core.SingletonContextObject method)</a>
+
+      <ul>
+        <li><a href="code/api/core/others.html#pydidas.core.SingletonQObject.initialize">(pydidas.core.SingletonQObject method)</a>
+</li>
+      </ul></li>
       <li><a href="code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp.initialize_shared_memory">initialize_shared_memory() (pydidas.apps.DirectorySpyApp method)</a>
 </li>
       <li><a href="code/api/plugins.html#pydidas.plugins.InputPlugin.input_available">input_available() (pydidas.plugins.InputPlugin method)</a>
@@ -1930,8 +1952,6 @@ document.write(`
       </ul></li>
       <li><a href="code/api/workflow/result_io.html#pydidas.workflow.result_io.ProcessingResultIoMeta.prepare_active_savers">prepare_active_savers() (pydidas.workflow.result_io.ProcessingResultIoMeta class method)</a>
 </li>
-      <li><a href="code/api/plugins.html#pydidas.plugins.InputPlugin.prepare_carryon_check">prepare_carryon_check() (pydidas.plugins.InputPlugin method)</a>
-</li>
       <li><a href="code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.prepare_execution">prepare_execution() (pydidas.workflow.ProcessingTree method)</a>
 
       <ul>
@@ -2221,6 +2241,8 @@ document.write(`
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="code/api/plugins.html#pydidas.plugins.BasePlugin.raise_UserConfigError">raise_UserConfigError() (pydidas.plugins.BasePlugin method)</a>
+</li>
       <li><a href="code/api/core/parameter.html#pydidas.core.Parameter.range">range (pydidas.core.Parameter property)</a>
 </li>
       <li><a href="code/api/managers.html#pydidas.managers.ImageMetadataManager.raw_size_x">raw_size_x (pydidas.managers.ImageMetadataManager property)</a>
@@ -2585,7 +2607,11 @@ document.write(`
       </ul></li>
       <li><a href="code/api/widgets/silx_plot.html#pydidas.widgets.silx_plot.SilxDataViewer">SilxDataViewer (class in pydidas.widgets.silx_plot)</a>
 </li>
+      <li><a href="code/api/core/others.html#pydidas.core.SingletonContextObject">SingletonContextObject (class in pydidas.core)</a>
+</li>
       <li><a href="code/api/core/others.html#pydidas.core.SingletonFactory">SingletonFactory (class in pydidas.core)</a>
+</li>
+      <li><a href="code/api/core/others.html#pydidas.core.SingletonQObject">SingletonQObject (class in pydidas.core)</a>
 </li>
       <li><a href="code/api/widgets/base.html#pydidas.widgets.ScrollArea.sizeHint">sizeHint() (pydidas.widgets.ScrollArea method)</a>
 
@@ -2900,7 +2926,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

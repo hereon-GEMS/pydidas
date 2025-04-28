@@ -39,7 +39,7 @@
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../../_static/documentation_options.js?v=b38044db"></script>
-    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -474,7 +474,7 @@ document.write(`
 <h1>Parameter<a class="headerlink" href="#class-name" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.core.Parameter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refkey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Parameter" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refkey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Parameter" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class used for storing a value and associated metadata.</p>
 <p>The Parameter has the following properties which can be accessed.
@@ -546,7 +546,7 @@ Parameter value.</p></td>
 <td><p>False</p></td>
 <td><p>For Iterable datatypes, a subtype can be
 defined to determine the data type inside
-the iterating object, e.g. a list of int.</p></td>
+the iterating object, e.g., a list of int</p></td>
 </tr>
 </tbody>
 </table>
@@ -573,7 +573,7 @@ this entry will be ignored. The default is None.</p></li>
 <dt>name<span class="classifier">str, optional</span></dt><dd><p>The name of the parameter. The default is None.</p>
 </dd>
 <dt>subtype<span class="classifier">Optional[type]</span></dt><dd><p>For Iterable datatypes, a subtype can be defined to determine the
-data type inside the iterating object, e.g. a list of int. None does
+data type inside the iterating object, e.g., a list of int. None does
 not enforce type checking. The default is None.</p>
 </dd>
 <dt>optional<span class="classifier">bool, optional</span></dt><dd><p>Keyword to toggle optional parameters. The default is False.</p>
@@ -599,8 +599,8 @@ is False.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.allow_None">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allow_None</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.core.Parameter.allow_None" title="Link to this definition">#</a></dt>
-<dd><p>Returns the flag to allow “None” as value.</p>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allow_None</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.core.Parameter.allow_None" title="Link to this definition">#</a></dt>
+<dd><p>Returns the flag to allow “None” as a value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The flag setting.</p>
@@ -613,7 +613,7 @@ is False.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.choices">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">choices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#pydidas.core.Parameter.choices" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">choices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#pydidas.core.Parameter.choices" title="Link to this definition">#</a></dt>
 <dd><p>Get or set the allowed choices for the Parameter value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -655,7 +655,7 @@ is False.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.default">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#pydidas.core.Parameter.default" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#pydidas.core.Parameter.default" title="Link to this definition">#</a></dt>
 <dd><p>Return the default value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -669,7 +669,7 @@ is False.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.dtype">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span></em><a class="headerlink" href="#pydidas.core.Parameter.dtype" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span></em><a class="headerlink" href="#pydidas.core.Parameter.dtype" title="Link to this definition">#</a></dt>
 <dd><p>Get the data type of the Parameter value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -733,7 +733,7 @@ in YAML files.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.name" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.name" title="Link to this definition">#</a></dt>
 <dd><p>Return the parameter name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -747,7 +747,7 @@ in YAML files.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.optional">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">optional</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.core.Parameter.optional" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">optional</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.core.Parameter.optional" title="Link to this definition">#</a></dt>
 <dd><p>Get the flag whether the parameter is optional or not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -761,21 +761,21 @@ in YAML files.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.range">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">range</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Real</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Real</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.core.Parameter.range" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">range</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Real</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Real</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.core.Parameter.range" title="Link to this definition">#</a></dt>
 <dd><p>Get the range of the Parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The range of the Parameter.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple[Real, Real]</p>
+<dd class="field-even"><p>None | tuple[Real, Real]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.refkey">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">refkey</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.refkey" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">refkey</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.refkey" title="Link to this definition">#</a></dt>
 <dd><p>Return the parameter reference key.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -795,7 +795,7 @@ in YAML files.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.tooltip">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tooltip</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.tooltip" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tooltip</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.tooltip" title="Link to this definition">#</a></dt>
 <dd><p>Get the Parameter tooltip.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -809,7 +809,7 @@ in YAML files.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.unit">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.unit" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Parameter.unit" title="Link to this definition">#</a></dt>
 <dd><p>Get the Parameter unit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -823,13 +823,13 @@ in YAML files.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.update_value_and_choices">
-<span class="sig-name descname"><span class="pre">update_value_and_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">object</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Parameter.update_value_and_choices" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_value_and_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Parameter.update_value_and_choices" title="Link to this definition">#</a></dt>
 <dd><p>Update the value and choices of the Parameter to prevent illegal selections.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value</strong> (<em>object</em>) – The new Parameter values</p></li>
-<li><p><strong>choices</strong> (<em>Iterable</em><em>[</em><em>object</em><em>, </em><em>...</em><em>]</em>) – The new choices for the Parameter.</p></li>
+<li><p><strong>value</strong> (<em>object</em>) – The new Parameter values.</p></li>
+<li><p><strong>choices</strong> (<em>Sequence</em><em>[</em><em>Any</em><em>]</em>) – The new choices for the Parameter.</p></li>
 </ul>
 </dd>
 </dl>
@@ -837,21 +837,21 @@ in YAML files.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#pydidas.core.Parameter.value" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#pydidas.core.Parameter.value" title="Link to this definition">#</a></dt>
 <dd><p>Get the Parameter value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The value of the parameter.</p>
+<dd class="field-odd"><p><strong>value</strong> – The value of the parameter.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>value</p>
+<dd class="field-even"><p>Any</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Parameter.value_for_export">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_for_export</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#pydidas.core.Parameter.value_for_export" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value_for_export</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#pydidas.core.Parameter.value_for_export" title="Link to this definition">#</a></dt>
 <dd><p>Get the value in a pickleable format for exporting.</p>
 <p>Note that this method does not work with Parameters without a defined
 data type.</p>
@@ -999,7 +999,7 @@ data type.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

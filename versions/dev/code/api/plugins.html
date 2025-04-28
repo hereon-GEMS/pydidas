@@ -39,7 +39,7 @@
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../_static/documentation_options.js?v=b38044db"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -463,7 +463,7 @@ document.write(`
 <h1>The plugins sub-package<a class="headerlink" href="#the-plugins-sub-package" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.plugin_collection.</span></span><span class="sig-name descname"><span class="pre">PluginRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.plugin_collection.</span></span><span class="sig-name descname"><span class="pre">PluginRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry" title="Link to this definition">#</a></dt>
 <dd><p>Class to hold references of plugins.</p>
 <p>Plugins can be accessed by their class names or by their plugin_name properties.
 For details, please refer to the individual methods.</p>
@@ -624,7 +624,7 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.registered_paths">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">registered_paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.registered_paths" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">registered_paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.registered_paths" title="Link to this definition">#</a></dt>
 <dd><p>Get all the paths which have been registered in the PluginCollection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -691,7 +691,7 @@ PluginCollection singleton which holds all registered plugins and allows to
 get new instances of these plugins.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">BaseFitPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">BaseFitPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin" title="Link to this definition">#</a></dt>
 <dd><p>Fit a single peak to the input data.</p>
 <p>This plugin allows to fit the input data with any function defined in the
 pydidas.core.fitting package.</p>
@@ -730,10 +730,10 @@ pydidas.core.fitting package.</p>
 <p>This method will return detailed information to display for the user. The return
 format is a dictionary with four keys:
 First, “n_plots” which determines the number of plots. Second, “plot_titles”
-gives a title for each subplot. Third, “plot_ylabels” gives a y axis label for
+gives a title for each subplot. Third, “plot_ylabels” gives a y-axis label for
 each subplot. Fourth, “items” provides a list with the different items to be
 plotted. Each list entry must be a dictionary with the following keys: “plot”
-[to detemine the plot number], “label” [for the legend label] and “data” with
+[to determine the plot number], “label” [for the legend label] and “data” with
 the actual data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -779,7 +779,7 @@ for the raw data, the data fit and the residual.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.detailed_results">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detailed_results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.detailed_results" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detailed_results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.detailed_results" title="Link to this definition">#</a></dt>
 <dd><p>Get the detailed results for the FitSinglePeak plugin.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -817,7 +817,7 @@ metadata.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.fit_outputs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_outputs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.fit_outputs" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_outputs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.fit_outputs" title="Link to this definition">#</a></dt>
 <dd><p>Get the selected outputs for the fit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -864,21 +864,13 @@ metadata.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.BaseFitPlugin.update_fit_param_bounds">
 <span class="sig-name descname"><span class="pre">update_fit_param_bounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BaseFitPlugin.update_fit_param_bounds" title="Link to this definition">#</a></dt>
 <dd><p>Update the fitting bounds from Parameters.</p>
-<p>Dictionary keys can be any key given in the param_labels. Values must be tuple
-pairs of low, high boundary values. None is allowed to ignore setting a
-particular boundary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Dict</em>) – Dictionary with key, value pairs for the</p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">BasePlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">BasePlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class from which all plugins inherit.</p>
 <p>Class attributes are used in the descriptions of individual plugins and
 all these attributes should be re-defined in individual plugins to
@@ -933,6 +925,23 @@ users with too many options. The default is an empty list [].</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.error_string_with_header">
+<span class="sig-name descname"><span class="pre">error_string_with_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.error_string_with_header" title="Link to this definition">#</a></dt>
+<dd><p>Raise a UserConfigError with the given error string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error_str</strong> (<em>str</em>) – The error string to raise.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The formatted error string with header.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin.execute" title="Link to this definition">#</a></dt>
 <dd><p>Execute the processing step.</p>
@@ -948,7 +957,7 @@ users with too many options. The default is an empty list [].</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.get_class_description">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_class_description</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.get_class_description" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_class_description</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.get_class_description" title="Link to this definition">#</a></dt>
 <dd><p>Get a description of the plugin as a multi-line string.</p>
 <p>This method can generate a description of the plugin with name,
 plugin type, class name and Parameters and the docstring.
@@ -965,7 +974,7 @@ The return is a formatted string.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.get_class_description_as_list">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_class_description_as_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.get_class_description_as_list" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_class_description_as_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.get_class_description_as_list" title="Link to this definition">#</a></dt>
 <dd><p>Get a description of the plugin as a list of keys and entries.</p>
 <p>This method can generate a description of the plugin with name,
 plugin type, class name and Parameters and the docstring.
@@ -1003,21 +1012,21 @@ non-standard items, e.g. sliders or interactive capability.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.input_data">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">input_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.input_data" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">input_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.input_data" title="Link to this definition">#</a></dt>
 <dd><p>Get the current input data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The input data passed to the plugin.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[int, <a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a>]</p>
+<dd class="field-even"><p>int | <a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a> | None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.input_data_dim_str">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">input_data_dim_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.input_data_dim_str" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">input_data_dim_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.input_data_dim_str" title="Link to this definition">#</a></dt>
 <dd><p>Get the input data dimensionality as string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1031,7 +1040,7 @@ non-standard items, e.g. sliders or interactive capability.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.is_basic_plugin">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_basic_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.is_basic_plugin" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_basic_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.is_basic_plugin" title="Link to this definition">#</a></dt>
 <dd><p>Get the basic plugin flag.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1045,7 +1054,7 @@ non-standard items, e.g. sliders or interactive capability.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.output_data_dim_str">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_data_dim_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.output_data_dim_str" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_data_dim_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.output_data_dim_str" title="Link to this definition">#</a></dt>
 <dd><p>Get the output data dimensionality as string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1064,19 +1073,28 @@ non-standard items, e.g. sliders or interactive capability.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.register_as_base_class">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_as_base_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin.register_as_base_class" title="Link to this definition">#</a></dt>
-<dd><p>Register a base class for the plugin.</p>
+<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.raise_UserConfigError">
+<span class="sig-name descname"><span class="pre">raise_UserConfigError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#pydidas.plugins.BasePlugin.raise_UserConfigError" title="Link to this definition">#</a></dt>
+<dd><p>Raise a UserConfigError with the given error string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>base_class</strong> (<em>type</em>) – The base class to register.</p>
+<dd class="field-odd"><p><strong>error_str</strong> (<em>str</em>) – The error string to raise.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – The UserConfigError with the formatted error string.</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.register_as_base_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_as_base_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.BasePlugin.register_as_base_class" title="Link to this definition">#</a></dt>
+<dd><p>Register a base class for the plugin.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.result_data_label">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_data_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.result_data_label" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_data_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.result_data_label" title="Link to this definition">#</a></dt>
 <dd><p>Get the combined result data label, consisting of the formatted
 output_data_label and output_data_unit.</p>
 <dl class="field-list simple">
@@ -1091,7 +1109,7 @@ output_data_label and output_data_unit.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.result_title">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.result_title" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">result_title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.result_title" title="Link to this definition">#</a></dt>
 <dd><p>Get the formatted title of the plugin’s results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1119,7 +1137,7 @@ output_data_label and output_data_unit.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.plugins.BasePlugin.test_mode">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.test_mode" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.plugins.BasePlugin.test_mode" title="Link to this definition">#</a></dt>
 <dd><p>Get the test mode flag.
 :returns: The test mode flag.
 :rtype: bool</p>
@@ -1129,7 +1147,7 @@ output_data_label and output_data_unit.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">InputPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">InputPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class for input plugins.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.execute">
@@ -1170,20 +1188,6 @@ output_data_label and output_data_unit.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.get_first_file_size">
-<span class="sig-name descname"><span class="pre">get_first_file_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.plugins.InputPlugin.get_first_file_size" title="Link to this definition">#</a></dt>
-<dd><p>Get the size of the first file to be processed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The file size in bytes.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.get_frame">
 <span class="sig-name descname"><span class="pre">get_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="headerlink" href="#pydidas.plugins.InputPlugin.get_frame" title="Link to this definition">#</a></dt>
 <dd><p>Get the specified image frame (which does not necessarily correspond to the
@@ -1207,7 +1211,7 @@ scan point index).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.handle_multi_image">
 <span class="sig-name descname"><span class="pre">handle_multi_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.InputPlugin.handle_multi_image" title="Link to this definition">#</a></dt>
-<dd><p>Handle frames with an image multiplicity.</p>
+<dd><p>Handle frames with image multiplicity.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1256,14 +1260,6 @@ used only for checks during live processing.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.prepare_carryon_check">
-<span class="sig-name descname"><span class="pre">prepare_carryon_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin.prepare_carryon_check" title="Link to this definition">#</a></dt>
-<dd><p>Prepare the checks of the multiprocessing carryon.</p>
-<p>By default, this gets and stores the file target size for live
-processing.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.update_filename_string">
 <span class="sig-name descname"><span class="pre">update_filename_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin.update_filename_string" title="Link to this definition">#</a></dt>
 <dd><p>Set up the generator that can create the full file names to load images.</p>
@@ -1275,7 +1271,7 @@ as defined in the ScanContext class.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">InputPlugin1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">InputPlugin1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin1d" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class for input plugins.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin1d.input_data_dim">
@@ -1292,7 +1288,7 @@ as defined in the ScanContext class.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.OutputPlugin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">OutputPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.OutputPlugin" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">OutputPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.OutputPlugin" title="Link to this definition">#</a></dt>
 <dd><p>The base class for output (file saving / plotting) plugins.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.OutputPlugin.get_output_filename">
@@ -1327,7 +1323,7 @@ label.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.ProcPlugin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">ProcPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.ProcPlugin" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">ProcPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.ProcPlugin" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class for processing plugins.</p>
 <p>This class updates the “plugin_type” and “plugin_subtype” attributes.</p>
 </dd></dl>
@@ -1351,7 +1347,7 @@ label.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">pyFAIintegrationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">pyFAIintegrationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase" title="Link to this definition">#</a></dt>
 <dd><p>Provide basic functionality for the concrete integration plugins.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.check_and_set_custom_mask">
@@ -1617,6 +1613,7 @@ will be used.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.copy"><code class="docutils literal notranslate"><span class="pre">BasePlugin.copy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.error_string_with_header"><code class="docutils literal notranslate"><span class="pre">BasePlugin.error_string_with_header</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.execute"><code class="docutils literal notranslate"><span class="pre">BasePlugin.execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_class_description"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_class_description</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.get_class_description_as_list"><code class="docutils literal notranslate"><span class="pre">BasePlugin.get_class_description_as_list</span></code></a></li>
@@ -1626,6 +1623,7 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.is_basic_plugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin.is_basic_plugin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.output_data_dim_str"><code class="docutils literal notranslate"><span class="pre">BasePlugin.output_data_dim_str</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">BasePlugin.pre_execute</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.raise_UserConfigError"><code class="docutils literal notranslate"><span class="pre">BasePlugin.raise_UserConfigError</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.register_as_base_class"><code class="docutils literal notranslate"><span class="pre">BasePlugin.register_as_base_class</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_data_label"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_data_label</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.BasePlugin.result_title"><code class="docutils literal notranslate"><span class="pre">BasePlugin.result_title</span></code></a></li>
@@ -1636,13 +1634,11 @@ will be used.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin"><code class="docutils literal notranslate"><span class="pre">InputPlugin</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin.execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.get_filename"><code class="docutils literal notranslate"><span class="pre">InputPlugin.get_filename</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.get_first_file_size"><code class="docutils literal notranslate"><span class="pre">InputPlugin.get_first_file_size</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.get_frame"><code class="docutils literal notranslate"><span class="pre">InputPlugin.get_frame</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.handle_multi_image"><code class="docutils literal notranslate"><span class="pre">InputPlugin.handle_multi_image</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.input_available"><code class="docutils literal notranslate"><span class="pre">InputPlugin.input_available</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.input_data_dim"><code class="docutils literal notranslate"><span class="pre">InputPlugin.input_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin.pre_execute</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.prepare_carryon_check"><code class="docutils literal notranslate"><span class="pre">InputPlugin.prepare_carryon_check</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.update_filename_string"><code class="docutils literal notranslate"><span class="pre">InputPlugin.update_filename_string</span></code></a></li>
 </ul>
 </li>
@@ -1738,7 +1734,7 @@ will be used.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

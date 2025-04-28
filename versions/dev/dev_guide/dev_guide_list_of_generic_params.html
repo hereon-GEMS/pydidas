@@ -39,7 +39,7 @@
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../_static/documentation_options.js?v=b38044db"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
@@ -477,19 +477,688 @@ and <a class="reference internal" href="../code/api/core/others.html#pydidas.cor
 available:</p>
 <nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#fit" id="id1">Fit</a></p></li>
-<li><p><a class="reference internal" href="#other" id="id2">Other</a></p></li>
-<li><p><a class="reference internal" href="#data-import" id="id3">Data import</a></p></li>
-<li><p><a class="reference internal" href="#scan" id="id4">Scan</a></p></li>
-<li><p><a class="reference internal" href="#settings" id="id5">Settings</a></p></li>
-<li><p><a class="reference internal" href="#image-ops" id="id6">Image ops</a></p></li>
-<li><p><a class="reference internal" href="#experiment" id="id7">Experiment</a></p></li>
-<li><p><a class="reference internal" href="#pyfai" id="id8">Pyfai</a></p></li>
+<li><p><a class="reference internal" href="#stress-strain" id="id1">Stress strain</a></p></li>
+<li><p><a class="reference internal" href="#settings" id="id2">Settings</a></p></li>
+<li><p><a class="reference internal" href="#scan" id="id3">Scan</a></p></li>
+<li><p><a class="reference internal" href="#fit" id="id4">Fit</a></p></li>
+<li><p><a class="reference internal" href="#data-import" id="id5">Data import</a></p></li>
+<li><p><a class="reference internal" href="#pyfai" id="id6">Pyfai</a></p></li>
+<li><p><a class="reference internal" href="#other" id="id7">Other</a></p></li>
+<li><p><a class="reference internal" href="#image-ops" id="id8">Image ops</a></p></li>
 <li><p><a class="reference internal" href="#proc" id="id9">Proc</a></p></li>
+<li><p><a class="reference internal" href="#experiment" id="id10">Experiment</a></p></li>
 </ul>
 </nav>
+<section id="stress-strain">
+<h3><a class="toc-backref" href="#id1" role="doc-backlink">Stress strain</a><a class="headerlink" href="#stress-strain" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">sin_square_chi_low_fit_limit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Lower bounds for fitting</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>range</strong> : (0, 1)</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary for the fitting range (in sin^2(chi)). This parameter is used to set the lower limit for the fitting range and it allows to ignore the first few points of the data.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">sin_square_chi_high_fit_limit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Upper bounds for fitting</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>range</strong> : (0, 1)</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary for the fitting range (in sin^2(chi)). This parameter is used to set the upper limit for the fitting range and it allows to ignore the last few points of the data.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="settings">
+<h3><a class="toc-backref" href="#id2" role="doc-backlink">Settings</a><a class="headerlink" href="#settings" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mp_n_workers</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 4</div>
+<div class="line"><strong>name</strong> : Number of MP workers</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of multiprocessing workers. Note that this number should not be set too high for two reasons:</div>
+<div class="line">1. File reading processes interfere with each other if too many are active at once.</div>
+<div class="line">2. pyFAI already inherently uses parallelization and you can only gain limited performance increases for multiple parallel processes.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">data_buffer_size</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1500</div>
+<div class="line"><strong>name</strong> : Data buffer size</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : MB</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The maximum size of the data buffer (for each display widget). Any data which is smaller than the buffer size will be stored in memory. Larger data will be read from disk in chunks.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_size</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 100</div>
+<div class="line"><strong>name</strong> : Shared buffer size limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : MB</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : A shared buffer is used to efficiently transport data between the main App and multiprocessing Processes. This buffer must be large enough to store at least one instance of all result data.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_max_n</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 20</div>
+<div class="line"><strong>name</strong> : Buffer dataframe limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The maximum number of datasets in the buffer. A dataset consists of all results for one frame. For performance reasons, the buffer should not be too large.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_image_size</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 100</div>
+<div class="line"><strong>name</strong> : Maximum image size</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : Mpx</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The maximum size (in megapixels) of images.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_detector_mask</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Use detector mask</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Flag to use a detector mask file and value. If False, no detector mask will be used.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_val</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Masked pixels display value</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The value to be used for the pixels masked on the detector. Note that this value will only be used for displaying the images. For pyFAI integration, the pixels will be fully masked and not be included.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_width</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Mosaic tiling border width</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The width of the border inserted between adjacent frames in the mosaic creation.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_value</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Mosaic border value</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The value to be put in the border pixels in mosaics.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">run_type</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Process in GUI</div>
+<div class="line"><strong>name</strong> : Run type</div>
+<div class="line"><strong>choices</strong> : [‘Process in GUI’, ‘Command line’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Specify how the processing shall be performed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_path</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Custom plugin paths</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The paths to all custom plugin locations. Individual entries must be separated by a double semicolon <cite>;;</cite>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_update_time</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1.0</div>
+<div class="line"><strong>name</strong> : Plot update time</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> : s</div>
+<div class="line"><strong>tooltip</strong> : The delay before any plot updates will be processed. This will prevent multiple frequent update of plots.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_number_curves</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 40</div>
+<div class="line"><strong>name</strong> : Maximum number of curves</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The maximum number of curves to plot. Increasing this number will allow more curves to be plotted simultaneously, but at the cost of significant performance decrease.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_high</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0.07</div>
+<div class="line"><strong>name</strong> : Histogram outlier fraction (high)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The fraction of pixels with high values which will be ignored when cropping the histogram for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger detector.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_low</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0.02</div>
+<div class="line"><strong>name</strong> : Histogram outlier fraction (low)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The fraction of pixels with low values which will be ignored when cropping the histogram for 2d plots.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_name</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Gray</div>
+<div class="line"><strong>name</strong> : Default colormap</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The default colormap used in pydidas plots.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_nan_color</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : #9AFEFF</div>
+<div class="line"><strong>name</strong> : Color for invalid data / no data</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>tooltip</strong> : The RGB color used to fill missing or invalid data points. Invalid data points are labeled with np.NaN values.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="scan">
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">Scan</a><a class="headerlink" href="#scan" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Scan dimensionsionality</div>
+<div class="line"><strong>choices</strong> : [1, 2, 3, 4]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The scan dimensionality. This defines the number of processed dimensions.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_title</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Scan name/title</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The scan name or title. This is used exclusively for reference in result exporters.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_base_directory</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : Path</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Scan base directory path</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The absolute path of the base directory in which to find this scan. Note that indivual plugins may automatically discover and use subdirectories. Please refer to the specific InputPlugin in use for more information.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_name_pattern</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : Path</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : The scan naming pattern</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The pattern used for naming scan (files). Use hashes ‘#’ for wildcards which will be filled in with numbers for the various files. Note that individual plugins may use this Parameter for either directory or file names. Please refer to the specific InputPlugin in use for more information.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_start_index</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : First filename number</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of the first file to be used in processing. This number will be applied as offset in the scan naming pattern to identify the respective filename for scan points.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index_stepping</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Frame index stepping</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The stepping of the index in frames. A value of n corresponds to only using every n-th index. For example, an index stepping of 3 with an offset of 5 would process the frames 5, 8, 11, 14 etc.</div>
+<div class="line">Please note that the index stepping refers to the frames, not the filenames. In the case of container files (e.g. hdf5), the index stepping will skip process every n-th frame, not every n-th file.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_multi_image_handling</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Average</div>
+<div class="line"><strong>name</strong> : Multi-image handling</div>
+<div class="line"><strong>choices</strong> : [‘Average’, ‘Sum’, ‘Maximum’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Define the handling of images if multiple images were acquired per scan point. If all individual images should be kept, please set the scan multiplicity to 1 and add an additional dimension with the multiplicity to the scan.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_multiplicity</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Image multiplicity</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of images acquired at <em>each</em> scan point. The default of ‘1’ corresponds to one image per scan point. Please note that the value for the multiplicity will be multiplied with the number of scan points. If this setting is used for ‘averaging’ images, please reduce the number of scan points correspondingly.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_label</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Name of scan direction 0</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The axis name for scan direction 0. This information will only be used for labelling.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_label</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Name of scan direction 1</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The axis name for scan direction 1. This information will only be used for labelling.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_label</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Name of scan direction 2</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The axis name for scan direction 2. This information will only be used for labelling.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_label</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Name of scan direction 3</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The axis name for scan direction 3. This information will only be used for labelling.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_n_points</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Number of scan points (dir. 0)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 0. The number of points is one higher than the number of intervals.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_n_points</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Number of scan points (dir. 1)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 1. The number of points is one higher than the number of intervals.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_n_points</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Number of scan points (dir. 2)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 2. The number of points is one higher than the number of intervals.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_n_points</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Number of scan points (dir. 3)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 3. The number of points is one higher than the number of intervals.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_delta</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Step width in direction 0</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 0.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_delta</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Step width in direction 1</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 1.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_delta</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Step width in direction 2</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 2.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_delta</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Step width in direction 3</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 3.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_offset</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Offset of direction 0</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 0 (i.e. the counter / motor position for scan step #0).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_offset</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Offset of direction 1</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 1 (i.e. the counter / motor position for scan step #0).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_offset</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Offset of direction 2</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 2 (i.e. the counter / motor position for scan step #0).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_offset</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Offset of direction 3</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 3 (i.e. the counter / motor position for scan step #0).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_unit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Unit of direction 0</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 0.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_unit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Unit of direction 1</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 1.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_unit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Unit of direction 2</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 2.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_unit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Unit of direction 3</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 3.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index0</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Scan dim. 0 index</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 0.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index1</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Scan dim. 1 index</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 1.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index2</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Scan dim. 2 index</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 2.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index3</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Scan dim. 3 index</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 3.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="fit">
-<h3><a class="toc-backref" href="#id1" role="doc-backlink">Fit</a><a class="headerlink" href="#fit" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Fit</a><a class="headerlink" href="#fit" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -829,624 +1498,8 @@ available:</p>
 </table>
 </div>
 </section>
-<section id="other">
-<h3><a class="toc-backref" href="#id2" role="doc-backlink">Other</a><a class="headerlink" href="#other" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 80.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Live processing</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Set live processing to True if the files do not yet exist at process startup. This will skip checks on file existence and size.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">label</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Node label</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : A label for identifying the Plugin node in the results. Internally, all Plugins are identified by their node IDs, this additional label is merely a handle for easier human identification.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">keep_results</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : bool</div>
-<div class="line"><strong>default</strong> : False</div>
-<div class="line"><strong>name</strong> : Always store results</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Flag to force pydidas to keep the results of this plugin available even if it is intermediary data and would normally not be stored.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_dataset_shape</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : tuple</div>
-<div class="line"><strong>default</strong> : (0, 0, 0)</div>
-<div class="line"><strong>name</strong> : Hdf5 dataset shape</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The shape of the hdf5 dataset. This corresponds to (number of images, image size y, image size x).</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_bg_file</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Subtract background image</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Keyword to toggle usage of background subtraction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">n_image</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Total number of images</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The total number of images in the composite images.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">n_files</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Total number of files</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The total number of selected files.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_nx</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Number of images in x</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of original images combined in the composite image in x direction. A value of -1 will determine the number of images in x direction automatically based on the number of images in y direction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_ny</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : -1</div>
-<div class="line"><strong>name</strong> : Number of images in y</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of original images combined in the composite image in y direction. A value of -1 will determine the number of images in y direction automatically based on the number of images in x direction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_dir</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : x</div>
-<div class="line"><strong>name</strong> : Preferred composite direction</div>
-<div class="line"><strong>choices</strong> : [‘x’, ‘y’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The ‘fast’ direction of the composite image. This dimension will be filled first before going to the next row/column.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_image_op</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Raw image operation</div>
-<div class="line"><strong>choices</strong> : [None, ‘Flip left/right’, ‘Flip up/down’, ‘Rot 180deg’, ‘Rot 90deg clockwise’, ‘Rot 90deg counter-clockwise’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The image operation applied to each raw image prior to merging it in the composite image. This allows to adjust the image orientation with respect to the scan.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_xdir_orientation</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : left-to-right</div>
-<div class="line"><strong>name</strong> : X orientation direction</div>
-<div class="line"><strong>choices</strong> : [‘left-to-right’, ‘right-to-left’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The direction of how images are inserted into the composite in x direction. Left-to-right starts with low indices (python standard) whereas right-to-left will insert image at the max index position first.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_ydir_orientation</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : top-to-bottom</div>
-<div class="line"><strong>name</strong> : Y orientation direction</div>
-<div class="line"><strong>choices</strong> : [‘top-to-bottom’, ‘bottom-to-top’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The direction of how images are inserted into the composite in y direction. Top-to-bottom starts with low indices (python standard) whereas bottom-to-top will insert image at the max index position first. Note that the display may be flipped with the origin at the bottom.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">first_index</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : First index</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The first index to be used for the file series.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">last_index</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Last index</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The last index to be used for the file series.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">frame_index</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Global frame index</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The global index of the frame to be processed. Note: The first frame number is always 0, irrespective of any offsets in the filenames.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_image_index</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Detector image number</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The detector image number, as files are written to disk.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">upper_limit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Upper limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no upper limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">lower_limit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Lower limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no lower limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">upper_limit_ax0</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Upper limit axis 0 (y)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no upper limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">lower_limit_ax0</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Lower limit axis 0 (y)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no lower limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">upper_limit_ax1</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Upper limit axis 1 (x)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no upper limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">lower_limit_ax1</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Lower limit axis 1 (x)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no lower limit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_results</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Autosave results</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Save the results automatically after finishing processing. The results for each plugin will be saved in a separate file (or files if multiple formats have been selected).</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_directory</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : Path</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Autosave directory</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The directory for autosave files.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_format</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : HDF5</div>
-<div class="line"><strong>name</strong> : Autosave formats</div>
-<div class="line"><strong>choices</strong> : [None, ‘HDF5’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The file format(s) for the data to be saved after the workflow has been executed. All data will be saved in a single folder for each run with one file for each plugin.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_fname</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : Path</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Output filename</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The output filename for the data export.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_fname_digits</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 6</div>
-<div class="line"><strong>name</strong> : Number of digits in filenames</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of digits to be used for the index of the output filename.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_index_offset</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : bool</div>
-<div class="line"><strong>default</strong> : False</div>
-<div class="line"><strong>name</strong> : Count output file numbers from 1 instead of 0</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : If True, the output files will be numbered starting from 1. If False, the numbering will start from 0 as is the python default.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">selected_results</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : No selection</div>
-<div class="line"><strong>name</strong> : Select node result to display</div>
-<div class="line"><strong>choices</strong> : [‘No selection’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The selected node of the WorkflowTree to display the corresponding results.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">saving_format</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : HDF5</div>
-<div class="line"><strong>name</strong> : Save to format</div>
-<div class="line"><strong>choices</strong> : [None, ‘HDF5’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The file format(s) for saving the data. All data will be saved in a single folder for each run.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">enable_overwrite</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : False</div>
-<div class="line"><strong>name</strong> : Enable overwriting</div>
-<div class="line"><strong>choices</strong> : [False, True]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Allow overwriting of existing files and writing in existing folders. If this Parameter is True, no further confirmation will be asked and no further warning will be displayed.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_scan_timeline</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : False</div>
-<div class="line"><strong>name</strong> : Use scan timeline</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Keyword to toggle using a scan timeline with only one dimension instead of all scan dimensions.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_data_range</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : True</div>
-<div class="line"><strong>name</strong> : Use data range</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Keyword to toggle using a the data range instead of the indices for selecting data.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : False</div>
-<div class="line"><strong>name</strong> : Scan for all new files</div>
-<div class="line"><strong>choices</strong> : [False, True]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Scan for all new files and not only files matching the input pattern.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">result_n_dim</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : -1</div>
-<div class="line"><strong>name</strong> : Result dimensionality</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The total number of dimensions in the result dataset.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">active_node</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : The active node</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The node ID of the currently selected node.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">type_selection</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Data values</div>
-<div class="line"><strong>name</strong> : Data selection</div>
-<div class="line"><strong>choices</strong> : [‘Data values’, ‘Indices’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Select between using the axis values (in the respective.unit) and the axis indices.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_ax1</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Data axis no. 1 for plot</div>
-<div class="line"><strong>choices</strong> : [0]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The axis which is to be used as the first axis in the plot of the results.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_ax2</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Data axis no. 2 for plot</div>
-<div class="line"><strong>choices</strong> : [0, 1]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The axis which is to be used as the second axis in the plot of the results.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">overlay_color</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : orange</div>
-<div class="line"><strong>name</strong> : Plot overlay color</div>
-<div class="line"><strong>choices</strong> : [‘orange’, ‘blue’, ‘red’, ‘green’, ‘purple’, ‘cyan’, ‘gray’, ‘black’, ‘white’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Set the display color for the overlay items (markers and shapes) in the plot.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mask_threshold_low</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Lower mask threshold</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The lower threshold for the mask. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be masked. A value of np.nan or None will ignore the threshold.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mask_threshold_high</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Upper mask threshold</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The upper threshold for the mask. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value above the threshold will be masked. A value of np.nan or None will ignore the threshold.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mask_grow</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Grow/shrink masked regions</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The masked region can be grown (morphological dilation) or shrunk (morphological erosion), based on the input value. A value &gt;0 will grow the masked region by the specified amounts in pixels, a value less than zero will erode the masked regions by the specified amount.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">kernel_iterations</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Grow/shrink iterations</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of iterations to apply the erosion/dilation operation on the masked region.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">process_data_dim</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : -1</div>
-<div class="line"><strong>name</strong> : Process data dimension</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : This parameter determines which data dimension should be processed if the input data dimensionality is larger than the processing dimensionality. The default of -1 will always use the last data dimension.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_process_data_dim</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : -1</div>
-<div class="line"><strong>name</strong> : Process data dimension</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : This internal parameter can store the modulated data dimension to be processed.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">process_data_dims</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : tuple</div>
-<div class="line"><strong>default</strong> : (0, 1)</div>
-<div class="line"><strong>name</strong> : Process data dimensions</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>subtype</strong> : &lt;class ‘int’&gt;</div>
-<div class="line"><strong>tooltip</strong> : This parameter determines which data dimensions should be processed if the input data dimensionality is larger than the processing dimensionality. The default of None will default to the full data dimensions and raise an error if the input data has more dimensions than expected for processing.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_process_data_dims</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : tuple</div>
-<div class="line"><strong>default</strong> : None</div>
-<div class="line"><strong>name</strong> : Process data dimensions</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>subtype</strong> : &lt;class ‘int’&gt;</div>
-<div class="line"><strong>tooltip</strong> : This internal Parameter can store the modulated data dimensions to be processed.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">auto_check_for_updates</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : True</div>
-<div class="line"><strong>name</strong> : Check for updates</div>
-<div class="line"><strong>choices</strong> : [False, True]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : This parameter allows the user to activate/deactivate the automatic checking for updates at startup.</div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 <section id="data-import">
-<h3><a class="toc-backref" href="#id3" role="doc-backlink">Data import</a><a class="headerlink" href="#data-import" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Data import</a><a class="headerlink" href="#data-import" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -1893,8 +1946,8 @@ available:</p>
 </table>
 </div>
 </section>
-<section id="scan">
-<h3><a class="toc-backref" href="#id4" role="doc-backlink">Scan</a><a class="headerlink" href="#scan" title="Link to this heading">#</a></h3>
+<section id="pyfai">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Pyfai</a><a class="headerlink" href="#pyfai" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -1906,388 +1959,207 @@ available:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_npoint</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Scan dimensionsionality</div>
-<div class="line"><strong>choices</strong> : [1, 2, 3, 4]</div>
+<div class="line"><strong>default</strong> : 1000</div>
+<div class="line"><strong>name</strong> : Num points radial integration</div>
+<div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The scan dimensionality. This defines the number of processed dimensions.</div>
+<div class="line"><strong>tooltip</strong> : The number of bins in radial direction for the pyFAI integration.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_title</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_unit</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Scan name/title</div>
-<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>default</strong> : 2theta / deg</div>
+<div class="line"><strong>name</strong> : Radial unit</div>
+<div class="line"><strong>choices</strong> : [‘Q / nm^-1’, ‘Q / A^-1’, ‘r / mm’, ‘2theta / deg’, ‘2theta / rad’]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The scan name or title. This is used exclusively for reference in result exporters.</div>
+<div class="line"><strong>tooltip</strong> : The unit and type of the azimuthal profile.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_base_directory</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : Path</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Scan base directory path</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The absolute path of the base directory in which to find this scan. Note that indivual plugins may automatically discover and use subdirectories. Please refer to the specific InputPlugin in use for more information.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_name_pattern</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : Path</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : The scan naming pattern</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The pattern used for naming scan (files). Use hashes ‘#’ for wildcards which will be filled in with numbers for the various files. Note that individual plugins may use this Parameter for either directory or file names. Please refer to the specific InputPlugin in use for more information.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_start_index</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : First filename number</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of the first file to be used in processing. This number will be applied as offset in the scan naming pattern to identify the respective filename for scan points.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index_stepping</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Frame index stepping</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The stepping of the index in frames. A value of n corresponds to only using every n-th index. For example, an index stepping of 3 with an offset of 5 would process the frames 5, 8, 11, 14 etc.</div>
-<div class="line">Please note that the index stepping refers to the frames, not the filenames. In the case of container files (e.g. hdf5), the index stepping will skip process every n-th frame, not every n-th file.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_multi_image_handling</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_use_range</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Average</div>
-<div class="line"><strong>name</strong> : Multi-image handling</div>
-<div class="line"><strong>choices</strong> : [‘Average’, ‘Sum’, ‘Maximum’]</div>
+<div class="line"><strong>default</strong> : Full detector</div>
+<div class="line"><strong>name</strong> : Radial range</div>
+<div class="line"><strong>choices</strong> : [‘Full detector’, ‘Specify radial range’]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Define the handling of images if multiple images were acquired per scan point. If all individual images should be kept, please set the scan multiplicity to 1 and add an additional dimension with the multiplicity to the scan.</div>
+<div class="line"><strong>tooltip</strong> : Toggle to limit the radial integration range or use the full data range. If ‘Specify radial range’ is used, boundaries need to be defined in the lower and upper radial range Parameters.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_multiplicity</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Image multiplicity</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of images acquired at <em>each</em> scan point. The default of ‘1’ corresponds to one image per scan point. Please note that the value for the multiplicity will be multiplied with the number of scan points. If this setting is used for ‘averaging’ images, please reduce the number of scan points correspondingly.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_label</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Name of scan direction 0</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The axis name for scan direction 0. This information will only be used for labelling.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_label</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Name of scan direction 1</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The axis name for scan direction 1. This information will only be used for labelling.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_label</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Name of scan direction 2</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The axis name for scan direction 2. This information will only be used for labelling.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_label</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Name of scan direction 3</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The axis name for scan direction 3. This information will only be used for labelling.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_n_points</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Number of scan points (dir. 0)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 0. The number of points is one higher than the number of intervals.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_n_points</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Number of scan points (dir. 1)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 1. The number of points is one higher than the number of intervals.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_n_points</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Number of scan points (dir. 2)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 2. The number of points is one higher than the number of intervals.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_n_points</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Number of scan points (dir. 3)</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The total number of scan points in scan direction 3. The number of points is one higher than the number of intervals.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_delta</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Step width in direction 0</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 0.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_delta</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Step width in direction 1</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 1.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_delta</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Step width in direction 2</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 2.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_delta</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1</div>
-<div class="line"><strong>name</strong> : Step width in direction 3</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The step width between scan points in direction 3.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_offset</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_range_lower</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Offset of direction 0</div>
+<div class="line"><strong>name</strong> : Radial lower range</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 0 (i.e. the counter / motor position for scan step #0).</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary of the radial integration range. This setting is only used if the ‘Specify radial range’ is set. This value needs to be given in the unit selected as radial unit.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_offset</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_range_upper</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Offset of direction 1</div>
+<div class="line"><strong>name</strong> : Radial upper range</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 1 (i.e. the counter / motor position for scan step #0).</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary of the radial integration range. This setting is only used if ‘Specify radial range’ is set. This value needs to be given in the unit selected as radial unit.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_offset</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_npoint</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1000</div>
+<div class="line"><strong>name</strong> : Num points azimuthal integration</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of bins in azimuthal direction for the pyFAI integration.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_unit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : chi / deg</div>
+<div class="line"><strong>name</strong> : Azimuthal unit</div>
+<div class="line"><strong>choices</strong> : [‘chi / deg’, ‘chi / rad’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The unit and type of the azimuthal profile.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_use_range</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Full detector</div>
+<div class="line"><strong>name</strong> : Azimuthal range</div>
+<div class="line"><strong>choices</strong> : [‘Full detector’, ‘Specify azimuthal range’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Toggle to limit the azimuthal integration range or use the full data range. If ‘Specify azimuthal range’ is used, boundaries need to be defined in the lower and upper azimuthal range Parameters.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_range_lower</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Offset of direction 2</div>
+<div class="line"><strong>name</strong> : Azimuthal lower range</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 2 (i.e. the counter / motor position for scan step #0).</div>
+<div class="line"><strong>tooltip</strong> : The lower boundary of the azimuthal integration range. This setting is only used if ‘Specify azimuthal range’ is set. This value needs to be given in the unit selected as azimuthal unit.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_offset</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_range_upper</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Offset of direction 3</div>
+<div class="line"><strong>name</strong> : Azimuthal upper range</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The coordinate offset of the movement in scan direction 3 (i.e. the counter / motor position for scan step #0).</div>
+<div class="line"><strong>tooltip</strong> : The upper boundary of the azimuthal integration range. This setting is only used if ‘Specify azimuthal range’ is set. This value needs to be given in the unit selected as azimuthal unit.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim0_unit</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_sector_width</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 20</div>
+<div class="line"><strong>name</strong> : Azimuthal sector width</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The width of each azimuthal sector (in azimuthal units).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_sector_centers</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Unit of direction 0</div>
+<div class="line"><strong>default</strong> : 0; 90; 180; 270</div>
+<div class="line"><strong>name</strong> : Azimuthal sector centers</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 0.</div>
+<div class="line"><strong>tooltip</strong> : The centers of the azimuthal sectors to be integrated (in azimuthal units). Separate multiple sectors by semicolons.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim1_unit</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">int_method</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Unit of direction 1</div>
-<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>default</strong> : CSR</div>
+<div class="line"><strong>name</strong> : PyFAI integration method</div>
+<div class="line"><strong>choices</strong> : [‘CSR’, ‘CSR OpenCL’, ‘CSR full’, ‘CSR full OpenCL’, ‘LUT’, ‘LUT OpenCL’, ‘LUT full’, ‘LUT full OpenCL’]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 1.</div>
+<div class="line"><strong>tooltip</strong> : The integration method. For a full reference, please visit the pyfai documentation available at: <a class="reference external" href="https://pyfai.readthedocs.io/">https://pyfai.readthedocs.io/</a></div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim2_unit</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">integration_direction</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Unit of direction 2</div>
-<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>default</strong> : Azimuthal integration</div>
+<div class="line"><strong>name</strong> : Integration direction</div>
+<div class="line"><strong>choices</strong> : [‘Azimuthal integration’, ‘Radial integration’, ‘2D integration’]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 2.</div>
+<div class="line"><strong>tooltip</strong> : The integration direction.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_dim3_unit</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_model</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Unit of direction 3</div>
-<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>default</strong> : Custom detector</div>
+<div class="line"><strong>name</strong> : Detector model</div>
+<div class="line"><strong>choices</strong> : [‘Custom detector’]</div>
 <div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The unit of the positions in scan direction 3.</div>
+<div class="line"><strong>allow_None</strong> : None</div>
+<div class="line"><strong>tooltip</strong> : The model name of the detector.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index0</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">polarization_factor</span></code></p></td>
 <td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Scan dim. 0 index</div>
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 0.99</div>
+<div class="line"><strong>name</strong> : Polarization factor</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 0.</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The Polarization factor. Must be a number between -1 (vertical) and +1 (horizontal). 0 corresponds to circular polarizazion, None corresponds to no correction.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index1</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">correct_solid_angle</span></code></p></td>
 <td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Scan dim. 1 index</div>
-<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : True</div>
+<div class="line"><strong>name</strong> : Correct solid angle</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 1.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index2</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Scan dim. 2 index</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 2.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_index3</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Scan dim. 3 index</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The position index for the scan dimension 3.</div>
+<div class="line"><strong>tooltip</strong> : The correct solid angle Parameter in pyFAI (de)activates the correction for the solid angle of the detector pixels. Detector pixels further away from the beam axis see a smaller projected intensity. Using this parameter allows to correct for this effect, if set to True.</div>
 </div>
 </td>
 </tr>
@@ -2295,8 +2167,8 @@ available:</p>
 </table>
 </div>
 </section>
-<section id="settings">
-<h3><a class="toc-backref" href="#id5" role="doc-backlink">Settings</a><a class="headerlink" href="#settings" title="Link to this heading">#</a></h3>
+<section id="other">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Other</a><a class="headerlink" href="#other" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -2308,209 +2180,626 @@ available:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mp_n_workers</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 4</div>
-<div class="line"><strong>name</strong> : Number of MP workers</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of multiprocessing workers. Note that this number should not be set too high for two reasons:</div>
-<div class="line">1. File reading processes interfere with each other if too many are active at once.</div>
-<div class="line">2. pyFAI already inherently uses parallelization and you can only gain limited performance increases for multiple parallel processes.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">data_buffer_size</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1500</div>
-<div class="line"><strong>name</strong> : Data buffer size</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : MB</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The maximum size of the data buffer (for each display widget). Any data which is smaller than the buffer size will be stored in memory. Larger data will be read from disk in chunks.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_size</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 100</div>
-<div class="line"><strong>name</strong> : Shared buffer size limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : MB</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : A shared buffer is used to efficiently transport data between the main App and multiprocessing Processes. This buffer must be large enough to store at least one instance of all result data.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_max_n</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 20</div>
-<div class="line"><strong>name</strong> : Buffer dataframe limit</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The maximum number of datasets in the buffer. A dataset consists of all results for one frame. For performance reasons, the buffer should not be too large.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_image_size</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 100</div>
-<div class="line"><strong>name</strong> : Maximum image size</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : Mpx</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The maximum size (in megapixels) of images.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_detector_mask</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : bool</div>
-<div class="line"><strong>default</strong> : False</div>
-<div class="line"><strong>name</strong> : Use detector mask</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Live processing</div>
 <div class="line"><strong>choices</strong> : [True, False]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Flag to use a detector mask file and value. If False, no detector mask will be used.</div>
+<div class="line"><strong>tooltip</strong> : Set live processing to True if the files do not yet exist at process startup. This will skip checks on file existence and size.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_val</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Masked pixels display value</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The value to be used for the pixels masked on the detector. Note that this value will only be used for displaying the images. For pyFAI integration, the pixels will be fully masked and not be included.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_width</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Mosaic tiling border width</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> : px</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The width of the border inserted between adjacent frames in the mosaic creation.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_value</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Mosaic border value</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The value to be put in the border pixels in mosaics.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">run_type</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Process in GUI</div>
-<div class="line"><strong>name</strong> : Run type</div>
-<div class="line"><strong>choices</strong> : [‘Process in GUI’, ‘Command line’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Specify how the processing shall be performed.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_path</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">label</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> :</div>
-<div class="line"><strong>name</strong> : Custom plugin paths</div>
+<div class="line"><strong>name</strong> : Node label</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The paths to all custom plugin locations. Individual entries must be separated by a double semicolon <cite>;;</cite>.</div>
+<div class="line"><strong>tooltip</strong> : A label for identifying the Plugin node in the results. Internally, all Plugins are identified by their node IDs, this additional label is merely a handle for easier human identification.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_update_time</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">keep_results</span></code></p></td>
 <td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 1.0</div>
-<div class="line"><strong>name</strong> : Plot update time</div>
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Always store results</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Flag to force pydidas to keep the results of this plugin available even if it is intermediary data and would normally not be stored.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_dataset_shape</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : tuple</div>
+<div class="line"><strong>default</strong> : (0, 0, 0)</div>
+<div class="line"><strong>name</strong> : Hdf5 dataset shape</div>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>unit</strong> : s</div>
-<div class="line"><strong>tooltip</strong> : The delay before any plot updates will be processed. This will prevent multiple frequent update of plots.</div>
+<div class="line"><strong>tooltip</strong> : The shape of the hdf5 dataset. This corresponds to (number of images, image size y, image size x).</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_number_curves</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_bg_file</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 40</div>
-<div class="line"><strong>name</strong> : Maximum number of curves</div>
-<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Subtract background image</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The maximum number of curves to plot. Increasing this number will allow more curves to be plotted simultaneously, but at the cost of significant performance decrease.</div>
+<div class="line"><strong>tooltip</strong> : Keyword to toggle usage of background subtraction.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_high</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">n_image</span></code></p></td>
 <td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0.07</div>
-<div class="line"><strong>name</strong> : Histogram outlier fraction (high)</div>
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Total number of images</div>
 <div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>allow_None</strong> : False</div>
 <div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The fraction of pixels with high values which will be ignored when cropping the histogram for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger detector.</div>
+<div class="line"><strong>tooltip</strong> : The total number of images in the composite images.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_low</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">n_files</span></code></p></td>
 <td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0.02</div>
-<div class="line"><strong>name</strong> : Histogram outlier fraction (low)</div>
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Total number of files</div>
 <div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>allow_None</strong> : False</div>
 <div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The fraction of pixels with low values which will be ignored when cropping the histogram for 2d plots.</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The total number of selected files.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_name</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_nx</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Number of images in x</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of original images combined in the composite image in x direction. A value of -1 will determine the number of images in x direction automatically based on the number of images in y direction.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_ny</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : -1</div>
+<div class="line"><strong>name</strong> : Number of images in y</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of original images combined in the composite image in y direction. A value of -1 will determine the number of images in y direction automatically based on the number of images in x direction.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_dir</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Gray</div>
-<div class="line"><strong>name</strong> : Default colormap</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>default</strong> : x</div>
+<div class="line"><strong>name</strong> : Preferred composite direction</div>
+<div class="line"><strong>choices</strong> : [‘x’, ‘y’]</div>
 <div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The default colormap used in pydidas plots.</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The ‘fast’ direction of the composite image. This dimension will be filled first before going to the next row/column.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_nan_color</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_image_op</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : #9AFEFF</div>
-<div class="line"><strong>name</strong> : Color for invalid data / no data</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Raw image operation</div>
+<div class="line"><strong>choices</strong> : [None, ‘Flip left/right’, ‘Flip up/down’, ‘Rot 180deg’, ‘Rot 90deg clockwise’, ‘Rot 90deg counter-clockwise’]</div>
 <div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>tooltip</strong> : The RGB color used to fill missing or invalid data points. Invalid data points are labeled with np.NaN values.</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The image operation applied to each raw image prior to merging it in the composite image. This allows to adjust the image orientation with respect to the scan.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_xdir_orientation</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : left-to-right</div>
+<div class="line"><strong>name</strong> : X orientation direction</div>
+<div class="line"><strong>choices</strong> : [‘left-to-right’, ‘right-to-left’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The direction of how images are inserted into the composite in x direction. Left-to-right starts with low indices (python standard) whereas right-to-left will insert image at the max index position first.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">composite_ydir_orientation</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : top-to-bottom</div>
+<div class="line"><strong>name</strong> : Y orientation direction</div>
+<div class="line"><strong>choices</strong> : [‘top-to-bottom’, ‘bottom-to-top’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The direction of how images are inserted into the composite in y direction. Top-to-bottom starts with low indices (python standard) whereas bottom-to-top will insert image at the max index position first. Note that the display may be flipped with the origin at the bottom.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">first_index</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : First index</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The first index to be used for the file series.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">last_index</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Last index</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The last index to be used for the file series.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">frame_index</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Global frame index</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The global index of the frame to be processed. Note: The first frame number is always 0, irrespective of any offsets in the filenames.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_image_index</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Detector image number</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The detector image number, as files are written to disk.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">upper_limit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Upper limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no upper limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">lower_limit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Lower limit</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no lower limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">upper_limit_ax0</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Upper limit axis 0 (y)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no upper limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">lower_limit_ax0</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Lower limit axis 0 (y)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no lower limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">upper_limit_ax1</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Upper limit axis 1 (x)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no upper limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">lower_limit_ax1</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Lower limit axis 1 (x)</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower limit of data selection. This point is included in the data. Note that the selection is either in indices or data range, depending on the value of ‘type_selection’. A limit of ‘None’ will set no lower limit.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_results</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Autosave results</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Save the results automatically after finishing processing. The results for each plugin will be saved in a separate file (or files if multiple formats have been selected).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_directory</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : Path</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Autosave directory</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The directory for autosave files.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_format</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : HDF5</div>
+<div class="line"><strong>name</strong> : Autosave formats</div>
+<div class="line"><strong>choices</strong> : [None, ‘HDF5’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The file format(s) for the data to be saved after the workflow has been executed. All data will be saved in a single folder for each run with one file for each plugin.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_fname</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : Path</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Output filename</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The output filename for the data export.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_fname_digits</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 6</div>
+<div class="line"><strong>name</strong> : Number of digits in filenames</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of digits to be used for the index of the output filename.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_index_offset</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Count output file numbers from 1 instead of 0</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : If True, the output files will be numbered starting from 1. If False, the numbering will start from 0 as is the python default.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_export_images_flag</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Export results as image for each data point</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : If selected, the plugin will export images of the results for each data point. Please keep in mind that this will slow down processing and potentially create a large number of files.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">selected_results</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : No selection</div>
+<div class="line"><strong>name</strong> : Select node result to display</div>
+<div class="line"><strong>choices</strong> : [‘No selection’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The selected node of the WorkflowTree to display the corresponding results.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">saving_format</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : HDF5</div>
+<div class="line"><strong>name</strong> : Save to format</div>
+<div class="line"><strong>choices</strong> : [None, ‘HDF5’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The file format(s) for saving the data. All data will be saved in a single folder for each run.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">enable_overwrite</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Enable overwriting</div>
+<div class="line"><strong>choices</strong> : [False, True]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Allow overwriting of existing files and writing in existing folders. If this Parameter is True, no further confirmation will be asked and no further warning will be displayed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_scan_timeline</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Use scan timeline</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Keyword to toggle using a scan timeline with only one dimension instead of all scan dimensions.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">squeeze_empty_dims</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : True</div>
+<div class="line"><strong>name</strong> : Squeeze empty dimensions</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Keyword to toggle squeezing empty dimensions from the result dataset.This will remove all dimensions with a size of 1.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_data_range</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : True</div>
+<div class="line"><strong>name</strong> : Use data range</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Keyword to toggle using a the data range instead of the indices for selecting data.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Scan for all new files</div>
+<div class="line"><strong>choices</strong> : [False, True]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Scan for all new files and not only files matching the input pattern.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">result_n_dim</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : -1</div>
+<div class="line"><strong>name</strong> : Result dimensionality</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The total number of dimensions in the result dataset.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">active_node</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : The active node</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The node ID of the currently selected node.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">type_selection</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Data values</div>
+<div class="line"><strong>name</strong> : Data selection</div>
+<div class="line"><strong>choices</strong> : [‘Data values’, ‘Indices’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Select between using the axis values (in the respective.unit) and the axis indices.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_ax1</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Data axis no. 1 for plot</div>
+<div class="line"><strong>choices</strong> : [0]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The axis which is to be used as the first axis in the plot of the results.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_ax2</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Data axis no. 2 for plot</div>
+<div class="line"><strong>choices</strong> : [0, 1]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The axis which is to be used as the second axis in the plot of the results.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">overlay_color</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : orange</div>
+<div class="line"><strong>name</strong> : Plot overlay color</div>
+<div class="line"><strong>choices</strong> : [‘orange’, ‘blue’, ‘red’, ‘green’, ‘purple’, ‘cyan’, ‘gray’, ‘black’, ‘white’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Set the display color for the overlay items (markers and shapes) in the plot.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mask_threshold_low</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Lower mask threshold</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The lower threshold for the mask. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be masked. A value of np.nan or None will ignore the threshold.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mask_threshold_high</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Upper mask threshold</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The upper threshold for the mask. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value above the threshold will be masked. A value of np.nan or None will ignore the threshold.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mask_grow</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Grow/shrink masked regions</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : px</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The masked region can be grown (morphological dilation) or shrunk (morphological erosion), based on the input value. A value &gt;0 will grow the masked region by the specified amounts in pixels, a value less than zero will erode the masked regions by the specified amount.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">kernel_iterations</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 1</div>
+<div class="line"><strong>name</strong> : Grow/shrink iterations</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The number of iterations to apply the erosion/dilation operation on the masked region.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">process_data_dim</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : -1</div>
+<div class="line"><strong>name</strong> : Process data dimension</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : This parameter determines which data dimension should be processed if the input data dimensionality is larger than the processing dimensionality. The default of -1 will always use the last data dimension.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_process_data_dim</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : -1</div>
+<div class="line"><strong>name</strong> : Process data dimension</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : This internal parameter can store the modulated data dimension to be processed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">process_data_dims</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : tuple</div>
+<div class="line"><strong>default</strong> : (0, 1)</div>
+<div class="line"><strong>name</strong> : Process data dimensions</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>subtype</strong> : &lt;class ‘int’&gt;</div>
+<div class="line"><strong>tooltip</strong> : This parameter determines which data dimensions should be processed if the input data dimensionality is larger than the processing dimensionality. The default of None will default to the full data dimensions and raise an error if the input data has more dimensions than expected for processing.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_process_data_dims</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : tuple</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Process data dimensions</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>subtype</strong> : &lt;class ‘int’&gt;</div>
+<div class="line"><strong>tooltip</strong> : This internal Parameter can store the modulated data dimensions to be processed.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">auto_check_for_updates</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : True</div>
+<div class="line"><strong>name</strong> : Check for updates</div>
+<div class="line"><strong>choices</strong> : [False, True]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : This parameter allows the user to activate/deactivate the automatic checking for updates at startup.</div>
 </div>
 </td>
 </tr>
@@ -2519,7 +2808,7 @@ available:</p>
 </div>
 </section>
 <section id="image-ops">
-<h3><a class="toc-backref" href="#id6" role="doc-backlink">Image ops</a><a class="headerlink" href="#image-ops" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Image ops</a><a class="headerlink" href="#image-ops" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -2691,8 +2980,49 @@ available:</p>
 </table>
 </div>
 </section>
+<section id="proc">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Proc</a><a class="headerlink" href="#proc" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">d_spacing_unit</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Angstrom</div>
+<div class="line"><strong>name</strong> : d-spacing unit</div>
+<div class="line"><strong>choices</strong> : [‘Angstrom’, ‘nm’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The output d-spacing unit. Å for Angstroms and nm for nanometers.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">output_type</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : Same as input</div>
+<div class="line"><strong>name</strong> : Output data type</div>
+<div class="line"><strong>choices</strong> : [‘Same as input’, ‘2theta / deg’, ‘2theta / rad’, ‘d-spacing / nm’, ‘d-spacing / A’, ‘Q / nm^-1’, ‘Q / A^-1’, ‘r / mm’]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The unit of the output data. The default is <cite>Same as input</cite>, which means that the output data will have the same unit as the input data. Choosing a different unit will convert the data to the selected unit.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="experiment">
-<h3><a class="toc-backref" href="#id7" role="doc-backlink">Experiment</a><a class="headerlink" href="#experiment" title="Link to this heading">#</a></h3>
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Experiment</a><a class="headerlink" href="#experiment" title="Link to this heading">#</a></h3>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
@@ -2948,256 +3278,6 @@ available:</p>
 </table>
 </div>
 </section>
-<section id="pyfai">
-<h3><a class="toc-backref" href="#id8" role="doc-backlink">Pyfai</a><a class="headerlink" href="#pyfai" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 80.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_npoint</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1000</div>
-<div class="line"><strong>name</strong> : Num points radial integration</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of bins in radial direction for the pyFAI integration.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_unit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : 2theta / deg</div>
-<div class="line"><strong>name</strong> : Radial unit</div>
-<div class="line"><strong>choices</strong> : [‘Q / nm^-1’, ‘Q / A^-1’, ‘r / mm’, ‘2theta / deg’, ‘2theta / rad’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The unit and type of the azimuthal profile.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_use_range</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Full detector</div>
-<div class="line"><strong>name</strong> : Radial range</div>
-<div class="line"><strong>choices</strong> : [‘Full detector’, ‘Specify radial range’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Toggle to limit the radial integration range or use the full data range. If ‘Specify radial range’ is used, boundaries need to be defined in the lower and upper radial range Parameters.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_range_lower</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Radial lower range</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary of the radial integration range. This setting is only used if the ‘Specify radial range’ is set. This value needs to be given in the unit selected as radial unit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">rad_range_upper</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Radial upper range</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary of the radial integration range. This setting is only used if ‘Specify radial range’ is set. This value needs to be given in the unit selected as radial unit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_npoint</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : int</div>
-<div class="line"><strong>default</strong> : 1000</div>
-<div class="line"><strong>name</strong> : Num points azimuthal integration</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of bins in azimuthal direction for the pyFAI integration.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_unit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : chi / deg</div>
-<div class="line"><strong>name</strong> : Azimuthal unit</div>
-<div class="line"><strong>choices</strong> : [‘chi / deg’, ‘chi / rad’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The unit and type of the azimuthal profile.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_use_range</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Full detector</div>
-<div class="line"><strong>name</strong> : Azimuthal range</div>
-<div class="line"><strong>choices</strong> : [‘Full detector’, ‘Specify azimuthal range’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Toggle to limit the azimuthal integration range or use the full data range. If ‘Specify azimuthal range’ is used, boundaries need to be defined in the lower and upper azimuthal range Parameters.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_range_lower</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Azimuthal lower range</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The lower boundary of the azimuthal integration range. This setting is only used if ‘Specify azimuthal range’ is set. This value needs to be given in the unit selected as azimuthal unit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_range_upper</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0</div>
-<div class="line"><strong>name</strong> : Azimuthal upper range</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The upper boundary of the azimuthal integration range. This setting is only used if ‘Specify azimuthal range’ is set. This value needs to be given in the unit selected as azimuthal unit.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_sector_width</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 20</div>
-<div class="line"><strong>name</strong> : Azimuthal sector width</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The width of each azimuthal sector (in azimuthal units).</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">azi_sector_centers</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : 0; 90; 180; 270</div>
-<div class="line"><strong>name</strong> : Azimuthal sector centers</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The centers of the azimuthal sectors to be integrated (in azimuthal units). Separate multiple sectors by semicolons.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">int_method</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : CSR</div>
-<div class="line"><strong>name</strong> : PyFAI integration method</div>
-<div class="line"><strong>choices</strong> : [‘CSR’, ‘CSR OpenCL’, ‘CSR full’, ‘CSR full OpenCL’, ‘LUT’, ‘LUT OpenCL’, ‘LUT full’, ‘LUT full OpenCL’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The integration method. For a full reference, please visit the pyfai documentation available at: <a class="reference external" href="https://pyfai.readthedocs.io/">https://pyfai.readthedocs.io/</a></div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">integration_direction</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Azimuthal integration</div>
-<div class="line"><strong>name</strong> : Integration direction</div>
-<div class="line"><strong>choices</strong> : [‘Azimuthal integration’, ‘Radial integration’, ‘2D integration’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The integration direction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_model</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Custom detector</div>
-<div class="line"><strong>name</strong> : Detector model</div>
-<div class="line"><strong>choices</strong> : [‘Custom detector’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : None</div>
-<div class="line"><strong>tooltip</strong> : The model name of the detector.</div>
-</div>
-</td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">polarization_factor</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : float</div>
-<div class="line"><strong>default</strong> : 0.99</div>
-<div class="line"><strong>name</strong> : Polarization factor</div>
-<div class="line"><strong>choices</strong> : None</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The Polarization factor. Must be a number between -1 (vertical) and +1 (horizontal). 0 corresponds to circular polarizazion, None corresponds to no correction.</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">correct_solid_angle</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : bool</div>
-<div class="line"><strong>default</strong> : True</div>
-<div class="line"><strong>name</strong> : Correct solid angle</div>
-<div class="line"><strong>choices</strong> : [True, False]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The correct solid angle Parameter in pyFAI (de)activates the correction for the solid angle of the detector pixels. Detector pixels further away from the beam axis see a smaller projected intensity. Using this parameter allows to correct for this effect, if set to True.</div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="proc">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">Proc</a><a class="headerlink" href="#proc" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="tight-table table">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 80.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">d_spacing_unit</span></code></p></td>
-<td><div class="line-block">
-<div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Angstrom</div>
-<div class="line"><strong>name</strong> : d-spacing unit</div>
-<div class="line"><strong>choices</strong> : [‘Angstrom’, ‘nm’]</div>
-<div class="line"><strong>unit</strong> :</div>
-<div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The output d-spacing unit. Å for Angstroms and nm for nanometers.</div>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 </section>
 </section>
 
@@ -3240,15 +3320,16 @@ available:</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-generic-parameters">List of generic Parameters</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit">Fit</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-import">Data import</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scan">Scan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stress-strain">Stress strain</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#settings">Settings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-ops">Image ops</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment">Experiment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scan">Scan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit">Fit</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-import">Data import</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pyfai">Pyfai</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-ops">Image ops</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proc">Proc</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment">Experiment</a></li>
 </ul>
 </li>
 </ul>
@@ -3313,7 +3394,7 @@ available:</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

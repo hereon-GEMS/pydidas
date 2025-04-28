@@ -39,7 +39,7 @@
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../../_static/documentation_options.js?v=b38044db"></script>
-    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -482,22 +482,22 @@ It also includes the CreateWidgetsMixin class which allows other classes easy ac
 to simplified widget creation.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">CreateWidgetsMixIn</span></span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">CreateWidgetsMixIn</span></span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A mixin class to allow easy widget creation in their host classes.</p>
 <p>The CreateWidgetsMixIn class includes methods for easy adding of widgets
-to the layout. The create_something methods from the factories are called
+to the layout. The create_something methods from the factories are called,
 and in addition, the layout and positions can be set.</p>
 <p>Use the “gridPos” keyword to define the widget position in the parent’s
 layout.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">add_any_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">add_any_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Add any existing widget to the layout and apply settings to it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The widget reference key.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The widget reference key.</p></li>
 <li><p><strong>widget_instance</strong> (<em>QWidget</em>) – The widget instance.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the specific QWidget with a setAttribute
 method are valid kwargs. In addition, ‘layout_kwargs’ is a valid key
@@ -509,7 +509,7 @@ to pass a dictionary with attributes for the widget’s layout.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_any_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_any_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create any widget with any settings and add it to the layout.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -520,9 +520,9 @@ can be added, however, using the <code class="docutils literal notranslate"><spa
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The reference name in the _widgets dictionary.</p></li>
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference name in the _widgets dictionary.</p></li>
 <li><p><strong>widget_class</strong> (<em>type</em>) – The class type of the widget.</p></li>
-<li><p><strong>*args</strong> (<em>args</em>) – Any arguments for the widget creation.</p></li>
+<li><p><strong>*args</strong> (<em>Any</em>) – Any arguments for the widget creation.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments for the widget creation.</p></li>
 </ul>
 </dd>
@@ -534,19 +534,20 @@ can be added, however, using the <code class="docutils literal notranslate"><spa
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a QPushButton and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The button’s displayed text.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QPushButton with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the button’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
 be used to control the font properties.
-The button’s clicked method can be connected directly, by specifing
+The button’s clicked method can be connected directly by specifying
 the slot through the ‘clicked’ kwarg.</p></li>
 </ul>
 </dd>
@@ -555,12 +556,12 @@ the slot through the ‘clicked’ kwarg.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_check_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_check_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a PydidasCheckBox and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The CheckBox’s descriptive text.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QCheckBox with a setAttribute method
@@ -575,12 +576,12 @@ to control the font properties or generic Qt properties.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_combo_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_combo_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a PydidasComboBox and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QComboBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
@@ -594,17 +595,17 @@ to control the font properties or generic Qt properties.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_double_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_double_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a QDoubleSpinBox for floating point values and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpinBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the SpinBox’s position in its parent’s layout. The
-default range is set to (0, 1), if it is not overridden with the
+default range is set to (0, 1) if it is not overridden with the
 ‘range’ keyword.</p></li>
 </ul>
 </dd>
@@ -613,12 +614,12 @@ default range is set to (0, 1), if it is not overridden with the
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_empty_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Create an ampty QWidget with a agrid layout.</p>
+<span class="sig-name descname"><span class="pre">create_empty_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create an empty QWidget with a grid layout.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the generic QWidget with a setAttribute
 method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
@@ -630,12 +631,12 @@ to specify the QWidget’s position in its parent’s layout.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a PydidasLabel and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The label’s displayed text.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QLabel with a setAttribute method
@@ -650,14 +651,14 @@ be used to control the font properties.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a line widget.</p>
-<p>This method creates a line widget (implemented as flat QFrame) as separator
+<p>This method creates a line widget (implemented as flat QFrame) as a separator
 and adds it to the parent widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
 implementation are valid kwargs.</p></li>
@@ -668,12 +669,12 @@ implementation are valid kwargs.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_lineedit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_lineedit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a PydidasLineEdit and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QLineEdit with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
@@ -687,12 +688,12 @@ be used to control the font properties.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a QProgressBar and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QProgressBar with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
@@ -704,20 +705,20 @@ to specify the QProgressBar’s position in its parent’s layout.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_radio_button_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_radio_button_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a RadioButtonGroup widget and set its properties.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>text</strong> (<em>str</em>) – The CheckBox’s descriptive text.</p></li>
+<li><p><strong>entries</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – The list of entries for the buttons.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the generic QWidget with a setAttribute
 method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the RadioButtonGroup’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ can be used
 to control the font properties or generic Qt properties.
-The ‘entries’ keyword takes a list of entries for the buttons and the
+The ‘entries’ keyword takes a list of entries for the buttons, and the
 number of rows and columns can be specified with the ‘rows’ and
 ‘columns’ keywords, respectively.</p></li>
 </ul>
@@ -727,15 +728,15 @@ number of rows and columns can be specified with the ‘rows’ and
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_spacer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_spacer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a QSpacerItem and set its properties.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpacerItem with a setAttribute method
-are valid kwargs. In addition, the gridPos key allows to specify
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QSpacerItem with a setAttribute method
+are valid kwargs. In addition, the gridPos key allows specifying
 the spacer’s position in its parent’s layout.</p></li>
 </ul>
 </dd>
@@ -744,17 +745,17 @@ the spacer’s position in its parent’s layout.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a QSpinBox for integer values and store the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpinBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the SpinBox’s position in its parent’s layout. The
-default range is set to (0, 1), if it is not overridden with the
+default range is set to (0, 1) if it is not overridden with the
 ‘range’ keyword.</p></li>
 </ul>
 </dd>
@@ -763,14 +764,14 @@ default range is set to (0, 1), if it is not overridden with the
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">create_vertical_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">create_vertical_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Create a vertical line widget.</p>
 <p>This method creates a vertical line widget (implemented as flat QFrame) as
-separator and adds it to the parent widget.</p>
+a separator and adds it to the parent widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference string for storing the widget. If None, the widget
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
 implementation are valid kwargs.</p></li>
@@ -783,7 +784,7 @@ implementation are valid kwargs.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">EmptyWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">EmptyWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>Create an empty widget with a QGridLayout.</p>
 <p>The constructor also sets QProperties based on the supplied keywords, if
@@ -792,14 +793,14 @@ a matching setter was found.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasCheckBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasCheckBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QCheckBox</span></code></p>
 <p>Create a QCheckBox with automatic font formatting.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasComboBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasComboBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QComboBox</span></code></p>
 <p>Create a QComboBox with automatic font formatting.</p>
 <p>This Combobox overwrites the default sizeHint to take as much space
@@ -842,14 +843,14 @@ a matching setter was found.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QLabel</span></code></p>
 <p>Create a QLabel with automatic font formatting.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasLineEdit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasLineEdit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QLineEdit</span></code></p>
 <p>Create a QLineEdit with automatic font formatting.</p>
 <dl class="py method">
@@ -867,20 +868,20 @@ a matching setter was found.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasPushButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">PydidasPushButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QPushButton</span></code></p>
 <p>Create a QPushButton with automatic font and size formatting.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">RadioButtonGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">RadioButtonGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>The RadioButtonGroup holds a number of QRadioButtons in a QButtonGroup.</p>
 <p>Creation is automated based on the entries.</p>
 <dl class="py property">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em></dt>
 <dd><p>Return the label name of the currently selected button.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -894,7 +895,7 @@ a matching setter was found.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emit_signal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emit_signal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em></dt>
 <dd><p>Query whether a signal will be emitted on change.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -960,7 +961,7 @@ a matching setter was found.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">SquareButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.factory.</span></span><span class="sig-name descname"><span class="pre">SquareButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QPushButton</span></code></p>
 <p>A PushButton which tries to stay square in size.</p>
 <dl class="py method">
@@ -1101,7 +1102,7 @@ a matching setter was found.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

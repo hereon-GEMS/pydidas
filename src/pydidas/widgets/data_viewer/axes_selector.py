@@ -186,10 +186,6 @@ class AxesSelector(WidgetWithParameterCollection):
             if self._multiline_layout and _dim > 0:
                 self._widgets[f"line_{_dim}"].setVisible(_dim < self._data_ndim)
 
-            # if _dim >= self._data_ndim:
-            #     with QtCore.QSignalBlocker(self._axwidgets[_dim]):
-            #         self._axwidgets[_dim].display_choice = "slice at index"
-
     def set_axis_metadata(
         self,
         axis: int,

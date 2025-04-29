@@ -34,9 +34,7 @@ import platform
 from qtpy import QtCore
 from qtpy.QtCore import QSortFilterProxyModel
 
-from pydidas.core import (
-    PydidasQsettings,
-)
+from pydidas.core import PydidasQsettings
 
 
 AscendingOrder = QtCore.Qt.AscendingOrder
@@ -71,7 +69,8 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
             # because toStdString does not work with Qt 5.15.2, fall back :
             if not bytes(_vol.device()).decode().startswith(__prefix)
         ]
-        self.__filename_filter_active = False
+        self.__filename_filter_active: bool = False
+        self.__filter_pattern: QtCore.QRegularExpression | None = None
 
     @QtCore.Slot(bool)
     def toggle_network_location_acceptance(self, acceptance: bool):
@@ -100,6 +99,7 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         escaped_filter_string = QtCore.QRegularExpression.escape(filter_string)
         self.__filter_pattern = QtCore.QRegularExpression(
             escaped_filter_string.replace("\\*", ".*").replace("\\?", ".")
+        )
         self.invalidateFilter()
 
     def filterAcceptsRow(

@@ -29,7 +29,7 @@ __all__ = ["ParameterCollectionMixIn"]
 
 
 from numbers import Integral
-from typing import Union
+from typing import Any
 
 from numpy import mod
 
@@ -48,7 +48,7 @@ class ParameterCollectionMixIn:
 
     default_params = ParameterCollection()
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not hasattr(self, "params"):
             self.params = ParameterCollection()
         if not isinstance(self.params, ParameterCollection):
@@ -107,22 +107,24 @@ class ParameterCollectionMixIn:
         """
         self.params.add_param(param)
 
-    def update_params_from_init(self, *args: tuple, **kwargs: dict):
+    def update_params_from_init(
+        self, *args: Parameter | ParameterCollection, **kwargs: Any
+    ):
         """
         Update the Parameters from the given init args and kwargs.
 
         Parameters
         ----------
-        *args : Tuple
+        *args : Parameter | ParameterCollection
             The input arguments.
-        **kwargs : Dict
+        **kwargs : Any
             The input keyword arguments.
         """
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
 
-    def add_params(self, *params: tuple[Union[Parameter, dict, ParameterCollection]]):
+    def add_params(self, *params: Parameter | ParameterCollection):
         """
         Add parameters to the object.
 
@@ -134,8 +136,8 @@ class ParameterCollectionMixIn:
 
         Parameters
         ----------
-        *params : Tuple[Union[Parameter, dict, ParameterCollection]]
-            Any Parameter or ParameterCollection
+        *params : Parameter | ParameterCollection
+            Any Parameter or ParameterCollection.
         """
         for _param in params:
             if isinstance(_param, Parameter):
@@ -160,13 +162,13 @@ class ParameterCollectionMixIn:
             if _key not in self.params:
                 self.add_param(_param.copy())
 
-    def update_param_values_from_kwargs(self, **kwargs: dict):
+    def update_param_values_from_kwargs(self, **kwargs: Any):
         """
         Update the Parameter values corresponding to the given keys.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             The dictionary with Parameter refkeys and values.
         """
         for _key, _val in kwargs.items():
@@ -177,7 +179,7 @@ class ParameterCollectionMixIn:
         self,
         param_key: str,
         *default: object,
-        dtype: Union[type, None] = None,
+        dtype: type | None = None,
         for_export: bool = False,
     ) -> object:
         """
@@ -189,7 +191,7 @@ class ParameterCollectionMixIn:
             The key name of the Parameter.
         default : object
             The default value if the param_key does not exist.
-        dtype : type, optional
+        dtype : type | None
             A datatype to convert the value into. If None, the native
             datatype is returned. The default is None.
         for_export : bool, optional
@@ -255,7 +257,7 @@ class ParameterCollectionMixIn:
             _params.append(self.params[_key])
         return _params
 
-    def set_param_value(self, param_key: str, value: object):
+    def set_param_value(self, param_key: str, value: Any):
         """
         Set a parameter value.
 
@@ -263,20 +265,20 @@ class ParameterCollectionMixIn:
         ----------
         param_key : str
             The key name of the Parameter.
-        value : object
+        value : Any
             The value to be set. This has to be the datatype associated with
             the Parameter.
         """
         self._check_key(param_key)
         self.params.set_value(param_key, value)
 
-    def set_param_values(self, **kwargs: dict):
+    def set_param_values(self, **kwargs: Any):
         """
         Set multiple parameter values at once.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             The reference key and value pairs for all Parameters to be set.
         """
         _wrong_keys = [_key for _key in kwargs if _key not in self.params]

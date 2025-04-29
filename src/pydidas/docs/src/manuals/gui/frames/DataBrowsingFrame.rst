@@ -48,7 +48,7 @@ Controls
 The controls are located on the left, above the directory explorer.
 Selecting or deselecting an option will directly update the directory explorer.
 
-The options are:
+The options and control widgets are:
 
   - Show network drives
   
@@ -59,6 +59,36 @@ The options are:
   
     This option toggles case sensitive sorting. If enabled, lowercase and 
     uppercase names will be sorted and displayed separately.
+
+  - Current directory
+
+    This widget both shows the current directory and allows to change the
+    current directory by entering a new path. If the new path does not
+    exist, the entry will be ignored. It is also possible to drag and drop
+    directories or files from the file system into the entry field. This will
+    automatically set the current directory to the directory of the dragged
+    item. In the case of files, the file will also be opened, if it is a
+    supported data format.
+
+  - Filename filter
+
+    This field allows to filter the displayed files in the directory explorer.
+    The asterix `*` can be used as a wildcard. For example, entering `*.h5`
+    will display only files with the `.h5` extension. The filter is applied to
+    files only and will not affect the display of directories, i.e. all
+    directories will always be shown, regardless of the filter. The filter
+    can be reset by deleting the entry in the field.
+
+  - Reset filter
+
+    This button also resets the filename filter. It is equivalent to deleting
+    the entry in the filter field.
+
+  - Collapse all
+
+    This button collapses all directories in the directory explorer. It is
+    equivalent to double-clicking on all top level entries.
+
 
 Directory explorer
 ^^^^^^^^^^^^^^^^^^

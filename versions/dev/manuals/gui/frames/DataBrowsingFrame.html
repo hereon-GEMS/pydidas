@@ -520,7 +520,7 @@ again by capturing and dragging the dark slider from the edge towards the center
 <h2>Controls<a class="headerlink" href="#controls" title="Link to this heading">#</a></h2>
 <p>The controls are located on the left, above the directory explorer.
 Selecting or deselecting an option will directly update the directory explorer.</p>
-<p>The options are:</p>
+<p>The options and control widgets are:</p>
 <blockquote>
 <div><ul>
 <li><p>Show network drives</p>
@@ -530,6 +530,31 @@ view.</p>
 <li><p>Sorting is case sensitive</p>
 <p>This option toggles case sensitive sorting. If enabled, lowercase and
 uppercase names will be sorted and displayed separately.</p>
+</li>
+<li><p>Current directory</p>
+<p>This widget both shows the current directory and allows to change the
+current directory by entering a new path. If the new path does not
+exist, the entry will be ignored. It is also possible to drag and drop
+directories or files from the file system into the entry field. This will
+automatically set the current directory to the directory of the dragged
+item. In the case of files, the file will also be opened, if it is a
+supported data format.</p>
+</li>
+<li><p>Filename filter</p>
+<p>This field allows to filter the displayed files in the directory explorer.
+The asterix <cite>*</cite> can be used as a wildcard. For example, entering <cite>*.h5</cite>
+will display only files with the <cite>.h5</cite> extension. The filter is applied to
+files only and will not affect the display of directories, i.e. all
+directories will always be shown, regardless of the filter. The filter
+can be reset by deleting the entry in the field.</p>
+</li>
+<li><p>Reset filter</p>
+<p>This button also resets the filename filter. It is equivalent to deleting
+the entry in the filter field.</p>
+</li>
+<li><p>Collapse all</p>
+<p>This button collapses all directories in the directory explorer. It is
+equivalent to double-clicking on all top level entries.</p>
 </li>
 </ul>
 </div></blockquote>

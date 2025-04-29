@@ -19,7 +19,7 @@
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0-noly"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 

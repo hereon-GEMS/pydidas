@@ -31,7 +31,7 @@ __all__ = ["ObjectWithParameterCollection"]
 
 import warnings
 from copy import copy, deepcopy
-from typing import Self
+from typing import Any, Self
 
 from qtpy import QtCore
 
@@ -56,8 +56,8 @@ class ObjectWithParameterCollection(
     QObject is not possible.
     """
 
-    def __init__(self):
-        QtCore.QObject.__init__(self)
+    def __init__(self, **kwargs: Any):
+        QtCore.QObject.__init__(self, parent=kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
         ParameterCollectionMixIn.__init__(self)
         self._config = {}

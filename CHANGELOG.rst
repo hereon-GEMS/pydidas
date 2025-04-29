@@ -21,6 +21,8 @@ Improvements
 - Added support for running workflows in live processing.
 - Improved type hints and docstrings in a number of files.
 - Added new singleton factories which allow a direct subclassing.
+- Added an option to enter a directory path manually to the DataBrowsingFrame.
+- Added an option to filter for filenames in the DataBrowsingFrame.
 
 
 Bugfixes

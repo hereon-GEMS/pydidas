@@ -29,6 +29,7 @@ __all__ = ["ParamIoWidgetWithButton"]
 
 
 from functools import partial
+from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QStyle
@@ -56,7 +57,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
 
     io_edited = QtCore.Signal(str)
 
-    def __init__(self, param: Parameter, **kwargs: dict):
+    def __init__(self, param: Parameter, **kwargs: Any):
         QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
         self._io_lineedit = PydidasLineEdit()

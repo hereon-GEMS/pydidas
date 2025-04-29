@@ -29,14 +29,12 @@ __status__ = "Production"
 from .directory_explorer import *
 from .hdf5_dataset_selector import *
 from .raw_metadata_selector import *
-from .result_selection_widget import *
 
 
 __all__ = (
     directory_explorer.__all__
     + hdf5_dataset_selector.__all__
     + raw_metadata_selector.__all__
-    + result_selection_widget.__all__
 )
 
 # Clean up the namespace:
@@ -44,5 +42,4 @@ del (
     directory_explorer,
     hdf5_dataset_selector,
     raw_metadata_selector,
-    result_selection_widget,
 )

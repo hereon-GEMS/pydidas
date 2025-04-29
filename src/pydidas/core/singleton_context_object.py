@@ -27,45 +27,52 @@ __status__ = "Production"
 __all__ = ["SingletonContextObject"]
 
 
-from pydidas.core import ObjectWithParameterCollection
+from copy import copy
+
+from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
+from pydidas.core.parameter_collection_mixin import ParameterCollectionMixIn
 
 
-class SingletonContextObject(ObjectWithParameterCollection):
+class SingletonContextObject:
     """
     Class which includes the necessary code to create classes only as Singletons.
 
-    Implementations cannot inherit from other classes and must use the
-    `initialize` method to set up the class instead of the `__init__` method.
+    Implementations must inherit from the ObjectWithParameterCollection class.
 
-    This method will try to fetch and restore the parameter values  from the
-    QSettings, if values have been set.
+    FOR THE CORRECT METHOD RESOLUTION ORDER, THE IMPLEMENTED CLASS *MUST*
+    INHERIT FROM THE SingletonContextObject CLASS *FIRST*.
     """
 
     _instance = None
     _initialized = False
+    non_context_class = ObjectWithParameterCollection
 
     def __new__(cls):
         """Create a new instance of the class if it does not exist yet."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
+        if not isinstance(cls._instance, ParameterCollectionMixIn):
+            raise TypeError(
+                "The class must inherit from ObjectWithParameterCollection."
+            )
         return cls._instance
 
     def __init__(self):
         if self._initialized:
             return
-        ObjectWithParameterCollection.__init__(self)
-        self.set_default_params()
-        for _key, _param in self.params.items():
-            _stored_val = self.q_settings_get(_key, default=None)
-            if _stored_val is not None:
-                self.set_param_value(_key, _stored_val)
-        self.initialize()
-        self._initialized = True
+        self.__class__._initialized = True
+        self.non_context_class.__init__(self)
 
-    def initialize(self):
+    def __copy__(self) -> object:
         """
-        Initialize the class instance.
+        Return a copy of the non-context class instance.
 
-        This method should be implemented in the custom classes, if required.
+        Returns
+        -------
+        obj :
+            The copy of the non-context class with the same state.
         """
-        pass
+        obj = self.non_context_class()
+        obj.params = self.params.copy()
+        obj._config = copy(self._config)
+        return obj

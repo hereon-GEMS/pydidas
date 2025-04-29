@@ -97,9 +97,9 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
             The filter string to be used.
         """
         self.__filename_filter_active = len(filter_string) > 0
+        escaped_filter_string = QtCore.QRegularExpression.escape(filter_string)
         self.__filter_pattern = QtCore.QRegularExpression(
-            filter_string.replace("*", ".*").replace("?", ".")
-        )
+            escaped_filter_string.replace("\\*", ".*").replace("\\?", ".")
         self.invalidateFilter()
 
     def filterAcceptsRow(

@@ -17,7 +17,7 @@
 
 """
 Module with the DiffractionExperimentContext singleton which is used to manage
-global information about the experiment independant from the individual frames.
+global information about the experiment.
 """
 
 __author__ = "Malte Storm"
@@ -29,7 +29,8 @@ __all__ = ["DiffractionExperimentContext"]
 
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
-from pydidas.core import SingletonFactory
+from pydidas.core import SingletonContextObject
 
 
-DiffractionExperimentContext = SingletonFactory(DiffractionExperiment)
+class DiffractionExperimentContext(SingletonContextObject, DiffractionExperiment):
+    non_context_class = DiffractionExperiment

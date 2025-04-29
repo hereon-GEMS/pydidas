@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,27 +18,35 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-noly"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
+import pytest
 
 from pydidas.contexts import ScanContext
 from pydidas.contexts.scan import Scan
 
 
-class TestScanContext(unittest.TestCase):
-    def setUp(self): ...
+def test_init():
+    SCAN = ScanContext()
+    assert isinstance(SCAN, Scan)
 
-    def tearDown(self): ...
 
-    def test_init_singleton(self):
-        SCAN = ScanContext()
-        self.assertIsInstance(SCAN, Scan)
+def test__repeated_calls():
+    SCAN = ScanContext()
+    SCAN2 = ScanContext()
+    assert id(SCAN) == id(SCAN2)
+
+
+def test_copy():
+    SCAN = ScanContext()
+    _copy = SCAN.copy()
+    assert id(_copy) != id(SCAN)
+    assert isinstance(_copy, Scan)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

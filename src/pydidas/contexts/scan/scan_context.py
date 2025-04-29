@@ -33,3 +33,6 @@ from pydidas.core import SingletonFactory
 
 
 ScanContext = SingletonFactory(Scan)
+
+# ScanContext = SingletonFactory(Scan):
+#     non_context_class = Scan

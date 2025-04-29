@@ -29,10 +29,8 @@ __all__ = ["ScanContext"]
 
 
 from pydidas.contexts.scan.scan import Scan
-from pydidas.core import SingletonFactory
+from pydidas.core.singleton_context_object import SingletonContextObject
 
 
-ScanContext = SingletonFactory(Scan)
-
-# ScanContext = SingletonFactory(Scan):
-#     non_context_class = Scan
+class ScanContext(SingletonContextObject, Scan):
+    non_context_class = Scan

@@ -84,7 +84,7 @@ class Scan(ObjectWithParameterCollection):
     default_params = SCAN_DEFAULT_PARAMS.copy()
 
     def __init__(self):
-        super().__init__()
+        ObjectWithParameterCollection.__init__(self)
         self.set_default_params()
 
     def get_index_position_in_scan(self, index: int) -> tuple:

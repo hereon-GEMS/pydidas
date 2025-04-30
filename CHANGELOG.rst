@@ -25,7 +25,7 @@ Improvements
 - Added an option to filter for filenames in the DataBrowsingFrame.
 - Added a new mixin class to handle the creation of context objects
   which allows contexts to be created as subclasses of the base class.
-
+- Changed all existing singleton classes to the new constructor classes.
 
 
 Bugfixes

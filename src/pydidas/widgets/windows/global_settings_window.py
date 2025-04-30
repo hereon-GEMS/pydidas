@@ -17,7 +17,7 @@
 
 """
 Module with the GlobalSettingsWindow class which is a QMainWindow widget
-to view and modify the global settings in a seperate Window.
+to view and modify the global settings in a separate Window.
 """
 
 __author__ = "Malte Storm"
@@ -32,7 +32,8 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import SingletonFactory, get_generic_param_collection
+import pydidas_qtcore
+from pydidas.core import SingletonObject, get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, QSETTINGS_GLOBAL_KEYS
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.framework import PydidasWindow
@@ -41,7 +42,7 @@ from pydidas.widgets.framework import PydidasWindow
 PLUGINS = PluginCollection()
 
 
-class _GlobalSettingsWindow(PydidasWindow):
+class GlobalSettingsWindow(SingletonObject, PydidasWindow):
     """
     A window to modify global pydidas settings.
     """
@@ -118,9 +119,8 @@ class _GlobalSettingsWindow(PydidasWindow):
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
-        QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
-            self.process_new_font_metrics
-        )
+        _app = pydidas_qtcore.PydidasQApplication.instance()
+        _app.sig_font_metrics_changed.connect(self.process_new_font_metrics)
 
     @QtCore.Slot(object)
     def update_qsetting(self, param_key, value):
@@ -156,7 +156,7 @@ class _GlobalSettingsWindow(PydidasWindow):
         if index != self.frame_index:
             return
         for _param_key, _param in self.params.items():
-            _value = self.q_settings_get(f"global/{_param_key}", _param.dtype)
+            _value = self.q_settings_get(f"global/{_param_key}", dtype=_param.dtype)
             self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):
@@ -196,6 +196,3 @@ class _GlobalSettingsWindow(PydidasWindow):
         """
         self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self.adjustSize()
-
-
-GlobalSettingsWindow = SingletonFactory(_GlobalSettingsWindow)

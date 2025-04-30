@@ -31,7 +31,7 @@ __all__ = ["GenericTree"]
 import copy
 import time
 import warnings
-from typing import Self, Union
+from typing import Iterable, Self, Type
 
 from qtpy import QtCore
 
@@ -42,7 +42,7 @@ from pydidas.workflow.generic_node import GenericNode
 
 class GenericTree:
     """
-    A generic tree used for organising items.
+    A generic tree used for organizing items.
     """
 
     def __init__(self, **kwargs: dict):
@@ -50,7 +50,7 @@ class GenericTree:
         self.node_ids = []
         self.nodes = {}
         self._config = {"tree_changed": False, "active_node_id": None} | kwargs
-        self._starthash = hash((get_random_string(12), time.time()))
+        self._start_hash = hash((get_random_string(12), time.time()))
 
     @property
     def tree_has_changed(self) -> bool:
@@ -93,20 +93,20 @@ class GenericTree:
         return self._config["active_node_id"]
 
     @active_node_id.setter
-    def active_node_id(self, new_id: Union[None, int]):
+    def active_node_id(self, new_id: int | None):
         """
         Set the active node ID.
 
         Parameters
         ----------
-        new_id : Union[None, int]
+        new_id : int | None
             Set the active node property of the tree. The new node id must be either
             None or included in the tree's ids.
 
         Raises
         ------
         ValueError
-            If new_id is not inluded in the tree's node ids.
+            If new_id is not included in the tree's node ids.
         """
         if new_id is None or new_id in self.node_ids:
             self._config["active_node_id"] = new_id
@@ -163,20 +163,20 @@ class GenericTree:
         self.node_ids = []
         self._config["active_node_id"] = None
         self._config["tree_changed"] = True
-        self._starthash = hash((get_random_string(12), time.time()))
+        self._start_hash = hash((get_random_string(12), time.time()))
         self.root = None
 
     def register_node(
         self,
         node: GenericNode,
-        node_id: Union[None, int] = None,
+        node_id: int | None = None,
         check_ids: bool = True,
     ):
         """
         Register a node with the tree.
 
         This method will register a node with the tree. It will add the node
-        to the managed nodes and it will check any supplied node_ids for
+        to the managed nodes, and it will check any supplied node_ids for
         consistency with the node_id namespace. If no node_id is supplied,
         a new one will be generated.
         Note: Creation of new node_ids should be left to the tree. While
@@ -188,7 +188,7 @@ class GenericTree:
         ----------
         node : GenericNode
             The node object to be registered.
-        node_id : Union[None, int}, optional
+        node_id : int | None, optional
             A supplied node_id. If None, the tree will select the next
             suitable node_id automatically. The default is None.
         check_ids : bool, optional
@@ -204,7 +204,7 @@ class GenericTree:
         if self.root is None:
             self.root = node
         if node_id is None and node.node_id is None:
-            node.node_id = self.get_new_nodeid()
+            node.node_id = self.get_new_node_id()
         elif node_id is not None:
             node.node_id = node_id
         self.node_ids.append(node.node_id)
@@ -214,13 +214,13 @@ class GenericTree:
             self.register_node(_child, _child.node_id, check_ids=False)
         self._config["tree_changed"] = True
 
-    def _check_node_ids(self, node_ids: Union[list, tuple, set]):
+    def _check_node_ids(self, node_ids: Iterable[int]):
         """
         Check the compatibility of a node's (and its children) ID with the tree.
 
         Parameters
         ----------
-        node_ids : Union[list, tuple, set]
+        node_ids : Iterable[int]
             A list (or other iterable) of all the node ids.
 
         Raises
@@ -243,12 +243,12 @@ class GenericTree:
                     "Tree node has not been registered!"
                 )
 
-    def get_new_nodeid(self) -> int:
+    def get_new_node_id(self) -> int:
         """
         Get a new integer node id.
 
         This method returns the next unused integer node id. Note that
-        node ids will not be re-used, i.e. the number of nodes is ultimately
+        node ids will not be re-used, i.e., the number of nodes is ultimately
         limited by the integer namespace.
 
         Returns
@@ -299,7 +299,7 @@ class GenericTree:
             Keyword to toggle deletion of the node's children as well.
             The default is True.
         keep_children : bool, optional
-            Keyword to keep the nodes children (and connect them to the node's parent).
+            Keyword to keep the node's children (and connect them to the node's parent).
             The default is False.
         """
         if recursive and keep_children:
@@ -362,8 +362,8 @@ class GenericTree:
             self.nodes[node_id] = _new_parent
         self._config["tree_changed"] = True
 
-    def order_node_ids(self):
-        """Order the node ids of all of the tree's nodes."""
+    def order_node_ids(self) -> None:
+        """Order All the node ids of the tree's nodes."""
         _root = self.root
         _active_node = self.active_node
         if _root is None:
@@ -375,13 +375,13 @@ class GenericTree:
         if _active_node is not None:
             self.active_node_id = _active_node.node_id
 
-    def get_all_leaves(self) -> list:
+    def get_all_leaves(self) -> list[int]:
         """
-        Get all tree nodes which are leaves.
+        Get all tree nodes that are leaves.
 
         Returns
         -------
-        list
+        list[int]
             A list of all leaf nodes.
         """
         _leaves = []
@@ -390,34 +390,30 @@ class GenericTree:
                 _leaves.append(_node)
         return _leaves
 
-    def copy(self) -> Self:
-        """
-        Get a copy of the WorkflowTree.
-
-        While this is method is not really useful in the main application
-        (due to the fact that the WorkflowTree is a Singleton), it is required
-        to pass working copies of the Tree to other processes in
-        multiprocessing.
-
-        Returns
-        -------
-        pydidas.workflow.WorkflowTree
-            A new instance of the WorkflowTree
-        """
-        return copy.copy(self)
+    def copy(self, as_type: Type | None = None) -> Self:
+        """Wrapper for __copy__"""
+        return self.__copy__(as_type=as_type)
 
     deepcopy = copy
 
-    def __copy__(self) -> Self:
+    def __copy__(self, as_type: Type | None = None) -> Self:
         """
-        Get a copy of the GenericTree.
+        Get a copy of the current tree.
+
+        Parameters
+        ----------
+        as_type : Type | None
+            The type of the object to be created. If None, the type of the
+            current instance will be used. The default is None.
 
         Returns
         -------
-        pydidas.workflow.GenericTree
-            A new instance of the GenericTree
+        GenericTree
+            A new instance of the current Tree.
         """
-        _copy = type(self.__class__.__name__, (self.__class__,), {})()
+        if as_type is None:
+            as_type = self.__class__
+        _copy = type(as_type.__name__, (as_type,), {})()
         _copy.__dict__.update(
             {
                 _key: copy.deepcopy(_value)
@@ -436,21 +432,7 @@ class GenericTree:
         return _copy
 
     def __deepcopy__(self, memo: dict) -> Self:
-        """
-        Get a deep copy of the GenericTree.
-
-        Note: The implementation of copy and deepcopy is the same for Trees.
-
-        Parameters
-        ----------
-        memo : dict
-            copy.deepcopy's dict of already copied values.
-
-        Returns
-        -------
-        pydidas.workflow.GenericTree
-            A new instance of the GenericTree
-        """
+        """Wrapper for __copy__"""
         return self.__copy__()
 
     def __hash__(self) -> int:
@@ -478,4 +460,4 @@ class GenericTree:
                 _node_vals.append(_hash)
             except TypeError:
                 warnings.warn(f'Could not hash the dictionary value "{_val}".')
-        return hash((tuple(_node_keys), tuple(_node_vals), self._starthash))
+        return hash((tuple(_node_keys), tuple(_node_vals), self._start_hash))

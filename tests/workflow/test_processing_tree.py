@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -317,7 +317,7 @@ class TestProcessingTree(unittest.TestCase):
         for key in set(self._curr_tree.__dict__.keys()) - {
             "root",
             "nodes",
-            "_starthash",
+            "_start_hash",
         }:
             self.assertEqual(getattr(self._curr_tree, key), getattr(tree2, key))
         for _id, _node in self._curr_tree.nodes.items():

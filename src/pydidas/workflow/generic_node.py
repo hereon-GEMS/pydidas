@@ -27,9 +27,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["GenericNode"]
 
+
 import copy
 from numbers import Integral
-from typing import List, Self, Union
+from typing import Self
 
 from qtpy import QtCore
 
@@ -44,7 +45,7 @@ class GenericNode:
     @staticmethod
     def _verify_type(item: object, allowNone: bool = False):
         """
-        Check that an item is of type class and raise a TypeError if not.
+        Check that an item is of the type class and raise a TypeError if not.
 
         Parameters
         ----------
@@ -69,7 +70,7 @@ class GenericNode:
         """
         Set up the generic node.
 
-        Any keywords will be stored as class attributes. This behaviour is motivated
+        Any keywords will be stored as class attributes. This behavior is motivated
         by the requirements of subclasses with specific calling arguments.
 
         Parameters
@@ -92,7 +93,7 @@ class GenericNode:
         Parameters
         ----------
         child : object
-            The child object to be registered.
+            The child to be registered.
         """
         self._verify_type(child)
         if child not in self._children:
@@ -100,25 +101,25 @@ class GenericNode:
         child.parent = self
 
     @property
-    def node_id(self) -> Union[None, int]:
+    def node_id(self) -> int | None:
         """
         Get the node_id.
 
         Returns
         -------
-        node_id : Union[None, int]
+        node_id : int | None
             The node_id.
         """
         return self._node_id
 
     @node_id.setter
-    def node_id(self, new_id: Union[None, int]):
+    def node_id(self, new_id: int | None):
         """
         Set the node_id.
 
         Parameters
         ----------
-        new_id : Union[None, int]
+        new_id : int | None
             The new node ID.
 
         Raises
@@ -134,14 +135,14 @@ class GenericNode:
         )
 
     @property
-    def parent_id(self) -> Union[None, int]:
+    def parent_id(self) -> int | None:
         """
         Get the parent's node ID.
 
         Returns
         -------
-        Union[None, int]
-            The parent's nodeID or None if parent is None
+        int | None
+            The parent's nodeID or None if the parent is None
         """
         if self.parent is None:
             return None
@@ -150,7 +151,7 @@ class GenericNode:
     @property
     def is_leaf(self) -> bool:
         """
-        Check if node has children.
+        Check if a node has children.
 
         This method will check if the node has children and return the
         result.
@@ -180,19 +181,19 @@ class GenericNode:
         return len(self._children)
 
     @property
-    def parent(self) -> Union[None, Self]:
+    def parent(self) -> Self | None:
         """
         Get the node's parent.
 
         Returns
         -------
-        parent : Union[GenericNode, None]
+        parent : GenericNode | None
             The parent node.
         """
         return self._parent
 
     @parent.setter
-    def parent(self, parent: Union[None, Self]):
+    def parent(self, parent: Self | None):
         """
         Set the node's parent.
 
@@ -200,7 +201,7 @@ class GenericNode:
 
         Parameters
         ----------
-        parent : pydidas.workflow.GenericNode
+        parent : GenericNode | None
             The parent object
         """
         if parent == self._parent:
@@ -227,7 +228,7 @@ class GenericNode:
     @property
     def children_ids(self) -> list[int]:
         """
-        Get the list of children IDs.
+        Get the list of the children's IDs.
 
         Returns
         -------
@@ -249,17 +250,17 @@ class GenericNode:
         """
         return self._children
 
-    def get_recursive_connections(self) -> List[int]:
+    def get_recursive_connections(self) -> list[list[int, int]]:
         """
         Get recursive connections between the node and all children.
 
         This method returns the recursive connection between a node and
-        its children (and all further descendants) in the form of a list of
-        entries with node_ids of parent and child.
+        its children (and all further descendants) in the form of a list.
+        Entries have the form of lists with node_ids of parent and child.
 
         Returns
         -------
-        conns : list
+        conns : list[list[int, int]]
             A list with entries in the form of [parent.node_id, child.node_id]
             for all descendants from the current node.
         """
@@ -269,7 +270,7 @@ class GenericNode:
             conns += child.get_recursive_connections()
         return conns
 
-    def get_recursive_ids(self) -> List[int]:
+    def get_recursive_ids(self) -> list[int]:
         """
         Get the node ids of the node and all children in its branch.
 
@@ -306,7 +307,7 @@ class GenericNode:
         ------
         RecursionError
             If the node has children but recursive is False, a recursion
-            error will be raised. This will prevent the children to become
+            error will be raised. This will prevent the children from becoming
             separated from the tree structure.
         """
         if not self.is_leaf and not recursive:
@@ -347,7 +348,7 @@ class GenericNode:
 
         This method will remove the reference to the child but not delete
         the child itself.
-        Note: This method's main use is to allow children to un-register
+        Note: This method's main use is to allow children to unregister
         themselves from their parents before deletion and should not be called
         by the user.
 

@@ -34,7 +34,8 @@ from typing import Iterable, Optional
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
-from pydidas.core import SingletonFactory
+import pydidas_qtcore
+from pydidas.core import SingletonObject
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.workflow_edit import PluginInWorkflowBox
 from pydidas.workflow import PluginPositionNode, WorkflowTree
@@ -44,15 +45,15 @@ PLUGIN_COLLECTION = PluginCollection()
 TREE = WorkflowTree()
 
 
-class _WorkflowTreeEditManager(QtCore.QObject):
+class WorkflowTreeEditManager(SingletonObject, QtCore.QObject):
     """
     Manage the editing of the workflow tree.
 
-    The _WorkflowTreeEditManager is designed as Singleton to manage editing
+    The _WorkflowTreeEditManager is designed as a Singleton to manage editing
     the WorkflowTree, plugin parameters and the corresponding plugins' QT
     widgets. It is responsible for creating widgets and placing them correctly
     on the canvas of the workflow editor. Most method names correspond to
-    similar methods in WorkflowTreeEditManager class. This class should only
+    similar methods in the WorkflowTreeEditManager class. This class should only
     be used by the WorkflowTreeEditManager to manage the widget aspect.
     """
 
@@ -71,7 +72,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         Parameters
         ----------
         qt_canvas : QtWidget, optional
-            The QtWidget which acts as canvas for the plugin workflow tree.
+            The QtWidget, which acts as canvas for the plugin workflow tree.
             The default is None.
         """
         super().__init__()
@@ -80,7 +81,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_positions = {}
         self._node_widgets = {}
         self._nodes = {}
-        self.__qtapp = QtWidgets.QApplication.instance()
+        self.__qtapp = pydidas_qtcore.PydidasQApplication.instance()
         if hasattr(self.__qtapp, "sig_font_size_changed"):
             self.__qtapp.sig_font_size_changed.connect(self.__app_font_changed)
             self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
@@ -92,7 +93,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         Store references to the QtCanvas for drawing.
 
         This method stores an internal reference to the canvas.
-        Because the class is designed as singleton, this information will
+        Because the class is designed as a singleton, this information will
         typically not be available at instantiation and needs to be supplied
         at runtime.
 
@@ -116,18 +117,18 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._nodes = {}
 
     def add_new_plugin_node(
-        self, name: str, title: str = "", parent_node_id: Optional[int] = None
+        self, name: str, title: str = "", parent_node_id: int | None = None
     ):
         """
         Add a new plugin node to the workflow.
 
-        Add a new plugin node to the workflow. The plugin type is determined
-        by the name. An optional title can be used as name for the plugin
-        widget but the title will be determined automatically from the plugin
+        Add a new plugin node to the workflow. The name determines the plugin
+        type. An optional title can be used as a name for the plugin
+        widget, but the title will be determined automatically from the plugin
         name if not selected.
-        New plugins will always be created as children of the active plugin
-        and it is the users responsibility to select the correct parent
-        prior to calling this method or to use the parent_node_id keyword.
+        New plugins will always be created as children of the active plugin,
+        and it is the users' responsibility to select the correct parent
+        before calling this method or to use the parent_node_id keyword.
 
         Parameters
         ----------
@@ -136,7 +137,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         title : str, optional
             The title of the plugin widget. If no title is given, this will default
             to the widget name. The default is an empty string.
-        parent_node : Union[int, None], optional
+        parent_node_id : int | None, optional
             The id of the parent node, if given. If None, this will default to the
             WorkflowTree's active node.
 
@@ -245,7 +246,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     @QtCore.Slot(str)
     def replace_plugin(self, plugin_name: str):
         """
-        Replace the active node's Plugin by a new Plugin class.
+        Replace the active node's Plugin with a new Plugin class.
 
         Parameters
         ----------
@@ -292,7 +293,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     @QtCore.Slot(int, int)
     def create_node_copy_request(self, calling_node: int, new_parent_node: int):
         """
-        Handle the signal that a node requested to append a copy of itself to parent.
+        Handle the request by a node to append a copy of itself to the parent.
 
         Parameters
         ----------
@@ -360,8 +361,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         Parameters
         ----------
         reset_active_node : bool, optional
-            Flag to toggle resetting the active node. After loading a
-            WorkflowTree from file, this can be used to reset the selection.
+            Flag to toggle resetting the active node. After loading the
+            WorkflowTree from a file, this can be used to reset the selection.
         """
         self.__delete_all_items()
         for _node_id, _node in TREE.nodes.items():
@@ -486,7 +487,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     @QtCore.Slot()
     def __app_font_changed(self):
         """
-        Handle the QApplication's font changed signal and update the widgets.
+        Handle the QApplication's font-changed signal and update the widgets.
         """
         _font = self.__qtapp.font()
         _font.setPointSizeF(self.__qtapp.font_size + 1)
@@ -497,6 +498,3 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         for _widget in self._node_widgets.values():
             _widget.setFixedSize(QtCore.QSize(_width, _height))
         self.update_node_positions()
-
-
-WorkflowTreeEditManager = SingletonFactory(_WorkflowTreeEditManager)

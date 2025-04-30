@@ -28,6 +28,7 @@ __all__ = ["SingletonContextObject"]
 
 
 from copy import copy
+from typing import Type
 
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter_collection_mixin import ParameterCollectionMixIn
@@ -46,6 +47,31 @@ class SingletonContextObject:
     _instance = None
     _initialized = False
     non_context_class = ObjectWithParameterCollection
+
+    @property
+    @classmethod
+    def instance(cls) -> Type:
+        """
+        Get the instance of the singleton object.
+
+        Returns
+        -------
+        SingletonContextObject
+            The instance of the singleton object.
+        """
+        return cls._instance
+
+    @classmethod
+    def instance(cls) -> Type:
+        """
+        Get the instance of the singleton object.
+
+        Returns
+        -------
+        SingletonContextObject
+            The instance of the singleton object.
+        """
+        return cls._instance
 
     def __new__(cls):
         """Create a new instance of the class if it does not exist yet."""

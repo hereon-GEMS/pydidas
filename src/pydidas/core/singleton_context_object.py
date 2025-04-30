@@ -48,20 +48,8 @@ class SingletonContextObject:
     _initialized = False
     non_context_class = ObjectWithParameterCollection
 
+    @classmethod
     @property
-    @classmethod
-    def instance(cls) -> Type:
-        """
-        Get the instance of the singleton object.
-
-        Returns
-        -------
-        SingletonContextObject
-            The instance of the singleton object.
-        """
-        return cls._instance
-
-    @classmethod
     def instance(cls) -> Type:
         """
         Get the instance of the singleton object.

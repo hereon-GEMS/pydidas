@@ -178,10 +178,10 @@ class ParameterCollectionMixIn:
     def get_param_value(
         self,
         param_key: str,
-        *default: object,
+        *default: Any,
         dtype: type | None = None,
         for_export: bool = False,
-    ) -> object:
+    ) -> Any:
         """
         Get a Parameter value.
 
@@ -189,7 +189,7 @@ class ParameterCollectionMixIn:
         ----------
         param_key : str
             The key name of the Parameter.
-        default : object
+        default : Any
             The default value if the param_key does not exist.
         dtype : type | None
             A datatype to convert the value into. If None, the native

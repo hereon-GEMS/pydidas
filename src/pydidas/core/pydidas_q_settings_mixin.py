@@ -29,7 +29,7 @@ __all__ = ["PydidasQsettingsMixin"]
 
 
 from numbers import Integral, Real
-from typing import Any, Optional, Self, overload
+from typing import Any, Optional, Self, Type, overload
 
 from qtpy import QtCore
 
@@ -82,7 +82,7 @@ class PydidasQsettingsMixin:
     def q_settings_get(
         self,
         key: str,
-        dtype: Integral | Real | type | None = None,
+        dtype: Integral | Real | Type | None = None,
         default: Any | None = None,
     ) -> Any:
         """
@@ -92,7 +92,7 @@ class PydidasQsettingsMixin:
         ----------
         key : str
             The QSetting reference key.
-        dtype : Integral | Real | type | None, optional
+        dtype : Integral | Real | Type | None, optional
             A return datatype. If not None, the output will be returned as
             dtype(value), otherwise, the generic string/int will be returned. The
             default is None.

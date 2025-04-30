@@ -72,6 +72,7 @@ class TestPydidasFrameStack(unittest.TestCase):
 
     def setUp(self):
         self.frames = []
+        PydidasFrameStack.reset_instance()
 
     def create_stack(self):
         stack = PydidasFrameStack()

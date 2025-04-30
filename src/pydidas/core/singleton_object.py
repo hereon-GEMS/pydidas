@@ -42,6 +42,17 @@ class SingletonObject:
     _instance = None
     _initialized = False
 
+    @classmethod
+    def reset_instance(cls) -> None:
+        """
+        Reset the instance of the singleton object.
+
+        This method is intended for testing purposes only and should not be used
+        in production code.
+        """
+        cls._instance = None
+        cls._initialized = False
+
     def __new__(cls, *args: Any, **kwargs: Any) -> "SingletonObject":
         """Create a new instance of the class if it does not exist yet."""
         if cls._instance is None:

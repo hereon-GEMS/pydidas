@@ -30,7 +30,7 @@ __all__ = ["GenericNode"]
 
 import copy
 from numbers import Integral
-from typing import Self
+from typing import Any, Self
 
 from qtpy import QtCore
 
@@ -66,7 +66,7 @@ class GenericNode:
                 "Cannot add objects which are not of type GenericNode (or subclasses)."
             )
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         """
         Set up the generic node.
 
@@ -75,7 +75,7 @@ class GenericNode:
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Any keywords required for this node.
         """
         self._parent = None

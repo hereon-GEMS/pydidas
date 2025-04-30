@@ -27,10 +27,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WorkflowTree"]
 
+from typing import Type
 
 from pydidas.core import SingletonObject
 from pydidas.workflow.processing_tree import ProcessingTree
-from pydidas.workflow.processing_tree_io.processing_tree_io_meta import WorkflowTree
 
 
 class WorkflowTree(SingletonObject, ProcessingTree):
@@ -42,7 +42,7 @@ class WorkflowTree(SingletonObject, ProcessingTree):
     instance of the ProcessingTree class.
     """
 
-    def __copy__(self) -> ProcessingTree:
+    def __copy__(self, as_type: Type | None = None) -> ProcessingTree:
         """
         Create a copy of the current ProcessingTree instance.
 
@@ -54,7 +54,7 @@ class WorkflowTree(SingletonObject, ProcessingTree):
         """
         return ProcessingTree.__copy__(self, as_type=ProcessingTree)
 
-    def copy(self) -> ProcessingTree:
+    def copy(self, as_type: Type | None = None) -> ProcessingTree:
         """
         Create a copy of the current ProcessingTree instance.
 

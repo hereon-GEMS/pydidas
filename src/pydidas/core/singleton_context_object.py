@@ -67,7 +67,7 @@ class SingletonContextObject:
             cls._instance = super().__new__(cls)
         if not isinstance(cls._instance, ParameterCollectionMixIn):
             raise TypeError(
-                "The class must inherit from ObjectWithParameterCollection."
+                "The class must inherit from ParameterCollectionMixIn."
             )
         return cls._instance
 

@@ -23,6 +23,9 @@ Improvements
 - Added new singleton factories which allow a direct subclassing.
 - Added an option to enter a directory path manually to the DataBrowsingFrame.
 - Added an option to filter for filenames in the DataBrowsingFrame.
+- Added a new mixin class to handle the creation of context objects
+  which allows contexts to be created as subclasses of the base class.
+
 
 
 Bugfixes

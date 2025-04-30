@@ -24,40 +24,53 @@ __copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["SingletonQObject"]
+__all__ = ["SingletonObject"]
 
 
-from qtpy import QtCore
+import warnings
+from typing import Any, NoReturn
 
 
-class SingletonQObject(QtCore.QObject):
+class SingletonObject:
     """
     Class which includes the necessary code to create classes only as Singletons.
 
-    Implementations cannot inherit from other classes and must use the
-    `initialize` method to set up the class instead of the `__init__` method.
+    Implementations must inherit from SingletonObject first to assert the correct
+    method resolution order for calling methods.
     """
 
     _instance = None
     _initialized = False
 
-    def __new__(cls):
+    def __new__(cls, *args: Any, **kwargs: Any) -> "SingletonObject":
         """Create a new instance of the class if it does not exist yet."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, parent: QtCore.QObject | None = None):
+    def __init__(self, *args: Any, **kwargs: Any):
         if self._initialized:
+            if args != () or kwargs != {}:
+                warnings.warn(
+                    "The instance of this class has already been created, "
+                    "and the arguments and keyword arguments have been ignored.",
+                    UserWarning,
+                )
             return
-        SingletonQObject.__init__(self, parent)
-        self.initialize()
-        self._initialized = True
+        self.__class__._initialized = True
+        super().__init__(*args, **kwargs)
 
-    def initialize(self):
+    def __copy__(self) -> NoReturn:
         """
-        Initialize the class instance.
+        Prevent copying of the singleton instance.
 
-        This method should be implemented in the custom classes, if required.
+        Raises
+        -------
+        TypeError
+            Always.
         """
-        pass
+        raise TypeError("SingletonQObject instances cannot be copied.")
+
+    def copy(self) -> NoReturn:
+        """Wrapper for the __copy__ method."""
+        return self.__copy__()

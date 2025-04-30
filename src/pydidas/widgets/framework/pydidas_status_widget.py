@@ -30,13 +30,13 @@ __all__ = ["PydidasStatusWidget"]
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from pydidas.core import SingletonFactory
+from pydidas.core import SingletonObject
 from pydidas.core.utils import get_time_string
 from pydidas.widgets.misc import ReadOnlyTextWidget
 from pydidas_qtcore import PydidasQApplication
 
 
-class _PydidasStatusWidget(QtWidgets.QDockWidget):
+class PydidasStatusWidget(SingletonObject, QtWidgets.QDockWidget):
     """
     The PydidasStatusWidget is used for managing global status messages.
     """
@@ -110,6 +110,3 @@ class _PydidasStatusWidget(QtWidgets.QDockWidget):
             The text of the widget.
         """
         return self._text_edit.toPlainText()
-
-
-PydidasStatusWidget = SingletonFactory(_PydidasStatusWidget)

@@ -782,6 +782,172 @@ implementation are valid kwargs.</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">PydidasFileDialog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/others.html#pydidas.core.SingletonObject" title="pydidas.core.singleton_object.SingletonObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingletonObject</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFileDialog</span></code>, <a class="reference internal" href="#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a></p>
+<p>pydidas’s subclassed QFileDialog with additional functionality.</p>
+<p>The PydidasFileDialogWidget is a subclassed QFileDialog with two additional
+buttons which allow fast navigation to the ScanContext base directory and to the
+latest selected directory (in any dialog).</p>
+<p>The usage is the same as for the generic QFileDialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>QWidget</em><em>]</em><em>, </em><em>optional</em>) – The dialog’s parent widget. The default is None.</p></li>
+<li><p><strong>caption</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – The dialog caption. If None, the caption will be selected based on the
+type of dialog. The default is None.</p></li>
+<li><p><strong>dialog_type</strong> (<em>str</em>) – The type of the dialog. Must be open_file, save_file, or open_directory.
+The default is open_file.</p></li>
+<li><p><strong>formats</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – The list of format filters for filenames, if used. The default is None.</p></li>
+<li><p><strong>info_string</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – An additional information string which is displayed in the FileDialog widget.
+The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.exec_">
+<span class="sig-name descname"><span class="pre">exec_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.exec_" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The return code of the file dialog.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_existing_directory">
+<span class="sig-name descname"><span class="pre">get_existing_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_existing_directory" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get an existing directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
+<dl class="simple">
+<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select directory’.</p>
+</dd>
+<dt>reference<span class="classifier">Union[str, int], optional</span></dt><dd><p>A reference key to store the selection only during the active instance.
+The default is None.</p>
+</dd>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings registry.
+The qsettings_ref will take precedence over the reference keyword.</p>
+</dd>
+<dt>info_string<span class="classifier">str, optional</span></dt><dd><p>An additional info string to be displayed at the top of the file
+selection for user information.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The directory path, if selected or None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[str, None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_existing_filename">
+<span class="sig-name descname"><span class="pre">get_existing_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_existing_filename" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get the full path of an existing file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
+<dl class="simple">
+<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select existing file’.</p>
+</dd>
+<dt>reference<span class="classifier">Union[str, int], optional</span></dt><dd><p>A reference key to store the selection only during the active instance.
+The default is None.</p>
+</dd>
+<dt>select_multiple<span class="classifier">bool, optional</span></dt><dd><p>If True, multiple files can be selected. The default is False.</p>
+</dd>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings registry.
+The qsettings_ref will take precedence over the reference keyword.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The full file path, if selected, or None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[str, None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_existing_filenames">
+<span class="sig-name descname"><span class="pre">get_existing_filenames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_existing_filenames" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get a list of existing files.</p>
+<p>This is a wrapper around get_existing_filename with the necessary
+kwargs settings taken care of for the user.</p>
+<p>Please refer to get_existing_filename for more information and
+Parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_saving_filename">
+<span class="sig-name descname"><span class="pre">get_saving_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_saving_filename" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get the full path of a file for saving.</p>
+<p>The file may exist or a new filename can be entered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
+<dl class="simple">
+<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select filename’.</p>
+</dd>
+<dt>reference<span class="classifier">Union[str, int], optional</span></dt><dd><p>A reference key to store the selection only during the active
+instance. The default is None.</p>
+</dd>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings
+registry. The qsettings_ref will take precedence over the
+reference keyword.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The full file path, if selected, or None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[str, None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.goto_latest_location">
+<span class="sig-name descname"><span class="pre">goto_latest_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_latest_location" title="Link to this definition">#</a></dt>
+<dd><p>Open the latest location from any dialogue.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.goto_scan_base_dir">
+<span class="sig-name descname"><span class="pre">goto_scan_base_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_scan_base_dir" title="Link to this definition">#</a></dt>
+<dd><p>Open the ScanContext home directory, if set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.set_curr_dir">
+<span class="sig-name descname"><span class="pre">set_curr_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.set_curr_dir" title="Link to this definition">#</a></dt>
+<dd><p>Set the current directory to the directory of the given item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em>) – The stored reference name.</p></li>
+<li><p><strong>item</strong> (<em>Union</em><em>[</em><em>pathlib.Path</em><em>, </em><em>str</em><em>]</em>) – The filename or directory name.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.ScrollArea">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">ScrollArea</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.ScrollArea" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QScrollArea</span></code></p>
@@ -1036,6 +1202,17 @@ allowed choice.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_spacer"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_spacer</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_spin_box"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_spin_box</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_vertical_line"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_vertical_line</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.exec_"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.exec_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_existing_directory"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_existing_directory</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_existing_filename"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_existing_filename</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_existing_filenames"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_existing_filenames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_saving_filename"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_saving_filename</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.goto_latest_location"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.goto_latest_location</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.goto_scan_base_dir"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.goto_scan_base_dir</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.set_curr_dir"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.set_curr_dir</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.ScrollArea"><code class="docutils literal notranslate"><span class="pre">ScrollArea</span></code></a><ul class="nav section-nav flex-column">

@@ -487,13 +487,13 @@ ProcessingTreeIo classes.</p>
 registry with all associated file extensions for exporting WorkflowTrees.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.processing_tree_io.ProcessingTreeIoMeta.export_to_file">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WWorkflowTree</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.processing_tree_io.ProcessingTreeIoMeta.export_to_file" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">WorkflowTree</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.processing_tree_io.ProcessingTreeIoMeta.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Call the export_to_file method associated with extension of the filename.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The full filename and path.</p></li>
-<li><p><strong>tree</strong> (<em>pydidas.workflow.WorkflowTree</em>) – The instance of the WorkflowTree</p></li>
+<li><p><strong>tree</strong> (<a class="reference internal" href="workflow.html#pydidas.workflow.WorkflowTree" title="pydidas.workflow.WorkflowTree"><em>pydidas.workflow.WorkflowTree</em></a>) – The instance of the WorkflowTree</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em>) – Any kwargs which should be passed to the udnerlying exporter.</p></li>
 </ul>
 </dd>
@@ -502,7 +502,7 @@ registry with all associated file extensions for exporting WorkflowTrees.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.processing_tree_io.ProcessingTreeIoMeta.import_from_file">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">WWorkflowTree</span></span></span><a class="headerlink" href="#pydidas.workflow.processing_tree_io.ProcessingTreeIoMeta.import_from_file" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">WorkflowTree</span></span></span><a class="headerlink" href="#pydidas.workflow.processing_tree_io.ProcessingTreeIoMeta.import_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Call the concrete import_from_file method in the subclass registered
 to the extension of the filename.</p>
 <dl class="field-list simple">
@@ -513,7 +513,7 @@ to the extension of the filename.</p>
 <dd class="field-even"><p>The new WorkflowTree instance.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pydidas.workflow.WorkflowTree</p>
+<dd class="field-odd"><p><a class="reference internal" href="workflow.html#pydidas.workflow.WorkflowTree" title="pydidas.workflow.WorkflowTree">pydidas.workflow.WorkflowTree</a></p>
 </dd>
 </dl>
 </dd></dl>

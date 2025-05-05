@@ -511,11 +511,11 @@ not be changed and will default to the PluginCollection singleton.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">PluginInWorkflowBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">PluginInWorkflowBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFrame</span></code></p>
 <p>Widget to represent a Plugin in the WorkflowTree.</p>
-<p>The widget displays plugin name, title and includes a delete button to remove the
-Plugin or the full branch from the workflow.</p>
+<p>The widget displays the plugin name, title and includes a delete button to
+remove the Plugin or the full branch from the workflow.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -527,7 +527,7 @@ Plugin or the full branch from the workflow.</p>
 </dd>
 <dt>label<span class="classifier">str, optional</span></dt><dd><p>The node’s label. The default is an empty string.</p>
 </dd>
-<dt>standard_size<span class="classifier">tuple[int, int]</span></dt><dd><p>The standard size in pixel.</p>
+<dt>standard_size<span class="classifier">tuple[int, int]</span></dt><dd><p>The standard size in pixels.</p>
 </dd>
 </dl>
 </p></li>
@@ -628,7 +628,7 @@ WorkflowTree.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_text">
 <span class="sig-name descname"><span class="pre">update_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox.update_text" title="Link to this definition">#</a></dt>
-<dd><p>Update the text for node label.</p>
+<dd><p>Update the text for the node label.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

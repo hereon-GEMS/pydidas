@@ -463,24 +463,28 @@ document.write(`
 <h1>The plugins sub-package<a class="headerlink" href="#the-plugins-sub-package" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.plugin_collection.</span></span><span class="sig-name descname"><span class="pre">PluginRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.plugin_collection.</span></span><span class="sig-name descname"><span class="pre">PluginRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry" title="Link to this definition">#</a></dt>
 <dd><p>Class to hold references of plugins.</p>
 <p>Plugins can be accessed by their class names or by their plugin_name properties.
 For details, please refer to the individual methods.</p>
-<p>Note that the PluginRegistry is a class which should not normally be
+<p>Note that the PluginRegistry is a class that should not normally be
 accessed directly but generally through its ‘PluginCollection’ singleton.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Supported kwargs are:</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported kwargs are:</p>
 <dl class="simple">
-<dt>plugin_path<span class="classifier">Union[str, list[Path], None], optional</span></dt><dd><p>The search directory for plugins. A single path can be supplies
-as string. Multiple paths can be supplied in a single string
-separated by “;;” or as a list. None will call to the default
-paths. The default is None.</p>
+<dt>parent<span class="classifier">QObject | None, optional</span></dt><dd><p>The parent QObject. The default is None.</p>
+</dd>
+<dt>plugin_path<span class="classifier">Union[str, list[Path], None], optional</span></dt><dd><p>The search directory for plugins. A single path can be supplied as a
+string. Multiple paths can be supplied in a single string separated
+by “;;” or as a list. None will call the default paths.
+The default is None.</p>
 </dd>
 <dt>force_initialization<span class="classifier">bool, optional</span></dt><dd><p>Keyword to force initialization at creation. By default, the
 PluginCollection is initialized the first time it is used.
 The default is False.</p>
+</dd>
+<dt>use_generic_plugins<span class="classifier">bool, optional</span></dt><dd><p>Flag to use the generic pydidas plugins. The default is True.</p>
 </dd>
 </dl>
 </p>
@@ -488,12 +492,12 @@ The default is False.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.check_and_register_class">
-<span class="sig-name descname"><span class="pre">check_and_register_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.check_and_register_class" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">check_and_register_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.check_and_register_class" title="Link to this definition">#</a></dt>
 <dd><p>Check whether a class is a valid plugin and register it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>class</strong> (<em>type</em>) – The class object.</p></li>
+<li><p><strong>class</strong> (Type[BasePlugin] <a href="#id1"><span class="problematic" id="id2">|</span></a>type) – The type of the class to be checked.</p></li>
 <li><p><strong>reload</strong> (<em>bool</em>) – Flag to enable reloading of plugins. If True, new plugins will
 overwrite older stored plugins. The default is False.</p></li>
 </ul>
@@ -515,12 +519,12 @@ is False.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins">
-<span class="sig-name descname"><span class="pre">find_and_register_plugins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">plugin_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">find_and_register_plugins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">plugin_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins" title="Link to this definition">#</a></dt>
 <dd><p>Find plugins in the given path(s) and register them in the PluginCollection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>plugin_paths</strong> (<em>tuple</em><em>[</em><em>Path</em><em>]</em>) – Any number of file system paths.</p></li>
+<li><p><strong>plugin_paths</strong> (<em>Path</em>) – Any number of file system paths.</p></li>
 <li><p><strong>reload</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to handle reloading of plugins if a plugin with an identical
 name is encountered. If False, these plugins will be skipped.</p></li>
 </ul>
@@ -565,7 +569,7 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 <dd class="field-odd"><p><strong>plugin_type</strong> (<em>Literal</em><em>[</em><em>&quot;base&quot;</em><em>, </em><em>&quot;input&quot;</em><em>, </em><em>&quot;proc&quot;</em><em>, </em><em>&quot;output&quot;</em><em>]</em>) – The type of the demanded plugins.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list with all Plugins which have the specified type.</p>
+<dd class="field-even"><p>A list with all Plugins that have the specified type.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
@@ -638,11 +642,11 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.remove_plugin_from_collection">
-<span class="sig-name descname"><span class="pre">remove_plugin_from_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.remove_plugin_from_collection" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">remove_plugin_from_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.remove_plugin_from_collection" title="Link to this definition">#</a></dt>
 <dd><p>Remove a Plugin from the PluginCollection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>class</strong> (<em>type</em>) – The class object to be removed.</p>
+<dd class="field-odd"><p><strong>class</strong> (<em>Type</em><em>[</em><a class="reference internal" href="#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><em>BasePlugin</em></a><em>]</em>) – The class object to be removed.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -661,11 +665,11 @@ default is False.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path">
-<span class="sig-name descname"><span class="pre">unregister_plugin_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">unregister_plugin_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path" title="Link to this definition">#</a></dt>
 <dd><p>Unregister the given path from the PluginCollection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) – The path to the directory containing the plugins.</p>
+<dd class="field-odd"><p><strong>path</strong> (<em>Path</em><em> | </em><em>str</em>) – The path to the directory containing the plugins.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If the given path is not registered.</p>
@@ -1322,6 +1326,17 @@ label.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="pydidas.plugins.PluginCollection">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">PluginCollection</span></span><a class="headerlink" href="#pydidas.plugins.PluginCollection" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="pydidas.plugins.PluginCollection.non_context_class">
+<span class="sig-name descname"><span class="pre">non_context_class</span></span><a class="headerlink" href="#pydidas.plugins.PluginCollection.non_context_class" title="Link to this definition">#</a></dt>
+<dd><p>alias of <a class="reference internal" href="#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_registry.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginRegistry</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.ProcPlugin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">ProcPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.ProcPlugin" title="Link to this definition">#</a></dt>
 <dd><p>The base plugin class for processing plugins.</p>
@@ -1651,6 +1666,10 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin.get_output_filename"><code class="docutils literal notranslate"><span class="pre">OutputPlugin.get_output_filename</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin.output_data_dim"><code class="docutils literal notranslate"><span class="pre">OutputPlugin.output_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">OutputPlugin.pre_execute</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.PluginCollection"><code class="docutils literal notranslate"><span class="pre">PluginCollection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.PluginCollection.non_context_class"><code class="docutils literal notranslate"><span class="pre">PluginCollection.non_context_class</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.ProcPlugin"><code class="docutils literal notranslate"><span class="pre">ProcPlugin</span></code></a></li>

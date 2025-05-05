@@ -528,7 +528,7 @@ to be used. It will not overwrite existing params attributes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.ParameterCollectionMixIn.add_params">
-<span class="sig-name descname"><span class="pre">add_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.add_params" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.add_params" title="Link to this definition">#</a></dt>
 <dd><p>Add parameters to the object.</p>
 <p>This method adds Parameters to the ParameterCollection of the object.
 Parameters can be either supplied as args or a ParameterCollection
@@ -537,7 +537,7 @@ This method is explicitly separated from the __init__ method to allow
 subclasses full control over args and kwargs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>*params</strong> (<em>Tuple</em><em>[</em><em>Union</em><em>[</em><a class="reference internal" href="parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em>, </em><em>dict</em><em>, </em><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><em>ParameterCollection</em></a><em>]</em><em>]</em>) – Any Parameter or ParameterCollection</p>
+<dd class="field-odd"><p><strong>*params</strong> (<a class="reference internal" href="parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> | </em><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><em>ParameterCollection</em></a>) – Any Parameter or ParameterCollection.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -590,14 +590,14 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.ParameterCollectionMixIn.get_param_value">
-<span class="sig-name descname"><span class="pre">get_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_export</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.get_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_export</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.get_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Get a Parameter value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param_key</strong> (<em>str</em>) – The key name of the Parameter.</p></li>
-<li><p><strong>default</strong> (<em>object</em>) – The default value if the param_key does not exist.</p></li>
-<li><p><strong>dtype</strong> (<em>type</em><em>, </em><em>optional</em>) – A datatype to convert the value into. If None, the native
+<li><p><strong>default</strong> (<em>Any</em>) – The default value if the param_key does not exist.</p></li>
+<li><p><strong>dtype</strong> (<em>type</em><em> | </em><em>None</em>) – A datatype to convert the value into. If None, the native
 datatype is returned. The default is None.</p></li>
 <li><p><strong>for_export</strong> (<em>bool</em><em>, </em><em>optional</em>) – An optional flag to force converting the Parameter value to an
 export-compatible format. This flag is not compatible with a specific
@@ -704,13 +704,13 @@ Parameter with a default value.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.ParameterCollectionMixIn.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.set_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.set_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Set a parameter value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param_key</strong> (<em>str</em>) – The key name of the Parameter.</p></li>
-<li><p><strong>value</strong> (<em>object</em>) – The value to be set. This has to be the datatype associated with
+<li><p><strong>value</strong> (<em>Any</em>) – The value to be set. This has to be the datatype associated with
 the Parameter.</p></li>
 </ul>
 </dd>
@@ -719,11 +719,11 @@ the Parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.ParameterCollectionMixIn.set_param_values">
-<span class="sig-name descname"><span class="pre">set_param_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.set_param_values" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.set_param_values" title="Link to this definition">#</a></dt>
 <dd><p>Set multiple parameter values at once.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – The reference key and value pairs for all Parameters to be set.</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – The reference key and value pairs for all Parameters to be set.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -741,24 +741,24 @@ the Parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.ParameterCollectionMixIn.update_param_values_from_kwargs">
-<span class="sig-name descname"><span class="pre">update_param_values_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.update_param_values_from_kwargs" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_param_values_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.update_param_values_from_kwargs" title="Link to this definition">#</a></dt>
 <dd><p>Update the Parameter values corresponding to the given keys.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – The dictionary with Parameter refkeys and values.</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – The dictionary with Parameter refkeys and values.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.ParameterCollectionMixIn.update_params_from_init">
-<span class="sig-name descname"><span class="pre">update_params_from_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.update_params_from_init" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_params_from_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.parameter_collection.ParameterCollection"><span class="pre">ParameterCollection</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ParameterCollectionMixIn.update_params_from_init" title="Link to this definition">#</a></dt>
 <dd><p>Update the Parameters from the given init args and kwargs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>*args</strong> (<em>Tuple</em>) – The input arguments.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Dict</em>) – The input keyword arguments.</p></li>
+<li><p><strong>*args</strong> (<a class="reference internal" href="parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> | </em><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><em>ParameterCollection</em></a>) – The input arguments.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – The input keyword arguments.</p></li>
 </ul>
 </dd>
 </dl>
@@ -859,7 +859,7 @@ referenced by param_key or dtype, if given.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">PydidasQsettingsMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.PydidasQsettingsMixin" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Mix-in class with access functions to pydidas QSettings values.</p>
-<p>This class can be inherited by any class which requires access to the
+<p>This class can be inherited by any class that requires access to the
 global QSettings defined in pydidas.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -868,16 +868,16 @@ global QSettings defined in pydidas.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.PydidasQsettingsMixin.q_settings_get">
-<span class="sig-name descname"><span class="pre">q_settings_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.core.PydidasQsettingsMixin.q_settings_get" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">q_settings_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Integral</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Real</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pydidas.core.PydidasQsettingsMixin.q_settings_get" title="Link to this definition">#</a></dt>
 <dd><p>Get the value from a QSetting key.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key</strong> (<em>str</em>) – The QSetting reference key.</p></li>
-<li><p><strong>dtype</strong> (<em>Union</em><em>[</em><em>type</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A return datatype. If not None, the output will be returned as
+<li><p><strong>dtype</strong> (<em>Integral</em><em> | </em><em>Real</em><em> | </em><em>Type</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – A return datatype. If not None, the output will be returned as
 dtype(value), otherwise, the generic string/int will be returned. The
 default is None.</p></li>
-<li><p><strong>default</strong> (<em>type</em><em>, </em><em>optional</em>) – The default value which is returned if the key defaults to None. The
+<li><p><strong>default</strong> (<em>Any</em><em>, </em><em>optional</em>) – The default value which is returned if the key defaults to None. The
 default is None.</p></li>
 </ul>
 </dd>
@@ -886,20 +886,20 @@ default is None.</p></li>
 referenced by param_key or dtype, if given.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>object</p>
+<dd class="field-odd"><p>Any</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.PydidasQsettingsMixin.q_settings_set">
-<span class="sig-name descname"><span class="pre">q_settings_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.PydidasQsettingsMixin.q_settings_set" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">q_settings_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.PydidasQsettingsMixin.q_settings_set" title="Link to this definition">#</a></dt>
 <dd><p>Set the value of a QSettings key.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key</strong> (<em>str</em>) – The name of the key.</p></li>
-<li><p><strong>value</strong> (<em>object</em>) – The value to be stored.</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – The value to be stored.</p></li>
 </ul>
 </dd>
 </dl>
@@ -910,63 +910,52 @@ referenced by param_key or dtype, if given.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.core.SingletonContextObject">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">SingletonContextObject</span></span><a class="headerlink" href="#pydidas.core.SingletonContextObject" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="object_with_prm_cllct.html#pydidas.core.ObjectWithParameterCollection" title="pydidas.core.object_with_parameter_collection.ObjectWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a></p>
-<p>Class which includes the necessary code to create classes only as Singletons.</p>
-<p>Implementations cannot inherit from other classes and must use the
-<cite>initialize</cite> method to set up the class instead of the <cite>__init__</cite> method.</p>
-<p>This method will try to fetch and restore the parameter values  from the
-QSettings, if values have been set.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.core.SingletonContextObject.initialize">
-<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.SingletonContextObject.initialize" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the class instance.</p>
-<p>This method should be implemented in the custom classes, if required.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pydidas.core.SingletonFactory">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">SingletonFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">permanent_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.SingletonFactory" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Factory to create a Singleton instance of a class.</p>
-<p>This factory also handles QObjects and removes the instance if the
-corresponding QObject has been destroyed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cls</strong> (<em>class</em>) – The Python class which should be managed by the SingletonFactory.</p></li>
-<li><p><strong>permanent_kwargs</strong> (<em>dict</em>) – Permanent kwargs which should always be used when creating the class
-instance.</p></li>
-</ul>
-</dd>
-</dl>
+<p>Class which includes the necessary code to create classes only as Singletons.</p>
+<p>Implementations must inherit from the ObjectWithParameterCollection class.</p>
+<p>FOR THE CORRECT METHOD RESOLUTION ORDER, THE IMPLEMENTED CLASS <em>MUST</em>
+INHERIT FROM THE SingletonContextObject CLASS <em>FIRST</em>.</p>
 <dl class="py property">
-<dt class="sig sig-object py" id="pydidas.core.SingletonFactory.instance">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#pydidas.core.SingletonFactory.instance" title="Link to this definition">#</a></dt>
-<dd><p>Get the instance. A wrapper for __call__</p>
+<dt class="sig sig-object py" id="pydidas.core.SingletonContextObject.instance">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span></em><a class="headerlink" href="#pydidas.core.SingletonContextObject.instance" title="Link to this definition">#</a></dt>
+<dd><p>Get the instance of the singleton object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kwargs</strong> (<em>dict</em>) – Any kwargs which should be passed. Note that this is only used
-if no instance exists yet.</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The instance of the singleton object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pydidas.core.SingletonContextObject" title="pydidas.core.SingletonContextObject">SingletonContextObject</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pydidas.core.SingletonContextObject.non_context_class">
+<span class="sig-name descname"><span class="pre">non_context_class</span></span><a class="headerlink" href="#pydidas.core.SingletonContextObject.non_context_class" title="Link to this definition">#</a></dt>
+<dd><p>alias of <a class="reference internal" href="object_with_prm_cllct.html#pydidas.core.ObjectWithParameterCollection" title="pydidas.core.object_with_parameter_collection.ObjectWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a></p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.core.SingletonQObject">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">SingletonQObject</span></span><a class="headerlink" href="#pydidas.core.SingletonQObject" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
+<dt class="sig sig-object py" id="pydidas.core.SingletonObject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">SingletonObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.SingletonObject" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class which includes the necessary code to create classes only as Singletons.</p>
-<p>Implementations cannot inherit from other classes and must use the
-<cite>initialize</cite> method to set up the class instead of the <cite>__init__</cite> method.</p>
+<p>Implementations must inherit from SingletonObject first to assert the correct
+method resolution order for calling methods.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.core.SingletonQObject.initialize">
-<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.SingletonQObject.initialize" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the class instance.</p>
-<p>This method should be implemented in the custom classes, if required.</p>
+<dt class="sig sig-object py" id="pydidas.core.SingletonObject.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#pydidas.core.SingletonObject.copy" title="Link to this definition">#</a></dt>
+<dd><p>Wrapper for the __copy__ method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.SingletonObject.reset_instance">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset_instance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.SingletonObject.reset_instance" title="Link to this definition">#</a></dt>
+<dd><p>Reset the instance of the singleton object.</p>
+<p>This method is intended for testing purposes only and should not be used
+in production code.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1109,15 +1098,13 @@ on the supplied keys.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonContextObject"><code class="docutils literal notranslate"><span class="pre">SingletonContextObject</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonContextObject.initialize"><code class="docutils literal notranslate"><span class="pre">SingletonContextObject.initialize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonContextObject.instance"><code class="docutils literal notranslate"><span class="pre">SingletonContextObject.instance</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonContextObject.non_context_class"><code class="docutils literal notranslate"><span class="pre">SingletonContextObject.non_context_class</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonFactory"><code class="docutils literal notranslate"><span class="pre">SingletonFactory</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonFactory.instance"><code class="docutils literal notranslate"><span class="pre">SingletonFactory.instance</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonQObject"><code class="docutils literal notranslate"><span class="pre">SingletonQObject</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonQObject.initialize"><code class="docutils literal notranslate"><span class="pre">SingletonQObject.initialize</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonObject"><code class="docutils literal notranslate"><span class="pre">SingletonObject</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonObject.copy"><code class="docutils literal notranslate"><span class="pre">SingletonObject.copy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonObject.reset_instance"><code class="docutils literal notranslate"><span class="pre">SingletonObject.reset_instance</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.UserConfigError"><code class="docutils literal notranslate"><span class="pre">UserConfigError</span></code></a></li>

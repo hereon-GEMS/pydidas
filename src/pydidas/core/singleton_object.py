@@ -69,7 +69,10 @@ class SingletonObject:
                 )
             return
         self.__class__._initialized = True
-        super().__init__(*args, **kwargs)
+
+        # Only call super().__init__ if there are multiple bases:
+        if len(self.__class__.__bases__) > 1:
+            super().__init__(*args, **kwargs)
 
     def __copy__(self) -> NoReturn:
         """
@@ -80,7 +83,7 @@ class SingletonObject:
         TypeError
             Always.
         """
-        raise TypeError("SingletonQObject instances cannot be copied.")
+        raise TypeError("SingletonObject instances cannot be copied.")
 
     def copy(self) -> NoReturn:
         """Wrapper for the __copy__ method."""

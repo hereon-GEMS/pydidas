@@ -31,6 +31,7 @@ __all__ = ["ProcessingResults"]
 import os
 import re
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -41,20 +42,25 @@ from pydidas.contexts import (
     Scan,
     ScanContext,
 )
-from pydidas.core import Dataset, Parameter, UserConfigError, utils
+from pydidas.core import (
+    Dataset,
+    ObjectWithParameterCollection,
+    UserConfigError,
+    utils,
+)
 from pydidas.workflow.processing_tree import ProcessingTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta as ResultSaver
 from pydidas.workflow.workflow_tree import WorkflowTree
 
 
-class ProcessingResults(QtCore.QObject):
+class ProcessingResults(ObjectWithParameterCollection):
     """
     A class for handling composite data from multiple plugins.
 
     This class handles Datasets from each plugin in the WorkflowTree. Results
     are referenced by the node ID of the data's producer.
 
-    Warning: Users should generally only use the WorkflowResults singleton,
+    Warning: Users should generally only use the WorkflowResults singleton
     and never use the ProcessingResults directly unless explicitly required.
 
     Parameters
@@ -64,11 +70,11 @@ class ProcessingResults(QtCore.QObject):
         if you explicitly require a different context. The default is None.
     diffraction_exp_context : Union[DiffractionExp, None], optional
         The diffraction experiment context. If None, the generic context will be used.
-        Only specify this, if you explicitly require a different context. The default
+        Only specify this if you explicitly require a different context. The default
         is None.
     workflow_tree : Union[WorkflowTree, None], optional
         The WorkflowTree. If None, the generic WorkflowTree will be used. Only specify
-        this, if you explicitly require a different context. The default is None.
+        this if you explicitly require a different context. The default is None.
     """
 
     new_results = QtCore.Signal()
@@ -79,7 +85,7 @@ class ProcessingResults(QtCore.QObject):
         scan_context: Scan | None = None,
         workflow_tree: ProcessingTree | None = None,
     ):
-        super().__init__(parent=None)
+        ObjectWithParameterCollection.__init__(self, parent=None)
         self._SCAN = ScanContext() if scan_context is None else scan_context
         self._EXP = (
             DiffractionExperimentContext()
@@ -131,14 +137,14 @@ class ProcessingResults(QtCore.QObject):
         self._config["frozen_TREE"].update_from_tree(self._TREE)
         self._config["frozen_TREE"].prepare_execution()
 
-    def store_frame_shapes(self, shapes: dict):
+    def store_frame_shapes(self, shapes: dict[int, tuple[int]]):
         """
         Store the shapes of the results in the ProcessingResults.
 
         Parameters
         ----------
-        shapes : dict
-            The shapes in form of a dictionary with nodeID keys and shape
+        shapes : dict[int, tuple[int]]
+            The shapes in the form of a dictionary with nodeID keys and shape
             values.
         """
         if shapes.keys() != self._config["plugin_res_metadata"].keys():
@@ -244,9 +250,9 @@ class ProcessingResults(QtCore.QObject):
         self._config["composites_created"] = True
 
     @property
-    def shapes(self) -> dict:
+    def shapes(self) -> dict[int, tuple[int]]:
         """
-        Return the shapes of the results in form of a dictionary.
+        Return the shapes of the results in the form of a dictionary.
 
         Returns
         -------
@@ -256,51 +262,52 @@ class ProcessingResults(QtCore.QObject):
         return self._config["shapes"].copy()
 
     @property
-    def node_labels(self) -> dict:
+    def node_labels(self) -> dict[int, str]:
         """
-        Return the labels of the results in form of a dictionary.
+        Return the labels of the results in the form of a dictionary.
 
         Returns
         -------
-        dict
+        dict[int, str]
             A dictionary with entries of the form <node_id: label>
         """
         return self._config["node_labels"].copy()
 
     @property
-    def data_labels(self) -> dict:
+    def data_labels(self) -> dict[int, str]:
         """
         Return the data labels of the different Plugins to in form of a
         dictionary.
 
         Returns
         -------
-        dict
+        dict[int, str]
             A dictionary with entries of the form <node_id: label>
         """
         return {_key: _item.data_label for _key, _item in self._composites.items()}
 
     @property
-    def data_units(self) -> dict:
+    def data_units(self) -> dict[int, str]:
         """
         Return the data units of the different Plugins to in form of a
         dictionary.
 
         Returns
         -------
-        dict
+        dict[int, str]
             A dictionary with entries of the form <node_id: label>
         """
         return {_key: _item.data_unit for _key, _item in self._composites.items()}
 
     @property
-    def ndims(self) -> dict:
+    def ndims(self) -> dict[int, int]:
         """
-        Return the number of dimensions of the results in form of a dictionary.
+        Return the number of dimensions for each of the results in the form
+        of a dictionary.
 
         Returns
         -------
-        dict
+        dict[int, int]
             A dictionary with entries of the form <node_id: ndim>
         """
         return {_key: _item.ndim for _key, _item in self._composites.items()}
@@ -355,7 +362,7 @@ class ProcessingResults(QtCore.QObject):
         return self.__source_hash
 
     @property
-    def result_titles(self) -> dict:
+    def result_titles(self) -> dict[int, str]:
         """
         Return the result titles for all node IDs in form of a dictionary.
 
@@ -384,7 +391,7 @@ class ProcessingResults(QtCore.QObject):
                 "the `keep_results` flag is set to True in the plugin."
             )
 
-    def get_result_ranges(self, node_id: int) -> dict:
+    def get_result_ranges(self, node_id: int) -> dict[int, np.ndarray]:
         """
         Get the data ranges for the requested node id.
 
@@ -395,7 +402,7 @@ class ProcessingResults(QtCore.QObject):
 
         Returns
         -------
-        dict
+        dict[int, np.ndarray]
             The dictionary with the ranges with dimension keys and ranges
             values.
         """
@@ -457,7 +464,7 @@ class ProcessingResults(QtCore.QObject):
     def get_result_subset(
         self,
         node_id: int,
-        *slices: tuple[int | slice],
+        *slices: int | slice,
         flattened_scan_dim: bool = False,
         squeeze: bool = False,
     ) -> Dataset:
@@ -472,7 +479,7 @@ class ProcessingResults(QtCore.QObject):
         ----------
         node_id : int
             The node ID for which results should be returned.
-        *slices : tuple[int | slice]
+        *slices : int | slice
             The tuple used for slicing/indexing the np.ndarray.
         flattened_scan_dim : bool, optional
             Keyword to process flattened Scan dimensions. If True, the Scan
@@ -504,7 +511,7 @@ class ProcessingResults(QtCore.QObject):
 
     def get_result_metadata(
         self, node_id: int, use_scan_timeline: bool = False
-    ) -> dict:
+    ) -> dict[str, Any]:
         """
         Get the stored metadata for the results of the specified node.
 
@@ -517,7 +524,7 @@ class ProcessingResults(QtCore.QObject):
 
         Returns
         -------
-        dict[str, object]
+        dict[str, Any]
             A dictionary with the metadata retrieved from the Dataset plus the shape
             and `node_label`.
         """
@@ -543,7 +550,7 @@ class ProcessingResults(QtCore.QObject):
     def save_results_to_disk(
         self,
         save_dir: str | Path,
-        *save_formats: tuple[str],
+        *save_formats: str,
         overwrite: bool = False,
         squeeze_results: bool = False,
         node_id: int | None = None,
@@ -563,7 +570,7 @@ class ProcessingResults(QtCore.QObject):
         ----------
         save_dir : Union[str, pathlib.Path]
             The basepath for all saved data.
-        save_formats : tuple[str]
+        save_formats : str
             Strings of all formats to be written. Individual formats can be
             also be given in a single string if they are separated by comma
             (","), ampersand ("&") or slash ("/") characters.
@@ -669,27 +676,6 @@ class ProcessingResults(QtCore.QObject):
             workflow_tree=self._config["frozen_TREE"],
         )
 
-    def update_param_choices_from_labels(
-        self, param: Parameter, add_no_selection_entry: bool = True
-    ):
-        """
-        Store the current ProcessingResults node labels in the specified
-        Parameter's choices.
-
-        A neutral entry of "No selection" can be added with the optional flag.
-
-        Parameters
-        ----------
-        param : pydidas.core.Parameter
-            The Parameter to be updated.
-        add_no_selection_entry : bool, optional
-            Flag to add an entry of no selection in addition to the entries
-            from the nodes. The default is True.
-        """
-        _new_choices = ["No selection"] if add_no_selection_entry else []
-        _new_choices.extend(list(self.result_titles.values()))
-        param.update_value_and_choices(_new_choices[0], _new_choices)
-
     def get_node_result_metadata_string(
         self,
         node_id: int,
@@ -759,13 +745,13 @@ class ProcessingResults(QtCore.QObject):
             _node_info += f"Data zero-dimensional\n  Value: {_val:.6f}"
         return _node_info
 
-    def import_data_from_directory(self, directory: str | Path):
+    def import_data_from_directory(self, directory: Path | str):
         """
         Import data from a directory.
 
         Parameters
         ----------
-        directory : Union[pathlib.Path, str]
+        directory : Path | str
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()

@@ -18,8 +18,8 @@
 """
 The PluginRegistry class stores Plugin information and allows to get the classes.
 
-The PluginRegistry allows to handle paths and search these paths for pydidas
-Plugins and keep a registry of all the class objects for the user to access.
+The PluginRegistry allows handling paths and searching these paths for pydidas
+plugins. It also keeps a registry of all the class objects for the user to access.
 """
 
 __author__ = "Malte Storm"
@@ -27,54 +27,60 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
+__all__ = ["PluginRegistry"]
 
 
 import importlib
 import inspect
 import warnings
 from pathlib import Path
-from typing import Literal, Union
+from typing import Any, Literal, Type
 
 from qtpy import QtCore
 
-from pydidas.core import PydidasQsettingsMixin, UserConfigError
+from pydidas.core import (
+    ObjectWithParameterCollection,
+    UserConfigError,
+)
 from pydidas.core.constants import GENERIC_PLUGIN_PATH
 from pydidas.core.utils import find_valid_python_files
 from pydidas.plugins import BasePlugin
 
 
-class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
+class PluginRegistry(ObjectWithParameterCollection):
     """
     Class to hold references of plugins.
 
     Plugins can be accessed by their class names or by their plugin_name properties.
     For details, please refer to the individual methods.
 
-    Note that the PluginRegistry is a class which should not normally be
+    Note that the PluginRegistry is a class that should not normally be
     accessed directly but generally through its 'PluginCollection' singleton.
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Supported kwargs are:
 
+        parent : QObject | None, optional
+            The parent QObject. The default is None.
         plugin_path : Union[str, list[Path], None], optional
-            The search directory for plugins. A single path can be supplies
-            as string. Multiple paths can be supplied in a single string
-            separated by ";;" or as a list. None will call to the default
-            paths. The default is None.
+            The search directory for plugins. A single path can be supplied as a
+            string. Multiple paths can be supplied in a single string separated
+            by ";;" or as a list. None will call the default paths.
+            The default is None.
         force_initialization : bool, optional
             Keyword to force initialization at creation. By default, the
             PluginCollection is initialized the first time it is used.
             The default is False.
+        use_generic_plugins : bool, optional
+            Flag to use the generic pydidas plugins. The default is True.
     """
 
     sig_updated_plugins = QtCore.Signal()
 
-    def __init__(self, **kwargs: dict):
-        QtCore.QObject.__init__(self)
-        PydidasQsettingsMixin.__init__(self)
+    def __init__(self, **kwargs: Any):
+        ObjectWithParameterCollection.__init__(self, **kwargs)
         self.plugins = {}
         self._plugin_types = {}
         self._plugin_names = {}
@@ -90,13 +96,13 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             self.verify_is_initialized()
 
     @staticmethod
-    def __get_plugin_path_from_kwargs(**kwargs: dict) -> list[Path]:
+    def __get_plugin_path_from_kwargs(**kwargs: Any) -> list[Path]:
         """
         Get the plugin path(s) from the calling keyword arguments.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             The calling keyword arguments
 
         Returns
@@ -152,7 +158,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
 
         Returns
         -------
-        plugin_paths : list
+        plugin_paths : list[Path]
             A list of plugin paths.
         """
         if self._config["initial_plugin_path"]:
@@ -190,15 +196,13 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             )
         return _existing_paths
 
-    def find_and_register_plugins(
-        self, *plugin_paths: tuple[Path], reload: bool = True
-    ):
+    def find_and_register_plugins(self, *plugin_paths: Path, reload: bool = True):
         """
         Find plugins in the given path(s) and register them in the PluginCollection.
 
         Parameters
         ----------
-        plugin_paths : tuple[Path]
+        plugin_paths : Path
             Any number of file system paths.
         reload : bool, optional
             Flag to handle reloading of plugins if a plugin with an identical
@@ -256,13 +260,13 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         self.q_settings_set("user/plugin_path", _paths)
 
     @staticmethod
-    def _get_valid_modules_and_filenames(path: Union[Path, str]) -> dict[str, Path]:
+    def _get_valid_modules_and_filenames(path: Path | str) -> dict[str, Path]:
         """
         Get all module names in a specified path (including subdirectories).
 
         Parameters
         ----------
-        path : Union[str, Path]
+        path : Path | str
             The file system path.
 
         Returns
@@ -305,14 +309,16 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         del spec, tmp_module
         return cls_members
 
-    def check_and_register_class(self, class_: type, reload: bool = False):
+    def check_and_register_class(
+        self, class_: Type[BasePlugin] | type, reload: bool = False
+    ):
         """
         Check whether a class is a valid plugin and register it.
 
         Parameters
         ----------
-        class_ : type
-            The class object.
+        class_ : Type[BasePlugin] |type
+            The type of the class to be checked.
         reload : bool
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
@@ -332,13 +338,13 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
             self.remove_plugin_from_collection(class_)
             self.__add_new_class(class_)
 
-    def __add_new_class(self, class_: type):
+    def __add_new_class(self, class_: Type[BasePlugin]):
         """
         Add a new class to the collection.
 
         Parameters
         ----------
-        class_ : type
+        class_ : Type[BasePlugin]
             The class object.
         """
         if class_.plugin_name in self._plugin_names:
@@ -357,13 +363,13 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         )
         self._plugin_names[class_.plugin_name] = class_.__name__
 
-    def remove_plugin_from_collection(self, class_: type):
+    def remove_plugin_from_collection(self, class_: Type[BasePlugin]):
         """
         Remove a Plugin from the PluginCollection.
 
         Parameters
         ----------
-        class_ : type
+        class_ : Type[BasePlugin]
             The class object to be removed.
         """
         if class_.__name__ in self.plugins:
@@ -451,7 +457,7 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         Returns
         -------
         list
-            A list with all Plugins which have the specified type.
+            A list with all Plugins that have the specified type.
         """
         self.verify_is_initialized()
         if plugin_type == "base":
@@ -476,13 +482,13 @@ class PluginRegistry(QtCore.QObject, PydidasQsettingsMixin):
         self.verify_is_initialized()
         return self._plugin_paths[:]
 
-    def unregister_plugin_path(self, path: Union[str, Path]):
+    def unregister_plugin_path(self, path: Path | str):
         """
         Unregister the given path from the PluginCollection.
 
         Parameters
         ----------
-        path : Union[str, Path]
+        path : Path | str
             The path to the directory containing the plugins.
 
         Raises

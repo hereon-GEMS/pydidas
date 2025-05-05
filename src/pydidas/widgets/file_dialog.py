@@ -35,7 +35,11 @@ from typing import Union
 from qtpy import QtCore, QtWidgets
 
 from pydidas.contexts import ScanContext
-from pydidas.core import PydidasQsettingsMixin, SingletonFactory, UserConfigError
+from pydidas.core import (
+    PydidasQsettingsMixin,
+    SingletonObject,
+    UserConfigError,
+)
 from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
 from pydidas.core.utils import flatten, update_child_qobject
 from pydidas.resources import icons
@@ -56,8 +60,8 @@ class SelectionModel(QtCore.QIdentityProxyModel):
         return _flags
 
 
-class PydidasFileDialogWidget(
-    QtWidgets.QFileDialog, CreateWidgetsMixIn, PydidasQsettingsMixin
+class PydidasFileDialog(
+    SingletonObject, QtWidgets.QFileDialog, CreateWidgetsMixIn, PydidasQsettingsMixin
 ):
     """
     pydidas's subclassed QFileDialog with additional functionality.
@@ -484,6 +488,3 @@ class PydidasFileDialogWidget(
                 "check the input and try again."
             )
         self._stored_dirs[reference] = item
-
-
-PydidasFileDialog = SingletonFactory(PydidasFileDialogWidget)

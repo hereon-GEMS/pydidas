@@ -35,7 +35,7 @@ from pydidas.core.io_registry import GenericIoMeta
 from pydidas.core.utils import get_extension
 
 
-WorkflowTree = NewType("WWorkflowTree", type)
+WorkflowTree = NewType("WorkflowTree", type)
 
 
 class ProcessingTreeIoMeta(GenericIoMeta):

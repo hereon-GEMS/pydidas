@@ -81,7 +81,7 @@ class Scan(ObjectWithParameterCollection):
     explicitly need to.
     """
 
-    default_params = SCAN_DEFAULT_PARAMS.copy()
+    default_params = SCAN_DEFAULT_PARAMS
 
     def __init__(self):
         super().__init__()

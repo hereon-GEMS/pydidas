@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,6 +38,7 @@ from pydidas.core import (
     Parameter,
     ParameterCollection,
     ParameterCollectionMixIn,
+    PydidasQsettingsMixin,
     UserConfigError,
 )
 
@@ -347,6 +348,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj2 = copy.copy(obj)
         self.assertIsInstance(obj2, ObjectWithParameterCollection)
+        self.assertNotEqual(id(obj), id(obj2))
 
     def test_explicity_copy(self):
         obj = ObjectWithParameterCollection()
@@ -359,6 +361,32 @@ class TestObjectWithParameterCollection(unittest.TestCase):
             self.assertIn(_key, obj2._config)
             obj._config[_key] = 42
             self.assertNotEqual(id(obj._config[_key]), id(obj2._config[_key]))
+
+    def test_copy__w_subclass(self):
+        class Subclass(ObjectWithParameterCollection):
+            pass
+
+        obj = Subclass()
+        obj.add_params(self._params)
+        obj2 = copy.copy(obj)
+        self.assertIsInstance(obj2, Subclass)
+        self.assertNotEqual(id(obj), id(obj2))
+        for _key, _val in obj.param_values.items():
+            self.assertEqual(_val, obj2.get_param_value(_key))
+
+    def test_copy__w_subclass_and_multiple_inheritance(self):
+        class Subclass(ObjectWithParameterCollection, PydidasQsettingsMixin):
+            def __init__(self):
+                ObjectWithParameterCollection.__init__(self)
+                PydidasQsettingsMixin.__init__(self)
+
+        obj = Subclass()
+        obj.add_params(self._params)
+        obj2 = copy.copy(obj)
+        self.assertIsInstance(obj2, Subclass)
+        self.assertNotEqual(id(obj), id(obj2))
+        for _key, _val in obj.param_values.items():
+            self.assertEqual(_val, obj2.get_param_value(_key))
 
     def test_explicity_deepcopy(self):
         obj = ObjectWithParameterCollection()

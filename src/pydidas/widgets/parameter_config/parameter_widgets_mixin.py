@@ -27,10 +27,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
+from typing import Any
 
 from qtpy import QtCore
 
-from pydidas.core import Parameter, PydidasGuiError
+from pydidas.core import Parameter, ParameterCollection, PydidasGuiError
 from pydidas.widgets.parameter_config.parameter_widget import ParameterWidget
 from pydidas.widgets.utilities import get_widget_layout_args
 
@@ -45,8 +46,12 @@ class ParameterWidgetsMixIn:
     def __init__(self):
         self.param_widgets = {}
         self.param_composite_widgets = {}
+        if not hasattr(self, "_widgets"):
+            self._widgets = {}
+        if not hasattr(self, "params"):
+            self.params = ParameterCollection()
 
-    def create_param_widget(self, param: Parameter, **kwargs: dict):
+    def create_param_widget(self, param: Parameter, **kwargs: Any):
         """
         Add a name label and input widget for a specific parameter to the
         widget.
@@ -55,34 +60,32 @@ class ParameterWidgetsMixIn:
         ----------
         param : Parameter
             A Parameter class instance.
-        **kwargs : dict
-            Optional keyword arguments.
+        **kwargs : Any
+            Optional keyword arguments. Supported keys are:
 
-        Keyword arguments
-        -----------------
-        gridPos : tuple, optional
-            The grid position in the layout. The default is (-1, 0, 1, 1)
-        width_text : float, optional
-            The relative width of the text field for the Parameter name. The default
-            is 0.5.
-        width_unit : float, optional
-            The relative width of the text field for the Parameter unit. The default
-            is 0.07.
-        width_io : int, optional
-            The relative width of the input widget. The default is 0.43.
-        linebreak : bool, optional
-            Keyword to toggle a line break between the text label and the
-            input widget. The default is False.
-        halign_io : QtCore.Qt.Alignment, optional
-            The horizontal alignment for the input widget. The default is
-            QtCore.Qt.AlignRight.
-        halign_text : QtCore.Qt.Alignment, optional
-            The horizontal alignment for the text (label) widget. The default
-            is QtCore.Qt.AlignRight.
-        parent_widget : Union[QWidget, str, None], optional
-            The widget to which the label is added. If a string, this picks up the
-            calling class's ._widgets dictionary and selects the string key's value.
-            The default is self.
+            gridPos : tuple, optional
+                The grid position in the layout. The default is (-1, 0, 1, 1)
+            width_text : float, optional
+                The relative width of the text field for the Parameter name. The default
+                is 0.5.
+            width_unit : float, optional
+                The relative width of the text field for the Parameter unit. The default
+                is 0.07.
+            width_io : int, optional
+                The relative width of the input widget. The default is 0.43.
+            linebreak : bool, optional
+                Keyword to toggle a line break between the text label and the
+                input widget. The default is False.
+            halign_io : QtCore.Qt.Alignment, optional
+                The horizontal alignment for the input widget. The default is
+                QtCore.Qt.AlignRight.
+            halign_text : QtCore.Qt.Alignment, optional
+                The horizontal alignment for the text (label) widget. The default
+                is QtCore.Qt.AlignRight.
+            parent_widget : Union[QWidget, str, None], optional
+                The widget to which the label is added. If a string, this picks up the
+                calling class's ._widgets dictionary and selects the string key's value.
+                The default is self.
         """
         _parent = kwargs.get("parent_widget", self)
         if isinstance(_parent, str):
@@ -101,7 +104,7 @@ class ParameterWidgetsMixIn:
         Update a parameter value both in the Parameter and the widget.
 
         This method will update the parameter referenced by <key> and
-        update both the Parameter.value as well as the displayed widget
+        update both the Parameter.value and the displayed widget
         entry.
 
         Parameters
@@ -120,20 +123,20 @@ class ParameterWidgetsMixIn:
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(f'No parameter with key "{key}" found.')
         with QtCore.QSignalBlocker(self.param_widgets[key]):
-            self.set_param_value(key, value)
+            self.set_param_value(key, value)  # noqa : from ParameterCollectionMixin
             self.param_widgets[key].set_value(value)
 
     def toggle_param_widget_visibility(self, key: str, visible: bool):
         """
-        Toggle the visibility of widgets referenced with key.
+        Toggle the visibility of widgets referenced with the key.
 
-        This method allows to show/hide the label and input widget for a
+        This method allows showing/hiding the label and input widget for a
         parameter referenced with <key>.
 
         Parameters
         ----------
         key : str
-            The reference key for the Parameter..
+            The reference key for the Parameter.
         visible : bool
             The boolean setting for the visibility.
 

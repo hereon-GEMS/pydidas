@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasExceptionMessageBox"]
 
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -39,6 +40,7 @@ from pydidas.core.utils import format_input_to_multiline_str
 from pydidas.resources import icons, logos
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.scroll_area import ScrollArea
+from pydidas_qtcore import PydidasQApplication
 
 
 class PydidasExceptionMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
@@ -47,9 +49,9 @@ class PydidasExceptionMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
 
     Parameters
     ----------
-    *args : tuple
-        Arguments passed to QtWidgets.QDialogue instanciation.
-    **kwargs : dict
+    *args : Any
+        Arguments passed to QtWidgets.QDialogue instantiation.
+    **kwargs : Any
         Supported keyword arguments are:
 
         text : str, optional
@@ -58,10 +60,10 @@ class PydidasExceptionMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             The window title. The default is "Configuration error".
     """
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         _text = kwargs.pop("text", "")
         _title = kwargs.pop("title", "Configuration error")
-        _font_height = QtWidgets.QApplication.instance().font_height
+        _font_height = PydidasQApplication.instance().font_height
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.setWindowTitle(_title)

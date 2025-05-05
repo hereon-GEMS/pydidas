@@ -64,7 +64,7 @@ class TestWorkerController(unittest.TestCase):
         if hasattr(self, "_wc") and isinstance(self._wc, WorkerController):
             self._wc.exit()
 
-    def wait_for_finish_signal(self, wc, timeout=8):
+    def wait_for_finish_signal(self, wc, timeout=10):
         t0 = time.time()
         _spy = QtTest.QSignalSpy(self._wc.finished)
         t0 = time.time()

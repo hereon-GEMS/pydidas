@@ -38,7 +38,7 @@ from pydidas import unittest_objects
 from pydidas.contexts import DiffractionExperiment
 from pydidas.contexts.diff_exp import DiffractionExperimentContext
 from pydidas.contexts.scan import Scan, ScanContext
-from pydidas.core import Dataset, Parameter, UserConfigError, get_generic_parameter
+from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
 from pydidas.unittest_objects import (
@@ -760,64 +760,6 @@ class TestProcessingResults(unittest.TestCase):
             _shape1 = f["entry/data/data"].shape
         self.assertEqual(_shape1, res.shapes[1])
         self.assertFalse(self.get_node_output_path(2).is_file())
-
-    def test_update_param_choices_from_label__curr_choice_okay(self):
-        _param = get_generic_parameter("selected_results")
-        res = ProcessingResults()
-        res._config["labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
-        res.update_param_choices_from_labels(_param)
-        _choices = _param.choices
-        self.assertIn("No selection", _choices)
-        for _key, _label in res.node_labels.items():
-            if len(_label) > 0:
-                _item = f"{_label} (node #{_key:03d})"
-            else:
-                _item = f"(node #{_key:03d})"
-            self.assertIn(_item, _choices)
-
-    def test_update_param_choices_from_label__curr_choice_not_okay(self):
-        _param = Parameter("test", str, "something", choices=["something"])
-        res = ProcessingResults()
-        res._config["labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
-        res.update_param_choices_from_labels(_param)
-        _choices = _param.choices
-        self.assertIn("No selection", _choices)
-        for _key, _label in res.node_labels.items():
-            if len(_label) > 0:
-                _item = f"{_label} (node #{_key:03d})"
-            else:
-                _item = f"(node #{_key:03d})"
-            self.assertIn(_item, _choices)
-
-    def test_update_param_choices_from_label__only_node_entries(self):
-        _param = get_generic_parameter("selected_results")
-        res = ProcessingResults()
-        res._config["node_labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
-        res._config["result_titles"] = {
-            1: "a (node #001)",
-            2: "b (node #002)",
-            3: "c (node #003)",
-            5: "[Dummy] (node #005)",
-        }
-        res.update_param_choices_from_labels(_param, False)
-        _choices = _param.choices
-        for _label in res.result_titles.values():
-            self.assertIn(_label, _choices)
-
-    def test_update_param_choices_from_label__node_only_bad_choice(self):
-        res = ProcessingResults()
-        _param = Parameter("test", str, "something", choices=["something"])
-        res._config["node_labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
-        res._config["result_titles"] = {
-            1: "a (node #001)",
-            2: "b (node #002)",
-            3: "c (node #003)",
-            5: "[Dummy] (node #005)",
-        }
-        res.update_param_choices_from_labels(_param, False)
-        _choices = _param.choices
-        for _label in res.result_titles.values():
-            self.assertIn(_label, _choices)
 
     def test_get_node_result_metadata_string(self):
         res = self.create_standard_workflow_results()

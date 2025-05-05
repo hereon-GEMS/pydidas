@@ -36,14 +36,14 @@ from typing import List, Union
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import SingletonFactory, utils
+from pydidas.core import SingletonObject, utils
 from pydidas.widgets.framework.base_frame import BaseFrame
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
-class _PydidasFrameStack(QtWidgets.QStackedWidget):
+class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
     """
-    A QStackedWidget with references to all the possible top level widgets.
+    A QStackedWidget with references to all the possible top-level widgets.
 
     Widgets are responsible for registering themselves with this class to
     allow a later reference. For the pydidas main application, the main
@@ -56,7 +56,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
 
     Attributes
     ----------
-    widgets : list
+    frames : list
         A list of all the registered widgets.
     frame_indices : dict
         A dictionary with (widget_name: index) entries to reference
@@ -85,7 +85,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         Raises
         ------
         TypeError
-            If a widget is not of type pydidas.widgets.framework.BaseFrame
+            If a widget is not of the type pydidas.widgets.framework.BaseFrame
         KeyError
             When a widget with the same name has already been registered
             to prevent duplicate entries in the index reference.
@@ -214,7 +214,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         Returns
         -------
         list
-            The list of all names of registered widgets.
+            The names of all registered widgets as a list.
         """
         return [w.menu_entry for w in self.frames]
 
@@ -272,7 +272,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         Overload the QStackedWidget.addWidget method to deactivate it.
 
-        Widgets should be added through the register_widget method which
+        Widgets should be added through the register_widget method, which
         also demands a reference name.
 
         Raises
@@ -288,8 +288,8 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         Remove a widget from the QStackdWidget.
 
-        This overloaded method removed a widget from the QStackedWidget and
-        also de-references it from the metadata.
+        This overloaded method removes a widget from the QStackedWidget and
+        also dereferences it from the metadata.
 
         Parameters
         ----------
@@ -337,7 +337,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         Returns
         -------
         bool
-            This will be True is the widget has been registered, and False
+            This will be True if the widget has been registered, and False
             if not.
         """
         return widget in self.frames
@@ -347,7 +347,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
         Change the reference name for a widget.
 
         This method changes the internal reference name for the widget and
-        stored the supplied new_name.
+        stores the supplied new_name.
 
         Parameters
         ----------
@@ -370,7 +370,7 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
             self.frame_indices[new_name] = index
             self.widget(index).menu_entry = new_name
 
-    def enterEvent(self, event):
+    def enterEvent(self, event: QtCore.QEvent):
         """
         Send a signal that the mouse entered the central widget.
 
@@ -380,6 +380,3 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
             The calling event.
         """
         self.sig_mouse_entered.emit()
-
-
-PydidasFrameStack = SingletonFactory(_PydidasFrameStack)

@@ -30,6 +30,7 @@ __all__ = ["PluginInWorkflowBox"]
 
 
 from functools import partial
+from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QFrame
@@ -48,8 +49,8 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
     """
     Widget to represent a Plugin in the WorkflowTree.
 
-    The widget displays plugin name, title and includes a delete button to remove the
-    Plugin or the full branch from the workflow.
+    The widget displays the plugin name, title and includes a delete button to
+    remove the Plugin or the full branch from the workflow.
 
     Parameters
     ----------
@@ -65,7 +66,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         label : str, optional
             The node's label. The default is an empty string.
         standard_size : tuple[int, int]
-            The standard size in pixel.
+            The standard size in pixels.
     """
 
     sig_widget_activated = QtCore.Signal(int)
@@ -74,7 +75,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
     sig_new_node_parent_request = QtCore.Signal(int, int)
     sig_create_copy_request = QtCore.Signal(int, int)
 
-    def __init__(self, plugin_name: str, widget_id: int, **kwargs: dict):
+    def __init__(self, plugin_name: str, widget_id: int, **kwargs: Any):
         QtWidgets.QFrame.__init__(self, kwargs.get("parent", None))
         CreateWidgetsMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
@@ -128,7 +129,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
 
     def update_text(self, node_id: int, label: str = ""):
         """
-        Update the text for node label.
+        Update the text for the node label.
 
         Parameters
         ----------
@@ -156,8 +157,8 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         """
         Create custom context menus.
 
-        This method creates two separate context menus for a) moving the node and
-        creating node copies and b) for deleting the current node from the tree.
+        This method creates two separate context menus for a. moving the node and
+        creating node copies and b. for deleting the current node from the tree.
         """
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._menu_item_context = QtWidgets.QMenu(self)

@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The ObjectWithParameterCollection is a serializable (ie. pickleable) class.
+The ObjectWithParameterCollection is a serializable (i.e., pickleable) class.
 
 It includes a ParameterCollection object.
 """
@@ -31,7 +31,7 @@ __all__ = ["ObjectWithParameterCollection"]
 
 import warnings
 from copy import copy, deepcopy
-from typing import Self
+from typing import Any, Self
 
 from qtpy import QtCore
 
@@ -48,10 +48,16 @@ class ObjectWithParameterCollection(
     This class can be inherited by any class which requires a
     ParameterCollection and access methods defined for it in the
     ParameterCollectionMixIn.
+
+    Note: The logic and code for handling the parameter collection are
+    implemented in the ParameterCollectionMixIn class. This is done
+    to allow adding the parameter collection to any class with a base class
+    other than QObject, e.g., for QWidgets. A duplicate inheritance of
+    QObject is not possible.
     """
 
-    def __init__(self):
-        QtCore.QObject.__init__(self)
+    def __init__(self, **kwargs: Any):
+        QtCore.QObject.__init__(self, parent=kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
         ParameterCollectionMixIn.__init__(self)
         self._config = {}

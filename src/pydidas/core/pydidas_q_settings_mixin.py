@@ -29,7 +29,7 @@ __all__ = ["PydidasQsettingsMixin"]
 
 
 from numbers import Integral, Real
-from typing import Optional, Self, Union
+from typing import Any, Optional, Self, Type, overload
 
 from qtpy import QtCore
 
@@ -63,7 +63,7 @@ class PydidasQsettingsMixin:
     """
     Mix-in class with access functions to pydidas QSettings values.
 
-    This class can be inherited by any class which requires access to the
+    This class can be inherited by any class that requires access to the
     global QSettings defined in pydidas.
 
     Parameters
@@ -76,12 +76,15 @@ class PydidasQsettingsMixin:
         self.q_settings = _CopyablePydidasQSettings()
         self.q_settings_version = version if version is not None else VERSION
 
+    @overload
+    def q_settings_get(self, key: str) -> str: ...
+
     def q_settings_get(
         self,
         key: str,
-        dtype: Union[type, None] = None,
-        default: Union[object, None] = None,
-    ) -> object:
+        dtype: Integral | Real | Type | None = None,
+        default: Any | None = None,
+    ) -> Any:
         """
         Get the value from a QSetting key.
 
@@ -89,17 +92,17 @@ class PydidasQsettingsMixin:
         ----------
         key : str
             The QSetting reference key.
-        dtype : Union[type, None], optional
+        dtype : Integral | Real | Type | None, optional
             A return datatype. If not None, the output will be returned as
             dtype(value), otherwise, the generic string/int will be returned. The
             default is None.
-        default : type, optional
+        default : Any, optional
             The default value which is returned if the key defaults to None. The
             default is None.
 
         Returns
         -------
-        value : object
+        value : Any
             The value, converted to the type associated with the Parameter
             referenced by param_key or dtype, if given.
         """
@@ -120,7 +123,7 @@ class PydidasQsettingsMixin:
             return dtype(_value)
         return _value
 
-    def q_settings_set(self, key: str, value: object):
+    def q_settings_set(self, key: str, value: Any):
         """
         Set the value of a QSettings key.
 
@@ -128,7 +131,7 @@ class PydidasQsettingsMixin:
         ----------
         key : str
             The name of the key.
-        value : object
+        value : Any
             The value to be stored.
         """
         _current = self.q_settings_get(key)

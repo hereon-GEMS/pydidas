@@ -27,9 +27,41 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WorkflowTree"]
 
+from typing import Type
 
-from pydidas.core import SingletonFactory
+from pydidas.core import SingletonObject
 from pydidas.workflow.processing_tree import ProcessingTree
 
 
-WorkflowTree = SingletonFactory(ProcessingTree)
+class WorkflowTree(SingletonObject, ProcessingTree):
+    """
+    The WorkflowTree class is the singleton instance of the ProcessingTree
+    class and is used to store the current processing tree of the workflow.
+
+    It implements a copy method to allow copying the current tree to a new
+    instance of the ProcessingTree class.
+    """
+
+    def __copy__(self, as_type: Type | None = None) -> ProcessingTree:
+        """
+        Create a copy of the current ProcessingTree instance.
+
+        Returns
+        -------
+        ProcessingTree
+            A new instance of the ProcessingTree class with the same
+            parameters as the current instance.
+        """
+        return ProcessingTree.__copy__(self, as_type=ProcessingTree)
+
+    def copy(self, as_type: Type | None = None) -> ProcessingTree:
+        """
+        Create a copy of the current ProcessingTree instance.
+
+        Returns
+        -------
+        ProcessingTree
+            A new instance of the ProcessingTree class with the same
+            parameters as the current instance.
+        """
+        return self.__copy__()

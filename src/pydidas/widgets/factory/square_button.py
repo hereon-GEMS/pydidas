@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SquareButton"]
 
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -41,7 +42,7 @@ class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
 
     init_kwargs = PydidasWidgetMixin.init_kwargs[:] + ["icon"]
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         if isinstance(kwargs.get("icon"), str):
             kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))
         QtWidgets.QPushButton.__init__(self, *args)

@@ -35,7 +35,7 @@ from numpy import ceil, floor
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from pydidas.core import SingletonFactory, get_generic_param_collection
+from pydidas.core import SingletonObject, get_generic_param_collection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_PARAM_EDIT_WIDTH,
@@ -64,9 +64,9 @@ _FONT_SIZE_VALIDATOR = QtGui.QDoubleValidator(5, 20, 1)
 _FONT_SIZE_VALIDATOR.setNotation(QtGui.QDoubleValidator.StandardNotation)
 
 
-class _UserConfigWindow(PydidasWindow):
+class UserConfigWindow(SingletonObject, PydidasWindow):
     """
-    The UserConfigWindow allows to set the user configuration for pydidas.
+    The UserConfigWindow allows setting the user configuration for pydidas.
     """
 
     menu_icon = "mdi::application-cog-outline"
@@ -564,6 +564,3 @@ class _UserConfigWindow(PydidasWindow):
             The error description.
         """
         _ = PydidasExceptionMessageBox(text=error, title="Warning").exec_()
-
-
-UserConfigWindow = SingletonFactory(_UserConfigWindow)

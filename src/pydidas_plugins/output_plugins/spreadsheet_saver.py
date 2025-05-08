@@ -106,7 +106,7 @@ class SpreadsheetSaver(OutputPlugin):
             raise UserConfigError(
                 "The number of significant digits must be at least 1."
             )
-        self._format = f"%.{self.get_param_value('significant_digits')}e"
+        self._format = f"%.{self.get_param_value('significant_digits')}E"
         _delimiter = self.get_param_value("delimiter")
         match _delimiter:
             case "Single space":

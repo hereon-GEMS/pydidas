@@ -131,11 +131,11 @@ class Hdf5BrowserWindow(PydidasWindow):
         """
         if self.parent() is None:
             _origin = (50, 50)
+            _screen = QtGui.QGuiApplication.primaryScreen()
         else:
             _origin = (self.parent().x(), self.parent().y())
-
-        _screen_number = self.__qtapp.desktop().screenNumber(self)
-        _screen_size = self.__qtapp.desktop().screenGeometry(_screen_number).size()
+            _screen = QtGui.QGuiApplication.screenAt(self.parent().geometry().center())
+        _screen_size = _screen.size()
         _default_size = (
             min(
                 int(160 * self.__qtapp.font_char_width),

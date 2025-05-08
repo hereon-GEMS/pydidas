@@ -39,6 +39,7 @@ class BaseClass:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.init_called = True
 
+
 class SecondBase:
     second_init_called = False
 
@@ -81,6 +82,7 @@ class TestSubClass(SingletonObject, SubClass):
             self.init_calls += 1
         else:
             self.init_calls = 1
+
 
 class MultipleBaseClass(SingletonObject, BaseClass, SecondBase): ...
 

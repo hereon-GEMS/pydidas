@@ -24,12 +24,8 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["get_2d_silx_plot_ax_settings", "user_config_update_func"]
+__all__ = ["get_2d_silx_plot_ax_settings"]
 
-
-from contextlib import nullcontext
-
-from qtpy import QtCore
 
 from pydidas.core import Dataset
 
@@ -60,31 +56,3 @@ def get_2d_silx_plot_ax_settings(data: Dataset) -> tuple[float, float]:
         scales.append(_delta * (_ax.size + 1) / _ax.size)
         origins.append(_ax[0] - _delta / 2)
     return tuple(origins), tuple(scales)
-
-
-@QtCore.Slot(str, str)
-def user_config_update_func(self, key: str, value: str):
-    """
-    Handle a user config update.
-
-    Parameters
-    ----------
-    key : str
-        The name of the updated key.
-    value :
-        The new value of the updated key.
-    """
-    if key not in ["cmap_name", "cmap_nan_color"]:
-        return
-    _current_image = self.getImage()
-    if _current_image is None:
-        _current_cmap = self.getDefaultColormap()
-        _context = nullcontext()
-    else:
-        _current_cmap = _current_image.getColormap()
-        _context = QtCore.QSignalBlocker(_current_image)
-    with _context:
-        if key == "cmap_name":
-            _current_cmap.setName(value.lower())
-        elif key == "cmap_nan_color":
-            _current_cmap.setNaNColor(value)

@@ -29,6 +29,7 @@ __all__ = ["PydidasPlot2D"]
 
 
 import inspect
+from contextlib import nullcontext
 from functools import partial
 from typing import Union
 
@@ -57,7 +58,6 @@ from pydidas.widgets.silx_plot.silx_actions import (
 )
 from pydidas.widgets.silx_plot.utilities import (
     get_2d_silx_plot_ax_settings,
-    user_config_update_func,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -76,7 +76,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
     sig_get_more_info_for_data = QtCore.Signal(float, float)
     init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
-    user_config_update = user_config_update_func
 
     @staticmethod
     def _check_data_dim(data: np.ndarray):
@@ -254,6 +253,33 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.get_data_info_action.sig_show_more_info_for_data.connect(
             self.sig_get_more_info_for_data
         )
+
+    @QtCore.Slot(str, str)
+    def user_config_update(self, key: str, value: str):
+        """
+        Handle a user config update.
+
+        Parameters
+        ----------
+        key : str
+            The name of the updated key.
+        value :
+            The new value of the updated key.
+        """
+        if key not in ["cmap_name", "cmap_nan_color"]:
+            return
+        _current_image = self.getImage()
+        if _current_image is None:
+            _current_cmap = self.getDefaultColormap()
+            _context = nullcontext()
+        else:
+            _current_cmap = _current_image.getColormap()
+            _context = QtCore.QSignalBlocker(_current_image)
+        with _context:
+            if key == "cmap_name":
+                _current_cmap.setName(value.lower())
+            elif key == "cmap_nan_color":
+                _current_cmap.setNaNColor(value)
 
     @QtCore.Slot()
     def update_exp_setup_params(self):

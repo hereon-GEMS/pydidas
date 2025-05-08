@@ -35,7 +35,7 @@ __all__ = [
 ]
 
 
-from typing import NewType
+from typing import Any, NewType
 
 import silx.gui.plot
 from qtpy import QtCore, QtWidgets
@@ -92,13 +92,13 @@ class ChangeCanvasToData(PlotAction):
         self.plot._backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)
         self.plot._backend.ax.set_anchor("C")
         self.plot.resetZoom()
-        # for some reason, need to call resetZoom twice to match data to new canvas
+        # for some reason, need to call resetZoom twice to match data to the new canvas
         self.plot.resetZoom()
 
 
 class ExpandCanvas(PlotAction):
     """
-    A modified silx ResetZoomAction which also resets the figure canvas to the maximum
+    A modified silx ResetZoomAction, which also resets the figure canvas to the maximum
     size allowed by the widget.
     """
 
@@ -128,7 +128,7 @@ class ExpandCanvas(PlotAction):
         self.plot.resetZoom()
 
 
-class AutoscaleToMeanAndThreeSigma(PlotAction):
+class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
     """
     A new custom PlotAction to set the colormap to autoscale with mean +/- 3 sigma.
 
@@ -142,7 +142,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
         parent : Union[None, QObject], optional
             The parent QObject. The default is None.
         forced_image_legend : Union[None, str], optional
-            A fixed image legend to use for enforcing the rescaling, if multiple
+            A fixed image legend to use for enforcing the rescaling if multiple
             image items are in a plot. None defaults to the active image.
             The default is None.
     """
@@ -151,8 +151,8 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=icons.get_pydidas_qt_icon("silx_cmap_autoscale.png"),
-            text="Autoscale colormap to mean +/- 3 std",
+            icons.get_pydidas_qt_icon("silx_cmap_autoscale.png"),
+            "Autoscale colormap to mean +/- 3 std",
             tooltip="Autoscale colormap to mean +/- 3 std",
             triggered=self._actionTriggered,
             checkable=False,
@@ -180,14 +180,14 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     A new custom PlotAction to crop outliers from the histogram.
 
     This action will use the global 'histogram_outlier_fraction' QSettings value to
-    determine where to limit the histogram and pick the respective value as new upper
-    limit.
+    determine where to limit the histogram and pick the respective value as the new
+    upper limit.
 
     The resolution for the upper limit is 27 bit, implemented in two tiers of 12 bit
     and 15 bit, respective to the full range of the image. For an Eiger detector, this
     corresponds to minimal final bins of 32 counts.
 
-    The lower limit is implemented in two tiers of 12 bit.
+    The lower limit is implemented in two tiers of 12 bits.
 
     Parameters
     ----------
@@ -199,12 +199,12 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         parent : Union[None, QObject], optional
             The parent QObject. The default is None.
         forced_image_legend : Union[None, str], optional
-            A fixed image legend to use for enforcing the rescaling, if multiple
+            A fixed image legend to use for enforcing the rescaling if multiple
             image items are in a plot. None defaults to the active image.
             The default is None.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any):
         PlotAction.__init__(
             self,
             plot,
@@ -236,7 +236,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
     """
     Action to load an image using the pydidas file dialog.
 
-    This action is used as additional option in the pyFAI calibration widgets.
+    This action is used as an additional option in the pyFAI calibration widgets.
 
     Parameters
     ----------
@@ -308,7 +308,7 @@ class PydidasGetDataInfoAction(PlotAction):
     @QtCore.Slot(dict)
     def __process_event(self, event):
         """
-        Process the event. If a mouse button click was detected, show popup.
+        Process the event. If a mouse button click was detected, show a popup.
         """
         if event["event"] == "mouseClicked":
             self.plot.sigPlotSignal.disconnect(self.__process_event)

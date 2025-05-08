@@ -282,13 +282,13 @@ class PydidasFileDialog(
         self._store_current_directory()
         return _selection
 
-    def get_existing_filename(self, **kwargs: dict) -> str | None:
+    def get_existing_filename(self, **kwargs: Any) -> str | None:
         """
         Execute the dialog and get the full path of an existing file.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Optional keyword arguments. Supported keywords are:
 
             caption : str, optional
@@ -326,7 +326,7 @@ class PydidasFileDialog(
             return self.selectedFiles()
         return self.selectedFiles()[0]
 
-    def get_existing_filenames(self, **kwargs: dict) -> list[str]:
+    def get_existing_filenames(self, **kwargs: Any) -> list[str]:
         """
         Execute the dialog and get a list of existing files.
 

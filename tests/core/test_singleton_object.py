@@ -39,6 +39,12 @@ class BaseClass:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.init_called = True
 
+class SecondBase:
+    second_init_called = False
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.second_init_called = True
+
 
 class SubClass(BaseClass):
     is_sub = True
@@ -75,6 +81,8 @@ class TestSubClass(SingletonObject, SubClass):
             self.init_calls += 1
         else:
             self.init_calls = 1
+
+class MultipleBaseClass(SingletonObject, BaseClass, SecondBase): ...
 
 
 @pytest.fixture
@@ -168,6 +176,15 @@ def test_init__w_skip_base_init(singleton_class):
     assert not obj.init_called
     obj2 = singleton_class()
     assert not obj2.init_called
+
+
+def test_init__w_multiple_bases():
+    obj = MultipleBaseClass()
+    assert isinstance(obj, SingletonObject)
+    assert isinstance(obj, BaseClass)
+    assert isinstance(obj, SecondBase)
+    assert obj.init_called
+    assert obj.second_init_called
 
 
 def test_copy(singleton_class):

@@ -73,7 +73,9 @@ class SingletonObject:
         _skip_base_init = kwargs.pop("skip_base_init", False)
         # Only call super().__init__ if there are multiple bases:
         if len(self.__class__.__bases__) > 1 and not _skip_base_init:
-            super().__init__(*args, **kwargs)
+            for base in self.__class__.__bases__:
+                if base is not SingletonObject and hasattr(base, "__init__"):
+                    base.__init__(self, *args, **kwargs)
         self.initialize(*args, **kwargs)
 
     def initialize(self, *args: Any, **kwargs: Any) -> None:

@@ -74,7 +74,7 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
     """
     Create the tasks for the calibration.
 
-    This function will also overload the generic tasks and add an CropHistogramOutlier
+    This function will also overload the generic tasks and add a CropHistogramOutlier
     action to the toolbars and change the default file dialog to use the pydidas
     file dialog.
 
@@ -129,7 +129,7 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
     tasks[3]._GeometryTask__plot.findChildren(QToolBar)[2].setVisible(False)
     # disable the default ring option in the peak picking task:
     tasks[2]._PeakPickingTask__createNewRingOption.setChecked(False)
-    # insert button for exporting to DiffractionExperimentContext:
+    # insert a button for exporting to DiffractionExperimentContext:
     _parent = tasks[4]._savePoniButton.parent()
     tasks[4]._update_context_button = QtWidgets.QPushButton(
         "Update pydidas diffraction setup from calibration"
@@ -144,7 +144,7 @@ class PyfaiCalibFrame(BaseFrame):
     used within pydidas.
 
     Note: Because this code is adapted from pyFAI, the names, nomenclature and
-    code structure is different from the rest of pydidas.
+    code structure are different from the rest of pydidas.
 
     Acknowledgements go to the creators of pyFAI for making it freely
     available.
@@ -262,7 +262,7 @@ class PyfaiCalibFrame(BaseFrame):
 
     def setup_calibration_model(self):
         """
-        Setup the calibration model from the context.
+        Set up the calibration model from the context.
         """
         self._model = self._calibration_context.getCalibrationModel()
         if len(self._model.markerModel()) == 0:

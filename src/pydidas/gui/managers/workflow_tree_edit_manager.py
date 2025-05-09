@@ -34,11 +34,11 @@ from typing import Iterable, Optional
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
-import pydidas_qtcore
 from pydidas.core import SingletonObject
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.workflow_edit import PluginInWorkflowBox
 from pydidas.workflow import PluginPositionNode, WorkflowTree
+from pydidas_qtcore import PydidasQApplication
 
 
 PLUGIN_COLLECTION = PluginCollection()
@@ -65,7 +65,7 @@ class WorkflowTreeEditManager(SingletonObject, QtCore.QObject):
     PLUGIN_WIDGET_WIDTH = -1
     PLUGIN_WIDGET_HEIGHT = -1
 
-    def __init__(self, qt_canvas: Optional[QtWidgets.QWidget] = None):
+    def initialize(self, qt_canvas: QtWidgets.QWidget | None = None):
         """
         Set up the instance.
 
@@ -75,13 +75,12 @@ class WorkflowTreeEditManager(SingletonObject, QtCore.QObject):
             The QtWidget, which acts as canvas for the plugin workflow tree.
             The default is None.
         """
-        super().__init__()
+        self.__qtapp = PydidasQApplication.instance()
         self.qt_canvas = qt_canvas
         self.root = None
         self._node_positions = {}
         self._node_widgets = {}
         self._nodes = {}
-        self.__qtapp = pydidas_qtcore.PydidasQApplication.instance()
         if hasattr(self.__qtapp, "sig_font_size_changed"):
             self.__qtapp.sig_font_size_changed.connect(self.__app_font_changed)
             self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
@@ -481,7 +480,11 @@ class WorkflowTreeEditManager(SingletonObject, QtCore.QObject):
         """
         for _id in node_ids:
             if _id in self._node_widgets:
-                self._node_widgets[_id].disconnect()
+                self._node_widgets[_id].sig_widget_activated.disconnect()
+                self._node_widgets[_id].sig_widget_delete_branch_request.disconnect()
+                self._node_widgets[_id].sig_widget_delete_request.disconnect()
+                self._node_widgets[_id].sig_new_node_parent_request.disconnect()
+                self._node_widgets[_id].sig_create_copy_request.disconnect()
                 self._node_widgets[_id].deleteLater()
 
     @QtCore.Slot()

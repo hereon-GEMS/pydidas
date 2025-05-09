@@ -454,6 +454,17 @@ class TestDataset(unittest.TestCase):
         self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, :, 0]))
         self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, :, 0, 0]))
 
+    def test_transpose__4d_with_axtuple(self):
+        obj = self.get_random_dataset(4)
+        _new = obj.transpose((2, 1, 0, 3))
+        for _i1, _i2 in [[0, 2], [2, 0]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[0, 0, :, 0], _new[:, 0, 0, 0]))
+        self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, :, 0]))
+        self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, :, 0, 0]))
+
     def test_squeeze__single_dim(self):
         obj = self.get_random_dataset(4)
         obj = obj[:, :, 0:1]

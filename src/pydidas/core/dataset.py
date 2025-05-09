@@ -33,7 +33,7 @@ from collections.abc import Iterable
 from copy import deepcopy
 from functools import partialmethod
 from numbers import Integral
-from typing import Any, Callable, Literal, Self
+from typing import Any, Callable, Literal, Self, SupportsIndex
 
 import numpy as np
 from numpy import ndarray
@@ -88,8 +88,20 @@ class Dataset(ndarray):
 
     The following numpy ufuncs are reimplemented to preserver the metadata:
     flatten, max, mean, min, repeat, reshape, shape, sort, squeeze, sum, take,
-    transpose.
+    transpose, moveaxes.
     For other numpy ufuncs, metadata preservation is not guaranteed.
+
+    The following numpy functions cannot be implemented because they are not defined
+    in the ndarray:
+    - numpy.roll:
+        This function will work but destroy metadata consistency. A custom
+        implementation is given in the Dataset.roll() method which takes
+        similar arguments as the numpy function but preserves the metadata.
+    - numpy.rollaxis:
+        This function is deprecated and moveaxes should be used instead.
+    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc:
+        These functions work but return pure ndarrays without metadata.
+
 
     Parameters
     ----------
@@ -775,7 +787,7 @@ class Dataset(ndarray):
     # Reimplementation of generic ndarray methods
     # ###########################################
 
-    def transpose(self, *axes: tuple[int]) -> Self:
+    def transpose(self, *axes: SupportsIndex) -> Self:
         """
         Overload the generic transpose method to transpose the metadata as well.
 
@@ -794,6 +806,8 @@ class Dataset(ndarray):
         """
         if axes is tuple():
             axes = tuple(np.arange(self.ndim)[::-1])
+        elif len(axes) == 1 and isinstance(axes[0], Iterable):
+            axes = tuple(axes[0])
         _new = ndarray.transpose(deepcopy(self), axes)
         _new.axis_labels = [self.axis_labels[_index] for _index in axes]
         _new.axis_units = [self.axis_units[_index] for _index in axes]
@@ -1164,6 +1178,40 @@ class Dataset(ndarray):
         return ndarray.argsort(
             self, axis=axis, kind=kind, order=order, stable=stable
         ).__array__()
+
+    def roll(self, shift: int, axis: int | None = None) -> Self:
+        """
+        Roll the array elements along a given axis.
+
+        Parameters
+        ----------
+        shift : int
+            The number of places by which elements are shifted.
+        axis : int, optional
+            The axis along which to roll. If None, the flattened array is rolled.
+            The default is None.
+
+        Returns
+        -------
+        Dataset
+            The rolled Dataset.
+        """
+        _new = np.roll(self, shift, axis)
+        if self.ndim == 0:
+            return _new
+        elif self.ndim == 1:
+            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))
+            return _new
+        if axis is None:
+            warnings.warn(
+                "Using roll without axis on a multi-dimensional array flattens "
+                "the array (temporarily) and removes all stored metadata. "
+                "Please use roll with a specific axis to preserve metadata.",
+                UserWarning,
+            )
+            return _new
+        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))
+        return _new
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """

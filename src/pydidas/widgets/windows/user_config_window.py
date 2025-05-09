@@ -29,7 +29,7 @@ __all__ = ["UserConfigWindow"]
 
 
 from functools import partial
-from typing import Union
+from typing import Any
 
 from numpy import ceil, floor
 from qtpy import QtCore, QtGui, QtWidgets
@@ -77,10 +77,9 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
     default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         self.__qtapp = PydidasQApplication.instance()
-        PydidasWindow.__init__(self, **kwargs)
-        self.set_default_params()
+        SingletonObject.__init__(self, **kwargs)
         self.setWindowTitle("pydidas user configuration")
         self.setSizePolicy(*POLICY_MIN_MIN)
 
@@ -369,13 +368,13 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot(QtGui.QColor)
-    def _update_cmap_nan_value(self, new_value: Union[None, QtGui.QColor]):
+    def _update_cmap_nan_value(self, new_value: QtGui.QColor | str | None):
         """
         Update the stored value for the colormap NaN.
 
         Parameters
         ----------
-        new_value : Union[None, str]
+        new_value : QtGui.QColor |str | None
             The new value. If None, the Parameter input value will be used.
         """
         if new_value is None:
@@ -387,13 +386,13 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self._update_cmap_nan_current_color(new_value)
         self.update_widget_value("cmap_nan_color", new_value)
 
-    def _update_cmap_nan_current_color(self, new_color: Union[QtGui.QColor, str]):
+    def _update_cmap_nan_current_color(self, new_color: QtGui.QColor | str):
         """
         Update the label's current NaN color display with the new value.
 
         Parameters
         ----------
-        new_color : Union[QtGui.QColor, str]
+        new_color : QtGui.QColor |str
             The new window color.
         """
         if isinstance(new_color, str):
@@ -506,7 +505,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         if index != self.frame_index:
             return
         for _param_key, _param in self.params.items():
-            _value = self.q_settings_get(f"user/{_param_key}", _param.dtype)
+            _value = self.q_settings_get(f"user/{_param_key}", dtype=_param.dtype)
             self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):
@@ -536,21 +535,6 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             self._update_cmap_nan_current_color(
                 self.q_settings_get("user/cmap_nan_color")
             )
-
-    @QtCore.Slot(str, object)
-    def external_update(self, param_key: str, value: object):
-        """
-        Perform an update after a Parameter has changed externally.
-
-        Parameters
-        ----------
-        param_key : str
-            The Parameter reference key.
-        value : object
-            The new value which was set externally.
-        """
-        value = self._qsettings_convert_value_type(param_key, value)
-        self.set_param_value_and_widget(param_key, value)
 
     @QtCore.Slot(str)
     def mpl_font_not_supported(self, error: str):

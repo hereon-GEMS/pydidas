@@ -47,6 +47,8 @@ Bugfixes
   indices.
 - Fixed an issue when trying to load empty files with numpy
 - Fixed a number of issues with Qt6
+- Fixed an issue with the detailed information for a scan point where the order of the 
+  coordinates was inverted.
 
 
 v25.04.08

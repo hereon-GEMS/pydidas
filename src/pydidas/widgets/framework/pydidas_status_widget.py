@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["PydidasStatusWidget"]
 
 
+from typing import Any
+
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import SingletonObject
@@ -41,8 +43,8 @@ class PydidasStatusWidget(SingletonObject, QtWidgets.QDockWidget):
     The PydidasStatusWidget is used for managing global status messages.
     """
 
-    def __init__(self):
-        QtWidgets.QDockWidget.__init__(self, "Logging and information")
+    def initialize(self, *args: Any, **kwargs: Any) -> None:
+        self.setWindowTitle("Logging and information")
         self._text_edit = ReadOnlyTextWidget(parent=None)
         self._text_edit.setMinimumHeight(50)
         self._text_edit.resize(500, 50)

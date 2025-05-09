@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SpreadsheetSaver"]
 
+from typing import Any
 
 import numpy as np
 
@@ -51,7 +52,18 @@ SIG_DIGIT_PARAM = Parameter(
     5,
     choices=None,
     name="Significant digits",
-    tooltip=("The number of significant digits to be used in the output file."),
+    tooltip="The number of significant digits to be used in the output file.",
+)
+CAPITAL_E_NOTATION_PARAM = Parameter(
+    "notation_capital_e",
+    bool,
+    True,
+    choices=[True, False],
+    name="Use capital `E` in notation",
+    tooltip=(
+        "Use a capital E in the scientific notation (e.g. 2.422E+4). If unchecked, a "
+        "lowercase `e` is used (e.g. 2.422e+4)."
+    ),
 )
 DELIMITER_PARAM = Parameter(
     "delimiter",
@@ -84,19 +96,14 @@ class SpreadsheetSaver(OutputPlugin):
     Warning: This plugin will create one file for each input image and is not
     recommended at all unless other processing tools specifically require
     these individual files.
-
-    Parameters
-    ----------
-    label : str
-        The prefix for saving the data.
-    directory_path : Path | str
-        The output directory.
     """
 
     plugin_name = "Spreadsheet Saver"
     input_data_dim = 2
     generic_params = OutputPlugin.generic_params.copy()
-    generic_params.add_params(HEADER_PARAM, SIG_DIGIT_PARAM, DELIMITER_PARAM)
+    generic_params.add_params(
+        HEADER_PARAM, SIG_DIGIT_PARAM, CAPITAL_E_NOTATION_PARAM, DELIMITER_PARAM
+    )
 
     def pre_execute(self):
         """Prepare the execution"""
@@ -106,7 +113,8 @@ class SpreadsheetSaver(OutputPlugin):
             raise UserConfigError(
                 "The number of significant digits must be at least 1."
             )
-        self._format = f"%.{self.get_param_value('significant_digits')}E"
+        _e_format = "E" if self.get_param_value("notation_capital_e") else "e"
+        self._format = f"%.{self.get_param_value('significant_digits')}{_e_format}"
         _delimiter = self.get_param_value("delimiter")
         match _delimiter:
             case "Single space":
@@ -124,32 +132,32 @@ class SpreadsheetSaver(OutputPlugin):
             case "Semicolon and space":
                 self._delimiter = "; "
 
-    def execute(self, data: Dataset | np.ndarray, **kwargs: dict):
+    def execute(self, data: Dataset | np.ndarray, **kwargs: Any):
         """
-        Save data to file in raw ascii text format.
+        Save 2d data to file in raw ASCII text format.
 
         Parameters
         ----------
         data : Dataset | np.ndarray
             The data to be stored.
-        **kwargs : dict
-            Any calling keyword arguments. Can be used to apply a ROI or
-            binning to the raw image.
+        **kwargs : Any
+            Calling keyword arguments. These can be used and / or modified
+            and will be passed to the next plugin in the chain.
 
         Returns
         -------
         data : Dataset
             The input data.
-        kwargs : dict
-            Any calling kwargs, appended by any changes in the function.
+        kwargs : Any
+            Calling kwargs, appended by any changes in the function.
         """
         if data.ndim != 2:
             raise UserConfigError("Only 2-d data can be saved as a spreadsheet")
         if kwargs.get("test", False):
             return data, kwargs
-        self._config["global_index"] = kwargs.get("global_index", None)
         if not isinstance(data, Dataset):
             data = Dataset(data)
+        self._config["global_index"] = kwargs.get("global_index", None)
         if data.axis_ranges[0] is None:
             data.update_axis_range(0, np.arange(data.size))
             data.update_axis_label(0, "index")

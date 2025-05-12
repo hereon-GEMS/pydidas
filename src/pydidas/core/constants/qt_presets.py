@@ -40,6 +40,7 @@ __all__ = [
     "QT_REG_EXP_INT_VALIDATOR",
     "QT_REG_EXP_SLICE_VALIDATOR",
     "QT_REG_EXP_INT_RANGE_VALIDATOR",
+    "QT_REG_EXP_POS_INT_RANGE_VALIDATOR",
     "QT_REG_EXP_FLOAT_SLICE_VALIDATOR",
     "QT_REG_EXP_FLOAT_RANGE_VALIDATOR",
     "QT_REG_EXP_RGB_VALIDATOR",
@@ -92,6 +93,9 @@ QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
 # validate a single range of type <start [int]>:<end [int]>
 QT_REG_EXP_INT_RANGE_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(r"-?\d+:-?\d+")
+)
+QT_REG_EXP_POS_INT_RANGE_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression(r"\d+:\d+")
 )
 
 # validate a single range of type <start [float]>:<end [float]>

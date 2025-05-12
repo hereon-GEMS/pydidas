@@ -51,6 +51,7 @@ Bugfixes
   coordinates was inverted.
 - Fixed an issue in Dataset where indexing with ndarrays which returned a 1-d Dataset would
   not reduce the metadata keys accordingly.
+- Fixed an issue in the DataAxisSelector when manually choosing empty selections to plot.
 
 
 v25.04.08

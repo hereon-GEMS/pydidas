@@ -47,15 +47,15 @@ class TestConvertToDSpacing(unittest.TestCase):
         cls._EXP.set_param_values(
             xray_wavelength=cls._lambda, detector_dist=cls._detector_distance
         )
-        _range = np.array((0, 2, 10, 25, 325, 2500, 10000, 1e6))
+        _range = np.array((0.01, 2, 10, 25, 325, 2500, 10000, 1e6))
         cls._ref = {
-            "Q": (2 * np.pi) / _range[:0:-1],
+            "Q": (2 * np.pi) / _range[::-1],
             "r": cls._lambda
             / (2 * np.sin(np.arctan(_range / (cls._detector_distance * 1e3)) / 2))[
-                :0:-1
+                ::-1
             ],
-            "2theta_deg": cls._lambda / (2 * np.sin(np.radians(_range) / 2))[:0:-1],
-            "2theta_rad": cls._lambda / (2 * np.sin(_range / 2))[:0:-1],
+            "2theta_deg": cls._lambda / (2 * np.sin(np.radians(_range) / 2))[::-1],
+            "2theta_rad": cls._lambda / (2 * np.sin(_range / 2))[::-1],
         }
         cls._range = _range
 
@@ -184,7 +184,7 @@ class TestConvertToDSpacing(unittest.TestCase):
         self._data.update_axis_label(0, "Q")
         self._data.update_axis_unit(0, "nm^-1")
         plugin.pre_execute()
-        _result, _kwargs = plugin.execute(self._data[1:])
+        _result, _kwargs = plugin.execute(self._data)
         self.assertTrue(np.allclose(_result.axis_ranges[0], self._ref["Q"]))
 
     def test_execute__missing_axis_label(self):

@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import copy
 import unittest
+import warnings
 from numbers import Real
 
 import numpy as np
@@ -40,7 +41,6 @@ _np_random_generator = np.random.default_rng()
 
 _AXIS_SLICES = [0, 3, -1, -3, (0,), (2,), (0, 1), (1, 3), (2, 0), (1, 2, 3), (0, 2, 3)]
 _IMPLEMENTED_METHODS = ["mean", "sum", "max", "min"]
-_METHOD_TAKES_INT_ONLY = ["cumsum"]
 _METHOD_REQUIRES_INITIAL = ["max", "min"]
 _METHOD_TAKES_NO_DTYPE = ["max", "min"]
 
@@ -584,7 +584,7 @@ class TestDataset(unittest.TestCase):
         _dim = 0
         _slice = [2]
         _new = np.take(obj, _slice, _dim)
-        self.assertTrue(np.allclose(obj[2], _new))
+        self.assertTrue(np.allclose(obj[2], _new[0]))
         for _dim in range(2):
             self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
             self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
@@ -608,11 +608,13 @@ class TestDataset(unittest.TestCase):
     def test_take__2d_array_wo_axis(self):
         obj = self.get_random_dataset(2)
         indices = [i for i in range(obj.size) if i != 1]
-        _new = np.take(obj, indices)
-        self.assertTrue(isinstance(_new, Dataset))
-        self.assertEqual(_new.size, obj.size - 1)
-        self.assertEqual(_new.ndim, 1)
-        self.assertEqual(_new.axis_ranges[0].size, _new.size)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            _new = np.take(obj, indices)
+            self.assertTrue(isinstance(_new, Dataset))
+            self.assertEqual(_new.size, obj.size - 1)
+            self.assertEqual(_new.ndim, 1)
+            self.assertEqual(_new.axis_ranges[0].size, _new.size)
 
     def test_getitem__simple(self):
         obj = self.create_large_dataset()
@@ -938,6 +940,17 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(_max, Dataset)
         self.assertEqual(_max.shape, obj.shape[1:])
 
+    def test_np_array__with_ndmin(self):
+        obj = self.create_large_dataset()
+        _new = np.array(obj, copy=None, subok=True, ndmin=obj.ndim + 2)
+        for _dim in range(obj.ndim):
+            self.assertEqual(_new.shape[2 + _dim], obj.shape[_dim])
+            self.assertEqual(_new.axis_labels[2 + _dim], obj.axis_labels[_dim])
+            self.assertEqual(_new.axis_units[2 + _dim], obj.axis_units[_dim])
+            self.assertTrue(
+                np.allclose(_new.axis_ranges[2 + _dim], obj.axis_ranges[_dim])
+            )
+
     def test_copy_dataset(self):
         _array = np.random.random((10, 10, 10))
         obj = Dataset(_array, axis_ranges=self._3x10_axis_ranges)
@@ -1076,8 +1089,6 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         for _method_name in _IMPLEMENTED_METHODS:
             for _ax in _AXIS_SLICES:
-                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
-                    continue
                 _ax_tuple = self.ax_tuple(obj, _ax)
                 _new_shape = tuple(
                     n for i, n in enumerate(obj.shape) if i not in _ax_tuple
@@ -1108,8 +1119,6 @@ class TestDataset(unittest.TestCase):
             if _method_name in _METHOD_TAKES_NO_DTYPE:
                 continue
             for _ax in _AXIS_SLICES:
-                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
-                    continue
                 _ax_tuple = self.ax_tuple(obj, _ax)
                 with self.subTest(method=_method_name, axis=_ax):
                     _method = getattr(obj, _method_name)
@@ -1124,8 +1133,6 @@ class TestDataset(unittest.TestCase):
         for _ax in _AXIS_SLICES:
             _ax_tuple = self.ax_tuple(obj, _ax)
             for _method_name in _IMPLEMENTED_METHODS:
-                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
-                    continue
                 with self.subTest(method=_method_name, axis=_ax):
                     _method = getattr(obj, _method_name)
                     _result = _method(axis=_ax, keepdims=True)
@@ -1144,8 +1151,6 @@ class TestDataset(unittest.TestCase):
         for _ax in _AXIS_SLICES:
             _ax_tuple = self.ax_tuple(obj, _ax)
             for _method_name in _IMPLEMENTED_METHODS:
-                if _method_name in _METHOD_TAKES_INT_ONLY and isinstance(_ax, tuple):
-                    continue
                 with self.subTest(method=_method_name, axis=_ax):
                     _method = getattr(obj, _method_name)
                     if _method_name in _METHOD_REQUIRES_INITIAL:
@@ -1340,6 +1345,13 @@ class TestDataset(unittest.TestCase):
                         self.assertEqual(_new.shape[_dim], obj.shape[_dim])
                 self.assertEqual(_new.axis_labels, obj.axis_labels)
                 self.assertEqual(_new.axis_units, obj.axis_units)
+
+    def test_repeat__axis_None(self):
+        obj = self.get_random_dataset(4)
+        _new = obj.repeat(repeats=3, axis=None)
+        self.assertEqual(_new.shape, (obj.size * 3,))
+        for _iter in [0, 1, 2]:
+            self.assertTrue(np.allclose(obj.flatten(), _new.reshape(-1, 3)[:, _iter]))
 
     def test_np_array__simple(self):
         obj = self.get_random_dataset(1)

@@ -191,7 +191,7 @@ class Dataset(ndarray):
             obj._meta["_get_item_key"] = ()
         self._meta["_get_item_key"] = ()
 
-    def __update_keys_from_object(self, obj: ndarray):
+    def __update_keys_from_object(self, obj: ndarray):  # noqa C901
         """
         Update the axis keys from the original object.
 
@@ -205,6 +205,10 @@ class Dataset(ndarray):
             _key: getattr(obj, _key, dataset_default_attribute(_key, self.shape))
             for _key in METADATA_KEYS
         }
+        # handle case of calling np.array with ndmin > self.ndim:
+        if self.ndim > obj.ndim and self._meta["_get_item_key"] == ():
+            for _ in range(self.ndim - obj.ndim):
+                self.__insert_axis_keys(0)
         _keys_require_shifting = False
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
             if (
@@ -215,6 +219,11 @@ class Dataset(ndarray):
                 and _slicer.ndim > 1
             ):
                 # in the case of an n-dim masked array, keep all axis keys.
+                # In the case of a flattened array, the axis keys are updated
+                if self.ndim == 1:
+                    self._meta["axis_labels"] = {0: "flattened"}
+                    self._meta["axis_units"] = {0: ""}
+                    self._meta["axis_ranges"] = {0: np.arange(self.shape[0])}
                 break
             if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
@@ -893,7 +902,11 @@ class Dataset(ndarray):
         Dataset
             The repeated array.
         """
-        _new = ndarray.repeat(self, repeats, axis)
+        # Catch warnings about temporarily inconsistent metadata in case
+        # of flattened arrays:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            _new = ndarray.repeat(self, repeats, axis)
         if axis is None:
             _new._update_keys_in_flattened_array()  # noqa
         else:
@@ -1083,7 +1096,11 @@ class Dataset(ndarray):
             )
         if has_dtype_arg:
             kwargs["dtype"] = dtype
-        _result = numpy_method(self, axis=axis, out=out, **kwargs)
+        # Need to catch warnings from numpy methods which temporarily invalidate
+        # the metadata.
+        with warnings.catch_warnings():
+            warnings.simplefilter(action="ignore", category=UserWarning)
+            _result = numpy_method(self, axis=axis, out=out, **kwargs)
         if axis is None or (not isinstance(_result, ndarray)):
             return _result
         if out is not None and not isinstance(out, Dataset):

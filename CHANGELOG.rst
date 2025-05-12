@@ -49,6 +49,8 @@ Bugfixes
 - Fixed a number of issues with Qt6
 - Fixed an issue with the detailed information for a scan point where the order of the 
   coordinates was inverted.
+- Fixed an issue in Dataset where indexing with ndarrays which returned a 1-d Dataset would
+  not reduce the metadata keys accordingly.
 
 
 v25.04.08

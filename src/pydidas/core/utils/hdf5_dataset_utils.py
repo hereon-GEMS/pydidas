@@ -36,7 +36,8 @@ __all__ = [
     "create_nx_entry_groups",
     "create_nx_dataset",
     "create_nxdata_entry",
-    "_create_nxdata_axis_entry",
+    "create_nxdata_axis_entry",
+    "get_nx_class_for_param",
 ]
 
 
@@ -44,7 +45,7 @@ import os
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import h5py
 import numpy as np
@@ -449,7 +450,7 @@ def create_nx_entry_groups(
     parent: h5py.File | h5py.Group,
     group_name: str,
     group_type: str = "NXdata",
-    **attributes: dict,
+    **attributes: Any,
 ) -> h5py.Group:
     """
     Create the NXentry groups in the hdf5 file and return the final group.
@@ -466,7 +467,7 @@ def create_nx_entry_groups(
         The name of the group to be created.
     group_type : str, optional
         The type of the last group. The default is "NXdata".
-    attributes : dict
+    attributes : Any
         The attributes to be set for the last group.
 
     Returns
@@ -506,7 +507,7 @@ def create_nxdata_entry(
     parent: h5py.File | h5py.Group,
     name: str,
     data: np.ndarray,
-    **attributes: dict,
+    **attributes: Any,
 ) -> h5py.Group:
     """
     Create a NXdata entry in the given parent object.
@@ -522,7 +523,7 @@ def create_nxdata_entry(
         The name of the NXdata data entry.
     data: np.ndarray
         The dataset to be stored in the group.
-    **attributes : dict
+    **attributes : Any
         The attributes to be set for the group.
     """
     if not isinstance(data, Dataset):
@@ -546,7 +547,7 @@ def create_nxdata_entry(
         NX_class="NX_NUMBER",
     )
     for _dim in range(data.ndim):
-        _create_nxdata_axis_entry(
+        create_nxdata_axis_entry(
             _data_group,
             _dim,
             data.axis_labels[_dim],
@@ -556,7 +557,7 @@ def create_nxdata_entry(
     return _data_group
 
 
-def _create_nxdata_axis_entry(
+def create_nxdata_axis_entry(
     group: h5py.Group, dim: int, label: str, unit: str, axdata: np.ndarray
 ):
     """
@@ -598,7 +599,7 @@ def create_nx_dataset(
     group: h5py.Group,
     name: str,
     data: dict | np.ndarray | str | Real | Integral,
-    **attributes: dict,
+    **attributes: Any,
 ) -> h5py.Dataset:
     """
     Create a NXdata dataset in the given Group (which should have an `NXdata` key).
@@ -613,7 +614,7 @@ def create_nx_dataset(
         The data to be stored in the dataset. This should typically be a numpy array
         or a scalar value or a string. If a dict is given, this is interpreted as
         the arguments for calling the create_dataset method.
-    **attributes : dict
+    **attributes : Any
         The attributes to be set for the dataset.
     """
     if name in group:

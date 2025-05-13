@@ -52,6 +52,8 @@ Bugfixes
 - Fixed an issue in Dataset where indexing with ndarrays which returned a 1-d Dataset would
   not reduce the metadata keys accordingly.
 - Fixed an issue in the DataAxisSelector when manually choosing empty selections to plot.
+- Fixed an issue with calculation of histogram bins due to changes in np.histogram 
+  implementation (numpy version 2.1.1 -> 2.2.5)
 
 
 v25.04.08

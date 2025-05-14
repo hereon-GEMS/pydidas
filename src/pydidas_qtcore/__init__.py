@@ -34,20 +34,19 @@ import sys as __sys
 
 # Check for Qt6 flag and PySide6 availability and set the QT_API environment
 # variable accordingly
-if True in [arg.upper() == "--QT6" for arg in sys.argv]:
+_env_qt_version = __os.environ.get("QT_API", None)
+__os.environ["FORCE_QT_API"] = "True"
+
+if _env_qt_version is None and True in [arg.upper() == "--QT6" for arg in sys.argv]:
     try:
-        import PySide6  # noqa
+        import PySide6  # noqa F401
     except ImportError:
         print("PySide6 requested but not found. Falling back to PyQt5.")
-        import PyQt5
     finally:
         __os.environ["QT_API"] = "pyside6" if "PySide6" in __sys.modules else "pyqt5"
-        __os.environ["FORCE_QT_API"] = "True"
-else:
-    import PyQt5  # noqa
 
 
-import qtpy as __qtpy
+import qtpy as __qtpy  # noqa E402
 
 
 if "--verbose" in sys.argv:

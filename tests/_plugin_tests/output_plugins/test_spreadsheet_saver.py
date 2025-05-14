@@ -97,8 +97,19 @@ def test_execute__invalid_data_dim(plugin):
         plugin.execute(data)
 
 
+def test_execute__w_filter_neg_values(plugin):
+    data = Dataset(np.random.rand(3, 3))
+    data[0, 0] = -1
+    data[2, 2] = -0.5
+    plugin.set_param_value("filter_negative_values", True)
+    plugin.pre_execute()
+    _new_data, _ = plugin.execute(data, global_index=1)
+    assert np.all(_new_data.array >= 0.0)
+
+
 def test_execute__test_case(plugin):
     data = Dataset(np.random.rand(3, 3))
+    plugin.pre_execute()
     _new_data, _ = plugin.execute(data, test=True)
     assert np.allclose(_new_data, data)
 

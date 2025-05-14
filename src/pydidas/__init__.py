@@ -29,26 +29,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import logging as __logging
-import os as __os
-import sys as __sys
-
-# __os.environ["QT_API"] = "pyside6"
-# must import h5py here to have the dll libraries linked correctly
+# must import h5py and the hdf5plugin here to have the dll libraries linked correctly
 # in Windows before using them in the package in different orders
 import h5py as __h5py  # noqa: F401
 import hdf5plugin as __hdf5plugin  # noqa: F401
-import qtpy as __qtpy
-import qtpy.QtCore as __QtCore
-import qtpy.QtGui as __QtGui
-import qtpy.QtWidgets as __QtWidgets
 
-
-if __QtWidgets.QApplication.instance() is None:
-    import pydidas_qtcore
-
-    __app = pydidas_qtcore.PydidasQApplication(__sys.argv)
-
+# import pydidas_qtcore to set up the QApplication and assure
+# that the QT_API is set correctly
+import pydidas_qtcore as __pydidas_qtcore  # noqa: F401
 
 # import local modules
 # import sub-packages:
@@ -66,12 +54,11 @@ from . import (
     widgets,
     workflow,
 )
-from .initalize import check_documentation, configure_pyFAI, initialize_qsetting_values
+from .core.utils.qt_utilities import IS_QT6
+from .initialize import check_documentation, configure_pyFAI, initialize_qsetting_values
 from .logging_level import LOGGING_LEVEL
 from .version import VERSION, version
 
-
-IS_QT6 = __qtpy.QT_VERSION[0] == "6"
 
 __version__ = VERSION
 __all__ = [

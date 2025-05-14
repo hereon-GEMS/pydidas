@@ -26,6 +26,7 @@ Improvements
 - Added a new mixin class to handle the creation of context objects
   which allows contexts to be created as subclasses of the base class.
 - Changed all existing singleton classes to the new constructor classes.
+- Added full support for Qt6 and optimized the selection process.
 
 
 Bugfixes

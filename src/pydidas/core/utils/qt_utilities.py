@@ -32,6 +32,7 @@ __all__ = [
     "update_qobject_font",
     "apply_font_properties",
     "check_pydidas_qapp_instance",
+    "IS_QT6",
 ]
 
 
@@ -44,6 +45,9 @@ from qtpy.QtGui import QFont
 from qtpy.QtWidgets import QWidget
 
 from pydidas_qtcore import PydidasQApplication
+
+
+IS_QT6 = QT_VERSION[0] == "6"
 
 
 def _get_args_as_list(args: Iterable):

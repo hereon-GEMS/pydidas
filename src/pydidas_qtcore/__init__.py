@@ -28,22 +28,38 @@ __status__ = "Production"
 
 
 import os as __os
+import sys
 import sys as __sys
 
-import qtpy
 
-from . import pydidas_qapp
-from .fontsize import *
-from .pydidas_qapp import *
-from .pydidas_splash_screen import *
+# Check for Qt6 flag and PySide6 availability and set the QT_API environment
+# variable accordingly
+if True in [arg.upper() == "--QT6" for arg in sys.argv]:
+    try:
+        import PySide6  # noqa
+    except ImportError:
+        print("PySide6 requested but not found. Falling back to PyQt5.")
+        import PyQt5
+    finally:
+        __os.environ["QT_API"] = "pyside6" if "PySide6" in __sys.modules else "pyqt5"
+        __os.environ["FORCE_QT_API"] = "True"
+else:
+    import PyQt5  # noqa
 
 
-if "--qt6" in __sys.argv:
-    __os.environ["QT_API"] = "pyside6"
-    __os.environ["FORCE_QT_API"] = "True"
+import qtpy as __qtpy
 
 
-if "--verbose-qt" in __sys.argv:
-    print("pydidas Using QT: ", qtpy.API_NAME)
+if "--verbose" in sys.argv:
+    print("pydidas Using QT: ", __qtpy.API_NAME)
+
+
+from . import pydidas_qapp  # noqa E402
+from .fontsize import *  # noqa E402
+from .pydidas_qapp import *  # noqa E402
+from .pydidas_splash_screen import *  # noqa E402
 
 __all__ = pydidas_qapp.__all__ + pydidas_splash_screen.__all__ + fontsize.__all__
+
+# Start the custom PydidasQApplication to assure the correct QApplication is running:
+__app = pydidas_qapp.PydidasQApplication(sys.argv)

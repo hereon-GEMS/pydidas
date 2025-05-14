@@ -27,6 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "configure_pyFAI",
+    "check_documentation",
+    "initialize_qsetting_values",
 ]
 
 

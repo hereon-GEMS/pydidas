@@ -19,6 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
+        env:
+          - QT_API: pyqt5
+          - QT_API: pyside6
 
     steps:
     - uses: actions/checkout@v3
@@ -32,10 +35,14 @@ jobs:
         python -m pip install .
         python -m pip install pytest
     - name: Run fast tests with pytest
+      env:
+        QT_API: ${{ matrix.env.QT_API }}
       run: |
         export QT_QPA_PLATFORM=offscreen
         python -m pytest
     - name: Run slow tests with pytest
+      env:
+        QT_API: ${{ matrix.env.QT_API }}
       run: |
         export QT_QPA_PLATFORM=offscreen
         python -m pytest -m slow

@@ -27,13 +27,12 @@ __status__ = "Production"
 __all__ = []
 
 
-import pydidas
-
-
 def open_gui():
     """
     Open the pydidas GUI.
     """
+    import pydidas
+
     pydidas.gui.start_pydidas_gui(use_default_frames=True)
 
 

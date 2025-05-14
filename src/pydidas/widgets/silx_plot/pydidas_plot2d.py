@@ -31,7 +31,7 @@ __all__ = ["PydidasPlot2D"]
 import inspect
 from contextlib import nullcontext
 from functools import partial
-from typing import Union
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -75,6 +75,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     """
 
     sig_get_more_info_for_data = QtCore.Signal(float, float)
+    sig_new_data_size = QtCore.Signal(int, int)
+    sig_data_linearity = QtCore.Signal(bool)
     init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
 
     @staticmethod
@@ -94,7 +96,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 "dimensions."
             )
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         PydidasQsettingsMixin.__init__(self)
         Plot2D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
@@ -112,7 +114,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if self._config["cs_transform"]:
             self._add_cs_transform_actions()
         self._set_colormap_and_bar()
-
         if self._config["use_data_info_action"]:
             self._add_data_info_action()
 
@@ -213,15 +214,13 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         This action allows to display image coordinates in polar coordinates
         (with r / mm, 2theta / deg or q / nm^-1) scaling.
         """
-        self._config["diffraction_exp"].sig_params_changed.connect(
-            self.update_exp_setup_params
-        )
-        self.update_exp_setup_params()
         self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
         self._toolbar.addWidget(self.cs_transform)
         self.cs_transform.sig_new_coordinate_system.connect(
             self._positionWidget.new_coordinate_system
         )
+        self.sig_new_data_size.connect(self.cs_transform.set_raw_data_size)
+        self.sig_data_linearity.connect(self.cs_transform.set_data_linearity)
 
     def _set_colormap_and_bar(self):
         """
@@ -281,30 +280,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             elif key == "cmap_nan_color":
                 _current_cmap.setNaNColor(value)
 
-    @QtCore.Slot()
-    def update_exp_setup_params(self):
-        """
-        Check that the detector is valid for a CS transform.
-        """
-        _exp = self._config["diffraction_exp"]
-        self._config["cs_transform_valid"] = _exp.detector_is_valid
-
-    def enable_cs_transform(self):
-        """
-        Enable or disable the coordinate system transformations.
-
-        The CS transform is enabled if the image has the same shape as the detector
-        configured in the DiffractionExperimentContext.
-        """
-        _data = self.getImage()
-        if _data is None or not self._config["cs_transform"]:
-            return
-        _data = _data.getData()
-        _enable = self._data_has_det_dim(_data)
-        if not _enable:
-            self.cs_transform.set_coordinates("cartesian")
-        self.cs_transform.setEnabled(_enable and self._config["cs_transform_valid"])
-
     def update_cs_units(self, x_unit: str, y_unit: str):
         """
         Update the coordinate system units.
@@ -322,7 +297,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         y_unit = "no unit" if y_unit == "" else y_unit
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
-    def addImage(self, data: Union[Dataset, np.ndarray], **kwargs: dict):
+    def addImage(self, data: Dataset | np.ndarray, **kwargs: Any):
         """
         Add an image to the plot.
 
@@ -331,10 +306,10 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        data : Union[Dataset, np.ndarray]
+        data : Dataset | np.ndarray
             The input data to be displayed.
 
-        **kwargs : dict
+        **kwargs : Any
             Any supported Plot2d.addImage keyword arguments.
         """
         self.remove(_SCATTER_LEGEND, kind="scatter")
@@ -344,7 +319,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self._check_data_dim(data)
             kwargs.update({"legend": _IMAGE_LEGEND, "replace": True})
             Plot2D.addImage(self, data, **kwargs)
-            self.__handle_cs_transform()
+            self.sig_new_data_size.emit(*data.shape)
+            self.sig_data_linearity.emit(True)
             self.update_cs_units("", "")
 
     def addNonUniformImage(self, data: Dataset, **kwargs: dict):
@@ -364,9 +340,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         self._check_data_dim(data)
         self.remove(_IMAGE_LEGEND, kind="image")
-        self.cs_transform.set_coordinates("cartesian")
-        self.cs_transform.setEnabled(False)
-        self.profile.setEnabled(False)
+        self.sig_data_linearity.emit(True)
         _scatter = self.getScatter(_SCATTER_LEGEND)
         if _scatter is None:
             _scatter = Scatter()
@@ -377,16 +351,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _scatter.setVisualization(_scatter.Visualization.IRREGULAR_GRID)
         self._notifyContentChanged(_scatter)
         self.setActiveScatter(_SCATTER_LEGEND)
-
-    def __handle_cs_transform(self):
-        """
-        Handle the setting of the CS transform.
-        """
-        if not self._config["cs_transform"]:
-            return
-        self.enable_cs_transform()
-        if self.cs_transform.isEnabled():
-            self.changeCanvasToDataAction._actionTriggered()
 
     def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
         """
@@ -414,17 +378,19 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 if _key in self._config["allowed_add_image_kwargs"]
             },
         }
-        if data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1):
+        _data_is_nonlinear = data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1)
+        self.profile.setEnabled(not _data_is_nonlinear)
+        self.sig_data_linearity.emit(_data_is_nonlinear)
+        if _data_is_nonlinear:
             self.addNonUniformImage(data, **kwargs)
         else:
             self.remove(_SCATTER_LEGEND, kind="scatter")
             _origin, _scale = get_2d_silx_plot_ax_settings(data)
             self._plot_config["kwargs"]["origin"] = _origin
             self._plot_config["kwargs"]["scale"] = _scale
-            self.profile.setEnabled(True)
             Plot2D.addImage(self, data.array, **self._plot_config["kwargs"])
             self.setActiveImage(_IMAGE_LEGEND)
-            self.__handle_cs_transform()
+            self.sig_new_data_size.emit(*data.shape)
         self.setGraphYLabel(self._plot_config["ax_labels"][0])
         self.setGraphXLabel(self._plot_config["ax_labels"][1])
         self._plot_config["cbar_legend"] = ""

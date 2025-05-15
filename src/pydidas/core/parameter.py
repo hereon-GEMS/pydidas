@@ -360,7 +360,7 @@ class Parameter:
         )
         raise ValueError(
             f"Cannot set Parameter (object ID:{id(self)}, refkey: '{self.refkey}', "
-            f"name: '{self.name}) because it is of the wrong data type. "
+            f"name: `{self.name}`) because it is of the wrong data type. "
             f"(expected: {self.dtype}({_subtype}), input type: {type(val)})"
         )
 

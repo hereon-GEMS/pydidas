@@ -62,4 +62,3 @@ specialized widgets are located in the respective sub-packages.
     widgets/selection
     widgets/silx_plot
     widgets/workflow_edit
-    widgets/windows

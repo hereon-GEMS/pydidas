@@ -34,7 +34,11 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install .
         python -m pip install pytest
-        python -m pip install opencv-python-headless
+    - name: Install system dependencies for PySide6
+      if: ${{ matrix.env.QT_API == 'pyside6' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libegl1 libopengl0
     - name: Run fast tests with pytest
       env:
         QT_API: ${{ matrix.env.QT_API }}

@@ -17,8 +17,8 @@ The following windows are available in pydidas:
     ImageSeriesOperationsWindow
     MaskEditorWindow
     ExportEigerPixelmaskWindow
-    _UserConfigWindow
-    _GlobalSettingsWindow
+    UserConfigWindow
+    GlobalSettingsWindow
     TweakPluginParameterWindow
     ShowDetailedPluginResultsWindow
     ManuallySetBeamcenterWindow

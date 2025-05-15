@@ -93,6 +93,7 @@ class Dataset(ndarray):
 
     The following numpy functions cannot be implemented because they are not defined
     in the ndarray:
+
     - numpy.roll:
         This function will work but destroy metadata consistency. A custom
         implementation is given in the Dataset.roll() method which takes

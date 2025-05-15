@@ -41,7 +41,7 @@ from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     POLICY_EXP_FIX,
     QT_REG_EXP_FLOAT_RANGE_VALIDATOR,
-    QT_REG_EXP_INT_RANGE_VALIDATOR,
+    QT_REG_EXP_POS_INT_RANGE_VALIDATOR,
 )
 from pydidas.widgets.factory import SquareButton
 from pydidas.widgets.silx_plot._data_views import (
@@ -229,7 +229,7 @@ def get_data_axis_widget_creation_args(
                     "contrary to Python slicing, the end index is included in the "
                     "selection."
                 ),
-                "validator": QT_REG_EXP_INT_RANGE_VALIDATOR,
+                "validator": QT_REG_EXP_POS_INT_RANGE_VALIDATOR,
                 "visible": False,
             },
         ],

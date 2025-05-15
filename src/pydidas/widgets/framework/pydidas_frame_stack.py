@@ -32,7 +32,7 @@ __all__ = ["PydidasFrameStack"]
 
 
 from pathlib import Path
-from typing import List, Union
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -65,8 +65,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
 
     sig_mouse_entered = QtCore.Signal()
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def initialize(self, *args: Any, **kwargs: Any) -> None:
         self.frame_indices = {}
         self.frames = []
 
@@ -152,7 +151,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         return self.widget(self.frame_indices[ref_name])
 
     @property
-    def frame_toolbar_entries(self) -> List[str]:
+    def frame_toolbar_entries(self) -> list[str]:
         """
         Get all menu entries based on the stored information in the Frames.
 
@@ -207,7 +206,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         """
         return self.get_name_from_index(self.currentIndex())
 
-    def get_all_widget_names(self) -> List[str]:
+    def get_all_widget_names(self) -> list[str]:
         """
         Get the names of all registered widgets.
 
@@ -266,9 +265,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         _widget = self.frames[self.frame_indices[ref_name]]
         self.removeWidget(_widget)
 
-    def addWidget(
-        self, widget: Union[None, QtWidgets.QWidget] = None, name: str = None
-    ):
+    def addWidget(self, widget: QtWidgets.QWidget | None = None, name: str = None):
         """
         Overload the QStackedWidget.addWidget method to deactivate it.
 

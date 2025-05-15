@@ -29,6 +29,7 @@ __all__ = ["DataAxisSelector", "GENERIC_AXIS_SELECTOR_CHOICES"]
 
 
 from functools import partial
+from typing import Any
 
 import numpy as np
 from numpy import ndarray
@@ -60,7 +61,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     sig_display_choice_changed = QtCore.Signal(int, str)
 
     def __init__(
-        self, index: int, parent: QtWidgets.QWidget | None = None, **kwargs: dict
+        self, index: int, parent: QtWidgets.QWidget | None = None, **kwargs: Any
     ):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
         PydidasWidgetMixin.__init__(self, **kwargs)
@@ -545,9 +546,15 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         _index_edit_visible = selection == "select range by indices"
         _data_edit_visible = selection == "select range by data values"
         if selection == "select range by indices":
+            self._check_input_and_reset_unacceptable_input("edit_range_data")
             self._handle_new_index_range_selection()
         elif selection == "select range by data values":
+            self._check_input_and_reset_unacceptable_input("edit_range_index")
             self._handle_new_data_range_selection()
+        elif selection == "use full axis":
+            self._check_input_and_reset_unacceptable_input("edit_range_data")
+            self._check_input_and_reset_unacceptable_input("edit_range_index")
+            self._handle_full_axis_selection()
         self._widgets["edit_range_index"].setVisible(_index_edit_visible)
         self._widgets["edit_range_data"].setVisible(_data_edit_visible)
 
@@ -568,7 +575,13 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             _stop = min(self._npoints, max(0, int(_range[1]) + 1))
         except ValueError:
             raise UserConfigError(invalid_range_str(_input))
-        # need to set to stop -1 because the slicing index is incremented to
+        if not _stop - _start > 1:
+            self._widgets["edit_range_index"].setText(f"0:{self._npoints - 1}")
+            raise UserConfigError(
+                "An invalid range was selected. The start index must be smaller than "
+                "the stop index. Resetting to the full range."
+            )
+        # need to set to stop - 1 because the slicing index is incremented to
         # include the last point
         self._widgets["edit_range_index"].setText(f"{_start}:{_stop - 1}")
         if (_start, _stop) == (self._current_slice.start, self._current_slice.stop):
@@ -597,6 +610,15 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             _stop = np.argmin(np.abs(self._data_range - float(_range[1]))) + 1
         except ValueError:
             raise UserConfigError(invalid_range_str(_input))
+        if not _stop - _start > 1:
+            self._widgets["edit_range_data"].setText(
+                f"{self._data_range[0]:.4f}:{self._data_range[self._npoints - 1]:.4f}"
+            )
+            raise UserConfigError(
+                "An invalid range was selected. The selected data range does not "
+                "include any points because the ranges for the data values are not "
+                "valid. Resetting to the full range."
+            )
         # need to set to stop -1 because the slicing index is incremented to
         # include the last point
         _new_input = f"{self._data_range[_start]:.4f}:{self._data_range[_stop - 1]:.4f}"
@@ -608,7 +630,36 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             self._widgets["edit_range_index"].setText(f"{_start}:{_stop - 1}")
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
-    def _check_edit_range_input(self, edit_name: str):
+    def _handle_full_axis_selection(self):
+        """
+        Handle the selection of the full axis.
+        """
+        self._current_slice = slice(0, self._npoints)
+        self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
+
+    def _check_input_and_reset_unacceptable_input(self, edit_name: str):
+        """
+        Check the input of the edit widget and reset it to the full range, if necessary.
+
+        Parameters
+        ----------
+        edit_name : str
+            The name of the edit widget.
+        """
+        if self._widgets[edit_name].hasAcceptableInput():
+            return
+        if edit_name == "edit_range_data":
+            _new_input = f"{self._data_range[0]:.4f}:{self._data_range[-1]:.4f}"
+        elif edit_name == "edit_range_index":
+            _new_input = f"0:{self._npoints - 1}"
+        else:
+            raise ValueError("Invalid edit name")
+        with QtCore.QSignalBlocker(self._widgets[edit_name]):
+            self._widgets[edit_name].setText(_new_input)
+        self._widgets[edit_name].setPalette(self._palette_base)
+
+    @QtCore.Slot(str)
+    def _check_edit_range_input(self, edit_name: str, new_text: str):
         """
         Check the input of the range edit widget.
 
@@ -616,6 +667,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         ----------
         edit_name : str
             The name of the edit widget.
+        new_text : str
+            The new text in the edit widget. This input is ignored because
+            the input is checked through the hasAcceptableInput() method.
         """
         if self._widgets[edit_name].hasAcceptableInput():
             self._widgets[edit_name].setPalette(self._palette_base)

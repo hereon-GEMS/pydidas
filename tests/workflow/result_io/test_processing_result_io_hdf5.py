@@ -110,13 +110,10 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
     def tearDown(self): ...
 
     def prepare_with_defaults(self):
-        _scan_shape = tuple(
-            SCAN.get_param_value(f"scan_dim{i}_n_points") for i in range(3)
-        )
         self._shapes = {
-            1: _scan_shape + (12, 7),
-            2: _scan_shape + (23,),
-            3: _scan_shape + (1, 3, 7),
+            1: SCAN.shape + (12, 7),
+            2: SCAN.shape + (23,),
+            3: SCAN.shape + (1, 3, 7),
         }
         self._labels = {1: "Test", 2: "not again", 3: "another"}
         self._datalabels = {1: "Intensity", 2: "Peak height", 3: "Area"}
@@ -295,7 +292,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
             with h5py.File(_fname, "r") as _file:
                 _written_data = _file["entry/data/data"][_scanindex]
-            self.assertTrue(np.allclose(_written_data, _data[_node_id]))
+            self.assertTrue(np.allclose(_written_data, _data[_node_id].array))
 
     def test_import_results_from_file(self):
         _data, _node_info, _scan, _exp, _tree = H5SAVER.import_results_from_file(

@@ -310,14 +310,14 @@ class PluginRegistry(ObjectWithParameterCollection):
         return cls_members
 
     def check_and_register_class(
-        self, class_: Type[BasePlugin] | type, reload: bool = False
+        self, class_: Type[BasePlugin] | Type[type], reload: bool = False
     ):
         """
         Check whether a class is a valid plugin and register it.
 
         Parameters
         ----------
-        class_ : Type[BasePlugin] |type
+        class_ : Type[BasePlugin] | Type[type]
             The type of the class to be checked.
         reload : bool
             Flag to enable reloading of plugins. If True, new plugins will

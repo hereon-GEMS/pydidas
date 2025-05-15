@@ -138,8 +138,8 @@ def __calc_lower_limit(
         data.min(),
         cmap_high_lim if cmap_high_lim is not None else data.max(),
     )
-    if _range[0] >= _range[1]:
-        _range = (_range[0] - 1e-4, _range[0] + 1e-4)
+    if _range[1] - _range[0] <= 1e-4:
+        _range = (min(_range) - 1e-4, max(_range) + 1e-4)
     _counts, _edges = np.histogram(data, bins=__NUM_BINS, range=_range)
     _cumcounts = np.cumsum(_counts / data.size)
     _bin_index_fine = np.max(np.where(_cumcounts <= threshold_low)[0], initial=0)

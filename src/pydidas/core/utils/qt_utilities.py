@@ -31,16 +31,23 @@ __all__ = [
     "update_palette",
     "update_qobject_font",
     "apply_font_properties",
+    "check_pydidas_qapp_instance",
+    "IS_QT6",
 ]
 
 
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, NoReturn
 
-from qtpy import QT_VERSION, QtGui
+from qtpy import QT_VERSION, QtGui, QtWidgets
 from qtpy.QtCore import QObject
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import QWidget
+
+from pydidas_qtcore import PydidasQApplication
+
+
+IS_QT6 = QT_VERSION[0] == "6"
 
 
 def _get_args_as_list(args: Iterable):
@@ -210,3 +217,19 @@ def apply_font_properties(font_obj: QFont, **kwargs: Any):
         if hasattr(font_obj, _name):
             _func = getattr(font_obj, _name)
             _func(*_get_args_as_list(kwargs.get(_key)))
+
+
+def check_pydidas_qapp_instance() -> None | NoReturn:
+    """
+    Check if the QtWidgets.QApplication instance is a PydidasQApplication.
+
+    If it is not, the function will raise a RuntimeError. This is used to
+    ensure that Pydidas is running in a PydidasQApplication instance.
+    """
+    _app = QtWidgets.QApplication.instance()
+    if not isinstance(_app, PydidasQApplication):
+        raise RuntimeError(
+            "The current QApplication instance is not a PydidasQApplication. "
+            "Pydidas widgets require a PydidasQApplication instance to work properly "
+            "and are not compatible with the generic QApplication."
+        )

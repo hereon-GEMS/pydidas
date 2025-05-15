@@ -70,9 +70,31 @@ class SingletonObject:
             return
         self.__class__._initialized = True
 
+        _skip_base_init = kwargs.pop("skip_base_init", False)
         # Only call super().__init__ if there are multiple bases:
-        if len(self.__class__.__bases__) > 1:
-            super().__init__(*args, **kwargs)
+        if len(self.__class__.__bases__) > 1 and not _skip_base_init:
+            for base in self.__class__.__bases__:
+                if base is not SingletonObject and hasattr(base, "__init__"):
+                    base.__init__(self, *args, **kwargs)
+        self.initialize(*args, **kwargs)
+
+    def initialize(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Initialize the singleton object.
+
+        This method should be overridden by subclasses which have additional
+        mixin-classes to perform any necessary initialization. Using the initialize
+        method instead of __init__ is required to avoid multiple initializations
+        through the SingletonObject.
+
+        Parameters
+        ----------
+        args : Any
+            Positional arguments for the initialization.
+        kwargs : Any
+            Keyword arguments for the initialization.
+        """
+        pass
 
     def __copy__(self) -> NoReturn:
         """

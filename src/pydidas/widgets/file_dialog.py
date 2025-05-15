@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with PydidasFileDialog which is a persistent QFileDialog which allows to keep
+Module with PydidasFileDialog which is a persistent QFileDialog that allows keeping
 persistent references to the selected directory.
 """
 
@@ -30,7 +30,7 @@ __all__ = ["PydidasFileDialog"]
 
 import os
 import pathlib
-from typing import Union
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -44,6 +44,7 @@ from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
 from pydidas.core.utils import flatten, update_child_qobject
 from pydidas.resources import icons
 from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas_qtcore import PydidasQApplication
 
 
 SCAN = ScanContext()
@@ -51,7 +52,7 @@ ITEM_SELECTABLE = QtCore.Qt.ItemIsSelectable
 
 
 class SelectionModel(QtCore.QIdentityProxyModel):
-    """A selection proxy model which allows to show files but make them unselectable."""
+    """A selection proxy model which allows showing files but make them unselectable."""
 
     def flags(self, index):
         _flags = QtCore.QIdentityProxyModel.flags(self, index)
@@ -71,28 +72,33 @@ class PydidasFileDialog(
     latest selected directory (in any dialog).
 
     The usage is the same as for the generic QFileDialog.
-
-    Parameters
-    ----------
-    parent : Union[None, QWidget], optional
-        The dialog's parent widget. The default is None.
-    caption : Union[None, str], optional
-        The dialog caption. If None, the caption will be selected based on the
-        type of dialog. The default is None.
-    dialog_type : str
-        The type of the dialog. Must be open_file, save_file, or open_directory.
-        The default is open_file.
-    formats : Union[None, str], optional
-        The list of format filters for filenames, if used. The default is None.
-    info_string : Union[None, str], optional
-        An additional information string which is displayed in the FileDialog widget.
-        The default is None.
     """
 
-    def __init__(self, **kwargs: dict):
-        QtWidgets.QFileDialog.__init__(self, kwargs.get("parent", None))
-        CreateWidgetsMixIn.__init__(self)
-        PydidasQsettingsMixin.__init__(self)
+    def initialize(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Initialize the PydidasFileDialog.
+
+        Parameters
+        ----------
+        *args : Any
+            Positional arguments.
+        **kwargs : Any
+            Keyword arguments. Supported keywords are:
+
+            parent : Union[None, QWidget], optional
+                The dialog's parent widget. The default is None.
+            caption : str | None, optional
+                The dialog caption. If None, the caption will be selected based on the
+                type of dialog. The default is None.
+            dialog_type : str
+                The type of the dialog. Must be open_file, save_file, or open_directory.
+                The default is open_file.
+            formats : str | None, optional
+                The list of format filters for filenames, if used. The default is None.
+            info_string : str | None, optional
+                An additional information string which is displayed in the FileDialog
+                widget. The default is None.
+        """
         self._files_unselectable_model = SelectionModel(self)
         self._config = {
             "caption": kwargs.get("caption", None),
@@ -194,7 +200,7 @@ class PydidasFileDialog(
         int
             The return code of the file dialog.
         """
-        _char_width, _char_height = QtWidgets.QApplication.instance().font_metrics
+        _char_width, _char_height = PydidasQApplication.instance().font_metrics
         _geo_width = int(_char_width * 160)
         _geo_height = int(_char_height * 32)
         update_child_qobject(self, "geometry", width=_geo_width, height=_geo_height)
@@ -216,18 +222,18 @@ class PydidasFileDialog(
         self._widgets["selection"].setText(_stored_selection)
         return QtWidgets.QFileDialog.exec_(self)
 
-    def _get_stored_entries(self) -> Union[str, None]:
+    def _get_stored_entries(self) -> tuple[str, str | None]:
         """
         Get the stored directory and selection based on the reference name.
 
-        If a 'qsettings_ref' key is given, this takes precendence over the 'reference'
+        If a 'qsettings_ref' key is given, this takes precedence over the 'reference'
         key.
 
         Returns
         -------
         str
             The stored selection or an empty string if no selection was saved.
-        Union[str, None]
+        str | None
             The stored directory, if existing or None.
         """
         if self._calling_kwargs.get("qsettings_ref") is not None:
@@ -238,7 +244,7 @@ class PydidasFileDialog(
             return self._stored_selections.get(_key, ""), self._stored_dirs.get(_key)
         return "", None
 
-    def get_existing_directory(self, **kwargs: dict) -> Union[None, str]:
+    def get_existing_directory(self, **kwargs: dict) -> str | None:
         """
         Execute the dialog and get an existing directory.
 
@@ -249,7 +255,7 @@ class PydidasFileDialog(
 
             caption : str, optional
                 The window title caption. The default is 'Select directory'.
-            reference : Union[str, int], optional
+            reference : str | int, optional
                 A reference key to store the selection only during the active instance.
                 The default is None.
             qsettings_ref : str, optional
@@ -261,7 +267,7 @@ class PydidasFileDialog(
 
         Returns
         -------
-        Union[str, None]
+        str | None
             The directory path, if selected or None.
         """
         self._calling_kwargs = kwargs
@@ -276,18 +282,18 @@ class PydidasFileDialog(
         self._store_current_directory()
         return _selection
 
-    def get_existing_filename(self, **kwargs: dict) -> Union[None, str]:
+    def get_existing_filename(self, **kwargs: Any) -> str | None:
         """
         Execute the dialog and get the full path of an existing file.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Optional keyword arguments. Supported keywords are:
 
             caption : str, optional
                 The window title caption. The default is 'Select existing file'.
-            reference : Union[str, int], optional
+            reference : str | int, optional
                 A reference key to store the selection only during the active instance.
                 The default is None.
             select_multiple : bool, optional
@@ -298,7 +304,7 @@ class PydidasFileDialog(
 
         Returns
         -------
-        Union[str, None]
+        str | None
             The full file path, if selected, or None.
         """
         self._calling_kwargs = kwargs
@@ -320,7 +326,7 @@ class PydidasFileDialog(
             return self.selectedFiles()
         return self.selectedFiles()[0]
 
-    def get_existing_filenames(self, **kwargs: dict) -> list[str]:
+    def get_existing_filenames(self, **kwargs: Any) -> list[str]:
         """
         Execute the dialog and get a list of existing files.
 
@@ -378,7 +384,7 @@ class PydidasFileDialog(
                 self._widgets["selection"].text()
             )
 
-    def get_saving_filename(self, **kwargs: dict) -> Union[None, str]:
+    def get_saving_filename(self, **kwargs: dict) -> str | None:
         """
         Execute the dialog and get the full path of a file for saving.
 
@@ -391,7 +397,7 @@ class PydidasFileDialog(
 
             caption : str, optional
                 The window title caption. The default is 'Select filename'.
-            reference : Union[str, int], optional
+            reference : str | int, optional
                 A reference key to store the selection only during the active
                 instance. The default is None.
             qsettings_ref : str, optional
@@ -401,7 +407,7 @@ class PydidasFileDialog(
 
         Returns
         -------
-        Union[str, None]
+        str | None
             The full file path, if selected, or None.
         """
         self._calling_kwargs = kwargs
@@ -467,15 +473,15 @@ class PydidasFileDialog(
                 "is unknown."
             )
 
-    def set_curr_dir(self, reference: Union[str, int], item: Union[pathlib.Path, str]):
+    def set_curr_dir(self, reference: str | int, item: pathlib.Path | str):
         """
         Set the current directory to the directory of the given item.
 
         Parameters
         ----------
-        reference: Union[str, int]
+        reference: str | int
             The stored reference name.
-        item : Union[pathlib.Path, str]
+        item : Path | str
             The filename or directory name.
         """
         if isinstance(item, pathlib.Path):

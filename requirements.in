@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: CC0-1.0
 
 pyFAI==2025.3.0
+# TODO: make changes for silx 2.2.2
+# silx==2.2.2
+silx==2.1.1
 scikit-image>=0.22.0
 sphinx>=8.0.0
 pydata_sphinx_theme>=0.15.4
@@ -13,6 +16,7 @@ hdf5plugin>=4.4.0
 pyyaml>=6.0
 requests>=2.31.0
 PyQt5==5.15.11
+PySide6>=6.9
 build>=1.0.3
 setuptools>69.0.0
 siphash24>=1.6

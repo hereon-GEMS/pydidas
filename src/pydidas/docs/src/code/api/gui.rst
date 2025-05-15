@@ -49,11 +49,3 @@ Frames
     gui/frames/workflow_run_frame
     gui/frames/view_results_frame
     gui/frames/builders
-
-Windows
--------
-    
-.. toctree::
-    :maxdepth: 3
-    
-    widgets/windows/global_settings_window

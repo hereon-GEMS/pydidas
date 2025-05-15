@@ -29,6 +29,7 @@ __all__ = ["UtilitiesFrame"]
 
 
 from functools import partial
+from typing import Type
 
 from qtpy import QtCore, QtWidgets
 
@@ -112,7 +113,7 @@ class UtilitiesFrame(BaseFrame):
         # )
 
     @QtCore.Slot(object)
-    def create_and_show_temp_window(self, window: QtWidgets.QWidget):
+    def create_and_show_temp_window(self, window: Type[QtWidgets.QWidget]):
         """
         Show the given temporary window.
 
@@ -131,7 +132,7 @@ class UtilitiesFrame(BaseFrame):
         self._child_windows[_name].show()
 
     @QtCore.Slot(object)
-    def create_and_show_frame(self, frame: BaseFrame):
+    def create_and_show_frame(self, frame: Type[BaseFrame]):
         """
         Show the given frame.
 

@@ -33,7 +33,7 @@ import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, Self, Sequence, Type, Union
+from typing import Any, NoReturn, Self, Sequence, Type
 
 from numpy import asarray, ndarray
 
@@ -45,7 +45,7 @@ _ITERATORS = (list, set, tuple)
 _NUMBERS = [Integral, Real]
 
 
-def _get_base_class(cls: Any) -> type | Real | Integral | None:
+def _get_base_class(cls: Any) -> Type | Real | Integral | None:
     """
     Filter numerical classes and return the corresponding abstract base class.
 
@@ -60,7 +60,7 @@ def _get_base_class(cls: Any) -> type | Real | Integral | None:
 
     Returns
     -------
-    type | Real | Integral | None
+    Type | Real | Integral | None
         The base class of the input class if the input. If no class has been
         defined, return None.
     """
@@ -84,23 +84,10 @@ def _outside_range_string(val: object, parameter: "Parameter") -> str:
     )
 
 
-def _invalid_choice_str(val: object, choices: list) -> str:
+def _invalid_choice_str(val: object, choices: list[Any]) -> str:
     return (
         f"The selected value '{val}' does not correspond to any of the allowed "
         f"choices: {choices}"
-    )
-
-
-def _value_set_valueerror_str(parameter: "Parameter", val: Any) -> str:
-    _subtype = (
-        f"[{parameter._Parameter__meta['subtype'].__name__}]"
-        if parameter._Parameter__meta["subtype"]
-        else ""
-    )
-    return (
-        f"Cannot set Parameter (object ID:{id(parameter)}, refkey: '{parameter.refkey}', "
-        f"name: '{parameter.name}) because it is of the wrong data type. "
-        f"(expected: {parameter.dtype}({_subtype}), input type: {type(val)})"
     )
 
 
@@ -160,20 +147,20 @@ class Parameter:
     refkey : str
         The reference key for the Parameter in the Parameter collection.
         If not specified, this will default to the name.
-    param_type : Union[None, type]
+    param_type : Type | None
         The datatype of the parameter. If None, no type-checking will be
         performed. If any integer or float value is used, this will be
         changed to the abstract base class of numbers.Integral or
         numbers.Real.
-    default : Union[None, type]
+    default : Any | None
         The default value. The data type must be of the same type as
         param_type. None is only accepted if param_type is None as well.
-    meta : Union[dict, None], optional
+    meta : dict | None, optional
         A dictionary with metadata. Any keys specified as meta will
         overwrite the kwargs dictionary. This is added merely as
         convenience to facility copying Parameter instances. If None,
         this entry will be ignored. The default is None.
-    **kwargs : dict
+    **kwargs : Any
         Additional keyword arguments. Supported argument
 
         name : str, optional
@@ -189,7 +176,7 @@ class Parameter:
             to include certain type and unit information. The default is ''.
         unit : str, optional
             The unit of the parameter. The default is ''.
-        choices : Union[list, tuple, None]
+        choices : Sequence[Any] |  None
             A list of allowed choices. If None, no checking will be enforced.
             The default is None.
         value : object
@@ -203,10 +190,10 @@ class Parameter:
     def __init__(
         self,
         refkey: str,
-        param_type: Union[None, Type],
+        param_type: Type | None,
         default: object,
-        meta: Union[None, dict] = None,
-        **kwargs: dict,
+        meta: dict | None = None,
+        **kwargs: Any,
     ):
         super().__init__()
         self.__refkey = refkey
@@ -250,13 +237,13 @@ class Parameter:
             )
         self.__meta["default"] = default
 
-    def __process_choices_input(self, kwargs: dict):
+    def __process_choices_input(self, kwargs: dict[Any]):
         """
         Process the choices input.
 
         Parameters
         ----------
-        kwargs : dict
+        kwargs : dict[Any]
             The kwargs passed to init.
 
         Raises
@@ -280,13 +267,13 @@ class Parameter:
                 f"choices: {self.__meta['choices']}."
             )
 
-    def __typecheck(self, val: object) -> bool:
+    def __typecheck(self, val: Any) -> bool:
         """
         Check the type of new input.
 
         Parameters
         ----------
-        val : object
+        val : Any
             The value of the parameter to be checked.
 
         Returns
@@ -306,7 +293,7 @@ class Parameter:
             return True
         return False
 
-    def __convenience_type_conversion(self, value: object) -> object:
+    def __convenience_type_conversion(self, value: Any) -> Any:
         """
         Convert the value to the defined type.
 
@@ -325,12 +312,12 @@ class Parameter:
 
         Parameters
         ----------
-        value : object
+        value : Any
             The input value. This can be any datatype entered by the user.
 
         Returns
         -------
-        value : object
+        value : Any
             The value with the above-mentioned type conversions applied.
         """
         if self.__meta["allow_None"] and value in ["None", "", None]:
@@ -366,6 +353,16 @@ class Parameter:
         if isinstance(value, Iterable) and self.__type == ndarray:
             return asarray(value)
         return value
+
+    def _raise_value_set_valueerror(self, val: Any) -> NoReturn:
+        _subtype = (
+            f"[{self.__meta['subtype'].__name__}]" if self.__meta["subtype"] else ""
+        )
+        raise ValueError(
+            f"Cannot set Parameter (object ID:{id(self)}, refkey: '{self.refkey}', "
+            f"name: `{self.name}`) because it is of the wrong data type. "
+            f"(expected: {self.dtype}({_subtype}), input type: {type(val)})"
+        )
 
     @property
     def name(self) -> str:
@@ -404,13 +401,13 @@ class Parameter:
         return self.__refkey
 
     @property
-    def default(self) -> object:
+    def default(self) -> Any:
         """
         Return the default value.
 
         Returns
         -------
-        default
+        default : Any
             The default value.
         """
         return self.__meta["default"]
@@ -455,26 +452,26 @@ class Parameter:
         return _t.replace(") (", ", ")
 
     @property
-    def choices(self) -> Union[None, list]:
+    def choices(self) -> list[Any] | None:
         """
         Get or set the allowed choices for the Parameter value.
 
         Returns
         -------
-        Union[list, None]
+        list[Any] | None
             The allowed choices for the Parameter.
         """
         return self.__meta["choices"]
 
     @choices.setter
-    def choices(self, choices: Union[None, list, tuple, set]):
+    def choices(self, choices: Sequence[Any] | None):
         """
         Update the allowed choices of a Parameter.
 
         Parameters
         ----------
-        choices : Union[None, list, tuple, set]
-            A list or tuple of allowed choices. A check will be performed that
+        choices : Sequence[Any] | None
+            A sequence of allowed choices. A check will be performed that
             all entries correspond to the defined data type and that the
             current parameter value is one of the allowed choices.
 
@@ -569,11 +566,11 @@ class Parameter:
         if self.__meta["choices"] and val not in self.__meta["choices"]:
             raise ValueError(_invalid_choice_str(val, self.__meta["choices"]))
         if not (self.__typecheck(val) or (self.__meta["optional"] and val is None)):
-            raise ValueError(_value_set_valueerror_str(self, val))
+            self._raise_value_set_valueerror(val)
         self.__value = val
 
     @property
-    def value_for_export(self) -> object:
+    def value_for_export(self) -> Any:
         """
         Get the value in a pickleable format for exporting.
 
@@ -582,7 +579,7 @@ class Parameter:
 
         Returns
         -------
-        object
+        Any
             The Parameter value in a pickleable format.
         """
         if self.value is None:
@@ -643,13 +640,13 @@ class Parameter:
         new_range = (float(new_range[0]), float(new_range[1]))
         self.__meta["range"] = new_range
 
-    def update_value_and_choices(self, value: object, choices: Sequence[Any]):
+    def update_value_and_choices(self, value: Any, choices: Sequence[Any]):
         """
         Update the value and choices of the Parameter to prevent illegal selections.
 
         Parameters
         ----------
-        value : object
+        value : Any
             The new Parameter values.
         choices : Sequence[Any]
             The new choices for the Parameter.
@@ -687,7 +684,7 @@ class Parameter:
 
     deepcopy = copy
 
-    def dump(self) -> tuple:
+    def dump(self) -> tuple[str, Type, Any, dict]:
         """
         A method to get the full class information for saving.
 
@@ -695,9 +692,9 @@ class Parameter:
         -------
         refkey : str
             The name of the Parameter
-        type : type
+        type : Type
             The data type of the Parameter.
-        default : object
+        default : Any
             The default value
         meta : dict
             A dictionary with all the metadata information about the Parameter
@@ -711,14 +708,14 @@ class Parameter:
             _default = self.value
         return self.__refkey, self.__type, _default, _meta
 
-    def export_refkey_and_value(self) -> tuple:
+    def export_refkey_and_value(self) -> tuple[str, Any]:
         """
         Export the refkey and value (in a pickleable format) for saving
         in YAML files.
 
         Returns
         -------
-        tuple
+        tuple[str, Any]
             The tuple of (refkey, value as pickleable format)
         """
         return self.__refkey, self.value_for_export
@@ -800,7 +797,7 @@ class Parameter:
 
         Parameters
         ----------
-        value : Union[str, Iterable]
+        value : str | Sequence[str | Real]
             The input object.
 
         Returns
@@ -837,14 +834,14 @@ class Parameter:
         """
         return self.copy()
 
-    def __call__(self) -> object:
+    def __call__(self) -> Any:
         """
         Get the stored Parameter value.
 
         Returns
         -------
-        value
-            The stored parameter value-
+        value : Any
+            The stored parameter value.
         """
         return self.__value
 

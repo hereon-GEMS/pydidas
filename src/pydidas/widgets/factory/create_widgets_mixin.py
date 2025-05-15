@@ -33,7 +33,7 @@ from typing import Any
 from qtpy import QtWidgets
 from qtpy.QtWidgets import QWidget
 
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, check_pydidas_qapp_instance
 from pydidas.widgets.factory.empty_widget import EmptyWidget
 from pydidas.widgets.factory.pydidas_checkbox import PydidasCheckBox
 from pydidas.widgets.factory.pydidas_combobox import PydidasComboBox
@@ -59,6 +59,7 @@ class CreateWidgetsMixIn:
     def __init__(self):
         self._widgets = {}
         self.__index_unreferenced = 0
+        check_pydidas_qapp_instance()
 
     def create_spacer(self, ref: str | None, **kwargs: Any):
         """

@@ -99,7 +99,13 @@ max-complexity = 12
 "app_processor_.py" = ["C901"]
 
 [tool.pytest.ini_options]
-addopts = "--disable-warnings -m 'not slow'"
+addopts = "-m 'not slow'"
 markers = [
     "slow: mark test as slow to run only when '-m slow' is specified",
+]
+filterwarnings = [
+    "ignore:Mean of empty slice",
+    "ignore:invalid value encountered in divide",
+    "ignore:All-NaN slice encountered",
+    "ignore:All-NaN axis encountered",
 ]

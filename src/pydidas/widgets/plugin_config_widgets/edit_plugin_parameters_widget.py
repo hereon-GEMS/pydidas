@@ -119,7 +119,7 @@ class EditPluginParametersWidget(
         """
         if isinstance(self._widgets.get("plugin_widget", None), QtWidgets.QWidget):
             try:
-                self._widgets["plugin_widget"].disconnect()
+                self._widgets["plugin_widget"].sig_new_label.disconnect()
             except RuntimeError:
                 pass
         delete_all_items_in_layout(self.layout())

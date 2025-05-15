@@ -84,7 +84,26 @@ class Pydidas_Plot2dView(_Plot2dView):
 
     def createWidget(self, parent):
         widget = PydidasPlot2D(parent=parent)
+        # TODO : Required for silx 2.2.2
+        # widget.setDefaultColormap(self.defaultColormap())
+        # widget.getColormapAction().setColormapDialog(self.defaultColorDialog())
         widget.getIntensityHistogramAction().setVisible(True)
+
+        # TODO : Required for silx 2.2.2
+        # self.__aggregationModeAction = AggregationModeAction(parent=widget)
+        # widget.toolBar().addAction(self.__aggregationModeAction)
+        # self.__aggregationModeAction.sigAggregationModeChanged.connect(
+        #     self._aggregationModeChanged
+        # )
+        # self._Plot2dView__imageItem = ImageDataAggregated()
+        # self._Plot2dView__imageItem.setAggregationMode(
+        #     self.__aggregationModeAction.getAggregationMode()
+        # )
+        # self._Plot2dView__imageItem.setName("data")
+        # self._Plot2dView__imageItem.setColormap(widget.getDefaultColormap())
+        # widget.addItem(self._Plot2dView__imageItem)
+        # widget.setActiveImage(self._Plot2dView__imageItem)
+
         widget.setKeepDataAspectRatio(True)
         widget.getXAxis().setLabel("X")
         widget.getYAxis().setLabel("Y")
@@ -113,11 +132,8 @@ class Pydidas_Plot1dView(_Plot1dView):
         """
         if not isinstance(data, Dataset):
             data = Dataset(data)
-        _xlabel = (
-            data.get_axis_description(0)
-            if len(data.get_axis_description(0)) > 0
-            else "x"
-        )
+        _x_desc = data.get_axis_description(0)
+        _xlabel = _x_desc if len(_x_desc) > 0 else "x"
         _ylabel = data.data_description if len(data.data_description) > 0 else "y"
         _widget = self.getWidget()
 

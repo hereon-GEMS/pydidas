@@ -10,3 +10,4 @@ pip-tools>=7.4.1
 reuse>=4.0.3
 ruff>=0.9.1
 pytest>=8.3.0
+PyQt5-stubs>=5.15.6

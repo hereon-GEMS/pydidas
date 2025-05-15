@@ -26,6 +26,7 @@ Improvements
 - Added a new mixin class to handle the creation of context objects
   which allows contexts to be created as subclasses of the base class.
 - Changed all existing singleton classes to the new constructor classes.
+- Added full support for Qt6 and optimized the selection process.
 
 
 Bugfixes
@@ -46,6 +47,14 @@ Bugfixes
 - Fixed an issue with getting a description of the slicing for Hdf5 files with integer 
   indices.
 - Fixed an issue when trying to load empty files with numpy
+- Fixed a number of issues with Qt6
+- Fixed an issue with the detailed information for a scan point where the order of the 
+  coordinates was inverted.
+- Fixed an issue in Dataset where indexing with ndarrays which returned a 1-d Dataset would
+  not reduce the metadata keys accordingly.
+- Fixed an issue in the DataAxisSelector when manually choosing empty selections to plot.
+- Fixed an issue with calculation of histogram bins due to changes in np.histogram 
+  implementation (numpy version 2.1.1 -> 2.2.5)
 
 
 v25.04.08

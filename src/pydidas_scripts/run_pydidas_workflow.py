@@ -29,10 +29,6 @@ __all__ = []
 
 import sys
 
-from pydidas.apps import ExecuteWorkflowRunner
-from pydidas.core import FileReadError, UserConfigError
-from pydidas.core.utils import print_warning, timed_print
-
 
 def run_workflow():
     """
@@ -42,6 +38,10 @@ def run_workflow():
     For running multiple workflows in a batch, please consider creating your
     own script.
     """
+    from pydidas.apps import ExecuteWorkflowRunner
+    from pydidas.core import FileReadError, UserConfigError
+    from pydidas.core.utils import print_warning, timed_print
+
     verbose = "--verbose" in sys.argv
     timed_print(
         "Processing of pydidas workflow started. Starting ExecuteWorkflowRunner.",

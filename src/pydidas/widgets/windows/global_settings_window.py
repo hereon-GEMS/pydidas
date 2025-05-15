@@ -29,6 +29,7 @@ __all__ = ["GlobalSettingsWindow"]
 
 
 from functools import partial
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -55,8 +56,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
 
     default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
-    def __init__(self, **kwargs: dict):
-        PydidasWindow.__init__(self, **kwargs)
+    def initialize(self, **kwargs: Any):
         self.set_default_params()
         self.setWindowTitle("pydidas system settings")
 
@@ -173,21 +173,6 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
                 _value = self.get_param_value(_param_key)
                 self.update_widget_value(_param_key, _value)
                 self.value_changed_signal.emit(_param_key, _value)
-
-    @QtCore.Slot(str, object)
-    def external_update(self, param_key, value):
-        """
-        Perform an update after a Parameter has changed externally.
-
-        Parameters
-        ----------
-        param_key : str
-            The Parameter reference key.
-        value : object
-            The new value which was set externally.
-        """
-        value = self._qsettings_convert_value_type(param_key, value)
-        self.set_param_value_and_widget(param_key, value)
 
     @QtCore.Slot()
     def process_new_font_metrics(self):

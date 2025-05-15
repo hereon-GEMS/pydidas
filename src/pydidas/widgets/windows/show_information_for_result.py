@@ -118,6 +118,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         ----------
         position : tuple
             A 2-tuple with the data position selected in the image.
+            The order is (y, x) and the values are in data coordinates.
         active_dims : tuple
             A 2-tuple with the active dimensions of the selection,
             i.e. the dimensions in which the position is defined.
@@ -136,9 +137,9 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         self._loader_plugin.update_filename_string()
         _scan = self._loader_plugin._SCAN
         _ax_ranges = result_metadata["axis_ranges"]
-        _index_y = (abs(_ax_ranges[active_dims[0]] - position[1])).argmin()
+        _index_y = (abs(_ax_ranges[active_dims[0]] - position[0])).argmin()
         selected_indices[active_dims[0]] = _index_y
-        _index_x = (abs(_ax_ranges[active_dims[1]] - position[0])).argmin()
+        _index_x = (abs(_ax_ranges[active_dims[1]] - position[1])).argmin()
         selected_indices[active_dims[1]] = _index_x
 
         _info_str = "Selected data position:\n" + "\n".join(

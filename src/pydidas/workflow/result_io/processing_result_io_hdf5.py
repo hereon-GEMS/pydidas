@@ -31,6 +31,7 @@ __all__ = ["ProcessingResultIoHdf5"]
 import os
 from functools import partial
 from pathlib import Path
+from typing import Any
 
 import h5py
 
@@ -45,7 +46,7 @@ from pydidas.core.utils import (
     read_and_decode_hdf5_dataset,
 )
 from pydidas.core.utils.hdf5_dataset_utils import (
-    _create_nxdata_axis_entry,
+    create_nxdata_axis_entry,
     get_nx_class_for_param,
 )
 from pydidas.data_io import import_data
@@ -316,7 +317,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         index: int,
         frame_result_dict: dict,
         scan_context: Scan | None = None,
-        **kwargs: dict,
+        **kwargs: Any,
     ):
         """
         Export the results of one frame and store them on disk.
@@ -330,8 +331,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan_context : Scan |None, optional
             The scan context to be used for exporting to file. If None, the
             global scan context will be used. The default is None.
-        kwargs : dict
-            Any kwargs which should be passed to the underlying exporter.
+        kwargs : Any
+            Kwargs which should be passed to the underlying exporter.
         """
         _scan = ScanContext() if scan_context is None else scan_context
         _indices = _scan.get_index_position_in_scan(index)
@@ -456,7 +457,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 _nxdata_group.attrs["axes"] = _axes_attr
                 for _dim in range(_ndim):
                     _nxdata_group.attrs[f"axis_{_dim}_repr_indices"] = [_dim]
-                    _create_nxdata_axis_entry(
+                    create_nxdata_axis_entry(
                         _nxdata_group,
                         _dim,
                         _metadata["axis_labels"][_dim],
@@ -465,7 +466,6 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     )
         cls._metadata_written = True
 
-    @classmethod
     @classmethod
     def import_results_from_file(
         cls, filename: Path | str

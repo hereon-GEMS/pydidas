@@ -36,33 +36,55 @@ from pydidas.core import SingletonObject
 class BaseClass:
     init_called = False
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.init_called = True
-        self.args = args
-        self.kwargs = kwargs
+
+
+class SecondBase:
+    second_init_called = False
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.second_init_called = True
 
 
 class SubClass(BaseClass):
     is_sub = True
     sub_init_called = False
 
-    def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        self.sub_init_called = True
-
 
 class DirectClass(SingletonObject):
-    def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        self.init_called = True
+    def initialize(self, *args: Any, **kwargs: Any):
+        self.initialize_called = True
+        if hasattr(self, "init_calls"):
+            self.init_calls += 1
+        else:
+            self.init_calls = 1
+
+
+class TestClass(SingletonObject, BaseClass):
+    def initialize(self, *args: Any, **kwargs: Any):
+        self.initialize_called = True
         self.args = args
         self.kwargs = kwargs
+        if hasattr(self, "init_calls"):
+            self.init_calls += 1
+        else:
+            self.init_calls = 1
 
 
-class TestClass(SingletonObject, BaseClass): ...
+class TestSubClass(SingletonObject, SubClass):
+    def initialize(self, *args: Any, **kwargs: Any):
+        self.initialize_called = True
+        self.sub_init_called = True
+        self.args = args
+        self.kwargs = kwargs
+        if hasattr(self, "init_calls"):
+            self.init_calls += 1
+        else:
+            self.init_calls = 1
 
 
-class TestSubClass(SingletonObject, SubClass): ...
+class MultipleBaseClass(SingletonObject, BaseClass, SecondBase): ...
 
 
 @pytest.fixture
@@ -104,26 +126,13 @@ def test_init(request, test_class):
     obj = _singleton_class(*_args, **_kwargs)
     assert isinstance(obj, SingletonObject)
     assert isinstance(obj, _base_class)
-    assert obj.init_called
-    assert obj.args == _args
-    assert obj.kwargs == _kwargs
+    assert obj.initialize_called
+    if _base_class != DirectClass:
+        assert obj.args == _args
+        assert obj.kwargs == _kwargs
+    assert obj.init_calls == 1
     assert _singleton_class._instance is obj
     assert _singleton_class._initialized
-
-
-def test_init__w_direct_class(direct_class):
-    _args = ("test", 42)
-    _kwargs = {"table": 12, "spam": 2.4, "eggs": 23, "ham": None}
-    assert direct_class._instance is None
-    assert not direct_class._initialized
-    obj = direct_class(*_args, **_kwargs)
-    assert isinstance(obj, SingletonObject)
-    assert isinstance(obj, direct_class)
-    assert obj.init_called
-    assert obj.args == _args
-    assert obj.kwargs == _kwargs
-    assert direct_class._instance is obj
-    assert direct_class._initialized
 
 
 @pytest.mark.parametrize(
@@ -141,6 +150,7 @@ def test_init__repeated_calls(request, test_class):
     obj2 = _singleton_class()
     assert isinstance(obj2, SingletonObject)
     assert isinstance(obj2, _base_class)
+    assert obj2.init_calls == 1
     assert id(obj) == id(obj2)
     assert obj is obj2
 
@@ -153,23 +163,30 @@ def test_init__repeated_calls__w_new_args(singleton_class):
     assert obj is obj2
 
 
-def test_init__w_subclass(singleton_subclass):
-    obj = singleton_subclass()
-    assert isinstance(obj, SubClass)
-    assert isinstance(obj, SingletonObject)
-    assert obj.init_called
-    assert obj.is_sub
-    assert obj.sub_init_called
-
-
 def test_init__w_qobject():
     class TestQObject(SingletonObject, QtCore.QObject): ...
 
-    qparent = QtCore.QObject()
-    obj = TestQObject(parent=qparent)
+    q_parent = QtCore.QObject()
+    obj = TestQObject(parent=q_parent)
     assert isinstance(obj, SingletonObject)
     assert isinstance(obj, QtCore.QObject)
-    assert obj.parent() == qparent
+    assert obj.parent() == q_parent
+
+
+def test_init__w_skip_base_init(singleton_class):
+    obj = singleton_class(skip_base_init=True)
+    assert not obj.init_called
+    obj2 = singleton_class()
+    assert not obj2.init_called
+
+
+def test_init__w_multiple_bases():
+    obj = MultipleBaseClass()
+    assert isinstance(obj, SingletonObject)
+    assert isinstance(obj, BaseClass)
+    assert isinstance(obj, SecondBase)
+    assert obj.init_called
+    assert obj.second_init_called
 
 
 def test_copy(singleton_class):

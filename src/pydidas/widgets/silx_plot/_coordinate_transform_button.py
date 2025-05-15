@@ -34,7 +34,6 @@ from qtpy import QtCore, QtWidgets
 from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from pydidas.contexts import DiffractionExperimentContext
-from pydidas.core import UserConfigError
 from pydidas.core.constants import ASCII_TO_UNI
 from pydidas.resources import icons
 
@@ -56,75 +55,69 @@ class CoordinateTransformButton(PlotToolButton):
         if self.STATE is None:
             self.__set_state()
         PlotToolButton.__init__(self, parent=parent, plot=plot)
-        self.__current_cs = "None"
+        self.__current_cs = ""
+        self._data_shape = (-1, -1)
+        self._data_linear = True
         self.__define_actions_and_create_menu()
+        DIFFRACTION_EXP.sig_params_changed.connect(self._check_enabled)
 
     def __set_state(self):
         """
         Set the state variables for all required actions.
         """
-        self.STATE = {}
-
-        self.STATE["cartesian", "icon"] = icons.get_pydidas_qt_icon(
-            "silx_coordinates_xy_cartesian.png"
-        )
-        self.STATE["cartesian", "state"] = "Cartesian x/y coordinates"
-        self.STATE["cartesian", "action"] = "Use cartesian x / y coordinates [px]"
-
-        self.STATE["r_chi", "icon"] = icons.get_pydidas_qt_icon(
-            "silx_coordinates_r_chi.png"
-        )
-        self.STATE["r_chi", "state"] = f"Polar r / {CHI} coordinates"
-        self.STATE["r_chi", "action"] = f"Use polar r / {CHI} coordinates [mm, deg]"
-
-        self.STATE["2theta_chi", "icon"] = icons.get_pydidas_qt_icon(
-            "silx_coordinates_2theta_chi.png"
-        )
-        self.STATE["2theta_chi", "state"] = f"Polar 2{THETA} / {CHI} coordinates"
-        self.STATE["2theta_chi", "action"] = (
-            f"Use polar 2{THETA} / {CHI} coordinates [deg, deg]"
-        )
-
-        self.STATE["q_chi", "icon"] = icons.get_pydidas_qt_icon(
-            "silx_coordinates_q_chi.png"
-        )
-        self.STATE["q_chi", "state"] = f"Polar q / {CHI} coordinates"
-        self.STATE["q_chi", "action"] = f"Use polar q / {CHI} coordinates [nm^-1, deg]"
+        self.STATE = {
+            ("cartesian", "icon"): icons.get_pydidas_qt_icon(
+                "silx_coordinates_xy_cartesian.png"
+            ),
+            ("cartesian", "state"): "Cartesian x/y coordinates",
+            ("cartesian", "action"): "Use cartesian x / y coordinates [px]",
+            ("r_chi", "icon"): icons.get_pydidas_qt_icon("silx_coordinates_r_chi.png"),
+            ("r_chi", "state"): f"Polar r / {CHI} coordinates",
+            ("r_chi", "action"): f"Use polar r / {CHI} coordinates [mm, deg]",
+            ("2theta_chi", "icon"): icons.get_pydidas_qt_icon(
+                "silx_coordinates_2theta_chi.png"
+            ),
+            ("2theta_chi", "state"): f"Polar 2{THETA} / {CHI} coordinates",
+            ("2theta_chi", "action"): (
+                f"Use polar 2{THETA} / {CHI} coordinates [deg, deg]"
+            ),
+            ("q_chi", "icon"): icons.get_pydidas_qt_icon("silx_coordinates_q_chi.png"),
+            ("q_chi", "state"): f"Polar q / {CHI} coordinates",
+            ("q_chi", "action"): f"Use polar q / {CHI} coordinates [nm^-1, deg]",
+        }
 
     def __define_actions_and_create_menu(self):
         """
         Define the required actions and create the button menu.
         """
-        cartesian_action = self._create_action("cartesian")
-        cartesian_action.triggered.connect(partial(self.set_coordinates, "cartesian"))
-        cartesian_action.setIconVisibleInMenu(True)
-
-        r_chi_action = self._create_action("r_chi")
-        r_chi_action.triggered.connect(partial(self.set_coordinates, "r_chi"))
-        r_chi_action.setIconVisibleInMenu(True)
-
-        theta_chi_action = self._create_action("2theta_chi")
-        theta_chi_action.triggered.connect(partial(self.set_coordinates, "2theta_chi"))
-        theta_chi_action.setIconVisibleInMenu(True)
-
-        q_chi_action = self._create_action("q_chi")
-        q_chi_action.triggered.connect(partial(self.set_coordinates, "q_chi"))
-        q_chi_action.setIconVisibleInMenu(True)
-
         menu = QtWidgets.QMenu(self)
-        menu.addAction(cartesian_action)
-        menu.addAction(r_chi_action)
-        menu.addAction(theta_chi_action)
-        menu.addAction(q_chi_action)
-
+        for _key in ["cartesian", "r_chi", "2theta_chi", "q_chi"]:
+            _action = self._create_action(_key)
+            menu.addAction(_action)
         self.setMenu(menu)
         self.set_coordinates("cartesian")
         self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
 
     def _create_action(self, coordinate_system: str) -> QtWidgets.QAction:
+        """
+        Create the action for the given coordinate system.
+
+        Parameters
+        ----------
+        coordinate_system : str
+            The name of the coordinate system.
+
+        Returns
+        -------
+        QtWidgets.QAction
+            The action for the coordinate system.
+        """
         _icon = self.STATE[coordinate_system, "icon"]
         _text = self.STATE[coordinate_system, "action"]
-        return QtWidgets.QAction(_icon, _text, self)
+        _action = QtWidgets.QAction(_icon, _text, self)
+        _action.triggered.connect(partial(self.set_coordinates, coordinate_system))
+        _action.setIconVisibleInMenu(True)
+        return _action
 
     @QtCore.Slot()
     def set_coordinates(
@@ -145,31 +138,63 @@ class CoordinateTransformButton(PlotToolButton):
             self.__current_cs = cs_name
 
     @QtCore.Slot()
-    def check_detector_is_set(self, silent: bool = False):
-        """
-        Check that the detector is set to convert radii to q and 2 theta values.
+    def _check_enabled(self):
+        """Check the data shape against the detector geometry"""
+        if (
+            self.detector_valid
+            and self._data_linear
+            and self._data_shape
+            == (
+                DIFFRACTION_EXP.get_param_value("detector_npixy"),
+                DIFFRACTION_EXP.get_param_value("detector_npixx"),
+            )
+        ):
+            self.setEnabled(True)
+            return
+        self.set_coordinates("cartesian")
+        self.setEnabled(False)
 
-        Parameters
-        ----------
-        silent : bool, optional
-            Flag to suppress the exception and silently reset the coordinates to
-            cartesian values.
+    @property
+    def detector_valid(self) -> bool:
+        """
+        Check that the detector is valid.
 
         Returns
         -------
         bool
-            Flag whether the detecor has been set up correctly.
+            Flag whether the detector has been set up correctly.
         """
-        if (
-            DIFFRACTION_EXP.get_param_value("detector_npixx") < 1
-            or DIFFRACTION_EXP.get_param_value("detector_npixy") < 1
-            or DIFFRACTION_EXP.get_param_value("detector_pxsizex") <= 0
-            or DIFFRACTION_EXP.get_param_value("detector_pxsizey") <= 0
-        ):
-            self.set_coordinates("cartesian")
-            if not silent:
-                raise UserConfigError(
-                    "The detector is not defined. Cannot convert pixel positions to "
-                    "angular values. Please set the detector in the 'Experimental "
-                    "Setup' tab and try again."
-                )
+        return (
+            DIFFRACTION_EXP.get_param_value("detector_npixx") >= 1
+            and DIFFRACTION_EXP.get_param_value("detector_npixy") >= 1
+            and DIFFRACTION_EXP.get_param_value("detector_pxsizex") > 0
+            and DIFFRACTION_EXP.get_param_value("detector_pxsizey") > 0
+        )
+
+    @QtCore.Slot(int, int)
+    def set_raw_data_size(self, height: int, width: int):
+        """
+        Slot to receive the new raw data dimensions.
+
+        Parameters
+        ----------
+        height : int
+            The height of the new raw data.
+        width : int
+            The width of the new raw data.
+        """
+        self._data_shape = (height, width)
+        self._check_enabled()
+
+    @QtCore.Slot(bool)
+    def set_data_linearity(self, linear: bool):
+        """
+        Slot to receive the new data linearity.
+
+        Parameters
+        ----------
+        linear : bool
+            The new data linearity.
+        """
+        self._data_linear = linear
+        self._check_enabled()

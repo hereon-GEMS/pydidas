@@ -31,7 +31,7 @@ import multiprocessing as mp
 import signal
 import warnings
 from pathlib import Path
-from typing import Optional, Type
+from typing import Type
 
 from qtpy.QtWidgets import QApplication
 
@@ -47,8 +47,8 @@ def start_pydidas_gui(
     *frames: tuple[BaseFrame],
     use_default_frames: bool = True,
     restore_state: str = "exit",
-    custom_mainwindow: Optional[Type[MainWindow]] = None,
-    custom_splash_image: Optional[Path] = None,
+    custom_mainwindow: Type[MainWindow] | None = None,
+    custom_splash_image: Path | None = None,
 ):
     """
     Open the pydidas GUI with the given frames and run the QEventLoop.

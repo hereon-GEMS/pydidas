@@ -456,7 +456,9 @@ class TestPluginRegistry(unittest.TestCase):
         ]
         PC = PluginRegistry()
         self._qsettings.set_value("user/plugin_path", ";;".join(str(p) for p in _paths))
-        _qplugin_path = PC.get_q_settings_plugin_paths()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            _qplugin_path = PC.get_q_settings_plugin_paths()
         self.assertEqual([], _qplugin_path)
         self.assertEqual(self._qsettings.value("user/plugin_path"), "")
 
@@ -469,7 +471,9 @@ class TestPluginRegistry(unittest.TestCase):
         ]
         PC = PluginRegistry()
         self._qsettings.set_value("user/plugin_path", ";;".join(str(p) for p in _paths))
-        _qplugin_path = PC.get_q_settings_plugin_paths()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            _qplugin_path = PC.get_q_settings_plugin_paths()
         self.assertEqual(_qplugin_path, [self._pluginpath, self._dummy_path])
         self.assertEqual(
             self._qsettings.value("user/plugin_path"),
@@ -493,7 +497,9 @@ class TestPluginRegistry(unittest.TestCase):
         _path = Path("some/path/to/nowhere")
         PC = PluginRegistry()
         self._qsettings.set_value("user/plugin_path", str(_path))
-        _newpath = PC._get_user_plugin_paths()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            _newpath = PC._get_user_plugin_paths()
         self.assertEqual(_newpath, [])
 
     def test_get_user_plugin_path__no_pp_q_path_existent(self):
@@ -558,7 +564,9 @@ class TestPluginRegistry(unittest.TestCase):
     def test__wrong_path_in_qsettings(self):
         _path = self._pluginpath.joinpath(get_random_string(8))
         self._qsettings.set_value("user/plugin_path", str(_path))
-        PC = PluginRegistry(force_initialization=True, use_generic_plugins=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            PC = PluginRegistry(force_initialization=True, use_generic_plugins=False)
         self.assertNotIn(_path, PC.registered_paths)
 
 

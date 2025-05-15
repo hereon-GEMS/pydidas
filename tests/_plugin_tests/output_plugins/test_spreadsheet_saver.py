@@ -50,6 +50,15 @@ def plugin(temp_dir):
     return _plugin
 
 
+@pytest.mark.parametrize("sig_digits", [2, 5, 12])
+@pytest.mark.parametrize("e_format", [True, False])
+def test_pre_execute__format(plugin, sig_digits, e_format):
+    plugin.set_param_value("significant_digits", sig_digits)
+    plugin.set_param_value("notation_capital_e", e_format)
+    plugin.pre_execute()
+    assert plugin._format == f"%.{sig_digits}{'E' if e_format else 'e'}"
+
+
 @pytest.mark.parametrize(
     "delimiters",
     [
@@ -62,12 +71,9 @@ def plugin(temp_dir):
         ("Semicolon and space", "; "),
     ],
 )
-@pytest.mark.parametrize("sig_digits", [2, 5, 12])
-def test_pre_execute(plugin, delimiters, sig_digits):
-    plugin.set_param_value("significant_digits", sig_digits)
+def test_pre_execute__delimiter(plugin, delimiters):
     plugin.set_param_value("delimiter", delimiters[0])
     plugin.pre_execute()
-    assert plugin._format == f"%.{sig_digits}e"
     assert plugin._delimiter == delimiters[1]
 
 
@@ -91,8 +97,19 @@ def test_execute__invalid_data_dim(plugin):
         plugin.execute(data)
 
 
+def test_execute__w_filter_neg_values(plugin):
+    data = Dataset(np.random.rand(3, 3))
+    data[0, 0] = -1
+    data[2, 2] = -0.5
+    plugin.set_param_value("filter_negative_values", True)
+    plugin.pre_execute()
+    _new_data, _ = plugin.execute(data, global_index=1)
+    assert np.all(_new_data.array >= 0.0)
+
+
 def test_execute__test_case(plugin):
     data = Dataset(np.random.rand(3, 3))
+    plugin.pre_execute()
     _new_data, _ = plugin.execute(data, test=True)
     assert np.allclose(_new_data, data)
 

@@ -33,7 +33,7 @@ from collections.abc import Iterable
 from copy import deepcopy
 from functools import partialmethod
 from numbers import Integral
-from typing import Any, Callable, Literal, Self
+from typing import Any, Callable, Literal, Self, SupportsIndex
 
 import numpy as np
 from numpy import ndarray
@@ -88,8 +88,21 @@ class Dataset(ndarray):
 
     The following numpy ufuncs are reimplemented to preserver the metadata:
     flatten, max, mean, min, repeat, reshape, shape, sort, squeeze, sum, take,
-    transpose.
+    transpose, moveaxes.
     For other numpy ufuncs, metadata preservation is not guaranteed.
+
+    The following numpy functions cannot be implemented because they are not defined
+    in the ndarray:
+
+    - numpy.roll:
+        This function will work but destroy metadata consistency. A custom
+        implementation is given in the Dataset.roll() method which takes
+        similar arguments as the numpy function but preserves the metadata.
+    - numpy.rollaxis:
+        This function is deprecated and moveaxes should be used instead.
+    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc:
+        These functions work but return pure ndarrays without metadata.
+
 
     Parameters
     ----------
@@ -179,7 +192,7 @@ class Dataset(ndarray):
             obj._meta["_get_item_key"] = ()
         self._meta["_get_item_key"] = ()
 
-    def __update_keys_from_object(self, obj: ndarray):
+    def __update_keys_from_object(self, obj: ndarray):  # noqa C901
         """
         Update the axis keys from the original object.
 
@@ -193,6 +206,10 @@ class Dataset(ndarray):
             _key: getattr(obj, _key, dataset_default_attribute(_key, self.shape))
             for _key in METADATA_KEYS
         }
+        # handle case of calling np.array with ndmin > self.ndim:
+        if self.ndim > obj.ndim and self._meta["_get_item_key"] == ():
+            for _ in range(self.ndim - obj.ndim):
+                self.__insert_axis_keys(0)
         _keys_require_shifting = False
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
             if (
@@ -203,6 +220,11 @@ class Dataset(ndarray):
                 and _slicer.ndim > 1
             ):
                 # in the case of an n-dim masked array, keep all axis keys.
+                # In the case of a flattened array, the axis keys are updated
+                if self.ndim == 1:
+                    self._meta["axis_labels"] = {0: "flattened"}
+                    self._meta["axis_units"] = {0: ""}
+                    self._meta["axis_ranges"] = {0: np.arange(self.shape[0])}
                 break
             if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
@@ -775,7 +797,7 @@ class Dataset(ndarray):
     # Reimplementation of generic ndarray methods
     # ###########################################
 
-    def transpose(self, *axes: tuple[int]) -> Self:
+    def transpose(self, *axes: SupportsIndex) -> Self:
         """
         Overload the generic transpose method to transpose the metadata as well.
 
@@ -794,6 +816,8 @@ class Dataset(ndarray):
         """
         if axes is tuple():
             axes = tuple(np.arange(self.ndim)[::-1])
+        elif len(axes) == 1 and isinstance(axes[0], Iterable):
+            axes = tuple(axes[0])
         _new = ndarray.transpose(deepcopy(self), axes)
         _new.axis_labels = [self.axis_labels[_index] for _index in axes]
         _new.axis_units = [self.axis_units[_index] for _index in axes]
@@ -879,7 +903,11 @@ class Dataset(ndarray):
         Dataset
             The repeated array.
         """
-        _new = ndarray.repeat(self, repeats, axis)
+        # Catch warnings about temporarily inconsistent metadata in case
+        # of flattened arrays:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            _new = ndarray.repeat(self, repeats, axis)
         if axis is None:
             _new._update_keys_in_flattened_array()  # noqa
         else:
@@ -1069,7 +1097,11 @@ class Dataset(ndarray):
             )
         if has_dtype_arg:
             kwargs["dtype"] = dtype
-        _result = numpy_method(self, axis=axis, out=out, **kwargs)
+        # Need to catch warnings from numpy methods which temporarily invalidate
+        # the metadata.
+        with warnings.catch_warnings():
+            warnings.simplefilter(action="ignore", category=UserWarning)
+            _result = numpy_method(self, axis=axis, out=out, **kwargs)
         if axis is None or (not isinstance(_result, ndarray)):
             return _result
         if out is not None and not isinstance(out, Dataset):
@@ -1164,6 +1196,40 @@ class Dataset(ndarray):
         return ndarray.argsort(
             self, axis=axis, kind=kind, order=order, stable=stable
         ).__array__()
+
+    def roll(self, shift: int, axis: int | None = None) -> Self:
+        """
+        Roll the array elements along a given axis.
+
+        Parameters
+        ----------
+        shift : int
+            The number of places by which elements are shifted.
+        axis : int, optional
+            The axis along which to roll. If None, the flattened array is rolled.
+            The default is None.
+
+        Returns
+        -------
+        Dataset
+            The rolled Dataset.
+        """
+        _new = np.roll(self, shift, axis)
+        if self.ndim == 0:
+            return _new
+        elif self.ndim == 1:
+            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))
+            return _new
+        if axis is None:
+            warnings.warn(
+                "Using roll without axis on a multi-dimensional array flattens "
+                "the array (temporarily) and removes all stored metadata. "
+                "Please use roll with a specific axis to preserve metadata.",
+                UserWarning,
+            )
+            return _new
+        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))
+        return _new
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """

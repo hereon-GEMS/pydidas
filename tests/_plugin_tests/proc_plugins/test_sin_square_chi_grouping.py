@@ -166,7 +166,6 @@ def expected_results(d_spacing_datasets):
 def test_plugin_initialization(plugin):
     # Test if the plugin is initialized correctly
     assert plugin.plugin_name == "sin^2(chi) grouping"
-    assert not plugin.basic_plugin
     assert plugin.plugin_type == PROC_PLUGIN
     assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == -1

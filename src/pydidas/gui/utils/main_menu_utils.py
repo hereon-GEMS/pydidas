@@ -127,9 +127,7 @@ def get_latest_release_tag() -> str:
     return _tag
 
 
-def get_update_check_text(
-    remote_version: str, acknowledged_update: str
-) -> str:
+def get_update_check_text(remote_version: str, acknowledged_update: str) -> str:
     """
     Get the text with the result of the update check for the user.
 

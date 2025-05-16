@@ -41,7 +41,7 @@ from pydidas.core import (
     get_generic_param_collection,
     utils,
 )
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, get_formatted_dict_representation
 from pydidas.gui.frames.builders import get_WorkflowTestFrame_build_config
 from pydidas.widgets.dialogues import WarningBox
 from pydidas.widgets.framework import BaseFrame
@@ -132,7 +132,10 @@ def _create_str_description_of_node_result(
         )
     )
     _str += f"\n\nValues:\n{_values}"
-    _str += f"\n\nMetadata:\n{_meta['metadata']}"
+    if _meta["metadata"]:
+        _str += "\n\nMetadata:\n" + get_formatted_dict_representation(
+            _meta["metadata"], indent=2
+        )
     _str += f"\n\nPlugin runtime: {node.runtime:.4f} s"
     return _str
 
@@ -202,7 +205,7 @@ class WorkflowTestFrame(BaseFrame):
             _method(*_args, **_kwargs)
         self._widgets["config_area"].setWidget(self._widgets["config"])
 
-        apply_qt_properties(self.layout(), columnStretch=((1, 10)))
+        apply_qt_properties(self.layout(), columnStretch=(1, 10))
 
     def connect_signals(self):
         """

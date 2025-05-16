@@ -141,7 +141,6 @@ class SinSquareChiGrouping(ProcPlugin):
     """
 
     plugin_name = "sin^2(chi) grouping"
-    basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = -1
@@ -1145,3 +1144,6 @@ class SinSquareChiGrouping(ProcPlugin):
         )
 
         return result
+
+
+SinSquareChiGrouping.register_as_base_class()

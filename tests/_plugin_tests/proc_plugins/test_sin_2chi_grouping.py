@@ -32,7 +32,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from pydidas_plugins.proc_plugins.sin_2chi_grouping import (
+from pydidas_plugins.residual_stress_plugins.sin_2chi_grouping import (
     LABELS_DIM0,
     LABELS_SIN2CHI,
     LABELS_SIN_2CHI,
@@ -365,7 +365,6 @@ def test_Sin_2chiGrouping_params(plugin_fixture):
 
     assert plugin.plugin_name == "Grouping of results vs sin(2*chi)"
     assert plugin.plugin_type == PROC_PLUGIN
-    assert not plugin.basic_plugin
     assert plugin.plugin_subtype == PROC_PLUGIN_STRESS_STRAIN
     assert plugin.input_data_dim == 2
     assert plugin.output_data_dim == 2

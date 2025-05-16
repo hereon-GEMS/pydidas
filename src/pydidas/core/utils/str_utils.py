@@ -41,6 +41,7 @@ __all__ = [
     "get_param_description_from_docstring",
     "strip_param_description_from_docstring",
     "get_formatted_blocks_from_docstring",
+    "get_formatted_dict_representation",
 ]
 
 
@@ -52,7 +53,7 @@ import sys
 import time
 from collections.abc import Iterable
 from numbers import Integral, Real
-from typing import Union
+from typing import Any
 
 import numpy as np
 
@@ -84,7 +85,7 @@ def get_fixed_length_str(
         The length of the output string.
     fill_back: bool, optional
         Keyword to toggle filling the front or end.
-        The default is True (filling the end of the string).
+        The default is True (filling at the end of the string).
     fill_char : char, optional
         The character used for filling the string. Note that if a string is
         padded, a space is always preserved between the padding and the input.
@@ -113,13 +114,13 @@ def get_fixed_length_str(
         _n * fill_char * (not fill_back)
         + " " * (not fill_back)
         + obj
-        + " " * (fill_back)
-        + _n * fill_char * (fill_back)
+        + " " * fill_back
+        + _n * fill_char * fill_back
         + " " * final_space
     )
 
 
-def get_time_string(epoch: Union[float, None] = None, human_output: bool = True) -> str:
+def get_time_string(epoch: Real | None = None, human_output: bool = True) -> str:
     """
     Return a formatted time string.
 
@@ -129,7 +130,7 @@ def get_time_string(epoch: Union[float, None] = None, human_output: bool = True)
 
     Parameters
     ----------
-    epoch : Union[float, None]
+    epoch : Real | None
         Keyword to process an epoch input. If None, the current
         system time will be used. The default is None.
 
@@ -143,7 +144,7 @@ def get_time_string(epoch: Union[float, None] = None, human_output: bool = True)
     -------
     str :
         The formatted date and time string.
-        If human-readible: (YYYY/MM/DD HH:MM:ss.sss)
+        If human-readable: (YYYY/MM/DD HH:MM:ss.sss)
         Else: YYYYMMDD_HHMMss
     """
     if epoch is None:
@@ -159,13 +160,13 @@ def get_time_string(epoch: Union[float, None] = None, human_output: bool = True)
     return _str
 
 
-def get_short_time_string(epoch: Union[float, None] = None) -> str:
+def get_short_time_string(epoch: Real | None = None) -> str:
     """
     Return a short time string in the format (DD/MM HH:MM:ss).
 
     Parameters
     ----------
-    epoch : Union[float, None]
+    epoch : Real | None
         Keyword to process an epoch input. If None, the current
         system time will be used. The default is None.
 
@@ -193,7 +194,7 @@ def timed_print(string: str, new_lines: int = 0, verbose: bool = True):
     new_lines : int, optional
         The number of preceding empty lines. The default is 0.
 
-    verbose : bool, optinoal
+    verbose : bool, optional
         Keyword to "mute" the output, i.e. prevent any text to be printed.
         If True, the output will be printed, if False, this function will
         do nothing. The default is True.
@@ -202,7 +203,7 @@ def timed_print(string: str, new_lines: int = 0, verbose: bool = True):
         print("\n" * new_lines + f"{get_time_string()}: {string}")
 
 
-def get_warning(message: Union[str, Iterable[str]], **kwargs: dict) -> str:
+def get_warning(message: str | Iterable[str], **kwargs: Any) -> str:
     """
     Generate a warning message (formatted string in a "box" of dashes).
 
@@ -212,14 +213,13 @@ def get_warning(message: Union[str, Iterable[str]], **kwargs: dict) -> str:
 
     Parameters
     ----------
-    message: Union[str, Iterable[str]]
+    message: str | Iterable[str]
         The input string to be formatted. A multi-line string can be passed
         as an Iterable.
-    **kwargs : dict
+    **kwargs : Any
         Additional keyword arguments for formatting:
         severe : bool, optional
-            Keyword to add an additional frame of double dashes. The default is
-            False.
+            Keyword to add a frame of double dashes. The default is False.
         new_lines : int, optional
             The number of preceding empty lines. The default is 0.
         leading_dash : bool, optional
@@ -260,19 +260,18 @@ def get_warning(message: Union[str, Iterable[str]], **kwargs: dict) -> str:
     return _s
 
 
-def print_warning(message: Union[str, Iterable[str]], **kwargs):
+def print_warning(message: str | Iterable[str], **kwargs: Any):
     """
     Print the given warning message.
 
     Parameters
     ----------
-    message: Union[str, Iterable[str]]
+    message: str | Iterable[str]
         The message to be printed.
-    **kwargs : dict
+    **kwargs : Any
         Additional keyword arguments for formatting:
         severe : bool, optional
-            Keyword to add an additional frame of double dashes. The default is
-            False.
+            Keyword to add a frame of double dashes. The default is False.
         new_lines : int, optional
             The number of preceding empty lines. The default is 0.
         leading_dash : bool, optional
@@ -286,20 +285,20 @@ def print_warning(message: Union[str, Iterable[str]], **kwargs):
     print(_warning)
 
 
-def convert_special_chars_to_unicode(obj: Union[str, list]) -> Union[str, list]:
+def convert_special_chars_to_unicode(obj: str | list[str]) -> str | list[str]:
     """
-    Convert a selection of special characters to unicode.
+    Convert a selection of special characters to Unicode.
 
-    This method will convert Greek letters, Angstrom and ^-1 to unicode.
+    This method will convert Greek letters, Angstrom and ^-1 to Unicode.
 
     Parameters
     ----------
-    obj : Union[str, list]
+    obj : str | list[str]
         The input string or list of strings.
 
     Returns
     -------
-    Union[str, list]
+    str | list[str]
         The updated string or list.
     """
     if isinstance(obj, list):
@@ -318,21 +317,21 @@ def convert_special_chars_to_unicode(obj: Union[str, list]) -> Union[str, list]:
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
-def convert_unicode_to_ascii(obj: Union[str, list]) -> Union[str, list]:
+def convert_unicode_to_ascii(obj: str | list[str]) -> str | list[str]:
     """
-    Convert a selection of special unicode characters to ASCII.
+    Convert a selection of special Unicode characters to ASCII.
 
     This method will convert Greek letters, Angstrom and ^-1 to ASCII
     representations.
 
     Parameters
     ----------
-    obj : Union[str, list]
+    obj : str | list[str]
         The input string or list of strings.
 
     Returns
     -------
-    Union[str, list]
+    str | list[str]
         The updated string or list.
     """
     if isinstance(obj, list):
@@ -350,13 +349,13 @@ def convert_unicode_to_ascii(obj: Union[str, list]) -> Union[str, list]:
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
-def get_range_as_formatted_string(obj: Union[np.ndarray, Iterable[float, ...]]) -> str:
+def get_range_as_formatted_string(obj: np.ndarray | Iterable[float, ...]) -> str:
     """
     Get a formatted string representation of an iterable range.
 
     Parameters
     ----------
-    _range : Union[np.ndarray, Iterable[float, ...]]
+    obj : np.ndarray | Iterable[float, ...]
         The input range.
 
     Returns
@@ -510,12 +509,12 @@ def _get_unformatted_lines(input_str: str, max_line_length: int = 60) -> list:
     _result_lines = []
     _current_str = _words.pop(0) if len(_words) > 0 else ""
     while len(_words) > 0:
-        _newword = _words.pop(0)
-        if len(_current_str + _newword) + 1 > max_line_length:
+        _new_word = _words.pop(0)
+        if len(_current_str + _new_word) + 1 > max_line_length:
             _result_lines.append(_current_str)
-            _current_str = _newword
+            _current_str = _new_word
         else:
-            _current_str = f"{_current_str} {_newword}"
+            _current_str = f"{_current_str} {_new_word}"
     _result_lines.append(_current_str)
     return _result_lines
 
@@ -620,3 +619,42 @@ def get_formatted_blocks_from_docstring(docstring: str) -> list[str]:
         if _formatted_section != "\n":
             _blocks.append(_formatted_section)
     return _blocks
+
+
+def get_formatted_dict_representation(
+    input_dict: dict, indent: int = 0, digits: int = 6
+) -> str:
+    """
+    Get a formatted string representation of a dictionary.
+
+    Parameters
+    ----------
+    input_dict : dict
+        The input dictionary.
+    indent : int, optional
+        The number of spaces to indent each line. The default is 0.
+    digits : int, optional
+        The number of decimal digits to format float values. The default is 6.
+
+    Returns
+    -------
+    str
+        The formatted string representation of the dictionary.
+    """
+    _formatted_str = ""
+    for _key, _value in input_dict.items():
+        _formatted_str += " " * indent + f"{_key}:"
+        if isinstance(_value, Real) and not isinstance(_value, Integral):
+            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"
+            _formatted_str += f" {_value:.{digits}{_formatter}}\n"
+        elif isinstance(_value, dict):
+            _formatted_str += (
+                "\n"
+                + get_formatted_dict_representation(
+                    _value, indent=indent + 2, digits=digits
+                )
+                + "\n"
+            )
+        else:
+            _formatted_str += f" {_value}\n"
+    return _formatted_str.rstrip()

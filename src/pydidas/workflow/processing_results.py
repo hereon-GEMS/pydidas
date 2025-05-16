@@ -732,7 +732,6 @@ class ProcessingResults(ObjectWithParameterCollection):
             + "".join(
                 (
                     f"Axis #{_dim:02d} {_print_info['axis_types'][_dim]}:\n"
-                    f"  Label: {_print_info['axis_labels'][_dim]}\n"
                     f"  N points: {_print_info['axis_points'][_dim]}\n"
                     f"  Range: {_print_info['axis_ranges'][_dim]} "
                     f"{_print_info['axis_units'][_dim]}\n"

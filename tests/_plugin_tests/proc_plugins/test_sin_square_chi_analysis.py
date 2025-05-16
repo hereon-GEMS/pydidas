@@ -31,7 +31,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from pydidas_plugins.proc_plugins.sin_square_chi_analysis import (
+from pydidas_plugins.residual_stress_plugins.sin_square_chi_analysis import (
     _filter_nan_from_1d_dataset,
 )
 

@@ -36,8 +36,10 @@ import scipy
 from matplotlib import pyplot as plt
 from qtpy import QtCore, QtWidgets
 
-from pydidas_plugins.proc_plugins.sin_2chi_grouping import Sin_2chiGrouping
-from pydidas_plugins.proc_plugins.sin_square_chi_grouping import SinSquareChiGrouping
+from pydidas_plugins.residual_stress_plugins.sin_2chi_grouping import Sin_2chiGrouping
+from pydidas_plugins.residual_stress_plugins.sin_square_chi_grouping import (
+    SinSquareChiGrouping,
+)
 
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import (
@@ -128,8 +130,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
 
         4. Fit the grouped values with a linear function.
 
-    The output array has the following elements:
-
+        The output array has the following elements:
         - [0]: slope of the sin^2(chi) fit
         - [1]: slope error
         - [2]: intercept of the sin^2(chi) fit
@@ -158,8 +159,12 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         "output_export_images_flag",
     )
     has_unique_parameter_config_widget = True
+    advanced_parameters = OutputPlugin.advanced_parameters + [
+        "sin_square_chi_low_fit_limit",
+        "sin_square_chi_high_fit_limit",
+    ]
 
-    def __init__(self, *args: tuple, **kwargs: dict) -> None:
+    def __init__(self, *args: tuple, **kwargs: Any) -> None:
         self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         self._SCAN = kwargs.pop("scan", ScanContext())
         OutputPlugin.__init__(self, *args, **kwargs)
@@ -170,6 +175,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         self.params = ParameterCollection(
             *(self.params[_key] for _key in _PARAM_KEY_ORDER)
         )
+        self.params["keep_results"].update_value_and_choices(1, [1])
         self._fit_slice: slice | None = None
         self._details: dict = {}
         self._figure: plt.Figure | None = None
@@ -206,7 +212,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
                 "sin^2(chi) data."
             )
 
-    def execute(self, data: Dataset, **kwargs: dict[str, Any]) -> tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Execute the plugin.
 
@@ -214,7 +220,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         ----------
         data : Dataset
             The input data to be processed.
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns
@@ -229,10 +235,21 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         _fit_sin_2chi_res = self._fit_sin_2chi_data(_sin_2chi_data)
         _results = Dataset(
             np.append(_fit_sin_square_res, _fit_sin_2chi_res),
-            data_label=_sin_square_chi_data.data_label,
+            data_label=f"fitted coefficients ({_sin_square_chi_data.data_label})",
             data_unit=_sin_square_chi_data.data_unit,
             axis_labels=["Fitted parameters (see Plugin docstring)"],
+            metadata={
+                "point #0": "fitted sin^2(chi) slope",
+                "point #1": "slope error",
+                "point #2": "fitted intercept",
+                "point #3": "intercept error",
+                "point #4": "fitted sin(2*chi) slope",
+                "point #5": "slope error",
+            },
         )
+        kwargs["sin_2chi_data"] = _sin_2chi_data
+        kwargs["sin_square_chi_data"] = _sin_square_chi_data
+        kwargs["sin_square_chi_analysis_fits"] = _results
         _flag_export = self.get_param_value(
             "output_export_images_flag"
         ) and not kwargs.get("test", False)
@@ -297,7 +314,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         if self.get_param_value("output_type") == "Same as input":
             self._converter = self._converter_identity
             self._config["converter_args"] = ()
-            self.output_data_label = input_data.data_label
+            self.output_data_label = f"fitted coefficients ({input_data.data_label})"
             self.output_data_unit = input_data.data_unit
         else:
             _input_type = input_data.data_label + " / " + input_data.data_unit
@@ -309,7 +326,8 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
                 self._EXP.xray_wavelength_in_m,
                 self._EXP.detector_dist_in_m,
             )
-            self.output_data_label, self.output_data_unit = _output.split(" / ")
+            _data_label, self.output_data_unit = _output.split(" / ")
+            self.output_data_label = f"fitted coefficients ({_data_label})"
         self._config["flag_conversion_set_up"] = True
 
     @staticmethod
@@ -461,6 +479,14 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
                 0: sin_square_chi_data.data_description,
                 1: sin_2chi_data.data_description,
             },
+            "metadata": (
+                "fitted slope of sin^2(chi):\n"
+                + f"    {fit_sin_square_res[0]:.4e} +/- {fit_sin_square_res[1]:.4e}\n\n"
+                + "fitted intercept of sin^2(chi):\n"
+                + f"    {fit_sin_square_res[2]:.4e} +/- {fit_sin_square_res[3]:.4e}\n\n"
+                + "fitted slope of sin(2*chi):\n"
+                + f"    {fit_sin_2chi_res[0]:.4e} +/- {fit_sin_2chi_res[1]:.4e}"
+            ),
             "items": [
                 {
                     "plot": 0,

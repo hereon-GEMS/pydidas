@@ -108,7 +108,7 @@ class Dataset(ndarray):
     ----------
     array : ndarray
         The data array.
-    **kwargs : dict
+    **kwargs : Any
         Optional keyword arguments. Supported keywords are:
 
         axis_labels : Union[dict, list, tuple], optional

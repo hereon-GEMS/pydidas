@@ -17,8 +17,7 @@
 
 
 """
-The SinSquareChiAnalysis plugin combines all required tools for the analysis of
-sin^2(chi) data.
+The StoreSinSquareChiData plugin allows to store the data from the sin^2(chi) analysis.
 """
 
 __author__ = "Malte Storm"
@@ -41,20 +40,6 @@ from pydidas.core.constants import (
     PROC_PLUGIN_STRESS_STRAIN,
 )
 from pydidas.plugins import ProcPlugin
-
-
-_PARAM_KEY_ORDER = [
-    "keep_results",
-    "label",
-    "output_type",
-    "sin_square_chi_low_fit_limit",
-    "sin_square_chi_high_fit_limit",
-    "output_export_images_flag",
-    "directory_path",
-    "enable_overwrite",
-    "output_fname_digits",
-    "output_index_offset",
-]
 
 
 class StoreSinSquareChiData(ProcPlugin):

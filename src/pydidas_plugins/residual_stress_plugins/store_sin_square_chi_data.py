@@ -97,7 +97,7 @@ class StoreSinSquareChiData(ProcPlugin):
         _fitted_values = _p_fit(_sin_square_data.axis_ranges[1])
         _results = Dataset(
             np.append(_sin_square_data, _fitted_values.reshape(1, -1), axis=0),
-            data_label="sin^2(chi) results",
+            data_label=f"sin^2(chi) results ({_sin_square_data.data_label})",
             data_unit=_sin_square_data.data_unit,
             axis_labels=["0: d+; 1: d-; 2: mean; 3: fit", "sin^2(chi)"],
             axis_ranges=[np.arange(4), _sin_square_data.axis_ranges[1]],

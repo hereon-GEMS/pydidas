@@ -83,7 +83,8 @@ class StoreSinTwoChiData(ProcPlugin):
             The processed data and additional information.
         """
         if not (
-            "sin_2chi_data" in kwargs and "sin_square_chi_analysis_fits" in kwargs
+            "sin_2chi_data" in kwargs
+            and "sin_square_chi_analysis_fits" in kwargs
             and "sin_square_chi_data" in kwargs
         ):
             self.raise_UserConfigError(
@@ -96,10 +97,10 @@ class StoreSinTwoChiData(ProcPlugin):
         _sin_2chi_data = _sin_2chi_data[_sin_2chi_data.axis_ranges[0].argsort()]
         _data_label = kwargs.get("sin_square_chi_data").data_label
         _fit_coeffs = kwargs.get("sin_square_chi_analysis_fits")
-        _p_fit = Polynomial((0, _fit_coeffs[4], ))
+        _p_fit = Polynomial((0, _fit_coeffs[4]))
         _fitted_values = _p_fit(_sin_2chi_data.axis_ranges[0])
         _results = Dataset(
-            np.append(_sin_2chi_data.reshape(1, -1), _fitted_values.reshape(1, -1), axis=0),
+            np.append(_sin_2chi_data, _fitted_values).reshape(2, -1),
             data_label=f"difference between branches ({_data_label})",
             data_unit=_sin_2chi_data.data_unit,
             axis_labels=["0: data; 1: fit", "sin(2*chi)"],

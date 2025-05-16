@@ -65,7 +65,7 @@ DATA_VIEW_CONFIG = {
         "ref": "view-curve",
         "view": Pydidas_Plot1dView,
         "use_axes_selector": True,
-        "additional choices": "use as curve y",
+        "additional choices": "use as curve x",
         "min_dims": 1,
     },
     2: {
@@ -73,7 +73,7 @@ DATA_VIEW_CONFIG = {
         "ref": "view-curve-group",
         "view": Pydidas_Plot1dGroupView,
         "use_axes_selector": True,
-        "additional choices": "show all curves;;use as curve y",
+        "additional choices": "show all curves;;use as curves' x",
         "min_dims": 2,
     },
     3: {

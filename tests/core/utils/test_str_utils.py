@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,6 +33,7 @@ import time
 import unittest
 from contextlib import redirect_stdout
 
+from pydidas.core.utils import get_formatted_dict_representation
 from pydidas.core.utils.str_utils import (
     convert_special_chars_to_unicode,
     convert_unicode_to_ascii,
@@ -456,6 +457,51 @@ class Test_str_utils(unittest.TestCase):
         self.assertEqual(len(_test), _len)
         for _char in _test:
             self.assertIn(_char, string.ascii_letters)
+
+    def test_get_formatted_dict_representation__indent(self):
+        _test_dict = {"a": 1, "b": 2.3, "c": "a", "d": 0.0000004, "e": 556744335.2}
+        for _indent in [0, 1, 3, 6]:
+            with self.subTest(indent=_indent):
+                _formatted = get_formatted_dict_representation(
+                    _test_dict, indent=_indent
+                )
+                for _line in _formatted.split("\n"):
+                    self.assertTrue(_line.startswith(" " * _indent))
+
+    def test_get_formatted_dict_representation__digits(self):
+        _test_dict = {"a": 2.3}
+        for _digits in [2, 4, 6, 9]:
+            with self.subTest(digits=_digits):
+                _formatted = get_formatted_dict_representation(
+                    _test_dict, digits=_digits
+                )
+                self.assertEqual(_formatted, f"a: {2.3:.{_digits}f}")
+
+    def test_get_formatted_dict_representation__small_float(self):
+        _value = 0.0000003
+        _test_dict = {"a": _value}
+        for _digits in [2, 4, 6, 9]:
+            with self.subTest(digits=_digits):
+                _formatted = get_formatted_dict_representation(
+                    _test_dict, digits=_digits
+                )
+                self.assertEqual(_formatted, f"a: {_value:.{_digits}e}")
+
+    def test_get_formatted_dict_representation__large_float(self):
+        _value = 534636333.2
+        _test_dict = {"a": _value}
+        for _digits in [2, 4, 6, 9]:
+            with self.subTest(digits=_digits):
+                _formatted = get_formatted_dict_representation(
+                    _test_dict, digits=_digits
+                )
+                self.assertEqual(_formatted, f"a: {_value:.{_digits}e}")
+
+    def test_get_formatted_dict_representation__large_int(self):
+        _value = 534636333
+        _test_dict = {"a": _value}
+        _formatted = get_formatted_dict_representation(_test_dict)
+        self.assertEqual(_formatted, f"a: {_value}")
 
 
 if __name__ == "__main__":

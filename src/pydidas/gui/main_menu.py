@@ -420,7 +420,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _ack_version = self.q_settings_get(
             "user/update_version_acknowledged", default=""
         )
-        _text = utils.get_update_check_text(_remote_v, _ack_version, auto_check)
+        _text = utils.get_update_check_text(_remote_v, _ack_version)
         if auto_check and (_remote_v <= VERSION or _remote_v in ["-1", _ack_version]):
             return
         _ack = AcknowledgeBox(

@@ -146,10 +146,18 @@ def get_update_check_text(
         _text = (
             "A new version of pydidas is available.\n\n"
             f"    Locally installed version: {VERSION}\n"
-            f"    Latest release: {remote_version}.\n\n"
+            f"    Latest release: {remote_version}."
         )
         if auto_check and remote_version not in ["-1", acknowledged_update]:
-            _text += "Please update pydidas to benefit from the latest improvements."
+            _text += (
+                "\n\nPlease update pydidas to benefit from the latest improvements."
+            )
+        if remote_version not in ["-1", acknowledged_update]:
+            _text += (
+                "\n\nThe most convenient way to upgrade pydidas is using pip:\n\n"
+                "python -m pip install --upgrade pydidas\n\n"
+                "(called from the command line in the\nrespective python environment)"
+            )
     else:
         _text = (
             f"The locally installed version of pydidas (version {VERSION}) \n"

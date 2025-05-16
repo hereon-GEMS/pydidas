@@ -32,7 +32,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from pydidas_plugins.proc_plugins.sin_2chi_grouping import (
+from pydidas_plugins.residual_stress_plugins.sin_2chi_grouping import (
     LABELS_DIM0,
     LABELS_SIN2CHI,
     LABELS_SIN_2CHI,

@@ -80,7 +80,6 @@ class Sin_2chiGrouping(ProcPlugin):
     """
 
     plugin_name = "Grouping of results vs sin(2*chi)"
-    basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_STRESS_STRAIN
     input_data_dim = 2
@@ -209,3 +208,6 @@ class Sin_2chiGrouping(ProcPlugin):
             )
 
         return np.sin(2 * np.arcsin(np.sqrt(s2c_values)))
+
+
+Sin_2chiGrouping.register_as_base_class()

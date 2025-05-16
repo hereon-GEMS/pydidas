@@ -34,7 +34,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from pydidas_plugins.proc_plugins.sin_square_chi_grouping import (
+from pydidas_plugins.residual_stress_plugins.sin_square_chi_grouping import (
     LABELS_CHI,
     LABELS_POSITION,
     LABELS_SIN2CHI,

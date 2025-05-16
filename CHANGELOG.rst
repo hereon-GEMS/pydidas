@@ -12,6 +12,8 @@ Improvements
 	  plugin.
 	- The ConvertToDSpacing plugin can now also convert from d-spacing.
 	- Added a new plugin for sin^2(chi) analysis for high-energy data.
+	- Added plugins to store the raw data of sin^2(chi) and sin(2*chi) in addition
+	  to the fitted coefficients
 - Added generic functions to convert scattering geometry and d-spacing.
 - Added axis_labels, axis_ranges and axis_units properties to Scan
 - Added an option to squeeze datasets when exporting results.

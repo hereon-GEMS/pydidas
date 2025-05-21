@@ -53,7 +53,7 @@ class StoreSinTwoChiData(ProcPlugin):
     The output is a 2-dimensional dataset with the following axes:
 
     - Axis 0:
-        The raw data pointsPositive branch (label: d+), negative branch (label: d-), mean of
+        The raw data points. Positive branch (label: d+), negative branch (label: d-), mean of
         both branches (label: mean), corresponding fit values (label: fit).
     - Axis 1:
         The sin(2*chi) values corresponding to the datapoints.

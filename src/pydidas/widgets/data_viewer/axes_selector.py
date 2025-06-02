@@ -61,7 +61,7 @@ class AxesSelector(WidgetWithParameterCollection):
 
     def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: dict):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
-        self._axwidgets = {}
+        self._axis_widgets = {}
         self._data_shape = ()
         self._data_ndim = 0
         self._data_ndim_gt_1 = 0
@@ -86,7 +86,9 @@ class AxesSelector(WidgetWithParameterCollection):
         list[str]
             The current display selection.
         """
-        return [self._axwidgets[_dim].display_choice for _dim in range(self._data_ndim)]
+        return [
+            self._axis_widgets[_dim].display_choice for _dim in range(self._data_ndim)
+        ]
 
     @property
     def transpose_required(self) -> bool:
@@ -148,7 +150,7 @@ class AxesSelector(WidgetWithParameterCollection):
             return
         with QtCore.QSignalBlocker(self):
             for _dim, _npoints in enumerate(shape):
-                self._axwidgets[_dim].set_axis_metadata(
+                self._axis_widgets[_dim].set_axis_metadata(
                     None, "", "", npoints=_npoints, ndim=self._data_ndim_gt_1
                 )
 
@@ -157,7 +159,7 @@ class AxesSelector(WidgetWithParameterCollection):
         Create the DataAxisSelector widgets for the axes.
         """
         for _dim in range(self._data_ndim):
-            if _dim in self._axwidgets:
+            if _dim in self._axis_widgets:
                 continue
             if self._multiline_layout and _dim > 0:
                 self.create_line(f"line_{_dim}", gridPos=(-1, 0, 1, 1))
@@ -168,16 +170,16 @@ class AxesSelector(WidgetWithParameterCollection):
                 sizePolicy=POLICY_EXP_FIX,
             )
             self._current_slice.append(slice(None))
-            self._axwidgets[_dim] = self._widgets[f"axis_{_dim}"]
-            self._axwidgets[_dim].define_additional_choices(
+            self._axis_widgets[_dim] = self._widgets[f"axis_{_dim}"]
+            self._axis_widgets[_dim].define_additional_choices(
                 self._additional_choices_str
             )
-            self._axwidgets[_dim].sig_display_choice_changed.connect(
+            self._axis_widgets[_dim].sig_display_choice_changed.connect(
                 self._process_new_display_choice
             )
-            self._axwidgets[_dim].sig_new_slicing.connect(self._update_ax_slicing)
-        for _dim in self._axwidgets:
-            self._axwidgets[_dim].setVisible(_dim < self._data_ndim)
+            self._axis_widgets[_dim].sig_new_slicing.connect(self._update_ax_slicing)
+        for _dim in self._axis_widgets:
+            self._axis_widgets[_dim].setVisible(_dim < self._data_ndim)
             if self._multiline_layout and _dim > 0:
                 self._widgets[f"line_{_dim}"].setVisible(_dim < self._data_ndim)
 
@@ -207,12 +209,12 @@ class AxesSelector(WidgetWithParameterCollection):
             The number of points in the axis. Use this to set the number
             of points if data_range is None.
         """
-        if axis not in self._axwidgets:
+        if axis not in self._axis_widgets:
             raise UserConfigError(
                 f"The axis `{axis}` not defined in the AxesSelector. Please update "
                 "the data shape first."
             )
-        self._axwidgets[axis].set_axis_metadata(
+        self._axis_widgets[axis].set_axis_metadata(
             data_range, label, unit, npoints=npoints, ndim=self._data_ndim_gt_1
         )
 
@@ -238,8 +240,8 @@ class AxesSelector(WidgetWithParameterCollection):
             )
         self.set_data_shape(dataset.shape, update_axwidgets=False)
         for _dim in range(self._data_ndim):
-            with QtCore.QSignalBlocker(self._axwidgets[_dim]):
-                self._axwidgets[_dim].set_axis_metadata(
+            with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
+                self._axis_widgets[_dim].set_axis_metadata(
                     dataset.axis_ranges[_dim],
                     dataset.axis_labels[_dim],
                     dataset.axis_units[_dim],
@@ -261,7 +263,7 @@ class AxesSelector(WidgetWithParameterCollection):
         """
         self._additional_choices_str = choices
         self._additional_choices = choices.split(";;")
-        for _dim, _axwidget in self._axwidgets.items():
+        for _dim, _axwidget in self._axis_widgets.items():
             with QtCore.QSignalBlocker(_axwidget):
                 _axwidget.define_additional_choices(choices)
         if choices == "":
@@ -287,7 +289,7 @@ class AxesSelector(WidgetWithParameterCollection):
 
             if self.current_display_selection.count(_choice) == 0:
                 for _dim in range(self._data_ndim):
-                    _axwidget = self._axwidgets[_dim]
+                    _axwidget = self._axis_widgets[_dim]
                     if (
                         _dim != ignore_ax
                         and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
@@ -317,8 +319,10 @@ class AxesSelector(WidgetWithParameterCollection):
         ]
         if ignore_ax in _dim_where_selected:
             _dim_where_selected.remove(ignore_ax)
+        elif self._additional_choices.index(choice) in _dim_where_selected:
+            _dim_where_selected.remove(self._additional_choices.index(choice))
         else:
-            _dim_where_selected = _dim_where_selected[1:]
+            _dim_where_selected = _dim_where_selected[:-1]
         _other_choices = [
             _c
             for _c in self._additional_choices
@@ -331,8 +335,8 @@ class AxesSelector(WidgetWithParameterCollection):
                 len(_dim_where_selected) - len(_other_choices)
             )
         for _i, _dim in enumerate(_dim_where_selected):
-            with QtCore.QSignalBlocker(self._axwidgets[_dim]):
-                self._axwidgets[_dim].display_choice = _other_choices[_i]
+            with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
+                self._axis_widgets[_dim].display_choice = _other_choices[_i]
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):
@@ -347,7 +351,7 @@ class AxesSelector(WidgetWithParameterCollection):
             The new display choice.
         """
         if choice in self._additional_choices:
-            for _dim, _axwidget in self._axwidgets.items():
+            for _dim, _axwidget in self._axis_widgets.items():
                 if _dim != axis and _axwidget.display_choice == choice:
                     with QtCore.QSignalBlocker(_axwidget):
                         _axwidget.reset_to_slicing()
@@ -363,11 +367,11 @@ class AxesSelector(WidgetWithParameterCollection):
             Flag to block signals during the processing.
         """
         self._current_slice_strings = {
-            _dim: self._axwidgets[_dim].current_slice_str
+            _dim: self._axis_widgets[_dim].current_slice_str
             for _dim in range(self._data_ndim)
         }
         self._current_slice = [
-            self._axwidgets[_dim].current_slice for _dim in range(self._data_ndim)
+            self._axis_widgets[_dim].current_slice for _dim in range(self._data_ndim)
         ]
         _curr_selection = ";;".join(self.current_display_selection)
         if not block_signals:
@@ -387,13 +391,13 @@ class AxesSelector(WidgetWithParameterCollection):
             The slicing string.
         """
         self._current_slice_strings[axis] = slicing
-        self._current_slice[axis] = self._axwidgets[axis].current_slice
+        self._current_slice[axis] = self._axis_widgets[axis].current_slice
         _curr_selection = ";;".join(self.current_display_selection)
         self.sig_new_slicing.emit()
         self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 
     def closeEvent(self, event: QtCore.QEvent):
         """Close the widget and delete Children"""
-        for _dim in self._axwidgets:
-            self._axwidgets[_dim].deleteLater()
+        for _dim in self._axis_widgets:
+            self._axis_widgets[_dim].deleteLater()
         super().closeEvent(event)

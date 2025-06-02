@@ -79,7 +79,7 @@ def _get_spy_results(spy):
 
 
 def test_init(selector):
-    assert selector._axwidgets == {}
+    assert selector._axis_widgets == {}
     assert selector._data_shape == ()
     assert selector._data_ndim == 0
 
@@ -100,7 +100,7 @@ def test_current_display_selection__simple(selector):
 def test_current_display_selection__w_change(selector):
     selector.set_data_shape((5, 7, 4))
     selector.set_axis_metadata(1, np.arange(12), "axis 1", "unit 1")
-    selector._axwidgets[1].display_choice = "slice at data value"
+    selector._axis_widgets[1].display_choice = "slice at data value"
     assert selector.current_display_selection == [
         "slice at index",
         "slice at data value",
@@ -135,7 +135,7 @@ def test_transpose_require__w_additional_choices_modified(
     _ax_to_set, _new_choice, _expected_result = modify_choice
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(data)
-    selector._axwidgets[_ax_to_set].display_choice = _new_choice
+    selector._axis_widgets[_ax_to_set].display_choice = _new_choice
     assert selector.transpose_required == _expected_result
 
 
@@ -151,8 +151,8 @@ def test_set_data_shape__valid(selector):
     assert selector._data_shape == (5, 7, 4)
     assert selector._data_ndim == 3
     for _dim in range(3):
-        assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
-        assert selector._axwidgets[_dim].npoints == _shape[_dim]
+        assert isinstance(selector._axis_widgets[_dim], DataAxisSelector)
+        assert selector._axis_widgets[_dim].npoints == _shape[_dim]
 
 
 def test_set_data_shape__w_len_dim_1(selector):
@@ -162,9 +162,9 @@ def test_set_data_shape__w_len_dim_1(selector):
     assert selector._data_shape == _shape
     assert selector._data_ndim == 5
     for _dim in range(5):
-        assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
-        assert selector._axwidgets[_dim].npoints == _shape[_dim]
-        assert selector._axwidgets[_dim].isEnabled() == (_shape[_dim] > 1)
+        assert isinstance(selector._axis_widgets[_dim], DataAxisSelector)
+        assert selector._axis_widgets[_dim].npoints == _shape[_dim]
+        assert selector._axis_widgets[_dim].isEnabled() == (_shape[_dim] > 1)
 
 
 def test_create_data_axis_selectors(selector):
@@ -172,11 +172,11 @@ def test_create_data_axis_selectors(selector):
     selector._data_ndim = 3
     selector._additional_choices_str = "choice1;;choice2"
     selector._create_data_axis_selectors()
-    assert len(selector._axwidgets) == selector._data_ndim
+    assert len(selector._axis_widgets) == selector._data_ndim
     for _dim, _len in enumerate(selector._data_shape):
-        assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
-        assert "choice1" in selector._axwidgets[_dim].available_choices
-        assert "choice2" in selector._axwidgets[_dim].available_choices
+        assert isinstance(selector._axis_widgets[_dim], DataAxisSelector)
+        assert "choice1" in selector._axis_widgets[_dim].available_choices
+        assert "choice2" in selector._axis_widgets[_dim].available_choices
 
 
 def test_create_data_axis_selectors__multiple_calls(selector):
@@ -186,18 +186,18 @@ def test_create_data_axis_selectors__multiple_calls(selector):
         selector._data_shape = _raw_shape[:_ndim]
         selector._data_ndim = _ndim
         selector._additional_choices_str = "choice1;;choice2"
-        for _item in selector._axwidgets.values():
+        for _item in selector._axis_widgets.values():
             _item.set_axis_metadata(np.linspace(3, 7, num=_raw_shape[_index]), "", "")
             with QtCore.QSignalBlocker(_item):
                 _item.display_choice = "slice at data value"
         selector._create_data_axis_selectors()
-        assert len(selector._axwidgets) == max(_ndim_list[: _index + 1])
+        assert len(selector._axis_widgets) == max(_ndim_list[: _index + 1])
         for _dim, _len in enumerate(selector._data_shape):
-            assert isinstance(selector._axwidgets[_dim], DataAxisSelector)
-            assert "choice1" in selector._axwidgets[_dim].available_choices
-            assert "choice2" in selector._axwidgets[_dim].available_choices
+            assert isinstance(selector._axis_widgets[_dim], DataAxisSelector)
+            assert "choice1" in selector._axis_widgets[_dim].available_choices
+            assert "choice2" in selector._axis_widgets[_dim].available_choices
         for _dim in range(selector._data_ndim):
-            _item = selector._axwidgets[_dim]
+            _item = selector._axis_widgets[_dim]
             if _dim >= _ndim:
                 assert _item.display_choice == "slice at index"
 
@@ -205,8 +205,8 @@ def test_create_data_axis_selectors__multiple_calls(selector):
 def test_set_axis_metadata(selector):
     selector.set_data_shape((5, 7, 4))
     selector.set_axis_metadata(1, np.arange(12), "axis 1", "unit 1")
-    assert selector._axwidgets[1].npoints == 12
-    assert "slice at data value" in selector._axwidgets[1].available_choices
+    assert selector._axis_widgets[1].npoints == 12
+    assert "slice at data value" in selector._axis_widgets[1].available_choices
 
 
 def test_set_axis_metadata__invalid_axis(selector):
@@ -233,7 +233,7 @@ def test_set_axis_metadata__invalid_ndim_w__allow_less_axes(selector):
 def test_set_metadata_from_dataset(selector):
     selector.set_metadata_from_dataset(_DATA)
     assert selector._data_shape == _DATA.shape
-    for _dim, _item in selector._axwidgets.items():
+    for _dim, _item in selector._axis_widgets.items():
         assert _item.npoints == _DATA.shape[_dim]
         assert _item.data_label == _DATA.axis_labels[_dim]
         assert _item.data_unit == _DATA.axis_units[_dim]
@@ -248,7 +248,7 @@ def test_set_metadata_from_dataset__new_shape(selector):
     selector.set_metadata_from_dataset(_data2)
     assert selector._data_shape == _data2.shape
     assert selector.current_slice == [slice(0, 10), slice(0, 14), slice(0, 1)]
-    for _dim, _item in selector._axwidgets.items():
+    for _dim, _item in selector._axis_widgets.items():
         assert _item.npoints == _data2.shape[_dim]
         assert _item.data_label == _data2.axis_labels[_dim]
         assert _item.data_unit == _data2.axis_units[_dim]
@@ -264,7 +264,7 @@ def test_set_metadata_from_dataset__new_shape_w_fewer_dims(selector):
     assert selector._data_shape == _data2.shape
     assert selector.current_slice == [slice(0, 14), slice(0, 14)]
     for _dim in range(_data2.ndim):
-        _item = selector._axwidgets[_dim]
+        _item = selector._axis_widgets[_dim]
         assert _item.npoints == _data2.shape[_dim]
         assert _item.data_label == _data2.axis_labels[_dim]
         assert _item.data_unit == _data2.axis_units[_dim]
@@ -280,7 +280,7 @@ def test_set_metadata_from_dataset__new_shape_w_more_dims(selector):
     assert selector._data_shape == _data2.shape
     assert selector.current_slice == [slice(0, 5), slice(0, 14), slice(0, 1)]
     for _dim in range(_data2.ndim):
-        _item = selector._axwidgets[_dim]
+        _item = selector._axis_widgets[_dim]
         assert _item.npoints == _data2.shape[_dim]
         assert _item.data_label == _data2.axis_labels[_dim]
         assert _item.data_unit == _data2.axis_units[_dim]
@@ -293,7 +293,7 @@ def test_set_metadata_from_dataset__w_choices(selector):
     assert selector._data_shape == _DATA.shape
     assert selector.current_display_selection.count("choice1") == 1
     assert selector.current_display_selection.count("choice2") == 1
-    for _dim, _item in selector._axwidgets.items():
+    for _dim, _item in selector._axis_widgets.items():
         assert _item.npoints == _DATA.shape[_dim]
         assert _item.data_label == _DATA.axis_labels[_dim]
         assert _item.data_unit == _DATA.axis_units[_dim]
@@ -310,7 +310,7 @@ def test_define_additional_choices(selector, data):
     selector.define_additional_choices(_choices)
     assert selector._additional_choices_str == _choices
     assert selector._additional_choices == _choices.split(";;")
-    for _dim, _item in selector._axwidgets.items():
+    for _dim, _item in selector._axis_widgets.items():
         assert "choice1" in _item.available_choices
         assert "choice2" in _item.available_choices
 
@@ -320,7 +320,7 @@ def test_define_additional_choices__no_metadata_set(selector, data):
     selector.define_additional_choices(_choices)
     assert selector._additional_choices_str == _choices
     assert selector._additional_choices == _choices.split(";;")
-    for _dim, _item in selector._axwidgets.items():
+    for _dim, _item in selector._axis_widgets.items():
         assert "choice1" in _item.available_choices
         assert "choice2" in _item.available_choices
 
@@ -333,7 +333,7 @@ def test_define_additional_choices__existing_choices(selector, data):
     selector.define_additional_choices(_choices)
     assert selector._additional_choices_str == "choice3;;choice4"
     assert selector._additional_choices == _choices.split(";;")
-    for _item in selector._axwidgets.values():
+    for _item in selector._axis_widgets.values():
         assert "choice1" not in _item.available_choices
         assert "choice2" not in _item.available_choices
         assert "choice3" in _item.available_choices
@@ -364,14 +364,14 @@ def test_define_additional_choices__w_generic_choices(selector, nchoices):
 def test_define_additional_choices__values_set_in_widgets(selector, data):
     selector.set_metadata_from_dataset(data)
     selector._additional_choices = "choice1;;choice2"
-    for _item in selector._axwidgets.values():
+    for _item in selector._axis_widgets.values():
         with QtCore.QSignalBlocker(_item):
             _item.define_additional_choices("choice1;;choice2")
             _item.display_choice = "choice1"
     selector.define_additional_choices("choice3;;choice4")
     assert selector._additional_choices_str == "choice3;;choice4"
     assert selector._additional_choices == ["choice3", "choice4"]
-    for _item in selector._axwidgets.values():
+    for _item in selector._axis_widgets.values():
         assert "choice1" not in _item.available_choices
         assert "choice2" not in _item.available_choices
         assert "choice3" in _item.available_choices
@@ -401,8 +401,8 @@ def test_process_new_display_choice(selector, choices, set_axwidget, data):
     selector.define_additional_choices(choices)
     if set_axwidget[1] not in choices.split(";;"):
         return
-    with QtCore.QSignalBlocker(selector._axwidgets[set_axwidget[0]]):
-        selector._axwidgets[set_axwidget[0]].display_choice = set_axwidget[1]
+    with QtCore.QSignalBlocker(selector._axis_widgets[set_axwidget[0]]):
+        selector._axis_widgets[set_axwidget[0]].display_choice = set_axwidget[1]
     selector._process_new_display_choice(*set_axwidget)
     _current_selection = selector.current_display_selection
     for _choice in choices.split(";;"):
@@ -412,7 +412,7 @@ def test_process_new_display_choice(selector, choices, set_axwidget, data):
 def test_process_new_slicing(selector, data, spy_new_slicing, spy_new_slicing_str):
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
-    for _dim, _item in selector._axwidgets.items():
+    for _dim, _item in selector._axis_widgets.items():
         if _item.display_choice in ["choice1", "choice2"]:
             continue
         with QtCore.QSignalBlocker(_item):
@@ -420,7 +420,7 @@ def test_process_new_slicing(selector, data, spy_new_slicing, spy_new_slicing_st
     selector.process_new_slicing()
     assert len(_get_spy_results(spy_new_slicing)) == 1
     assert len(_get_spy_results(spy_new_slicing_str)) == 1
-    for _dim, _item in selector._axwidgets.items():
+    for _dim, _item in selector._axis_widgets.items():
         if _item.display_choice in ["choice1", "choice2"]:
             assert selector._current_slice[_dim] == slice(0, data.shape[_dim])
             assert selector._current_slice_strings[_dim] == _item.current_slice_str
@@ -434,11 +434,11 @@ def test_process_new_slicing(selector, data, spy_new_slicing, spy_new_slicing_st
 def test_update_ax_slicing(selector, data, spy_new_slicing, spy_new_slicing_str):
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
-    for _dim in selector._axwidgets:
+    for _dim in selector._axis_widgets:
         selector._current_slice[_dim] = slice(0, 1)
         selector._current_slice_strings[_dim] = "0:1"
-    with QtCore.QSignalBlocker(selector._axwidgets[3]):
-        selector._axwidgets[3]._move_to_index(3)
+    with QtCore.QSignalBlocker(selector._axis_widgets[3]):
+        selector._axis_widgets[3]._move_to_index(3)
     assert selector._current_slice[3] == slice(0, 1)
     selector._update_ax_slicing(3, "3:4")
     assert selector._current_slice[3] == slice(3, 4)
@@ -453,7 +453,7 @@ def test__integration__change_axis(
 ):
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
-    selector._axwidgets[0].display_choice = "slice at index"
+    selector._axis_widgets[0].display_choice = "slice at index"
     assert len(_get_spy_results(spy_new_slicing)) == 1
     assert len(_get_spy_results(spy_new_slicing_str)) == 1
 
@@ -463,14 +463,14 @@ def test__integration__unselect_choice(selector, spy_new_slicing, spy_new_slicin
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
     with pytest.raises(ValueError):
-        selector._axwidgets[0].display_choice = "slice at index"
+        selector._axis_widgets[0].display_choice = "slice at index"
 
 
 def test__integration__swap_choices(selector, spy_new_slicing, spy_new_slicing_str):
     data = create_dataset(2, dtype=float)
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
-    selector._axwidgets[0].display_choice = "choice2"
+    selector._axis_widgets[0].display_choice = "choice2"
     assert "choice1" in selector.current_display_selection
     assert "choice2" in selector.current_display_selection
     assert len(_get_spy_results(spy_new_slicing)) == 1
@@ -483,7 +483,7 @@ def test__integration__swap_choices_case2(
     data = create_dataset(2, dtype=float)
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices("choice1;;choice2")
-    selector._axwidgets[1].display_choice = "choice1"
+    selector._axis_widgets[1].display_choice = "choice1"
     assert selector.current_display_selection == ["choice2", "choice1"]
     assert len(_get_spy_results(spy_new_slicing)) == 1
     assert len(_get_spy_results(spy_new_slicing_str)) == 1
@@ -508,8 +508,8 @@ def test__integration__change_dataset_w_less_dims(
     data3 = create_dataset(3, dtype=float, shape=(19, 21, 4))
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(data3)
-    selector._axwidgets[1].display_choice = "choice1"
-    selector._axwidgets[2].display_choice = "choice2"
+    selector._axis_widgets[1].display_choice = "choice1"
+    selector._axis_widgets[2].display_choice = "choice2"
     selector.set_metadata_from_dataset(data2)
     selector.set_metadata_from_dataset(data3)
     assert selector.current_display_selection.count("choice1") == 1

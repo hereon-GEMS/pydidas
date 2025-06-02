@@ -501,5 +501,20 @@ def test__integration__change_dataset(selector, spy_new_slicing, spy_new_slicing
     )
 
 
+def test__integration__change_dataset_w_less_dims(
+    selector, spy_new_slicing, spy_new_slicing_str
+):
+    data2 = create_dataset(2, dtype=float, shape=(19 * 21, 4))
+    data3 = create_dataset(3, dtype=float, shape=(19, 21, 4))
+    selector.define_additional_choices("choice1;;choice2")
+    selector.set_metadata_from_dataset(data3)
+    selector._axwidgets[1].display_choice = "choice1"
+    selector._axwidgets[2].display_choice = "choice2"
+    selector.set_metadata_from_dataset(data2)
+    selector.set_metadata_from_dataset(data3)
+    assert selector.current_display_selection.count("choice1") == 1
+    assert selector.current_display_selection.count("choice2") == 1
+
+
 if __name__ == "__main__":
     pytest.main()

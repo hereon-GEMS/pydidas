@@ -64,7 +64,6 @@ class AxesSelector(WidgetWithParameterCollection):
         self._axis_widgets = {}
         self._data_shape = ()
         self._data_ndim = 0
-        self._data_ndim_gt_1 = 0
         self._additional_choices_str = ""
         self._additional_choices = []
         self._current_slice_strings = {}
@@ -75,6 +74,11 @@ class AxesSelector(WidgetWithParameterCollection):
         self._allow_less_dims = kwargs.get("allow_less_dims", False)
         self.layout().setColumnStretch(0, 1)
         self.create_spacer("final_spacer", gridPos=(0, 1, 1, 1), fixedWidth=5)
+
+    @property
+    def filtered_data_ndim(self) -> int:
+        """The number of dimensions of the data that are greater than 1."""
+        return sum(i > 1 for i in self._data_shape)
 
     @property
     def current_display_selection(self) -> list[str]:
@@ -144,14 +148,13 @@ class AxesSelector(WidgetWithParameterCollection):
             )
         self._data_shape = shape
         self._data_ndim = len(shape)
-        self._data_ndim_gt_1 = sum(i > 1 for i in shape)
         self._create_data_axis_selectors()
         if not update_axwidgets:
             return
         with QtCore.QSignalBlocker(self):
             for _dim, _npoints in enumerate(shape):
                 self._axis_widgets[_dim].set_axis_metadata(
-                    None, "", "", npoints=_npoints, ndim=self._data_ndim_gt_1
+                    None, "", "", npoints=_npoints, ndim=self.filtered_data_ndim
                 )
 
     def _create_data_axis_selectors(self):
@@ -215,7 +218,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 "the data shape first."
             )
         self._axis_widgets[axis].set_axis_metadata(
-            data_range, label, unit, npoints=npoints, ndim=self._data_ndim_gt_1
+            data_range, label, unit, npoints=npoints, ndim=self.filtered_data_ndim
         )
 
     def set_metadata_from_dataset(self, dataset: Dataset):
@@ -245,7 +248,7 @@ class AxesSelector(WidgetWithParameterCollection):
                     dataset.axis_ranges[_dim],
                     dataset.axis_labels[_dim],
                     dataset.axis_units[_dim],
-                    ndim=self._data_ndim_gt_1,
+                    ndim=self.filtered_data_ndim,
                 )
         self._verify_additional_choices_selected(-1, block_signals=True)
         self.process_new_slicing(block_signals=True)
@@ -285,32 +288,22 @@ class AxesSelector(WidgetWithParameterCollection):
         """
         for _choice in self._additional_choices:
             if self.current_display_selection.count(_choice) > 1:
-                self._change_duplicate_choices(ignore_ax, _choice)
-
-            if self.current_display_selection.count(_choice) == 0:
-                for _dim in range(self._data_ndim):
-                    _axwidget = self._axis_widgets[_dim]
-                    if (
-                        _dim != ignore_ax
-                        and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
-                        and self._data_shape[_dim] > 1
-                    ):
-                        with QtCore.QSignalBlocker(_axwidget):
-                            _axwidget.display_choice = _choice
-                        break
+                self._change_duplicate_choices(_choice, ignore_ax)
+            elif self.current_display_selection.count(_choice) == 0:
+                self._assign_choice_to_first_available_axis(_choice, ignore_ax)
         self._current_transpose_required = None
         self.process_new_slicing(block_signals)
 
-    def _change_duplicate_choices(self, ignore_ax: int, choice: str):
+    def _change_duplicate_choices(self, choice: str, ignore_ax: int):
         """
         Change duplicate choices in the current display selection.
 
         Parameters
         ----------
-        ignore_ax : int
-            The axis dimension to be ignored.
         choice : str
             The current choice to be replaced.
+        ignore_ax : int
+            The axis dimension to be ignored.
         """
         _dim_where_selected = [
             _dim
@@ -337,6 +330,20 @@ class AxesSelector(WidgetWithParameterCollection):
         for _i, _dim in enumerate(_dim_where_selected):
             with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
                 self._axis_widgets[_dim].display_choice = _other_choices[_i]
+
+    def _assign_choice_to_first_available_axis(self, choice: str, ignore_ax: int = -1):
+        """
+        Assign a choice to the first available axis that is not the ignored axis.
+        """
+        for _dim, _axwidget in self._axis_widgets.items():
+            if (
+                _dim != ignore_ax
+                and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
+                and self._data_shape[_dim] > 1
+            ):
+                with QtCore.QSignalBlocker(_axwidget):
+                    _axwidget.display_choice = choice
+                break
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):

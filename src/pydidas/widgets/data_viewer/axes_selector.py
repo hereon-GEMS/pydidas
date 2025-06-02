@@ -69,7 +69,6 @@ class AxesSelector(WidgetWithParameterCollection):
         self._additional_choices = []
         self._current_slice_strings = {}
         self._current_slice = []
-        self._current_display_selection = []
         self._current_transpose_required = None
 
         self._multiline_layout = kwargs.get("multiline_layout", False)
@@ -87,11 +86,7 @@ class AxesSelector(WidgetWithParameterCollection):
         list[str]
             The current display selection.
         """
-        if self._current_display_selection == []:
-            self._current_display_selection = [
-                self._axwidgets[_dim].display_choice for _dim in range(self._data_ndim)
-            ]
-        return self._current_display_selection
+        return [self._axwidgets[_dim].display_choice for _dim in range(self._data_ndim)]
 
     @property
     def transpose_required(self) -> bool:
@@ -287,11 +282,9 @@ class AxesSelector(WidgetWithParameterCollection):
             Flag to block signals during the verification.
         """
         for _choice in self._additional_choices:
-            self._current_display_selection = []
             if self.current_display_selection.count(_choice) > 1:
                 self._change_duplicate_choices(ignore_ax, _choice)
 
-            self._current_display_selection = []
             if self.current_display_selection.count(_choice) == 0:
                 for _dim in range(self._data_ndim):
                     _axwidget = self._axwidgets[_dim]
@@ -303,7 +296,6 @@ class AxesSelector(WidgetWithParameterCollection):
                         with QtCore.QSignalBlocker(_axwidget):
                             _axwidget.display_choice = _choice
                         break
-        self._current_display_selection = []
         self._current_transpose_required = None
         self.process_new_slicing(block_signals)
 

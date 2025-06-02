@@ -327,7 +327,11 @@ class AxesSelector(WidgetWithParameterCollection):
             _dim_where_selected.remove(ignore_ax)
         else:
             _dim_where_selected = _dim_where_selected[1:]
-        _other_choices = [_c for _c in self._additional_choices if _c != choice]
+        _other_choices = [
+            _c
+            for _c in self._additional_choices
+            if (_c != choice and _c not in self.current_display_selection)
+        ]
         if len(_other_choices) < len(_dim_where_selected):
             if self._data_ndim == len(self._additional_choices):
                 raise ValueError("Cannot set the additional choices for all axes.")

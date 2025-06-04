@@ -87,12 +87,14 @@ class TestPydidasFrameStack(unittest.TestCase):
         obj = PydidasFrameStack()
         self.assertIsInstance(obj, QtWidgets.QStackedWidget)
         self.assertTrue(hasattr(obj, "frame_indices"))
-        self.assertTrue(hasattr(obj, "frames"))
+        self.assertTrue(hasattr(obj, "current_frames"))
+        self.assertTrue(hasattr(obj, "frame_names"))
 
     def test_register_frame(self):
         stack = PydidasFrameStack()
         w = TestWidget()
         stack.register_frame(w)
+        assert stack.widget(0) == w
 
     def test_register_frame_duplicate(self):
         stack = PydidasFrameStack()
@@ -101,14 +103,9 @@ class TestPydidasFrameStack(unittest.TestCase):
         with self.assertRaises(KeyError):
             stack.register_frame(w)
 
-    def test_get_name_from_index(self):
-        stack = self.create_stack()
-        _name = stack.get_name_from_index(0)
-        self.assertEqual(_name, self.frames[0].menu_entry)
-
     def test_get_widget_by_name__known_name(self):
         stack = self.create_stack()
-        _w = stack.get_widget_by_name(self.frames[0].menu_entry)
+        _w = stack.get_widget_by_name(stack.widget(0).menu_entry)
         self.assertEqual(_w, self.frames[0])
 
     def test_get_widget_by_name__not_registered(self):
@@ -118,7 +115,7 @@ class TestPydidasFrameStack(unittest.TestCase):
 
     def test_get_all_widget_names(self):
         stack = self.create_stack()
-        _names = stack.get_all_widget_names()
+        _names = stack.frame_names
         self.assertEqual(len(self.frames), len(_names))
         for w in self.frames:
             self.assertTrue(w.menu_entry in _names)
@@ -153,8 +150,8 @@ class TestPydidasFrameStack(unittest.TestCase):
         w = self.frames[1]
         stack.removeWidget(w)
         _indices = set(stack.frame_indices.values())
-        self.assertNotIn(w.menu_entry, stack.frame_indices.keys())
-        self.assertNotIn(w, stack.frames)
+        self.assertNotIn(w.menu_entry, stack.frame_indices)
+        self.assertNotIn(w, stack.current_frames)
         self.assertEqual(_indices, set(np.arange(stack.count())))
 
     def test_addWidget(self):
@@ -167,7 +164,7 @@ class TestPydidasFrameStack(unittest.TestCase):
         stack = self.create_stack()
         stack.reset()
         self.assertEqual(stack.count(), 0)
-        self.assertEqual(stack.frames, [])
+        self.assertEqual(stack.current_frames, [])
         self.assertEqual(stack.frame_indices, {})
 
     def test_is_registered(self):
@@ -177,21 +174,6 @@ class TestPydidasFrameStack(unittest.TestCase):
     def test_is_registered_wrong_widget(self):
         stack = self.create_stack()
         self.assertFalse(stack.is_registered(TestWidget()))
-
-    def test_change_reference_name__with_registered_widget(self):
-        _new = "The new widget name"
-        stack = self.create_stack()
-        w = self.frames[0]
-        stack.change_reference_name(_new, w)
-        self.assertIn(_new, stack.frame_indices)
-        self.assertEqual(w.menu_entry, _new)
-
-    def test_change_reference_name__with_unregistered_widget(self):
-        _new = "The new widget name"
-        stack = self.create_stack()
-        w = TestWidget()
-        with self.assertRaises(KeyError):
-            stack.change_reference_name(_new, w)
 
 
 if __name__ == "__main__":

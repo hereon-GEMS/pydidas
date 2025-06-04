@@ -164,7 +164,12 @@ class BaseFrame(
             frame's state.
         """
         _params = self.get_param_values_as_dict(filter_types_for_export=True)
-        return self.frame_index, {"params": _params}
+        return self.menu_entry, {
+            "frame_index": self.frame_index,
+            "params": _params,
+            "menu_entry": self.menu_entry,
+            "class": self.__class__.__name__,
+        }
 
     def restore_state(self, state: dict):
         """
@@ -184,6 +189,7 @@ class BaseFrame(
         if not self._config["built"]:
             self._config["state"] = state
             return
+        self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:

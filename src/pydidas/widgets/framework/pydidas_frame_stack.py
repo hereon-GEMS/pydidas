@@ -37,6 +37,7 @@ from typing import Any
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import SingletonObject, utils
+from pydidas.widgets.dialogues import WarningBox
 from pydidas.widgets.framework.base_frame import BaseFrame
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
@@ -56,7 +57,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
 
     Attributes
     ----------
-    frames : list
+    current_frames : list
         A list of all the registered widgets.
     frame_indices : dict
         A dictionary with (widget_name: index) entries to reference
@@ -66,8 +67,52 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
     sig_mouse_entered = QtCore.Signal()
 
     def initialize(self, *args: Any, **kwargs: Any) -> None:
-        self.frame_indices = {}
-        self.frames = []
+        self._frame_indices = {}
+        self._frame_names_from_index = {}
+        self._frames = {}
+
+    @property
+    def frame_indices(self) -> dict[str, int]:
+        """
+        Get the frame indices.
+
+        Returns
+        -------
+        dict
+            A dictionary with the frame indices, where the keys are the
+            frame menu items and the values are the indices in the QStackedWidget.
+        """
+        return self._frame_indices
+
+    @property
+    def current_frames(self) -> list[BaseFrame]:
+        """
+        Get all current frames
+
+        This property returns the list of all registered frames in the
+        PydidasFrameStack.
+
+        Returns
+        -------
+        list
+            The list of all registered frames.
+        """
+        return list(self._frames.values())
+
+    @property
+    def frame_names(self) -> list[str]:
+        """
+        Get the names of all registered frames.
+
+        This property returns the list of all registered frame names in the
+        PydidasFrameStack.
+
+        Returns
+        -------
+        list
+            The list of all registered frame names.
+        """
+        return list(self._frames)
 
     def register_frame(self, frame: BaseFrame):
         """
@@ -91,7 +136,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         """
         if not isinstance(frame, BaseFrame):
             raise TypeError("Can only register pydidas.widgets.BaseFrame objects.")
-        if frame.menu_entry in self.frame_indices:
+        if frame.menu_entry in self._frame_indices:
             raise KeyError(
                 f"A widget with the menu entry '{frame.menu_entry}' has already "
                 "been registered with the PydidasFrameStack. The new widget has not "
@@ -100,29 +145,9 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         index = QtWidgets.QStackedWidget.addWidget(self, frame)
         frame.frame_index = index
         self.currentChanged.connect(frame.frame_activated)
-        self.frames.append(frame)
-        self.frame_indices[frame.menu_entry] = index
-
-    def get_name_from_index(self, index: int) -> str:
-        """
-        Get the widget reference name associated with the indexed widget.
-
-        This method searches the dictionary of (name: index) entries and
-        returns the name key for the index value.
-
-        Parameters
-        ----------
-        index : int
-            The widget index.
-
-        Returns
-        -------
-        str
-            The reference name.
-        """
-        key_list = list(self.frame_indices.keys())
-        val_list = list(self.frame_indices.values())
-        return key_list[val_list.index(index)]
+        self._frames[frame.menu_entry] = frame
+        self._frame_indices[frame.menu_entry] = index
+        self._frame_names_from_index[index] = frame.menu_entry
 
     def get_widget_by_name(self, ref_name: str) -> BaseFrame:
         """
@@ -146,9 +171,9 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         widget : pydidas.widgets.framework.BaseFrame
             The widget referenced by the name.
         """
-        if ref_name not in self.frame_indices:
+        if ref_name not in self._frame_indices:
             raise KeyError(f"No widget with the name `{ref_name}` has been registered.")
-        return self.widget(self.frame_indices[ref_name])
+        return self.widget(self._frame_indices[ref_name])
 
     @property
     def frame_toolbar_entries(self) -> list[str]:
@@ -161,12 +186,12 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
             The list of the menu entries for all registered Frames.
         """
         _entries = []
-        for _frame in self.frames:
+        for _frame in self._frames.values():
             _entries.append(_frame.menu_entry)
         return _entries
 
     @property
-    def frame_toolbar_metadata(self) -> dict:
+    def frame_toolbar_metadata(self) -> dict[str, Any]:
         """
         Get all the metadata to create the frame toolbar menu from the frames.
 
@@ -176,7 +201,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
             A dictionary with all the required information to create the toolbar menu.
         """
         _meta = {}
-        for _frame in self.frames:
+        for _frame in self._frames.values():
             if isinstance(_frame.menu_icon, str):
                 _frame.menu_icon = get_pyqt_icon_from_str(_frame.menu_icon)
 
@@ -204,18 +229,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         str
             The name of the active widget.
         """
-        return self.get_name_from_index(self.currentIndex())
-
-    def get_all_widget_names(self) -> list[str]:
-        """
-        Get the names of all registered widgets.
-
-        Returns
-        -------
-        list
-            The names of all registered widgets as a list.
-        """
-        return [w.menu_entry for w in self.frames]
+        return self._frame_names_from_index[self.currentIndex()]
 
     def activate_widget_by_name(self, ref_name: str):
         """
@@ -231,13 +245,12 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         KeyError
             If no widget with the name has been registered.
         """
-        if ref_name not in self.frame_indices:
+        if ref_name not in self._frame_indices:
             raise KeyError(
                 f"No widget with the name `{ref_name}` has been"
                 " registered with the CENTRAL_WIDGET_STACK."
             )
-        index = self.frame_indices[ref_name]
-        self.setCurrentIndex(index)
+        self.setCurrentIndex(self._frame_indices[ref_name])
 
     def remove_widget_by_name(self, ref_name: str):
         """
@@ -245,6 +258,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
 
         This method finds the widget associated with the reference name and
         deletes it from the QStackedWidget.
+
         Note: This does not delete the widget itself, only the reference in
         the QStackedWidget.
 
@@ -258,11 +272,11 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         KeyError
             If the reference name has not been used for registering a widget.
         """
-        if ref_name not in self.frame_indices:
+        if ref_name not in self._frame_indices:
             raise KeyError(
                 f"No widget width the name `{ref_name}` has been registered."
             )
-        _widget = self.frames[self.frame_indices[ref_name]]
+        _widget = self._frames[ref_name]
         self.removeWidget(_widget)
 
     def addWidget(self, widget: QtWidgets.QWidget | None = None, name: str = None):
@@ -281,16 +295,16 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
             'Please use the "register_widget(name, widget)" method.'
         )
 
-    def removeWidget(self, widget: BaseFrame):
+    def removeWidget(self, frame: BaseFrame):
         """
-        Remove a widget from the QStackdWidget.
+        Remove a frame from the QStackdWidget.
 
-        This overloaded method removes a widget from the QStackedWidget and
+        This overloaded method removes a frame widget from the QStackedWidget and
         also dereferences it from the metadata.
 
         Parameters
         ----------
-        widget : BaseFrame
+        frame : BaseFrame
             The widget to be removed from the QStackedWidget.
 
         Raises
@@ -298,26 +312,26 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         KeyError
             If the widget is not registered.
         """
-        if widget not in self.frames:
-            raise KeyError(f"The widget `{widget}` is not registered.")
-        widget.frame_index = None
-        _index = self.frames.index(widget)
-        _ref_name = self.get_name_from_index(_index)
-        self.frames.remove(widget)
-        self.currentChanged.disconnect(widget.frame_activated)
-        for _key, _cur_index in self.frame_indices.items():
-            if _cur_index > _index:
-                self.frame_indices[_key] -= 1
-                self.widget(_cur_index).frame_index -= 1
-        del self.frame_indices[_ref_name]
-        super().removeWidget(widget)
+        if frame not in self._frames.values():
+            raise KeyError(f"The widget `{frame}` is not registered.")
+        frame.frame_index = None
+        del self._frames[frame.menu_entry]
+        del self._frame_indices[frame.menu_entry]
+        self.currentChanged.disconnect(frame.frame_activated)
+        super().removeWidget(frame)
+        self._frame_names_from_index = {}
+        for _index in range(self.count()):
+            _frame = self.widget(_index)
+            _frame.frame_index = _index
+            self._frame_names_from_index[_index] = _frame.menu_entry
+            self._frame_indices[_frame.menu_entry] = _index
 
     def reset(self):
         """
         Reset the PydidasFrameStack and delete all widgets from itself.
         """
-        while len(self.frames) > 0:
-            self.removeWidget(self.frames[0])
+        while len(self._frames) > 0:
+            self.removeWidget(self.widget(0))
 
     def is_registered(self, widget: BaseFrame) -> bool:
         """
@@ -337,35 +351,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
             This will be True if the widget has been registered, and False
             if not.
         """
-        return widget in self.frames
-
-    def change_reference_name(self, new_name: str, widget: BaseFrame):
-        """
-        Change the reference name for a widget.
-
-        This method changes the internal reference name for the widget and
-        stores the supplied new_name.
-
-        Parameters
-        ----------
-        new_name : str
-            The new reference name.
-        widget : BaseFrame
-            The widget of which the reference name shall be changed.
-
-        Raises
-        ------
-        KeyError
-            If the widget is not registered at all.
-        """
-        if not self.is_registered(widget):
-            raise KeyError(f"The widget `{widget}` is not registered.")
-        index = self.frames.index(widget)
-        name = self.get_name_from_index(index)
-        if name != new_name:
-            del self.frame_indices[name]
-            self.frame_indices[new_name] = index
-            self.widget(index).menu_entry = new_name
+        return widget in self._frames.values()
 
     def enterEvent(self, event: QtCore.QEvent):
         """
@@ -377,3 +363,38 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
             The calling event.
         """
         self.sig_mouse_entered.emit()
+
+    def restore_frame_states(self, state: dict[str, dict]):
+        """
+        Restore the states of all frames from the stored state information.
+
+        Parameters
+        ----------
+        state : dict[str, dict]
+            A dictionary with the stored state information for all frames.
+            The keys are labeled based on the menu entries and the values are
+            dictionaries with the state information for each frame.
+        """
+        _unrestored_frames = self.frame_names
+        _missing_frames = []
+        for _frame_name, _state in state.items():
+            if _frame_name not in _unrestored_frames:
+                _missing_frames.append(_frame_name)
+            self.get_widget_by_name(_frame_name).restore_state(_state)
+            _unrestored_frames.remove(_frame_name)
+        if _unrestored_frames:
+            WarningBox(
+                "Unrestored frames",
+                (
+                    "No stored state information was found for the following frames:\n"
+                    + ", ".join(_unrestored_frames)
+                ),
+            )
+        if _missing_frames:
+            WarningBox(
+                "Frames not included in current GUI",
+                (
+                    "The following frames had a stored state bute were not found in "
+                    "the current GUI configuration:\n" + ", ".join(_missing_frames)
+                ),
+            )

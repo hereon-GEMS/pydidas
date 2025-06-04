@@ -63,7 +63,7 @@ class QuickIntegrationFrame(BaseFrame):
 
     menu_icon = "pydidas::frame_icon_quick_integration"
     menu_title = "Quick integration"
-    menu_entry = "Quick integration"
+    menu_entry = "Analysis tools/Quick integration"
     default_params = get_generic_param_collection(
         "detector_pxsize",
         "beamcenter_x",

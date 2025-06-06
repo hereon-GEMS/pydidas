@@ -297,7 +297,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
 
     def removeWidget(self, frame: BaseFrame):
         """
-        Remove a frame from the QStackdWidget.
+        Remove a frame from the QStackedWidget.
 
         This overloaded method removes a frame widget from the QStackedWidget and
         also dereferences it from the metadata.
@@ -394,7 +394,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
             WarningBox(
                 "Frames not included in current GUI",
                 (
-                    "The following frames had a stored state bute were not found in "
+                    "The following frames had a stored state but were not found in "
                     "the current GUI configuration:\n" + ", ".join(_missing_frames)
                 ),
             )

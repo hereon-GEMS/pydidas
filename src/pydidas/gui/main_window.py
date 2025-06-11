@@ -228,8 +228,8 @@ class MainWindow(MainMenu):
             given by title, menu_entry and icon is created.
         """
         _stack = self.centralWidget()
-        _entry_exists = frame.menu_entry in _stack.get_all_widget_names()
-        _class_exists = frame in [_frame.__class__ for _frame in _stack.frames]
+        _entry_exists = frame.menu_entry in _stack.frame_names
+        _class_exists = frame in [_frame.__class__ for _frame in _stack.current_frames]
         if _entry_exists and _class_exists:
             return
         if _entry_exists or _class_exists:

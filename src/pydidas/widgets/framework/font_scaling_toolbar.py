@@ -66,6 +66,4 @@ class FontScalingToolbar(QtWidgets.QToolBar):
             The font height in pixels.
         """
         self.setStyleSheet("QToolBar{spacing:" + f"{font_height}" + "px;}")
-
         self.setIconSize(QtCore.QSize(int(3 * font_height), int(3 * font_height)))
-        self.setFixedWidth(int(14 * font_width))

@@ -9,7 +9,7 @@ path = [
     "requirements.txt",
     "src/pydidas/docs/make.bat",
     "src/pydidas/docs/Makefile",
-	"src/pydidas/sphinx/docs-built.yml",
+    "src/pydidas/sphinx/docs-built.yml",
     "src/pydidas/docs/src/_static/_css/pydidas-custom.css",
     "tests/_data/**",
 ]
@@ -89,7 +89,10 @@ SPDX-FileCopyrightText = "MasksUr"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "src/pydidas/resources/mdi_icons/folder-upload-outline.svg"
+path = [
+    "src/pydidas/resources/mdi_icons/folder-upload-outline.svg",
+    "src/pydidas/resources/mdi_icons/tools.svg",
+]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Michael Richins"
 SPDX-License-Identifier = "Apache-2.0"
@@ -102,11 +105,11 @@ SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
 path = [
-	"src/pydidas/resources/mdi_icons/image-lock-outline.svg",
-	"src/pydidas/resources/mdi_icons/skip-backward.svg",
-	"src/pydidas/resources/mdi_icons/skip-forward.svg",
-	"src/pydidas/resources/mdi_icons/step-backward.svg",
-	"src/pydidas/resources/mdi_icons/step-forward.svg",
+    "src/pydidas/resources/mdi_icons/image-lock-outline.svg",
+    "src/pydidas/resources/mdi_icons/skip-backward.svg",
+    "src/pydidas/resources/mdi_icons/skip-forward.svg",
+    "src/pydidas/resources/mdi_icons/step-backward.svg",
+    "src/pydidas/resources/mdi_icons/step-forward.svg",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Simran"

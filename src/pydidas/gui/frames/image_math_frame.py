@@ -73,7 +73,7 @@ class ImageMathFrame(BaseFrame):
 
     menu_icon = "pydidas::frame_icon_image_math"
     menu_title = "Image math"
-    menu_entry = "Image math"
+    menu_entry = "Analysis tools/Image math"
 
     default_params = _DEFAULTS.copy()
     BUFFER_SIZE = 3

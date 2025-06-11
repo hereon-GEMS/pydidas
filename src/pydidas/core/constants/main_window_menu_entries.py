@@ -29,12 +29,21 @@ __all__ = ["MAIN_WINDOW_MENU_ENTRIES"]
 
 MAIN_WINDOW_MENU_ENTRIES = {
     "Workflow processing": {
-        "label": "Expand\nWorkflow\nprocessing",
-        "label_visible": "Hide\nworkflow\nprocessing",
-        "label_invisible": "Expand\nworkflow\nprocessing",
+        "label": "Show\nWorkflow\nprocessing",
         "icon": "pydidas::workflow_processing_expand",
+        "label_visible": "Hide\nworkflow\nprocessing",
+        "label_invisible": "Show\nworkflow\nprocessing",
         "icon_visible": "pydidas::workflow_processing_hide",
         "icon_invisible": "pydidas::workflow_processing_expand",
         "menu_tree": ["", "Workflow processing"],
+    },
+    "Analysis tools": {
+        "label": "Show\nanalysis\ntools",
+        "icon": "pydidas::analysis_tools_expand",
+        "label_visible": "Hide\nanalysis\ntools",
+        "label_invisible": "Show\nanalysis\ntools",
+        "icon_visible": "pydidas::analysis_tools_hide",
+        "icon_invisible": "pydidas::analysis_tools_expand",
+        "menu_tree": ["", "Analysis tools"],
     },
 }

@@ -170,24 +170,6 @@ class WorkflowEditFrame(BaseFrame):
         TREE.import_from_file(_fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
-    def export_state(self) -> tuple[int, dict]:
-        """
-        Export the state of the Frame for saving.
-
-        Returns
-        -------
-        frame_index : int
-            The frame index which can be used as key for referencing the state.
-        information : dict
-            A dictionary with all the information required to export the
-            frame's state.
-        """
-        _params = self.get_param_values_as_dict(filter_types_for_export=True)
-        _widgets = {
-            _key: _w.geometry().getCoords() for _key, _w in self._widgets.items()
-        }
-        return (self.frame_index, {"params": _params, "widgets": _widgets})
-
     def restore_state(self, state: dict):
         """
         Restore the frame's state from stored information.

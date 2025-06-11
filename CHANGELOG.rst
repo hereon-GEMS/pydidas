@@ -2,6 +2,22 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v25.mm.dd
+=========
+
+Improvements
+------------
+- Reorganized the frames in the toolbar menu.
+- Programatically improved the layout of the GUI export/import files for more clarity
+  and to support importing states created from different configurations.
+
+
+Bugfixes
+--------
+- Fixed an issue in the AxesSelector when switching between Datasets of different dimensionality.
+- Fixed an issue where the toolbars would not expand when the main window was too small.
+
+
 v25.05.16
 =========
 

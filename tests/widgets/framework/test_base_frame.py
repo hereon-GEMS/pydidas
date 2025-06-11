@@ -106,6 +106,9 @@ class TestBaseFrame(unittest.TestCase):
         obj.show()
         _, _state = obj.export_state()
         self.assertEqual(obj.get_param_values_as_dict(), _state["params"])
+        self.assertEqual(obj.frame_index, _state["frame_index"])
+        self.assertEqual(obj.menu_entry, _state["menu_entry"])
+        self.assertEqual(obj.__class__.__name__, _state["class"])
 
     def test_restore_state__hidden_frame(self):
         _n = 10
@@ -113,7 +116,7 @@ class TestBaseFrame(unittest.TestCase):
         obj._config["built"] = False
         self.create_widgets_in_frame(obj, _n)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
-        _state = {"params": _params}
+        _state = {"params": _params, "frame_index": 0, "menu_entry": obj.menu_entry}
         QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         obj.restore_state(_state)
@@ -125,7 +128,11 @@ class TestBaseFrame(unittest.TestCase):
         self.create_widgets_in_frame(obj, _n)
         obj.frame_activated(obj.frame_index)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
-        _state = {"params": _params}
+        _state = {
+            "params": _params,
+            "frame_index": obj.frame_index,
+            "menu_entry": obj.menu_entry,
+        }
         QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         obj.restore_state(_state)

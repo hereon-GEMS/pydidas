@@ -76,6 +76,7 @@ _RAW_DATA = Dataset(
     axis_labels=["chi", "2theta"],
     axis_units=["deg", "rad"],
 )
+_FITTED_DATA = {}
 
 
 @pytest.fixture(scope="module")
@@ -97,15 +98,32 @@ def sin_2chi_plugin():
 @pytest.fixture
 def fitted_data(request):
     _input = request.param
-    _output = _input[2] if len(_input) == 3 else "position; amplitude; FWHM"
+    if _input in _FITTED_DATA:
+        return _FITTED_DATA[_input][:]
+
     _FIT_PLUGIN = _REGISTRY.get_plugin_by_name("FitSinglePeak")()
-    _FIT_PLUGIN.set_param_value("fit_output", _output)
+    _FIT_PLUGIN.set_param_value("fit_output", "position; amplitude; FWHM")
     _FIT_PLUGIN.pre_execute()
-    _label, _unit = _input[0].split("_")
+    _label, _unit = _input.split("_")
     _data = _RAW_DATA.copy()
     _data.update_axis_unit(1, _unit)
     _data.update_axis_label(1, _label)
-    _data.update_axis_range(1, _RANGES[_input[0]])
+    _data.update_axis_range(1, _RANGES[_input])
+    _data, _ = _FIT_PLUGIN.execute(_data)
+    _data[1, :] = np.nan
+    _FITTED_DATA[_input] = _data
+    return _data[:]
+
+
+@pytest.fixture(scope="module")
+def fitted_2theta_deg_data():
+    _FIT_PLUGIN = _REGISTRY.get_plugin_by_name("FitSinglePeak")()
+    _FIT_PLUGIN.set_param_value("fit_output", "position; amplitude; FWHM")
+    _FIT_PLUGIN.pre_execute()
+    _data = _RAW_DATA.copy()
+    _data.update_axis_unit(1, "deg")
+    _data.update_axis_label(1, "2theta")
+    _data.update_axis_range(1, np.rad2deg(_RANGE_2THETA_RAD))
     _data, _ = _FIT_PLUGIN.execute(_data)
     _data[1, :] = np.nan
     return _data
@@ -130,14 +148,6 @@ def plugin(temp_dir):
     _plugin.set_param_value("enable_overwrite", True)
     _plugin.node_id = 42
     yield _plugin
-
-
-@pytest.fixture
-def grouped_sin_square_chi_data(fitted_data, sin_square_plugin) -> Dataset:
-    _plugin = sin_square_plugin.copy()
-    _plugin.pre_execute()
-    _sin_square_chi_data = _plugin.execute(fitted_data)
-    return _sin_square_chi_data
 
 
 def test_init(plugin):
@@ -167,44 +177,40 @@ def test_check_input_data__invalid_ndim(plugin, ndim):
         plugin._check_input_data(fitted_data)
 
 
-@pytest.mark.parametrize("fitted_data", _RANGE_ONLY_2THETA_RAD, indirect=True)
-def test_check_input_data__invalid_ax0_label(plugin, fitted_data):
-    fitted_data.update_axis_label(0, "not chi")
+def test_check_input_data__invalid_ax0_label(plugin, fitted_2theta_deg_data):
+    fitted_2theta_deg_data = fitted_2theta_deg_data[:]
+    fitted_2theta_deg_data.update_axis_label(0, "not chi")
     plugin.pre_execute()
     with pytest.raises(UserConfigError, match="The data does not appear to be "):
-        plugin._check_input_data(fitted_data)
+        plugin._check_input_data(fitted_2theta_deg_data)
 
 
-@pytest.mark.parametrize(
-    "fitted_data",
-    [("2theta_deg", np.rad2deg(_RANGE_2THETA_RAD), "FWHM")],
-    indirect=True,
-)
-def test_check_input_data__invalid_fit_output(plugin, fitted_data):
+def test_check_input_data__invalid_fit_output(plugin, fitted_2theta_deg_data):
+    fitted_2theta_deg_data = fitted_2theta_deg_data[:, 2:3]
+    fitted_2theta_deg_data.data_label = "FWHM / deg"
+    fitted_2theta_deg_data.update_axis_label(1, "0: FWHM")
     plugin.pre_execute()
     with pytest.raises(UserConfigError, match="The data does not appear to be "):
-        plugin._check_input_data(fitted_data)
+        plugin._check_input_data(fitted_2theta_deg_data)
 
 
-@pytest.mark.parametrize(
-    "fitted_data",
-    [("2theta_deg", np.rad2deg(_RANGE_2THETA_RAD), "position")],
-    indirect=True,
-)
-def test_check_input_data__fit_only_position(plugin, fitted_data):
+def test_check_input_data__fit_only_position(plugin, fitted_2theta_deg_data):
+    fitted_2theta_deg_data = fitted_2theta_deg_data[:, 0:1]
+    fitted_2theta_deg_data.data_label = "position / deg"
+    fitted_2theta_deg_data.update_axis_label(1, "0: position")
     plugin.pre_execute()
-    plugin._check_input_data(fitted_data)
+    plugin._check_input_data(fitted_2theta_deg_data)
     assert plugin._config["flag_input_data_check"]
 
 
-@pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
+@pytest.mark.parametrize("fitted_data", list(_RANGES), indirect=True)
 def test_check_input_data__valid(plugin, fitted_data):
     plugin.pre_execute()
     plugin._check_input_data(fitted_data)
     assert plugin._config["flag_input_data_check"]
 
 
-@pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
+@pytest.mark.parametrize("fitted_data", list(_RANGES), indirect=True)
 @pytest.mark.parametrize("output_type", _OUTPUT_UNIT_PARAM.choices)
 def test_set_up_converter(plugin, fitted_data, output_type):
     plugin.set_param_value("output_type", output_type)
@@ -215,7 +221,7 @@ def test_set_up_converter(plugin, fitted_data, output_type):
     assert callable(plugin._converter)
 
 
-@pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
+@pytest.mark.parametrize("fitted_data", list(_RANGES), indirect=True)
 @pytest.mark.parametrize("output_type", _OUTPUT_UNIT_PARAM.choices)
 def test_regroup_data_w_sin_chi(plugin, fitted_data, output_type, sin_square_plugin):
     plugin.set_param_value("output_type", output_type)
@@ -238,15 +244,16 @@ def test_regroup_data_w_sin_chi(plugin, fitted_data, output_type, sin_square_plu
     assert np.allclose(_sin_square_chi_data.data, _ref_sin_square_chi_data.data)
 
 
-@pytest.mark.parametrize("fitted_data", _RANGE_ONLY_2THETA_RAD, indirect=True)
 @pytest.mark.parametrize("output_type", [_OUTPUT_UNIT_PARAM.choices[0]])
 @pytest.mark.parametrize("non_nan_values", list(np.arange(10)))
 def test_fit_sin_square_chi_data__w_nan_values(
-    plugin, fitted_data, output_type, non_nan_values
+    plugin, fitted_2theta_deg_data, output_type, non_nan_values
 ):
     plugin.set_param_value("output_type", output_type)
     plugin.pre_execute()
-    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(fitted_data)
+    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(
+        fitted_2theta_deg_data
+    )
     _sin_square_chi_data[2, non_nan_values:] = np.nan
     _fitted_slope_and_errors = plugin._fit_sin_square_chi_data(_sin_square_chi_data)
     if non_nan_values in [0, 1]:
@@ -262,7 +269,7 @@ def test_fit_sin_square_chi_data__w_nan_values(
             assert np.isnan(_fitted_slope_and_errors[3])
 
 
-@pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
+@pytest.mark.parametrize("fitted_data", list(_RANGES), indirect=True)
 @pytest.mark.parametrize("output_type", _OUTPUT_UNIT_PARAM.choices)
 def test_fit_sin_square_chi_data(plugin, fitted_data, output_type):
     plugin.set_param_value("output_type", output_type)
@@ -277,23 +284,24 @@ def test_fit_sin_square_chi_data(plugin, fitted_data, output_type):
     assert np.allclose(_fitted_slope_and_errors[2], _intercept_estimate, atol=0.1)
 
 
-@pytest.mark.parametrize("fitted_data", _RANGE_ONLY_2THETA_RAD, indirect=True)
 @pytest.mark.parametrize("output_type", [_OUTPUT_UNIT_PARAM.choices[0]])
 def test_fit_sin_2chi_data__w_all_nan(
     plugin,
-    fitted_data,
+    fitted_2theta_deg_data,
     output_type,
 ):
     plugin.set_param_value("output_type", output_type)
     plugin.pre_execute()
-    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(fitted_data)
+    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(
+        fitted_2theta_deg_data
+    )
     _sin_2chi_data[2, :] = np.nan
     _fitted_slope_and_error = plugin._fit_sin_2chi_data(_sin_2chi_data)
     assert np.isnan(_fitted_slope_and_error[0])
     assert np.isnan(_fitted_slope_and_error[1])
 
 
-@pytest.mark.parametrize("fitted_data", list(_RANGES.items()), indirect=True)
+@pytest.mark.parametrize("fitted_data", list(_RANGES), indirect=True)
 @pytest.mark.parametrize("output_type", _OUTPUT_UNIT_PARAM.choices)
 def test_fit_sin_2chi_data(
     plugin,
@@ -323,10 +331,11 @@ def test_calculate_fit_slice(plugin, limit_low, limit_high):
     assert plugin._fit_slice.stop == _valid_indices[-1] + 1
 
 
-@pytest.mark.parametrize("fitted_data", _RANGE_ONLY_2THETA_RAD, indirect=True)
-def test_create_detailed_results(plugin, fitted_data):
+def test_create_detailed_results(plugin, fitted_2theta_deg_data):
     plugin.pre_execute()
-    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(fitted_data)
+    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(
+        fitted_2theta_deg_data
+    )
     _fit_sin_square_res = plugin._fit_sin_square_chi_data(_sin_square_chi_data)
     _fit_sin_2chi_res = plugin._fit_sin_2chi_data(_sin_2chi_data)
     plugin.create_detailed_results(
@@ -348,12 +357,13 @@ def test_create_detailed_results(plugin, fitted_data):
     assert "items" in plugin._details[None]
 
 
-@pytest.mark.parametrize("fitted_data", _RANGE_ONLY_2THETA_RAD, indirect=True)
-def test_write_results(plugin, fitted_data):
+def test_write_results(plugin, fitted_2theta_deg_data):
     plugin.set_param_value("output_export_images_flag", True)
     plugin._config["global_index"] = 2
     plugin.pre_execute()
-    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(fitted_data)
+    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(
+        fitted_2theta_deg_data
+    )
     _fit_sin_square_res = plugin._fit_sin_square_chi_data(_sin_square_chi_data)
     _fit_sin_2chi_res = plugin._fit_sin_2chi_data(_sin_2chi_data)
     plugin.create_detailed_results(
@@ -367,13 +377,14 @@ def test_write_results(plugin, fitted_data):
     assert Path(_fname).is_file()
 
 
-@pytest.mark.parametrize("fitted_data", _RANGE_ONLY_2THETA_RAD, indirect=True)
-def test_write_results__all_nan(plugin, fitted_data):
+def test_write_results__all_nan(plugin, fitted_2theta_deg_data):
     plugin.set_param_value("output_export_images_flag", True)
     plugin._config["global_index"] = 2
     plugin.pre_execute()
-    fitted_data[:] = np.nan
-    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(fitted_data)
+    fitted_2theta_deg_data[:] = np.nan
+    _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(
+        fitted_2theta_deg_data
+    )
     _fit_sin_square_res = plugin._fit_sin_square_chi_data(_sin_square_chi_data)
     _fit_sin_2chi_res = plugin._fit_sin_2chi_data(_sin_2chi_data)
     plugin.create_detailed_results(

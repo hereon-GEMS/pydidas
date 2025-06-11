@@ -50,7 +50,7 @@ from pydidas.gui.gui_excepthook_ import gui_excepthook
 from pydidas.resources import icons
 from pydidas.version import VERSION
 from pydidas.widgets import PydidasFileDialog, get_pyqt_icon_from_str
-from pydidas.widgets.dialogues import AcknowledgeBox, QuestionBox, critical_warning
+from pydidas.widgets.dialogues import AcknowledgeBox, QuestionBox
 from pydidas.widgets.framework import PydidasFrameStack, PydidasStatusWidget
 from pydidas.widgets.windows import (
     AboutWindow,
@@ -512,15 +512,14 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         if not filename.parent.is_dir():
             filename.parent.mkdir(parents=True)
         _state = self.__get_window_states()
-        for _index, _frame in enumerate(self.centralWidget().frames):
-            _frameindex, _frame_state = _frame.export_state()
-            assert _index == _frameindex
-            _state[f"frame_{_index:02d}"] = _frame_state
+        for _index, _frame in enumerate(self.centralWidget().current_frames):
+            _entry, _frame_state = _frame.export_state()
+            _state[f"frame::{_entry}"] = _frame_state
         for _key, _context in GLOBAL_CONTEXTS.items():
-            _state[_key] = _context.get_param_values_as_dict(
+            _state[f"context::{_key}"] = _context.get_param_values_as_dict(
                 filter_types_for_export=True
             )
-        _state["workflow_tree"] = TREE.export_to_string()
+        _state["context::workflow_tree"] = TREE.export_to_string()
         _state["pydidas_version"] = VERSION
         with open(filename, "wt", encoding="UTF-8") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
@@ -537,8 +536,8 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         """
         _window_states = {}
         for _key, _window in self._child_windows.items():
-            if _key != "tmp":
-                _window_states[_key] = _window.export_window_state()
+            if not _key.startswith("temp_window"):
+                _window_states[f"window::{_key}"] = _window.export_window_state()
         _window_states["main"] = self.export_main_window_state()
         return _window_states
 
@@ -626,8 +625,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             window states.
         """
         for _key, _window in self._child_windows.items():
-            if not _key.startswith("temp_window"):
-                _window.restore_window_state(state[_key])
+            _window.restore_window_state(state[f"window::{_key}"])
 
     def restore_main_window_state(self, state: dict):
         """
@@ -667,19 +665,12 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         state : dict
             The state information for all frames.
         """
-        _frame_info = [
-            f"frame_{_index:02d}" in state.keys()
-            for _index, _ in enumerate(self.centralWidget().frames)
-        ]
-        if False in _frame_info:
-            self._qtapp.sig_gui_exception_occurred.emit()
-            critical_warning(
-                "Error",
-                "The state is not defined for all frames. Aborting Frame state import.",
-            )
-            return
-        for _index, _frame in enumerate(self.centralWidget().frames):
-            _frame.restore_state(state[f"frame_{_index:02d}"])
+        _frame_states = {
+            _key.removeprefix("frame::"): _val
+            for _key, _val in state.items()
+            if _key.startswith("frame::")
+        }
+        self.centralWidget().restore_frame_states(_frame_states)
 
     @QtCore.Slot()
     def _open_help(self):

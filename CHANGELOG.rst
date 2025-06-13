@@ -2,6 +2,19 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v25.mm.dd
+=========
+
+Improvements
+------------
+
+
+Bugfixes
+--------
+- Fixed an issue where the import of frame states would alter the frame index
+  which would de-sync the frame index with the index in the central widget.
+
+
 v25.05.16
 =========
 

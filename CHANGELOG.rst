@@ -13,6 +13,7 @@ Bugfixes
 --------
 - Fixed an issue where the import of frame states would alter the frame index
   which would de-sync the frame index with the index in the central widget.
+- Fixed an issue in the GeneralAsciiSaver where exporting data with a metadata header.
 
 
 v25.05.16

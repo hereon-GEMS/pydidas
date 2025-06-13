@@ -147,7 +147,7 @@ class GeneralAsciiSaver(OutputPlugin):
             The header string.
         """
         _header = "# Metadata:\n"
-        for _key, _val in self._data.metadata:
+        for _key, _val in self._data.metadata.items():
             _header += f"# {_key}: {_val}\n"
         _header += "#\n"
         _header += f"# Axis label: {self._data.axis_labels[0]}\n"

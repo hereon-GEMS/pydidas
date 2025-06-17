@@ -7,7 +7,7 @@ v25.mm.dd
 
 Improvements
 ------------
-
+- Added an option to copy the results of a ProcessingResults instance to another instance.
 
 Bugfixes
 --------

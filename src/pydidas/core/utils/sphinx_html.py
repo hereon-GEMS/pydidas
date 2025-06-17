@@ -36,12 +36,12 @@ from pathlib import Path
 from typing import Union
 
 import yaml
-from qtpy import QtWidgets
 
 from pydidas.core.utils.get_documentation_targets import (
     DOC_BUILD_PATH,
     DOC_SOURCE_DIRECTORY,
 )
+from pydidas_qtcore import PydidasSplashScreen
 
 
 def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
@@ -102,16 +102,11 @@ def run_sphinx_html_build(
         print("----- the documentation has been finished.             -----")
         print("-" * 60)
         print("=" * 60)
-        app = QtWidgets.QApplication.instance()
-        if app is not None:
-            for _widget in app.topLevelWidgets():
-                if isinstance(_widget, QtWidgets.QSplashScreen) and hasattr(
-                    _widget, "show_aligned_message"
-                ):
-                    _widget.show_aligned_message(
-                        "Building html documentation (required only once during first "
-                        "startup)"
-                    )
+        if PydidasSplashScreen.is_active():
+            _splash_screen = PydidasSplashScreen.instance()
+            _splash_screen.show_aligned_message(
+                "Building html documentation (required only once during first startup)"
+            )
     try:
         with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:
             yaml.dump({"docs-built": True}, f)

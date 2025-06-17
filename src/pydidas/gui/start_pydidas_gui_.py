@@ -49,6 +49,7 @@ def start_pydidas_gui(
     restore_state: str = "exit",
     custom_mainwindow: Type[MainWindow] | None = None,
     custom_splash_image: Path | None = None,
+    splash_screen: PydidasSplashScreen | None = None,
 ):
     """
     Open the pydidas GUI with the given frames and run the QEventLoop.
@@ -69,6 +70,9 @@ def start_pydidas_gui(
     custom_splash_image : Path, optional
         The path to a custom splash image to be used. If not provided, the
         default splash image will be used.
+    splash_screen : PydidasSplashScreen, optional
+        An existing splash screen instance to be used. If not provided, a new
+        PydidasSplashScreen instance will be created.
     """
     main_window_cls = MainWindow if custom_mainwindow is None else custom_mainwindow
     restore_state = "None" if restore_state is None else restore_state
@@ -76,7 +80,11 @@ def start_pydidas_gui(
     if use_default_frames:
         frames = DEFAULT_FRAMES + frames
     _check_frames(frames)
-    _splash = PydidasSplashScreen(custom_splash_image=custom_splash_image)
+    _splash = (
+        PydidasSplashScreen.instance(custom_splash_image=custom_splash_image)
+        if splash_screen is None
+        else splash_screen
+    )
     try:
         _splash.show_aligned_message("Starting QApplication")
         _app = _get_pydidas_qapplication()

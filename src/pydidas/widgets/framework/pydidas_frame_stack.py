@@ -54,14 +54,6 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
     ----------
     parent : QWidget, optional
         The parent widget. The default is None.
-
-    Attributes
-    ----------
-    current_frames : list
-        A list of all the registered widgets.
-    frame_indices : dict
-        A dictionary with (widget_name: index) entries to reference
-        widgets with their names.
     """
 
     sig_mouse_entered = QtCore.Signal()

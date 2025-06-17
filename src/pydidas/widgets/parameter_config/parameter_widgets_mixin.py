@@ -44,7 +44,7 @@ class ParameterWidgetsMixIn:
     """
 
     def __init__(self):
-        self.param_widgets = {}
+        self.param_widgets: dict[str, ParameterWidget] = {}
         self.param_composite_widgets = {}
         if not hasattr(self, "_widgets"):
             self._widgets = {}

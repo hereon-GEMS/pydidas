@@ -50,7 +50,7 @@ class ParameterCollectionMixIn:
 
     def __init__(self) -> None:
         if not hasattr(self, "params"):
-            self.params = ParameterCollection()
+            self.params: ParameterCollection = ParameterCollection()
         if not isinstance(self.params, ParameterCollection):
             raise TypeError(
                 "The class has a .params attribute which is not a ParameterCollection. "

@@ -77,6 +77,7 @@ class ParameterWidget(EmptyWidget):
     """
 
     io_edited = QtCore.Signal(str)
+    sig_value_changed = QtCore.Signal()
 
     def __init__(
         self,
@@ -124,7 +125,6 @@ class ParameterWidget(EmptyWidget):
         config["width_unit"] = (
             config["width_unit_setting"] if len(self.param.unit) > 0 else 0
         )
-
         if config["linebreak"]:
             config["width_text"] = 1.0
             config["width_io"] = kwargs.get("width_io", 0.9 - config["width_unit"])
@@ -136,7 +136,6 @@ class ParameterWidget(EmptyWidget):
                 + config["width_unit_setting"]
                 - config["width_unit"],
             )
-
         config["align_text"] = QtCore.Qt.AlignVCenter | kwargs.get(
             "halign_text", QtCore.Qt.AlignLeft
         )

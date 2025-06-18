@@ -34,6 +34,7 @@ from pydidas.gui.frames.home_frame import HomeFrame
 from pydidas.gui.frames.image_math_frame import ImageMathFrame
 from pydidas.gui.frames.pyfai_calib_frame import PyfaiCalibFrame
 from pydidas.gui.frames.quick_integration_frame import QuickIntegrationFrame
+from pydidas.gui.frames.sin_square_chi_results_frame import SinSquareChiResultsFrame
 from pydidas.gui.frames.utilities_frame import UtilitiesFrame
 from pydidas.gui.frames.view_results_frame import ViewResultsFrame
 from pydidas.gui.frames.workflow_edit_frame import WorkflowEditFrame
@@ -54,4 +55,5 @@ DEFAULT_FRAMES = (
     WorkflowRunFrame,
     ViewResultsFrame,
     UtilitiesFrame,
+    SinSquareChiResultsFrame,
 )

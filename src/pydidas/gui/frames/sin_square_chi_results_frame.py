@@ -1,0 +1,428 @@
+# This file is part of pydidas
+#
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with pydidas If not, see <http://www.gnu.org/licenses/>.
+
+"""
+Module with the DataBrowsingFrame which is used to browse through the filesystem in a
+dedicated filesystem tree and show file data in a view window.
+"""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
+__maintainer__ = "Malte Storm"
+__status__ = "Production"
+__all__ = ["SinSquareChiResultsFrame"]
+
+from functools import partial
+from pathlib import Path
+
+from qtpy import QtCore
+
+from pydidas_plugins.residual_stress_plugins.store_sin_2chi_data import (
+    StoreSinTwoChiData,
+)
+from pydidas_plugins.residual_stress_plugins.store_sin_square_chi_data import (
+    StoreSinSquareChiData,
+)
+
+from pydidas.core import Parameter, ParameterCollection
+from pydidas.core.utils import apply_qt_properties
+from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
+    get_widget_creation_information,
+)
+from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.plotting import GridCurvePlot
+from pydidas.workflow import ProcessingResults, WorkflowResults
+from pydidas_qtcore import PydidasQApplication
+
+
+# TODO: Addd documentation
+
+_DEFAULT_PARAMS = ParameterCollection(
+    Parameter(
+        "selected_data_source",
+        str,
+        "None",
+        name="Selected data source",
+        tooltip="The data source used for the visualization",
+    ),
+    Parameter(
+        "selected_sin_square_chi_node",
+        str,
+        "no selection",
+        name="Selected sin^2(chi) node",
+        choices=["no selection"],
+        tooltip=(
+            "The node which includes the stored information with the results of the "
+            "fit plotted vs sin^2(chi)."
+        ),
+    ),
+    Parameter(
+        "show_sin_square_chi_results",
+        bool,
+        True,
+        choices=[True, False],
+        name="Show sin^2(chi) results in plot",
+        tooltip=(
+            "Flag to show the results of the sin^2(chi) analysis in the plot. "
+            "If False, no results will be shown."
+        ),
+    ),
+    Parameter(
+        "show_sin_square_chi_branches",
+        bool,
+        True,
+        choices=[True, False],
+        name="Show sin^2(chi) branches in plot",
+        tooltip=(
+            "Flag to show the positive and negative branches of the sin^2(chi) "
+            "analysis in the plot. If False, no branches will be shown but only the "
+            "average and the fit results."
+        ),
+    ),
+    Parameter(
+        "autoscale_sin_square_chi_results",
+        bool,
+        True,
+        choices=[True, False],
+        name="Autoscale sin^2(chi) results",
+        tooltip=(
+            "Flag to autoscale the results of the sin^2(chi) analysis in the plot. "
+            "If False, the plot will not be autoscaled."
+        ),
+    ),
+    Parameter(
+        "sin_square_chi_limit_low",
+        float,
+        0.0,
+        name="Lower limit for sin^2(chi) results",
+        tooltip=(
+            "The lower limit for the sin^2(chi) results in the plot. "
+            "If autoscaling is enabled, this value will be ignored."
+        ),
+    ),
+    Parameter(
+        "sin_square_chi_limit_high",
+        float,
+        1.0,
+        name="Upper limit for sin^2(chi) results",
+        tooltip=(
+            "The upper limit for the sin^2(chi) results in the plot. "
+            "If autoscaling is enabled, this value will be ignored."
+        ),
+    ),
+    Parameter(
+        "selected_sin_2chi_node",
+        str,
+        "no selection",
+        name="Selected sin(2*chi) node",
+        choices=["no selection"],
+        tooltip=(
+            "The node which includes the stored information with the results of the "
+            "fit results plotted vs. sin(2*chi)."
+        ),
+    ),
+    Parameter(
+        "show_sin_2chi_results",
+        bool,
+        True,
+        choices=[True, False],
+        name="Show sin(2*chi) results in plot",
+        tooltip=(
+            "Flag to show the results of the sin(2*chi) analysis in the plot. "
+            "If False, no results will be shown."
+        ),
+    ),
+    Parameter(
+        "autoscale_sin_2chi_results",
+        bool,
+        True,
+        choices=[True, False],
+        name="Autoscale sin(2*chi) results",
+        tooltip=(
+            "Flag to autoscale the results of the sin(2*chi) analysis in the plot. "
+            "If False, the plot will not be autoscaled."
+        ),
+    ),
+    Parameter(
+        "sin_2chi_limit_low",
+        float,
+        0.0,
+        name="Lower limit for sin(2*chi) results",
+        tooltip=(
+            "The lower limit for the sin(2*chi) results in the plot. "
+            "If autoscaling is enabled, this value will be ignored."
+        ),
+    ),
+    Parameter(
+        "sin_2chi_limit_high",
+        float,
+        1.0,
+        name="Upper limit for sin(2*chi) results",
+        tooltip=(
+            "The upper limit for the sin(2*chi) results in the plot. "
+            "If autoscaling is enabled, this value will be ignored."
+        ),
+    ),
+)
+_RESULTS = WorkflowResults()
+
+
+class SinSquareChiResultsFrame(BaseFrame):
+    """
+    A class to visualize the results of a sin-square chi analysis.
+    """
+
+    menu_icon = "pydidas::frame_icon_sin_square_visualization"
+    menu_title = "Sin square chi results visualization"
+    menu_entry = "Analysis tools/Sin square chi results visualization"
+    default_params = _DEFAULT_PARAMS
+    params_not_to_restore = list(_DEFAULT_PARAMS.keys())
+
+    def __init__(self, **kwargs: dict):
+        BaseFrame.__init__(self, **kwargs)
+        self.__qtapp = PydidasQApplication.instance()
+        self.set_default_params()
+        self.__import_dialog = PydidasFileDialog()
+        self.__current_results = ProcessingResults()
+        self._sin_square_chi_node_keys = {"no selection": -1}
+        self._sin_2chi_node_keys = {"no selection": -1}
+        self._sin_square_chi_data = None
+        self._sin_2chi_data = None
+
+    def build_frame(self):
+        """
+        Build the frame and populate it with widgets.
+        """
+        for _name, _args, _kwargs in get_widget_creation_information(self.params):
+            _method = getattr(self, _name)
+            if "widget" in _kwargs:
+                _kwargs["widget"] = self._widgets[_kwargs["widget"]]
+            _method(*_args, **_kwargs)
+        apply_qt_properties(self.layout(), columnStretch=(1, 1))
+
+    def connect_signals(self):
+        """
+        Connect all required signals and slots between widgets and class
+        methods.
+        """
+        self._widgets["button_load_workflow_results"].clicked.connect(
+            self._import_workflow_results
+        )
+        self._widgets["button_import_from_directory"].clicked.connect(
+            self._import_from_directory
+        )
+        self.param_widgets["autoscale_sin_square_chi_results"].io_edited.connect(
+            partial(self._update_scaling_visibility, "square_chi")
+        )
+        self.param_widgets["autoscale_sin_2chi_results"].io_edited.connect(
+            partial(self._update_scaling_visibility, "2chi")
+        )
+        for _key in [
+            "autoscale_sin_square_chi_results",
+            "sin_square_chi_limit_low",
+            "sin_square_chi_limit_high",
+            "autoscale_sin_2chi_results",
+            "sin_2chi_limit_low",
+            "sin_2chi_limit_high",
+        ]:
+            _ref = "square" if "square" in _key else "two_chi"
+            self.param_widgets[_key].io_edited.connect(
+                partial(self.__set_scaling, _ref)
+            )
+        for _key in [
+            "selected_sin_2chi_node",
+            "selected_sin_square_chi_node",
+            "show_sin_square_chi_branches",
+            "show_sin_square_chi_results",
+            "show_sin_2chi_results",
+        ]:
+            self.param_widgets[_key].io_edited.connect(self._update_plotted_data)
+
+    def finalize_ui(self):
+        """
+        Finalize the UI initialization.
+        """
+        self._plots: GridCurvePlot = self._widgets["visualization"]
+        # "complicated" syntax below to allow key of 2chi
+        self._plots.set_datasets(square=None, two_chi=None)
+        for _key in ["square", "two_chi"]:
+            self._plots.set_xscaling(_key, (0, 1))
+            self._plots.set_y_autoscaling(_key)
+
+    @QtCore.Slot(int)
+    def frame_activated(self, index: int):
+        """
+        Received signal that frame has been activated.
+
+        This method is called when this frame becomes activated by the
+        central widget. By default, this method will perform no actions.
+        If specific frames require any actions, they will need to overwrite
+        this method.
+
+        Parameters
+        ----------
+        index : int
+            The index of the activated frame.
+        """
+        BaseFrame.frame_activated(self, index)
+
+    def update_selected_data_source(self, data_source: str):
+        """
+        Update the selected data source parameter.
+
+        Parameters
+        ----------
+        data_source : str
+            The new data source to set.
+        """
+        self.param_widgets["selected_data_source"].setReadOnly(False)
+        self.set_param_value_and_widget("selected_data_source", data_source)
+        self.param_widgets["selected_data_source"].setReadOnly(True)
+
+    @QtCore.Slot()
+    def _import_workflow_results(self):
+        """
+        Import workflow results from a file dialog.
+        """
+        self.__current_results.update_from_processing_results(_RESULTS)
+        self.update_selected_data_source("Workflow results")
+        self.reset_selection()
+        self._update_selection_choices()
+
+    @QtCore.Slot()
+    def _import_from_directory(self):
+        """
+        Open a file dialog to import data from a directory.
+        """
+        _dir = self.__import_dialog.get_existing_directory(
+            caption="Import data from directory",
+            qsettings_ref="SinSquareChiResultsFrame__import_dir",
+        )
+        if _dir is not None:
+            self.__current_results.import_data_from_directory(_dir)
+            _stem = Path(_dir).stem
+            self.update_selected_data_source("Directory: " + _stem)
+            self.reset_selection()
+            self._update_selection_choices()
+
+    def reset_selection(self):
+        """
+        Reset the selection of sin-square chi and sin(2*chi) nodes.
+
+        This method will reset the selected nodes to their initial state.
+        """
+        self.set_param_value("selected_sin_square_chi_node", "no selection")
+        self.set_param_value("selected_sin_2chi_node", "no selection")
+        self._plots.clear()
+
+    def _update_selection_choices(self):
+        """
+        Update the choices for the sin-square chi and sin(2*chi) nodes.
+
+        This method will update the parameter choices based on the current
+        results.
+        """
+        self._sin_square_chi_node_keys = {
+            self.__current_results._config["result_titles"][_key]: _key
+            for _key, _val in self.__current_results._config["plugin_names"].items()
+            if StoreSinSquareChiData.plugin_name in _val
+        } | {"no selection": -1}
+        self.params["selected_sin_square_chi_node"].update_value_and_choices(
+            list(self._sin_square_chi_node_keys)[0],
+            list(self._sin_square_chi_node_keys),
+        )
+        self.param_widgets["selected_sin_square_chi_node"].update_choices(
+            self.params["selected_sin_square_chi_node"].choices
+        )
+        self._sin_2chi_node_keys = {
+            self.__current_results._config["result_titles"][_key]: _key
+            for _key, _val in self.__current_results._config["plugin_names"].items()
+            if StoreSinTwoChiData.plugin_name in _val
+        } | {"no selection": -1}
+        self.params["selected_sin_2chi_node"].update_value_and_choices(
+            list(self._sin_2chi_node_keys)[0],
+            list(self._sin_2chi_node_keys),
+        )
+        self.param_widgets["selected_sin_2chi_node"].update_choices(
+            self.params["selected_sin_2chi_node"].choices
+        )
+        if (
+            len(self._sin_2chi_node_keys) == 2
+            and len(self._sin_square_chi_node_keys) == 2
+        ):
+            self._update_plotted_data("all")
+
+    @QtCore.Slot(str)
+    def _update_plotted_data(self, new_selection: str):
+        """
+        Update the data used in the plots.
+        """
+        self._plots.clear()
+        for _key in ["square_chi", "2chi"]:
+            _node_str = self.get_param_value(f"selected_sin_{_key}_node")
+            _node_id = getattr(self, f"_sin_{_key}_node_keys")[_node_str]
+            _show = self.get_param_value(f"show_sin_{_key}_results")
+            if _node_id > 0 and _show:
+                _data = self.__current_results.get_results_for_flattened_scan(_node_id)
+                if _key == "square_chi" and not self.get_param_value(
+                    "show_sin_square_chi_branches"
+                ):
+                    _data = _data[:, 2:, :]
+            else:
+                _data = None
+            setattr(self, f"_sin_{_key}_data", _data)
+        self._plots.set_datasets(
+            square=self._sin_square_chi_data, two_chi=self._sin_2chi_data
+        )
+
+    @QtCore.Slot(str)
+    def _update_scaling_visibility(self, results: str, autoscale: str):
+        """
+        Update the visibility of the scaling widgets based on the autoscale parameter.
+
+        Parameters
+        ----------
+        results : str
+            The key of the result for which the autoscale parameter is set.
+        autoscale : str
+            The autoscale parameter value as a string ("TRUE" or "FALSE").
+        """
+        autoscale = autoscale.upper() == "TRUE"
+        for _key in [f"sin_{results}_limit_low", f"sin_{results}_limit_high"]:
+            self.param_composite_widgets[_key].setVisible(not autoscale)
+        self._widgets[f"button_update_sin_{results}_limits"].setVisible(not autoscale)
+
+    @QtCore.Slot(str)
+    def __set_scaling(self, result_key: str):
+        """
+        Set the scaling for the sin-square chi or sin(2*chi) results.
+
+        Parameters
+        ----------
+        result_key : str
+            The type of results to set the scaling for ("square" or "2chi").
+        """
+        _key = "square_chi" if result_key == "square" else "2chi"
+        _use_autoscale = self.get_param_value(f"autoscale_sin_{_key}_results")
+        if _use_autoscale:
+            self._plots.set_y_autoscaling(result_key)
+            return
+        _low = self.get_param_value(f"sin_{result_key}_chi_limit_low")
+        _high = self.get_param_value(f"sin_{result_key}_chi_limit_high")
+        self._plots.set_yscaling(result_key, (_low, _high))

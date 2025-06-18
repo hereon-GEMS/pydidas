@@ -36,6 +36,7 @@ from .define_diffraction_exp_frame_builder import *
 from .define_scan_frame_builder import *
 from .image_math_frame_builder import *
 from .quick_integration_frame_builder import *
+from .sin_square_chi_results_frame_builder import *
 from .utilities_frame_builder import *
 from .workflow_edit_frame_builder import *
 from .workflow_run_frame_builder import *
@@ -48,6 +49,7 @@ __all__ = (
     + image_math_frame_builder.__all__
     + define_diffraction_exp_frame_builder.__all__
     + define_scan_frame_builder.__all__
+    + sin_square_chi_results_frame_builder.__all__
     + quick_integration_frame_builder.__all__
     + utilities_frame_builder.__all__
     + workflow_edit_frame_builder.__all__
@@ -63,6 +65,7 @@ del (
     define_diffraction_exp_frame_builder,
     define_scan_frame_builder,
     quick_integration_frame_builder,
+    sin_square_chi_results_frame_builder,
     utilities_frame_builder,
     workflow_edit_frame_builder,
     workflow_run_frame_builder,

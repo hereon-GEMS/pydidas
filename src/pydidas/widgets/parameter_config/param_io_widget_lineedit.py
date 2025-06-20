@@ -30,9 +30,9 @@ __all__ = ["ParamIoWidgetLineEdit"]
 
 
 from numbers import Real
+from typing import Any
 
 import numpy as np
-from qtpy import QtCore
 
 from pydidas.core import Parameter
 from pydidas.core.constants import FLOAT_DISPLAY_ACCURACY, POLICY_EXP_FIX
@@ -50,19 +50,17 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
     ----------
     param : Parameter
         A Parameter instance.
-    **kwargs : dict
+    **kwargs : Any
         Any additional kwargs.
     """
 
-    io_edited = QtCore.Signal(str)
-
-    def __init__(self, param: Parameter, **kwargs: dict):
+    def __init__(self, param: Parameter, **kwargs: Any):
         PydidasLineEdit.__init__(self, parent=kwargs.get("parent", None))
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
         self.set_validator(param)
         self.set_value(param.value)
         self.editingFinished.connect(self.emit_signal)
-        self.setSizePolicy(*POLICY_EXP_FIX)
+        self.setSizePolicy(*POLICY_EXP_FIX)  # noqa E1120, E1121
 
     def emit_signal(self):
         """
@@ -74,7 +72,8 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         _cur_value = self.text()
         if _cur_value != self._old_value:
             self._old_value = _cur_value
-            self.io_edited.emit(_cur_value)
+            self.sig_new_value.emit(_cur_value)
+            self.sig_value_changed.emit()
 
     def get_value(self) -> object:
         """

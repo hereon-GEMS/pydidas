@@ -244,13 +244,13 @@ class PydidasFileDialog(
             return self._stored_selections.get(_key, ""), self._stored_dirs.get(_key)
         return "", None
 
-    def get_existing_directory(self, **kwargs: dict) -> str | None:
+    def get_existing_directory(self, **kwargs: Any) -> str | None:
         """
         Execute the dialog and get an existing directory.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Optional keyword arguments. Supported keywords are:
 
             caption : str, optional
@@ -384,7 +384,7 @@ class PydidasFileDialog(
                 self._widgets["selection"].text()
             )
 
-    def get_saving_filename(self, **kwargs: dict) -> str | None:
+    def get_saving_filename(self, **kwargs: Any) -> str | None:
         """
         Execute the dialog and get the full path of a file for saving.
 
@@ -392,7 +392,7 @@ class PydidasFileDialog(
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Optional keyword arguments. Supported keywords are:
 
             caption : str, optional

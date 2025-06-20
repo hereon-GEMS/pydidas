@@ -217,7 +217,7 @@ class TestWorkerController(unittest.TestCase):
         self._wc = WorkerController()
         self._wc.flags["active"] = True
         t0 = time.time()
-        self._wc._wait_for_processes_to_finish(timeout=_timeout)
+        self._wc.wait_for_processes_to_finish(timeout=_timeout)
         self.assertTrue(time.time() - t0 >= _timeout)
 
     def test_add_tasks(self):

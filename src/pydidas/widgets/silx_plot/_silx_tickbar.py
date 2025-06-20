@@ -30,13 +30,14 @@ __status__ = "Production"
 __all__ = ["tickbar_paintEvent", "tickbar_paintTick"]
 
 
-from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui.plot.ColorBar import _TickBar
+from qtpy import QtCore, QtGui
+from silx.gui.plot.ColorBar import _TickBar  # noqa W0212
 
-from pydidas.core.utils import update_qobject_font
+from pydidas.core.utils import update_qwidget_font
+from pydidas_qtcore import PydidasQApplication
 
 
-def tickbar_paintEvent(instance: QtWidgets.QWidget, event: QtCore.QEvent):
+def tickbar_paintEvent(instance: _TickBar, event: QtCore.QEvent):  # noqa C0103
     """
     Handle the paintEvent with the global font.
 
@@ -45,34 +46,34 @@ def tickbar_paintEvent(instance: QtWidgets.QWidget, event: QtCore.QEvent):
 
     Parameters
     ----------
-    instance : QtWidgets.QWidget
+    instance :_TickBar
         The _TickBar instance.
     event : QtGui.QEvent
         The paint event.
     """
-    _qtapp = QtWidgets.QApplication.instance()
+    _qtapp = PydidasQApplication.instance()
     painter = QtGui.QPainter(instance)
-    update_qobject_font(painter, pointSizeF=_qtapp.font_size - 2)
+    update_qwidget_font(painter, pointSizeF=_qtapp.font_size - 2)  # noqa
     _font_metric = QtGui.QFontMetrics(painter.font())
     instance._WIDTH_DISP_VAL = int(
-        5.5 * (_font_metric.averageCharWidth()) + instance._LINE_WIDTH
+        5.5 * (_font_metric.averageCharWidth()) + instance._LINE_WIDTH  # noqa W0212
     )
-    instance._resetWidth()
+    instance._resetWidth()  # noqa W0212
 
     # paint ticks
     for val in instance.ticks:
-        instance._paintTick(val, painter, majorTick=True)
+        instance._paintTick(val, painter, majorTick=True)  # noqa W0212
 
     # paint subticks
     for val in instance.subTicks:
-        instance._paintTick(val, painter, majorTick=False)
+        instance._paintTick(val, painter, majorTick=False)  # noqa W0212
 
 
-def tickbar_paintTick(
-    instance: QtWidgets.QWidget,
+def tickbar_paintTick(  # noqa C0103
+    instance: _TickBar,
     val: float,
     painter: QtGui.QPainter,
-    majorTick: bool = True,
+    majorTick: bool = True,  # noqa C0103
 ):
     """
     Paint a tick with the global font.
@@ -95,10 +96,10 @@ def tickbar_paintTick(
     _value_str = instance.form.format(val)
     _offset = _font_metric.tightBoundingRect(_value_str).height() / 2
 
-    viewportHeight = instance.rect().height() - instance.margin * 2 - 1
-    relativePos = instance._getRelativePosition(val)
-    height = int(viewportHeight * relativePos + instance.margin)
-    _line_y0 = int(instance.width() - _TickBar._LINE_WIDTH / (1 if majorTick else 2))
+    viewport_height = instance.rect().height() - instance.margin * 2 - 1
+    relative_pos = instance._getRelativePosition(val)  # noqa W0212
+    height = int(viewport_height * relative_pos + instance.margin)
+    _line_y0 = int(instance.width() - _TickBar._LINE_WIDTH / (1 if majorTick else 2))  # noqa W0212
 
     painter.drawLine(QtCore.QLine(_line_y0, height, instance.width(), height))
     if instance.displayValues and majorTick is True:

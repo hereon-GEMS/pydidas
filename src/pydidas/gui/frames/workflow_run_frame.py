@@ -29,6 +29,7 @@ __all__ = ["WorkflowRunFrame"]
 
 
 import time
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -61,7 +62,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
 
     sig_processing_running = QtCore.Signal(bool)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         self._EXP = DiffractionExperimentContext()
         self._SCAN = ScanContext()
         self._TREE = WorkflowTree()
@@ -97,7 +98,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         Connect all required Qt slots and signals.
         """
-        self.param_widgets["autosave_results"].io_edited.connect(
+        self.param_widgets["autosave_results"].sig_value_changed.connect(
             self.__update_autosave_widget_visibility
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
@@ -335,6 +336,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
             self.toggle_param_widget_visibility(_key, not running)
         self.__update_autosave_widget_visibility()
 
+    @QtCore.Slot()
     def __update_autosave_widget_visibility(self):
         """
         Update the visibility of the autosave widgets based on the selection

@@ -664,7 +664,7 @@ class _SinSquareChiAnalysisConfigWidget(GenericPluginConfigWidget):
     def finalize_init(self):
         """Show/hide the output parameters based on user selection."""
         self._toggle_output_parameters()
-        self.param_widgets["output_export_images_flag"].io_edited.connect(
+        self.param_widgets["output_export_images_flag"].sig_new_value.connect(
             self._toggle_output_parameters
         )
 

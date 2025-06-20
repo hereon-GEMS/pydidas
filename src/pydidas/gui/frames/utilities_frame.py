@@ -29,7 +29,7 @@ __all__ = ["UtilitiesFrame"]
 
 
 from functools import partial
-from typing import Type
+from typing import Any, Type
 
 from qtpy import QtCore, QtWidgets
 
@@ -54,7 +54,7 @@ class UtilitiesFrame(BaseFrame):
     menu_title = "Utilities"
     menu_entry = "Utilities"
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
         self._child_windows = {}
         self.__window_counter = 0

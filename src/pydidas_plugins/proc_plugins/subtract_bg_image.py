@@ -173,7 +173,7 @@ class SubtractBackgroundImageConfigWidget(GenericPluginConfigWidget):
     def connect_signals(self):
         """Connect the signals of the widgets to the appropriate slots."""
         GenericPluginConfigWidget.connect_signals(self)
-        self.param_composite_widgets["bg_file"].io_edited.connect(
+        self.param_composite_widgets["bg_file"].sig_new_value.connect(
             self._toggle_hdf5_plugin_visibility
         )
 

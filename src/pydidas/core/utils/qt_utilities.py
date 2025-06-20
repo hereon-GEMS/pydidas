@@ -29,17 +29,18 @@ __all__ = [
     "update_size_policy",
     "apply_qt_properties",
     "update_palette",
-    "update_qobject_font",
+    "update_qwidget_font",
     "apply_font_properties",
     "check_pydidas_qapp_instance",
     "IS_QT6",
+    "qstate_is_checked",
 ]
 
 
 from collections.abc import Iterable
 from typing import Any, NoReturn
 
-from qtpy import QT_VERSION, QtGui, QtWidgets
+from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QObject
 from qtpy.QtGui import QFont
 from qtpy.QtWidgets import QWidget
@@ -172,15 +173,15 @@ def update_palette(obj: QWidget, **kwargs: Any):
     obj.setPalette(_palette)
 
 
-def update_qobject_font(obj: QObject, **kwargs: Any):
+def update_qwidget_font(obj: QWidget, **kwargs: Any):
     """
-    Update the font associated with a QObject.
+    Update the font associated with a QWidget.
 
     Note that the object is modified in place and no explicit return is given.
 
     Parameters
     ----------
-    obj : QtCore.QObject
+    obj : QtCore.QWidget
         The QObject to be updated.
     **kwargs : Any
         A dictionary with font properties.
@@ -233,3 +234,23 @@ def check_pydidas_qapp_instance() -> None | NoReturn:
             "Pydidas widgets require a PydidasQApplication instance to work properly "
             "and are not compatible with the generic QApplication."
         )
+
+
+def qstate_is_checked(state: QtCore.Qt.CheckState) -> bool:
+    """
+    Check if the given state is checked.
+
+    Parameters
+    ----------
+    state : QtCore.Qt.CheckState
+        The state to check.
+
+    Returns
+    -------
+    bool
+        True if the state is checked, False otherwise.
+    """
+    # The E1101 ignores unresolved attribute access in Qt5 / 6, respectively.
+    if IS_QT6:
+        return state == QtCore.Qt.Checked.value  # noqa E1101
+    return state == QtCore.Qt.Checked  # noqa E1101

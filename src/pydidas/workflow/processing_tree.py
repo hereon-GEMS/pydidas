@@ -31,7 +31,7 @@ __all__ = ["ProcessingTree"]
 import ast
 from numbers import Integral
 from pathlib import Path
-from typing import Self
+from typing import Any, Self
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import OUTPUT_PLUGIN
@@ -278,7 +278,7 @@ class ProcessingTree(GenericTree):
             setattr(self, _att, getattr(_new_tree, _att))
         self._config["tree_changed"] = True
 
-    def export_to_file(self, filename: Path | str, **kwargs: dict):
+    def export_to_file(self, filename: Path | str, **kwargs: Any):
         """
         Export the WorkflowTree to a file using any of the registered exporters.
 

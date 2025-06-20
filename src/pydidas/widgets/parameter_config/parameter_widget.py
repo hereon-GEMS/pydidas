@@ -30,6 +30,7 @@ __all__ = ["ParameterWidget"]
 
 import html
 from pathlib import Path
+from typing import Any
 
 from qtpy import QtCore
 
@@ -57,6 +58,10 @@ from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
 )
 
 
+AlignLeft = QtCore.Qt.AlignLeft
+AlignVCenter = QtCore.Qt.AlignVCenter
+
+
 class ParameterWidget(EmptyWidget):
     """
     A combined widget to display and modify a Parameter with name, value and unit.
@@ -76,13 +81,13 @@ class ParameterWidget(EmptyWidget):
         Additional keyword arguments
     """
 
-    io_edited = QtCore.Signal(str)
+    sig_new_value = QtCore.Signal(str)
     sig_value_changed = QtCore.Signal()
 
     def __init__(
         self,
         param: Parameter,
-        **kwargs: dict,
+        **kwargs: Any,
     ):
         EmptyWidget.__init__(self, **kwargs)
         self.setSizePolicy(*POLICY_EXP_FIX)
@@ -105,10 +110,11 @@ class ParameterWidget(EmptyWidget):
             self.__create_unit_widget()
         self.io_widget = self._widgets["io"]
 
-        self._widgets["io"].io_edited.connect(self.__emit_io_changed)
-        self._widgets["io"].io_edited.connect(self.__set_param_value)
+        self._widgets["io"].sig_new_value.connect(self.set_param_value)
+        self._widgets["io"].sig_new_value.connect(self.sig_new_value)
+        self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
 
-    def __store_config_from_kwargs(self, kwargs: dict):
+    def __store_config_from_kwargs(self, kwargs: dict[str, Any]):
         """
         Get the config from the kwargs formatting options.
 
@@ -117,35 +123,26 @@ class ParameterWidget(EmptyWidget):
         kwargs : dict
             The calling kwargs.
         """
+        _unit_preset = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
+        _text_preset = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
+        _unit_width = _unit_preset if len(self.param.unit) > 0 else 0
+        _io_width = kwargs.get("width_io", PARAM_WIDGET_EDIT_WIDTH) + (
+            0 if _unit_width > 0 else _unit_preset
+        )
+        _linebreak = kwargs.get("linebreak", False)
         config = {
-            "linebreak": kwargs.get("linebreak", False),
+            "linebreak": _linebreak,
             "persistent_qsettings_ref": kwargs.get("persistent_qsettings_ref", None),
+            "width_unit": _unit_width,
+            "width_text": 1.0 if _linebreak else _text_preset,
+            "width_io": kwargs.get(
+                "width_io", (0.9 - _unit_width if _linebreak else _io_width)
+            ),
+            "align_text": AlignVCenter | kwargs.get("halign_text", AlignLeft),
+            "align_io": AlignVCenter | kwargs.get("halign_io", AlignLeft),
+            "align_unit": AlignVCenter | kwargs.get("halign_unit", AlignLeft),
         }
-        config["width_unit_setting"] = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
-        config["width_unit"] = (
-            config["width_unit_setting"] if len(self.param.unit) > 0 else 0
-        )
-        if config["linebreak"]:
-            config["width_text"] = 1.0
-            config["width_io"] = kwargs.get("width_io", 0.9 - config["width_unit"])
-        else:
-            config["width_text"] = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
-            config["width_io"] = kwargs.get(
-                "width_io",
-                PARAM_WIDGET_EDIT_WIDTH
-                + config["width_unit_setting"]
-                - config["width_unit"],
-            )
-        config["align_text"] = QtCore.Qt.AlignVCenter | kwargs.get(
-            "halign_text", QtCore.Qt.AlignLeft
-        )
-        config["align_io"] = QtCore.Qt.AlignVCenter | kwargs.get(
-            "halign_io", QtCore.Qt.AlignLeft
-        )
-        config["align_unit"] = QtCore.Qt.AlignVCenter | kwargs.get(
-            "halign_unit", QtCore.Qt.AlignLeft
-        )
-        self._config = config
+        self._config: dict[str, Any] = config
 
     def __store_layout_args_for_widgets(self):
         """
@@ -259,23 +256,17 @@ class ParameterWidget(EmptyWidget):
         value : str
             The value emitted by the IO widget.
         """
-        self.io_edited.emit(value)
+        self.sig_new_value.emit(value)
+        self.sig_value_changed.emit()
 
     @QtCore.Slot()
-    def __set_param_value(self):
+    def set_param_value(self):
         """
         Update the Parameter value with the entry from the widget.
 
         This method tries to update the Parameter value with the entry from
         the widget. If unsuccessful, an exception box will be opened and
         the widget input will be reset to the stored Parameter value.
-
-        Parameters
-        ----------
-        param : Parameter
-            A Parameter class instance from the plugin.
-        widget : QWidget
-            The input widget used for editing the parameter value.
         """
         _new_value = self._widgets["io"].get_value()
         try:

@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ViewResultsFrame"]
 
+from typing import Any
 
 from qtpy import QtCore
 
@@ -53,7 +54,7 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
     menu_title = "Import and display workflow results"
     menu_entry = "Workflow processing/View workflow results"
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         self._SCAN = Scan()
         self._TREE = ProcessingTree()
         self._EXP = DiffractionExperiment()

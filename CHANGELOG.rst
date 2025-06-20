@@ -8,6 +8,8 @@ v25.mm.dd
 Improvements
 ------------
 - Added an option to copy the results of a ProcessingResults instance to another instance.
+- Overhauled the signals from ParameterWidgets to allow also notifications
+  of value changes without broadcasting the new value.
 
 Bugfixes
 --------

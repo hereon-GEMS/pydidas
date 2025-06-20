@@ -31,7 +31,7 @@ __all__ = ["ParamIoWidgetWithButton"]
 from functools import partial
 from typing import Any
 
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtGui, QtWidgets
 from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Parameter
@@ -49,13 +49,11 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
     ----------
     param : Parameter
         A Parameter instance.
-    **kwargs : dict
+    **kwargs : Any
         Optional keyword arguments. Supported kwargs are "width" (in pixel)
         to specify the size of the I/O field and "button_icon" to give an
         icon for the button.
     """
-
-    io_edited = QtCore.Signal(str)
 
     def __init__(self, param: Parameter, **kwargs: Any):
         QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
@@ -101,7 +99,8 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         _curr_value = self._io_lineedit.text()
         if _curr_value != self._old_value or force_update:
             self._old_value = _curr_value
-            self.io_edited.emit(_curr_value)
+            self.sig_new_value.emit(_curr_value)
+            self.sig_value_changed.emit()
 
     def get_value(self) -> object:
         """
@@ -129,7 +128,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         self._old_value = self.get_value()
         self._io_lineedit.setText(f"{value}")
 
-    def setText(self, text: object):
+    def setText(self, text: object):  # noqa C0103
         """
         Set the line edit text to the input.
 

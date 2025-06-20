@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["DiffractionExperiment"]
 
 
-import pathlib
-from typing import Self, Union
+from pathlib import Path
+from typing import Any, Self
 
 import numpy as np
 import pyFAI
@@ -77,13 +77,13 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: tuple, **kwargs: Any):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
 
-    def set_param_value(self, param_key: str, value: object):
+    def set_param_value(self, param_key: str, value: Any):
         """
         Set a Parameter value.
 
@@ -94,7 +94,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         ----------
         param_key : str
             The Parameter identifier key.
-        value : object
+        value : Any
             The new value for the parameter. Depending upon the parameter,
             value can take any form (number, string, object, ...).
 
@@ -286,28 +286,26 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                     self.set_param_value("detector_name", _det.name)
         self.sig_params_changed.emit()
 
-    def import_from_file(self, filename: Union[str, pathlib.Path]):
+    def import_from_file(self, filename: str | Path):
         """
         Import DiffractionExperimentContext from a file.
 
         Parameters
         ----------
-        filename : Union[str, pathlib.Path]
+        filename : str | Path
             The full filename.
         """
         with QtCore.QSignalBlocker(self):
             DiffractionExperimentIo.import_from_file(filename, diffraction_exp=self)
         self.sig_params_changed.emit()
 
-    def export_to_file(
-        self, filename: Union[str, pathlib.Path], overwrite: bool = False
-    ):
+    def export_to_file(self, filename: str | Path, overwrite: bool = False):
         """
         Import DiffractionExperimentContext from a file.
 
         Parameters
         ----------
-        filename : Union[str, pathlib.Path]
+        filename : str | Path
             The full filename.
         overwrite : bool, optional
             Keyword to allow overwriting of existing files.
@@ -357,7 +355,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             _tilt = _tilt * 180 / np.pi
             _tilt_plane = _tilt_plane * 180 / np.pi
         with NoPrint():
-            _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(
+            _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(  # noqa E0602
                 dict(
                     directDist=det_dist * 1e3,
                     centerX=center_x,
@@ -405,7 +403,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                 "The detector pixel size of 0 is invalid for a fit2d geometry."
             )
         _geo = self.as_pyfai_geometry()
-        _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)
+        _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)  # noqa E0602
         return {
             "center_x": _f2d_geo.centerX,
             "center_y": _f2d_geo.centerY,

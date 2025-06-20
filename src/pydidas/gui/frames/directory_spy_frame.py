@@ -29,7 +29,7 @@ __all__ = ["DirectorySpyFrame"]
 
 
 import time
-from typing import Self
+from typing import Any
 
 from qtpy import QtCore
 from qtpy.QtWidgets import QApplication
@@ -64,7 +64,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
     menu_entry = "Directory spy"
     default_params = ParameterCollection()
 
-    def __init__(self, **kwargs: dict) -> Self:
+    def __init__(self, **kwargs: Any) -> None:
         BaseFrameWithApp.__init__(self, **kwargs)
         _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
@@ -86,19 +86,19 @@ class DirectorySpyFrame(BaseFrameWithApp):
         """
         Connect all required Qt slots and signals.
         """
-        self.param_widgets["scan_for_all"].io_edited.connect(
+        self.param_widgets["scan_for_all"].sig_value_changed.connect(
             self.__update_file_widget_visibility
         )
-        self.param_widgets["filename_pattern"].io_edited.connect(
+        self.param_widgets["filename_pattern"].sig_value_changed.connect(
             self.__update_file_widget_visibility
         )
-        self.param_widgets["use_detector_mask"].io_edited.connect(
+        self.param_widgets["use_detector_mask"].sig_value_changed.connect(
             self.__update_det_mask_visibility
         )
-        self.param_widgets["use_bg_file"].io_edited.connect(
+        self.param_widgets["use_bg_file"].sig_value_changed.connect(
             self.__update_bg_widget_visibility
         )
-        self.param_widgets["bg_file"].io_edited.connect(
+        self.param_widgets["bg_file"].sig_value_changed.connect(
             self.__update_bg_widget_visibility
         )
         self._widgets["but_once"].clicked.connect(self.__scan_once)
@@ -268,7 +268,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
     def __set_proc_widget_enabled_for_running(self, running: bool):
         """
         Set the visibility of all widgets which need to be updated for/after
-        procesing
+        processing
 
         Parameters
         ----------

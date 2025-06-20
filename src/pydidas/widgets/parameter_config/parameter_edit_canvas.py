@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["ParameterEditCanvas"]
 
 
+from typing import Any
+
 from pydidas.core.constants import POLICY_MIN_MIN
 from pydidas.widgets.factory import EmptyWidget
 from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
@@ -41,11 +43,11 @@ class ParameterEditCanvas(ParameterWidgetsMixIn, EmptyWidget):
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Additional keyword arguments
     """
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         EmptyWidget.__init__(self, **kwargs)
         ParameterWidgetsMixIn.__init__(self)
         self.layout().setContentsMargins(0, 0, 0, 0)

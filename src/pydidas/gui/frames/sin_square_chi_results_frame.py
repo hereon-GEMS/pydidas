@@ -227,10 +227,10 @@ class SinSquareChiResultsFrame(BaseFrame):
         self._widgets["button_import_from_directory"].clicked.connect(
             self._import_from_directory
         )
-        self.param_widgets["autoscale_sin_square_chi_results"].io_edited.connect(
+        self.param_widgets["autoscale_sin_square_chi_results"].sig_new_value.connect(
             partial(self._update_scaling_visibility, "square_chi")
         )
-        self.param_widgets["autoscale_sin_2chi_results"].io_edited.connect(
+        self.param_widgets["autoscale_sin_2chi_results"].sig_new_value.connect(
             partial(self._update_scaling_visibility, "2chi")
         )
         for _key in [
@@ -242,7 +242,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             "sin_2chi_limit_high",
         ]:
             _ref = "square" if "square" in _key else "two_chi"
-            self.param_widgets[_key].io_edited.connect(
+            self.param_widgets[_key].sig_new_value.connect(
                 partial(self.__set_scaling, _ref)
             )
         for _key in [
@@ -252,7 +252,9 @@ class SinSquareChiResultsFrame(BaseFrame):
             "show_sin_square_chi_results",
             "show_sin_2chi_results",
         ]:
-            self.param_widgets[_key].io_edited.connect(self._update_plotted_data)
+            self.param_widgets[_key].sig_value_changed.connect(
+                self._update_plotted_data
+            )
 
     def finalize_ui(self):
         """
@@ -291,9 +293,9 @@ class SinSquareChiResultsFrame(BaseFrame):
         data_source : str
             The new data source to set.
         """
-        self.param_widgets["selected_data_source"].setReadOnly(False)
+        self.param_widgets["selected_data_source"].setReadOnly(False)  # noqa E1101
         self.set_param_value_and_widget("selected_data_source", data_source)
-        self.param_widgets["selected_data_source"].setReadOnly(True)
+        self.param_widgets["selected_data_source"].setReadOnly(True)  # noqa E1101
 
     @QtCore.Slot()
     def _import_workflow_results(self):
@@ -366,10 +368,10 @@ class SinSquareChiResultsFrame(BaseFrame):
             len(self._sin_2chi_node_keys) == 2
             and len(self._sin_square_chi_node_keys) == 2
         ):
-            self._update_plotted_data("all")
+            self._update_plotted_data()
 
-    @QtCore.Slot(str)
-    def _update_plotted_data(self, new_selection: str):
+    @QtCore.Slot()
+    def _update_plotted_data(self):
         """
         Update the data used in the plots.
         """
@@ -408,7 +410,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             self.param_composite_widgets[_key].setVisible(not autoscale)
         self._widgets[f"button_update_sin_{results}_limits"].setVisible(not autoscale)
 
-    @QtCore.Slot(str)
+    @QtCore.Slot()
     def __set_scaling(self, result_key: str):
         """
         Set the scaling for the sin-square chi or sin(2*chi) results.

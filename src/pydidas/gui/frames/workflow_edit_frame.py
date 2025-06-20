@@ -29,6 +29,7 @@ __all__ = ["WorkflowEditFrame"]
 
 import os
 from functools import partial
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -84,7 +85,7 @@ class WorkflowEditFrame(BaseFrame):
     menu_icon = "pydidas::frame_icon_workflow_edit"
     sig_workflow_edit_frame_activated = QtCore.Signal()
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
         self.__io_dialog = PydidasFileDialog()
         self.__qtapp = QtWidgets.QApplication.instance()

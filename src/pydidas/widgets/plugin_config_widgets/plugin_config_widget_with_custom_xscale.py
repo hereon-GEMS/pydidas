@@ -51,7 +51,7 @@ class PluginConfigWidgetWithCustomXscale(GenericPluginConfigWidget):
         Connect the signals to the slots.
         """
         GenericPluginConfigWidget.connect_signals(self)
-        self.param_widgets["use_custom_xscale"].io_edited.connect(
+        self.param_widgets["use_custom_xscale"].sig_new_value.connect(
             self._toggle_custom_scale
         )
 
@@ -62,16 +62,16 @@ class PluginConfigWidgetWithCustomXscale(GenericPluginConfigWidget):
         self._toggle_custom_scale(self.plugin.get_param_value("use_custom_xscale"))
 
     @QtCore.Slot(str)
-    def _toggle_custom_scale(self, input: str):
+    def _toggle_custom_scale(self, value: str):
         """
         Toggle the visibility of the custom xscale parameters.
 
         Parameters
         ----------
-        input : str
+        value : str
             The value of the custom xscale parameter.
         """
-        _show = input in [True, "True"]
+        _show = value in [True, "True"]
         for param in CUSTOM_X_PARAMS:
             self.toggle_param_widget_visibility(param, _show)
 

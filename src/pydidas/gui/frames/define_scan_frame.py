@@ -29,8 +29,9 @@ __all__ = ["DefineScanFrame"]
 
 
 from functools import partial
+from typing import Any
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from pydidas.contexts import ScanContext, ScanIo
 from pydidas.core import UserConfigError, constants, utils
@@ -45,6 +46,7 @@ from pydidas.widgets.dialogues import ItemInListSelectionWidget
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.windows import ScanDimensionInformationWindow
 from pydidas.workflow import WorkflowTree
+from pydidas_qtcore import PydidasQApplication
 
 
 SCAN = ScanContext()
@@ -78,10 +80,10 @@ class DefineScanFrame(BaseFrame):
     menu_title = "Define\nscan"
     menu_entry = "Workflow processing/Define scan"
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
         self._io_dialog = PydidasFileDialog()
-        self._qtapp = QtWidgets.QApplication.instance()
+        self._qtapp = PydidasQApplication.instance()
         self.__info_window = ScanDimensionInformationWindow()
 
     def build_frame(self):
@@ -119,7 +121,7 @@ class DefineScanFrame(BaseFrame):
         )
         self._widgets["but_reset"].clicked.connect(self.reset_entries)
         self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_info_window)
-        self.param_widgets["scan_dim"].currentTextChanged.connect(
+        self.param_widgets["scan_dim"].sig_value_changed.connect(
             self.update_dim_visibility
         )
         for _index in range(4):
@@ -129,7 +131,7 @@ class DefineScanFrame(BaseFrame):
             self._widgets[f"button_down_{_index}"].clicked.connect(
                 partial(self.move_dim, _index, 1)
             )
-        self.param_widgets["scan_base_directory"].io_edited.connect(
+        self.param_widgets["scan_base_directory"].sig_new_value.connect(
             self.set_new_base_directory
         )
         self._qtapp.sig_exit_pydidas.connect(self.__info_window.close)
@@ -143,6 +145,7 @@ class DefineScanFrame(BaseFrame):
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
 
+    @QtCore.Slot()
     def update_dim_visibility(self):
         """
         Update the visibility of dimensions based on the selected number
@@ -155,7 +158,7 @@ class DefineScanFrame(BaseFrame):
             "scan_dim{n}_unit",
             "scan_dim{n}_offset",
         ]
-        _dim = int(self.param_widgets["scan_dim"].currentText())
+        _dim = int(self.param_widgets["scan_dim"].get_value())
         for i in range(4):
             _toggle = i < _dim
             self._widgets[f"title_{i}"].setVisible(_toggle)

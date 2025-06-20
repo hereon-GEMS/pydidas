@@ -197,7 +197,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         Finalize the user interface.
         """
         self._update_image_if_required()
-        self._bc_controller.manual_beamcenter_update(None)
+        self._bc_controller.manual_beamcenter_update()
         self._bc_controller.show_plot_items("beamcenter")
 
     @QtCore.Slot(str, object)

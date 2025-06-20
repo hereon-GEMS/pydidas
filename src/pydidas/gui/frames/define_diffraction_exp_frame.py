@@ -30,7 +30,7 @@ __all__ = ["DefineDiffractionExpFrame"]
 
 from functools import partial
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 import numpy as np
 from pyFAI.detectors import Detector
@@ -44,6 +44,9 @@ from pydidas.gui.frames.builders import DefineDiffractionExpFrameBuilder
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import critical_warning
 from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+    BaseParamIoWidget,
+)
 from pydidas.widgets.windows import (
     ConvertFit2dGeometryWindow,
     ManuallySetBeamcenterWindow,
@@ -74,7 +77,7 @@ class DefineDiffractionExpFrame(BaseFrame):
     menu_title = "Define diffraction setup"
     menu_entry = "Workflow processing/Define diffraction setup"
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
         self.params = EXP.params
         self._bc_params = get_generic_param_collection("beamcenter_x", "beamcenter_y")
@@ -106,8 +109,10 @@ class DefineDiffractionExpFrame(BaseFrame):
             # disconnect directly setting the parameters and route
             # through update_param method to catch wavelength/energy
             _w = self.param_widgets[param.refkey]
-            _w.io_edited.disconnect()
-            _w.io_edited.connect(partial(self.update_param, _param_key, _w))
+            _w.sig_new_value.disconnect(
+                self.param_composite_widgets[_param_key].set_param_value
+            )
+            _w.sig_new_value.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
     def set_param_value_and_widget(self, key: str, value: object):
@@ -126,7 +131,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             Parameter.
         """
         EXP.set_param_value(key, value)
-        if key in ["xray_energy", "xray_wavelength"]:
+        if key in ["xray_energy", "xray_wavelength"]:  # noqa R0801
             _energy = self.get_param_value("xray_energy")
             _lambda = self.get_param_value("xray_wavelength")
             self.param_widgets["xray_energy"].set_value(_energy)
@@ -134,8 +139,8 @@ class DefineDiffractionExpFrame(BaseFrame):
         else:
             self.param_widgets[key].set_value(value)
 
-    @QtCore.Slot(str)
-    def update_param(self, param_key: str, widget: QtWidgets.QWidget, value_str: str):
+    @QtCore.Slot()
+    def update_param(self, param_key: str, widget: BaseParamIoWidget):
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -145,8 +150,6 @@ class DefineDiffractionExpFrame(BaseFrame):
             The reference key.
         widget : pydidas.widgets.parameter_config.BaseParamIoWidget
             The Parameter editing widget.
-        value_str : str
-            The string representation of the value.
         """
         EXP.set_param_value(param_key, widget.get_value())
         # explicitly call update fo wavelength and energy
@@ -174,7 +177,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         self.copy_energy_from_pyFAI(show_warning=False)
         self.copy_geometry_from_pyFAI()
 
-    def copy_detector_from_pyFAI(self, show_warning: bool = True):
+    def copy_detector_from_pyFAI(self, show_warning: bool = True):  # noqa C0103
         """
         Copy the detector from the pyFAI CalibrationContext instance.
 
@@ -193,7 +196,7 @@ class DefineDiffractionExpFrame(BaseFrame):
     def update_detector_params(
         self,
         det: Detector,
-        maskfile: Union[None, str, Path] = None,
+        maskfile: str | Path | None = None,
         show_warning: bool = True,
     ):
         """
@@ -203,7 +206,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         ----------
         det : pyFAI.detectors.Detector
             The detector instance.
-        maskfile : Union [None, str, Path], optional
+        maskfile : str | Path | None, optional
             The path of the mask file, if it has been defined in the pyFAI calibration.
             The default is None.
         show_warning : bool, optional
@@ -226,7 +229,7 @@ class DefineDiffractionExpFrame(BaseFrame):
                 "No detector selected in pyFAI. Cannot copy information.",
             )
 
-    def copy_geometry_from_pyFAI(self, show_warning: bool = True):
+    def copy_geometry_from_pyFAI(self, show_warning: bool = True):  # noqa C0103
         """
         Copy the geometry from the pyFAI CalibrationContext instance.
 
@@ -251,7 +254,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _GEO_INVALID)
 
-    def copy_energy_from_pyFAI(self, show_warning: bool = True):
+    def copy_energy_from_pyFAI(self, show_warning: bool = True):  # noqa C0103
         """
         Copy the pyFAI energy and store it in the DiffractionExperimentContext.
 
@@ -300,7 +303,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         center_x : float
             The beamcenter x value in pixels
         center_y : float
-            The beancenter y value in pixels.
+            The beamcenter y value in pixels.
         """
         _px_size_x = self.get_param_value("detector_pxsizex")
         _px_size_y = self.get_param_value("detector_pxsizey")
@@ -347,7 +350,7 @@ class DefineDiffractionExpFrame(BaseFrame):
 
     def export_to_file(self):
         """
-        Open a dialog to select a filename and write all currrent settings
+        Open a dialog to select a filename and write all current settings
         for the DiffractionExperimentContext to file.
         """
         _fname = self._io_dialog.get_saving_filename(

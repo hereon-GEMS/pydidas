@@ -136,10 +136,10 @@ def get_widget_creation_information(
             {"parent_widget": "config", "visible": False},
         ],
         __create_param_widget(
-            params.get_param("sin_square_chi_limit_low"), visible=False, width_io=0.2
+            params.get_param("sin_square_chi_limit_high"), visible=False, width_io=0.2
         ),
         __create_param_widget(
-            params.get_param("sin_square_chi_limit_high"), visible=False, width_io=0.2
+            params.get_param("sin_square_chi_limit_low"), visible=False, width_io=0.2
         ),
         ["create_line", (None,), {"parent_widget": "config"}],
         ["create_spacer", (None,), {"parent_widget": "config", "fixedHeight": 15}],
@@ -160,10 +160,10 @@ def get_widget_creation_information(
             {"parent_widget": "config", "visible": False},
         ],
         __create_param_widget(
-            params.get_param("sin_2chi_limit_low"), visible=False, width_io=0.2
+            params.get_param("sin_2chi_limit_high"), visible=False, width_io=0.2
         ),
         __create_param_widget(
-            params.get_param("sin_2chi_limit_high"), visible=False, width_io=0.2
+            params.get_param("sin_2chi_limit_low"), visible=False, width_io=0.2
         ),
         ["create_line", (None,), {"parent_widget": "config"}],
         ["create_spacer", (None,), {"parent_widget": "config", "fixedHeight": 15}],

@@ -30,8 +30,10 @@ __all__ = ["SinSquareChiResultsFrame"]
 from functools import partial
 from pathlib import Path
 
+import numpy as np
 from qtpy import QtCore
 
+from pydidas.widgets.dialogues import WarningBox
 from pydidas_plugins.residual_stress_plugins.store_sin_2chi_data import (
     StoreSinTwoChiData,
 )
@@ -39,7 +41,7 @@ from pydidas_plugins.residual_stress_plugins.store_sin_square_chi_data import (
     StoreSinSquareChiData,
 )
 
-from pydidas.core import Parameter, ParameterCollection
+from pydidas.core import Parameter, ParameterCollection, UserConfigError
 from pydidas.core.utils import apply_qt_properties
 from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
     get_widget_creation_information,
@@ -194,6 +196,23 @@ class SinSquareChiResultsFrame(BaseFrame):
     default_params = _DEFAULT_PARAMS
     params_not_to_restore = list(_DEFAULT_PARAMS.keys())
 
+    @staticmethod
+    def _get_data_min_and_max(data: np.ndarray) -> tuple[float, float]:
+        if data is None:
+            raise UserConfigError("No data available to update limits.")
+        try:
+            _min = float(np.nanmin(data))
+            _max = float(np.nanmax(data))
+            _delta = _max - _min
+            _min = round(_min - 0.05 * _delta, 6)
+            _max = round(_max + 0.05 * _delta, 6)
+
+        except RuntimeWarning:
+            _min, _max = 0, 1
+            WarningBox("Empty data", "The data does not include any valid values.")
+        return _min, _max
+
+
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
         self.__qtapp = PydidasQApplication.instance()
@@ -255,17 +274,18 @@ class SinSquareChiResultsFrame(BaseFrame):
             self.param_widgets[_key].sig_value_changed.connect(
                 self._update_plotted_data
             )
+        self._widgets["button_update_sin_2chi_limits"].clicked.connect(
+            self._update_sin_2chi_limits_from_data
+        )
+        self._widgets["button_update_sin_square_chi_limits"].clicked.connect(
+            self._update_sin_square_chi_limits_from_data
+        )
 
     def finalize_ui(self):
         """
         Finalize the UI initialization.
         """
         self._plots: GridCurvePlot = self._widgets["visualization"]
-        # "complicated" syntax below to allow key of 2chi
-        self._plots.set_datasets(square=None, two_chi=None)
-        for _key in ["square", "two_chi"]:
-            self._plots.set_xscaling(_key, (0, 1))
-            self._plots.set_y_autoscaling(_key)
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int):
@@ -331,7 +351,11 @@ class SinSquareChiResultsFrame(BaseFrame):
         """
         self.set_param_value("selected_sin_square_chi_node", "no selection")
         self.set_param_value("selected_sin_2chi_node", "no selection")
-        self._plots.clear()
+        self._plots.set_datasets(square=None, two_chi=None)
+        for _key in ["square", "two_chi"]:
+            self._plots.set_xscaling(_key, (0, 1), update_plot=False)
+            self._plots.set_y_autoscaling(_key, update_plot=False)
+
 
     def _update_selection_choices(self):
         """
@@ -375,7 +399,6 @@ class SinSquareChiResultsFrame(BaseFrame):
         """
         Update the data used in the plots.
         """
-        self._plots.clear()
         for _key in ["square_chi", "2chi"]:
             _node_str = self.get_param_value(f"selected_sin_{_key}_node")
             _node_id = getattr(self, f"_sin_{_key}_node_keys")[_node_str]
@@ -425,6 +448,26 @@ class SinSquareChiResultsFrame(BaseFrame):
         if _use_autoscale:
             self._plots.set_y_autoscaling(result_key)
             return
-        _low = self.get_param_value(f"sin_{result_key}_chi_limit_low")
-        _high = self.get_param_value(f"sin_{result_key}_chi_limit_high")
+        _low = self.get_param_value(f"sin_{_key}_limit_low")
+        _high = self.get_param_value(f"sin_{_key}_limit_high")
         self._plots.set_yscaling(result_key, (_low, _high))
+
+    @QtCore.Slot()
+    def _update_sin_square_chi_limits_from_data(self):
+        """
+        Update the sin^2(chi) limits from the selected data.
+        """
+        _min, _max = self._get_data_min_and_max(self._sin_square_chi_data)
+        self.set_param_value_and_widget("sin_square_chi_limit_low", _min)
+        self.set_param_value_and_widget("sin_square_chi_limit_high", _max)
+        self.__set_scaling("square")
+
+    @QtCore.Slot()
+    def _update_sin_2chi_limits_from_data(self):
+        """
+        Update the sin(2*chi) limits from the selected data.
+        """
+        _min, _max = self._get_data_min_and_max(self._sin_2chi_data)
+        self.set_param_value_and_widget("sin_2chi_limit_low", _min)
+        self.set_param_value_and_widget("sin_2chi_limit_high", _max)
+        self.__set_scaling("two_chi")

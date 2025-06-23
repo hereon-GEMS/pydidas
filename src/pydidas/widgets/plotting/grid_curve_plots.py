@@ -93,7 +93,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._datasets = datasets
         self._update_plot()
 
-    def set_xscaling(self, dataset_key: str, scaling: tuple[float, float]):
+    def set_xscaling(self, dataset_key: str, scaling: tuple[float, float], update_plot: bool = True):
         """
         Set the x-scaling for a specific dataset.
 
@@ -103,16 +103,18 @@ class GridCurvePlot(WidgetWithParameterCollection):
             The key of the dataset to set the scaling for.
         scaling : tuple[float, float]
             The x-scaling as a tuple (min, max).
+        update_plot : bool, optional
+            Flag whether to update the plot after setting the scaling. Default is True.
         """
         if dataset_key not in self._datasets:
             raise UserConfigError(f"Dataset '{dataset_key}' not found.")
         if not isinstance(scaling, tuple) or len(scaling) != 2:
             raise UserConfigError("Scaling must be a tuple of (min, max).")
-
         self._xscaling[dataset_key] = scaling
-        self._update_plot()
+        if update_plot:
+            self._update_plot()
 
-    def set_yscaling(self, dataset_key, scaling: tuple[float, float]):
+    def set_yscaling(self, dataset_key, scaling: tuple[float, float], update_plot: bool = True):
         """
         Set the y-scaling for a specific dataset.
 
@@ -122,16 +124,18 @@ class GridCurvePlot(WidgetWithParameterCollection):
             The key of the dataset to set the scaling for.
         scaling : tuple[float, float]
             The y-scaling as a tuple (min, max).
+        update_plot : bool, optional
+            Flag whether to update the plot after setting the scaling. Default is True.
         """
         if dataset_key not in self._datasets:
             raise UserConfigError(f"Dataset '{dataset_key}' not found.")
         if not isinstance(scaling, tuple) or len(scaling) != 2:
             raise UserConfigError("Scaling must be a tuple of (min, max).")
-
         self._yscaling[dataset_key] = scaling
-        self._update_plot()
+        if update_plot:
+            self._update_plot()
 
-    def set_y_autoscaling(self, dataset_key: str):
+    def set_y_autoscaling(self, dataset_key: str, update_plot: bool = True):
         """
         Set the y-axis scaling to use autoscaling.
 
@@ -139,11 +143,14 @@ class GridCurvePlot(WidgetWithParameterCollection):
         ----------
         dataset_key : str
             The key of the dataset to set autoscaling for.
+        update_plot : bool, optional
+            Flag whether to update the plot after setting the scaling. Default is True.
         """
         if dataset_key not in self._datasets:
             raise UserConfigError(f"Dataset '{dataset_key}' not found.")
         self._yscaling[dataset_key] = (None, None)
-        self._update_plot()
+        if update_plot:
+            self._update_plot()
 
     def _update_plot(self):
         """

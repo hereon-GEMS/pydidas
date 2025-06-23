@@ -26,48 +26,62 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["GridCurvePlot"]
 
-
-from typing import Any
+from itertools import product
+from typing import Any, Union
 
 import numpy as np
 
+from pydidas.contexts import Scan
 from pydidas.core import Parameter, ParameterCollection, UserConfigError
+from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets import WidgetWithParameterCollection
-
-
-_GRID_CURVE_PLOT_PARAMS = ParameterCollection(
-    Parameter(
-        "num_horizontal_plots",
-        int,
-        4,
-        name="Number of horizontal plots",
-        tooltip="The number of plots to display in each row of the grid.",
-        choices=[2, 3, 4, 5, 6],
-    ),
-    Parameter(
-        "num_vertical_plots",
-        int,
-        3,
-        name="Number of vertical plots",
-        tooltip="The number of plots to display in each column of the grid.",
-        choices=[2, 3, 4, 5, 6],
-    ),
-)
 
 
 class GridCurvePlot(WidgetWithParameterCollection):
     """
     A widget to display curve plots in a grid layout.
-
     """
-
-    default_params = _GRID_CURVE_PLOT_PARAMS
-
     def __init__(self, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, **kwargs)
+        self.set_default_params()
         self._datasets = {}
         self._yscaling = {}
         self._xscaling = {}
+        self.__scan = Scan()
+        self.__n_hor = 4
+        self.__n_vert = 3
+        self.create_empty_widget("config_top", parent_widget=self)
+        self.create_empty_widget("grid", parent_widget=self)
+        self.create_empty_widget("config_bottom", parent_widget=self)
+
+    @property
+    def nplots(self) -> int:
+        """Get the total number of plots in the grid."""
+        return self.__n_hor * self.__n_vert
+
+    def __check_key_and_scaling(self, dataset_key: Any, scaling: Any) -> None:
+        """
+        Check if the dataset key and scaling are valid.
+
+        Parameters
+        ----------
+        dataset_key : Any
+            The key of the dataset to check.
+        scaling : Any
+            The scaling to check.
+
+        Raises
+        ------
+        UserConfigError
+            If the dataset key is not a string
+            or the scaling is not a tuple of two floats.
+        """
+        if dataset_key not in self._datasets:
+            raise UserConfigError(f"Dataset '{dataset_key}' not found.")
+        if not isinstance(scaling, tuple) or len(scaling) != 2:
+            raise UserConfigError("Scaling must be a tuple of (min, max).")
+
+
 
     def clear(self):
         """
@@ -78,18 +92,31 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._xscaling = {}
         self._update_plot()
 
-    def set_datasets(self, **datasets: dict[str, np.ndarray | None]):
+    def set_scan(self, scan: Scan):
+        """
+        Set the scan context for the plot.
+
+        Parameters
+        ----------
+        scan : Scan
+            The Scan instance to set as the context for the plot.
+        """
+        if not isinstance(scan, Scan):
+            raise UserConfigError("Provided scan is not a valid Scan instance.")
+        self.__scan.update_from_scan(scan)
+        self._update_plot()
+
+    def set_datasets(self, **datasets: np.ndarray | None):
         """
         Set the datasets to be plotted in the grid.
 
         Parameters
         ----------
-        **datasets : dict[str, np.ndarray]
+        **datasets : np.ndarray | None
             The datasets to be plotted.
         """
         if not datasets:
             raise UserConfigError("No datasets provided for plotting.")
-
         self._datasets = datasets
         self._update_plot()
 
@@ -106,10 +133,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         update_plot : bool, optional
             Flag whether to update the plot after setting the scaling. Default is True.
         """
-        if dataset_key not in self._datasets:
-            raise UserConfigError(f"Dataset '{dataset_key}' not found.")
-        if not isinstance(scaling, tuple) or len(scaling) != 2:
-            raise UserConfigError("Scaling must be a tuple of (min, max).")
+        self.__check_key_and_scaling(dataset_key, scaling)
         self._xscaling[dataset_key] = scaling
         if update_plot:
             self._update_plot()
@@ -127,10 +151,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         update_plot : bool, optional
             Flag whether to update the plot after setting the scaling. Default is True.
         """
-        if dataset_key not in self._datasets:
-            raise UserConfigError(f"Dataset '{dataset_key}' not found.")
-        if not isinstance(scaling, tuple) or len(scaling) != 2:
-            raise UserConfigError("Scaling must be a tuple of (min, max).")
+        self.__check_key_and_scaling(dataset_key, scaling)
         self._yscaling[dataset_key] = scaling
         if update_plot:
             self._update_plot()
@@ -151,6 +172,49 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._yscaling[dataset_key] = (None, None)
         if update_plot:
             self._update_plot()
+
+    def set_num_hor_plots(self, number: int):
+        """
+        Set the number of horizontal plots in the grid.
+
+        Parameters
+        ----------
+        number : int
+            The number of horizontal plots to set.
+        """
+        self.__n_hor = number
+        self._update_grid_of_plots()
+
+    def set_num_vert_plots(self, number: int):
+        """
+        Set the number of vertical plots in the grid.
+
+        Parameters
+        ----------
+        number : int
+            The number of vertical plots to set.
+        """
+        self.__n_vert = number
+        self._update_grid_of_plots()
+
+    def _update_grid_of_plots(self):
+        """
+        Update the grid of the plots based on the currently selected numbers.
+        """
+        _new_plot_indices = list(product(range(self.__n_vert), range(self.__n_hor)))
+        _new_plot_keys = [f"plot_{_i}_{_j}" for _i, _j in _new_plot_indices]
+        _plot_layout = self._widgets["grid"].layout()
+        print("Updating grid of plots with keys:", _new_plot_keys)
+        for _key in list(self._widgets):
+            if _key.startswith("plot_") and _key not in _new_plot_keys:
+               _widget = self._widgets.pop(_key)
+               _plot_layout.removeWidget(_widget)
+               _widget.deleteLater()
+               _widget.setParent(None)
+        for _key in _new_plot_keys:
+            if _key in self._widgets:
+                continue
+
 
     def _update_plot(self):
         """

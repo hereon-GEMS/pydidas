@@ -41,7 +41,7 @@ from pydidas_plugins.residual_stress_plugins.store_sin_square_chi_data import (
     StoreSinSquareChiData,
 )
 
-from pydidas.core import Parameter, ParameterCollection, UserConfigError
+from pydidas.core import Parameter, ParameterCollection, UserConfigError, get_generic_parameter
 from pydidas.core.utils import apply_qt_properties
 from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
     get_widget_creation_information,
@@ -181,7 +181,14 @@ _DEFAULT_PARAMS = ParameterCollection(
             "If autoscaling is enabled, this value will be ignored."
         ),
     ),
+    get_generic_parameter("num_horizontal_plots"),
+    get_generic_parameter("num_vertical_plots"),
 )
+
+_PARAMS_NOT_TO_RESTORE = list(_DEFAULT_PARAMS.keys())
+_PARAMS_NOT_TO_RESTORE.remove("num_horizontal_plots")
+_PARAMS_NOT_TO_RESTORE.remove("num_vertical_plots")
+
 _RESULTS = WorkflowResults()
 
 
@@ -194,7 +201,7 @@ class SinSquareChiResultsFrame(BaseFrame):
     menu_title = "Sin square chi results visualization"
     menu_entry = "Analysis tools/Sin square chi results visualization"
     default_params = _DEFAULT_PARAMS
-    params_not_to_restore = list(_DEFAULT_PARAMS.keys())
+    params_not_to_restore = _PARAMS_NOT_TO_RESTORE
 
     @staticmethod
     def _get_data_min_and_max(data: np.ndarray) -> tuple[float, float]:
@@ -280,6 +287,12 @@ class SinSquareChiResultsFrame(BaseFrame):
         self._widgets["button_update_sin_square_chi_limits"].clicked.connect(
             self._update_sin_square_chi_limits_from_data
         )
+        self.param_widgets["num_horizontal_plots"].sig_new_value.connect(
+            partial(self.__update_plot_numbers, "hor")
+        )
+        self.param_widgets["num_vertical_plots"].sig_new_value.connect(
+            partial(self.__update_plot_numbers, "vert")
+        )
 
     def finalize_ui(self):
         """
@@ -355,7 +368,6 @@ class SinSquareChiResultsFrame(BaseFrame):
         for _key in ["square", "two_chi"]:
             self._plots.set_xscaling(_key, (0, 1), update_plot=False)
             self._plots.set_y_autoscaling(_key, update_plot=False)
-
 
     def _update_selection_choices(self):
         """
@@ -471,3 +483,18 @@ class SinSquareChiResultsFrame(BaseFrame):
         self.set_param_value_and_widget("sin_2chi_limit_low", _min)
         self.set_param_value_and_widget("sin_2chi_limit_high", _max)
         self.__set_scaling("two_chi")
+
+    @QtCore.Slot(str)
+    def __update_plot_numbers(self, direction: str, value: str):
+        """
+        Update the number of horizontal or vertical plots in the grid.
+
+        Parameters
+        ----------
+        direction : str
+            The direction to update ("hor" for horizontal, "vert" for vertical).
+        value : str
+            The value of the parameter that triggered the update.
+        """
+        _method = getattr(self._plots, f"set_num_{direction}_plots")
+        _method(int(value))

@@ -99,11 +99,7 @@ def get_widget_creation_information(
             },
         ],
         [
-            "create_any_widget",
-            ("visualization", GridCurvePlot),
-            {
-                "gridPos": (1, 1, 1, 1),
-            },
+            "create_any_widget", ("visualization", GridCurvePlot), {"gridPos": (1, 1, 1, 1)},
         ],
         [
             "create_button",
@@ -116,6 +112,8 @@ def get_widget_creation_information(
             {"parent_widget": "config"},
         ],
         __create_param_widget(params.get_param("selected_data_source"), linebreak=True),
+        __create_param_widget(params.get_param("num_horizontal_plots"), linebreak=False, width_io=0.15),
+        __create_param_widget(params.get_param("num_vertical_plots"), linebreak=False, width_io=0.15),
         ["create_line", (None,), {"parent_widget": "config"}],
         ["create_spacer", (None,), {"parent_widget": "config", "fixedHeight": 15}],
         [

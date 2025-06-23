@@ -107,6 +107,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         if _cur_value != self._old_value:
             self._old_value = _cur_value
             self.sig_new_value.emit(_cur_value)
+            self.sig_value_changed.emit()
 
     def get_value(self) -> object:
         """

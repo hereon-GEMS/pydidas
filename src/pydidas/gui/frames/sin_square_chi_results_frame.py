@@ -33,7 +33,6 @@ from pathlib import Path
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.widgets.dialogues import WarningBox
 from pydidas_plugins.residual_stress_plugins.store_sin_2chi_data import (
     StoreSinTwoChiData,
 )
@@ -41,12 +40,20 @@ from pydidas_plugins.residual_stress_plugins.store_sin_square_chi_data import (
     StoreSinSquareChiData,
 )
 
-from pydidas.core import Parameter, ParameterCollection, UserConfigError, get_generic_parameter
+from pydidas.core import (
+    Parameter,
+    ParameterCollection,
+    UserConfigError,
+    get_generic_parameter,
+)
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
     get_widget_creation_information,
 )
 from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.dialogues import WarningBox
+from pydidas.widgets.factory import EmptyWidget
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.plotting import GridCurvePlot
 from pydidas.workflow import ProcessingResults, WorkflowResults
@@ -219,7 +226,6 @@ class SinSquareChiResultsFrame(BaseFrame):
             WarningBox("Empty data", "The data does not include any valid values.")
         return _min, _max
 
-
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
         self.__qtapp = PydidasQApplication.instance()
@@ -235,6 +241,9 @@ class SinSquareChiResultsFrame(BaseFrame):
         """
         Build the frame and populate it with widgets.
         """
+        self._widgets["config"] = EmptyWidget(
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH
+        )
         for _name, _args, _kwargs in get_widget_creation_information(self.params):
             _method = getattr(self, _name)
             if "widget" in _kwargs:
@@ -299,23 +308,16 @@ class SinSquareChiResultsFrame(BaseFrame):
         Finalize the UI initialization.
         """
         self._plots: GridCurvePlot = self._widgets["visualization"]
+        self.reset_selection()
 
-    @QtCore.Slot(int)
-    def frame_activated(self, index: int):
-        """
-        Received signal that frame has been activated.
-
-        This method is called when this frame becomes activated by the
-        central widget. By default, this method will perform no actions.
-        If specific frames require any actions, they will need to overwrite
-        this method.
-
-        Parameters
-        ----------
-        index : int
-            The index of the activated frame.
-        """
-        BaseFrame.frame_activated(self, index)
+    def restore_state(self, state: dict):
+        """Restore the frame's state from stored information."""
+        BaseFrame.restore_state(self, state)
+        if self._config["built"]:
+            self._plots.update_plot_numbers(
+                self.get_param_value("num_vertical_plots"),
+                self.get_param_value("num_horizontal_plots"),
+            )
 
     def update_selected_data_source(self, data_source: str):
         """
@@ -496,5 +498,11 @@ class SinSquareChiResultsFrame(BaseFrame):
         value : str
             The value of the parameter that triggered the update.
         """
-        _method = getattr(self._plots, f"set_num_{direction}_plots")
-        _method(int(value))
+        if direction == "hor":
+            self._plots.n_plots_hor = int(value)
+        elif direction == "vert":
+            self._plots.n_plots_vert = int(value)
+        else:
+            raise ValueError(
+                f"Direction must be `hor` or `vert`. Received: `{direction}`."
+            )

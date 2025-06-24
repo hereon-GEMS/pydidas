@@ -31,7 +31,7 @@ from typing import Any
 
 from pydidas.core import Parameter, ParameterCollection
 from pydidas.core.constants import (
-    FONT_METRIC_CONFIG_WIDTH,
+    POLICY_FIX_EXP,
 )
 from pydidas.widgets import ScrollArea
 from pydidas.widgets.plotting import GridCurvePlot
@@ -82,24 +82,20 @@ def get_widget_creation_information(
             {"fontsize_offset": 4, "bold": True, "gridPos": (0, 0, 1, 2)},
         ],
         [
-            "create_empty_widget",
-            ("config",),
+            "create_any_widget",
+            ("config_area", ScrollArea),
             {
                 "gridPos": (1, 0, 1, 1),
-                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+                "layout_kwargs": {"alignment": None},
+                "resize_to_widget_width": True,
+                "widget": "config",
+                "sizePolicy": POLICY_FIX_EXP,
             },
         ],
         [
             "create_any_widget",
-            ("config_area", ScrollArea),
-            {
-                "layout_kwargs": {"alignment": None},
-                "resize_to_widget_width": True,
-                "widget": "config",
-            },
-        ],
-        [
-            "create_any_widget", ("visualization", GridCurvePlot), {"gridPos": (1, 1, 1, 1)},
+            ("visualization", GridCurvePlot),
+            {"gridPos": (1, 1, 1, 1)},
         ],
         [
             "create_button",
@@ -112,8 +108,12 @@ def get_widget_creation_information(
             {"parent_widget": "config"},
         ],
         __create_param_widget(params.get_param("selected_data_source"), linebreak=True),
-        __create_param_widget(params.get_param("num_horizontal_plots"), linebreak=False, width_io=0.15),
-        __create_param_widget(params.get_param("num_vertical_plots"), linebreak=False, width_io=0.15),
+        __create_param_widget(
+            params.get_param("num_horizontal_plots"), linebreak=False, width_io=0.15
+        ),
+        __create_param_widget(
+            params.get_param("num_vertical_plots"), linebreak=False, width_io=0.15
+        ),
         ["create_line", (None,), {"parent_widget": "config"}],
         ["create_spacer", (None,), {"parent_widget": "config", "fixedHeight": 15}],
         [

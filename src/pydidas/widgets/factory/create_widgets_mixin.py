@@ -41,6 +41,7 @@ from pydidas.widgets.factory.pydidas_label import PydidasLabel
 from pydidas.widgets.factory.pydidas_lineedit import PydidasLineEdit
 from pydidas.widgets.factory.pydidas_pushbutton import PydidasPushButton
 from pydidas.widgets.factory.radio_button_group import RadioButtonGroup
+from pydidas.widgets.factory.square_button import SquareButton
 from pydidas.widgets.utilities import get_widget_layout_args
 
 
@@ -105,7 +106,7 @@ class CreateWidgetsMixIn:
             will automatically get a unique reference number.
         text : str
             The label's displayed text.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QLabel with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the label's position in its parent's layout.
@@ -126,7 +127,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any additional keyword arguments. All QFrame attributes with setAttribute
             implementation are valid kwargs.
         """
@@ -148,7 +149,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any additional keyword arguments. All QFrame attributes with setAttribute
             implementation are valid kwargs.
         """
@@ -167,7 +168,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QLineEdit with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the LineEdit's position in its parent's layout.
@@ -187,7 +188,7 @@ class CreateWidgetsMixIn:
             will automatically get a unique reference number.
         text : str
             The button's displayed text.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QPushButton with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the button's position in its parent's layout.
@@ -200,6 +201,26 @@ class CreateWidgetsMixIn:
         if "clicked" in kwargs and ref is not None:
             self._widgets[ref].clicked.connect(kwargs.get("clicked"))
 
+    def create_square_button(self, ref: str | None, **kwargs: Any):
+        """
+        Create a SquareButton with only an icon and no text.
+
+        Parameters
+        ----------
+        ref : str | None
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
+        **kwargs : Any
+            Any attributes supported by QPushButton with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the button's position in its parent's layout.
+            The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
+            be used to control the font properties.
+        """
+        self.create_any_widget(ref, SquareButton, **kwargs)
+        if "clicked" in kwargs and ref is not None:
+            self._widgets[ref].clicked.connect(kwargs.get("clicked"))
+
     def create_spin_box(self, ref: str | None, **kwargs: Any):
         """
         Create a QSpinBox for integer values and store the widget.
@@ -209,7 +230,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QSpinBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the SpinBox's position in its parent's layout. The
@@ -228,7 +249,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QSpinBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the SpinBox's position in its parent's layout. The
@@ -247,7 +268,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QProgressBar with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the QProgressBar's position in its parent's layout.
@@ -265,7 +286,7 @@ class CreateWidgetsMixIn:
             will automatically get a unique reference number.
         text : str
             The CheckBox's descriptive text.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QCheckBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the QProgressBar's position in its parent's layout.
@@ -283,7 +304,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by QComboBox with a setAttribute method
             are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the QComboBox's position in its parent's layout.
@@ -305,7 +326,7 @@ class CreateWidgetsMixIn:
             will automatically get a unique reference number.
         entries : list[str]
             The list of entries for the buttons.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by the generic QWidget with a setAttribute
             method are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the RadioButtonGroup's position in its parent's layout.
@@ -326,7 +347,7 @@ class CreateWidgetsMixIn:
         ref : str | None
             The reference string for storing the widget. If None, the widget
             will automatically get a unique reference number.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by the generic QWidget with a setAttribute
             method are valid kwargs. In addition, the 'gridPos' keyword can be used
             to specify the QWidget's position in its parent's layout.
@@ -353,7 +374,7 @@ class CreateWidgetsMixIn:
             The class type of the widget.
         *args : Any
             Any arguments for the widget creation.
-        **kwargs : dict
+        **kwargs : Any
             Keyword arguments for the widget creation.
 
         Raises
@@ -381,7 +402,7 @@ class CreateWidgetsMixIn:
             The widget reference key.
         widget_instance : QWidget
             The widget instance.
-        **kwargs : dict
+        **kwargs : Any
             Any attributes supported by the specific QWidget with a setAttribute
             method are valid kwargs. In addition, 'layout_kwargs' is a valid key
             to pass a dictionary with attributes for the widget's layout.

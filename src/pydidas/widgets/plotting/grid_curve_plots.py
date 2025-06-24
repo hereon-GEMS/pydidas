@@ -86,6 +86,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
             "num_grid_spaces": 0,
             "active_plot_indices": [],
             "active_plot_keys": [],
+            "new_data": False,
         }
         self.set_default_params()
         self._datasets = {}
@@ -334,6 +335,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
                 "All datasets must have the same size of the 1st dimension."
             )
         self._config["max_index"] = min(_sizes) - 1 if _sizes else 0
+        self._config["new_data"] = True
         self._datasets = datasets
         for _key in self._datasets:
             if _key not in self._yscaling:
@@ -484,7 +486,8 @@ class GridCurvePlot(WidgetWithParameterCollection):
         Update the plot with the current datasets and parameters.
         This method should be implemented to create the actual plot.
         """
-        if all(_data is None for _data in self._datasets.values()):
+        self.setVisible(not all(_data is None for _data in self._datasets.values()))
+        if not self.isVisible():
             return
         if self.n_plots != self._config["num_grid_spaces"]:
             print("Updating grid for plots.")
@@ -500,8 +503,12 @@ class GridCurvePlot(WidgetWithParameterCollection):
             # print("required n plots", self.n_plots)
             # print("current num plots", self._config["num_plots_in_grid"])
             self.__create_plots_in_grid_if_needed()
-        else:
-            print("Plots already verified, skipping creation.")
+        if self._config["new_data"]:
+            for _idata, _data in enumerate(self._datasets.values()):
+                for _key in self._config["active_plot_keys"]:
+                    self._widgets[f"sub{_key}_{_idata}"].setVisible(_data is not None)
+            self._config["new_data"] = False
+
         # print(self._datasets.keys())
         # print(
         #     "plotting",

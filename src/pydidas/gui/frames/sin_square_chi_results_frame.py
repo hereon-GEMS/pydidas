@@ -426,6 +426,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             else:
                 _data = None
             setattr(self, f"_sin_{_key}_data", _data)
+
         self._plots.set_datasets(
             square=self._sin_square_chi_data, two_chi=self._sin_2chi_data
         )

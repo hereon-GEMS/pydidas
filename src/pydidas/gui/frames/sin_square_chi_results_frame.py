@@ -314,7 +314,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         """Restore the frame's state from stored information."""
         BaseFrame.restore_state(self, state)
         if self._config["built"]:
-            self._plots.update_plot_numbers(
+            self._plots.set_plot_numbers(
                 self.get_param_value("num_vertical_plots"),
                 self.get_param_value("num_horizontal_plots"),
             )

@@ -93,10 +93,13 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._xscaling = {}
         self._local_scan = Scan()
 
-        self._current_index = 0
+        self._current_index = -1
         self.setSizePolicy(*POLICY_EXP_EXP)  # noqa E1120, E1121
         self.create_empty_widget("config_top", parent_widget=self)
         self.create_empty_widget("grid", parent_widget=self, sizePolicy=POLICY_EXP_EXP)
+        apply_qt_properties(
+            self._widgets["grid"].layout(), horizontalSpacing=30, verticalSpacing=10
+        )
 
         self._create_config_bottom_widgets()
         self.__updated_n_plot_numbers()
@@ -106,7 +109,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self.create_empty_widget("config_bottom", parent_widget=self, visible=True)
         self.create_square_button(
             "button_start",
-            connect=partial(self._change_start_index, -1),
+            clicked=partial(self._change_start_index, "::start::"),
             font_metric_height_factor=1,
             icon="mdi::skip-backward",
             gridPos=(0, -1, 1, 1),
@@ -117,6 +120,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
             "button_back_page",
             "Go back one page",
             icon="pydidas::page-backward",
+            clicked=partial(self._change_start_index, "::page-::"),
             font_metric_width_factor=_BUTTON_WIDTH,
             gridPos=(0, -1, 1, 1),
             parent_widget="config_bottom",
@@ -124,6 +128,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         )
         self.create_square_button(
             "button_backward",
+            clicked=partial(self._change_start_index, -1),
             font_metric_height_factor=1,
             icon="mdi::step-backward",
             gridPos=(0, -1, 1, 1),
@@ -160,7 +165,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         )
         self.create_square_button(
             "button_forward",
-            connect=partial(self._change_start_index, 1),
+            clicked=partial(self._change_start_index, 1),
             font_metric_height_factor=1,
             icon="mdi::step-forward",
             gridPos=(0, -1, 1, 1),
@@ -170,6 +175,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self.create_button(
             "button_forward",
             "Go forward one page",
+            clicked=partial(self._change_start_index, "::page+::"),
             icon="pydidas::page-forward",
             font_metric_width_factor=_BUTTON_WIDTH,
             gridPos=(0, -1, 1, 1),
@@ -178,6 +184,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         )
         self.create_square_button(
             "button_end",
+            clicked=partial(self._change_start_index, "::end::"),
             font_metric_height_factor=1,
             icon="mdi::skip-forward",
             gridPos=(0, -1, 1, 1),
@@ -190,6 +197,12 @@ class GridCurvePlot(WidgetWithParameterCollection):
         )
         apply_qt_properties(
             self._widgets["config_bottom"].layout(), columnStretch=(_ncols, 1)
+        )
+        self._widgets["edit_index_low"].editingFinished.connect(
+            partial(self._manual_index_change, "low")
+        )
+        self._widgets["edit_index_high"].editingFinished.connect(
+            partial(self._manual_index_change, "high")
         )
 
     @property
@@ -223,9 +236,9 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._config["n_vert"] = int(n_plots_vert)
         self.__updated_n_plot_numbers()
 
-    def update_plot_numbers(self, n_vert: int, n_hor: int) -> None:
+    def set_plot_numbers(self, n_vert: int, n_hor: int) -> None:
         """
-        Update the number of plots in the grid.
+        Set the number of plots in the grid.
 
         Parameters
         ----------
@@ -252,6 +265,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._config["active_plot_indices"] = _indices
         self._config["active_plot_keys"] = [f"plot_{_i}_{_j}" for _i, _j in _indices]
         if self._datasets:
+            self._update_edit_displayed_indices()
             self._update_plot()
 
     def __check_key(self, dataset_key: Any) -> None:
@@ -269,6 +283,15 @@ class GridCurvePlot(WidgetWithParameterCollection):
         """
         if dataset_key not in self._datasets:
             raise UserConfigError(f"Dataset `{dataset_key}` not found.")
+
+    def _update_edit_displayed_indices(self) -> None:
+        """Update the edit indices in the bottom configuration."""
+        with QtCore.QSignalBlocker(self._widgets["edit_index_low"]):
+            self._widgets["edit_index_low"].setText(str(self._current_index))
+        with QtCore.QSignalBlocker(self._widgets["edit_index_low"]):
+            self._widgets["edit_index_high"].setText(
+                str(self._current_index + self.n_plots - 1)
+            )
 
     def clear(self):
         """
@@ -317,6 +340,8 @@ class GridCurvePlot(WidgetWithParameterCollection):
                 self._yscaling[_key] = (None, None)
             if _key not in self._xscaling:
                 self._xscaling[_key] = (None, None)
+        if self._current_index < 0:
+            self._change_start_index("::start::")
         self._update_plot()
 
     def set_xscaling(
@@ -399,14 +424,24 @@ class GridCurvePlot(WidgetWithParameterCollection):
         """
         _plot_layout = self._widgets["grid"].layout()
         for _key in [_key for _key in self._widgets if _key.startswith("plot_")]:
-            self._widgets[_key].setVisible(_key in self._config["active_plot_keys"])
+            _comparator = _key.rstrip("_title") if _key.endswith("_title") else _key
+            self._widgets[_key].setVisible(
+                _comparator in self._config["active_plot_keys"]
+            )
         for _index, _key in enumerate(self._config["active_plot_keys"]):
             if _key in self._widgets:
                 continue
+            _y, _x = self._config["active_plot_indices"][_index]
+            self.create_label(
+                f"{_key}_title",
+                f"Plot {_x + 1}, {_y + 1}",
+                parent_widget=self._widgets["grid"],
+                gridPos=(2 * _y, _x, 1, 1),
+            )
             self.create_empty_widget(
                 _key,
                 parent_widget=self._widgets["grid"],
-                gridPos=(*self._config["active_plot_indices"][_index], 1, 1),
+                gridPos=(2 * _y + 1, _x, 1, 1),
             )
         self._config["num_grid_spaces"] = self.n_plots
 
@@ -441,6 +476,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
                     raise UserConfigError(
                         "The parameter for the start index could not be interpreted."
                     )
+        self._update_edit_displayed_indices()
         self._update_plot()
 
     def _update_plot(self):
@@ -449,9 +485,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         This method should be implemented to create the actual plot.
         """
         if all(_data is None for _data in self._datasets.values()):
-            print("No datasets available for plotting, skipping update.")
             return
-        print("\nUpdating plot with datasets:")
         if self.n_plots != self._config["num_grid_spaces"]:
             print("Updating grid for plots.")
             self._update_grid_for_plots()
@@ -459,21 +493,26 @@ class GridCurvePlot(WidgetWithParameterCollection):
             len(self._datasets) != self._config["num_dataset_plots"]
             or self.n_plots != self._config["num_plots_in_grid"]
         ):
-            print("Creating plots in grid layout.")
+            # print("Creating plots in grid layout.")
+            # print("len datasets: ", len(self._datasets))
+            # print("len datasets: ", len(self._datasets))
+            # print("stored num dataset plots", self._config["num_dataset_plots"])
+            # print("required n plots", self.n_plots)
+            # print("current num plots", self._config["num_plots_in_grid"])
             self.__create_plots_in_grid_if_needed()
         else:
-            print("Plots already verified, skipping creation.", self._widgets.keys())
-        print(self._datasets.keys())
-        print(
-            "plotting",
-            [
-                (_key, _val.shape)
-                for _key, _val in self._datasets.items()
-                if _val is not None
-            ],
-        )
-        print("X scaling:", self._xscaling)
-        print("Y scaling:", self._yscaling)
+            print("Plots already verified, skipping creation.")
+        # print(self._datasets.keys())
+        # print(
+        #     "plotting",
+        #     [
+        #         (_key, _val.shape)
+        #         for _key, _val in self._datasets.items()
+        #         if _val is not None
+        #     ],
+        # )
+        # print("X scaling:", self._xscaling)
+        # print("Y scaling:", self._yscaling)
 
     def __create_plots_in_grid_if_needed(self):
         """
@@ -485,7 +524,11 @@ class GridCurvePlot(WidgetWithParameterCollection):
         pg.setConfigOption("background", (255, 255, 255, 0))
 
         _n_data = len(self._datasets)
-        _plot_keys = [_key for _key in self._widgets if _key.startswith("plot_")]
+        _plot_keys = [
+            _key
+            for _key in self._widgets
+            if _key.startswith("plot_") and not _key.endswith("_title")
+        ]
         for _plot_key in self._config["active_plot_keys"]:
             _widget = self._widgets[_plot_key]
             if _widget.layout().count() != _n_data:
@@ -505,6 +548,25 @@ class GridCurvePlot(WidgetWithParameterCollection):
                     )
         self._config["num_dataset_plots"] = _n_data
         self._config["num_plots_in_grid"] = len(_plot_keys)
+
+    @QtCore.Slot()
+    def _manual_index_change(self, source: str) -> None:
+        """
+        Change the start index based on manual input.
+
+        Parameters
+        ----------
+        source : str
+            The source of the manual input, either 'low' or 'high'.
+        """
+        _low = int(self._widgets[f"edit_index_{source}"].text())
+        if source == "high":
+            _low -= self.n_plots
+        self._current_index = max(
+            0, min(_low, self._config["max_index"] - self.n_plots)
+        )
+        self._update_edit_displayed_indices()
+        self._update_plot()
 
 
 if __name__ == "__main__":

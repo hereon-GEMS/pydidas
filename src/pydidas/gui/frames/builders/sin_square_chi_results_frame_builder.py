@@ -37,7 +37,9 @@ from pydidas.widgets import ScrollArea
 from pydidas.widgets.plotting import GridCurvePlot
 
 
-def __create_param_widget(param: Parameter, **kwargs: Any) -> list[str, tuple, dict]:
+def __create_param_widget(
+    param: Parameter, parent: str, **kwargs: Any
+) -> list[str, tuple, dict]:
     """
     Get the widget creation information for a parameter widget.
     """
@@ -45,7 +47,7 @@ def __create_param_widget(param: Parameter, **kwargs: Any) -> list[str, tuple, d
         "create_param_widget",
         (param,),
         {
-            "parent_widget": "config",
+            "parent_widget": parent,
             "linebreak": True if param.choices else False,
         }
         | kwargs,
@@ -78,7 +80,7 @@ def get_widget_creation_information(
     return [
         [
             "create_label",
-            (None, "Sin square chi result analysis"),
+            (None, "Sin square chi result visualization"),
             {"fontsize_offset": 4, "bold": True, "gridPos": (0, 0, 1, 2)},
         ],
         [
@@ -97,72 +99,132 @@ def get_widget_creation_information(
             ("visualization", GridCurvePlot),
             {"gridPos": (0, 1, 2, 1)},
         ],
+        ["create_empty_widget", ("config_generic",), {"parent_widget": "config"}],
+        ["create_empty_widget", ("config_grid_plot",), {"parent_widget": "config"}],
+        ["create_empty_widget", ("config_rel_stress",), {"parent_widget": "config"}],
         [
             "create_button",
             ("button_load_workflow_results", "Import current workflow results"),
-            {"parent_widget": "config"},
+            {"parent_widget": "config_generic"},
         ],
         [
             "create_button",
             ("button_import_from_directory", "Import results from directory"),
-            {"parent_widget": "config"},
+            {"parent_widget": "config_generic"},
         ],
-        __create_param_widget(params.get_param("selected_data_source"), linebreak=True),
         __create_param_widget(
-            params.get_param("num_horizontal_plots"), linebreak=False, width_io=0.15
+            params.get_param("selected_data_source"), "config_generic", linebreak=True
         ),
         __create_param_widget(
-            params.get_param("num_vertical_plots"), linebreak=False, width_io=0.15
+            params.get_param("selected_sin_square_chi_node"), "config_generic"
         ),
-        ["create_line", (None,), {"parent_widget": "config"}],
-        ["create_spacer", (None,), {"parent_widget": "config", "fixedHeight": 15}],
+        __create_param_widget(
+            params.get_param("selected_sin_2chi_node"), "config_generic"
+        ),
+        ["create_line", (None,), {"parent_widget": "config_generic"}],
+        [
+            "create_spacer",
+            (None,),
+            {"parent_widget": "config_grid_plot", "fixedHeight": 15},
+        ],
         [
             "create_label",
-            (None, "Source plugin for sin^2(chi):"),
-            {"parent_widget": "config"},
+            (None, "Grid plot configuration:"),
+            {"parent_widget": "config_grid_plot", "underline": True},
         ],
-        __create_param_widget(params.get_param("selected_sin_square_chi_node")),
-        __create_param_widget(params.get_param("show_sin_square_chi_results")),
-        __create_param_widget(params.get_param("show_sin_square_chi_branches")),
-        __create_param_widget(params.get_param("autoscale_sin_square_chi_results")),
+        __create_param_widget(
+            params.get_param("num_horizontal_plots"),
+            "config_grid_plot",
+            linebreak=False,
+            width_io=0.15,
+        ),
+        __create_param_widget(
+            params.get_param("num_vertical_plots"),
+            "config_grid_plot",
+            linebreak=False,
+            width_io=0.15,
+        ),
+        ["create_line", (None,), {"parent_widget": "config_grid_plot"}],
+        [
+            "create_spacer",
+            (None,),
+            {"parent_widget": "config_grid_plot", "fixedHeight": 15},
+        ],
+        [
+            "create_label",
+            (None, "Plot configuration for sin^2(chi):"),
+            {"parent_widget": "config_grid_plot"},
+        ],
+        __create_param_widget(
+            params.get_param("show_sin_square_chi_results"), "config_grid_plot"
+        ),
+        __create_param_widget(
+            params.get_param("show_sin_square_chi_branches"), "config_grid_plot"
+        ),
+        __create_param_widget(
+            params.get_param("autoscale_sin_square_chi_results"), "config_grid_plot"
+        ),
         [
             "create_button",
             (
                 "button_update_sin_square_chi_limits",
                 "Update limits from selected data",
             ),
-            {"parent_widget": "config", "visible": False},
+            {"parent_widget": "config_grid_plot", "visible": False},
         ],
         __create_param_widget(
-            params.get_param("sin_square_chi_limit_high"), visible=False, width_io=0.2
+            params.get_param("sin_square_chi_limit_high"),
+            "config_grid_plot",
+            visible=False,
+            width_io=0.2,
         ),
         __create_param_widget(
-            params.get_param("sin_square_chi_limit_low"), visible=False, width_io=0.2
+            params.get_param("sin_square_chi_limit_low"),
+            "config_grid_plot",
+            visible=False,
+            width_io=0.2,
         ),
-        ["create_line", (None,), {"parent_widget": "config"}],
-        ["create_spacer", (None,), {"parent_widget": "config", "fixedHeight": 15}],
+        ["create_line", (None,), {"parent_widget": "config_grid_plot"}],
+        [
+            "create_spacer",
+            (None,),
+            {"parent_widget": "config_grid_plot", "fixedHeight": 15},
+        ],
         [
             "create_label",
-            (None, "Source plugin for sin(2*chi):"),
-            {"parent_widget": "config"},
+            (None, "Plot configuration for sin(2*chi):"),
+            {"parent_widget": "config_grid_plot"},
         ],
-        __create_param_widget(params.get_param("selected_sin_2chi_node")),
-        __create_param_widget(params.get_param("show_sin_2chi_results")),
-        __create_param_widget(params.get_param("autoscale_sin_2chi_results")),
+        __create_param_widget(
+            params.get_param("show_sin_2chi_results"), "config_grid_plot"
+        ),
+        __create_param_widget(
+            params.get_param("autoscale_sin_2chi_results"), "config_grid_plot"
+        ),
         [
             "create_button",
             (
                 "button_update_sin_2chi_limits",
                 "Update limits from selected data",
             ),
-            {"parent_widget": "config", "visible": False},
+            {"parent_widget": "config_grid_plot", "visible": False},
         ],
         __create_param_widget(
-            params.get_param("sin_2chi_limit_high"), visible=False, width_io=0.2
+            params.get_param("sin_2chi_limit_high"),
+            "config_grid_plot",
+            visible=False,
+            width_io=0.2,
         ),
         __create_param_widget(
-            params.get_param("sin_2chi_limit_low"), visible=False, width_io=0.2
+            params.get_param("sin_2chi_limit_low"),
+            "config_grid_plot",
+            visible=False,
+            width_io=0.2,
         ),
-        ["create_line", (None,), {"parent_widget": "config"}],
-        ["create_spacer", (None,), {"parent_widget": "config", "fixedHeight": 15}],
+        ["create_line", (None,), {"parent_widget": "config_grid_plot"}],
+        [
+            "create_spacer",
+            (None,),
+            {"parent_widget": "config_grid_plot", "fixedHeight": 15},
+        ],
     ]

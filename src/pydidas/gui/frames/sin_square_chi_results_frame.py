@@ -41,10 +41,8 @@ from pydidas_plugins.residual_stress_plugins.store_sin_square_chi_data import (
 )
 
 from pydidas.core import (
-    Parameter,
-    ParameterCollection,
     UserConfigError,
-    get_generic_parameter,
+    get_generic_param_collection,
 )
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
@@ -62,139 +60,37 @@ from pydidas_qtcore import PydidasQApplication
 
 # TODO: Addd documentation
 
-_DEFAULT_PARAMS = ParameterCollection(
-    Parameter(
-        "selected_data_source",
-        str,
-        "None",
-        name="Selected data source",
-        tooltip="The data source used for the visualization",
-    ),
-    Parameter(
-        "selected_sin_square_chi_node",
-        str,
-        "no selection",
-        name="Selected sin^2(chi) node",
-        choices=["no selection"],
-        tooltip=(
-            "The node which includes the stored information with the results of the "
-            "fit plotted vs sin^2(chi)."
-        ),
-    ),
-    Parameter(
-        "show_sin_square_chi_results",
-        bool,
-        True,
-        choices=[True, False],
-        name="Show sin^2(chi) results in plot",
-        tooltip=(
-            "Flag to show the results of the sin^2(chi) analysis in the plot. "
-            "If False, no results will be shown."
-        ),
-    ),
-    Parameter(
-        "show_sin_square_chi_branches",
-        bool,
-        False,
-        choices=[True, False],
-        name="Show sin^2(chi) branches in plot",
-        tooltip=(
-            "Flag to show the positive and negative branches of the sin^2(chi) "
-            "analysis in the plot. If False, no branches will be shown but only the "
-            "average and the fit results."
-        ),
-    ),
-    Parameter(
-        "autoscale_sin_square_chi_results",
-        bool,
-        True,
-        choices=[True, False],
-        name="Autoscale sin^2(chi) results",
-        tooltip=(
-            "Flag to autoscale the results of the sin^2(chi) analysis in the plot. "
-            "If False, the plot will not be autoscaled."
-        ),
-    ),
-    Parameter(
-        "sin_square_chi_limit_low",
-        float,
-        0.0,
-        name="Lower limit for sin^2(chi) results",
-        tooltip=(
-            "The lower limit for the sin^2(chi) results in the plot. "
-            "If autoscaling is enabled, this value will be ignored."
-        ),
-    ),
-    Parameter(
-        "sin_square_chi_limit_high",
-        float,
-        1.0,
-        name="Upper limit for sin^2(chi) results",
-        tooltip=(
-            "The upper limit for the sin^2(chi) results in the plot. "
-            "If autoscaling is enabled, this value will be ignored."
-        ),
-    ),
-    Parameter(
-        "selected_sin_2chi_node",
-        str,
-        "no selection",
-        name="Selected sin(2*chi) node",
-        choices=["no selection"],
-        tooltip=(
-            "The node which includes the stored information with the results of the "
-            "fit results plotted vs. sin(2*chi)."
-        ),
-    ),
-    Parameter(
-        "show_sin_2chi_results",
-        bool,
-        True,
-        choices=[True, False],
-        name="Show sin(2*chi) results in plot",
-        tooltip=(
-            "Flag to show the results of the sin(2*chi) analysis in the plot. "
-            "If False, no results will be shown."
-        ),
-    ),
-    Parameter(
-        "autoscale_sin_2chi_results",
-        bool,
-        True,
-        choices=[True, False],
-        name="Autoscale sin(2*chi) results",
-        tooltip=(
-            "Flag to autoscale the results of the sin(2*chi) analysis in the plot. "
-            "If False, the plot will not be autoscaled."
-        ),
-    ),
-    Parameter(
-        "sin_2chi_limit_low",
-        float,
-        0.0,
-        name="Lower limit for sin(2*chi) results",
-        tooltip=(
-            "The lower limit for the sin(2*chi) results in the plot. "
-            "If autoscaling is enabled, this value will be ignored."
-        ),
-    ),
-    Parameter(
-        "sin_2chi_limit_high",
-        float,
-        1.0,
-        name="Upper limit for sin(2*chi) results",
-        tooltip=(
-            "The upper limit for the sin(2*chi) results in the plot. "
-            "If autoscaling is enabled, this value will be ignored."
-        ),
-    ),
-    get_generic_parameter("num_horizontal_plots"),
-    get_generic_parameter("num_vertical_plots"),
+_DEFAULT_PARAMS = get_generic_param_collection(
+    "selected_data_source",
+    "selected_sin_square_chi_node",
+    "selected_sin_2chi_node",
+    "plot_type",
+    "show_sin_square_chi_results",
+    "show_sin_square_chi_branches",
+    "autoscale_sin_square_chi_results",
+    "sin_square_chi_limit_low",
+    "sin_square_chi_limit_high",
+    "show_sin_2chi_results",
+    "autoscale_sin_2chi_results",
+    "sin_2chi_limit_low",
+    "sin_2chi_limit_high",
+    "num_horizontal_plots",
+    "num_vertical_plots",
 )
 
-_PARAMS_NOT_TO_RESTORE = list(_DEFAULT_PARAMS.keys())
-_PARAMS_NOT_TO_RESTORE.remove("num_horizontal_plots")
-_PARAMS_NOT_TO_RESTORE.remove("num_vertical_plots")
+_PARAMS_NOT_TO_RESTORE = [
+    "selected_data_source",
+    "selected_sin_square_chi_node",
+    "selected_sin_2chi_node",
+    "plot_type",
+    "autoscale_sin_square_chi_results",
+    "sin_square_chi_limit_low",
+    "sin_square_chi_limit_high",
+    "autoscale_sin_2chi_results",
+    "sin_2chi_limit_low",
+    "sin_2chi_limit_high",
+]
+
 
 _RESULTS = WorkflowResults()
 
@@ -364,6 +260,8 @@ class SinSquareChiResultsFrame(BaseFrame):
 
         This method will reset the selected nodes to their initial state.
         """
+        self._sin_2chi_data = None
+        self._sin_square_chi_data = None
         self.set_param_value("selected_sin_square_chi_node", "no selection")
         self.set_param_value("selected_sin_2chi_node", "no selection")
         self._plots.set_datasets(square=None, two_chi=None)

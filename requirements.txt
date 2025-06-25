@@ -147,7 +147,7 @@ pyyaml==6.0.2
     # via -r requirements.in
 qtpy==2.4.3
     # via -r requirements.in
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements.in
     #   sphinx
@@ -207,7 +207,7 @@ typing-extensions==4.13.2
     #   beautifulsoup4
     #   pydata-sphinx-theme
     #   pytools
-urllib3==2.4.0
+urllib3==2.5.0
     # via requests
 
 # The following packages are considered to be unsafe in a requirements file:

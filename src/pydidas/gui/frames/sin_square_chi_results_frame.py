@@ -95,7 +95,7 @@ _DEFAULT_PARAMS = ParameterCollection(
     Parameter(
         "show_sin_square_chi_branches",
         bool,
-        True,
+        False,
         choices=[True, False],
         name="Show sin^2(chi) branches in plot",
         tooltip=(
@@ -367,8 +367,9 @@ class SinSquareChiResultsFrame(BaseFrame):
         self.set_param_value("selected_sin_square_chi_node", "no selection")
         self.set_param_value("selected_sin_2chi_node", "no selection")
         self._plots.set_datasets(square=None, two_chi=None)
+        self._plots.set_titles(square="sin^2(chi)", two_chi="sin(2*chi)")
         for _key in ["square", "two_chi"]:
-            self._plots.set_xscaling(_key, (0, 1), update_plot=False)
+            self._plots.set_xscaling(_key, (-0.05, 1.05), update_plot=False)
             self._plots.set_y_autoscaling(_key, update_plot=False)
 
     def _update_selection_choices(self):
@@ -378,6 +379,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         This method will update the parameter choices based on the current
         results.
         """
+        self._plots.set_scan(self.__current_results.frozen_scan)
         self._sin_square_chi_node_keys = {
             self.__current_results._config["result_titles"][_key]: _key
             for _key, _val in self.__current_results._config["plugin_names"].items()

@@ -95,7 +95,7 @@ def get_widget_creation_information(
         [
             "create_any_widget",
             ("visualization", GridCurvePlot),
-            {"gridPos": (1, 1, 1, 1)},
+            {"gridPos": (0, 1, 2, 1)},
         ],
         [
             "create_button",

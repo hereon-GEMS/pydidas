@@ -51,6 +51,7 @@ def app():
 @pytest.fixture
 def grid_plot():
     _grid_plot = GridCurvePlot()
+    _grid_plot._local_scan.set_param_value("scan_dim0_n_points", 140)
     yield _grid_plot
     _grid_plot.deleteLater()
 
@@ -58,29 +59,6 @@ def grid_plot():
 @pytest.fixture
 def datasets():
     return {_k: copy(_val) for _k, _val in _DATASETS.items()}
-
-
-#
-# @pytest.fixture
-# def data_range():
-#     return _DATA_RANGE.copy()
-
-#
-# @pytest.fixture
-# def spy_display_choice(grid_plot):
-#     return QtTest.QSignalSpy(grid_plot.sig_display_choice_changed)
-#
-#
-# @pytest.fixture
-# def spy_new_slicing(grid_plot):
-#     return QtTest.QSignalSpy(grid_plot.sig_new_slicing)
-
-#
-# def _get_spy_results(spy):
-#     if IS_QT6:
-#         return [spy.at(i) for i in range(spy.count())]
-#     else:
-#         return [spy[i] for i in range(len(spy))]
 
 
 def test_init(grid_plot):
@@ -91,6 +69,7 @@ def test_init(grid_plot):
     assert isinstance(grid_plot._config, dict)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("n_plots_hor", [2, 5, 7])
 @pytest.mark.parametrize("n_plots_vert", [3, 4, 6])
 def test_set_n_plots(grid_plot, n_plots_hor, n_plots_vert):
@@ -101,6 +80,7 @@ def test_set_n_plots(grid_plot, n_plots_hor, n_plots_vert):
     assert grid_plot.n_plots == n_plots_hor * n_plots_vert
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("n_plots_hor", [2, 5, 7])
 @pytest.mark.parametrize("n_plots_vert", [3, 4, 6])
 def test_set_n_plots__w_data(grid_plot, datasets, n_plots_hor, n_plots_vert):
@@ -116,6 +96,7 @@ def test_set_n_plots__w_data(grid_plot, datasets, n_plots_hor, n_plots_vert):
             assert _key in grid_plot._widgets
 
 
+@pytest.mark.slow
 def test_set_scan(grid_plot):
     _scan = Scan()
     _scan.set_param_value("scan_title", "dummy")
@@ -125,6 +106,7 @@ def test_set_scan(grid_plot):
         assert grid_plot._local_scan.get_param_value(_key) == _val
 
 
+@pytest.mark.slow
 def test_clear(grid_plot):
     grid_plot._datasets = {"test1": None, "test2": [1, 2]}
     grid_plot._yscaling = {"test1": 1, "test2": 2}
@@ -136,6 +118,7 @@ def test_clear(grid_plot):
     assert grid_plot._config["max_index"] is None
 
 
+@pytest.mark.slow
 def test_set_datasets(grid_plot, datasets):
     grid_plot.set_datasets(**datasets)
     assert grid_plot._datasets == datasets
@@ -157,6 +140,14 @@ def test_set_datasets__wrong_shape(grid_plot):
         )
 
 
+def test_set_datasets__wrong_dim(grid_plot):
+    with pytest.raises(UserConfigError):
+        grid_plot.set_datasets(
+            test1=Dataset(np.random.random((140, 3, 12, 4))),
+        )
+
+
+@pytest.mark.slow
 @pytest.mark.parametrize("direction", ["x", "y"])
 def test_set_scaling(grid_plot, datasets, direction):
     grid_plot.set_datasets(**datasets)
@@ -183,6 +174,7 @@ def test_set_scaling__wrong_scaling(grid_plot, datasets, direction):
         _setter("test1", (0.5, 1.5, 2.0))
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("direction", ["x", "y"])
 def test_set_autoscaling(grid_plot, datasets, direction):
     grid_plot.set_datasets(**datasets)
@@ -195,6 +187,7 @@ def test_set_autoscaling(grid_plot, datasets, direction):
     assert _values["test2"] == (1, 2)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("n_plots", [3, 4])
 @pytest.mark.parametrize(
     "start_value", ["::start::", "::end::", "::page+::", "::page-::", 1, -1, 4, -4]
@@ -215,7 +208,7 @@ def test_change_start_index(grid_plot, datasets, n_plots, start_value, direction
         elif start_value == "::end::":
             assert (
                 grid_plot._current_index
-                == datasets["test1"].shape[0] - 1 - grid_plot.n_plots
+                == datasets["test1"].shape[0] - grid_plot.n_plots
             )
         elif start_value == "::page+::":
             assert grid_plot._current_index == _index0 + grid_plot.n_plots

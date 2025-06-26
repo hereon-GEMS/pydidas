@@ -181,8 +181,10 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
 
         Filter keys are set up dynamically along with their checkbox widgets.
         """
-        self.param_widgets["min_datadim"].io_edited.connect(self.__process_min_datadim)
-        self.param_widgets["dataset"].io_edited.connect(self.__select_dataset)
+        self.param_widgets["min_datadim"].sig_new_value.connect(
+            self.__process_min_datadim
+        )
+        self.param_widgets["dataset"].sig_value_changed.connect(self.__select_dataset)
         self._widgets["button_inspect"].clicked.connect(self.sig_request_hdf5_browser)
 
     @QtCore.Slot(str)
@@ -224,6 +226,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         )
         self.__select_dataset()
 
+    @QtCore.Slot()
     def __select_dataset(self):
         """
         Select a dataset from the drop-down list.

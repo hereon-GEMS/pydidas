@@ -311,7 +311,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         for _param_key in self.params:
             if _param_key.startswith("cmap"):
                 continue
-            self.param_widgets[_param_key].io_edited.connect(
+            self.param_widgets[_param_key].sig_new_value.connect(
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_plugins"].clicked.connect(self.update_plugin_collection)
@@ -352,7 +352,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             self._widgets["cmap_combobox"].setCurrentText(_default_cmap)
 
     @QtCore.Slot(object)
-    def update_qsetting(self, param_key: str, value: object):
+    def update_qsetting(self, param_key: str, value: Any):
         """
         Update a QSettings value
 
@@ -361,7 +361,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         param_key : str
             The QSettings reference key. A "global/" prefix will be applied
             to it.
-        value : object
+        value : Any
             The new value.
         """
         self.q_settings_set(f"user/{param_key}", value)

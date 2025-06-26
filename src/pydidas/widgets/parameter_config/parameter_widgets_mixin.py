@@ -27,11 +27,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
+
 from typing import Any
 
 from qtpy import QtCore
 
 from pydidas.core import Parameter, ParameterCollection, PydidasGuiError
+from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+    BaseParamIoWidget,
+)
 from pydidas.widgets.parameter_config.parameter_widget import ParameterWidget
 from pydidas.widgets.utilities import get_widget_layout_args
 
@@ -44,8 +48,8 @@ class ParameterWidgetsMixIn:
     """
 
     def __init__(self):
-        self.param_widgets = {}
-        self.param_composite_widgets = {}
+        self.param_widgets: dict[str, BaseParamIoWidget] = {}
+        self.param_composite_widgets: dict[str, ParameterWidget] = {}
         if not hasattr(self, "_widgets"):
             self._widgets = {}
         if not hasattr(self, "params"):
@@ -123,7 +127,9 @@ class ParameterWidgetsMixIn:
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(f'No parameter with key "{key}" found.')
         with QtCore.QSignalBlocker(self.param_widgets[key]):
-            self.set_param_value(key, value)  # noqa : from ParameterCollectionMixin
+            # The set_param_value method is expected to be defined in the
+            # class that uses this mixin:
+            self.set_param_value(key, value)  # noqa E1101
             self.param_widgets[key].set_value(value)
 
     def toggle_param_widget_visibility(self, key: str, visible: bool):

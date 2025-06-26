@@ -162,7 +162,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     def connect_signals(self):
         """Connect the basic signals to the widgets."""
         self._widgets["restore_defaults"].clicked.connect(self.restore_defaults)
-        self.param_widgets["label"].io_edited.connect(self._label_updated)
+        self.param_widgets["label"].sig_new_value.connect(self._label_updated)
         if self._use_advanced_params:
             self._widgets["but_toggle_advanced_params"].clicked.connect(
                 self.toggle_advanced_params

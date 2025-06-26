@@ -115,15 +115,15 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         Connect the signals for Parameter updates.
         """
         for _param_key in self.params:
-            self.param_widgets[_param_key].io_edited.connect(
+            self.param_widgets[_param_key].sig_new_value.connect(
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
         _app = pydidas_qtcore.PydidasQApplication.instance()
         _app.sig_font_metrics_changed.connect(self.process_new_font_metrics)
 
-    @QtCore.Slot(object)
-    def update_qsetting(self, param_key, value):
+    @QtCore.Slot(str)
+    def update_qsetting(self, param_key: str, value: str):
         """
         Update a QSettings value
 
@@ -132,7 +132,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         param_key : str
             The QSettings reference key. A "global/" prefix will be applied
             to it.
-        value : object
+        value : str
             The new value.
         """
         self.q_settings_set(f"global/{param_key}", value)

@@ -96,7 +96,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         )
         self._widgets["but_open"].clicked.connect(self.open_image_dialog)
         self._widgets["but_confirm_file"].clicked.connect(self._selected_new_file)
-        self.param_widgets["filename"].io_edited.connect(
+        self.param_widgets["filename"].sig_new_value.connect(
             self.process_new_filename_input
         )
         self.restore_param_widgets()

@@ -29,22 +29,36 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetCheckBox"]
 
 
-from typing import Union
-
-import qtpy as __qtpy
-
 from pydidas.core import Parameter
+from pydidas.core.utils import IS_QT6
 from pydidas.widgets.factory import PydidasCheckBox
 from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
     BaseParamIoWidgetMixIn,
 )
 
 
-IS_QT6 = __qtpy.QT_VERSION[0] == "6"
-
-
 class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
     """Widgets for I/O during plugin parameter editing with boolean choices."""
+
+    @staticmethod
+    def __convert_bool(value: int | str) -> bool:
+        """
+        Convert boolean strings to bool.
+
+        This conversion is necessary because boolean "0" and "1" cannot be
+        interpreted as "True" and "False" straight away.
+
+        Parameters
+        ----------
+        value : int | str
+            The input value from the field.
+
+        Returns
+        -------
+        bool
+            The input value, with 0/1 converted to True or False
+        """
+        return value in ["1", 1]
 
     def __init__(self, param: Parameter, **kwargs: dict):
         """
@@ -71,25 +85,6 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         self.setText(param.name)
         self.setEnabled(set(param.choices) == {True, False})
 
-    def __convert_bool(self, value: Union[int, str]) -> bool:
-        """
-        Convert boolean strings to bool.
-
-        This conversion is necessary because boolean "0" and "1" cannot be
-        interpreted as "True" and "False" straight away.
-
-        Parameters
-        ----------
-        value : Union[int, str]
-            The input value from the field. This could be any object.
-
-        Returns
-        -------
-        bool
-            The input value, with 0/1 converted to True or False
-        """
-        return True if value == "1" or value == 1 else False
-
     def emit_signal(self):
         """
         Emit a signal that the value has been edited.
@@ -100,7 +95,8 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         _cur_value = self.isChecked()
         if _cur_value != self._old_value:
             self._old_value = _cur_value
-            self.io_edited.emit("True" if _cur_value else "False")
+            self.sig_new_value.emit("True" if _cur_value else "False")
+            self.sig_value_changed.emit()
 
     def get_value(self) -> object:
         """

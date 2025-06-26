@@ -30,7 +30,7 @@ __all__ = ["QuickIntegrationFrame"]
 
 from functools import partial
 from pathlib import Path
-from typing import Union
+from typing import Any, Union
 
 import numpy as np
 from qtpy import QtCore
@@ -86,7 +86,7 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_mask_file",
     ]
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
         self._EXP = DiffractionExperiment(detector_pxsizex=100, detector_pxsizey=100)
         self.add_params(self._EXP.params)
@@ -149,13 +149,13 @@ class QuickIntegrationFrame(BaseFrame):
         self._widgets["but_fit_center_circle"].clicked.connect(
             self._bc_controller.fit_beamcenter_with_circle
         )
-        self.param_widgets["detector_pxsize"].io_edited.connect(
+        self.param_widgets["detector_pxsize"].sig_new_value.connect(
             self._update_detector_pxsize
         )
-        self.param_widgets["detector_model"].io_edited.connect(
+        self.param_widgets["detector_model"].sig_value_changed.connect(
             self._change_detector_model
         )
-        self.param_widgets["integration_direction"].io_edited.connect(
+        self.param_widgets["integration_direction"].sig_new_value.connect(
             self._changed_plugin_direction
         )
         self._widgets["but_run_integration"].clicked.connect(self._run_integration)
@@ -175,11 +175,15 @@ class QuickIntegrationFrame(BaseFrame):
                 )
         for _param_key in ["xray_energy", "xray_wavelength"]:
             _w = self.param_widgets[_param_key]
-            _w.io_edited.disconnect()
-            _w.io_edited.connect(partial(self._update_xray_param, _param_key, _w))
+            _w.sig_value_changed.disconnect()
+            _w.sig_value_changed.connect(
+                partial(self._update_xray_param, _param_key, _w)
+            )
         for _param_key in ["beamcenter_x", "beamcenter_y"]:
-            self.param_widgets[_param_key].io_edited.connect(self._update_beamcenter)
-        self.param_widgets["detector_mask_file"].io_edited.connect(
+            self.param_widgets[_param_key].sig_value_changed.connect(
+                self._update_beamcenter
+            )
+        self.param_widgets["detector_mask_file"].sig_new_value.connect(
             self._new_mask_file_selection
         )
 
@@ -224,7 +228,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._toggle_fname_valid(True)
         self._update_detector_model()
         self._widgets["tabs"].setCurrentIndex(0)
-        self._bc_controller.manual_beamcenter_update(None)
+        self._bc_controller.manual_beamcenter_update()
 
     @QtCore.Slot(bool)
     def _toggle_fname_valid(self, is_valid: bool):
@@ -288,6 +292,7 @@ class QuickIntegrationFrame(BaseFrame):
         else:
             BaseFrame.set_param_value_and_widget(self, key, value)
 
+    @QtCore.Slot()
     def _update_xray_param(self, param_key, widget):
         """
         Update a value in both the Parameter and the corresponding widget.
@@ -332,7 +337,7 @@ class QuickIntegrationFrame(BaseFrame):
             self._roi_controller.set_param_value_and_widget(
                 _key, self._plugins["generic"].get_param_value(_key) * _ratio
             )
-        self._update_beamcenter(None)
+        self._update_beamcenter()
         self._config["previous_det_pxsize"] = _pxsize
 
     @QtCore.Slot()
@@ -376,8 +381,8 @@ class QuickIntegrationFrame(BaseFrame):
         else:
             self._bc_controller.set_mask_file(None)
 
-    @QtCore.Slot(str)
-    def _update_beamcenter(self, _):
+    @QtCore.Slot()
+    def _update_beamcenter(self):
         """
         Update the DiffractionExperiment's stored PONI from the beamcenter.
         """
@@ -409,7 +414,7 @@ class QuickIntegrationFrame(BaseFrame):
         else:
             self._bc_controller.remove_plot_items("all")
             self._roi_controller.show_plot_items("roi")
-            self._update_beamcenter(None)
+            self._update_beamcenter()
 
     @QtCore.Slot(bool)
     def _roi_selection_toggled(self, active: bool):

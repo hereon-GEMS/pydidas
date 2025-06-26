@@ -28,11 +28,11 @@ __status__ = "Production"
 __all__ = ["PointsForBeamcenterWidget"]
 
 
-from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import get_generic_parameter
 from pydidas.core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, qstate_is_checked
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 
@@ -264,8 +264,5 @@ class PointsForBeamcenterWidget(
         state : QtCore.Qt.CheckState
             The checkbox's state.
         """
-        if QT_VERSION.startswith("6"):
-            _usage = state == QtCore.Qt.Checked.value
-        else:
-            _usage = state == QtCore.Qt.Checked
+        _usage = qstate_is_checked(state)
         self.sig_2click_usage.emit(_usage)

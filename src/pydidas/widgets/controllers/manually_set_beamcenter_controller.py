@@ -30,11 +30,11 @@ __all__ = ["ManuallySetBeamcenterController"]
 
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Literal, NewType, Union
+from typing import Any, Literal, Sequence
 
 import numpy as np
 import pyFAI
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import PYDIDAS_COLORS
@@ -44,11 +44,9 @@ from pydidas.core.utils import (
     fit_detector_center_and_tilt_from_points,
 )
 from pydidas.data_io import import_data
-
-
-BaseFrame = NewType("BaseFrame", QtWidgets.QWidget)
-PydidasPlot2d = NewType("PydidasPlot2d", QtWidgets.QWidget)
-PointsForBeamcenterWidget = NewType("PointsForBeamcenterWidget", QtWidgets.QWidget)
+from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.misc import PointsForBeamcenterWidget
+from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
 class ManuallySetBeamcenterController(QtCore.QObject):
@@ -71,12 +69,34 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
     sig_selected_beamcenter = QtCore.Signal()
 
+    @staticmethod
+    def _get_points_as_arrays(points: list[tuple[float, float]]):
+        """
+        Get the given list of points as arrays.
+
+        Parameters
+        ----------
+        points : list[tuple[float, float]]
+            The points to be processed.
+
+        Returns
+        -------
+        np.ndarray, np.ndarray :
+            The x and y positions of the selected points.
+        """
+        _x = np.zeros((len(points)))
+        _y = np.zeros((len(points)))
+        for _index, (_xpos, _ypos) in enumerate(points):
+            _x[_index] = _xpos
+            _y[_index] = _ypos
+        return _x, _y
+
     def __init__(
         self,
         parent_frame: BaseFrame,
-        plot: PydidasPlot2d,
+        plot: PydidasPlot2D,
         point_table: PointsForBeamcenterWidget,
-        **kwargs: dict,
+        **kwargs: Any,
     ):
         QtCore.QObject.__init__(self)
         self._config = {
@@ -98,15 +118,15 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._plot.sigPlotSignal.connect(self._process_plot_signal)
         self._points_for_bc.sig_new_selection.connect(self.__new_points_selected)
         self._points_for_bc.sig_remove_points.connect(self.__remove_points_from_plot)
-        self._points_for_bc.param_widgets["overlay_color"].io_edited.connect(
+        self._points_for_bc.param_widgets["overlay_color"].sig_new_value.connect(
             self.set_marker_color
         )
         self._points_for_bc.sig_2click_usage.connect(self.toggle_2click_selection)
 
-        self._parent_frame.param_widgets["beamcenter_x"].io_edited.connect(
+        self._parent_frame.param_widgets["beamcenter_x"].sig_value_changed.connect(
             self.manual_beamcenter_update
         )
-        self._parent_frame.param_widgets["beamcenter_y"].io_edited.connect(
+        self._parent_frame.param_widgets["beamcenter_y"].sig_value_changed.connect(
             self.manual_beamcenter_update
         )
 
@@ -137,27 +157,6 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             The y values of the selected points.
         """
         return self._get_points_as_arrays(self._config["selected_points"])
-
-    def _get_points_as_arrays(self, points: list[tuple[float, float]]):
-        """
-        Get the given list of points as arrays.
-
-        Parameters
-        ----------
-        points : list[tuple[float, float]]
-            The points to be processed.
-
-        Returns
-        -------
-        np.ndarray, np.ndarray :
-            The x and y positions of the selected points.
-        """
-        _x = np.zeros((len(points)))
-        _y = np.zeros((len(points)))
-        for _index, (_xpos, _ypos) in enumerate(points):
-            _x[_index] = _xpos
-            _y[_index] = _ypos
-        return _x, _y
 
     @property
     def beamcenter_is_set(self) -> bool:
@@ -197,22 +196,22 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _marker_keys = [f"marker_{_point[0]}_{_point[1]}" for _point in self._points]
         _marker_keys.append("beamcenter")
         for _key in _marker_keys:
-            _item = self._plot._getItem("marker", legend=_key)
+            _item = self._plot._getItem("marker", legend=_key)  # noqa W0212
             if _item is not None:
                 _item.setColor(self._config["overlay_color"])
-        _item = self._plot._getItem("item", legend="beamcenter_outline")
+        _item = self._plot._getItem("item", legend="beamcenter_outline")  # noqa W0212
         if _item is not None:
             _item.setColor(self._config["overlay_color"])
 
     def remove_plot_items(
-        self, *kind: tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        self, *kind: Literal["all", "marker", "beamcenter", "beamcenter_outline"]
     ):
         """
         Remove the selected items from the plot.
 
         Parameters
         ----------
-        *kind : tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        *kind : Literal["all", "marker", "beamcenter", "beamcenter_outline"]
             The kind of items to be removed.
         """
         kind = ["marker", "beamcenter", "beamcenter_outline"] if "all" in kind else kind
@@ -225,14 +224,14 @@ class ManuallySetBeamcenterController(QtCore.QObject):
                 self._plot.removeMarker(f"marker_{_point[0]}_{_point[1]}")
 
     def show_plot_items(
-        self, *kind: tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        self, *kind: Literal["all", "marker", "beamcenter", "beamcenter_outline"]
     ):
         """
         Show the selected items in the plot.
 
         Parameters
         ----------
-        *kind : tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+        *kind : Literal["all", "marker", "beamcenter", "beamcenter_outline"]
             The kind of items to be removed.
         """
         kind = ["marker", "beamcenter", "beamcenter_outline"] if "all" in kind else kind
@@ -446,13 +445,13 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._plot_beamcenter_outline(_x, _y)
         self.sig_selected_beamcenter.emit()
 
-    def set_mask_file(self, mask: Union[None, Path]):
+    def set_mask_file(self, mask: Path | None):
         """
         Set the mask file.
 
         Parameters
         ----------
-        mask : Union[None, Path]
+        mask : Path | None
             The path to the mask file or None to skip masking.
         """
         if mask is None:
@@ -503,7 +502,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._config["selected_points"] = points
         for _point in self._points:
             _label = f"marker_{_point[0]}_{_point[1]}"
-            _marker = self._plot._getItem("marker", _label)
+            _marker = self._plot._getItem("marker", _label)  # noqa W0212
             _symbol = "o" if _point in points else "x"
             _marker.setSymbol(_symbol)
 
@@ -524,8 +523,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
                 _index = self._config["selected_points"].index(_point)
                 self._config["selected_points"].pop(_index)
 
-    @QtCore.Slot(str)
-    def manual_beamcenter_update(self, *arg):
+    @QtCore.Slot()
+    def manual_beamcenter_update(self):
         """
         Process a manual update of the beamcenter x/y Parameter.
         """
@@ -537,7 +536,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             self.remove_plot_items("beamcenter_outline")
 
     def _plot_beamcenter_outline(
-        self, xpoints: tuple[float, ...], ypoints: tuple[float, ...]
+        self, xpoints: Sequence[float], ypoints: Sequence[float]
     ):
         """
         Plot an outline from the beamcenter fit defined through the points.
@@ -547,10 +546,10 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
         Parameters
         ----------
-        xpoints : tuple[float, ...]
-            The x positions of the points for the outline in form of a tuple.
-        ypoints : tuple[float, ...]
-            The y positions of the points for the outline in form of a tuple.
+        xpoints : Sequence[float]
+            The x positions of the points for the outline in form of a sequence.
+        ypoints : Sequence[float]
+            The y positions of the points for the outline in form of a sequence.
         """
         self._config["beamcenter_outline_points"] = (xpoints, ypoints)
         self._plot.addShape(

@@ -73,14 +73,14 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
         """Connect the signals of the widgets."""
         GenericPluginConfigWidget.connect_signals(self)
         if "azi_use_range" in self.param_composite_widgets:
-            self.param_composite_widgets["azi_use_range"].io_edited.connect(
+            self.param_composite_widgets["azi_use_range"].sig_new_value.connect(
                 self._toggle_azimuthal_ranges_visibility
             )
             self._toggle_azimuthal_ranges_visibility(
                 self.plugin.get_param_value("azi_use_range")
             )
         if "rad_use_range" in self.param_composite_widgets:
-            self.param_composite_widgets["rad_use_range"].io_edited.connect(
+            self.param_composite_widgets["rad_use_range"].sig_new_value.connect(
                 self._toggle_radial_ranges_visibility
             )
             self._toggle_radial_ranges_visibility(

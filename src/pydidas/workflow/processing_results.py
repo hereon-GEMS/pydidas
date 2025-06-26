@@ -30,6 +30,7 @@ __all__ = ["ProcessingResults"]
 
 import os
 import re
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -773,3 +774,25 @@ class ProcessingResults(ObjectWithParameterCollection):
             for _id, _array in _data.items():
                 self._config["plugin_res_metadata"][_id] = _array.property_dict
                 self._config["plugin_res_metadata"][_id].pop("metadata")
+
+    def update_from_processing_results(self, results: "ProcessingResults"):
+        """
+        Update the current ProcessingResults from another instance.
+
+        Parameters
+        ----------
+        results : ProcessingResults
+            The other ProcessingResults instance to update from.
+        """
+        if not isinstance(results, ProcessingResults):
+            raise TypeError("The provided object is not a ProcessingResults instance.")
+        self._SCAN.update_from_scan(results._SCAN)
+        self._EXP.update_from_diffraction_exp(results._EXP)
+        self._TREE.update_from_tree(results._TREE)
+        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
+        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
+        self._config["frozen_TREE"].update_from_tree(self._TREE)
+        self._composites = {
+            _key: deepcopy(_val) for _key, _val in results._composites.items()
+        }
+        self._config = {_key: deepcopy(_val) for _key, _val in results._config.items()}

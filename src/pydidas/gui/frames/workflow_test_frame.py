@@ -29,6 +29,7 @@ __all__ = ["WorkflowTestFrame"]
 
 
 import copy
+from typing import Any
 
 from qtpy import QtCore
 
@@ -172,7 +173,7 @@ class WorkflowTestFrame(BaseFrame):
         ),
     )
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self._tree = None
@@ -211,7 +212,7 @@ class WorkflowTestFrame(BaseFrame):
         """
         Connect all required signals and slots.
         """
-        self.param_widgets["image_selection"].io_edited.connect(
+        self.param_widgets["image_selection"].sig_new_value.connect(
             self.__update_image_selection_visibility
         )
         self._widgets["result_table"].sig_new_selection.connect(self._selected_new_node)

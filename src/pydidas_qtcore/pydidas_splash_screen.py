@@ -28,7 +28,7 @@ __all__ = ["PydidasSplashScreen"]
 
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -54,12 +54,35 @@ class PydidasSplashScreen(QtWidgets.QSplashScreen):
         pixmap parameter takes precedence.
     """
 
+    _instance = None
+
+    @classmethod
+    def is_active(cls) -> bool:
+        """
+        Check whether the PydidasSplashScreen is currently active.
+        """
+        return cls._instance is not None
+
+    @classmethod
+    def instance(cls, **kwargs: Any):
+        """
+        Get the singleton instance of the PydidasSplashScreen.
+        """
+        if cls._instance is None:
+            cls._instance = cls(**kwargs)
+        if kwargs.get("custom_splash_image") is not None:
+            _pixmap = QtGui.QPixmap(str(kwargs["custom_splash_image"]))
+            cls._instance.setPixmap(cls._instance.pixmap)
+        return cls._instance
+
     def __init__(
         self,
         pixmap=None,
         f=QtCore.Qt.WindowStaysOnTopHint,
         custom_splash_image: Optional[Path] = None,
     ):
+        if PydidasSplashScreen._instance is not None:
+            return PydidasSplashScreen._instance
         if pixmap is None:
             _splash_path = (
                 custom_splash_image if custom_splash_image else _SPLASH_IMAGE_PATH

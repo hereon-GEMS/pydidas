@@ -28,7 +28,8 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetComboBox"]
 
 
-from collections.abc import Iterable
+from collections.abc import Sequence
+from typing import Any
 
 from qtpy import QtCore
 
@@ -51,7 +52,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         """
         Initialize the widget.
 
-        Init method to setup the widget and set the links to the parameter
+        Init method to set up the widget and set the links to the parameter
         and Qt parent widget.
 
         Parameters
@@ -105,7 +106,8 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         _cur_value = convert_unicode_to_ascii(self.currentText())
         if _cur_value != self._old_value:
             self._old_value = _cur_value
-            self.io_edited.emit(_cur_value)
+            self.sig_new_value.emit(_cur_value)
+            self.sig_value_changed.emit()
 
     def get_value(self) -> object:
         """
@@ -136,7 +138,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         _txt_repr = convert_special_chars_to_unicode(str(value))
         self.setCurrentText(_txt_repr)
 
-    def update_choices(self, new_choices: Iterable[object, ...]):
+    def update_choices(self, new_choices: Sequence[Any]):
         """
         Update the choices of the BaseParamIoWidget in place.
 
@@ -146,8 +148,8 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
 
         Parameters
         ----------
-        new_choices : collections.abc.Iterable
-            Any iterable with new choices.
+        new_choices : collections.abc.Sequence
+            Any sequence with new choices.
         """
         with QtCore.QSignalBlocker(self):
             self.clear()

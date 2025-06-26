@@ -29,8 +29,6 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetHdf5Key"]
 
 
-from qtpy import QtCore
-
 from pydidas.core import Parameter
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
@@ -48,13 +46,11 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     dialogue.
     """
 
-    io_edited = QtCore.Signal(str)
-
     def __init__(self, param: Parameter, **kwargs):
         """
         Initialize the widget.
 
-        Init method to setup the widget and set the links to the parameter
+        Init method to set up the widget and set the links to the parameter
         and Qt parent widget.
 
         Parameters
@@ -67,7 +63,9 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
             opened directory.
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
-        self._button.setToolTip("Select a dataset from all dataset keys in a file.")
+        self._button.setToolTip(
+            "Select the dataset to use from all dataset keys in a file."
+        )
         self.io_dialog = PydidasFileDialog()
         self._io_qsettings_ref = kwargs.get("persistent_qsettings_ref", None)
 

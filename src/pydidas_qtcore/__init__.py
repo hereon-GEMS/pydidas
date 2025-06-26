@@ -49,6 +49,12 @@ if _env_qt_version is None and True in [arg.upper() == "--QT6" for arg in sys.ar
 import qtpy as __qtpy  # noqa E402
 
 
+if __qtpy.QT_VERSION.startswith("6"):
+    __os.environ["PYQTGRAPH_QT_LIB"] = "PySide6"
+else:
+    __os.environ["PYQTGRAPH_QT_LIB"] = "PyQt5"
+
+
 if "--verbose" in sys.argv:
     print("pydidas Using QT: ", __qtpy.API_NAME)
 

@@ -7,13 +7,25 @@ v25.mm.dd
 
 Improvements
 ------------
+- Added an option to copy the results of a ProcessingResults instance to another instance.
+- Overhauled the signals from ParameterWidgets to allow also notifications
+  of value changes without broadcasting the new value.
+- Added a new frame to visualize the results of sin^2(chi) and sin(2*chi) fits for
+  residual stress calculations.
 - Reorganized the frames in the toolbar menu.
-- Programatically improved the layout of the GUI export/import files for more clarity
-  and to support importing states created from different configurations.
-
-
+- Programmatic improvements:
+	- Programatically improved the layout of the GUI export/import files for more clarity
+	  and to support importing states created from different configurations.
+	- Modified the behaviour of the splash screen to allow display of the splash screen
+	  also when calling pydidas trough an entry-point from the command line.
+	
 Bugfixes
 --------
+- Fixed an issue where the import of frame states would alter the frame index
+  which would de-sync the frame index with the index in the central widget.
+- Fixed an issue in the GeneralAsciiSaver where exporting data with a metadata header.
+- Fixed an issue where the splash screen would only show after the package imports/exports
+  and html documentation build.
 - Fixed an issue in the AxesSelector when switching between Datasets of different dimensionality.
 - Fixed an issue where the toolbars would not expand when the main window was too small.
 

@@ -27,13 +27,19 @@ __status__ = "Production"
 __all__ = []
 
 
+from pydidas_qtcore import PydidasSplashScreen
+
+
 def open_gui():
     """
     Open the pydidas GUI.
     """
+    _splash = PydidasSplashScreen.instance()
+    _splash.show_aligned_message("Importing packages")
+
     import pydidas
 
-    pydidas.gui.start_pydidas_gui(use_default_frames=True)
+    pydidas.gui.start_pydidas_gui(use_default_frames=True, splash_screen=_splash)
 
 
 def run_gui():

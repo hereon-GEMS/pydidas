@@ -30,19 +30,19 @@ __all__ = ["WorkerController"]
 
 import multiprocessing as mp
 import time
-from collections.abc import Iterable
 from contextlib import contextmanager
 from numbers import Integral
 from queue import Empty
-from typing import Callable, Optional, Union
+from typing import Callable, Sequence
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from pydidas.core import PydidasQsettings
 from pydidas.core.utils import pydidas_logger
 from pydidas.logging_level import LOGGING_LEVEL
 from pydidas.multiprocessing.processor_ import processor
 from pydidas.multiprocessing.pydidas_process import PydidasProcess
+from pydidas_qtcore import PydidasQApplication
 
 
 logger = pydidas_logger()
@@ -60,7 +60,7 @@ class WorkerController(QtCore.QThread):
 
     Parameters
     ----------
-    n_workers : Union[None, int], optional
+    n_workers : int, optional
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
     function : Callable, optional
@@ -78,10 +78,10 @@ class WorkerController(QtCore.QThread):
 
     def __init__(
         self,
-        n_workers: Optional[int] = None,
-        function: Optional[Callable] = None,
+        n_workers: int | None = None,
+        function: Callable | None = None,
         func_args: tuple = (),
-        func_kwargs: Optional[dict] = None,
+        func_kwargs: dict | None = None,
     ):
         QtCore.QThread.__init__(self)
         self.flags = {
@@ -202,9 +202,9 @@ class WorkerController(QtCore.QThread):
         using the :py:meth`WorkerController.restart` method.
         """
         self.flags["running"] = False
-        self._wait_for_processes_to_finish()
+        self.wait_for_processes_to_finish()
 
-    def _wait_for_processes_to_finish(self, timeout: float = 2):
+    def wait_for_processes_to_finish(self, timeout: float = 2):
         """
         Wait for the processes to finish their calculations.
 
@@ -285,7 +285,7 @@ class WorkerController(QtCore.QThread):
         with self.write_lock():
             self._to_process.append(task)
 
-    def add_tasks(self, tasks: Iterable, are_stop_tasks: bool = False):
+    def add_tasks(self, tasks: Sequence, are_stop_tasks: bool = False):
         """
         Add tasks to the worker pool.
 
@@ -295,7 +295,7 @@ class WorkerController(QtCore.QThread):
 
         Parameters
         ----------
-        tasks : Union[list, tuple, set]
+        tasks : Sequence
             An iterable of the first argument for the processing function.
         are_stop_tasks : bool
             Keyword to signal that the added tasks are stop tasks. This flag will
@@ -339,7 +339,7 @@ class WorkerController(QtCore.QThread):
 
         This method is automatically called upon starting the thread.
         """
-        _app = QtWidgets.QApplication.instance()
+        _app = PydidasQApplication.instance()
         _app.register_thread(self)
         self._workers_done = 0
         self._workers_shutdown = 0
@@ -511,8 +511,8 @@ class WorkerController(QtCore.QThread):
         """
         if not self.flags["running"]:
             return
-        _tstart = time.time()
-        while time.time() - _tstart <= timeout:
+        _start_time = time.time()
+        while time.time() - _start_time <= timeout:
             self._check_if_workers_finished()
             if not self.flags["running"]:
                 return
@@ -530,7 +530,7 @@ class WorkerController(QtCore.QThread):
         self.flags["running"] = False
         self.flags["thread_alive"] = False
 
-    def exit(self, code: Union[None, int] = None):
+    def exit(self, code: int | None = None):
         """
         Call the exit method.
 
@@ -538,7 +538,7 @@ class WorkerController(QtCore.QThread):
 
         Parameters
         ----------
-        code : Union[None, int]
+        code : int | None
             The exit code.
         """
         logger.debug("WorkerController: Exiting thread")

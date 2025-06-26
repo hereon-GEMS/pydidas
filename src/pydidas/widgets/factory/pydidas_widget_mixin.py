@@ -37,7 +37,7 @@ from pydidas.core.constants import (
     GENERIC_STANDARD_WIDGET_WIDTH,
     MINIMUN_WIDGET_DIMENSIONS,
 )
-from pydidas.core.utils import apply_qt_properties, update_qobject_font
+from pydidas.core.utils import apply_qt_properties, update_qwidget_font
 
 
 class PydidasWidgetMixin:
@@ -84,7 +84,7 @@ class PydidasWidgetMixin:
         self.update_font_family(self._qtapp.font_family)
         self._minimum_width = kwargs.get("minimum_width", MINIMUN_WIDGET_DIMENSIONS)
         if True in self.__font_config.values():
-            update_qobject_font(self, **self.__font_config)
+            update_qwidget_font(self, **self.__font_config)
         self._font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
         self._font_metric_height_factor = kwargs.get("font_metric_height_factor", None)
         self._qtapp.sig_new_fontsize.connect(self.update_fontsize)

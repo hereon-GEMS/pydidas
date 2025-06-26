@@ -29,7 +29,7 @@ __all__ = ["PydidasQsettingsMixin"]
 
 
 from numbers import Integral, Real
-from typing import Any, Optional, Self, Type, overload
+from typing import Any, Optional, Self, Type
 
 from qtpy import QtCore
 
@@ -75,9 +75,6 @@ class PydidasQsettingsMixin:
     def __init__(self, version: Optional[str] = None):
         self.q_settings = _CopyablePydidasQSettings()
         self.q_settings_version = version if version is not None else VERSION
-
-    @overload
-    def q_settings_get(self, key: str) -> str: ...
 
     def q_settings_get(
         self,

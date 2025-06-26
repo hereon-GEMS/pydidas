@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["GenericIoMeta"]
 
+from typing import Any
 
 from pydidas.core.exceptions import UserConfigError
 from pydidas.core.utils.file_utils import get_extension
@@ -175,7 +176,7 @@ class GenericIoMeta(type):
         return _formats
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs):
+    def export_to_file(cls, filename, **kwargs: Any):
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
@@ -186,8 +187,8 @@ class GenericIoMeta(type):
             The full filename and path.
         tree : pydidas.workflow.WorkflowTree
             The instance of the WorkflowTree
-        kwargs : dict
-            Any kwargs which should be passed to the udnerlying exporter.
+        kwargs : Any
+            Any kwargs which should be passed to the underlying exporter.
         """
         _extension = get_extension(filename, lowercase=False)
         cls.verify_extension_is_registered(_extension)

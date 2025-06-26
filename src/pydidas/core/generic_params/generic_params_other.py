@@ -556,6 +556,30 @@ GENERIC_PARAMS_OTHER = {
             "plot."
         ),
     },
+    "num_horizontal_plots": {
+        "type": int,
+        "default": 4,
+        "name": "Number of horizontal plots",
+        "choices": [2, 3, 4, 5, 6, 7],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The number of horizontal plots in the grid. This will determine how many "
+            "plots are displayed in a single row."
+        ),
+    },
+    "num_vertical_plots": {
+        "type": int,
+        "default": 3,
+        "name": "Number of vertical plots",
+        "choices": [2, 3, 4, 5, 6, 7],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The number of vertical plots in the grid. This will determine how many "
+            "plots are displayed in a single column."
+        ),
+    },
     ############################
     # Dynamic mask configuration
     ############################

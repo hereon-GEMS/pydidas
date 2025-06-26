@@ -29,7 +29,7 @@ __all__ = ["DataBrowsingFrame"]
 
 
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 import h5py
 import numpy as np
@@ -66,7 +66,7 @@ class DataBrowsingFrame(BaseFrame):
     menu_title = "Data browsing"
     menu_entry = "Data browsing"
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
         self.__qtapp = PydidasQApplication.instance()
         self.__supported_extensions = set(IoManager.registry_import.keys())
@@ -186,13 +186,13 @@ class DataBrowsingFrame(BaseFrame):
             self.__current_filename = None
             raise FileReadError(catcher.exception_message)
 
-    def __display_dataset(self, data: Union[Dataset, H5Node]):
+    def __display_dataset(self, data: Dataset | H5Node):
         """
         Display the data in the viewer widget.
 
         Parameters
         ----------
-        data : Union[Dataset, h5py.Dataset]
+        data : Dataset | H5Node
             The data to display.
         """
         self._widgets["viewer"].setData(data)

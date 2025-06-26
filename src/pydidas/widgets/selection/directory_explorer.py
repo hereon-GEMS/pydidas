@@ -33,12 +33,12 @@ import os
 from pathlib import Path
 from typing import Any
 
-import qtpy
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import (
     get_generic_parameter,
 )
+from pydidas.core.utils import qstate_is_checked
 from pydidas.widgets.selection.directory_explorer_filter_model import (
     DirectoryExplorerFilterModel,
 )
@@ -162,7 +162,9 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._widgets["case_sensitive"].stateChanged.connect(
             self.__update_filter_case_sensitivity
         )
-        self.param_widgets["current_directory"].io_edited.connect(self.__user_dir_input)
+        self.param_widgets["current_directory"].sig_new_value.connect(
+            self.__user_dir_input
+        )
         self._widgets["button_collapse"].clicked.connect(self.__collapse_all)
         self._widgets["button_reset_filter"].clicked.connect(self.__reset_filter)
         self._widgets["filter_edit"].textChanged.connect(
@@ -190,10 +192,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         state : QtCore.Qt.CheckState
             The checkbox's state.
         """
-        if qtpy.QT_VERSION.startswith("6"):
-            _usage = state == QtCore.Qt.Checked.value
-        else:
-            _usage = state == QtCore.Qt.Checked
+        _usage = qstate_is_checked(state)
         self.q_settings_set("directory_explorer/show_network_drives", _usage)
         self._filter_model.toggle_network_location_acceptance(_usage)
         self._filter_model.sort(0, self._filter_model.sortOrder())
@@ -208,10 +207,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         state : QtCore.Qt.CheckState
             The checkbox's state.
         """
-        if qtpy.QT_VERSION.startswith("6"):
-            _usage = state == QtCore.Qt.Checked.value
-        else:
-            _usage = state == QtCore.Qt.Checked
+        _usage = qstate_is_checked(state)
         self.q_settings_set("directory_explorer/is_case_sensitive", _usage)
         self._filter_model.setSortCaseSensitivity(
             QtCore.Qt.CaseSensitive if _usage else QtCore.Qt.CaseInsensitive

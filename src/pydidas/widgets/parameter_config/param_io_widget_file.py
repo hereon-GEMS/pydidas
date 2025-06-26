@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import Union
 
 from numpy import nan
-from qtpy import QtCore
+from qtpy import QtGui
 
 from pydidas.data_io import IoManager
 from pydidas.widgets.dialogues import critical_warning
@@ -49,8 +49,6 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
 
     This widget includes a small button to select a filepath from a dialogue.
     """
-
-    io_edited = QtCore.Signal(str)
 
     def __init__(self, param, **kwargs):
         """
@@ -141,18 +139,18 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         self._file_selection = ";;".join(list_of_choices)
 
-    def dragEnterEvent(self, event: QtCore.QEvent):
+    def dragEnterEvent(self, event: QtGui.QDragEnterEvent):
         """Allow to drag files from, for example, the explorer."""
         if event.mimeData().hasFormat("text/uri-list"):
             event.acceptProposedAction()
 
-    def dropEvent(self, event: QtCore.QEvent):
+    def dropEvent(self, event: QtGui.QDropEvent):
         """
         Allow to drop files from, for example, the explorer.
         """
-        mimeData = event.mimeData()
-        if mimeData.hasUrls():
-            urls = mimeData.urls()
+        _mime_data = event.mimeData()
+        if _mime_data.hasUrls():
+            urls = _mime_data.urls()
             if len(urls) > 1:
                 critical_warning("Not a single file", "A single file is expected.")
                 return
@@ -203,4 +201,5 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             self._io_lineedit.setText(_curr_value)
         if _curr_value != self._old_value or force_update:
             self._old_value = _curr_value
-            self.io_edited.emit(_curr_value)
+            self.sig_new_value.emit(_curr_value)
+            self.sig_value_changed.emit()

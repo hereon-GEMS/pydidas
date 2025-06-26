@@ -38,6 +38,7 @@ __all__ = [
     "QT_COMBO_BOX_SIZE_POLICY",
     "QT_REG_EXP_FLOAT_VALIDATOR",
     "QT_REG_EXP_INT_VALIDATOR",
+    "QT_REG_EXP_POS_INT_VALIDATOR",
     "QT_REG_EXP_SLICE_VALIDATOR",
     "QT_REG_EXP_INT_RANGE_VALIDATOR",
     "QT_REG_EXP_POS_INT_RANGE_VALIDATOR",
@@ -84,6 +85,10 @@ QT_REG_EXP_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
         r"-?\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
     )
+)
+
+QT_REG_EXP_POS_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression(r"\d+")
 )
 
 QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="40"
+   height="40"
+   viewBox="0 0 40 40"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="frame_icon_sin_square_visualization.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="20.62984"
+     inkscape:cx="12.966654"
+     inkscape:cy="18.686524"
+     inkscape:window-width="2124"
+     inkscape:window-height="1275"
+     inkscape:window-x="3216"
+     inkscape:window-y="8"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg1" />
+  <title
+     id="title1">Pydidas frame icon: Quick intergration</title>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient782"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#f93246;stop-opacity:1;"
+         offset="0.12529002"
+         id="stop782" />
+      <stop
+         style="stop-color:#cc977a;stop-opacity:1;"
+         offset="0.39675173"
+         id="stop784" />
+      <stop
+         style="stop-color:#505050;stop-opacity:1;"
+         offset="0.60556847"
+         id="stop785" />
+      <stop
+         style="stop-color:#323246;stop-opacity:0;"
+         offset="1"
+         id="stop783" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient5488"
+       id="radialGradient5490"
+       cx="26.458332"
+       cy="54.70821"
+       fx="26.458332"
+       fy="54.70821"
+       r="6.6662598"
+       gradientTransform="matrix(1.46259,0,0,1.46259,-28.197696,-69.515677)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5488">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5484" />
+      <stop
+         style="stop-color:#c8c8c8;stop-opacity:0.80769229;"
+         offset="0.33333334"
+         id="stop6286" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop5486" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient782"
+       id="radialGradient783"
+       cx="18.228113"
+       cy="-3.4617412"
+       fx="18.228113"
+       fy="-3.4617412"
+       r="18"
+       gradientTransform="matrix(-1.6143275,-0.01580401,0.01215066,-1.0053293,49.50629,0.1806378)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Pydidas frame icon: Quick intergration</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon GmbH</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <rect
+     style="fill:#323246;stroke:none;stroke-width:1.40319;stroke-dasharray:none;paint-order:markers stroke fill"
+     id="rect1"
+     width="40"
+     height="12"
+     x="0"
+     y="2"
+     ry="0" />
+  <rect
+     style="fill:url(#radialGradient783);stroke:none;stroke-width:1.40319;stroke-dasharray:none;paint-order:markers stroke fill"
+     id="rect1-1"
+     width="40"
+     height="12"
+     x="0"
+     y="2"
+     ry="0" />
+  <path
+     style="fill:#323246;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 12,0 8,6 8,-6 z"
+     id="path1"
+     sodipodi:nodetypes="cccc" />
+  <path
+     style="fill:none;stroke:#00aae6;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 2.3752002,20.55275 37.179153,32.380278"
+     id="path785" />
+  <path
+     style="fill:none;stroke:#e60046;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 37.07977,32.309292 C 31.747688,22.953912 10.809585,16.577928 2.666041,20.455805 6.6893392,31.507757 33.928994,36.090223 37.07977,32.309292 Z"
+     id="path786"
+     sodipodi:nodetypes="ccc" />
+  <path
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.993127px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 1.4794521,38.485574 H 37.534075 v 1.5 l 2.465925,-2 -2.465925,-2.25 v 1.75 H 2.4657535 V 18.161525 h 1.4794521 l -1.9726028,-2.5 L 0,18.161525 h 1.4794521 z"
+     id="path1-8"
+     sodipodi:nodetypes="ccccccccccccc" />
+</svg>

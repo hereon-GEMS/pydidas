@@ -153,8 +153,8 @@ def update_palette(obj: QWidget, **kwargs: Any):
 
     Parameters
     ----------
-    obj : QtCore.QObject
-        The QObject to be updated.
+    obj : QtWidgets.QWidget
+        The QWidget to be updated.
     **kwargs : Any
         A dictionary with palette values. Keys must correspond to palette roles.
     """
@@ -250,7 +250,7 @@ def qstate_is_checked(state: QtCore.Qt.CheckState) -> bool:
     bool
         True if the state is checked, False otherwise.
     """
-    # The E1101 ignores unresolved attribute access in Qt5 / 6, respectively.
-    if IS_QT6:
-        return state == QtCore.Qt.Checked.value  # noqa E1101
-    return state == QtCore.Qt.Checked  # noqa E1101
+    # In Qt6, Qt.CheckState is an enum.Enum, and `.value` is used to get the integer
+    # value. In Qt5, no `.value` is available and the Qt.CheckState holds the
+    # integer value directly.
+    return state == getattr(QtCore.Qt.Checked, "value", QtCore.Qt.Checked)

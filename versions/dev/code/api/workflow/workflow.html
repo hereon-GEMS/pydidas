@@ -854,6 +854,17 @@ values.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.workflow_results.ProcessingResults.update_from_processing_results">
+<span class="sig-name descname"><span class="pre">update_from_processing_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.workflow.workflow_results.ProcessingResults" title="pydidas.workflow.processing_results.ProcessingResults"><span class="pre">ProcessingResults</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.ProcessingResults.update_from_processing_results" title="Link to this definition">#</a></dt>
+<dd><p>Update the current ProcessingResults from another instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> (<a class="reference internal" href="#pydidas.workflow.workflow_results.ProcessingResults" title="pydidas.workflow.workflow_results.ProcessingResults"><em>ProcessingResults</em></a>) – The other ProcessingResults instance to update from.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <p id="module-pydidas.workflow">The workflow package defines classes to create and manage the workflow and
@@ -1509,7 +1520,7 @@ be a single value or an array.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.ProcessingTree.export_to_file">
-<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.export_to_file" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.ProcessingTree.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Export the WorkflowTree to a file using any of the registered exporters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2058,6 +2069,7 @@ parameters as the current instance.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.store_frame_metadata"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.store_frame_metadata</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.store_frame_shapes"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.store_frame_shapes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.store_results"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.store_results</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.update_from_processing_results"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.update_from_processing_results</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.GenericNode"><code class="docutils literal notranslate"><span class="pre">GenericNode</span></code></a><ul class="nav section-nav flex-column">

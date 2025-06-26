@@ -651,29 +651,6 @@ window takes care of registration.</p>
 <dd class="field-odd"><p><strong>parent</strong> (<em>QWidget</em><em>, </em><em>optional</em>) – The parent widget. The default is None.</p>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.current_frames">
-<span class="sig-name descname"><span class="pre">current_frames</span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.current_frames" title="Link to this definition">#</a></dt>
-<dd><p>A list of all the registered widgets.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.frame_indices">
-<span class="sig-name descname"><span class="pre">frame_indices</span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.frame_indices" title="Link to this definition">#</a></dt>
-<dd><p>A dictionary with (widget_name: index) entries to reference
-widgets with their names.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.activate_widget_by_name">
 <span class="sig-name descname"><span class="pre">activate_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.activate_widget_by_name" title="Link to this definition">#</a></dt>
@@ -716,8 +693,8 @@ also demands a reference name.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id0">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.current_frames">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.current_frames" title="Link to this definition">#</a></dt>
 <dd><p>Get all current frames</p>
 <p>This property returns the list of all registered frames in the
 PydidasFrameStack.</p>
@@ -743,8 +720,8 @@ PydidasFrameStack.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame_indices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.frame_indices">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame_indices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.frame_indices" title="Link to this definition">#</a></dt>
 <dd><p>Get the frame indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1095,14 +1072,12 @@ the respective helpfile if it exits or the main documentation if it does not.</p
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.current_frames"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.current_frames</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.frame_indices"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_indices</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.activate_widget_by_name"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.activate_widget_by_name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.active_widget_name"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.active_widget_name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.addWidget"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.addWidget</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.current_frames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.current_frames"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.current_frames</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.enterEvent"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.enterEvent</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_indices</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.frame_indices"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_indices</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.frame_names"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_names</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.frame_toolbar_entries"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_toolbar_entries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.frame_toolbar_metadata"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_toolbar_metadata</span></code></a></li>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Frames &#8212; pydidas</title>
+    <title>Sin square chi results visualization frame &#8212; pydidas</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'manuals/gui/frames/frames_main';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'manuals/gui/frames/SinSquareChiResultsFrame';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
@@ -57,8 +57,8 @@
         </script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Data browsing frame" href="DataBrowsingFrame.html" />
-    <link rel="prev" title="Plots" href="../silx/plots.html" />
+    <link rel="next" title="Windows" href="../windows/windows_main.html" />
+    <link rel="prev" title="Image math frame" href="ImageMathFrame.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="25.05.16" />
@@ -364,7 +364,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../menu.html">The menu</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../editing_parameters.html">Editing Parameters in the GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../silx/plots.html">Plots</a></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">Frames</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="frames_main.html">Frames</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
 <li class="toctree-l3"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
 <li class="toctree-l3"><a class="reference internal" href="DefineDiffractionExpFrame.html">Define diffraction experiment</a></li>
@@ -377,7 +377,7 @@
 <li class="toctree-l3"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
 <li class="toctree-l3"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
-<li class="toctree-l3"><a class="reference internal" href="SinSquareChiResultsFrame.html">Sin square chi results visualization frame</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Sin square chi results visualization frame</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../windows/windows_main.html">Windows</a></li>
@@ -430,7 +430,10 @@
     
     <li class="breadcrumb-item"><a href="../graphical_user_interface.html" class="nav-link">Graphical user interface</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Frames</span></li>
+    
+    <li class="breadcrumb-item"><a href="frames_main.html" class="nav-link">Frames</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Sin square chi results visualization frame</span></li>
   </ul>
 </nav>
 </div>
@@ -447,26 +450,137 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="frames">
-<span id="frames-main"></span><h1>Frames<a class="headerlink" href="#frames" title="Link to this heading">#</a></h1>
-<p>The following frames are available in pydidas:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DefineDiffractionExpFrame.html">Define diffraction experiment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DefineScanFrame.html">Define scan frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SinSquareChiResultsFrame.html">Sin square chi results visualization frame</a></li>
+  <section id="sin-square-chi-results-visualization-frame">
+<h1>Sin square chi results visualization frame<a class="headerlink" href="#sin-square-chi-results-visualization-frame" title="Link to this heading">#</a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#data-selection" id="id1">Data selection</a></p></li>
+<li><p><a class="reference internal" href="#plot-controls" id="id2">Plot controls</a></p></li>
+<li><p><a class="reference internal" href="#data-display" id="id3">Data display</a></p></li>
+<li><p><a class="reference internal" href="#data-selection-and-navigation" id="id4">Data selection and navigation</a></p></li>
 </ul>
+</nav>
+<p>The <em>Sin square chi results visualization</em> frame allows to inspect the results
+of the <em>Sin square chi</em> analysis.</p>
+<a class="reference internal image-reference" href="../../../_images/overview4.png"><img alt="../../../_images/overview4.png" class="align-center" src="../../../_images/overview4.png" style="width: 600px;" />
+</a>
+<p>The frame includes controls for selecting
+the input source and for controlling the display of the results on the left.
+The data is displayed on the right side in a grid of plots. Controls for browsing
+through the data are included on the bottom of the data display area.</p>
+<section id="data-selection">
+<h2>Data selection<a class="headerlink" href="#data-selection" title="Link to this heading">#</a></h2>
+<img alt="../../../_images/data_import.png" class="align-left" src="../../../_images/data_import.png" />
+<p>Data for visualization can be selected in one of two ways: First, the current
+workflow results can be imported into this frame by clicking the <em>Import current
+workflow results</em> button. This will load a copy of the current workflow results.
+Second, results can be imported from a directory with exported pydidas results.</p>
+<div class="line-block">
+<div class="line"><br /></div>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>When importing results from disk, only the directory needs to be selected.
+Pydidas will determine which nodes include results and will make these
+available for visualization.</p>
+</div>
+<p>The name of the selected directory (or <em>Workflow results</em> in case of the
+current results) is displayed for convenience.</p>
+<p>The nodes which contain the exported results of the <em>sin^2(chi)</em> fit and the
+<em>sin(2*chi)</em> fit are automatically detected and displayed in the respective
+drop-down boxes. A choice of <em>no selection</em> is equivalent to disabling plotting
+for that type of plot.</p>
+</section>
+<section id="plot-controls">
+<h2>Plot controls<a class="headerlink" href="#plot-controls" title="Link to this heading">#</a></h2>
+<img alt="../../../_images/plot_controls.png" class="align-right" src="../../../_images/plot_controls.png" />
+<p>The plot controls allow to modify how the data is displayed. Controls for
+the number of horizontal and vertical plots allow to change the number of
+rows and columns of plots in the grid.</p>
+<p>Checkboxes allow disabling of showing of the selected <em>sin^2(chi)</em> and <em>sin(2*chi)</em>
+nodes completely. Note that when no data was selected through the <em>no selection</em>
+setting in the data selection, these entries will be ignored.</p>
+<p>The <em>sin^2(chi) fit</em> configuration also has a toggle to display the positive and
+negative branches of the analysis. Unchecking this box will only plot the average
+data and the linear fit.</p>
+<img alt="../../../_images/scaling.png" class="align-right" src="../../../_images/scaling.png" />
+<p>The autoscale checkboxes control the scaling. When autoscaling is enabled, all
+plots will be scaled to the same range, which is determined by the minimum and
+maximum of the data in all plots (of the same type). When autoscaling is disabled, the
+user can set the minimum and maximum values for the y-axis of each plot individually.
+Note that the x-axis is always autoscaled to the range (0, 1). A button allows to
+update the manual scales from the data. These can be further modified by the user.</p>
+</section>
+<section id="data-display">
+<h2>Data display<a class="headerlink" href="#data-display" title="Link to this heading">#</a></h2>
+<a class="reference internal image-reference" href="../../../_images/plots.png"><img alt="../../../_images/plots.png" class="align-left" src="../../../_images/plots.png" style="width: 400px;" />
+</a>
+<p>The data display area shows the results of the <em>sin^2(chi)</em> and <em>sin(2*chi)</em> fits,
+if selected in the data selection. Each plot has a small title with the type of plot.
+The grid of plots also includes titles with the scan point (i.e. the consecutive
+number in the acquisition sequence) as well as the indices of the point on each
+of the scan axes.</p>
+<p>Panning and zooming of the plots is disabled by default to keep the scale of all plots
+comparable.</p>
+</section>
+<section id="data-selection-and-navigation">
+<h2>Data selection and navigation<a class="headerlink" href="#data-selection-and-navigation" title="Link to this heading">#</a></h2>
+<img alt="../../../_images/plot_navigation.png" class="align-center" src="../../../_images/plot_navigation.png" />
+<p>The bottom of the data display area includes controls for navigating through the
+data. The currently selected scan points are displayed in the center as the current
+selection. These can also be modified by the user which will update the displayed
+data. The buttons on the left and right allow to navigate through the data and are
+described in detail in the following table:</p>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>button</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><img alt="../../../_images/button_start.png" class="align-center" src="../../../_images/button_start.png" />
+</td>
+<td><p>Go to the start of the scan and visualize the first scan points.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/button_page_back.png" class="align-center" src="../../../_images/button_page_back.png" />
+</td>
+<td><p>Go back by one page. This will display the previous set of scan
+points in the grid of plots, i.e. all plots will be updated with the previous
+scan points. For example, if the grid inlcudes 3x5 plots, the previous
+15 scan points will be displayed.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/button_back.png" class="align-center" src="../../../_images/button_back.png" />
+</td>
+<td><p>Display the previous scan point in the grid of plots. This will update
+the first plot with previous scan point and all other plots will be shifted.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/button_forward.png" class="align-center" src="../../../_images/button_forward.png" />
+</td>
+<td><p>Display the next scan point in the grid of plots. This will update
+all plots with the next scan point, i.e. the last plot will show the next
+scan point and the other plots will be shifted in the grid.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/button_page_forward.png" class="align-center" src="../../../_images/button_page_forward.png" />
+</td>
+<td><p>Go forward by one page. This will display the next set of scan points
+in the grid of plots, i.e. all plots will be updated with the next scan
+points. For example, if the grid inlcudes 3x4 plots, the next 12 scan points
+will be displayed.</p></td>
+</tr>
+<tr class="row-odd"><td><img alt="../../../_images/button_end.png" class="align-center" src="../../../_images/button_end.png" />
+</td>
+<td><p>Go to the end of the scan and visualize the last scan points. The last
+scan points will always be displayed in the last plot of the grid. The other
+plots will be updated with the previous scan points, as available.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 </section>
 
 
@@ -480,20 +594,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../silx/plots.html"
+       href="ImageMathFrame.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Plots</p>
+        <p class="prev-next-title">Image math frame</p>
       </div>
     </a>
     <a class="right-next"
-       href="DataBrowsingFrame.html"
+       href="../windows/windows_main.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Data browsing frame</p>
+        <p class="prev-next-title">Windows</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -509,10 +623,25 @@
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-selection">Data selection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-controls">Plot controls</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-display">Data display</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-selection-and-navigation">Data selection and navigation</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/manuals/gui/frames/frames_main.rst">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/manuals/gui/frames/SinSquareChiResultsFrame.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -528,7 +657,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../../_sources/manuals/gui/frames/frames_main.rst.txt"
+      <li><a href="../../../_sources/manuals/gui/frames/SinSquareChiResultsFrame.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

@@ -452,19 +452,19 @@
 <p>Package with individual QWidgets used for displaying and editing pydidas Parameters.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterEditCanvas">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">ParameterEditCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterEditCanvas" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">ParameterEditCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterEditCanvas" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn" title="pydidas.widgets.parameter_config.parameter_widgets_mixin.ParameterWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></p>
 <p>The ParameterEditCanvas is widget for handling Parameter edit widgets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Additional keyword arguments</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – Additional keyword arguments</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">ParameterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">ParameterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></p>
 <p>A combined widget to display and modify a Parameter with name, value and unit.</p>
 <p>This widget is a wrapper and includes labels for name and unit and the
@@ -480,6 +480,15 @@ Parameters.</p>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.set_param_value">
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value" title="Link to this definition">#</a></dt>
+<dd><p>Update the Parameter value with the entry from the widget.</p>
+<p>This method tries to update the Parameter value with the entry from
+the widget. If unsuccessful, an exception box will be opened and
+the widget input will be reset to the stored Parameter value.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -636,7 +645,10 @@ parameter referenced with &lt;key&gt;.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterEditCanvas"><code class="docutils literal notranslate"><span class="pre">ParameterEditCanvas</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_param_value</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.create_param_widget"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.create_param_widget</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_value_and_widget"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.set_param_value_and_widget</span></code></a></li>

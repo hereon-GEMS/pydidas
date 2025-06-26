@@ -546,7 +546,7 @@ between function calls.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_workers</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – The number of spawned worker processes. The default is None which will
+<li><p><strong>n_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of spawned worker processes. The default is None which will
 use the globally defined pydidas setting for the number of workers.</p></li>
 <li><p><strong>function</strong> (<em>Callable</em><em>, </em><em>optional</em>) – The function to be called by the workers. If not specified at init, it must
 be set later for the workers to actually perform tasks.</p></li>
@@ -572,7 +572,7 @@ required by the function.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.add_tasks">
-<span class="sig-name descname"><span class="pre">add_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">are_stop_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.add_tasks" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">are_stop_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.add_tasks" title="Link to this definition">#</a></dt>
 <dd><p>Add tasks to the worker pool.</p>
 <p>This will add tasks to the worker pool to call the function defined in
 :py:meth`WorkerController.change_function` method. Note that the task_arg given
@@ -580,7 +580,7 @@ here will be interpreted as the first argument required by the function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tasks</strong> (<em>Union</em><em>[</em><em>list</em><em>, </em><em>tuple</em><em>, </em><em>set</em><em>]</em>) – An iterable of the first argument for the processing function.</p></li>
+<li><p><strong>tasks</strong> (<em>Sequence</em>) – An iterable of the first argument for the processing function.</p></li>
 <li><p><strong>are_stop_tasks</strong> (<em>bool</em>) – Keyword to signal that the added tasks are stop tasks. This flag will
 disable updating the task target number.</p></li>
 </ul>
@@ -627,12 +627,12 @@ signal before raising a TimeoutError.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.exit">
-<span class="sig-name descname"><span class="pre">exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.exit" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.exit" title="Link to this definition">#</a></dt>
 <dd><p>Call the exit method.</p>
 <p>This exit method adds shutdown calls to the Queue threads.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>code</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>]</em>) – The exit code.</p>
+<dd class="field-odd"><p><strong>code</strong> (<em>int</em><em> | </em><em>None</em>) – The exit code.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -738,6 +738,17 @@ signal will be processed.</p>
 <p>This method effectively suspends the event loop and calls for the
 workers to be joined again. New calculations can be performed by
 using the :py:meth`WorkerController.restart` method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.multiprocessing.WorkerController.wait_for_processes_to_finish">
+<span class="sig-name descname"><span class="pre">wait_for_processes_to_finish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.multiprocessing.WorkerController.wait_for_processes_to_finish" title="Link to this definition">#</a></dt>
+<dd><p>Wait for the processes to finish their calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum time to wait (in seconds). The default is 10.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -881,6 +892,7 @@ about the logging level as well as queue objects</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.send_stop_signal"><code class="docutils literal notranslate"><span class="pre">WorkerController.send_stop_signal</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.stop"><code class="docutils literal notranslate"><span class="pre">WorkerController.stop</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.suspend"><code class="docutils literal notranslate"><span class="pre">WorkerController.suspend</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.wait_for_processes_to_finish"><code class="docutils literal notranslate"><span class="pre">WorkerController.wait_for_processes_to_finish</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.multiprocessing.WorkerController.write_lock"><code class="docutils literal notranslate"><span class="pre">WorkerController.write_lock</span></code></a></li>
 </ul>
 </li>

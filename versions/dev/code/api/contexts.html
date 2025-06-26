@@ -436,7 +436,7 @@
 <h1>The contexts sub-package<a class="headerlink" href="#the-contexts-sub-package" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperiment">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">DiffractionExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">DiffractionExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="core/object_with_prm_cllct.html#pydidas.core.ObjectWithParameterCollection" title="pydidas.core.object_with_parameter_collection.ObjectWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a></p>
 <p>Class which holds experimental settings for diffraction experiments.</p>
 <p>This class must be used with care. Usually, the unique DiffractionExperimentContext
@@ -595,7 +595,7 @@ pixel are positive.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em> | </em><em>Path</em>) – The full filename.</p></li>
 <li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to allow overwriting of existing files.</p></li>
 </ul>
 </dd>
@@ -731,7 +731,7 @@ keys.</p>
 <dd><p>Import DiffractionExperimentContext from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em> | </em><em>Path</em>) – The full filename.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -880,7 +880,7 @@ and update the internal Parameters.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperiment.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.set_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.set_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Set a Parameter value.</p>
 <p>This method overloads the inherited set_param_value method to update
 the linked parameters of X-ray energy and wavelength.</p>
@@ -888,7 +888,7 @@ the linked parameters of X-ray energy and wavelength.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param_key</strong> (<em>str</em>) – The Parameter identifier key.</p></li>
-<li><p><strong>value</strong> (<em>object</em>) – The new value for the parameter. Depending upon the parameter,
+<li><p><strong>value</strong> (<em>Any</em>) – The new value for the parameter. Depending upon the parameter,
 value can take any form (number, string, object, …).</p></li>
 </ul>
 </dd>
@@ -1781,7 +1781,7 @@ pixel are positive.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em> | </em><em>Path</em>) – The full filename.</p></li>
 <li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to allow overwriting of existing files.</p></li>
 </ul>
 </dd>
@@ -1939,7 +1939,7 @@ keys.</p>
 <dd><p>Import DiffractionExperimentContext from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em> | </em><em>Path</em>) – The full filename.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2199,7 +2199,7 @@ and update the internal Parameters.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentContext.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.set_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.set_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Set a Parameter value.</p>
 <p>This method overloads the inherited set_param_value method to update
 the linked parameters of X-ray energy and wavelength.</p>
@@ -2207,7 +2207,7 @@ the linked parameters of X-ray energy and wavelength.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param_key</strong> (<em>str</em>) – The Parameter identifier key.</p></li>
-<li><p><strong>value</strong> (<em>object</em>) – The new value for the parameter. Depending upon the parameter,
+<li><p><strong>value</strong> (<em>Any</em>) – The new value for the parameter. Depending upon the parameter,
 value can take any form (number, string, object, …).</p></li>
 </ul>
 </dd>
@@ -2343,7 +2343,7 @@ DiffractionExperiment or DiffractionExperimentContexts.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.export_to_file">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.export_to_file" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Call the concrete export_to_file method in the subclass registered
 to the extension of the filename.</p>
 <dl class="field-list simple">
@@ -2351,7 +2351,7 @@ to the extension of the filename.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> (<em>str</em>) – The full filename and path.</p></li>
 <li><p><strong>tree</strong> (<a class="reference internal" href="workflow/workflow.html#pydidas.workflow.WorkflowTree" title="pydidas.workflow.WorkflowTree"><em>pydidas.workflow.WorkflowTree</em></a>) – The instance of the WorkflowTree</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – Any kwargs which should be passed to the udnerlying exporter.</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – Any kwargs which should be passed to the underlying exporter.</p></li>
 </ul>
 </dd>
 </dl>

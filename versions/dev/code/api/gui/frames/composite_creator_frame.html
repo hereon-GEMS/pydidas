@@ -458,7 +458,7 @@
 <span id="own-methods-compositecreatorframe"></span><h2>CompositeCreatorFrame with own methods only<a class="headerlink" href="#class-name-with-own-methods-only" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.CompositeCreatorFrame">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">CompositeCreatorFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.CompositeCreatorFrame" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">CompositeCreatorFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.CompositeCreatorFrame" title="Link to this definition">#</a></dt>
 <dd><p>Frame with Parameter setup for the CompositeCreatorApp and result
 visualization.</p>
 <dl class="py method">
@@ -482,7 +482,7 @@ visualization.</p>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p><strong>frame_index</strong> (<em>int</em>) – The frame index which can be used as key for referencing the state.</p></li>
-<li><p><strong>information</strong> (<em>dict</em>) – A dictionary with all the information required to export the
+<li><p><strong>state</strong> (<em>dict</em>) – A dictionary with all the information required to export the
 frame’s state.</p></li>
 </ul>
 </p>
@@ -528,7 +528,7 @@ respective information for all.</p>
 <span id="all-methods-compositecreatorframe"></span><h2>CompositeCreatorFrame with inherited methods too<a class="headerlink" href="#class-name-with-inherited-methods-too" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">CompositeCreatorFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">CompositeCreatorFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Frame with Parameter setup for the CompositeCreatorApp and result
 visualization.</p>
 <dl class="py class">
@@ -599,7 +599,7 @@ visualization.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The widget reference key.</p></li>
 <li><p><strong>widget_instance</strong> (<em>QWidget</em>) – The widget instance.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the specific QWidget with a setAttribute
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by the specific QWidget with a setAttribute
 method are valid kwargs. In addition, ‘layout_kwargs’ is a valid key
 to pass a dictionary with attributes for the widget’s layout.</p></li>
 </ul>
@@ -786,7 +786,7 @@ can be added, however, using the <code class="docutils literal notranslate"><spa
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference name in the _widgets dictionary.</p></li>
 <li><p><strong>widget_class</strong> (<em>type</em>) – The class type of the widget.</p></li>
 <li><p><strong>*args</strong> (<em>Any</em>) – Any arguments for the widget creation.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments for the widget creation.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Keyword arguments for the widget creation.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -805,7 +805,7 @@ can be added, however, using the <code class="docutils literal notranslate"><spa
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The button’s displayed text.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QPushButton with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QPushButton with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the button’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
@@ -827,7 +827,7 @@ the slot through the ‘clicked’ kwarg.</p></li>
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The CheckBox’s descriptive text.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QCheckBox with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QCheckBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the QProgressBar’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ can be used
@@ -846,7 +846,7 @@ to control the font properties or generic Qt properties.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QComboBox with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QComboBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the QComboBox’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ can be used
@@ -865,7 +865,7 @@ to control the font properties or generic Qt properties.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpinBox with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QSpinBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the SpinBox’s position in its parent’s layout. The
 default range is set to (0, 1) if it is not overridden with the
@@ -884,7 +884,7 @@ default range is set to (0, 1) if it is not overridden with the
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the generic QWidget with a setAttribute
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by the generic QWidget with a setAttribute
 method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the QWidget’s position in its parent’s layout.</p></li>
 </ul>
@@ -902,7 +902,7 @@ to specify the QWidget’s position in its parent’s layout.</p></li>
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The label’s displayed text.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QLabel with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QLabel with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the label’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
@@ -923,7 +923,7 @@ and adds it to the parent widget.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
 implementation are valid kwargs.</p></li>
 </ul>
 </dd>
@@ -939,7 +939,7 @@ implementation are valid kwargs.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QLineEdit with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QLineEdit with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the LineEdit’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
@@ -999,7 +999,7 @@ The default is self.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QProgressBar with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QProgressBar with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the QProgressBar’s position in its parent’s layout.</p></li>
 </ul>
@@ -1017,7 +1017,7 @@ to specify the QProgressBar’s position in its parent’s layout.</p></li>
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>entries</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – The list of entries for the buttons.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by the generic QWidget with a setAttribute
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by the generic QWidget with a setAttribute
 method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the RadioButtonGroup’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ can be used
@@ -1056,11 +1056,30 @@ the spacer’s position in its parent’s layout.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any attributes supported by QSpinBox with a setAttribute method
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QSpinBox with a setAttribute method
 are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the SpinBox’s position in its parent’s layout. The
 default range is set to (0, 1) if it is not overridden with the
 ‘range’ keyword.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_square_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create a SquareButton with only an icon and no text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QPushButton with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the button’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
+be used to control the font properties.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1077,7 +1096,7 @@ a separator and adds it to the parent widget.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
 implementation are valid kwargs.</p></li>
 </ul>
 </dd>
@@ -1210,7 +1229,7 @@ implementation are valid kwargs.</p></li>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p><strong>frame_index</strong> (<em>int</em>) – The frame index which can be used as key for referencing the state.</p></li>
-<li><p><strong>information</strong> (<em>dict</em>) – A dictionary with all the information required to export the
+<li><p><strong>state</strong> (<em>dict</em>) – A dictionary with all the information required to export the
 frame’s state.</p></li>
 </ul>
 </p>

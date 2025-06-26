@@ -31,14 +31,14 @@ __all__ = [
     "pyfai_rot_matrix",
     "get_chi_from_x_and_y",
     "fit_ellipse_from_points",
+    "get_ellipse_axes_from_coeffs",
     "fit_detector_center_and_tilt_from_points",
     "fit_circle_from_points",
     "calc_points_on_ellipse",
-    "ray_from_center_intersection_with_detector",
+    "ray_intersects_with_detector",
 ]
 
-
-from typing import List, Tuple
+from typing import Tuple
 
 import numpy as np
 from numpy import cos, sin
@@ -227,15 +227,14 @@ def fit_ellipse_from_points(xpoints: np.ndarray, ypoints: np.ndarray) -> np.ndar
         The coefficients for the formula
         F(x; y) = ax**2 + 2bxy + cy**2 + 2dx + 2fy + g = 0
     """
-    D1 = np.column_stack((xpoints**2, xpoints * ypoints, ypoints**2))
-    D2 = np.column_stack((xpoints, ypoints, np.ones(xpoints.size)))
-    S1 = np.matmul(D1.T, D1)
-    S2 = np.matmul(D1.T, D2)
-    S3 = np.matmul(D2.T, D2)
-    T = np.matmul(-np.linalg.inv(S3), S2.T)
-    M = S1 + np.matmul(S2, T)
-    inv_C1 = np.array(((0, 0, 0.5), (0, -1, 0), (0.5, 0, 0)))
-    M = np.matmul(inv_C1, M)
+    D1 = np.column_stack((xpoints**2, xpoints * ypoints, ypoints**2))  # noqa C0103
+    D2 = np.column_stack((xpoints, ypoints, np.ones(xpoints.size)))  # noqa C0103
+    S1 = np.matmul(D1.T, D1)  # noqa C0103
+    S2 = np.matmul(D1.T, D2)  # noqa C0103
+    S3 = np.matmul(D2.T, D2)  # noqa C0103
+    T = np.matmul(-np.linalg.inv(S3), S2.T)  # noqa C0103
+    inv_C1 = np.array(((0, 0, 0.5), (0, -1, 0), (0.5, 0, 0)))  # noqa C0103
+    M = np.matmul(inv_C1, S1 + np.matmul(S2, T))  # noqa C0103
     _eigenvals, _eigenvecs = np.linalg.eig(M)
     _cond = 4 * _eigenvecs[0] * _eigenvecs[2] - _eigenvecs[1] ** 2
     _a1 = _eigenvecs[:, _cond > 0]
@@ -244,6 +243,33 @@ def fit_ellipse_from_points(xpoints: np.ndarray, ypoints: np.ndarray) -> np.ndar
     coeffs[3] = coeffs[3] / 2
     coeffs[4] = coeffs[4] / 2
     return coeffs / coeffs[0]
+
+
+def get_ellipse_axes_from_coeffs(coeffs: tuple) -> tuple[float, float]:
+    """
+    Get the ellipse axes lengths from the fit parameters.
+
+    Parameters are defined as in Wolfram's mathworld formula:
+    https://mathworld.wolfram.com/Ellipse.html
+
+    Parameters
+    ----------
+    coeffs : tuple
+        The tuple with the parameters (a, b, c, d, f, g)
+
+    Returns
+    -------
+    axes : tuple[float, float]
+        The tuple with the two axes lengths.
+    """
+    a, b, c, d, f, g = coeffs
+    _axes = (
+        2
+        * (a * f**2 + c * d**2 + g * b**2 - 2 * b * d * f - a * c * g)
+        / (b**2 - a * c)
+        / (np.array((1, -1)) * ((a - c) ** 2 + 4 * b**2) ** 0.5 - (a + c))
+    ) ** 0.5
+    return _axes
 
 
 def get_ellipse_params_from_coeffs(coeffs: tuple) -> tuple:
@@ -274,12 +300,7 @@ def get_ellipse_params_from_coeffs(coeffs: tuple) -> tuple:
     a, b, c, d, f, g = coeffs
     _center_x = (c * d - b * f) / (b**2 - a * c)
     _center_y = (a * f - b * d) / (b**2 - a * c)
-    _axes = (
-        2
-        * (a * f**2 + c * d**2 + g * b**2 - 2 * b * d * f - a * c * g)
-        / (b**2 - a * c)
-        / (np.array((1, -1)) * ((a - c) ** 2 + 4 * b**2) ** 0.5 - (a + c))
-    ) ** 0.5
+    _axes = get_ellipse_axes_from_coeffs(coeffs)
     if b == 0:
         _tilt_plane = np.pi / 2 if a > c else 0
     else:
@@ -312,7 +333,7 @@ def fit_circle_from_points(xpoints: np.ndarray, ypoints: np.ndarray) -> tuple:
 
     _c0 = [np.mean(xpoints), np.mean(ypoints), (np.amax(xpoints) - np.amin(xpoints))]
     _c1, _ = leastsq(circle_distance, _c0, args=(xpoints, ypoints))
-    return _c1
+    return tuple(_c1)
 
 
 def calc_points_on_ellipse(
@@ -325,7 +346,7 @@ def calc_points_on_ellipse(
     Return points on the ellipse described by the given coefficients.
 
     Parameters for the ellipse must be given in form of (x0, y0, ap, bp, e, phi)
-    for values of the parametric variable t between tmin and tmax.
+    for values of the parametric variable t between t_min and t_max.
 
     Parameters
     ----------
@@ -361,54 +382,61 @@ def calc_points_on_ellipse(
     return _x, _y
 
 
-def ray_from_center_intersection_with_detector(
-    center: Tuple[float], chi: float, shape: Tuple[int]
-) -> Tuple[List[float]]:
+def ray_intersects_with_detector(
+    center: tuple[float, float], chi: float, shape: tuple[int, int]
+) -> list[tuple[float, float]]:
     """
     Calculate the point where a ray from the detector center hits the detector's edge.
 
     Parameters
     ----------
-    center : tuple
+    center : Point
         The center (cx, cy) coordinates.
     chi : float
         The angle from the center point in rad.
-    shape : tuple
-        The detector shape (in pixels).
+    shape : tuple[int, int]
+        The detector shape (in pixels), given as (ny, nx).
 
     Returns
     -------
-    x_intersections : List[float]
-        The x-positions of the intersections between ray and detector boundaries.
-    y_intersections : List[float]
-    The y-positions of the intersections between ray and detector boundaries.
+    intersections : list[tuple[float, float]]
+        The positions of the intersection points between ray and detector boundaries.
+        Each point is given as a tuple (x, y).
     """
     _cx, _cy = center
     _ny, _nx = shape
-    _px = 10 * _nx * np.cos(chi) + _cx
-    _py = 10 * _ny * np.sin(chi) + _cy
-    _xintersections = []
-    _yintersections = []
-    _dist_center = []
-    for _x3, _x4, _y3, _y4 in [
-        [_nx, _nx, 0, _ny],
-        [_nx, 0, _ny, _ny],
-        [0, 0, _ny, 0],
-        [0, _nx, 0, 0],
-    ]:
-        _denom = (_cx - _px) * (_y3 - _y4) - (_cy - _py) * (_x3 - _x4)
-        if _denom != 0:
-            _t = ((_cx - _x3) * (_y3 - _y4) - (_cy - _y3) * (_x3 - _x4)) / _denom
-            _u = ((_cx - _x3) * (_cy - _py) - (_cy - _y3) * (_cx - _px)) / _denom
-            if 0 <= _t <= 1 and 0 <= _u <= 1:
-                _xi = np.round(_cx + _t * (_px - _cx), 5)
-                if _xi not in _xintersections:
-                    _xintersections.append(_xi)
-                    _yintersections.append(np.round(_cy + _t * (_py - _cy), 5))
-                    _dist_center.append(
-                        _t * ((_px - _cx) ** 2 + (_py - _cy) ** 2) ** 0.5
-                    )
-    if len(_dist_center) == 2 and _dist_center[1] < _dist_center[0]:
-        _xintersections = _xintersections[::-1]
-        _yintersections = _yintersections[::-1]
-    return _xintersections, _yintersections
+    _intersects = []
+    chi = np.mod(chi, 2 * np.pi)
+    if np.round(chi, 6) in [np.round(np.pi / 2, 6), np.round(3 * np.pi / 2, 6)]:
+        _factor = 1 if chi < np.pi else -1
+        for _y in [0, _ny]:
+            if (0 <= _cx <= shape[0]) and _factor * _cy <= _factor * _y:
+                _intersects.append((float(_cx), float(_y)))
+        return _intersects
+    _ray_m = np.tan(chi)
+    _ray_y0 = _cy - _ray_m * _cx
+    # intersections with vertical edges:
+    for _x in [0, _nx]:
+        _y = np.round(_ray_m * (_x - _cx) + _cy, 5)
+        if (0 <= _y <= _ny) and (
+            (np.cos(chi) > 0 and _cx <= _x) or (np.cos(chi) < 0 and _cx >= _x)
+        ):
+            # only add intersections if the ray is pointing towards the edge
+            _intersects.append((float(_x), float(_y)))
+    if _ray_m != 0:
+        # intersections with horizontal edges:
+        for _y in [0, _ny]:
+            _x = np.round((_y - _cy) / _ray_m + _cx)
+            if (0 <= _x <= _nx) and (
+                (np.sin(chi) > 0 and _cy <= _y) or (np.sin(chi) < 0 and _cy >= _y)
+            ):
+                # only add intersections if the ray is pointing towards the edge
+                _intersects.append((float(_x), float(_y)))
+    if (
+        len(_intersects) == 2
+        and (_intersects[0][0] - _cx) ** 2 + (_intersects[0][1] - _cy) ** 2
+        > (_intersects[1][0] - _cx) ** 2 + (_intersects[1][1] - _cy) ** 2
+    ):
+        # ensure that the first intersection is the one closest to the center
+        _intersects.reverse()
+    return _intersects

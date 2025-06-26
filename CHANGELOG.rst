@@ -12,12 +12,13 @@ Improvements
   of value changes without broadcasting the new value.
 - Added a new frame to visualize the results of sin^2(chi) and sin(2*chi) fits for
   residual stress calculations.
+- Reorganized the frames in the toolbar menu.
 - Programmatic improvements:
-	- Modified the keys in the yaml state export file layout for clearer structure.
+	- Programatically improved the layout of the GUI export/import files for more clarity
+	  and to support importing states created from different configurations.
 	- Modified the behaviour of the splash screen to allow display of the splash screen
 	  also when calling pydidas trough an entry-point from the command line.
 	
-
 Bugfixes
 --------
 - Fixed an issue where the import of frame states would alter the frame index
@@ -25,10 +26,9 @@ Bugfixes
 - Fixed an issue in the GeneralAsciiSaver where exporting data with a metadata header.
 - Fixed an issue where the splash screen would only show after the package imports/exports
   and html documentation build.
-- Fixed an issue in the AxesSelector which triggered duplicate selection of unique
-  keys in specific cases when changing the dimensionality in the input data.
-- Fixed an issue in the left toolbars which would not allow expansion when the
-  toolbar was not visible due to the window size.
+- Fixed an issue in the AxesSelector when switching between Datasets of different dimensionality.
+- Fixed an issue where the toolbars would not expand when the main window was too small.
+
 
 v25.05.16
 =========

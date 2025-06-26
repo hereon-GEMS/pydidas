@@ -189,6 +189,7 @@ class BaseFrame(
         if not self._config["built"]:
             self._config["state"] = state
             return
+        self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:

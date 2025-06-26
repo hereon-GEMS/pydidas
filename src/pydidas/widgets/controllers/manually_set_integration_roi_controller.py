@@ -38,7 +38,7 @@ from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.utils import get_chi_from_x_and_y
 from pydidas.core.utils.scattering_geometry import convert_integration_result
-from pydidas.plugins import BasePlugin
+from pydidas.plugins import pyFAIintegrationBase
 from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
 from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
@@ -112,13 +112,13 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         return self._config["enabled"]
 
-    def set_new_plugin(self, plugin: BasePlugin):
+    def set_new_plugin(self, plugin: pyFAIintegrationBase):
         """
         Set a new connected plugin.
 
         Parameters
         ----------
-        plugin : pydidas.plugins.BasePlugin
+        plugin : pydidas.plugins.pyFAIintegrationBase
             The plugin to be edited
         """
         if self._config["exp"] is not None:
@@ -202,7 +202,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             else:
                 self._plugin.set_param_value(_key, _val)
         self.reset_selection_mode()
-        self.show_plot_items("roi")  # noqa : type: ignore[no-untyped-call]
+        self.show_plot_items("roi")
 
     def reset_selection_mode(self):
         """
@@ -264,15 +264,13 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         if "roi" in kind:
             self._show_integration_region()
 
-    def remove_plot_items(
-        self, *kind: tuple[Literal["azimuthal", "radial", "roi", "all"]]
-    ):
+    def remove_plot_items(self, *kind: Literal["azimuthal", "radial", "roi", "all"]):
         """
         Remove the items for the given kind from the plot.
 
         Parameters
         ----------
-        *kind : tuple[Literal["azimuthal", "radial", "roi", "all"]]
+        *kind : Literal["azimuthal", "radial", "roi", "all"]
             The kind or markers to be removed.
         """
         kind = ["azimuthal", "radial", "roi"] if "all" in kind else kind
@@ -292,7 +290,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self._config["beamcenter"] = self._config["exp"].beamcenter
         self._config["det_dist"] = self._config["exp"].get_param_value("detector_dist")
         if self._config["roi_plotted"]:
-            self.show_plot_items("roi")  # noqa : type: ignore[no-untyped-call]
+            self.show_plot_items("roi")
 
     @QtCore.Slot()
     def _start_selection(self, type_: Literal["radial", "azimuthal"]):
@@ -313,13 +311,13 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         )
         self._config[f"{type_}_active"] = True
         self._config[f"{type_}_n"] = 0
-        self.remove_plot_items("all")  # noqa : type: ignore[no-untyped-call]
-        self.show_plot_items(_other_type)  # noqa : type: ignore[no-untyped-call]
+        self.remove_plot_items("all")
+        self.show_plot_items(_other_type)
         self.toggle_enable(False)
         self.sig_toggle_selection_mode.emit(True)
         self._plot.sig_new_point_selected.connect(getattr(self, f"_new_{type_}_point"))
 
-    def set_param_value_and_widget(self, key: str, value: object):
+    def set_param_value_and_widget(self, key: str, value: Any):
         """
         Set the Plugin's Parameter value and the widget display value.
 
@@ -327,7 +325,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         ----------
         key : str
             The parameter reference key.
-        value : object
+        value : Any
             The new value.
         """
         self._plugin.set_param_value(key, value)
@@ -398,8 +396,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         if self._config["radial_n"] > 1:
             self._plot.sig_new_point_selected.disconnect(self._new_radial_point)
             self.reset_selection_mode()
-            self.remove_plot_items("all")  # noqa : type: ignore[no-untyped-call]
-            self.show_plot_items("roi")  # noqa : type: ignore[no-untyped-call]
+            self.remove_plot_items("all")
+            self.show_plot_items("roi")
 
     @QtCore.Slot(float, float)
     def _new_azimuthal_point(self, xpos: float, ypos: float):
@@ -430,16 +428,16 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         if self._config["azimuthal_n"] > 1:
             self._plot.sig_new_point_selected.disconnect(self._new_azimuthal_point)
             self.reset_selection_mode()
-            self.remove_plot_items("all")  # noqa : type: ignore[no-untyped-call]
+            self.remove_plot_items("all")
             if not self._plugin.is_range_valid():
                 self.set_param_value_and_widget("azi_use_range", "Full detector")
                 self.update_input_widgets()
-                self.show_plot_items("roi")  # noqa : type: ignore[no-untyped-call]
+                self.show_plot_items("roi")
                 raise UserConfigError(
                     "The pyFAI integration range must either be in the interval "
                     "[0°, 360°] or [-180°, 180°]. Please select matching limits."
                 )
-            self.show_plot_items("roi")  # noqa : type: ignore[no-untyped-call]
+            self.show_plot_items("roi")
             _low, _high = self._plugin.get_azimuthal_range_native()
             self.set_param_value_and_widget("azi_range_lower", _low)
             self.set_param_value_and_widget("azi_range_upper", _high)
@@ -510,4 +508,4 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self._editor.toggle_param_widget_visibility(
             f"{type_[:3]}_range_upper", _use_range
         )
-        self.show_plot_items("roi")  # noqa : type: ignore[no-untyped-call]
+        self.show_plot_items("roi")

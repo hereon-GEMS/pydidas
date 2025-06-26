@@ -10,6 +10,13 @@ Improvements
 - Added an option to copy the results of a ProcessingResults instance to another instance.
 - Overhauled the signals from ParameterWidgets to allow also notifications
   of value changes without broadcasting the new value.
+- Added a new frame to visualize the results of sin^2(chi) and sin(2*chi) fits for
+  residual stress calculations.
+- Programmatic improvements:
+	- Modified the keys in the yaml state export file layout for clearer structure.
+	- Modified the behaviour of the splash screen to allow display of the splash screen
+	  also when calling pydidas trough an entry-point from the command line.
+	
 
 Bugfixes
 --------
@@ -18,7 +25,10 @@ Bugfixes
 - Fixed an issue in the GeneralAsciiSaver where exporting data with a metadata header.
 - Fixed an issue where the splash screen would only show after the package imports/exports
   and html documentation build.
-
+- Fixed an issue in the AxesSelector which triggered duplicate selection of unique
+  keys in specific cases when changing the dimensionality in the input data.
+- Fixed an issue in the left toolbars which would not allow expansion when the
+  toolbar was not visible due to the window size.
 
 v25.05.16
 =========

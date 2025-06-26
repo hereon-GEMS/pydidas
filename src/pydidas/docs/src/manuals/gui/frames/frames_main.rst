@@ -16,9 +16,6 @@ The following frames are available in pydidas:
 
     DataBrowsingFrame
     PyfaiCalibFrame
-    DirectorySpyFrame
-    QuickIntegrationFrame
-    ImageMathFrame
     DefineDiffractionExpFrame
     DefineScanFrame
     WorkflowEditFrame
@@ -26,3 +23,7 @@ The following frames are available in pydidas:
     WorkflowRunFrame
     ViewResultsFrame
     UtilitiesFrame
+    DirectorySpyFrame
+    QuickIntegrationFrame
+    ImageMathFrame
+    SinSquareChiResultsFrame

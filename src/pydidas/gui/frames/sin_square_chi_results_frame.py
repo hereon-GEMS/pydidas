@@ -58,8 +58,6 @@ from pydidas.workflow import ProcessingResults, WorkflowResults
 from pydidas_qtcore import PydidasQApplication
 
 
-# TODO: Addd documentation
-
 _DEFAULT_PARAMS = get_generic_param_collection(
     "selected_data_source",
     "selected_sin_square_chi_node",
@@ -303,8 +301,8 @@ class SinSquareChiResultsFrame(BaseFrame):
             self.params["selected_sin_2chi_node"].choices
         )
         if (
-            len(self._sin_2chi_node_keys) == 2
-            and len(self._sin_square_chi_node_keys) == 2
+            len(self._sin_2chi_node_keys) <= 2
+            and len(self._sin_square_chi_node_keys) <= 2
         ):
             self._update_plotted_data()
 

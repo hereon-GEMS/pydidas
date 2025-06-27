@@ -44,6 +44,7 @@ from pydidas.core import (
     get_generic_param_collection,
 )
 from pydidas.core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
+from pydidas.core.math import Point
 from pydidas.core.utils import NoPrint
 
 
@@ -371,19 +372,17 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         self.sig_params_changed.emit()
 
     @property
-    def beamcenter(self) -> tuple[float, float]:
+    def beamcenter(self) -> Point:
         """
         Get the beamcenter in detector pixel coordinates.
 
         Returns
         -------
-        center_x : float
+        Point
             The beamcenter x coordinate (in pixels).
-        center_y : float
-            The beamcenter y coordinate (in pixels).
         """
         _f2d = self.as_fit2d_geometry_values()
-        return _f2d["center_x"], _f2d["center_y"]
+        return Point(_f2d["center_x"], _f2d["center_y"])
 
     def as_fit2d_geometry_values(self) -> dict:
         """

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -268,9 +268,9 @@ class TestDiffractionExperiment(unittest.TestCase):
 
     def test_beamcenter__not_set(self):
         obj = prepare_exp_with_Eiger()
-        _cx, _cy = obj.beamcenter
-        self.assertEqual(_cx, 0)
-        self.assertEqual(_cy, 0)
+        _center = obj.beamcenter
+        self.assertEqual(_center.x, 0)
+        self.assertEqual(_center.y, 0)
 
     def test_beamcenter__set(self):
         obj = prepare_exp_with_Eiger()
@@ -282,9 +282,9 @@ class TestDiffractionExperiment(unittest.TestCase):
         obj.set_param_value(
             "detector_poni2", _cx * obj.get_param_value("detector_pxsizey") * 1e-6
         )
-        _cx_calc, _cy_calc = obj.beamcenter
-        self.assertAlmostEqual(_cx, _cx_calc, 8)
-        self.assertAlmostEqual(_cy, _cy_calc, 8)
+        _center = obj.beamcenter
+        self.assertAlmostEqual(_center.x, _cx, 8)
+        self.assertAlmostEqual(_center.y, _cy, 8)
 
     def test_hash(self):
         obj = prepare_exp_with_Eiger()

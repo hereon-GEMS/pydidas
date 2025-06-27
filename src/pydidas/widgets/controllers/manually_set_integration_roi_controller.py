@@ -376,8 +376,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         ypos : float
             The y position in detector pixels.
         """
-        _cx, _cy = self._config["beamcenter"]
-        _r_px = ((xpos - _cx) ** 2 + (ypos - _cy) ** 2) ** 0.5
+        _r_px = (Point(xpos, ypos) - self._config["beamcenter"]).r
         _r = _r_px * self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
         _r_in_mm = _r * 1e3
         _val = convert_integration_result(
@@ -411,8 +410,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         ypos : float
             The y position in detector pixels.
         """
-        _cx, _cy = self._config["beamcenter"]
-        _chi = Point(xpos - _cx, ypos - _cy).chi
+        _chi = (Point(xpos, ypos) - config["beamcenter"]).chi
         _factor = (
             180 / np.pi if "deg" in self._plugin.get_param_value("azi_unit") else 1
         )

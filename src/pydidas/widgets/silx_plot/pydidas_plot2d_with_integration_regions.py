@@ -104,7 +104,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         self,
         radius: float,
         legend: str,
-        center: Union[None, Tuple[float, float]] = None,
+        center: Point | None = None,
     ):
         """
         Draw a circle with the given radius and store it as the given legend.
@@ -115,14 +115,14 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             The circle radius in pixels.
         legend : str
             The shape's legend for referencing it in the plot.
-        center : Union[None, Tuple[float, float]], optional
+        center : Point, optional
             The center of the circle. If None, this defaults to the
             DiffractionExperiment beamcenter. The default is None.
         """
-        _cx, _cy = self._config["beamcenter"] if center is None else center
+        _center = self._config["beamcenter"] if center is None else center
         self.addShape(
-            radius * cos_phi + _cx,
-            radius * sin_phi + _cy,
+            radius * cos_phi + _center.x,
+            radius * sin_phi + _center.y,
             legend=legend,
             color=self._config["overlay_color"],
             linestyle="--",
@@ -143,7 +143,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         """
         _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
         _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _center = Point(self._config["beamcenter"])
+        _center = self._config["beamcenter"]
         _intersects = ray_intersects_with_detector(_center, chi, (_ny, _nx))
         if len(_intersects) == 0:
             return
@@ -214,7 +214,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         points : PointList
             The coordinates of the radial integration region.
         """
-        _center = Point(self._config["beamcenter"])
+        _center = self._config["beamcenter"]
         _phi = (
             np.linspace(0, 2 * np.pi, num=145)
             if azimuthal is None
@@ -245,7 +245,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         """
         _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
         _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _center = Point(self._config["beamcenter"])
+        _center = self._config["beamcenter"]
         _center_on_det = 0 <= _center.x <= _nx and 0 <= _center.y <= _ny
 
         _intersects0 = ray_intersects_with_detector(_center, azimuthal[0], (_ny, _nx))

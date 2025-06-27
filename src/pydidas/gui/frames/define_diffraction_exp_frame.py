@@ -325,11 +325,11 @@ class DefineDiffractionExpFrame(BaseFrame):
         """
         Update the displayed beamcenter position.
         """
-        _bx, _by = np.round(EXP.beamcenter, 3)
-        self._bc_params.set_value("beamcenter_x", _bx)
-        self._bc_params.set_value("beamcenter_y", _by)
-        self.update_widget_value("beamcenter_x", _bx)
-        self.update_widget_value("beamcenter_y", _by)
+        _center = EXP.beamcenter.rounded(3)
+        self._bc_params.set_value("beamcenter_x", _center.x)
+        self._bc_params.set_value("beamcenter_y", _center.y)
+        self.update_widget_value("beamcenter_x", _center.x)
+        self.update_widget_value("beamcenter_y", _center.y)
 
     def import_from_file(self):
         """

@@ -30,8 +30,6 @@ __status__ = "Production"
 __all__ = ["PydidasPlot2DwithIntegrationRegions"]
 
 
-from typing import Tuple, Union
-
 import numpy as np
 from qtpy import QtCore
 

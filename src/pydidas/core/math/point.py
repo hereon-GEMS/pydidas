@@ -307,6 +307,22 @@ class Point:
         self.x = state["x"]
         self.y = state["y"]
 
+    def rounded(self, decimals: int = 6) -> "Point":
+        """
+        Return a new Point with coordinates rounded to the specified number of decimals.
+
+        Parameters
+        ----------
+        decimals : int, optional
+            The number of decimal places to round to (default is 6).
+
+        Returns
+        -------
+        Point
+            A new Point with rounded coordinates.
+        """
+        return Point(round(self.x, decimals), round(self.y, decimals))
+
 
 def PointFromPolar(r: float, theta: float) -> Point:  # noqa C0103
     """

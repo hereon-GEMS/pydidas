@@ -266,5 +266,13 @@ def test_pickle():
     assert unpickled_point.y == point.y
 
 
+@pytest.mark.parametrize("decimals", [0, 1, 2, 3, 5])
+def test_rounded(decimals):
+    point = Point(3.1415953345, 2.718223423428)
+    rounded_point = point.rounded(decimals)
+    assert rounded_point.x == pytest.approx(np.round(point.x, decimals))
+    assert rounded_point.y == pytest.approx(np.round(point.y, decimals))
+
+
 if __name__ == "__main__":
     pytest.main()

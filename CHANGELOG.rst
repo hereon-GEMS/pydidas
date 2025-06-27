@@ -18,6 +18,9 @@ Improvements
 	  and to support importing states created from different configurations.
 	- Modified the behaviour of the splash screen to allow display of the splash screen
 	  also when calling pydidas trough an entry-point from the command line.
+    - Added classes Point and PointList to handle 2-dimensional points and lists of
+      points in a more generic way.
+    - Added a pydidas.core.math subpackage to handle mathematical operations.
 	
 Bugfixes
 --------

@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The math_utils module includes functions for mathematical operations used in pydidas.
+The ellipse module includes functions for calculations pertaining to ellipses and circles,
 """
 
 __author__ = "Malte Storm"
@@ -25,137 +25,18 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "rot_matrix_rx",
-    "rot_matrix_ry",
-    "rot_matrix_rz",
-    "pyfai_rot_matrix",
-    "get_chi_from_x_and_y",
     "fit_ellipse_from_points",
-    "get_ellipse_axes_from_coeffs",
+    "axes_from_coeffs",
     "fit_detector_center_and_tilt_from_points",
-    "fit_circle_from_points",
     "calc_points_on_ellipse",
-    "ray_intersects_with_detector",
+    "fit_circle_from_points",
 ]
 
-from typing import Tuple
 
 import numpy as np
-from numpy import cos, sin
 from scipy.optimize import leastsq
 
 from pydidas.core.exceptions import UserConfigError
-
-
-def rot_matrix_rx(theta: float) -> np.ndarray:
-    """
-    Create the rotation matrix for a rotation around the x-axis of a value of theta.
-
-    Parameters
-    ----------
-    theta : float
-        The rotation angle [in rad]
-
-    Returns
-    -------
-    matrix : np.ndarray
-        The rotation matrix.
-    """
-    return np.array(
-        [[1, 0, 0], [0, cos(theta), -sin(theta)], [0, sin(theta), cos(theta)]]
-    )
-
-
-def rot_matrix_ry(theta: float) -> np.ndarray:
-    """
-    Create the rotation matrix for a rotation around the y-axis of a value of theta.
-
-    Parameters
-    ----------
-    theta : float
-        The rotation angle [in rad].
-
-    Returns
-    -------
-    matrix : np.ndarray
-        The rotation matrix.
-    """
-    return np.array(
-        [[cos(theta), 0, sin(theta)], [0, 1, 0], [-sin(theta), 0, cos(theta)]]
-    )
-
-
-def rot_matrix_rz(theta: float) -> np.ndarray:
-    """
-    Create the rotation matrix for a rotation around the z-axis of a value of theta.
-
-    Parameters
-    ----------
-    theta : float
-        The rotation angle [in rad].
-
-    Returns
-    -------
-    matrix : np.ndarray
-        The rotation matrix.
-    """
-    return np.array(
-        [[cos(theta), -sin(theta), 0], [sin(theta), cos(theta), 0], [0, 0, 1]]
-    )
-
-
-def pyfai_rot_matrix(theta1: float, theta2: float, theta3: float) -> np.ndarray:
-    """
-    Get the combined rotation matrix for pyFAI theta values.
-
-    Note: Rotations must be supplied in pyFAI notation (with theta1 and theta2 defined
-    left-handedly).
-
-    Parameters
-    ----------
-    theta1 : float
-        The first rotation angle [in rad].
-    theta2 : float
-        The second rotation angle [in rad]
-    theta3 : float
-        The third rotation angle [in rad]
-
-
-    Returns
-    -------
-    matrix : np.ndarray
-        The combined rotation matrix.
-    """
-    return np.dot(
-        np.dot(rot_matrix_rz(theta3), rot_matrix_ry(-theta2)), rot_matrix_rx(-theta1)
-    )
-
-
-def get_chi_from_x_and_y(x: float, y: float) -> float:
-    """
-    Get the chi position in radians from the x and y coordinates.
-
-    Parameters
-    ----------
-    x : float
-        The input value for the x coordinate.
-    y : float
-        The input value for the y coordinate.
-
-    Returns
-    -------
-    float
-        The chi value based on the input variables.
-    """
-    if x == 0 and y >= 0:
-        _chi = np.pi / 2
-    elif x == 0 and y < 0:
-        _chi = 3 * np.pi / 2
-    else:
-        _chi = np.arctan(y / x)
-    if x < 0:
-        _chi += np.pi
-    return np.mod(_chi, 2 * np.pi)
 
 
 def fit_detector_center_and_tilt_from_points(
@@ -199,7 +80,7 @@ def fit_detector_center_and_tilt_from_points(
             "solution."
         )
     _coeffs = fit_ellipse_from_points(xpoints, ypoints)
-    _cx, _cy, _tilt, _tilt_plane, _ax = get_ellipse_params_from_coeffs(_coeffs)
+    _cx, _cy, _tilt, _tilt_plane, _ax = params_from_coeffs(_coeffs)
     return _cx, _cy, _tilt, _tilt_plane, _coeffs
 
 
@@ -245,7 +126,7 @@ def fit_ellipse_from_points(xpoints: np.ndarray, ypoints: np.ndarray) -> np.ndar
     return coeffs / coeffs[0]
 
 
-def get_ellipse_axes_from_coeffs(coeffs: tuple) -> tuple[float, float]:
+def axes_from_coeffs(coeffs: tuple) -> tuple[float, float]:
     """
     Get the ellipse axes lengths from the fit parameters.
 
@@ -272,7 +153,7 @@ def get_ellipse_axes_from_coeffs(coeffs: tuple) -> tuple[float, float]:
     return _axes
 
 
-def get_ellipse_params_from_coeffs(coeffs: tuple) -> tuple:
+def params_from_coeffs(coeffs: tuple) -> tuple:
     """
     Get the ellipse parameters for center and tilt from the fit parameters.
 
@@ -300,7 +181,7 @@ def get_ellipse_params_from_coeffs(coeffs: tuple) -> tuple:
     a, b, c, d, f, g = coeffs
     _center_x = (c * d - b * f) / (b**2 - a * c)
     _center_y = (a * f - b * d) / (b**2 - a * c)
-    _axes = get_ellipse_axes_from_coeffs(coeffs)
+    _axes = axes_from_coeffs(coeffs)
     if b == 0:
         _tilt_plane = np.pi / 2 if a > c else 0
     else:
@@ -341,7 +222,7 @@ def calc_points_on_ellipse(
     n_points: int = 144,
     theta_min: float = 0,
     theta_max: float = 2 * np.pi,
-) -> Tuple[np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Return points on the ellipse described by the given coefficients.
 
@@ -367,7 +248,7 @@ def calc_points_on_ellipse(
         The array with the y-positions of the points on the ellipse circumference.
 
     """
-    _cx, _cy, _tilt, _tilt_angle, _axes = get_ellipse_params_from_coeffs(coeffs)
+    _cx, _cy, _tilt, _tilt_angle, _axes = params_from_coeffs(coeffs)
     _theta = np.linspace(theta_min, theta_max, num=n_points)
     _x = (
         _cx
@@ -380,63 +261,3 @@ def calc_points_on_ellipse(
         + _axes[1] * np.sin(_theta) * np.cos(_tilt_angle)
     )
     return _x, _y
-
-
-def ray_intersects_with_detector(
-    center: tuple[float, float], chi: float, shape: tuple[int, int]
-) -> list[tuple[float, float]]:
-    """
-    Calculate the point where a ray from the detector center hits the detector's edge.
-
-    Parameters
-    ----------
-    center : Point
-        The center (cx, cy) coordinates.
-    chi : float
-        The angle from the center point in rad.
-    shape : tuple[int, int]
-        The detector shape (in pixels), given as (ny, nx).
-
-    Returns
-    -------
-    intersections : list[tuple[float, float]]
-        The positions of the intersection points between ray and detector boundaries.
-        Each point is given as a tuple (x, y).
-    """
-    _cx, _cy = center
-    _ny, _nx = shape
-    _intersects = []
-    chi = np.mod(chi, 2 * np.pi)
-    if np.round(chi, 6) in [np.round(np.pi / 2, 6), np.round(3 * np.pi / 2, 6)]:
-        _factor = 1 if chi < np.pi else -1
-        for _y in [0, _ny]:
-            if (0 <= _cx <= shape[0]) and _factor * _cy <= _factor * _y:
-                _intersects.append((float(_cx), float(_y)))
-        return _intersects
-    _ray_m = np.tan(chi)
-    _ray_y0 = _cy - _ray_m * _cx
-    # intersections with vertical edges:
-    for _x in [0, _nx]:
-        _y = np.round(_ray_m * (_x - _cx) + _cy, 5)
-        if (0 <= _y <= _ny) and (
-            (np.cos(chi) > 0 and _cx <= _x) or (np.cos(chi) < 0 and _cx >= _x)
-        ):
-            # only add intersections if the ray is pointing towards the edge
-            _intersects.append((float(_x), float(_y)))
-    if _ray_m != 0:
-        # intersections with horizontal edges:
-        for _y in [0, _ny]:
-            _x = np.round((_y - _cy) / _ray_m + _cx)
-            if (0 <= _x <= _nx) and (
-                (np.sin(chi) > 0 and _cy <= _y) or (np.sin(chi) < 0 and _cy >= _y)
-            ):
-                # only add intersections if the ray is pointing towards the edge
-                _intersects.append((float(_x), float(_y)))
-    if (
-        len(_intersects) == 2
-        and (_intersects[0][0] - _cx) ** 2 + (_intersects[0][1] - _cy) ** 2
-        > (_intersects[1][0] - _cx) ** 2 + (_intersects[1][1] - _cy) ** 2
-    ):
-        # ensure that the first intersection is the one closest to the center
-        _intersects.reverse()
-    return _intersects

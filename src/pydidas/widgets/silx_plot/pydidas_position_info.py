@@ -36,7 +36,7 @@ from silx.gui.plot.tools import PositionInfo
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import UserConfigError
-from pydidas.core.utils import get_chi_from_x_and_y
+from pydidas.core.math import Point
 
 
 AX_LABELS = {
@@ -198,11 +198,11 @@ class PydidasPositionInfo(PositionInfo):
         tuple
             The tuple with the polar r, chi coordinates.
         """
-        _x_rel = (x_pix - self._beam_center[1]) * self._pixelsize[0]
-        _y_rel = (y_pix - self._beam_center[0]) * self._pixelsize[1]
-        _r = ((_x_rel) ** 2 + (_y_rel) ** 2) ** 0.5 * 1e3
-        _chi = get_chi_from_x_and_y(_x_rel, _y_rel) * 180 / np.pi
-        return (_r, _chi)
+        _pos = 1e3 * Point(
+            (x_pix - self._beam_center[1]) * self._pixelsize[0],
+            (y_pix - self._beam_center[0]) * self._pixelsize[1],
+        )
+        return _pos.r, _pos.chi_deg
 
     def pixel_to_cs_2theta_chi(self, x_pix: float, y_pix: float) -> tuple[float, float]:
         """
@@ -224,7 +224,7 @@ class PydidasPositionInfo(PositionInfo):
         _y_rel = (y_pix - self._beam_center[0]) * self._pixelsize[1]
         _r = (_x_rel**2 + _y_rel**2) ** 0.5
         _2theta = np.arctan(_r / self._beam_center[2]) * 180 / np.pi
-        _chi = get_chi_from_x_and_y(_x_rel, _y_rel) * 180 / np.pi
+        _chi = Point(_x_rel, _y_rel).chi_deg
         return (_2theta, _chi)
 
     def pixel_to_cs_q_chi(self, x_pix: float, y_pix: float) -> tuple[float, float]:

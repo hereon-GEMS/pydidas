@@ -24,7 +24,7 @@ __copyright__ = "Copyright  2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["Point"]
+__all__ = ["Point", "PointFromPolar"]
 
 
 from dataclasses import dataclass
@@ -38,6 +38,55 @@ import numpy as np
 class Point:
     x: float
     y: float
+
+    """
+    A Point class representing a point in 2D space.
+    
+    The point can be initialized with either two float values for x and y coordinates,
+    or a tuple of two floats. The class supports basic arithmetic operations such as
+    addition, subtraction, multiplication by a scalar, and division by a scalar.
+    """
+
+    @staticmethod
+    def _valid_input(item: Any) -> bool:
+        """
+        Check if the input is a valid Point or a tuple of two floats.
+
+        Parameters
+        ----------
+        item : Any
+            The item to check.
+
+        Returns
+        -------
+        bool
+            True if the item is a valid Point or a tuple of two floats, False otherwise.
+        """
+        return isinstance(item, Point) or (
+            isinstance(item, (tuple, list))
+            and len(item) == 2
+            and all(isinstance(coord, Real) for coord in item)
+        )
+
+    def __init__(self, x: float | tuple[float, float], y: float = None) -> None:
+        """
+        Construct a Point object.
+
+        The point can be initialized with either two float values for x and y coordinates,
+        or a tuple of two floats. The class supports basic arithmetic operations such as
+        addition, subtraction, multiplication by a scalar, and division by a scalar.
+        """
+
+        if isinstance(x, tuple) and self._valid_input(x):
+            self.x, self.y = x
+        elif isinstance(x, Real) and isinstance(y, Real):
+            self.x, self.y = x, y
+        else:
+            raise TypeError(
+                "Point must be initialized with two floats or a 2-tuple of floats."
+            )
+        self.x = float(self.x)
+        self.y = float(self.y)
 
     def __call__(self) -> tuple[float, float]:
         """
@@ -198,10 +247,58 @@ class Point:
         float
             The angle of the point in radians.
         """
-        if self.x == 0 and self.y >= 0:
+        if self.x == 0 and self.y > 0:
             return np.pi / 2
         elif self.x == 0 and self.y < 0:
             return 3 * np.pi / 2
         else:
             angle = np.arctan2(self.y, self.x)
             return np.mod(angle, 2 * np.pi)
+
+    angle = theta
+    chi = theta
+
+    @property
+    def theta_deg(self) -> float:
+        """
+        Get the angle of the point from the origin in degrees.
+
+        Returns
+        -------
+        float
+            The angle of the point in degrees.
+        """
+        return np.rad2deg(self.theta)
+
+    angle_deg = theta_deg
+    chi_deg = theta_deg
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the Point.
+
+        Returns
+        -------
+        str
+            A string representation of the Point.
+        """
+        return f"Point(x={self.x:.6f}, y={self.y:.6f})"
+
+
+def PointFromPolar(r: float, theta: float) -> Point:  # noqa C0103
+    """
+    Create a Point from polar coordinates.
+
+    Parameters
+    ----------
+    r : float
+        The radius.
+    theta : float
+        The angle in radians.
+
+    Returns
+    -------
+    Point
+        A Point object with the given polar coordinates.
+    """
+    return Point(r * np.cos(theta), r * np.sin(theta))

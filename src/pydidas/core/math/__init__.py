@@ -26,8 +26,16 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from .point import Point
+from . import ellipse, rotations
+from .math_utils import *
+from .point import Point, PointFromPolar
 from .point_list import PointList
 
 
-__all__ = ["Point", "PointList"]
+__all__ = [
+    "Point",
+    "PointFromPolar",
+    "PointList",
+    "ellipse",
+    "rotations",
+] + math_utils.__all__

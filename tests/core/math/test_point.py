@@ -38,6 +38,18 @@ def test_point_initialization():
     assert point.y == 7.2
 
 
+def test_point_initialization__w_tuple():
+    point = Point((3.5, 7.2))
+    assert point.x == 3.5
+    assert point.y == 7.2
+
+
+@pytest.mark.parametrize("value", [(3.5, "7"), (1, 2, 3), ("2", 3, 2)])
+def test_point_initialization__w_wrong_tuple(value):
+    with pytest.raises(TypeError):
+        Point(value)
+
+
 def test_point_equality():
     point1 = Point(1.0, 2.0)
     point2 = Point(1.0, 2.0)
@@ -48,7 +60,7 @@ def test_point_equality():
 
 def test_point_repr():
     point = Point(4.0, 5.0)
-    assert repr(point) == "Point(x=4.0, y=5.0)"
+    assert repr(point) == "Point(x=4.000000, y=5.000000)"
 
 
 def test_point_call():
@@ -84,10 +96,10 @@ def test_point_addition_in_place():
 def test_point_addition__w_tuple_wrong_length():
     point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
-        result = point1 + (2.0, 3.0, 2.1)
+        point1 + (2.0, 3.0, 2.1)
 
 
-def test_point_addition__w_tuple__nonnumbers():
+def test_point_addition__w_tuple__non_numbers():
     point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
         point1 + (2.0, "invalid")
@@ -96,13 +108,13 @@ def test_point_addition__w_tuple__nonnumbers():
 def test_point_addition__w_scalar():
     point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
-        point1 + 3
+        point1 + 3  # noqa
 
 
 def test_point_addition__w_invalid_type():
     point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
-        point1 + "invalid"
+        point1 + "invalid"  # noqa
 
 
 def test_point_subtraction__w_point():
@@ -133,10 +145,10 @@ def test_point_subtraction_in_place():
 def test_point_subtraction__w_tuple_wrong_length():
     point1 = Point(5.0, 7.0)
     with pytest.raises(TypeError):
-        result = point1 - (2.0, 3.0, 2.1)
+        point1 - (2.0, 3.0, 2.1)
 
 
-def test_point_subtraction__w_tuple__nonnumbers():
+def test_point_subtraction__w_tuple__non_numbers():
     point1 = Point(5.0, 7.0)
     with pytest.raises(TypeError):
         point1 - (2.0, "invalid")
@@ -145,18 +157,24 @@ def test_point_subtraction__w_tuple__nonnumbers():
 def test_point_subtraction__w_scalar():
     point1 = Point(5.0, 7.0)
     with pytest.raises(TypeError):
-        point1 - 3
+        point1 - 3  # noqa
 
 
 def test_point_subtraction__w_invalid_type():
     point1 = Point(5.0, 7.0)
     with pytest.raises(TypeError):
-        point1 - "invalid"
+        point1 - "invalid"  # noqa
 
 
 def test_point_multiplication__w_scalar():
     point = Point(2.0, 3.0)
     result = point * 2
+    assert result == Point(4.0, 6.0)
+
+
+def test_point_multiplication__w_left_scalar():
+    point = Point(2.0, 3.0)
+    result = 2 * point
     assert result == Point(4.0, 6.0)
 
 
@@ -169,7 +187,7 @@ def test_point_multiplication__in_place():
 def test_point_multiplication__w_tuple():
     point = Point(2.0, 3.0)
     with pytest.raises(TypeError):
-        point * (2, 3)
+        point * (2, 3)  # noqa
 
 
 def test_point_division():
@@ -193,7 +211,7 @@ def test_point_division__zero():
 def test_point_division__wrong_type():
     point = Point(6.0, 8.0)
     with pytest.raises(TypeError):
-        point / "invalid"
+        point / "invalid"  # noqa
 
 
 def test_point_radius():
@@ -215,3 +233,27 @@ def test_point_radius():
 def test_point_theta(x, y, expected_theta):
     point = Point(x, y)
     assert point.theta == pytest.approx(expected_theta)
+    assert point.angle == pytest.approx(expected_theta)
+    assert point.chi == pytest.approx(expected_theta)
+
+
+@pytest.mark.parametrize(
+    "x, y, expected_theta",
+    [
+        (1.0, 0.0, 0.0),
+        (0.0, 1.0, np.rad2deg(np.pi / 2)),
+        (-1.0, 0.0, np.rad2deg(np.pi)),
+        (0.0, -1.0, np.rad2deg(3 * np.pi / 2)),
+        (-1, -1, np.rad2deg(5 * np.pi / 4)),
+        (1.0, 1.0, np.rad2deg(np.pi / 4)),
+    ],
+)
+def test_point_theta_deg(x, y, expected_theta):
+    point = Point(x, y)
+    assert point.theta_deg == pytest.approx(expected_theta)
+    assert point.angle_deg == pytest.approx(expected_theta)
+    assert point.chi_deg == pytest.approx(expected_theta)
+
+
+if __name__ == "__main__":
+    pytest.main()

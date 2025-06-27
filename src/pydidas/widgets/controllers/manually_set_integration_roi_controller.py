@@ -36,7 +36,7 @@ from qtpy import QtCore
 
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PYDIDAS_COLORS
-from pydidas.core.utils import get_chi_from_x_and_y
+from pydidas.core.math import Point
 from pydidas.core.utils.scattering_geometry import convert_integration_result
 from pydidas.plugins import pyFAIintegrationBase
 from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
@@ -412,7 +412,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             The y position in detector pixels.
         """
         _cx, _cy = self._config["beamcenter"]
-        _chi = get_chi_from_x_and_y(xpos - _cx, ypos - _cy)
+        _chi = Point(xpos - _cx, ypos - _cy).chi
         _factor = (
             180 / np.pi if "deg" in self._plugin.get_param_value("azi_unit") else 1
         )

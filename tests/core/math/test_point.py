@@ -26,6 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
+import pickle
+
 import numpy as np
 import pytest
 
@@ -253,6 +255,15 @@ def test_point_theta_deg(x, y, expected_theta):
     assert point.theta_deg == pytest.approx(expected_theta)
     assert point.angle_deg == pytest.approx(expected_theta)
     assert point.chi_deg == pytest.approx(expected_theta)
+
+
+def test_pickle():
+    point = Point(3.0, 4.0)
+    pickled_point = pickle.dumps(point)
+    unpickled_point = pickle.loads(pickled_point)
+    assert isinstance(unpickled_point, Point)
+    assert unpickled_point.x == point.x
+    assert unpickled_point.y == point.y
 
 
 if __name__ == "__main__":

@@ -284,6 +284,29 @@ class Point:
         """
         return f"Point(x={self.x:.6f}, y={self.y:.6f})"
 
+    def __getstate__(self) -> dict:
+        """
+        Get the state of the Point for serialization.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the state of the Point.
+        """
+        return {"x": self.x, "y": self.y}
+
+    def __setstate__(self, state: dict) -> None:
+        """
+        Set the state of the Point from a serialized state.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary containing the state of the Point.
+        """
+        self.x = state["x"]
+        self.y = state["y"]
+
 
 def PointFromPolar(r: float, theta: float) -> Point:  # noqa C0103
     """

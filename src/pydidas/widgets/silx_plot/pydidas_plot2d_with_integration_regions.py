@@ -30,15 +30,15 @@ __status__ = "Production"
 __all__ = ["PydidasPlot2DwithIntegrationRegions"]
 
 
-from typing import Tuple, Union
-
 import numpy as np
 from qtpy import QtCore
 
 from pydidas.core.constants import PYDIDAS_COLORS
-from pydidas.core.utils import (
-    get_chi_from_x_and_y,
-    ray_from_center_intersection_with_detector,
+from pydidas.core.math import (
+    Point,
+    PointFromPolar,
+    PointList,
+    ray_intersects_with_detector,
 )
 from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
@@ -66,6 +66,20 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             self._process_exp_update
         )
 
+    @property
+    def det_corner_points(self) -> PointList:
+        """
+        Get a list of the detector corner points.
+        """
+        _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
+        _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
+        _points = PointList()
+        _points.append(Point(0, 0))
+        _points.append(Point(0, _ny))
+        _points.append(Point(_nx, _ny))
+        _points.append(Point(_nx, 0))
+        return _points
+
     @QtCore.Slot()
     def _process_exp_update(self):
         """
@@ -88,7 +102,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         self,
         radius: float,
         legend: str,
-        center: Union[None, Tuple[float, float]] = None,
+        center: Point | None = None,
     ):
         """
         Draw a circle with the given radius and store it as the given legend.
@@ -99,14 +113,14 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             The circle radius in pixels.
         legend : str
             The shape's legend for referencing it in the plot.
-        center : Union[None, Tuple[float, float]], optional
+        center : Point, optional
             The center of the circle. If None, this defaults to the
             DiffractionExperiment beamcenter. The default is None.
         """
-        _cx, _cy = self._config["beamcenter"] if center is None else center
+        _center = self._config["beamcenter"] if center is None else center
         self.addShape(
-            radius * cos_phi + _cx,
-            radius * sin_phi + _cy,
+            radius * cos_phi + _center.x,
+            radius * sin_phi + _center.y,
             legend=legend,
             color=self._config["overlay_color"],
             linestyle="--",
@@ -127,21 +141,15 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         """
         _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
         _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _cx, _cy = self._config["beamcenter"]
-        _xpoints, _ypoints = ray_from_center_intersection_with_detector(
-            (_cx, _cy), chi, (_ny, _nx)
-        )
-        if len(_xpoints) == 0:
+        _center = self._config["beamcenter"]
+        _intersects = ray_intersects_with_detector(_center, chi, (_ny, _nx))
+        if len(_intersects) == 0:
             return
-        if len(_xpoints) == 1:
-            _xarr = [_cx, _xpoints[0]]
-            _yarr = [_cy, _ypoints[0]]
-        else:
-            _xarr = [_xpoints[0], _xpoints[1]]
-            _yarr = [_ypoints[0], _ypoints[1]]
+        if len(_intersects) == 1:
+            _intersects.insert(0, _center)
         self.addShape(
-            _xarr,
-            _yarr,
+            _intersects.xarr,
+            _intersects.yarr,
             legend=legend,
             shape="polylines",
             color=self._config["overlay_color"],
@@ -152,108 +160,122 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
     def draw_integration_region(
         self,
-        radial: Union[None, Tuple[float, float]],
-        azimuthal: Union[None, Tuple[float, float]],
+        radial: tuple[float, float] | None,
+        azimuthal: tuple[float, float] | None,
     ):
         """
         Draw the given integration region.
 
         Parameters
         ----------
-        radial : Union[None, Tuple[float, float]]
+        radial : tuple[float, float] | None
             The radial integration region. Use None for the full detector or a tuple
             with (r_inner, r_outer) in pixels to select a region.
-        azimuthal : Union[None, Tuple[float, float]]
+        azimuthal : tuple[float, float] | None
             The azimuthal integration region. Use None for the full detector or a tuple
             with (azi_start, azi_end) in radians for a region.
         """
-        _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
-        _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _cx, _cy = self._config["beamcenter"]
-        _center_on_det = 0 <= _cx <= _nx and 0 <= _cy <= _ny
+        if isinstance(azimuthal, tuple):
+            if np.mod(azimuthal, 2 * np.pi).std() < 1e-6:
+                azimuthal = None
         if radial is None and azimuthal is None:
-            _xarr = [0, 0, _nx, _nx]
-            _yarr = [0, _ny, _ny, 0]
-        if radial is None and azimuthal is not None:
-            _x0, _y0 = ray_from_center_intersection_with_detector(
-                (_cx, _cy), azimuthal[0], (_ny, _nx)
-            )
-            _x1, _y1 = ray_from_center_intersection_with_detector(
-                (_cx, _cy), azimuthal[1], (_ny, _nx)
-            )
-            if _center_on_det:
-                _xpoints, _ypoints = self._get_included_corners(
-                    (_x0[0], _y0[0]), (_x1[0], _y1[0])
-                )
-                _xpoints.insert(0, _cx)
-                _xpoints.append(_cx)
-                _ypoints.insert(0, _cy)
-                _ypoints.append(_cy)
-            else:  # center off detector
-                if len(_x0) == 0 and len(_x1) == 0:
-                    # no intersections, i.e. either full detector or no point on
-                    # detector in roi
-                    _chi_det = get_chi_from_x_and_y(_nx / 2 - _cx, _ny / 2 - _cy)
-                    if azimuthal[0] < _chi_det < azimuthal[1]:
-                        _xpoints = [0, 0, _nx, _nx]
-                        _ypoints = [0, _ny, _ny, 0]
-                    else:
-                        self.remove_plot_items("roi")
-                        return
-                elif len(_x0) == 2 and len(_x1) == 2:
-                    _xpoints, _ypoints = self._get_included_corners(
-                        (_x1[0], _y1[0]), (_x0[0], _y0[0])
-                    )
-                    _p2x, _p2y = self._get_included_corners(
-                        (_x0[1], _y0[1]), (_x1[1], _y1[1])
-                    )
-                    _xpoints.extend(_p2x)
-                    _ypoints.extend(_p2y)
-                elif len(_x0) == 0 and len(_x1) == 2:
-                    _xpoints, _ypoints = self._get_included_corners(
-                        (_x1[0], _y1[0]), (_x1[1], _y1[1])
-                    )
-                elif len(_x0) == 2 and len(_x1) == 0:
-                    _xpoints, _ypoints = self._get_included_corners(
-                        (_x0[1], _y0[1]), (_x0[0], _y0[0])
-                    )
-
-            _xarr = np.asarray(_xpoints)
-            _yarr = np.asarray(_ypoints)
-        if radial is not None:
-            _phi = (
-                np.linspace(0, 2 * np.pi, num=145)
-                if azimuthal is None
-                else np.linspace(azimuthal[0], azimuthal[1], num=145)
-            )
-            _xarr = _cx + np.concatenate(
-                (
-                    radial[0] * np.cos(_phi),
-                    radial[1] * np.cos(_phi[::-1]),
-                    (radial[0] * np.cos(_phi[0]),),
-                )
-            )
-            _yarr = _cy + np.concatenate(
-                (
-                    radial[0] * np.sin(_phi),
-                    radial[1] * np.sin(_phi[::-1]),
-                    (radial[0] * np.sin(_phi[0]),),
-                )
-            )
+            _points = self.det_corner_points
+        elif radial is not None:
+            _points = self._handle_radial_region(radial, azimuthal)
+        else:
+            _points = self._handle_azimuthal_region(azimuthal)
         self.addShape(
-            _xarr,
-            _yarr,
+            _points.xarr,
+            _points.yarr,
             legend="roi",
             color=self._config["overlay_color"],
             linewidth=2.0,
         )
         self._config["roi_active"] = True
 
-    def _get_included_corners(
-        self, startpoint: Tuple[float, float], endpoint: Tuple[float, float]
-    ):
+    def _handle_radial_region(
+        self, radial: tuple[float, float], azimuthal: None | tuple[float, float]
+    ) -> PointList:
         """
-        Get the corners on the detector outline between startpoint and endpoint.
+        Handle the radial region drawing logic.
+
+        Parameters
+        ----------
+        radial : tuple[float, float]
+            The radial integration region as (r_inner, r_outer) in pixels.
+        azimuthal : None | tuple[float, float]
+            The azimuthal integration region as (azi_start, azi_end) in radians or
+            None for the full detector.
+
+        Returns
+        -------
+        points : PointList
+            The coordinates of the radial integration region.
+        """
+        _center = self._config["beamcenter"]
+        _phi = (
+            np.linspace(0, 2 * np.pi, num=145)
+            if azimuthal is None
+            else np.linspace(azimuthal[0], azimuthal[1], num=145)
+        )
+        _points = PointList()
+        for _p in _phi:
+            _points.append(_center + PointFromPolar(radial[0], _p))
+        for _p in _phi[::-1]:
+            _points.append(_center + PointFromPolar(radial[1], _p))
+        _points.append(_center + PointFromPolar(radial[0], _phi[0]))
+        return _points
+
+    def _handle_azimuthal_region(self, azimuthal: tuple[float, float]) -> PointList:
+        """
+        Handle the azimuthal region drawing logic.
+
+        Parameters
+        ----------
+        azimuthal : tuple[float, float]
+            The azimuthal integration region as (azi_start, azi_end) in radians.
+
+        Returns
+        -------
+        points : PointList
+            A list of Point objects representing the corners of the azimuthal
+            integration region on the detector.
+        """
+        _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
+        _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
+        _center = self._config["beamcenter"]
+        _center_on_det = 0 <= _center.x <= _nx and 0 <= _center.y <= _ny
+
+        _intersects0 = ray_intersects_with_detector(_center, azimuthal[0], (_ny, _nx))
+        _intersects1 = ray_intersects_with_detector(_center, azimuthal[1], (_ny, _nx))
+        if _center_on_det:
+            _points = self._get_outline(_intersects0[0], _intersects1[0])
+            _points.insert(0, _center)
+            _points.append(_center)
+            return _points
+        # center off detector
+        _points = PointList()
+        if len(_intersects0) == 0 and len(_intersects1) == 0:
+            # no intersections, i.e. either full detector or no point on
+            # detector in roi
+            _chi_det = (Point(_nx / 2, _ny / 2) - _center).chi
+            if azimuthal[0] < _chi_det < azimuthal[1]:
+                _points.extend(self.det_corner_points)
+            else:
+                self.remove_plot_items("roi")  # noqa E1101
+        elif len(_intersects0) == 2 and len(_intersects1) == 2:
+            _points = self._get_outline(_intersects1[0], _intersects0[0])
+            _points2 = self._get_outline(_intersects0[1], _intersects1[1])
+            _points.extend(_points2)
+        elif len(_intersects0) == 0 and len(_intersects1) == 2:
+            _points = self._get_outline(_intersects1[0], _intersects1[1])
+        elif len(_intersects0) == 2 and len(_intersects1) == 0:
+            _points = self._get_outline(_intersects0[1], _intersects0[0])
+        return _points
+
+    def _get_outline(self, startpoint: Point, endpoint: Point) -> PointList:
+        """
+        Get the outline including the corners between startpoint and endpoint.
 
         Starting at the startpoint, follow the detector outline in a positive rotation
         and tag all corner points which are covered before reaching the endpoint.
@@ -261,59 +283,38 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
         Parameters
         ----------
-        startpoint : Tuple[float, float]
+        startpoint : Point
             The starting point (x, y)
-        endpoint : Tuple[float, float]
+        endpoint : Point
             The endpoint (x, y)
 
         Returns
         -------
-        corners_x : list
-            The corner x positions.
-        corners_y : list
-            The corner y positions.
+        PointList
+            A list of Point objects representing the corner points between the start
         """
         _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
         _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _ex, _ey = endpoint
-        _c_x = [startpoint[0]]
-        _c_y = [startpoint[1]]
+        _points = PointList([startpoint])
         while True:
-            if _c_y[-1] == 0 and _ey != 0:
-                _c_x.append(_nx)
-                _c_y.append(0)
-            elif _c_y[-1] == 0:
-                if _ex > _c_x[-1]:
+            if _points[-1].y == 0:
+                if endpoint.x > _points[-1].x and endpoint.y == 0:
                     break
-                _c_x.append(_nx)
-                _c_y.append(0)
-            if _c_x[-1] == _nx and _ex != _nx:
-                _c_x.append(_nx)
-                _c_y.append(_ny)
-            elif _c_x[-1] == _nx:
-                if _ey > _c_y[-1]:
+                _points.append(Point(_nx, 0))
+            if _points[-1].x == _nx:
+                if endpoint.y > _points[-1].y and endpoint.x == _nx:
                     break
-                _c_x.append(_nx)
-                _c_y.append(_ny)
-            if _c_y[-1] == _ny and _ey != _ny:
-                _c_x.append(0)
-                _c_y.append(_ny)
-            elif _c_y[-1] == _ny:
-                if _ex < _c_x[-1]:
+                _points.append(Point(_nx, _ny))
+            if _points[-1].y == _ny:
+                if endpoint.x < _points[-1].x and endpoint.y == _ny:
                     break
-                _c_x.append(0)
-                _c_y.append(_ny)
-            if _c_x[-1] == 0 and _ex != 0:
-                _c_x.append(0)
-                _c_y.append(0)
-            elif _c_x[-1] == 0:
-                if _ey < _c_y[-1]:
+                _points.append(Point(0, _ny))
+            if _points[-1].x == 0:
+                if endpoint.y < _points[-1].y and endpoint.x == 0:
                     break
-                _c_x.append(0)
-                _c_y.append(0)
-        _c_x.append(_ex)
-        _c_y.append(_ey)
-        return _c_x, _c_y
+                _points.append(Point(0, 0))
+        _points.append(endpoint)
+        return _points
 
     @QtCore.Slot(dict)
     def _process_plot_signal(self, event_dict: dict):

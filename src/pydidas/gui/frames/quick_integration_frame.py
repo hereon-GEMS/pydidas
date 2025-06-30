@@ -468,9 +468,9 @@ class QuickIntegrationFrame(BaseFrame):
         self.set_param_value_and_widget(
             "detector_pxsize", self.get_param_value("detector_pxsizex")
         )
-        _cx, _cy = self._EXP.beamcenter
-        self.set_param_value_and_widget("beamcenter_x", _cx)
-        self.set_param_value_and_widget("beamcenter_y", _cy)
+        _center = self._EXP.beamcenter
+        self.set_param_value_and_widget("beamcenter_x", _center.x)
+        self.set_param_value_and_widget("beamcenter_y", _center.y)
         self._bc_controller.manual_beamcenter_update()
 
     def _import_diffraction_exp(self):
@@ -489,9 +489,9 @@ class QuickIntegrationFrame(BaseFrame):
             for _key, _param in self._EXP.params.items():
                 if _key in self.param_widgets:
                     self.param_widgets[_key].set_value(_param.value)
-        _cx, _cy = self._EXP.beamcenter
-        self.update_widget_value("beamcenter_x", np.round(_cx, 3))
-        self.update_widget_value("beamcenter_y", np.round(_cy, 3))
+        _center = self._EXP.beamcenter
+        self.update_widget_value("beamcenter_x", np.round(_center.x, 3))
+        self.update_widget_value("beamcenter_y", np.round(_center.y, 3))
 
     @QtCore.Slot()
     def _run_integration(self):

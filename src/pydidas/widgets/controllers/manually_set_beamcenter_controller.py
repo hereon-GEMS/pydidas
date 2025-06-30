@@ -38,7 +38,7 @@ from qtpy import QtCore
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import PYDIDAS_COLORS
-from pydidas.core.utils import (
+from pydidas.core.math.ellipse import (
     calc_points_on_ellipse,
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,

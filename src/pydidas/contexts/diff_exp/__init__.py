@@ -32,7 +32,13 @@ __status__ = "Production"
 # import __all__ items from modules:
 # even though not explicitly used, the import is necessary for python to read
 # the code and to register the classes in the metaclass registry
-from . import diff_exp_io_hdf5, diff_exp_io_poni, diff_exp_io_yaml
+from . import diff_exp as __diff_exp
+from . import diff_exp_context as __diff_exp_context
+from . import diff_exp_io as __diff_exp_io
+from . import diff_exp_io_base as __diff_exp_io_base
+from . import diff_exp_io_hdf5 as __diff_exp_io_hdf5
+from . import diff_exp_io_poni as __diff_exp_io_poni
+from . import diff_exp_io_yaml as __diff_exp_io_yaml
 from .diff_exp import *
 from .diff_exp_context import *
 from .diff_exp_io import *
@@ -41,18 +47,18 @@ from .diff_exp_io_base import *
 
 __all__ = (
     diff_exp.__all__
-    + diff_exp_context.__all__
-    + diff_exp_io.__all__
-    + diff_exp_io_base.__all__
+    + __diff_exp_context.__all__
+    + __diff_exp_io.__all__
+    + __diff_exp_io_base.__all__
 )
 
 # Clean up the namespace:
 del (
-    diff_exp,
-    diff_exp_context,
-    diff_exp_io,
-    diff_exp_io_base,
-    diff_exp_io_yaml,
-    diff_exp_io_poni,
-    diff_exp_io_hdf5,
+    __diff_exp,
+    __diff_exp_context,
+    __diff_exp_io,
+    __diff_exp_io_base,
+    __diff_exp_io_yaml,
+    __diff_exp_io_poni,
+    __diff_exp_io_hdf5,
 )

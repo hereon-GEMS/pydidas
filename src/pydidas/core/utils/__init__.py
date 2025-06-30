@@ -39,7 +39,6 @@ from .hdf5_dataset_utils import *
 from .image_utils import *
 from .iterable_utils import *
 from .logger import *
-from .math_utils import *
 from .no_print import *
 from .numpy_parser import *
 from .qt_utilities import *
@@ -61,7 +60,6 @@ __all__ = (
     + hdf5_dataset_utils.__all__
     + logger.__all__
     + image_utils.__all__
-    + math_utils.__all__
     + numpy_parser.__all__
     + no_print.__all__
     + qt_utilities.__all__
@@ -84,7 +82,6 @@ del (
     hdf5_dataset_utils,
     logger,
     image_utils,
-    math_utils,
     numpy_parser,
     no_print,
     qt_utilities,

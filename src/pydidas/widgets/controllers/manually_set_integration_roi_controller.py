@@ -410,7 +410,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         ypos : float
             The y position in detector pixels.
         """
-        _chi = (Point(xpos, ypos) - self.config["beamcenter"]).chi
+        _chi = (Point(xpos, ypos) - self._config["beamcenter"]).chi
         _factor = (
             180 / np.pi if "deg" in self._plugin.get_param_value("azi_unit") else 1
         )

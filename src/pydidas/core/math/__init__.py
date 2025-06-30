@@ -27,6 +27,7 @@ __status__ = "Production"
 
 
 from . import ellipse, rotations
+from . import math_utils as __math_utils
 from .math_utils import *
 from .point import Point, PointFromPolar
 from .point_list import PointList
@@ -38,4 +39,4 @@ __all__ = [
     "PointList",
     "ellipse",
     "rotations",
-] + math_utils.__all__
+] + __math_utils.__all__

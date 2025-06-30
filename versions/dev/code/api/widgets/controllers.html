@@ -671,11 +671,11 @@ Parameters and draws the new bounds in the plot.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.controllers.ManuallySetIntegrationRoiController.remove_plot_items">
-<span class="sig-name descname"><span class="pre">remove_plot_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'azimuthal'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'radial'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'roi'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetIntegrationRoiController.remove_plot_items" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">remove_plot_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'azimuthal'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'radial'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'roi'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetIntegrationRoiController.remove_plot_items" title="Link to this definition">#</a></dt>
 <dd><p>Remove the items for the given kind from the plot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>*kind</strong> (<em>tuple</em><em>[</em><em>Literal</em><em>[</em><em>&quot;azimuthal&quot;</em><em>, </em><em>&quot;radial&quot;</em><em>, </em><em>&quot;roi&quot;</em><em>, </em><em>&quot;all&quot;</em><em>]</em><em>]</em>) – The kind or markers to be removed.</p>
+<dd class="field-odd"><p><strong>*kind</strong> (<em>Literal</em><em>[</em><em>&quot;azimuthal&quot;</em><em>, </em><em>&quot;radial&quot;</em><em>, </em><em>&quot;roi&quot;</em><em>, </em><em>&quot;all&quot;</em><em>]</em>) – The kind or markers to be removed.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -705,24 +705,24 @@ Parameters and draws the new bounds in the plot.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.controllers.ManuallySetIntegrationRoiController.set_new_plugin">
-<span class="sig-name descname"><span class="pre">set_new_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetIntegrationRoiController.set_new_plugin" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_new_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.pyFAIintegrationBase" title="pydidas.plugins.pyfai_integration_base.pyFAIintegrationBase"><span class="pre">pyFAIintegrationBase</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetIntegrationRoiController.set_new_plugin" title="Link to this definition">#</a></dt>
 <dd><p>Set a new connected plugin.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>plugin</strong> (<a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><em>pydidas.plugins.BasePlugin</em></a>) – The plugin to be edited</p>
+<dd class="field-odd"><p><strong>plugin</strong> (<a class="reference internal" href="../plugins.html#pydidas.plugins.pyFAIintegrationBase" title="pydidas.plugins.pyFAIintegrationBase"><em>pydidas.plugins.pyFAIintegrationBase</em></a>) – The plugin to be edited</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.controllers.ManuallySetIntegrationRoiController.set_param_value_and_widget">
-<span class="sig-name descname"><span class="pre">set_param_value_and_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetIntegrationRoiController.set_param_value_and_widget" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value_and_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetIntegrationRoiController.set_param_value_and_widget" title="Link to this definition">#</a></dt>
 <dd><p>Set the Plugin’s Parameter value and the widget display value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key</strong> (<em>str</em>) – The parameter reference key.</p></li>
-<li><p><strong>value</strong> (<em>object</em>) – The new value.</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – The new value.</p></li>
 </ul>
 </dd>
 </dl>

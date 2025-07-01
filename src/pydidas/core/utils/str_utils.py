@@ -446,6 +446,7 @@ def format_input_to_multiline_str(
     max_line_length: int = 60,
     pad_to_max_length: bool = False,
     keep_linebreaks: bool = True,
+    indent: int = 0,
 ) -> str:
     """
     Format an input string by changing linebreaks to limit the maximum line length.
@@ -466,6 +467,8 @@ def format_input_to_multiline_str(
         If False, no padding is added. The default is False.
     keep_linebreaks : bool, optional
         Flag to keep linebreaks in the final formatting. The default is True.
+    indent : int, optional
+        The number of spaces to indent each line. The default is 0.
 
     Returns
     -------
@@ -477,9 +480,13 @@ def format_input_to_multiline_str(
         _result_lines = []
         _tmp_lines = input_str.split("\n")
         for _curr_line in _tmp_lines:
-            _result_lines.extend(_get_unformatted_lines(_curr_line, max_line_length))
-    if not keep_linebreaks:
-        _result_lines = _get_unformatted_lines(input_str, max_line_length)
+            _result_lines.extend(
+                _get_unformatted_lines(_curr_line, max_line_length - indent)
+            )
+    else:
+        _result_lines = _get_unformatted_lines(input_str, max_line_length - indent)
+    if indent > 0:
+        _result_lines = [" " * indent + _item for _item in _result_lines]
     if pad_to_max_length:
         for _index, _item in enumerate(_result_lines):
             _delta = max(0, max_line_length - len(_item))

@@ -22,8 +22,7 @@ scan_title: Test
 scan_dim: 2
 scan_base_directory: .
 scan_name_pattern: test_####
-file_number_offset: 0
-file_number_delta: 1
-scan_frames_per_scan_point: 1
-frame_indices_per_scan_point: 1
-scan_multi_frame_handling: Average
+scan_start_index: 0
+scan_index_stepping: 1
+scan_multiplicity: 1
+scan_multi_image_handling: Average

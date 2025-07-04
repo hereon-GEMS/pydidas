@@ -41,6 +41,7 @@ from pydidas.widgets.factory.pydidas_label import PydidasLabel
 from pydidas.widgets.factory.pydidas_lineedit import PydidasLineEdit
 from pydidas.widgets.factory.pydidas_pushbutton import PydidasPushButton
 from pydidas.widgets.factory.pydidas_svgwidget import PydidasSvgWidget
+from pydidas.widgets.factory.pydidas_table import PydidasQTable
 from pydidas.widgets.factory.radio_button_group import RadioButtonGroup
 from pydidas.widgets.factory.square_button import SquareButton
 from pydidas.widgets.utilities import get_widget_layout_args
@@ -370,6 +371,22 @@ class CreateWidgetsMixIn:
             method or from pydidas' CreateWidgetsMixIn class are valid.
         """
         self.create_any_widget(ref, PydidasSvgWidget, svg_path, **kwargs)
+
+    def create_table(self, ref: str | None, **kwargs: Any):
+        """
+        Create a QTableWidget and store the widget.
+
+        Parameters
+        ----------
+        ref : str | None
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
+        **kwargs : Any
+            Any attributes supported by QTableWidget with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the QTableWidget's position in its parent's layout.
+        """
+        self.create_any_widget(ref, PydidasQTable, **kwargs)
 
     def create_any_widget(
         self, ref: str | None, widget_class: type, *args: Any, **kwargs: Any

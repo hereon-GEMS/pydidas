@@ -215,7 +215,7 @@ class WorkflowTestFrame(BaseFrame):
         self.param_widgets["image_selection"].sig_new_value.connect(
             self.__update_image_selection_visibility
         )
-        self._widgets["result_table"].sig_new_selection.connect(self._selected_new_node)
+        self._widgets["result_table"].sig_node_selected.connect(self._selected_new_node)
         self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)
         self._widgets["but_reload_tree"].clicked.connect(self.reload_workflow)
         self._widgets["but_show_details"].clicked.connect(self.show_plugin_details)
@@ -413,8 +413,8 @@ class WorkflowTestFrame(BaseFrame):
         int
             The global index.
         """
-        _i0 = SCAN.get_param_value("scan_start_index")
-        _delta = SCAN.get_param_value("scan_index_stepping")
+        _i0 = SCAN.get_param_value("file_number_offset")
+        _delta = SCAN.get_param_value("frame_indices_per_scan_point")
         _num = self.get_param_value("detector_image_index")
         _index = (_num - _i0) // _delta
         if not 0 <= _index < SCAN.n_points:

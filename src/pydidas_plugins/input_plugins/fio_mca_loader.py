@@ -151,7 +151,7 @@ class FioMcaLoader(InputPlugin1d):
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
         <InputPlugin>` class.
         """
-        _index = self._SCAN.get_param_value("scan_start_index") + index
+        _index = self._SCAN.get_param_value("file_number_offset") + index
         return self.filename_string.format(index0=_index)
 
     def get_parameter_config_widget(self):

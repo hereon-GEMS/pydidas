@@ -159,7 +159,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         correctly.
         """
         if self.get_param_value("files_per_directory") == -1:
-            _i_start = self._SCAN.get_param_value("scan_start_index")
+            _i_start = self._SCAN.get_param_value("file_number_offset")
             _path = Path(self.filename_string.format(index0=_i_start, index1=1)).parent
             if not _path.is_dir():
                 raise FileReadError(
@@ -212,7 +212,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         """
         _n_per_dir = self.get_param_value("_counted_files_per_directory")
         _path_index = index // _n_per_dir + self._SCAN.get_param_value(
-            "scan_start_index"
+            "file_number_offset"
         )
         _file_index = index % _n_per_dir + 1
         return self.filename_string.format(index0=_path_index, index1=_file_index)

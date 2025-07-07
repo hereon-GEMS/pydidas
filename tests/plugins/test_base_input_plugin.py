@@ -54,8 +54,8 @@ class TestInputPlugin(InputPlugin):
 
     def get_frame(self, index, **kwargs):
         _frame = index * SCAN.get_param_value(
-            "scan_index_stepping"
-        ) + SCAN.get_param_value("scan_start_index")
+            "frame_indices_per_scan_point"
+        ) + SCAN.get_param_value("file_number_offset")
         kwargs["indices"] = (_frame,)
         return import_data(self.filename_string, **kwargs), kwargs
 
@@ -175,39 +175,39 @@ class TestBaseInputPlugin(unittest.TestCase):
         self.assertTrue(np.allclose(_data, 0))
 
     def test_execute__w_multiplicity_and_average(self):
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Average")
+        SCAN.set_param_value("scan_frames_per_scan_point", 4)
+        SCAN.set_param_value("scan_multi_frame_handling", "Average")
         plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 1.5))
 
     def test_execute__w_multiplicity_and_sum(self):
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Sum")
+        SCAN.set_param_value("scan_frames_per_scan_point", 4)
+        SCAN.set_param_value("scan_multi_frame_handling", "Sum")
         plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 6))
 
     def test_execute__w_multiplicity_and_max(self):
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Maximum")
+        SCAN.set_param_value("scan_frames_per_scan_point", 4)
+        SCAN.set_param_value("scan_multi_frame_handling", "Maximum")
         plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 3))
 
     def test_execute__w_start_index(self):
-        SCAN.set_param_value("scan_start_index", 4)
+        SCAN.set_param_value("file_number_offset", 4)
         plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 4))
 
     def test_execute__w_start_index_w_delta(self):
-        SCAN.set_param_value("scan_start_index", 4)
-        SCAN.set_param_value("scan_index_stepping", 3)
+        SCAN.set_param_value("file_number_offset", 4)
+        SCAN.set_param_value("frame_indices_per_scan_point", 3)
         plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
@@ -216,10 +216,10 @@ class TestBaseInputPlugin(unittest.TestCase):
         self.assertTrue(np.allclose(_data2, 7))
 
     def test_execute__full_complexity(self):
-        SCAN.set_param_value("scan_start_index", 4)
-        SCAN.set_param_value("scan_index_stepping", 3)
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Sum")
+        SCAN.set_param_value("file_number_offset", 4)
+        SCAN.set_param_value("frame_indices_per_scan_point", 3)
+        SCAN.set_param_value("scan_frames_per_scan_point", 4)
+        SCAN.set_param_value("scan_multi_frame_handling", "Sum")
         plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _result_0 = 4 + 7 + 10 + 13

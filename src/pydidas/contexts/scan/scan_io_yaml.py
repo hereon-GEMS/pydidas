@@ -35,6 +35,7 @@ import yaml
 from pydidas.contexts.scan.scan import Scan
 from pydidas.contexts.scan.scan_context import ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
+from pydidas.core import UserConfigError
 from pydidas.core.constants import YAML_EXTENSIONS
 
 
@@ -85,6 +86,9 @@ class ScanIoYaml(ScanIoBase):
             except yaml.YAMLError as yerr:
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
-        assert isinstance(cls.imported_params, dict)
-        cls._verify_all_entries_present()
-        cls._write_to_scan_settings(scan=_scan)
+        if not isinstance(cls.imported_params, dict):
+            raise UserConfigError(
+                "The imported YAML file for the Scan does not contain a valid "
+                "dictionary."
+            )
+        cls.update_scan_from_import(scan)

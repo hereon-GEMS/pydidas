@@ -85,15 +85,15 @@ has *global* Parameters for generic information, listed in detail below:
       - str
       - The naming pattern of the scan files. Use hashes '#' for wildcards 
         which will be replaced by indices.
-    * - scan_start_index
+    * - file_number_offset
       - int
       - The starting index to subsititute the wildcards in the name pattern.
-    * - scan_multiplicity
+    * - scan_frames_per_scan_point
       - int
       - The number of frames acquired at each scan point.
         Note: If you want to handle multiple images individually, add them as 
         an additional scan dimension.
-    * - scan_multi_image_handling
+    * - scan_multi_frame_handling
       - str
       - Flag how to handle multiple images. Choices are averaging or summation.
 

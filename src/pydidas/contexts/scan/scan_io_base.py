@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["ScanIoBase"]
 
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any
 
 from pydidas.contexts.scan.scan import Scan
 from pydidas.contexts.scan.scan_context import ScanContext
@@ -53,7 +53,7 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
     import_only = False
 
     @classmethod
-    def _verify_all_entries_present(cls):
+    def _verify_all_entries_present(cls) -> None:
         """
         Verify that the tmp_params dictionary holds all keys from the
         scanSettings.
@@ -77,13 +77,13 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
             raise UserConfigError(_text)
 
     @classmethod
-    def _write_to_scan_settings(cls, scan: Optional[Scan] = None):
+    def _write_to_scan_settings(cls, scan: Scan | None = None) -> None:
         """
         Write the loaded (temporary) Parameters to the scanSettings.
 
         Parameters
         ----------
-        scan : Optional[Scan], optional
+        scan : Scan, optional
             The Scan instance to be updated. If None, the ScanContext instance is used.
             The default is None.
         """
@@ -93,22 +93,84 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
         cls.imported_params = {}
 
     @classmethod
-    def check_file_list(
-        cls, filenames: list[Union[Path, str]], **kwargs: dict
-    ) -> list[str]:
+    def check_file_list(cls, filenames: list[Path | str], **kwargs: Any) -> list[str]:
         """
         Check if the list of filenames is valid.
 
         Parameters
         ----------
-        filenames : List[Path]
+        filenames : list[Path | str]
             List of filenames to be checked.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments. Must be defined by the subclass.
 
         Returns
         -------
-        List[str]
+        list[str]
             A list of coded messages.
         """
         return ["::no_error::"]
+
+    @classmethod
+    def update_scan_from_import(cls, scan: Scan) -> None:
+        """
+        Update the scan with the imported parameters.
+
+        Parameters
+        ----------
+        scan : Scan
+            The Scan instance to be updated.
+        """
+        cls._convert_legacy_param_names()
+        cls._verify_all_entries_present()
+        cls._write_to_scan_settings(scan=scan)
+
+    @classmethod
+    def _convert_legacy_param_names(cls) -> None:
+        """
+        Convert legacy parameter names to the new format.
+
+        This method should be overridden by subclasses if they have
+        specific legacy import formats to handle.
+        """
+        if "scan_start_index" in cls.imported_params:
+            if "file_number_offset" in cls.imported_params:
+                raise UserConfigError(
+                    "The parameter `scan_start_index` is deprecated and has been "
+                    "replaced by `file_number_offset`. However, both parameter keys "
+                    "are present. Please verify the input file."
+                )
+            cls.imported_params["file_number_offset"] = cls.imported_params.pop(
+                "scan_start_index"
+            )
+            cls.imported_params["file_number_delta"] = 1
+        if "scan_index_stepping" in cls.imported_params:
+            if "frame_indices_per_scan_point" in cls.imported_params:
+                raise UserConfigError(
+                    "The parameter `scan_index_stepping` is deprecated and has been "
+                    "replaced by `frame_indices_per_scan_point`. However, both "
+                    "parameter keys are present. Please verify the input file."
+                )
+            cls.imported_params["frame_indices_per_scan_point"] = (
+                cls.imported_params.pop("scan_index_stepping")
+            )
+        if "scan_multiplicity" in cls.imported_params:
+            if "scan_frames_per_scan_point" in cls.imported_params:
+                raise UserConfigError(
+                    "The parameter `scan_multiplicity` is deprecated and has been "
+                    "replaced by `scan_frames_per_scan_point`. However, both "
+                    "parameter keys are present. Please verify the input file."
+                )
+            cls.imported_params["scan_frames_per_scan_point"] = cls.imported_params.pop(
+                "scan_multiplicity"
+            )
+        if "scan_multi_image_handling" in cls.imported_params:
+            if "scan_multi_frame_handling" in cls.imported_params:
+                raise UserConfigError(
+                    "The parameter `scan_multi_image_handling` is deprecated and has "
+                    "been replaced by `scan_multi_frame_handling`. However, both "
+                    "parameter keys are present. Please verify the input file."
+                )
+            cls.imported_params["scan_multi_frame_handling"] = cls.imported_params.pop(
+                "scan_multi_image_handling"
+            )

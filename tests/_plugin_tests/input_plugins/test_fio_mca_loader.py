@@ -78,7 +78,7 @@ def setup_scan(config):
     SCAN.restore_all_defaults(True)
     SCAN.set_param_value("scan_name_pattern", config._name_pattern)
     SCAN.set_param_value("scan_base_directory", config._path)
-    SCAN.set_param_value("scan_start_index", 1)
+    SCAN.set_param_value("file_number_offset", 1)
     yield
     SCAN.restore_all_defaults(True)
 

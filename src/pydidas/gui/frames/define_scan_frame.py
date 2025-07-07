@@ -36,9 +36,8 @@ from qtpy import QtCore
 from pydidas.contexts import ScanContext, ScanIo
 from pydidas.core import UserConfigError, constants, utils
 from pydidas.gui.frames.builders.define_scan_frame_builder import (
-    build_header_config,
-    build_scan_dim_groups,
     column_width_factor,
+    scan_frame_build_config,
 )
 from pydidas.plugins import PluginCollection
 from pydidas.widgets import PydidasFileDialog
@@ -84,7 +83,7 @@ class DefineScanFrame(BaseFrame):
         BaseFrame.__init__(self, **kwargs)
         self._io_dialog = PydidasFileDialog()
         self._qtapp = PydidasQApplication.instance()
-        self.__info_window = ScanDimensionInformationWindow()
+        self.__scan_dim_info_window = ScanDimensionInformationWindow()
 
     def build_frame(self):
         """
@@ -95,15 +94,10 @@ class DefineScanFrame(BaseFrame):
             horizontalSpacing=25,
             alignment=constants.ALIGN_TOP_LEFT,
         )
-        for _name, _args, _kwargs in build_header_config():
+        for _name, _args, _kwargs in scan_frame_build_config():
             _method = getattr(self, _name)
             if "widget" in _kwargs:
                 _kwargs["widget"] = self._widgets[_kwargs["widget"]]
-            _method(*_args, **_kwargs)
-        for _name, _args, _kwargs in build_scan_dim_groups(
-            self._widgets["main"].layout().rowCount()
-        ):
-            _method = getattr(self, _name)
             _method(*_args, **_kwargs)
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
@@ -134,13 +128,15 @@ class DefineScanFrame(BaseFrame):
         self.param_widgets["scan_base_directory"].sig_new_value.connect(
             self.set_new_base_directory
         )
-        self._qtapp.sig_exit_pydidas.connect(self.__info_window.close)
+        self._qtapp.sig_exit_pydidas.connect(self.__scan_dim_info_window.close)
 
     def finalize_ui(self):
         """
         Finalize the UI initialization.
         """
-        self.__info_window.frame_activated(self.__info_window.frame_index)
+        self.__scan_dim_info_window.frame_activated(
+            self.__scan_dim_info_window.frame_index
+        )
         self.update_dim_visibility()
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
@@ -312,5 +308,5 @@ class DefineScanFrame(BaseFrame):
         """
         Show the information window about scan dimensions.
         """
-        self.__info_window.show()
-        self.__info_window.raise_()
+        self.__scan_dim_info_window.show()
+        self.__scan_dim_info_window.raise_()

@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["TableWithResultDatasets"]
 
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -33,101 +34,37 @@ from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
 )
 from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.factory.pydidas_table import PydidasQTable
 from pydidas.workflow import ProcessingResults, WorkflowResults
 
 
 RESULTS = WorkflowResults()
 
 
-class TableWithResultDatasets(QtWidgets.QTableWidget):
+class TableWithResultDatasets(PydidasQTable):
     """
     A QTableWidget used for selecting a dataset from the workflow results.
     """
 
-    init_kwargs = ["font_metric_height_factor", "font_metric_width_factor"]
+    sig_node_selected = QtCore.Signal(int)
 
-    sig_new_selection = QtCore.Signal(int)
-
-    def __init__(self, **kwargs: dict):
-        QtWidgets.QTableWidget.__init__(self, kwargs.get("parent", None))
-        apply_qt_properties(
-            self,
-            columnCount=1,
-            rowCount=0,
-            verticalScrollBarPolicy=QtCore.Qt.ScrollBarAlwaysOn,
-            editTriggers=QtWidgets.QTableWidget.NoEditTriggers,
-        )
-        self._font_metric_width_factor = kwargs.get(
+    def __init__(self, **kwargs: Any):
+        kwargs["font_metric_width_factor"] = kwargs.get(
             "font_metric_width_factor", FONT_METRIC_CONFIG_WIDTH
         )
-        self._font_metric_height_factor = kwargs.get("font_metric_height_factor", 6)
+        kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 6)
+        PydidasQTable.__init__(self, **kwargs)
+        apply_qt_properties(self, columnCount=1, rowCount=0)
         self._row_items = {}
-        self._qtapp = QtWidgets.QApplication.instance()
-        self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
-        self.process_new_font_metrics(*self._qtapp.font_metrics)
-        self.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.horizontalHeader().setVisible(False)
-        self.verticalHeader().setVisible(False)
-        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.selectionModel().selectionChanged.connect(self.emit_new_selection)
-
-    @property
-    def table_display_height(self) -> int:
-        """Calculate the required height for the table"""
-        _nrows = min(self.rowCount(), self._font_metric_height_factor)
-        return self.horizontalHeader().height() + sum(
-            (self.rowHeight(_i) + 1) for _i in range(_nrows)
-        )
-
-    @property
-    def selected_node_id(self) -> int:
-        """
-        Get the selected node id.
-
-        Returns
-        -------
-        int
-            The selected node id.
-        """
-        _rows = [_item.row() for _item in self.selectedIndexes()]
-        if len(_rows) == 0:
-            return -1
-        return self._row_items[_rows[0]]
-
-    @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
-        """
-        Adjust the widget's width based on the font metrics.
-
-        Parameters
-        ----------
-        char_width : float
-            The font width in pixels.
-        char_height : float
-            The font height in pixels.
-        """
-        _new_width = int(self._font_metric_width_factor * char_width)
-        self.setFixedWidth(_new_width)
-        self.setFixedHeight(self.table_display_height)
+        self.selectionModel().selectionChanged.connect(self.emit_new_node_selection)
 
     @QtCore.Slot()
-    def emit_new_selection(self):
+    def emit_new_node_selection(self):
         """
         Emit the signal of a new selection.
         """
-        self.sig_new_selection.emit(self.selected_node_id)
-
-    @QtCore.Slot()
-    def remove_all_rows(self):
-        """
-        Remove all points.
-        """
-        with QtCore.QSignalBlocker(self.selectionModel()):
-            while self.rowCount() > 0:
-                self.removeRow(0)
-        self.setRowCount(0)
-        self.setVisible(False)
+        if self.selected_row_id >= 0:
+            self.sig_node_selected.emit(self._row_items[self.selected_row_id])
 
     def update_choices_from_workflow_results(self, results: ProcessingResults):
         """

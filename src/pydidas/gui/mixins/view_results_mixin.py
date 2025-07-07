@@ -252,7 +252,7 @@ class ViewResultsMixin:
         self._widgets["data_viewer"].sig_plot2d_get_more_info_for_data.connect(
             self._show_info_popup
         )
-        self._widgets["result_table"].sig_new_selection.connect(self._selected_new_node)
+        self._widgets["result_table"].sig_node_selected.connect(self._selected_new_node)
         self._widgets["radio_arrangement"].new_button_index.connect(
             self._arrange_results_in_timeline_or_scan_shape
         )

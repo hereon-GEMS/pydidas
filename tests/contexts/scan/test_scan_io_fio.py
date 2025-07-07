@@ -79,9 +79,9 @@ def assert_general_scan_params_in_order(
     Asserts the general scan parameters have been reset correctly during the import.
     """
     assert scan.get_param_value("scan_dim") == n_dim
-    assert scan.get_param_value("scan_start_index") == start_index
-    assert scan.get_param_value("scan_index_stepping") == 1
-    assert scan.get_param_value("scan_multiplicity") == 1
+    assert scan.get_param_value("file_number_offset") == start_index
+    assert scan.get_param_value("frame_indices_per_scan_point") == 1
+    assert scan.get_param_value("scan_frames_per_scan_point") == 1
     assert scan.get_param_value("scan_name_pattern") == Path(filename.stem)
     assert scan.get_param_value("scan_base_directory") == filename.parents[1]
 
@@ -127,6 +127,18 @@ def test_import_from_file__filelist(scan_type):
     ]
     ScanIoFio.import_from_file(_filenames, scan=scan)
     assert_scan_params_from_filelist_in_order(scan)
+
+
+def test_import_from_file__no_file():
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file("no/such/file")
+
+
+def test_import_from_file__wrong_type():
+    scan = Scan()
+    _filenames = set(["test_single_fio_ascan.fio", "test_single_fio_dscan.fio"])
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file(_filenames, scan=scan)
 
 
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
@@ -189,6 +201,19 @@ def test_import_from_multiple_files__validation(
     if scan is None:
         scan = ScanContext()
     assert_scan_params_from_filelist_in_order(scan)
+
+
+def test_import_from_multiple_files__no_common_prefix(reset_scan_context, temp_dir):
+    filenames = [
+        _TEST_DIR.joinpath("_data", "2d_mesh_fio_dscan", f"2dmesh_{i:05d}.fio")
+        for i in range(1, 11)
+    ]
+    _new_file = temp_dir / "other_file_2.fio"
+    shutil.copy(filenames[2], _new_file)
+    filenames[2] = _new_file
+    ScanIoFio.import_from_file(filenames)
+    scan = ScanContext()
+    assert scan.get_param_value("scan_name_pattern") == Path()
 
 
 def test_import_from_multiple_files__corrupt_file(reset_scan_context, temp_dir):
@@ -286,6 +311,22 @@ def test_check_file_list__w_multiple_files(scan_type: str, reset_scan_context):
         for _i in range(1, 11)
     ]
     assert ScanIoFio.check_file_list(_filenames) == ["::no_error::"]
+
+
+def test_check_file_list__w_multiple_files__no_moves(reset_scan_context):
+    _filenames = [
+        _TEST_DIR / "_data" / "2d_mesh_no_moves" / f"2dmesh_{_i:05d}.fio"
+        for _i in range(1, 4)
+    ]
+    assert ScanIoFio.check_file_list(_filenames)[0] == "::no_motor_moved::"
+
+
+def test_check_file_list__w_multiple_files__multiple_moves(reset_scan_context):
+    _filenames = [
+        _TEST_DIR / "_data" / "2d_mesh_multiple_moves" / f"2dmesh_{_i:05d}.fio"
+        for _i in range(1, 4)
+    ]
+    assert ScanIoFio.check_file_list(_filenames)[0] == "::multiple_motors::"
 
 
 if __name__ == "__main__":

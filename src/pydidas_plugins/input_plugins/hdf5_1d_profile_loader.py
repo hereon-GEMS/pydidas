@@ -186,7 +186,7 @@ class Hdf51dProfileLoader(InputPlugin1d):
         _i_file = (
             frame_index // self.get_param_value("_counted_images_per_file")
         ) * self.get_param_value("file_stepping") + self._SCAN.get_param_value(
-            "scan_start_index"
+            "file_number_offset"
         )
         return self.filename_string.format(index=_i_file)
 

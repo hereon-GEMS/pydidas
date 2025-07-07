@@ -69,9 +69,13 @@ class InputPlugin1d(InputPlugin):
         Run generic pre-execution routines.
         """
         self.update_filename_string()
-        self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
-        self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
-        self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
+        self._config["n_multi"] = self._SCAN.get_param_value(
+            "scan_frames_per_scan_point"
+        )
+        self._config["start_index"] = self._SCAN.get_param_value("file_number_offset")
+        self._config["delta_index"] = self._SCAN.get_param_value(
+            "frame_indices_per_scan_point"
+        )
 
 
 InputPlugin1d.register_as_base_class()

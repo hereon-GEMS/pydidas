@@ -111,9 +111,13 @@ class InputPlugin(BasePlugin):
         Run generic pre-execution routines.
         """
         self.update_filename_string()
-        self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
-        self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
-        self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
+        self._config["n_multi"] = self._SCAN.get_param_value(
+            "scan_frames_per_scan_point"
+        )
+        self._config["start_index"] = self._SCAN.get_param_value("file_number_offset")
+        self._config["delta_index"] = self._SCAN.get_param_value(
+            "frame_indices_per_scan_point"
+        )
 
     def get_filename(self, frame_index: int) -> str:
         """
@@ -130,8 +134,8 @@ class InputPlugin(BasePlugin):
             The filename.
         """
         _index = frame_index * self._SCAN.get_param_value(
-            "scan_index_stepping"
-        ) + self._SCAN.get_param_value("scan_start_index")
+            "frame_indices_per_scan_point"
+        ) + self._SCAN.get_param_value("file_number_offset")
         return self.filename_string.format(index=_index)
 
     def update_filename_string(self):
@@ -200,7 +204,7 @@ class InputPlugin(BasePlugin):
             The updated kwargs.
         """
         _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
-        _handling = self._SCAN.get_param_value("scan_multi_image_handling")
+        _handling = self._SCAN.get_param_value("scan_multi_frame_handling")
         _factor = self._config["n_multi"] if _handling == "Average" else 1
         _data = None
         for _frame_index in _frames:

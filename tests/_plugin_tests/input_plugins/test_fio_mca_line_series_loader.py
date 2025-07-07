@@ -84,7 +84,7 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
         SCAN.restore_all_defaults(True)
         SCAN.set_param_value("scan_name_pattern", self._name_pattern)
         SCAN.set_param_value("scan_base_directory", self._path)
-        SCAN.set_param_value("scan_start_index", 1)
+        SCAN.set_param_value("file_number_offset", 1)
 
     def tearDown(self):
         SCAN.restore_all_defaults(True)
@@ -117,7 +117,7 @@ class TestFioMcaLineSeriesLoader(unittest.TestCase):
     def test_check_files_per_directory__no_preset_wrong_dir(self):
         plugin = self.create_standard_plugin()
         plugin.update_filename_string()
-        SCAN.set_param_value("scan_start_index", 12345)
+        SCAN.set_param_value("file_number_offset", 12345)
         with self.assertRaises(FileReadError):
             plugin._check_files_per_directory()
 

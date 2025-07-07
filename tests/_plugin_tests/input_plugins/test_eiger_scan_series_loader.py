@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -86,7 +86,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         SCAN.restore_all_defaults(True)
         SCAN.set_param_value("scan_name_pattern", "test_#####")
         SCAN.set_param_value("scan_base_directory", self._path)
-        SCAN.set_param_value("scan_start_index", self._fname_i0)
+        SCAN.set_param_value("file_number_offset", self._fname_i0)
 
     def tearDown(self):
         SCAN.restore_all_defaults(True)

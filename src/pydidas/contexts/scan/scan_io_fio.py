@@ -79,10 +79,11 @@ class ScanIoFio(ScanIoBase):
         _defaults = {
             "scan_dim": ndim,
             "scan_title": "",
-            "scan_start_index": 0,
-            "scan_index_stepping": 1,
-            "scan_multiplicity": 1,
-            "scan_multi_image_handling": "Average",
+            "file_number_offset": 0,
+            "file_number_delta": 1,
+            "frame_indices_per_scan_point": 1,
+            "scan_frames_per_scan_point": 1,
+            "scan_multi_frame_handling": "Average",
             "scan_name_pattern": filepath.stem,
             "scan_base_directory": filepath.parents[1],
         }
@@ -194,8 +195,7 @@ class ScanIoFio(ScanIoBase):
                 "a list or tuple of filenames. Filenames can be given as string "
                 "or Path objects."
             )
-        cls._verify_all_entries_present()
-        cls._write_to_scan_settings(scan=scan)
+        cls.update_scan_from_import(scan)
 
     @classmethod
     def _import_single_fio(cls, filename: Path | str, scan: Scan | None = None):
@@ -213,25 +213,25 @@ class ScanIoFio(ScanIoBase):
         _scan = SCAN if scan is None else scan
         _scan_command_found = False
 
-        with open(filename, "r") as stream:
-            file_lines = stream.readlines()
         try:
-            for _i_line, _line in enumerate(file_lines):
-                if cls._line_starts_with_scan_cmd(_line):
-                    if _scan_command_found:
-                        cls._process_duplicate_scan_command()
-                    if _line.startswith("ascan") or _line.startswith("dscan"):
-                        cls._process_1dscan_cmd(_i_line, _line, file_lines)
-                        _scan_dim = 1
-                    elif _line.startswith("mesh") or _line.startswith("dmesh"):
-                        cls._process_mesh_cmd(_i_line, _line, file_lines)
-                        _scan_dim = 2
-                    _scan_command_found = True
-            if not _scan_command_found:
-                raise UserConfigError("No scan command found.")
+            with open(filename, "r") as stream:
+                file_lines = stream.readlines()
         except (FileNotFoundError, OSError, ValueError) as error:
             cls.imported_params = {}
             raise UserConfigError from error
+        for _i_line, _line in enumerate(file_lines):
+            if cls._line_starts_with_scan_cmd(_line):
+                if _scan_command_found:
+                    cls._process_duplicate_scan_command()
+                if _line.startswith("ascan") or _line.startswith("dscan"):
+                    cls._process_1dscan_cmd(_i_line, _line, file_lines)
+                    _scan_dim = 1
+                elif _line.startswith("mesh") or _line.startswith("dmesh"):
+                    cls._process_mesh_cmd(_i_line, _line, file_lines)
+                    _scan_dim = 2
+                _scan_command_found = True
+        if not _scan_command_found:
+            raise UserConfigError("No scan command found.")
         cls.imported_params.update(cls._get_default_values(Path(filename), _scan_dim))
 
     @classmethod
@@ -341,14 +341,14 @@ class ScanIoFio(ScanIoBase):
         _scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
         _motor_pos, _motor_names = cls._process_fio_file_list(filenames, _scan)
         _index_moved_motors = cls._get_moved_motor_indices(_motor_pos, _motor_names)
-        if len(_index_moved_motors) == 1:
-            return ["::no_error::"]
         if len(_index_moved_motors) == 0:
             return ["::no_motor_moved::", "No motor has moved between scans."]
-        if len(_index_moved_motors) > 1:
-            return ["::multiple_motors::"] + [
-                _motor_names[_i] for _i in _index_moved_motors
-            ]
+        if len(_index_moved_motors) == 1:
+            return ["::no_error::"]
+        # last case: len(_index_moved_motors) > 1:
+        return ["::multiple_motors::"] + [
+            _motor_names[_i] for _i in _index_moved_motors
+        ]
 
     @classmethod
     def _import_multiple_fio(cls, filenames: list[Path | str], **kwargs: dict):
@@ -404,11 +404,14 @@ class ScanIoFio(ScanIoBase):
         _stems = [Path(_fname).stem for _fname in filenames]
         _stem_lengths = np.unique([len(_stem) for _stem in _stems])
         _common = os.path.commonprefix(_stems)
-        while _common[-1] == "0":
-            _common = _common[:-1]
-        if _common and _stem_lengths.size == 1:
-            cls.imported_params["scan_start_index"] = int(_stems[0][len(_common) :])
-            _common += "#" * (_stem_lengths[0] - len(_common))
+        if _common:
+            while _common[-1] == "0":
+                _common = _common[:-1]
+            if _common and _stem_lengths.size == 1:
+                cls.imported_params["file_number_offset"] = int(
+                    _stems[0][len(_common) :]
+                )
+                _common += "#" * (_stem_lengths[0] - len(_common))
         cls.imported_params["scan_name_pattern"] = _common
 
     @classmethod

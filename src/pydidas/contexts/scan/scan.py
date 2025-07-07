@@ -26,9 +26,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Scan"]
 
-
+import warnings
 from pathlib import Path
-from typing import Self, Tuple, Union
+from typing import Any, Self, Tuple, Union
 
 import numpy as np
 
@@ -45,10 +45,11 @@ SCAN_DEFAULT_PARAMS = get_generic_param_collection(
     "scan_title",
     "scan_base_directory",
     "scan_name_pattern",
-    "scan_start_index",
-    "scan_index_stepping",
-    "scan_multiplicity",
-    "scan_multi_image_handling",
+    "file_number_offset",
+    "file_number_delta",
+    "frame_indices_per_scan_point",
+    "scan_frames_per_scan_point",
+    "scan_multi_frame_handling",
     "scan_dim0_label",
     "scan_dim1_label",
     "scan_dim2_label",
@@ -70,15 +71,21 @@ SCAN_DEFAULT_PARAMS = get_generic_param_collection(
     "scan_dim2_offset",
     "scan_dim3_offset",
 )
+SCAN_LEGACY_PARAMS = {
+    "scan_start_index": "file_number_offset",
+    "scan_index_stepping": "frame_indices_per_scan_point",
+    "scan_multiplicity": "scan_frames_per_scan_point",
+    "scan_multi_image_handling": "scan_multi_frame_handling",
+}
 
 
 class Scan(ObjectWithParameterCollection):
     """
-    Class which holds the settings for the scan.
+    Class which holds the settings for a scan.
 
-    This class should only be instanciated through its factory, therefore guaranteeing
-    that only a single instance exists. Please instanciate Scan only directly if you
-    explicitly need to.
+    Only use this class if you are in need to a local Scan instance. Generally,
+    the global ScanContext instance is used throughout pydidas to ensure a
+    consistent state for all usages of the Scan.
     """
 
     default_params = SCAN_DEFAULT_PARAMS
@@ -87,7 +94,7 @@ class Scan(ObjectWithParameterCollection):
         super().__init__()
         self.set_default_params()
 
-    def get_index_position_in_scan(self, index: int) -> tuple:
+    def get_index_position_in_scan(self, index: int) -> tuple[int]:
         """
         Get the scan coordinates of the given input index.
 
@@ -98,19 +105,19 @@ class Scan(ObjectWithParameterCollection):
 
         Returns
         -------
-        tuple
-            The indices for indexing the position of the frame in the scan.
+        tuple[int]
+            The indices for indexing the scan point in the grid of all scan points.
             The length of indices is equal to the number of scan dimensions.
         """
         return self.__get_scan_indices(index, 1)
 
-    def get_frame_position_in_scan(self, frame_index: int):
+    def get_frame_position_in_scan(self, frame_index: int) -> tuple[int]:
         """
         Get the position of a frame number on scan coordinates.
 
         Parameters
         ----------
-        frame : int
+        frame_index : int
             The frame number.
 
         Returns
@@ -120,10 +127,10 @@ class Scan(ObjectWithParameterCollection):
             The length of indices is equal to the number of scan dimensions.
         """
         return self.__get_scan_indices(
-            frame_index, self.get_param_value("scan_multiplicity")
+            frame_index, self.get_param_value("scan_frames_per_scan_point")
         )
 
-    def __get_scan_indices(self, index: int, multiplicity: int) -> tuple:
+    def __get_scan_indices(self, index: int, multiplicity: int) -> tuple[int]:
         """
         Get the scan indices for the given index and multiplicity.
 
@@ -184,7 +191,9 @@ class Scan(ObjectWithParameterCollection):
                 f"of the scan range {self.shape}"
             )
         _factors = np.asarray([np.prod(_shapes[_i + 1 :]) for _i in range(self.ndim)])
-        _index = np.sum(_factors * indices) * self.get_param_value("scan_multiplicity")
+        _index = np.sum(_factors * indices) * self.get_param_value(
+            "scan_frames_per_scan_point"
+        )
         return _index
 
     def get_index_of_frame(self, frame_index: int) -> int:
@@ -201,13 +210,13 @@ class Scan(ObjectWithParameterCollection):
         int
             The scan point index.
         """
-        return frame_index // self.get_param_value("scan_multiplicity")
+        return frame_index // self.get_param_value("scan_frames_per_scan_point")
 
     def get_metadata_for_dim(self, index: int) -> Tuple[str, str, np.ndarray]:
         """
         Get the label, unit and range of the specified scan dimension.
 
-        Note: The scan dimensions are 0 .. 3 and follow the python convention of
+        Note: The scan dimensions are 0 ... 3 and follow the python convention of
         starting with zero.
 
         Parameters
@@ -233,7 +242,7 @@ class Scan(ObjectWithParameterCollection):
         """
         Get the Scan range for the specified dimension.
 
-        Note: The scan dimensions are 0 .. 3 and follow the python convention of
+        Note: The scan dimensions are 0 ... 3 and follow the python convention of
         starting with zero.
 
         Parameters
@@ -255,7 +264,7 @@ class Scan(ObjectWithParameterCollection):
 
     def update_from_scan(self, scan: Self):
         """
-        Update this Scan onject's Parameters from another Scan.
+        Update this Scan object's Parameters from another Scan.
 
         The purpose of this method is to "copy" the other Scan's Parameter values while
         keeping the reference to this object.
@@ -284,10 +293,10 @@ class Scan(ObjectWithParameterCollection):
             "scan_title",
             "scan_base_directory",
             "scan_name_pattern",
-            "scan_start_index",
-            "scan_index_stepping",
-            "scan_multiplicity",
-            "scan_multi_image_handling",
+            "file_number_offset",
+            "frame_indices_per_scan_point",
+            "scan_frames_per_scan_point",
+            "scan_multi_frame_handling",
         ]:
             self.set_param_value(_pname, scan_dict[_pname])
         for _dim in range(self.get_param_value("scan_dim")):
@@ -399,3 +408,26 @@ class Scan(ObjectWithParameterCollection):
             False.
         """
         ScanIo.export_to_file(filename, scan=self, overwrite=overwrite)
+
+    def set_param_value(self, param_key: str, value: Any):
+        """
+        Set the value of a parameter.
+
+        Parameters
+        ----------
+        param_key : str
+            The key of the parameter to set.
+        value : Any
+            The value to set for the parameter.
+        """
+        if param_key in SCAN_LEGACY_PARAMS:
+            warnings.warn(
+                (
+                    f"The parameter `{param_key}` is deprecated and has be replaced by "
+                    f"`{SCAN_LEGACY_PARAMS[param_key]}`. Please use the new parameter "
+                    "key."
+                ),
+                DeprecationWarning,
+            )
+            param_key = SCAN_LEGACY_PARAMS[param_key]
+        super().set_param_value(param_key, value)

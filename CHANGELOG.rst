@@ -31,6 +31,7 @@ Bugfixes
   and html documentation build.
 - Fixed an issue in the AxesSelector when switching between Datasets of different dimensionality.
 - Fixed an issue where the toolbars would not expand when the main window was too small.
+- Fixed an issue in AverageDataDimension plugin when averaging over 1D data which returned a scalar.
 
 
 v25.05.16

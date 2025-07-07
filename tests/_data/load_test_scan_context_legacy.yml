@@ -22,7 +22,7 @@ scan_title: Test
 scan_dim: 2
 scan_base_directory: .
 scan_name_pattern: test_####
-scan_start_index: 0
-scan_index_stepping: 1
-scan_multiplicity: 1
-scan_multi_image_handling: Average
+scan_start_index: 7
+scan_index_stepping: 2
+scan_multiplicity: 4
+scan_multi_image_handling: Maximum

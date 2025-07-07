@@ -27,8 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ScanIo"]
 
-
-from typing import Optional, TypeVar
+from pathlib import Path
+from typing import Any, Optional, TypeVar
 
 from pydidas.core import UserConfigError
 from pydidas.core.io_registry import GenericIoMeta
@@ -131,15 +131,15 @@ class ScanIo(GenericIoMeta):
             return cls.beamline_format_registry[_extension]
 
     @classmethod
-    def import_from_multiple_files(cls, filenames: list[str], **kwargs: dict):
+    def import_from_multiple_files(cls, filenames: list[Path | str], **kwargs: Any):
         """
         Import a Scan from multiple files and update the given Scan object.
 
         Parameters
         ----------
-        filenames : list[str]
+        filenames : list[Path | str]
             The list of full filenames and paths.
-        **kwargs : dict
+        **kwargs : Any
             Any kwargs which should be passed to the underlying importer.
             Supported kwargs are:
 
@@ -158,15 +158,17 @@ class ScanIo(GenericIoMeta):
         _io_class.import_from_file(filenames, **kwargs)
 
     @classmethod
-    def check_multiple_files(cls, filenames: list[str], **kwargs: dict) -> list[str]:
+    def check_multiple_files(
+        cls, filenames: list[Path | str], **kwargs: Any
+    ) -> list[str]:
         """
         Check whether a selection of multiple files can be imported.
 
         Parameters
         ----------
-        filenames : list[str]
+        filenames : list[Path | str]
             The list of full filenames and paths.
-        **kwargs : dict
+        **kwargs : Any
             Any kwargs which should be passed to the underlying importer.
             Supported kwargs are:
 
@@ -190,18 +192,16 @@ class ScanIo(GenericIoMeta):
         return _result
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs):
+    def export_to_file(cls, filename: Path | str, **kwargs: Any):
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
 
         Parameters
         ----------
-        filename : str
+        filename : Path | str
             The full filename and path.
-        tree : pydidas.workflow.WorkflowTree
-            The instance of the WorkflowTree
-        kwargs : dict
+        kwargs : Any
             Any kwargs which should be passed to the udnerlying exporter.
         """
         _extension = get_extension(filename, lowercase=False)
@@ -217,7 +217,7 @@ class ScanIo(GenericIoMeta):
         _io_class.export_to_file(filename, **kwargs)
 
     @classmethod
-    def is_extension_registered(cls, extension):
+    def is_extension_registered(cls, extension: str):
         """
         Check if the extension of filename corresponds to a registered
         class.
@@ -237,7 +237,7 @@ class ScanIo(GenericIoMeta):
         return False
 
     @classmethod
-    def get_string_of_beamline_formats(cls):
+    def get_string_of_beamline_formats(cls) -> str:
         """
         Get a list of strings with the different beamline formats and extensions.
 

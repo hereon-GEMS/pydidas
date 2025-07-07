@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -92,6 +92,66 @@ class TestScanIoBase(unittest.TestCase):
         for _key, _value in _scan.get_param_values_as_dict().items():
             self.assertEqual(_new_scan.get_param_value(_key), _value)
         self.assertEqual(SCAN.get_param_value("scan_dim1_label"), "")
+
+    def test_convert_legacy_param_names__w_scan_start_index(self):
+        SCAN_IO.imported_params = {"scan_start_index": 42}
+        SCAN_IO._convert_legacy_param_names()
+        self.assertEqual(SCAN_IO.imported_params["file_number_offset"], 42)
+        self.assertEqual(SCAN_IO.imported_params["file_number_delta"], 1)
+        self.assertNotIn("scan_start_index", SCAN_IO.imported_params)
+
+    def test_convert_legacy_param_names__w_scan_start_index__duplicate(self):
+        SCAN_IO.imported_params = {"scan_start_index": 42, "file_number_offset": 0}
+        with self.assertRaises(UserConfigError):
+            SCAN_IO._convert_legacy_param_names()
+
+    def test_convert_legacy_params__w_scan_index_stepping(self):
+        SCAN_IO.imported_params = {"scan_index_stepping": 2}
+        SCAN_IO._convert_legacy_param_names()
+        self.assertEqual(SCAN_IO.imported_params["frame_indices_per_scan_point"], 2)
+        self.assertNotIn("scan_index_stepping", SCAN_IO.imported_params)
+
+    def test_convert_legacy_params__w_scan_index_stepping__duplicate(self):
+        SCAN_IO.imported_params = {
+            "scan_index_stepping": 2,
+            "frame_indices_per_scan_point": 0,
+        }
+        with self.assertRaises(UserConfigError):
+            SCAN_IO._convert_legacy_param_names()
+
+    def test_convert_legacy_params__w_scan_multiplicity(self):
+        SCAN_IO.imported_params = {"scan_multiplicity": 7}
+        SCAN_IO._convert_legacy_param_names()
+        self.assertEqual(SCAN_IO.imported_params["scan_frames_per_scan_point"], 7)
+        self.assertNotIn("scan_multiplicity", SCAN_IO.imported_params)
+
+    def test_convert_legacy_params__w_scan_multiplicity__duplicate(self):
+        SCAN_IO.imported_params = {
+            "scan_multiplicity": 7,
+            "scan_frames_per_scan_point": 2,
+        }
+        with self.assertRaises(UserConfigError):
+            SCAN_IO._convert_legacy_param_names()
+
+    def test_convert_legacy_params__w_scan_multi_image_handling(self):
+        SCAN_IO.imported_params = {"scan_multi_image_handling": "Average"}
+        SCAN_IO._convert_legacy_param_names()
+        self.assertEqual(
+            SCAN_IO.imported_params["scan_multi_frame_handling"], "Average"
+        )
+        self.assertNotIn("scan_multi_image_handling", SCAN_IO.imported_params)
+
+    def test_convert_legacy_params__w_scan_multi_image_handling__duplicate(self):
+        SCAN_IO.imported_params = {
+            "scan_multi_image_handling": "Average",
+            "scan_multi_frame_handling": "Sum",
+        }
+        with self.assertRaises(UserConfigError):
+            SCAN_IO._convert_legacy_param_names()
+
+    def test_check_file_list(self):
+        _res = SCAN_IO.check_file_list(["scan_0001.h5", "scan_0002.h5"])
+        self.assertEqual(_res, ["::no_error::"])
 
 
 if __name__ == "__main__":

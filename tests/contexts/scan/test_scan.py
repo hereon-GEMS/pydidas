@@ -151,7 +151,7 @@ class TestScan(unittest.TestCase):
     def test_get_frame_position_in_scan__multiplicity_gt_one(self):
         SCAN = Scan()
         self.set_scan_params(SCAN)
-        SCAN.set_param_value("scan_multiplicity", 3)
+        SCAN.set_param_value("scan_frames_per_scan_point", 3)
         _pos = tuple(i - 1 for i in self._scan_shape)
         _tmpshape = self._scan_shape + (3,)
         _n = np.sum(
@@ -168,7 +168,7 @@ class TestScan(unittest.TestCase):
         self.set_scan_params(SCAN)
         for M in range(1, 4):
             with self.subTest(M=M):
-                SCAN.set_param_value("scan_multiplicity", M)
+                SCAN.set_param_value("scan_frames_per_scan_point", M)
                 _pos = tuple(i - 2 for i in self._scan_shape)
                 _shape = self._scan_shape + (1,)
                 _n = np.sum(
@@ -183,7 +183,7 @@ class TestScan(unittest.TestCase):
         _n = 60
         for M in range(1, 4):
             with self.subTest(M=M):
-                SCAN.set_param_value("scan_multiplicity", M)
+                SCAN.set_param_value("scan_frames_per_scan_point", M)
                 _index = SCAN.get_index_of_frame(_n)
                 self.assertEqual(_index, _n / M)
 
@@ -191,6 +191,12 @@ class TestScan(unittest.TestCase):
         SCAN = Scan()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_from_indices((0, 0, 0, 0))
+        self.assertEqual(_index, 0)
+
+    def test_get_frame_from_indices__zero_as_ndarray(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        _index = SCAN.get_frame_from_indices(np.array((0, 0, 0, 0)))
         self.assertEqual(_index, 0)
 
     def test_get_frame_from_indices__negative(self):
@@ -222,7 +228,7 @@ class TestScan(unittest.TestCase):
         ) * 3
         SCAN = Scan()
         self.set_scan_params(SCAN)
-        SCAN.set_param_value("scan_multiplicity", 3)
+        SCAN.set_param_value("scan_frames_per_scan_point", 3)
         _index = SCAN.get_frame_from_indices(_indices)
         self.assertEqual(_index, _frame)
 
@@ -277,10 +283,10 @@ class TestScan(unittest.TestCase):
             "scan_dim": 2,
             "scan_base_directory": "/dummy",
             "scan_name_pattern": "test_###",
-            "scan_start_index": 1,
-            "scan_index_stepping": 1,
-            "scan_multiplicity": 1,
-            "scan_multi_image_handling": "Sum",
+            "file_number_offset": 1,
+            "frame_indices_per_scan_point": 1,
+            "scan_frames_per_scan_point": 1,
+            "scan_multi_frame_handling": "Sum",
             0: {
                 "label": get_random_string(5),
                 "unit": get_random_string(3),
@@ -306,6 +312,12 @@ class TestScan(unittest.TestCase):
                     _scan[_dim][_entry],
                     SCAN.get_param_value(f"scan_dim{_dim}_{_entry}"),
                 )
+
+    def test_set_param_value__deprecated(self):
+        SCAN = Scan()
+        with self.assertWarns(DeprecationWarning):
+            SCAN.set_param_value("scan_start_index", 42)
+        self.assertEqual(SCAN.get_param_value("file_number_offset"), 42)
 
 
 if __name__ == "__main__":

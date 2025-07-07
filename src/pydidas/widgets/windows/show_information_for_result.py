@@ -158,7 +158,6 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             else _scan.get_frame_from_indices(selected_indices[: _scan.ndim])
         )
         self._index = _scan.get_index_of_frame(self._frame)
-        _scan_indices = _scan.get_frame_position_in_scan(self._frame)
 
         _info_str += (
             "\n\nPosition in scan:"
@@ -169,7 +168,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             + "\n".join(
                 get_fixed_length_str(f"Scan dim {_dim} index:", 20, final_space=False)
                 + get_fixed_length_str(_index, 6, fill_back=False, formatter="{:d}")
-                for _dim, _index in enumerate(_scan_indices)
+                for _dim, _index in enumerate(selected_indices)
             )
         )
         if "_counted_images_per_file" in loader_plugin.params:

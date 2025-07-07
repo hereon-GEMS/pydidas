@@ -109,69 +109,29 @@ class Scan(ObjectWithParameterCollection):
             The indices for indexing the scan point in the grid of all scan points.
             The length of indices is equal to the number of scan dimensions.
         """
-        return self.__get_scan_indices(index, 1)
-
-    def get_frame_position_in_scan(self, frame_index: int) -> tuple[int]:
-        """
-        Get the position of a frame number on scan coordinates.
-
-        Parameters
-        ----------
-        frame_index : int
-            The frame number.
-
-        Returns
-        -------
-        indices : tuple
-            The indices for indexing the position of the frame in the scan.
-            The length of indices is equal to the number of scan dimensions.
-        """
-        return self.__get_scan_indices(
-            frame_index, self.get_param_value("scan_frames_per_scan_point")
-        )
-
-    def __get_scan_indices(self, index: int, multiplicity: int) -> tuple[int]:
-        """
-        Get the scan indices for the given index and multiplicity.
-
-        Parameters
-        ----------
-        index : int
-            The input index.
-        multiplicity : int
-            The image multiplicity.
-
-        Returns
-        -------
-        tuple
-            The scan indices.
-        """
-        _n_frames = self.n_points * multiplicity
-        if not 0 <= index < _n_frames:
+        if not 0 <= index < self.n_points:
             raise UserConfigError(
                 f"The demanded frame number {index} is out of the scope of the Scan "
-                f"indices (0, {_n_frames})."
+                f"indices (0, {self.n_points})."
             )
         _ndim = self.get_param_value("scan_dim")
-        _N = [self.get_param_value(f"scan_dim{_n}_n_points") for _n in range(_ndim)] + [
-            multiplicity
-        ]
+        _N = self.shape + (1,)
         _indices = [0] * _ndim
         for _dim in range(_ndim):
             _indices[_dim] = index // np.prod(_N[_dim + 1 :])
             index -= _indices[_dim] * np.prod(_N[_dim + 1 :])
         return tuple(_indices)
 
-    def get_frame_from_indices(self, indices: tuple) -> int:
+    def get_frame_from_indices(self, indices: tuple | list | np.ndarray) -> int:
         """
         Get the frame number based on the scan indices.
 
-        Note: For an image multiplicity > 1, this frame number corresponds to the first
-        frame at this scan position.
+        Note: For multiple frames per scan point, this frame number corresponds to
+        the first frame at this scan position.
 
         Parameters
         ----------
-        indices : Union[tuple, list, np.ndarray]
+        indices : tuple | list | np.ndarray
             The iterable with the scan position indices.
 
         Returns
@@ -199,6 +159,9 @@ class Scan(ObjectWithParameterCollection):
     def get_index_of_frame(self, frame_index: int) -> int:
         """
         Get the scan point index of the given frame.
+
+        Note: If the frame is used in multiple scan points, this method returns the
+        index of the first scan point that uses this frame.
 
         Parameters
         ----------

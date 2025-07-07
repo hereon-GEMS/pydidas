@@ -304,7 +304,7 @@ class TestProcessingResults(unittest.TestCase):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
         res.store_results(_index, _results)
-        _scan_indices = SCAN.get_frame_position_in_scan(_index)
+        _scan_indices = SCAN.get_index_position_in_scan(_index)
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
 
@@ -314,7 +314,7 @@ class TestProcessingResults(unittest.TestCase):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
         res.store_results(_index, _results)
-        _scan_indices = SCAN.get_frame_position_in_scan(_index)
+        _scan_indices = SCAN.get_index_position_in_scan(_index)
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
         self.assertTrue(res._config["metadata_complete"])
@@ -327,7 +327,7 @@ class TestProcessingResults(unittest.TestCase):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
         res.store_results(_index, _results)
-        _scan_indices = SCAN.get_frame_position_in_scan(_index)
+        _scan_indices = SCAN.get_index_position_in_scan(_index)
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
 

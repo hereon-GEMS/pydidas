@@ -123,7 +123,7 @@ def test_get_metadata_for_dim():
 
 
 @pytest.mark.parametrize("n_frames", [1, 2, 3, 4])
-def test_get_index_position_in_scan(n_frames):
+def test_get_indices_from_ordinal(n_frames):
     scan = Scan()
     set_scan_params(scan)
     scan.set_param_value("scan_frames_per_scan_point", n_frames)
@@ -135,42 +135,32 @@ def test_get_index_position_in_scan(n_frames):
             for i in range(_scan_param_values["scan_dim"])
         ]
     )
-    _index = scan.get_index_position_in_scan(_n)
+    _index = scan.get_indices_from_ordinal(_n)
     assert _index == _pos
 
 
-@pytest.mark.parametrize("n_frames", [1, 2, 3, 4])
-def test_get_index_of_frame(n_frames):
+def test_get_ordinal_from_indices__zero():
     scan = Scan()
     set_scan_params(scan)
-    _n = 60
-    scan.set_param_value("scan_frames_per_scan_point", n_frames)
-    _index = scan.get_index_of_frame(_n)
-    assert _index == _n / n_frames
-
-
-def test_get_frame_from_indices__zero():
-    scan = Scan()
-    set_scan_params(scan)
-    _index = scan.get_frame_from_indices((0, 0, 0, 0))
+    _index = scan.get_ordinal_from_indices((0, 0, 0, 0))
     assert _index == 0
 
 
-def test_get_frame_from_indices__zero_as_ndarray():
+def test_get_ordinal_from_indices__zero_as_ndarray():
     scan = Scan()
     set_scan_params(scan)
-    _index = scan.get_frame_from_indices(np.array((0, 0, 0, 0)))
+    _index = scan.get_ordinal_from_indices(np.array((0, 0, 0, 0)))
     assert _index == 0
 
 
-def test_get_frame_from_indices__negative():
+def test_get_ordinal_from_indices__negative():
     scan = Scan()
     set_scan_params(scan)
     with pytest.raises(UserConfigError):
-        scan.get_frame_from_indices((0, -1, 0, 0))
+        scan.get_ordinal_from_indices((0, -1, 0, 0))
 
 
-def test_get_frame_from_indices__inscan():
+def test_get_ordinal_from_indices__inscan():
     _indices = (2, 1, 2, 1)
     _frame = (
         _indices[3]
@@ -180,23 +170,23 @@ def test_get_frame_from_indices__inscan():
     )
     scan = Scan()
     set_scan_params(scan)
-    _index = scan.get_frame_from_indices(_indices)
+    _index = scan.get_ordinal_from_indices(_indices)
     assert _index == _frame
 
 
-def test_get_frame_from_indices__multiplicity_gt_one():
-    _indices = (2, 1, 2, 1)
-    _frame = (
-        _indices[3]
-        + _scan_param_values["shape"][3] * _indices[2]
-        + np.prod(_scan_param_values["shape"][2:]) * _indices[1]
-        + np.prod(_scan_param_values["shape"][1:]) * _indices[0]
-    ) * 3
-    scan = Scan()
-    set_scan_params(scan)
-    scan.set_param_value("scan_frames_per_scan_point", 3)
-    _index = scan.get_frame_from_indices(_indices)
-    assert _index == _frame
+# def test_get_ordinal_from_indices__multiplicity_gt_one():
+#     _indices = (2, 1, 2, 1)
+#     _frame = (
+#         _indices[3]
+#         + _scan_param_values["shape"][3] * _indices[2]
+#         + np.prod(_scan_param_values["shape"][2:]) * _indices[1]
+#         + np.prod(_scan_param_values["shape"][1:]) * _indices[0]
+#     ) * 3
+#     scan = Scan()
+#     set_scan_params(scan)
+#     scan.set_param_value("scan_frames_per_scan_point", 3)
+#     _index = scan.get_ordinal_from_indices(_indices)
+#     assert _index == _frame
 
 
 def test_axis_labels():

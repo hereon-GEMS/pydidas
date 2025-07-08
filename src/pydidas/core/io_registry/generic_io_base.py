@@ -29,6 +29,8 @@ __all__ = ["GenericIoBase"]
 
 
 import os
+from pathlib import Path
+from typing import Any, NoReturn
 
 from pydidas.core.io_registry.generic_io_meta import GenericIoMeta
 
@@ -43,7 +45,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
     imported_params = {}
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs):
+    def export_to_file(cls, filename, **kwargs: Any) -> None:
         """
         Write the content to a file.
 
@@ -53,14 +55,16 @@ class GenericIoBase(metaclass=GenericIoMeta):
         ----------
         filename : str
             The filename of the file to be written.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments. Supported keywords must be specified by
             the specific implementation.
         """
         raise NotImplementedError
 
     @classmethod
-    def import_from_file(cls, filename):
+    def import_from_file(
+        cls, filename: str | Path | list[Path | str], **kwargs: Any
+    ) -> None:
         """
         Restore the content from a file
 
@@ -68,24 +72,27 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str
+        filename : str | Path | list[Path | str]
             The filename of the file to be imported.
         """
         raise NotImplementedError
 
     @classmethod
-    def check_for_existing_file(cls, filename, **kwargs):
+    def check_for_existing_file(
+        cls, filename: str | Path, **kwargs: Any
+    ) -> None | NoReturn:
         """
         Check if the file exists and if the overwrite flag has been set.
 
         Parameters
         ----------
-        filename : str
+        filename : str | Path
             The full filename and path.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments. Supported are:
-        **overwrite : bool, optional
-            Flag to allow overwriting of existing files.
+
+            overwrite : bool, optional
+                Flag to allow overwriting of existing files.
 
         Raises
         ------

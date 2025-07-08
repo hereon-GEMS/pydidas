@@ -27,15 +27,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ScanIo"]
 
-from pathlib import Path
-from typing import Any, Optional, TypeVar
 
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+from pydidas.contexts.scan.scan import Scan
 from pydidas.core import UserConfigError
 from pydidas.core.io_registry import GenericIoMeta
 from pydidas.core.utils.file_utils import get_extension
 
 
-Scan = TypeVar("Scan")
+if TYPE_CHECKING:
+    from pydidas.contexts.scan.scan_io_base import ScanIoBase
 
 
 class ScanIo(GenericIoMeta):
@@ -47,17 +50,17 @@ class ScanIo(GenericIoMeta):
     """
 
     # need to redefine the registry to have a unique registry for ScanIo
-    registry = {}
-    beamline_format_registry = {}
+    registry: dict[str, "ScanIoBase"] = {}
+    beamline_format_registry: dict[str, "ScanIoBase"] = {}
 
     @classmethod
-    def register_class(cls, new_class, update_registry=False):
+    def register_class(cls, new_class: "ScanIoBase", update_registry=False):
         """
         Register a class as object for its native extensions.
 
         Parameters
         ----------
-        new_class : type
+        new_class : ScanIoBase
             The class to be registered.
         update_registry : bool, optional
             Keyword to allow updating / overwriting of registered extensions.
@@ -90,7 +93,7 @@ class ScanIo(GenericIoMeta):
         cls.beamline_format_registry = {}
 
     @classmethod
-    def import_from_file(cls, filename: str, scan: Optional[Scan] = None):
+    def import_from_file(cls, filename: str, scan: Scan | None = None):
         """
         Import a Scan from file and update the given Scan object.
 
@@ -101,7 +104,7 @@ class ScanIo(GenericIoMeta):
         ----------
         filename : str
             The full filename and path.
-        scan : Optional[Scan]
+        scan : Scan, optional
             The Scan object to be updated. If None, the generic ScanContext is used.
             The default is None.
         """
@@ -109,25 +112,25 @@ class ScanIo(GenericIoMeta):
         _io_class.import_from_file(filename, scan=scan)
 
     @classmethod
-    def get_io_class(cls, filename: str):
+    def get_io_class(cls, filename: Path | str) -> "ScanIoBase":
         """
         Get the IO class for a given filename.
 
         Parameters
         ----------
-        filename : str
+        filename : Path | str
             The filename with extension.
 
         Returns
         -------
-        type
+        ScanIoBase
             The IO class.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         if _extension in cls.registry:
             return cls.registry[_extension]
-        elif _extension in cls.beamline_format_registry:
+        else:  # _extension must be in cls.beamline_format_registry:
             return cls.beamline_format_registry[_extension]
 
     @classmethod
@@ -143,10 +146,10 @@ class ScanIo(GenericIoMeta):
             Any kwargs which should be passed to the underlying importer.
             Supported kwargs are:
 
-            scan : Optional[Scan]
+            scan : Scan, optional
                 The Scan object to be updated. If None, the generic ScanContext is used.
                 The default is None.
-            scan_dim0_motor : Optional[str]
+            scan_dim0_motor : str, optional
                 The motor name for the first dimension. The default is None.
         """
         _extensions = set([get_extension(_filename) for _filename in filenames])
@@ -172,7 +175,7 @@ class ScanIo(GenericIoMeta):
             Any kwargs which should be passed to the underlying importer.
             Supported kwargs are:
 
-            scan : Optional[Scan]
+            scan : Scan, optional
                 The Scan object to be updated. If None, the generic ScanContext is used.
                 The default is None.
 
@@ -202,13 +205,13 @@ class ScanIo(GenericIoMeta):
         filename : Path | str
             The full filename and path.
         kwargs : Any
-            Any kwargs which should be passed to the udnerlying exporter.
+            Any kwargs which should be passed to the underlying exporter.
         """
         _extension = get_extension(filename, lowercase=False)
         cls.verify_extension_is_registered(_extension)
         if _extension in cls.registry:
             _io_class = cls.registry[_extension]
-        elif _extension in cls.beamline_format_registry:
+        else:  # _extension must be in cls.beamline_format_registry:
             _io_class = cls.beamline_format_registry[_extension]
         if _io_class.import_only:
             raise UserConfigError(

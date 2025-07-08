@@ -30,16 +30,17 @@ __all__ = ["ShowInformationForResult"]
 
 from pathlib import Path
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import ShowBusyMouse, get_fixed_length_str
-from pydidas.plugins import BasePlugin
+from pydidas.plugins import InputPlugin
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.misc import ReadOnlyTextWidget
 from pydidas.widgets.silx_plot import PydidasPlotStack
+from pydidas_qtcore import PydidasQApplication
 
 
 class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
@@ -54,7 +55,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         CreateWidgetsMixIn.__init__(self)
 
         self.setWindowTitle("Information for data point")
-        self._frame = None
+        self._ordinal = None
         self._loader_plugin = None
         self.create_label(
             "label_title",
@@ -95,20 +96,20 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             visible=False,
             minimumHeight=600,
             minimumWidth=600,
-            gridPos=(2, 1, self.layout().rowCount() - 2, 1),
+            gridPos=(2, 1, self.layout().rowCount() - 2, 1),  # noqa E0602
         )
-        QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
+        PydidasQApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )
-        self.layout().setColumnStretch(1, 1)
+        self.layout().setColumnStretch(1, 1)  # noqa E0602
 
     def display_information(
         self,
         position: tuple,
         active_dims: tuple,
-        selected_indices: list,
+        selected_indices: list[int | None],
         result_metadata: dict,
-        loader_plugin: BasePlugin,
+        loader_plugin: InputPlugin,
         use_timeline: bool = False,
     ):
         """
@@ -122,7 +123,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         active_dims : tuple
             A 2-tuple with the active dimensions of the selection,
             i.e. the dimensions in which the position is defined.
-        selected_indices : list
+        selected_indices : list[int | None]
             The selected indices of the full result dataset. This will be integers
             for inactive dimensions and None for the active dimensions.
         result_metadata : dict
@@ -135,7 +136,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         """
         self._loader_plugin = loader_plugin.copy()
         self._loader_plugin.update_filename_string()
-        _scan = self._loader_plugin._SCAN
+        _scan = self._loader_plugin._SCAN  # noqa W0212
         _ax_ranges = result_metadata["axis_ranges"]
         _index_y = (abs(_ax_ranges[active_dims[0]] - position[0])).argmin()
         selected_indices[active_dims[0]] = _index_y
@@ -152,18 +153,17 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             + f" {result_metadata['axis_units'][_dim]}"
             for _dim, _index in enumerate(selected_indices)
         )
-        self._frame = (
+        self._ordinal = (
             selected_indices[0]
             if use_timeline
-            else _scan.get_frame_from_indices(selected_indices[: _scan.ndim])
+            else _scan.get_ordinal_from_indices(selected_indices[: _scan.ndim])
         )
-        self._index = _scan.get_index_of_frame(self._frame)
 
         _info_str += (
             "\n\nPosition in scan:"
             + "\n"
-            + get_fixed_length_str("Frame index:", 20, final_space=False)
-            + get_fixed_length_str(self._frame, 6, fill_back=False, formatter="{:d}")
+            + get_fixed_length_str("Ordinal index:", 20, final_space=False)
+            + get_fixed_length_str(self._ordinal, 6, fill_back=False, formatter="{:d}")
             + "\n"
             + "\n".join(
                 get_fixed_length_str(f"Scan dim {_dim} index:", 20, final_space=False)
@@ -172,14 +172,16 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             )
         )
         if "_counted_images_per_file" in loader_plugin.params:
-            _index = self._frame % loader_plugin.get_param_value(
+            _index = self._ordinal % loader_plugin.get_param_value(
                 "_counted_images_per_file"
             )
             _info_str += (
                 "\n\n" + get_fixed_length_str("Frame in file:", 18) + str(_index)
             )
         self._widgets["info_field"].setText(_info_str)
-        self._widgets["edit_filename"].setText(loader_plugin.get_filename(self._frame))
+        self._widgets["edit_filename"].setText(
+            loader_plugin.get_filename(self._ordinal)
+        )
         self._widgets["but_show_input"].setEnabled(True)
         self._widgets["plot"].setVisible(False)
         self.show()
@@ -187,7 +189,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
     @QtCore.Slot()
     def show_input_image(self):
         """Show the input image as loaded from the loader plugin."""
-        if not Path(self._loader_plugin.get_filename(self._frame)).is_file():
+        if not Path(self._loader_plugin.get_filename(self._ordinal)).is_file():
             self._widgets["but_show_input"].setEnabled(False)
             raise UserConfigError(
                 "Cannot display the input image because the filename does not point to "
@@ -196,7 +198,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         self._widgets["plot"].setVisible(True)
         with ShowBusyMouse():
             self._loader_plugin.pre_execute()
-            _input, _kwargs = self._loader_plugin.execute(self._index)
+            _input, _kwargs = self._loader_plugin.execute(self._ordinal)
             self._widgets["plot"].plot_data(_input)
 
     @QtCore.Slot()

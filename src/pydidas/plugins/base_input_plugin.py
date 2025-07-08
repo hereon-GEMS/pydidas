@@ -29,6 +29,7 @@ __all__ = ["InputPlugin"]
 
 import os
 import time
+from typing import Any
 
 import numpy as np
 
@@ -36,9 +37,6 @@ from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, FileReadError, UserConfigError, get_generic_parameter
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.plugins.base_plugin import BasePlugin
-
-
-SCAN = ScanContext()
 
 
 class InputPlugin(BasePlugin):
@@ -71,12 +69,12 @@ class InputPlugin(BasePlugin):
         "binning",
     ]
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: tuple, **kwargs: Any):
         """
         Create a BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
-        self._SCAN = kwargs.get("scan", SCAN)
+        self._SCAN = kwargs.get("scan", ScanContext())
         self.filename_string = ""
 
     def input_available(self, index: int) -> bool:
@@ -156,22 +154,22 @@ class InputPlugin(BasePlugin):
             "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
         )
 
-    def execute(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Import the data and pass it on after (optionally) handling image multiplicity.
 
         Parameters
         ----------
         index : int
-            The index of the scan point.
-        **kwargs : dict
+            The ordinal index of the scan point.
+        **kwargs : Any
             Keyword arguments passed to the execute method.
 
         Returns
         -------
         pydidas.core.Dataset
             The image data frame.
-        kwargs : dict
+        kwargs : Any
             The updated kwargs.
         """
         if "n_multi" not in self._config:
@@ -185,7 +183,7 @@ class InputPlugin(BasePlugin):
             return _data, kwargs
         return self.handle_multi_image(index, **kwargs)
 
-    def handle_multi_image(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+    def handle_multi_image(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Handle frames with image multiplicity.
 
@@ -193,14 +191,14 @@ class InputPlugin(BasePlugin):
         ----------
         index : int
             The scan index.
-        **kwargs : dict
+        **kwargs : Any
             Keyword arguments for the get_frame method.
 
         Returns
         -------
         pydidas.core.Dataset
             The image data frame.
-        kwargs : dict
+        kwargs : Any
             The updated kwargs.
         """
         _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
@@ -221,7 +219,7 @@ class InputPlugin(BasePlugin):
         _data.data_unit = self.output_data_unit
         return _data, kwargs
 
-    def get_frame(self, frame_index: int, **kwargs: dict) -> Dataset:
+    def get_frame(self, frame_index: int, **kwargs: Any) -> Dataset:
         """
         Get the specified image frame (which does not necessarily correspond to the
         scan point index).
@@ -230,7 +228,7 @@ class InputPlugin(BasePlugin):
         ----------
         frame_index : int
             The index of the specific frame to be loaded.
-        **kwargs : dict
+        **kwargs : Any
             Keyword arguments passed for loading the frame.
 
         Returns

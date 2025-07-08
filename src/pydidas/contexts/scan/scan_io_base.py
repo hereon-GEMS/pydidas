@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanIoBase class which exporters/importers for the
-ScanContext should inherit from.
+Module with the ScanIoBase class which exporters/importers for Scan should inherit from.
 """
 
 __author__ = "Malte Storm"
@@ -26,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ScanIoBase"]
+
 
 from pathlib import Path
 from typing import Any
@@ -38,12 +38,9 @@ from pydidas.core.generic_params import SCAN_GENERIC_PARAM_NAMES
 from pydidas.core.io_registry import GenericIoBase
 
 
-SCAN = ScanContext()
-
-
 class ScanIoBase(GenericIoBase, metaclass=ScanIo):
     """
-    Base class for ScanContext importer/exporters.
+    Base class for Scan importer/exporters.
     """
 
     extensions = []
@@ -70,9 +67,8 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
                     _missing_entries.append(_item)
 
         if len(_missing_entries) > 0:
-            _text = (
-                "The following ScanContext Parameters are missing:\n - "
-                + "\n - ".join(_missing_entries)
+            _text = "The following Scan Parameters are missing:\n - " + "\n - ".join(
+                _missing_entries
             )
             raise UserConfigError(_text)
 
@@ -87,7 +83,7 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
             The Scan instance to be updated. If None, the ScanContext instance is used.
             The default is None.
         """
-        _scan = SCAN if scan is None else scan
+        _scan = ScanContext() if scan is None else scan
         for _key, _item in cls.imported_params.items():
             _scan.set_param_value(_key, _item)
         cls.imported_params = {}

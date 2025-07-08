@@ -286,7 +286,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         self.prepare_with_defaults()
         _data = self.get_datasets()
         _index = 5
-        _scan_indices = SCAN.get_index_position_in_scan(_index)
+        _scan_indices = SCAN.get_indices_from_ordinal(_index)
         H5SAVER.export_frame_to_file(_index, _data, SCAN)
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])

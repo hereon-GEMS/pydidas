@@ -60,7 +60,7 @@ EXP = DiffractionExperimentContext()
 
 IMAGE_SELECTION_PARAM = Parameter(
     "image_selection",
-    str,
+    str,  # noqa
     "Use global index",
     name="Scan point selection",
     choices=[
@@ -89,8 +89,6 @@ def _create_str_description_of_node_result(
         The WorkflowNode which created the results.
     plugin_results : pydidas.core.Dataset
         The resulting Dataset.
-    config : dict
-        The
 
     Returns
     -------
@@ -261,9 +259,9 @@ class WorkflowTestFrame(BaseFrame):
         TREE.nodes[node_id].plugin.params = copy.deepcopy(
             self._tree.nodes[node_id].plugin.params
         )
-
-        _arg = copy.copy(self._tree.nodes[node_id].plugin._config["input_data"])
-        _kwargs = self._tree.nodes[node_id].plugin._config["input_kwargs"].copy() | {
+        _plugin_config = self._tree.nodes[node_id].plugin._config  # noqa W0212
+        _arg = copy.copy(_plugin_config["input_data"])
+        _kwargs = _plugin_config["input_kwargs"].copy() | {
             "force_store_results": True,
             "store_input_data": True,
         }
@@ -396,7 +394,7 @@ class WorkflowTestFrame(BaseFrame):
         _nums = [
             self.get_param_value(f"scan_index{_index}") for _index in range(SCAN.ndim)
         ]
-        _index = SCAN.get_frame_from_indices(_nums)
+        _index = SCAN.get_ordinal_from_indices(_nums)
         if _index >= SCAN.n_points:
             raise UserConfigError(
                 f"The selected scan point {_nums} is outside the scope of the scan "

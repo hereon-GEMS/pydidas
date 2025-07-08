@@ -29,6 +29,7 @@ __all__ = ["ScanIoFio"]
 
 import os
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -37,8 +38,6 @@ from pydidas.contexts.scan.scan_context import ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
 from pydidas.core import UserConfigError
 
-
-SCAN = ScanContext()
 
 _ERROR_TEXT_MULTIPLE_SCAN_COMMANDS = (
     "Multiple scan commands found in FIO file. Please check "
@@ -160,7 +159,7 @@ class ScanIoFio(ScanIoBase):
         )
 
     @classmethod
-    def import_from_file(cls, filenames: Path | str | list[Path | str], **kwargs: dict):
+    def import_from_file(cls, filenames: Path | str | list[Path | str], **kwargs: Any):
         """
         Import scan metadata from a single or multiple fio files.
 
@@ -169,7 +168,7 @@ class ScanIoFio(ScanIoBase):
         filenames : Union[Path, str, list[Union[Path, str]]]
             The filename(s) of the file(s) to be imported. Filenames can
             either be a single
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments. The following keys are supported:
 
             scan : Scan, optional
@@ -180,7 +179,7 @@ class ScanIoFio(ScanIoBase):
                 If None, the motor name is determined from differences in the
                 motor positions between the scans.
         """
-        scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
+        scan = kwargs.get("scan") or ScanContext()
         cls.imported_params = {}
         if isinstance(filenames, (Path, str)):
             cls._import_single_fio(filenames, scan=scan)
@@ -210,7 +209,7 @@ class ScanIoFio(ScanIoBase):
             The scan object to import the data into. If None, the global
             ScanContext is used
         """
-        _scan = SCAN if scan is None else scan
+        _scan = scan or ScanContext()
         _scan_command_found = False
 
         try:
@@ -245,7 +244,7 @@ class ScanIoFio(ScanIoBase):
     @classmethod
     def _process_1dscan_cmd(cls, i_line: int, cmd_line: str, file_lines: list[str]):
         """
-        Processs a 1D scan command from  the fio file.
+        Process a 1D scan command from  the fio file.
 
         Parameters
         ----------
@@ -317,7 +316,7 @@ class ScanIoFio(ScanIoBase):
         cls.imported_params[f"{_D1}_offset"] = _motor1_start
 
     @classmethod
-    def check_file_list(cls, filenames: list[Path | str], **kwargs: dict) -> list[str]:
+    def check_file_list(cls, filenames: list[Path | str], **kwargs: Any) -> list[str]:
         """
         Check if the given list of files is valid for import.
 
@@ -327,7 +326,7 @@ class ScanIoFio(ScanIoBase):
         ----------
         filenames : list[Union[Path, str]]
             The list of filenames to be checked.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments. Please refer to _import_multiple_fio
             for the supported keys.
 
@@ -338,7 +337,7 @@ class ScanIoFio(ScanIoBase):
         """
         if len(filenames) == 1:
             return ["::no_error::"]
-        _scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
+        _scan = kwargs.get("scan") or ScanContext()
         _motor_pos, _motor_names = cls._process_fio_file_list(filenames, _scan)
         _index_moved_motors = cls._get_moved_motor_indices(_motor_pos, _motor_names)
         if len(_index_moved_motors) == 0:
@@ -351,7 +350,7 @@ class ScanIoFio(ScanIoBase):
         ]
 
     @classmethod
-    def _import_multiple_fio(cls, filenames: list[Path | str], **kwargs: dict):
+    def _import_multiple_fio(cls, filenames: list[Path | str], **kwargs: Any):
         """
         Import scan metadata from multiple fio files.
 
@@ -362,7 +361,7 @@ class ScanIoFio(ScanIoBase):
         ----------
         filenames : list[Union[Path, str]]
             The filenames of the files to be imported.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments. The following keys are supported:
 
             scan : Scan, optional
@@ -377,7 +376,7 @@ class ScanIoFio(ScanIoBase):
                 scans. If True, the function returns a list with the error message
                 and the names of the motors that have moved.
         """
-        _scan = SCAN if kwargs.get("scan", None) is None else kwargs.get("scan")
+        _scan = kwargs.get("scan") or ScanContext()
         scan_dim0_motor = kwargs.get("scan_dim0_motor", None)
         _motor_pos, _motor_names = cls._process_fio_file_list(filenames, _scan)
 

@@ -304,7 +304,7 @@ class TestProcessingResults(unittest.TestCase):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
         res.store_results(_index, _results)
-        _scan_indices = SCAN.get_index_position_in_scan(_index)
+        _scan_indices = SCAN.get_indices_from_ordinal(_index)
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
 
@@ -314,7 +314,7 @@ class TestProcessingResults(unittest.TestCase):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
         res.store_results(_index, _results)
-        _scan_indices = SCAN.get_index_position_in_scan(_index)
+        _scan_indices = SCAN.get_indices_from_ordinal(_index)
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
         self.assertTrue(res._config["metadata_complete"])
@@ -327,7 +327,7 @@ class TestProcessingResults(unittest.TestCase):
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
         res.store_results(_index, _results)
-        _scan_indices = SCAN.get_index_position_in_scan(_index)
+        _scan_indices = SCAN.get_indices_from_ordinal(_index)
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
 
@@ -842,30 +842,28 @@ class TestProcessingResults(unittest.TestCase):
                 {"axis_labels", "axis_units", "axis_ranges", "data_unit", "data_label"},
             )
 
-        def test_update_from_processing_results__wrong_type(self):
-            res = ProcessingResults()
-            with self.assertRaises(TypeError):
-                res.update_from_processing_results("not a ProcessingResults instance")
+    def test_update_from_processing_results__wrong_type(self):
+        res = ProcessingResults()
+        with self.assertRaises(TypeError):
+            res.update_from_processing_results("not a ProcessingResults instance")
 
-        def test_update_from_processing_results(self):
-            res = self.create_standard_workflow_results()
-            _new_res = ProcessingResults()
-            _new_res.update_from_processing_results(res)
-            self.assertEqual(_new_res.shapes, res.shapes)
-            self.assertEqual(_new_res.node_labels, res.node_labels)
-            self.assertEqual(_new_res.data_labels, res.data_labels)
-            self.assertEqual(_new_res.data_units, res.data_units)
-            self.assertEqual(_new_res.ndims, res.ndims)
-            self.assertEqual(
-                _new_res.frozen_tree.export_to_string(),
-                res.frozen_tree.export_to_string(),
-            )
-            self.assertEqual(
-                _new_res.frozen_exp.param_values, res.frozen_exp.param_values
-            )
-            self.assertEqual(
-                _new_res.frozen_scan.param_values, res.frozen_scan.param_values
-            )
+    def test_update_from_processing_results(self):
+        res = self.create_standard_workflow_results()
+        _new_res = ProcessingResults()
+        _new_res.update_from_processing_results(res)
+        self.assertEqual(_new_res.shapes, res.shapes)
+        self.assertEqual(_new_res.node_labels, res.node_labels)
+        self.assertEqual(_new_res.data_labels, res.data_labels)
+        self.assertEqual(_new_res.data_units, res.data_units)
+        self.assertEqual(_new_res.ndims, res.ndims)
+        self.assertEqual(
+            _new_res.frozen_tree.export_to_string(),
+            res.frozen_tree.export_to_string(),
+        )
+        self.assertEqual(_new_res.frozen_exp.param_values, res.frozen_exp.param_values)
+        self.assertEqual(
+            _new_res.frozen_scan.param_values, res.frozen_scan.param_values
+        )
 
 
 if __name__ == "__main__":

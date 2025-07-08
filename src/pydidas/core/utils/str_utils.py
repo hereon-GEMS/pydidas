@@ -61,7 +61,7 @@ from pydidas.core.constants import ASCII_TO_UNI, UNI_TO_ASCII
 
 
 def get_fixed_length_str(
-    obj: str,
+    obj: Any,
     length: int,
     fill_back: bool = True,
     fill_char: str = ".",
@@ -79,8 +79,8 @@ def get_fixed_length_str(
 
     Parameters
     ----------
-    obj : str
-        The input string to be formatted.
+    obj : Any
+        The input object to be converted to a formatted string.
     length : int
         The length of the output string.
     fill_back: bool, optional

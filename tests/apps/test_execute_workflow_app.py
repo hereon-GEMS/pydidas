@@ -575,7 +575,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertEqual(_spy_result, 1)
         self.assertTrue(main_app._config["result_metadata_set"])
         self.assertTrue(
-            np.all(RESULTS._composites[1][SCAN.get_index_position_in_scan(0)] > 0)
+            np.all(RESULTS._composites[1][SCAN.get_indices_from_ordinal(0)] > 0)
         )
 
     def test_multiprocessing_store_results__autosave(self):
@@ -588,7 +588,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         _fname = self._path.joinpath("test", f"node_{_node_id:02d}.h5")
         self.assertTrue(main_app._config["export_files_prepared"])
         with h5py.File(_fname, "r") as _f:
-            _data = _f["entry/data/data"][SCAN.get_index_position_in_scan(0)]
+            _data = _f["entry/data/data"][SCAN.get_indices_from_ordinal(0)]
             self.assertTrue(np.all(_data > 0))
 
     def test_multiprocessing_store_results__repetitive(self):

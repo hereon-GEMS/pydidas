@@ -386,3 +386,21 @@ class Scan(ObjectWithParameterCollection):
             )
             param_key = SCAN_LEGACY_PARAMS[param_key]
         super().set_param_value(param_key, value)
+
+    def get_frame_indices_from_ordinal(self, ordinal: int) -> list[int]:
+        """
+        Get the frame indices for a given ordinal index.
+
+        Parameters
+        ----------
+        ordinal : int
+            The ordinal index of the scan point (i.e. the position in the 'timeline').
+
+        Returns
+        -------
+        list[int]
+            The list of frame indices for this scan point.
+        """
+        _i0 = ordinal * self.get_param_value("frame_indices_per_scan_point")
+        _n_frames = self.get_param_value("scan_frames_per_scan_point")
+        return [_i0 + _i for _i in range(_n_frames)]

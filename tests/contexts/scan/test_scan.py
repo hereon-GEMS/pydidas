@@ -174,21 +174,6 @@ def test_get_ordinal_from_indices__inscan():
     assert _index == _frame
 
 
-# def test_get_ordinal_from_indices__multiplicity_gt_one():
-#     _indices = (2, 1, 2, 1)
-#     _frame = (
-#         _indices[3]
-#         + _scan_param_values["shape"][3] * _indices[2]
-#         + np.prod(_scan_param_values["shape"][2:]) * _indices[1]
-#         + np.prod(_scan_param_values["shape"][1:]) * _indices[0]
-#     ) * 3
-#     scan = Scan()
-#     set_scan_params(scan)
-#     scan.set_param_value("scan_frames_per_scan_point", 3)
-#     _index = scan.get_ordinal_from_indices(_indices)
-#     assert _index == _frame
-
-
 def test_axis_labels():
     scan = Scan()
     set_scan_params(scan)
@@ -281,6 +266,18 @@ def test_set_param_value__deprecated():
     with pytest.warns(DeprecationWarning):
         scan.set_param_value("scan_start_index", 42)
     assert scan.get_param_value("file_number_offset") == 42
+
+
+@pytest.mark.parametrize("indices", [1, 2, 4, 12])
+@pytest.mark.parametrize("frames", [1, 3, 5])
+@pytest.mark.parametrize("ordinal", [0, 1, 2, 42])
+def test_get_frame_indices_from_ordinal(indices, frames, ordinal):
+    scan = Scan()
+    set_scan_params(scan)
+    scan.set_param_value("scan_frames_per_scan_point", frames)
+    scan.set_param_value("frame_indices_per_scan_point", indices)
+    _indices = scan.get_frame_indices_from_ordinal(ordinal)
+    assert _indices == [ordinal * indices + _i for _i in range(frames)]
 
 
 if __name__ == "__main__":

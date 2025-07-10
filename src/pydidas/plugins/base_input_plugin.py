@@ -114,21 +114,8 @@ class InputPlugin(BasePlugin):
         as defined in the ScanContext class.
         """
         _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
-        _hash_indices = [i for i, char in enumerate(_pattern) if char == "#"]
-        if _hash_indices and max(np.diff(_hash_indices)) > 1:
-            raise UserConfigError(
-                "The scan name pattern must only contain one consecutive group of "
-                "hash characters (#)."
-            )
-        _len_pattern = _pattern.count("#")
-        _base_str = os.path.join(_basepath, _pattern)
-        if _len_pattern < 1:
-            self.filename_string = _base_str
-        else:
-            self.filename_string = _base_str.replace(
-                "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
-            )
+        _pattern = self._SCAN.processed_file_naming_pattern
+        self.filename_string = os.path.join(_basepath, _pattern)
 
     def input_available(self, ordinal: int) -> bool:
         """

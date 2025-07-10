@@ -23,7 +23,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import os
 import pickle
 import shutil
 import tempfile
@@ -35,7 +34,7 @@ import numpy as np
 import pytest
 
 from pydidas.contexts import ScanContext
-from pydidas.core import Dataset, Parameter, UserConfigError
+from pydidas.core import Dataset, Parameter
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.data_io import export_data, import_data
@@ -150,38 +149,24 @@ def test_output_data_dim(reset_scan, base_dim, n_frames, multi_frame):
 
 
 @pytest.mark.parametrize(
-    "pattern", ["##test_###.tiff", "test_###0_##.tiff", "test_##_##_##.tiff"]
+    "pattern",
+    ["test_1244.tiff", "test_0_22.npy", "test_###.tiff", "test_######0_22.npy"],
 )
-def test_update_filename_string__multiple_counters(reset_scan, pattern):
-    SCAN.set_param_value("scan_name_pattern", pattern)
-    plugin = InputPlugin()
-    with pytest.raises(UserConfigError):
-        plugin.update_filename_string()
-
-
-@pytest.mark.parametrize(
-    "pattern", ["test_1244.tiff", "test_0_22.npy", "test_22_ba_2.h5"]
-)
-def test_update_filename_string__no_counters(reset_scan, pattern):
-    SCAN.set_param_value("scan_base_directory", "Test")
+@pytest.mark.parametrize("directory", [Path(__file__).parent, None])
+def test_update_filename_string__valid_pattern(
+    reset_scan, pattern, directory, temp_dir_w_file
+):
+    _dir = directory or temp_dir_w_file
+    SCAN.set_param_value("scan_base_directory", _dir)
     SCAN.set_param_value("scan_name_pattern", pattern)
     plugin = InputPlugin()
     plugin.update_filename_string()
-    assert plugin.filename_string == "Test" + os.sep + pattern
-
-
-@pytest.mark.parametrize(
-    "pattern", ["test_###.tiff", "test_######0_22.npy", "test_22_####_2.h5"]
-)
-def test_update_filename_string(reset_scan, pattern):
-    SCAN.set_param_value("scan_base_directory", "Test")
-    SCAN.set_param_value("scan_name_pattern", pattern)
-    plugin = InputPlugin()
-    plugin.update_filename_string()
-    _nhash = pattern.count("#")
-    _parts = pattern.split("#" * _nhash)
-    _parts.insert(1, "{index:0" + str(_nhash) + "d}")
-    assert plugin.filename_string == "Test" + os.sep + "".join(_parts)
+    _target = str(_dir / pattern)
+    if "#" in pattern:
+        _target = _target.replace(
+            "#" * pattern.count("#"), "{index:0" + str(pattern.count("#")) + "d}"
+        )
+    assert plugin.filename_string == _target
 
 
 @pytest.mark.parametrize("frame_index", [0, 1, 37])

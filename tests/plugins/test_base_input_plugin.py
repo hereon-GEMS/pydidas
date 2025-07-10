@@ -44,17 +44,20 @@ from pydidas.unittest_objects import create_plugin_class
 
 
 _DUMMY_SHAPE = (130, 140)
+_DUMMY_SHAPE_1d = (145,)
 
 SCAN = ScanContext()
 
 
 class TestInputPlugin(InputPlugin):
-    def __init__(self, filename=""):
+    def __init__(self, filename="", ndim=2):
+        self.base_output_data_dim = ndim
         InputPlugin.__init__(self)
         self.filename_string = str(filename)
 
     def get_frame(self, index, **kwargs):
-        _frame = Dataset(np.zeros(_DUMMY_SHAPE, dtype=np.uint16) + index)
+        _shape = _DUMMY_SHAPE if self.base_output_data_dim == 2 else _DUMMY_SHAPE_1d
+        _frame = Dataset(np.zeros(_shape, dtype=np.uint16) + index)
         kwargs["indices"] = (_frame,)
         return _frame, kwargs
 
@@ -115,18 +118,35 @@ def test_class_attributes():
         assert hasattr(plugin, att)
 
 
-def test_class_generic_params():
-    plugin = create_plugin_class(INPUT_PLUGIN)
+@pytest.mark.parametrize("base_output_data_dim", [1, 2])
+def test__init__correct_params(base_output_data_dim):
+    plugin_class = create_plugin_class(INPUT_PLUGIN)
+    plugin_class.base_output_data_dim = base_output_data_dim
+    plugin = plugin_class()
     for att in (
         "use_roi",
         "roi_xlow",
         "roi_xhigh",
-        "roi_ylow",
-        "roi_yhigh",
         "binning",
     ):
-        _param = plugin.generic_params.get_param(att)
-        assert isinstance(_param, Parameter)
+        assert isinstance(plugin.get_param(att), Parameter)
+    if base_output_data_dim == 2:
+        assert isinstance(plugin.get_param("roi_ylow"), Parameter)
+        assert isinstance(plugin.get_param("roi_yhigh"), Parameter)
+
+
+@pytest.mark.parametrize("base_dim", [1, 2, 3])
+@pytest.mark.parametrize("n_frames", [1, 3, 4])
+@pytest.mark.parametrize("multi_frame", ["Average", "Sum", "Maximum", "Stack"])
+def test_output_data_dim(reset_scan, base_dim, n_frames, multi_frame):
+    plugin = create_plugin_class(INPUT_PLUGIN)()
+    plugin.base_output_data_dim = base_dim
+    SCAN.set_param_value("scan_frames_per_scan_point", n_frames)
+    SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
+    _expected_dim = base_dim
+    if n_frames > 1 and multi_frame == "Stack":
+        _expected_dim += 1
+    assert plugin.output_data_dim == _expected_dim
 
 
 @pytest.mark.parametrize(
@@ -213,13 +233,15 @@ def test_pickle():
 @pytest.mark.parametrize("ordinal", [0, 1, 37])
 @pytest.mark.parametrize("multi_frame", ["Average", "Sum", "Maximum", "Stack"])
 @pytest.mark.parametrize("i_per_point", [1, 4, 7])
-def test_execute__single(reset_scan, ordinal, multi_frame, i_per_point):
+@pytest.mark.parametrize("output_dim", [1, 2])
+def test_execute__single(reset_scan, ordinal, multi_frame, i_per_point, output_dim):
     SCAN.set_param_value("scan_frames_per_scan_point", 1)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
-    plugin = TestInputPlugin()
+    plugin = TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
+    assert _data.shape == (_DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d)
     assert _data.mean() == ordinal * i_per_point
     assert isinstance(_data, Dataset)
 
@@ -228,15 +250,17 @@ def test_execute__single(reset_scan, ordinal, multi_frame, i_per_point):
 @pytest.mark.parametrize("multi_frame", ["Average", "Sum", "Maximum"])
 @pytest.mark.parametrize("i_per_point", [1, 7, 13])
 @pytest.mark.parametrize("n_frames", [2, 5, 11])
+@pytest.mark.parametrize("output_dim", [1, 2])
 def test_execute__multiple_frames(
-    reset_scan, ordinal, multi_frame, i_per_point, n_frames
+    reset_scan, ordinal, multi_frame, i_per_point, n_frames, output_dim
 ):
     SCAN.set_param_value("scan_frames_per_scan_point", n_frames)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
-    plugin = TestInputPlugin()
+    plugin = TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
+    assert _data.shape == (_DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d)
     match multi_frame:
         case "Average":
             assert np.isclose(_data.mean(), ordinal * i_per_point + (n_frames - 1) / 2)
@@ -254,14 +278,19 @@ def test_execute__multiple_frames(
 @pytest.mark.parametrize("ordinal", [0, 1, 37])
 @pytest.mark.parametrize("i_per_point", [1, 7, 13])
 @pytest.mark.parametrize("n_frames", [2, 5, 11])
-def test_execute__multiple_frame_stack(reset_scan, ordinal, i_per_point, n_frames):
+@pytest.mark.parametrize("output_dim", [1, 2])
+def test_execute__multiple_frame_stack(
+    reset_scan, ordinal, i_per_point, n_frames, output_dim
+):
     SCAN.set_param_value("scan_frames_per_scan_point", n_frames)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", "Stack")
-    plugin = TestInputPlugin()
+    plugin = TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
-    assert _data.shape == (n_frames, *_DUMMY_SHAPE)
+    assert _data.shape == (n_frames,) + (
+        _DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d
+    )
     for _n in range(n_frames):
         assert _data[_n].mean() == ordinal * i_per_point + _n
     assert isinstance(_data, Dataset)

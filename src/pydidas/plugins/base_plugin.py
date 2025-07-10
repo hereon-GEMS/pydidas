@@ -300,9 +300,7 @@ class BasePlugin(ObjectWithParameterCollection):
                 self.set_param_value(_kw, _item)
         self._config["test_mode"]: bool = False
         self._config["input_data"]: int | Dataset | None = None
-
         self.node_id = None
-        self._roi_data_dim = None
 
     def __copy__(self) -> Self:
         """
@@ -538,11 +536,7 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         if "use_roi" not in self.params.keys() or not self.get_param_value("use_roi"):
             return None
-        _roi_data_dim = (
-            self._roi_data_dim
-            if self._roi_data_dim is not None
-            else self.output_data_dim
-        )
+        _roi_data_dim = getattr(self, "base_output_data_dim", self.output_data_dim)
         if _roi_data_dim == 1:
             return slice(
                 self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")

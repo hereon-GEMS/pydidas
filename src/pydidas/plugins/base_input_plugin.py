@@ -49,15 +49,13 @@ class InputPlugin(BasePlugin):
     output_data_label = "Image intensity"
     output_data_unit = "counts"
     input_data_dim = None
-    output_data_dim = 2
+    base_output_data_dim = 2
     generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
+        get_generic_parameter("binning"),
         get_generic_parameter("use_roi"),
         get_generic_parameter("roi_xlow"),
         get_generic_parameter("roi_xhigh"),
-        get_generic_parameter("roi_ylow"),
-        get_generic_parameter("roi_yhigh"),
-        get_generic_parameter("binning"),
         get_generic_parameter("_counted_images_per_file"),
     )
     default_params = BasePlugin.default_params.copy()
@@ -78,6 +76,28 @@ class InputPlugin(BasePlugin):
         self._SCAN = kwargs.get("scan", ScanContext())
         self.filename_string = ""
         self._config["pre_executed"] = False
+        if self.base_output_data_dim == 2:
+            self.add_params(
+                get_generic_parameter("roi_ylow"),
+                get_generic_parameter("roi_yhigh"),
+            )
+
+    @property
+    def output_data_dim(self) -> int:
+        """
+        The output data dimension of the plugin.
+
+        Returns
+        -------
+        int
+            The output data dimension.
+        """
+        return self.base_output_data_dim + (
+            1
+            if self._SCAN.get_param_value("scan_frames_per_scan_point") > 1
+            and self._SCAN.get_param_value("scan_multi_frame_handling") == "Stack"
+            else 0
+        )
 
     def pre_execute(self):
         """

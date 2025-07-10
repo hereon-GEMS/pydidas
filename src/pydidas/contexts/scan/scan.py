@@ -331,6 +331,30 @@ class Scan(ObjectWithParameterCollection):
         """
         return [self.get_range_for_dim(_i) for _i in range(self.ndim)]
 
+    @property
+    def file_naming_pattern_w_index(self) -> str:
+        """
+        Get the naming pattern with the index placeholder.
+
+        Returns
+        -------
+        str
+            The naming pattern with the index placeholder.
+        """
+        _pattern = self.get_param_value("scan_name_pattern", dtype=str)
+        _hash_indices = [i for i, char in enumerate(_pattern) if char == "#"]
+        if _hash_indices and max(np.diff(_hash_indices)) > 1:
+            raise UserConfigError(
+                "The scan name pattern must only contain one consecutive group of "
+                "hash characters (#)."
+            )
+        _len_pattern = _pattern.count("#")
+        if _len_pattern < 1:
+            return _pattern
+        return _pattern.replace(
+            "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
+        )
+
     def import_from_file(self, filename: Union[str, Path]):
         """
         Import ScanContext from a file.

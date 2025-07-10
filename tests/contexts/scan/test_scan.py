@@ -86,6 +86,37 @@ def test_ndim():
     assert scan.ndim == 4
 
 
+@pytest.mark.parametrize(
+    "pattern", ["##test_###.tiff", "test_###0_##.tiff", "test_##_##_##.tiff"]
+)
+def test_file_naming_pattern_w_index__multiple_counters(pattern):
+    scan = Scan()
+    scan.set_param_value("scan_name_pattern", pattern)
+    with pytest.raises(UserConfigError):
+        scan.file_naming_pattern_w_index
+
+
+@pytest.mark.parametrize(
+    "pattern", ["test_1244.tiff", "test_0_22.npy", "test_22_ba_2.h5"]
+)
+def test_file_naming_pattern_w_index__no_counters(pattern):
+    scan = Scan()
+    scan.set_param_value("scan_name_pattern", pattern)
+    assert scan.file_naming_pattern_w_index == pattern
+
+
+@pytest.mark.parametrize(
+    "pattern", ["test_###.tiff", "test_######0_22.npy", "test_22_####_2.h5"]
+)
+def test_update_filename_string(pattern):
+    scan = Scan()
+    scan.set_param_value("scan_name_pattern", pattern)
+    _nhash = pattern.count("#")
+    _parts = pattern.split("#" * _nhash)
+    _parts.insert(1, "{index:0" + str(_nhash) + "d}")
+    assert scan.file_naming_pattern_w_index == "".join(_parts)
+
+
 def test_get_range_for_dim__wrong_dim():
     scan = Scan()
     set_scan_params(scan)

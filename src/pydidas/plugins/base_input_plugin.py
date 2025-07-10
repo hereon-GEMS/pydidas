@@ -58,6 +58,7 @@ class InputPlugin(BasePlugin):
         get_generic_parameter("roi_ylow"),
         get_generic_parameter("roi_yhigh"),
         get_generic_parameter("binning"),
+        get_generic_parameter("_counted_images_per_file"),
     )
     default_params = BasePlugin.default_params.copy()
     advanced_parameters = [
@@ -76,65 +77,14 @@ class InputPlugin(BasePlugin):
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", ScanContext())
         self.filename_string = ""
-
-    def input_available(self, index: int) -> bool:
-        """
-        Check whether a new input file is available.
-
-        Note: This function returns False by default. It is intended to be
-        used only for checks during live processing.
-
-        Parameters
-        ----------
-        index : int
-            The frame index.
-
-        Returns
-        -------
-        bool
-            flag whether the file for the frame #<index> is ready for reading.
-        """
-        _fname = self.get_filename(index)
-        if os.path.exists(_fname):
-            try:
-                _ = self.get_frame(index)
-            except FileReadError:
-                time.sleep(0.05)
-                return False
-            return True
-        return False
+        self._config["pre_executed"] = False
 
     def pre_execute(self):
         """
         Run generic pre-execution routines.
         """
         self.update_filename_string()
-        self._config["n_multi"] = self._SCAN.get_param_value(
-            "scan_frames_per_scan_point"
-        )
-        self._config["start_index"] = self._SCAN.get_param_value("file_number_offset")
-        self._config["delta_index"] = self._SCAN.get_param_value(
-            "frame_indices_per_scan_point"
-        )
-
-    def get_filename(self, frame_index: int) -> str:
-        """
-        Get the filename of the file associated with the frame index.
-
-        Parameters
-        ----------
-        frame index : int
-            The index of the frame to be processed.
-
-        Returns
-        -------
-        str
-            The filename.
-        """
-        _index = frame_index * self._SCAN.get_param_value(
-            "frame_indices_per_scan_point"
-        ) + self._SCAN.get_param_value("file_number_offset")
-        return self.filename_string.format(index=_index)
+        self._config["pre_executed"] = True
 
     def update_filename_string(self):
         """
@@ -145,79 +95,69 @@ class InputPlugin(BasePlugin):
         """
         _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
         _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
-        _len_pattern = _pattern.count("#")
-        if _len_pattern < 1:
-            # raise UserConfigError("No filename pattern detected in the Input plugin!")
-            self.filename_string = os.path.join(_basepath, _pattern)
-            return
-        self.filename_string = os.path.join(_basepath, _pattern).replace(
-            "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
-        )
-
-    def execute(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
-        """
-        Import the data and pass it on after (optionally) handling image multiplicity.
-
-        Parameters
-        ----------
-        index : int
-            The ordinal index of the scan point.
-        **kwargs : Any
-            Keyword arguments passed to the execute method.
-
-        Returns
-        -------
-        pydidas.core.Dataset
-            The image data frame.
-        kwargs : Any
-            The updated kwargs.
-        """
-        if "n_multi" not in self._config:
+        _hash_indices = [i for i, char in enumerate(_pattern) if char == "#"]
+        if _hash_indices and max(np.diff(_hash_indices)) > 1:
             raise UserConfigError(
-                "Calling plugin execution without prior pre-execution is not allowed."
+                "The scan name pattern must only contain one consecutive group of "
+                "hash characters (#)."
             )
-        if self._config["n_multi"] == 1:
-            _data, kwargs = self.get_frame(index, **kwargs)
-            _data.data_label = self.output_data_label
-            _data.data_unit = self.output_data_unit
-            return _data, kwargs
-        return self.handle_multi_image(index, **kwargs)
+        _len_pattern = _pattern.count("#")
+        _base_str = os.path.join(_basepath, _pattern)
+        if _len_pattern < 1:
+            self.filename_string = _base_str
+        else:
+            self.filename_string = _base_str.replace(
+                "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
+            )
 
-    def handle_multi_image(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
+    def input_available(self, ordinal: int) -> bool:
         """
-        Handle frames with image multiplicity.
+        Check whether a new input file is available.
+
+        Note: This function returns False by default. It is intended to be
+        used only for checks during live processing.
 
         Parameters
         ----------
-        index : int
-            The scan index.
-        **kwargs : Any
-            Keyword arguments for the get_frame method.
+        ordinal : int
+            The frame index.
 
         Returns
         -------
-        pydidas.core.Dataset
-            The image data frame.
-        kwargs : Any
-            The updated kwargs.
+        bool
+            flag whether the file for the frame #<index> is ready for reading.
         """
-        _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
-        _handling = self._SCAN.get_param_value("scan_multi_frame_handling")
-        _factor = self._config["n_multi"] if _handling == "Average" else 1
-        _data = None
-        for _frame_index in _frames:
-            _tmp_data, kwargs = self.get_frame(_frame_index, **kwargs)
-            if _data is None:
-                _data = Dataset(np.zeros(_tmp_data.shape, dtype=np.float32))
-            if _handling == "Maximum":
-                np.maximum(_data, _tmp_data, out=_data)
-            else:
-                _data += _tmp_data / _factor
-        if _frames.size > 1:
-            kwargs["frames"] = _frames
-        _data.data_label = self.output_data_label
-        _data.data_unit = self.output_data_unit
-        return _data, kwargs
+        _frame_indices = self._SCAN.get_frame_indices_from_ordinal(ordinal)
+        _last_index = _frame_indices[-1]
+        _fname = self.get_filename(_last_index)
+        if os.path.exists(_fname):
+            try:
+                _ = self.get_frame(_last_index)
+            except FileReadError:
+                time.sleep(0.05)
+                return False
+            return True
+        return False
+
+    def get_filename(self, frame_index: int) -> str:
+        """
+        Get the filename of the file associated with the frame index.
+
+        Parameters
+        ----------
+        frame_index : int
+            The index of the frame.
+
+        Returns
+        -------
+        str
+            The filename.
+        """
+        _file_counter = frame_index // self.get_param_value("_counted_images_per_file")
+        _file_index = _file_counter * self._SCAN.get_param_value(
+            "file_number_delta"
+        ) + self._SCAN.get_param_value("file_number_offset")
+        return self.filename_string.format(index=_file_index)
 
     def get_frame(self, frame_index: int, **kwargs: Any) -> Dataset:
         """
@@ -237,6 +177,76 @@ class InputPlugin(BasePlugin):
             The image data frame.
         """
         raise NotImplementedError
+
+    def execute(self, ordinal: int, **kwargs: Any) -> tuple[Dataset, dict]:
+        """
+        Import the data and pass it on after (optionally) handling image multiplicity.
+
+        Parameters
+        ----------
+        ordinal : int
+            The ordinal index of the scan point.
+        **kwargs : Any
+            Keyword arguments passed to the execute method.
+
+        Returns
+        -------
+        Dataset
+            The image data frame.
+        kwargs : Any
+            The updated kwargs.
+        """
+        if not self._config["pre_executed"]:
+            raise UserConfigError(
+                "The pre_execute method must be called before the execute method."
+            )
+        _frames = self._SCAN.get_frame_indices_from_ordinal(ordinal)
+        if len(_frames) == 1:
+            _data, kwargs = self.get_frame(_frames[0], **kwargs)
+        else:
+            _data, kwargs = self.read_multi_image(_frames, **kwargs)
+        _data.data_label = self.output_data_label
+        _data.data_unit = self.output_data_unit
+        return _data, kwargs
+
+    def read_multi_image(
+        self, frame_indices: list[int, ...], **kwargs: Any
+    ) -> tuple[Dataset, dict]:
+        """
+        Read multiple image frames and handle them according to the settings.
+
+        Parameters
+        ----------
+        frame_indices : list[int, ...]
+            The indices of the frames to be handled.
+        **kwargs : Any
+            Keyword arguments for the get_frame method.
+
+        Returns
+        -------
+        Dataset
+            The image data frame.
+        kwargs : Any
+            The updated kwargs.
+        """
+        _handling = self._SCAN.get_param_value("scan_multi_frame_handling")
+        _factor = len(frame_indices) if _handling == "Average" else 1
+        _data = None
+        for _i, _frame_index in enumerate(frame_indices):
+            _tmp_data, kwargs = self.get_frame(_frame_index, **kwargs)
+            if _data is None:
+                _shape = _tmp_data.shape
+                if _handling == "Stack":
+                    _shape = (len(frame_indices),) + _shape
+                _data = Dataset(np.zeros(_shape, dtype=np.float32))
+            if _handling == "Stack":
+                _data[_i] = _tmp_data
+            elif _handling == "Maximum":
+                np.maximum(_data, _tmp_data, out=_data)
+            else:  # Average or Sum
+                _data += _tmp_data / _factor
+        kwargs["frames"] = frame_indices
+        return _data, kwargs
 
 
 InputPlugin.register_as_base_class()

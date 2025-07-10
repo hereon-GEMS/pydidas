@@ -24,7 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import pickle
 import shutil
 import tempfile
@@ -44,52 +43,39 @@ from pydidas.unittest_objects import LocalPluginCollection
 PLUGIN_COLLECTION = LocalPluginCollection()
 SCAN = ScanContext()
 
+_SHAPE = (10, 15)
+_N_PER_FILE = 13
+_N_FILES = 11
+_DATA_SHAPE = (_N_PER_FILE,) + _SHAPE
+
 
 @pytest.fixture(scope="module")
 def config():
     _config = type("Config", (object,), {})()
-    _config._path = tempfile.mkdtemp()
-    _config._img_shape = (10, 10)
-    _config._n_per_file = 13
-    _config._n_files = 11
-    _config._fname_i0 = 2
-    _config._n = _config._n_files * _config._n_per_file
-    _config._hdf5key = "/entry/data/data"
-    _config._data = np.repeat(
-        np.arange(_config._n, dtype=np.uint16), np.prod(_config._img_shape)
-    ).reshape((_config._n,) + _config._img_shape)
+    _config.path = Path(tempfile.mkdtemp())
+    _config.data = np.repeat(
+        np.arange(_N_PER_FILE * _N_FILES, dtype=np.uint16), np.prod(_SHAPE)
+    ).reshape((_N_PER_FILE * _N_FILES,) + _SHAPE)
 
     _config._hdf5_fnames = []
-    for i in range(_config._n_files):
-        _fname = Path(
-            os.path.join(_config._path, f"test_{i + _config._fname_i0:05d}.h5")
-        )
-        _config._hdf5_fnames.append(_fname)
-        _slice = slice(i * _config._n_per_file, (i + 1) * _config._n_per_file, 1)
+    for i in range(_N_FILES):
+        _fname = _config.path / f"test_{i:05d}.h5"
+        _slice = slice(i * _N_PER_FILE, (i + 1) * _N_PER_FILE, 1)
         with h5py.File(_fname, "w") as f:
-            f[_config._hdf5key] = _config._data[_slice]
-    yield _config
-    shutil.rmtree(_config._path)
-
-
-@pytest.fixture
-def setup_scan(config):
+            f["/entry/data/data"] = _config.data[_slice]
     SCAN.restore_all_defaults(True)
     SCAN.set_param_value("scan_name_pattern", "test_#####.h5")
-    SCAN.set_param_value("scan_base_directory", config._path)
-    SCAN.set_param_value("file_number_offset", config._fname_i0)
+    SCAN.set_param_value("scan_base_directory", _config.path)
+    yield _config
+    shutil.rmtree(_config.path)
 
 
 @pytest.fixture
-def plugin(config):
+def plugin():
     plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-    plugin.set_param_value("images_per_file", config._n_per_file)
-    plugin.set_param_value("hdf5_key", config._hdf5key)
+    plugin.set_param_value("images_per_file", _N_PER_FILE)
+    plugin.set_param_value("hdf5_key", "/entry/data/data")
     return plugin
-
-
-def get_index_in_file(config, index):
-    return index % config._n_per_file
 
 
 def test_creation():
@@ -97,45 +83,84 @@ def test_creation():
     assert isinstance(plugin, BasePlugin)
 
 
-def test_pre_execute__no_input(setup_scan):
+def test_pre_execute__no_input(config):
     plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
     plugin.pre_execute()
     assert "dataset" in plugin._standard_kwargs.keys()
     assert "binning" in plugin._standard_kwargs.keys()
 
 
-def test_pre_execute__no_images_per_file_set(config, setup_scan, plugin):
-    plugin.set_param_value("images_per_file", -1)
+@pytest.mark.parametrize("slice_ax", [0, 1, 2])
+@pytest.mark.parametrize("index", [0, 3, 7])
+@pytest.mark.parametrize("n_per_file", [-1, None])
+def test_pre_execute(config, plugin, slice_ax, index, n_per_file):
+    plugin.set_param_value("hdf5_slicing_axis", slice_ax)
+    plugin.set_param_value("images_per_file", n_per_file or _DATA_SHAPE[slice_ax])
     plugin.pre_execute()
-    assert plugin.get_param_value("_counted_images_per_file") == config._n_per_file
+    assert plugin.get_param_value("_counted_images_per_file") == _DATA_SHAPE[slice_ax]
+    assert plugin._index_func(index) == (None,) * slice_ax + (index,)
+    assert "dataset" in plugin._standard_kwargs.keys()
+    assert "binning" in plugin._standard_kwargs.keys()
 
 
-def test_execute__no_input(plugin):
+@pytest.mark.parametrize("index", [0, 3, 7])
+@pytest.mark.parametrize("n_per_file", [-1, None])
+def test_pre_execute__w_none_slice_ax(config, plugin, index, n_per_file):
+    plugin.set_param_value("hdf5_slicing_axis", None)
+    plugin.set_param_value("images_per_file", n_per_file or _DATA_SHAPE[0])
+    plugin.pre_execute()
+    assert plugin.get_param_value("_counted_images_per_file") == 1
+    assert plugin._index_func(index) is None
+    assert "dataset" in plugin._standard_kwargs.keys()
+    assert "binning" in plugin._standard_kwargs.keys()
+
+
+@pytest.mark.parametrize("slice_ax", [0, 1, 2])
+@pytest.mark.parametrize("frame_index", [0, 7, 27, 76])
+@pytest.mark.parametrize("n_per_file", [-1, None])
+def test_get_frame(config, plugin, slice_ax, frame_index, n_per_file):
+    plugin.set_param_value("hdf5_slicing_axis", slice_ax)
+    plugin.set_param_value("images_per_file", n_per_file or _DATA_SHAPE[slice_ax])
+    plugin.pre_execute()
+    _data, kwargs = plugin.execute(frame_index)
+    _n_start = _N_PER_FILE * (frame_index // _DATA_SHAPE[slice_ax])
+    match slice_ax:
+        case 0:
+            _slicing = (frame_index,)
+        case 1:
+            _slicing = (
+                slice(_n_start, _n_start + _DATA_SHAPE[0]),
+                frame_index % _DATA_SHAPE[1],
+            )
+        case 2:
+            _slicing = (
+                slice(_n_start, _n_start + _DATA_SHAPE[0]),
+                slice(None),
+                frame_index % _DATA_SHAPE[2],
+            )
+        case _:
+            raise UserConfigError(f"Invalid slicing axis: {slice_ax}")
+    assert plugin.get_param_value("_counted_images_per_file") == _DATA_SHAPE[slice_ax]
+    assert _data.shape == config.data[_slicing].shape
+    assert np.allclose(_data, config.data[_slicing])
+    assert kwargs["indices"] == (None,) * (slice_ax) + (
+        frame_index % _DATA_SHAPE[slice_ax],
+    )
+    assert (
+        _data.metadata["indices"]
+        == "[" + ":, " * slice_ax + f"{frame_index % _DATA_SHAPE[slice_ax]}]"
+    )
+
+
+def test_get_frame__wrong_dim(config, plugin):
+    plugin.set_param_value("hdf5_slicing_axis", None)
+    plugin.pre_execute()
     with pytest.raises(UserConfigError):
-        plugin.execute(0)
+        plugin.get_frame(0)
 
 
-def test_execute__simple(config, setup_scan, plugin):
-    _index = 0
-    plugin.pre_execute()
-    _data, kwargs = plugin.execute(_index)
-    assert (_data == _index).all()
-    assert kwargs["indices"] == (get_index_in_file(config, _index),)
-    assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
-
-
-def test_execute__slicing_ax_1(config, setup_scan, plugin):
-    plugin.set_param_value("hdf5_slicing_axis", 1)
-    _index = 0
-    plugin.pre_execute()
-    _data, kwargs = plugin.execute(_index)
-    assert np.allclose(_data, config._data[: config._n_per_file, _index])
-    assert kwargs["indices"] == (None, get_index_in_file(config, _index))
-    assert _data.metadata["indices"] == f"[:, {get_index_in_file(config, _index)}]"
-
-
-@pytest.mark.parametrize("roi", [[0, 5, 0, None], [1, 5, 1, 5]])
-def test_execute__with_roi(config, setup_scan, plugin, roi):
+@pytest.mark.parametrize("roi", [[0, 5, 0, None], [1, 5, 1, 5], [None, None, 2, 7]])
+def test__integration__execute_with_roi(config, plugin, roi):
     plugin.set_param_value("use_roi", True)
     plugin.set_param_value("roi_ylow", roi[0])
     plugin.set_param_value("roi_yhigh", roi[1])
@@ -146,33 +171,16 @@ def test_execute__with_roi(config, setup_scan, plugin, roi):
     _data, kwargs = plugin.execute(_index)
     _roi = plugin._get_own_roi()
     assert (_data == _index).all()
-    assert kwargs["indices"] == (get_index_in_file(config, _index),)
-    assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
+    assert kwargs["indices"] == (_index % _N_PER_FILE,)
+    assert _data.metadata["indices"] == f"[{_index % _N_PER_FILE}]"
     assert _roi == (slice(roi[0], roi[1]), slice(roi[2], roi[3]))
-    for _dim in [0, 1]:
-        if _roi[_dim] == slice(0, None):
-            assert _data.shape[_dim] == config._img_shape[_dim]
-        else:
-            assert _data.shape[_dim] == _roi[_dim].stop - _roi[_dim].start
+    assert (
+        _data.shape
+        == config.data[0, slice(roi[0], roi[1]), slice(roi[2], roi[3])].shape
+    )
 
 
-def test_get_frame__wrong_dim(config, setup_scan, plugin):
-    plugin.set_param_value("hdf5_slicing_axis", None)
-    plugin.pre_execute()
-    with pytest.raises(UserConfigError):
-        plugin.execute(0)
-
-
-def test_execute__get_all_frames(config, setup_scan, plugin):
-    plugin.pre_execute()
-    for _index in range(config._n):
-        _data, kwargs = plugin.execute(_index)
-        assert (_data == _index).all()
-        assert kwargs["indices"] == (get_index_in_file(config, _index),)
-        assert _data.metadata["indices"] == f"[{get_index_in_file(config, _index)}]"
-
-
-def test_pickle(config, setup_scan, plugin):
+def test_pickle(config, plugin):
     _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
     for _key, _val in _new_params.items():
         plugin.add_param(Parameter(_key, str, _val))

@@ -93,7 +93,7 @@ def test_file_naming_pattern_w_index__multiple_counters(pattern):
     scan = Scan()
     scan.set_param_value("scan_name_pattern", pattern)
     with pytest.raises(UserConfigError):
-        scan.file_naming_pattern_w_index
+        scan.processed_file_naming_pattern
 
 
 @pytest.mark.parametrize(
@@ -102,7 +102,7 @@ def test_file_naming_pattern_w_index__multiple_counters(pattern):
 def test_file_naming_pattern_w_index__no_counters(pattern):
     scan = Scan()
     scan.set_param_value("scan_name_pattern", pattern)
-    assert scan.file_naming_pattern_w_index == pattern
+    assert scan.processed_file_naming_pattern == pattern
 
 
 @pytest.mark.parametrize(
@@ -114,7 +114,7 @@ def test_update_filename_string(pattern):
     _nhash = pattern.count("#")
     _parts = pattern.split("#" * _nhash)
     _parts.insert(1, "{index:0" + str(_nhash) + "d}")
-    assert scan.file_naming_pattern_w_index == "".join(_parts)
+    assert scan.processed_file_naming_pattern == "".join(_parts)
 
 
 def test_get_range_for_dim__wrong_dim():

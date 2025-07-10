@@ -332,9 +332,9 @@ class Scan(ObjectWithParameterCollection):
         return [self.get_range_for_dim(_i) for _i in range(self.ndim)]
 
     @property
-    def file_naming_pattern_w_index(self) -> str:
+    def processed_file_naming_pattern(self) -> str:
         """
-        Get the naming pattern with the index placeholder.
+        Get the naming pattern with the index placeholder instead of wildcards.
 
         Returns
         -------

@@ -536,9 +536,7 @@ class BasePlugin(ObjectWithParameterCollection):
             (depending on the data dimensionality) which define the image ROI
             or None if the Plugin does not define a ROI.
         """
-        if "use_roi" not in self.params.keys():
-            return None
-        if not self.get_param_value("use_roi"):
+        if "use_roi" not in self.params.keys() or not self.get_param_value("use_roi"):
             return None
         _roi_data_dim = (
             self._roi_data_dim

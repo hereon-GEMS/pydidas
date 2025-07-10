@@ -21,7 +21,13 @@ Improvements
     - Added classes Point and PointList to handle 2-dimensional points and lists of
       points in a more generic way.
     - Added a pydidas.core.math subpackage to handle mathematical operations.
-	
+- Modified Scan:
+    - Added a `processed_file_naming_pattern` property to the Scan to handle conversion
+	  of wildcard hashes centrally in the scan.
+	- Added option to process multiple frames as `Stack` to the Scan
+    - Added option to differentiate between index stepping and the number of frames used
+      per scan point to allow rolling averages and staggered processing.	
+
 Bugfixes
 --------
 - Fixed an issue where the import of frame states would alter the frame index

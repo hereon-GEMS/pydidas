@@ -49,6 +49,9 @@ SCAN = ScanContext()
 
 
 class TestInputPlugin(InputPlugin):
+    output_data_label = "Test data"
+    output_data_unit = "some counts"
+
     def __init__(self, filename="", ndim=2):
         self.base_output_data_dim = ndim
         InputPlugin.__init__(self)
@@ -56,8 +59,13 @@ class TestInputPlugin(InputPlugin):
 
     def get_frame(self, index, **kwargs):
         _shape = _DUMMY_SHAPE if self.base_output_data_dim == 2 else _DUMMY_SHAPE_1d
-        _frame = Dataset(np.zeros(_shape, dtype=np.uint16) + index)
-        kwargs["indices"] = (_frame,)
+        _frame = Dataset(
+            np.zeros(_shape, dtype=np.uint16) + index,
+            axis_labels=["det y", "det x"] if self.base_output_data_dim == 2 else ["x"],
+            axis_units=["px", "px"] if self.base_output_data_dim == 2 else ["channels"],
+            data_unit=self.output_data_unit,
+            data_label=self.output_data_label,
+        )
         return _frame, kwargs
 
     def read_frame(self, index, **kwargs):
@@ -245,7 +253,13 @@ def test_execute__multiple_frames(
     plugin = TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
+    _ref = plugin.get_frame(ordinal)[0].property_dict
     assert _data.shape == (_DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d)
+    for _key in ["data_label", "data_unit", "axis_labels", "axis_units"]:
+        assert getattr(_data, _key) == _ref[_key]
+    assert all(
+        np.allclose(_data.axis_ranges[i], _ref["axis_ranges"][i]) for i in range(output_dim)
+    )
     match multi_frame:
         case "Average":
             assert np.isclose(_data.mean(), ordinal * i_per_point + (n_frames - 1) / 2)
@@ -273,8 +287,18 @@ def test_execute__multiple_frame_stack(
     plugin = TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
+    _ref = plugin.get_frame(ordinal)[0].property_dict
     assert _data.shape == (n_frames,) + (
         _DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d
+    )
+    _ref = plugin.get_frame(ordinal)[0].property_dict
+    assert list(_data.axis_labels.values()) == ["image number"] + list(
+        _ref["axis_labels"].values()
+    )
+    assert list(_data.axis_units.values()) == [""] + list(_ref["axis_units"].values())
+    assert all(
+        np.allclose(_data.axis_ranges[i + 1], _ref["axis_ranges"][i])
+        for i in range(output_dim)
     )
     for _n in range(n_frames):
         assert _data[_n].mean() == ordinal * i_per_point + _n

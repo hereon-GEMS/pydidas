@@ -166,7 +166,7 @@ class InputPlugin(BasePlugin):
         ) + self._SCAN.get_param_value("pattern_number_offset")
         return self.filename_string.format(index=_file_index)
 
-    def get_frame(self, frame_index: int, **kwargs: Any) -> Dataset:
+    def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Get the specified image frame (which does not necessarily correspond to the
         scan point index).
@@ -182,6 +182,8 @@ class InputPlugin(BasePlugin):
         -------
         pydidas.core.Dataset
             The image data frame.
+        kwargs : dict
+            The updated kwargs for loading the frame.
         """
         raise NotImplementedError
 
@@ -243,9 +245,17 @@ class InputPlugin(BasePlugin):
             _tmp_data, kwargs = self.get_frame(_frame_index, **kwargs)
             if _data is None:
                 _shape = _tmp_data.shape
+                _metadata = _tmp_data.property_dict
                 if _handling == "Stack":
                     _shape = (len(frame_indices),) + _shape
-                _data = Dataset(np.zeros(_shape, dtype=np.float32))
+                    _metadata["axis_labels"] = ["image number"] + list(
+                        _tmp_data.axis_labels.values()
+                    )
+                    _metadata["axis_units"] = [""] + list(_tmp_data.axis_units.values())
+                    _metadata["axis_ranges"] = [None] + list(
+                        _tmp_data.axis_ranges.values()
+                    )
+                _data = Dataset(np.zeros(_shape, dtype=np.float32), **_metadata)
             if _handling == "Stack":
                 _data[_i] = _tmp_data
             elif _handling == "Maximum":

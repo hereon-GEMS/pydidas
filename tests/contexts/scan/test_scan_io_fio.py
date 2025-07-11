@@ -79,7 +79,7 @@ def assert_general_scan_params_in_order(
     Asserts the general scan parameters have been reset correctly during the import.
     """
     assert scan.get_param_value("scan_dim") == n_dim
-    assert scan.get_param_value("file_number_offset") == start_index
+    assert scan.get_param_value("pattern_number_offset") == start_index
     assert scan.get_param_value("frame_indices_per_scan_point") == 1
     assert scan.get_param_value("scan_frames_per_scan_point") == 1
     assert scan.get_param_value("scan_name_pattern") == Path(filename.stem)

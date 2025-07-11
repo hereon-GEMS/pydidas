@@ -45,8 +45,8 @@ SCAN_DEFAULT_PARAMS = get_generic_param_collection(
     "scan_title",
     "scan_base_directory",
     "scan_name_pattern",
-    "file_number_offset",
-    "file_number_delta",
+    "pattern_number_offset",
+    "pattern_number_delta",
     "frame_indices_per_scan_point",
     "scan_frames_per_scan_point",
     "scan_multi_frame_handling",
@@ -72,7 +72,7 @@ SCAN_DEFAULT_PARAMS = get_generic_param_collection(
     "scan_dim3_offset",
 )
 SCAN_LEGACY_PARAMS = {
-    "scan_start_index": "file_number_offset",
+    "scan_start_index": "pattern_number_offset",
     "scan_index_stepping": "frame_indices_per_scan_point",
     "scan_multiplicity": "scan_frames_per_scan_point",
     "scan_multi_image_handling": "scan_multi_frame_handling",
@@ -243,7 +243,7 @@ class Scan(ObjectWithParameterCollection):
             "scan_title",
             "scan_base_directory",
             "scan_name_pattern",
-            "file_number_offset",
+            "pattern_number_offset",
             "frame_indices_per_scan_point",
             "scan_frames_per_scan_point",
             "scan_multi_frame_handling",
@@ -343,7 +343,7 @@ class Scan(ObjectWithParameterCollection):
         """
         _pattern = self.get_param_value("scan_name_pattern", dtype=str)
         _hash_indices = [i for i, char in enumerate(_pattern) if char == "#"]
-        if _hash_indices and max(np.diff(_hash_indices)) > 1:
+        if len(_hash_indices) > 1 and max(np.diff(_hash_indices)) > 1:
             raise UserConfigError(
                 "The scan name pattern must only contain one consecutive group of "
                 "hash characters (#)."

@@ -123,7 +123,7 @@ def _get_pydidas_context_config_entries(
         [
             "entry/instrument/detector/COLLECTION",
             "frame_start_number",
-            {"data": scan.get_param_value("file_number_offset")},
+            {"data": scan.get_param_value("pattern_number_offset")},
             {"NX_class": "NX_INT", "units": ""},
         ],
         [

@@ -106,7 +106,8 @@ def test_file_naming_pattern_w_index__no_counters(pattern):
 
 
 @pytest.mark.parametrize(
-    "pattern", ["test_###.tiff", "test_######0_22.npy", "test_22_####_2.h5"]
+    "pattern",
+    ["test_###.tiff", "test_######0_22.npy", "test_22_####_2.h5", "test_1a_#.h5"],
 )
 def test_update_filename_string(pattern):
     scan = Scan()
@@ -262,7 +263,7 @@ def test_update_from_dictionary__all_entries_present():
         "scan_dim": 2,
         "scan_base_directory": "/dummy",
         "scan_name_pattern": "test_###",
-        "file_number_offset": 1,
+        "pattern_number_offset": 1,
         "frame_indices_per_scan_point": 1,
         "scan_frames_per_scan_point": 1,
         "scan_multi_frame_handling": "Sum",
@@ -296,7 +297,7 @@ def test_set_param_value__deprecated():
     scan = Scan()
     with pytest.warns(DeprecationWarning):
         scan.set_param_value("scan_start_index", 42)
-    assert scan.get_param_value("file_number_offset") == 42
+    assert scan.get_param_value("pattern_number_offset") == 42
 
 
 @pytest.mark.parametrize("indices", [1, 2, 4, 12])

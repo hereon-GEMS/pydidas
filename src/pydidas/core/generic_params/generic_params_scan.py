@@ -83,33 +83,34 @@ GENERIC_PARAMS_SCAN = (
                 "use for more information."
             ),
         },
-        "file_number_offset": {
+        "pattern_number_offset": {
             "type": int,
             "default": 0,
-            "name": "First filename number",
+            "name": "First pattern number",
             "choices": None,
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The number of the first file to be used in processing. This number "
+                "The first number in the pattern to be used in processing. This number "
                 "will be applied as offset in the scan naming pattern to identify the "
                 "respective filename for scan points. For example, if the first file "
                 "is named `scan_0001.h5`, the offset should be set to 1."
             ),
         },
-        "file_number_delta": {
+        "pattern_number_delta": {
             "type": int,
             "default": 1,
-            "name": "Index stepping of filenames",
+            "name": "Index stepping of pattern",
             "choices": None,
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The difference in the index between two consecutive filenames. "
-                "A value of 1 would mean that each file is processed whereas a "
-                "value of n would mean that only every n-th file is processed. "
-                "For example, a value of 3 would process the files with the names "
-                "`scan_0000.h5`, `scan_0003.h5`, `scan_0006.h5` etc."
+                "The difference in the index between two consecutive pattern points. "
+                "A value of 1 would mean that each index is processed in the pattern "
+                "whereas a value of n would mean that only every n-th index (e.g. "
+                "filename) is processed.For example, a value of 3 would process the "
+                "files with the names `scan_0000.h5`, `scan_0003.h5`, `scan_0006.h5` "
+                "etc."
             ),
         },
         "frame_indices_per_scan_point": {

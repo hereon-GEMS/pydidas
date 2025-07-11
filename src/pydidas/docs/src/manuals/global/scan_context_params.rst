@@ -19,12 +19,12 @@ List of all ScanContext Parameters
     will be filled in with numbers for the various files. Note that individual
     plugins may use this Parameter for either directory or file names. Please refer
     to the specific InputPlugin in use for more information.
-- file_number_offset (type: int, default: 0, unit: )
+- pattern_number_offset (type: int, default: 0, unit: )
     The number of the first file to be used in processing. This number will be
     applied as offset in the scan naming pattern to identify the respective filename
     for scan points. For example, if the first file is named `scan_0001.h5`, the
     offset should be set to 1.
-- file_number_delta (type: int, default: 1, unit: )
+- pattern_number_delta (type: int, default: 1, unit: )
     The difference in the index between two consecutive filenames. A value of 1
     would mean that each file is processed whereas a value of n would mean that only
     every n-th file is processed. For example, a value of 3 would process the files

@@ -411,7 +411,7 @@ class WorkflowTestFrame(BaseFrame):
         int
             The global index.
         """
-        _i0 = SCAN.get_param_value("file_number_offset")
+        _i0 = SCAN.get_param_value("pattern_number_offset")
         _delta = SCAN.get_param_value("frame_indices_per_scan_point")
         _num = self.get_param_value("detector_image_index")
         _index = (_num - _i0) // _delta

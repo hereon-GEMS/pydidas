@@ -130,16 +130,16 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
         specific legacy import formats to handle.
         """
         if "scan_start_index" in cls.imported_params:
-            if "file_number_offset" in cls.imported_params:
+            if "pattern_number_offset" in cls.imported_params:
                 raise UserConfigError(
                     "The parameter `scan_start_index` is deprecated and has been "
-                    "replaced by `file_number_offset`. However, both parameter keys "
+                    "replaced by `pattern_number_offset`. However, both parameter keys "
                     "are present. Please verify the input file."
                 )
-            cls.imported_params["file_number_offset"] = cls.imported_params.pop(
+            cls.imported_params["pattern_number_offset"] = cls.imported_params.pop(
                 "scan_start_index"
             )
-            cls.imported_params["file_number_delta"] = 1
+            cls.imported_params["pattern_number_delta"] = 1
         if "scan_index_stepping" in cls.imported_params:
             if "frame_indices_per_scan_point" in cls.imported_params:
                 raise UserConfigError(

@@ -175,8 +175,8 @@ def test_update_filename_string__valid_pattern(
 @pytest.mark.parametrize("images_per_file", [1, 11, 47])
 def test_get_filename(offset, delta, frame_index, images_per_file, reset_scan):
     _input_fname = "test_name_{index:03d}.h5"
-    SCAN.set_param_value("file_number_offset", offset)
-    SCAN.set_param_value("file_number_delta", delta)
+    SCAN.set_param_value("pattern_number_offset", offset)
+    SCAN.set_param_value("pattern_number_delta", delta)
     plugin = TestInputPlugin(filename=_input_fname)
     plugin.set_param_value("_counted_images_per_file", images_per_file)
     _fname = plugin.get_filename(frame_index)

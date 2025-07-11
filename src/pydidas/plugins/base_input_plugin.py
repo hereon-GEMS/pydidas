@@ -162,8 +162,8 @@ class InputPlugin(BasePlugin):
         """
         _file_counter = frame_index // self.get_param_value("_counted_images_per_file")
         _file_index = _file_counter * self._SCAN.get_param_value(
-            "file_number_delta"
-        ) + self._SCAN.get_param_value("file_number_offset")
+            "pattern_number_delta"
+        ) + self._SCAN.get_param_value("pattern_number_offset")
         return self.filename_string.format(index=_file_index)
 
     def get_frame(self, frame_index: int, **kwargs: Any) -> Dataset:

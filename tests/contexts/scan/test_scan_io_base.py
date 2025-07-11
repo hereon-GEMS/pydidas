@@ -96,12 +96,12 @@ class TestScanIoBase(unittest.TestCase):
     def test_convert_legacy_param_names__w_scan_start_index(self):
         SCAN_IO.imported_params = {"scan_start_index": 42}
         SCAN_IO._convert_legacy_param_names()
-        self.assertEqual(SCAN_IO.imported_params["file_number_offset"], 42)
-        self.assertEqual(SCAN_IO.imported_params["file_number_delta"], 1)
+        self.assertEqual(SCAN_IO.imported_params["pattern_number_offset"], 42)
+        self.assertEqual(SCAN_IO.imported_params["pattern_number_delta"], 1)
         self.assertNotIn("scan_start_index", SCAN_IO.imported_params)
 
     def test_convert_legacy_param_names__w_scan_start_index__duplicate(self):
-        SCAN_IO.imported_params = {"scan_start_index": 42, "file_number_offset": 0}
+        SCAN_IO.imported_params = {"scan_start_index": 42, "pattern_number_offset": 0}
         with self.assertRaises(UserConfigError):
             SCAN_IO._convert_legacy_param_names()
 

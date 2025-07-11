@@ -333,8 +333,8 @@ def _global_settings_config() -> list[list[str, tuple, dict[str, Any]]]:
             _items.extend(__file_naming_header_config())
         _items.append(__param_widget_config(_name, linebreak=True))
     for _name in [
-        "file_number_offset",
-        "file_number_delta",
+        "pattern_number_offset",
+        "pattern_number_delta",
         "frame_indices_per_scan_point",
         "scan_frames_per_scan_point",
         "scan_multi_frame_handling",

@@ -85,9 +85,9 @@ has *global* Parameters for generic information, listed in detail below:
       - str
       - The naming pattern of the scan files. Use hashes '#' for wildcards 
         which will be replaced by indices.
-    * - file_number_offset
+    * - pattern_number_offset
       - int
-      - The starting index to subsititute the wildcards in the name pattern.
+      - The starting index to substitute the wildcards in the name pattern.
     * - scan_frames_per_scan_point
       - int
       - The number of frames acquired at each scan point.

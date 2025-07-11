@@ -78,8 +78,8 @@ class ScanIoFio(ScanIoBase):
         _defaults = {
             "scan_dim": ndim,
             "scan_title": "",
-            "file_number_offset": 0,
-            "file_number_delta": 1,
+            "pattern_number_offset": 0,
+            "pattern_number_delta": 1,
             "frame_indices_per_scan_point": 1,
             "scan_frames_per_scan_point": 1,
             "scan_multi_frame_handling": "Average",
@@ -407,7 +407,7 @@ class ScanIoFio(ScanIoBase):
             while _common[-1] == "0":
                 _common = _common[:-1]
             if _common and _stem_lengths.size == 1:
-                cls.imported_params["file_number_offset"] = int(
+                cls.imported_params["pattern_number_offset"] = int(
                     _stems[0][len(_common) :]
                 )
                 _common += "#" * (_stem_lengths[0] - len(_common))

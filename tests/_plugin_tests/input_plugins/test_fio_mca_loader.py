@@ -29,15 +29,18 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
-from pydidas.plugins import BasePlugin
+from pydidas.plugins import InputPlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
 
 COLLECTION = LocalPluginCollection()
 SCAN = ScanContext()
+_N_CHANNELS = 2048
+_N_DIRS = 13
+_N_FILES = 11
+_N = _N_FILES * _N_DIRS
 
 
 @pytest.fixture(scope="module")
@@ -56,7 +59,6 @@ def config():
     _config._data = np.repeat(
         np.arange(_config._n, dtype=np.uint16), _config._n_channels
     ).reshape((_config._n, _config._n_channels))
-    _config._params = {}
     _config._global_fnames = {}
     _config._name_pattern = "test_12_mca_s#.fio"
     for _ifile in range(_config._n_files):
@@ -69,8 +71,6 @@ def config():
             _file.write("\n".join(str(val) for val in _config._data[_ifile]))
     yield _config
     shutil.rmtree(_config._path)
-    qs = QtCore.QSettings("Hereon", "pydidas")
-    qs.remove("unittesting")
 
 
 @pytest.fixture
@@ -78,28 +78,25 @@ def setup_scan(config):
     SCAN.restore_all_defaults(True)
     SCAN.set_param_value("scan_name_pattern", config._name_pattern)
     SCAN.set_param_value("scan_base_directory", config._path)
-    SCAN.set_param_value("file_number_offset", 1)
+    SCAN.set_param_value("pattern_number_offset", 1)
     yield
     SCAN.restore_all_defaults(True)
 
 
 @pytest.fixture
-def plugin(config):
+def plugin():
     plugin = COLLECTION.get_plugin_by_name("FioMcaLoader")()
-    for _key, _val in config._params.items():
-        plugin.set_param_value(_key, _val)
     return plugin
 
 
 def test_creation():
     plugin = COLLECTION.get_plugin_by_name("FioMcaLoader")()
-    assert isinstance(plugin, BasePlugin)
-    assert not plugin.get_param_value("live_processing")
+    assert isinstance(plugin, InputPlugin)
 
 
 def test_update_filename_string(setup_scan, plugin):
     plugin.update_filename_string()
-    _fname = plugin.filename_string.format(index0=1)
+    _fname = plugin.filename_string.format(index=1)
     assert Path(_fname).is_file()
 
 
@@ -116,65 +113,25 @@ def test_get_filename__start(setup_scan, config, plugin):
     assert Path(_name) == config._global_fnames[0]
 
 
-def test_determine_roi__no_roi(setup_scan, plugin):
-    plugin.pre_execute()
-    assert plugin._config["roi"] is None
-
-
-def test_determine_roi__roi_no_abs_energy(setup_scan, plugin):
-    plugin.set_param_value("use_roi", True)
+@pytest.mark.parametrize("use_roi", [True, False])
+@pytest.mark.parametrize("custom_xscale", [True, False])
+def test_get_frame(setup_scan, config, plugin, use_roi, custom_xscale):
+    _delta = 2.5
+    _offset = 150
     plugin.set_param_value("roi_xlow", 128)
     plugin.set_param_value("roi_xhigh", 256)
-    plugin.pre_execute()
-    assert plugin._config["roi"] == slice(128, 256)
-
-
-def test_get_frame__no_x_scale(setup_scan, plugin):
+    plugin.set_param_value("x0_offset", _offset)
+    plugin.set_param_value("x_delta", _delta)
+    plugin.set_param_value("use_roi", use_roi)
+    plugin.set_param_value("use_custom_xscale", custom_xscale)
     _i_image = 37
     plugin.pre_execute()
     _data, _ = plugin.get_frame(_i_image)
+    _range_ref = np.arange(128, 256) if use_roi else np.arange(_N_CHANNELS)
+    if custom_xscale:
+        _range_ref = _range_ref * _delta + _offset
     assert np.all(_data == _i_image)
-    assert np.allclose(_data.axis_ranges[0], np.arange(_data.size))
-
-
-def test_get_frame__no_x_scale_w_roi(setup_scan, plugin):
-    _i_image = 37
-    plugin.set_param_value("use_roi", True)
-    plugin.set_param_value("roi_xlow", 128)
-    plugin.set_param_value("roi_xhigh", 256)
-    plugin.pre_execute()
-    _data, _ = plugin.get_frame(_i_image)
-    assert np.all(_data == _i_image)
-    assert np.allclose(_data.axis_ranges[0], np.arange(128, 256))
-
-
-def test_get_frame__w_x_scale(setup_scan, plugin):
-    _i_image = 42
-    _delta = 2.5
-    _offset = 150
-    plugin.set_param_value("use_custom_xscale", True)
-    plugin.set_param_value("x0_offset", _offset)
-    plugin.set_param_value("x_delta", _delta)
-    plugin.pre_execute()
-    _data, _ = plugin.get_frame(_i_image)
-    assert np.all(_data == _i_image)
-    assert np.allclose(_data.axis_ranges[0], np.arange(_data.size) * _delta + _offset)
-
-
-def test_get_frame__w_x_scale_and_roi(setup_scan, plugin):
-    _i_image = 87
-    _delta = 2.5
-    _offset = 150
-    plugin.set_param_value("use_custom_xscale", True)
-    plugin.set_param_value("x0_offset", _offset)
-    plugin.set_param_value("x_delta", _delta)
-    plugin.set_param_value("use_roi", True)
-    plugin.set_param_value("roi_xlow", 128)
-    plugin.set_param_value("roi_xhigh", 256)
-    plugin.pre_execute()
-    _data, _ = plugin.get_frame(_i_image)
-    assert np.all(_data == _i_image)
-    assert np.allclose(_data.axis_ranges[0], np.arange(128, 256) * _delta + _offset)
+    assert np.allclose(_data.axis_ranges[0], _range_ref)
 
 
 if __name__ == "__main__":

@@ -100,7 +100,7 @@ class Dataset(ndarray):
         similar arguments as the numpy function but preserves the metadata.
     - numpy.rollaxis:
         This function is deprecated and moveaxes should be used instead.
-    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc:
+    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc.:
         These functions work but return pure ndarrays without metadata.
 
 
@@ -154,7 +154,7 @@ class Dataset(ndarray):
             The new dataset object.
         """
         obj = np.array(array).view(cls)
-        update_dataset_properties_from_kwargs(obj, kwargs)
+        update_dataset_properties_from_kwargs(obj, kwargs)  # noqa
         return obj
 
     def __getitem__(self, key: int | tuple[int | slice] | slice) -> Self:
@@ -207,16 +207,16 @@ class Dataset(ndarray):
             for _key in METADATA_KEYS
         }
         # handle case of calling np.array with ndmin > self.ndim:
-        if self.ndim > obj.ndim and self._meta["_get_item_key"] == ():
-            for _ in range(self.ndim - obj.ndim):
+        if self.ndim > obj.ndim and self._meta["_get_item_key"] == ():  # noqa
+            for _ in range(self.ndim - obj.ndim):  # noqa
                 self.__insert_axis_keys(0)
         _keys_require_shifting = False
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
             if (
                 isinstance(_slicer, ndarray)
                 and _slicer.dtype == np.bool_
-                and _slicer.shape == obj.shape
-                and _slicer.ndim == obj.ndim
+                and _slicer.shape == obj.shape  # noqa
+                and _slicer.ndim == obj.ndim  # noqa
                 and _slicer.ndim > 1
             ):
                 # in the case of an n-dim masked array, keep all axis keys.
@@ -648,8 +648,7 @@ class Dataset(ndarray):
         ValueError
             If the index is not in range of the Dataset dimensions.
         """
-        if not 0 <= index < self.ndim:
-            raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
+        index = index % self.ndim
         _new = convert_ranges_and_check_length({index: item}, self.shape)
         self._meta["axis_ranges"][index] = _new[index]
 
@@ -670,8 +669,7 @@ class Dataset(ndarray):
             If the index is not in range of the Dataset dimensions or if the item is
             not a string.
         """
-        if not 0 <= index < self.ndim:
-            raise ValueError(f"The index *{index}* is out of bounds (0..{self.ndim}).")
+        index = index % self.ndim
         if not isinstance(item, str):
             raise ValueError(
                 f"The item `{item}` is not a string. Cannot update the axis label."
@@ -695,8 +693,7 @@ class Dataset(ndarray):
             If the index is not in range of the Dataset dimensions or if the item is
             not a string.
         """
-        if not 0 <= index < self.ndim:
-            raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
+        index = index % self.ndim
         if not isinstance(item, str):
             raise ValueError(
                 f"The item *{item}* is not a string. Cannot update the axis label."
@@ -865,7 +862,7 @@ class Dataset(ndarray):
                 new_shape = tuple(new_shape[0])
             elif isinstance(new_shape[0], tuple):
                 new_shape = new_shape[0]
-        _new = ndarray.reshape(self, new_shape, order=order)
+        _new = ndarray.reshape(self, new_shape, order=order)  # noqa
         _dim_matches = (
             {} if self.shape == () else get_corresponding_dims(self.shape, _new.shape)
         )
@@ -911,11 +908,11 @@ class Dataset(ndarray):
         if axis is None:
             _new._update_keys_in_flattened_array()  # noqa
         else:
-            _new._meta["axis_ranges"][axis] = np.repeat(self.axis_ranges[axis], repeats)
+            _new._meta["axis_ranges"][axis] = np.repeat(self.axis_ranges[axis], repeats)  # noqa E1101
         return _new
 
     @property
-    def shape(self) -> tuple:
+    def shape(self) -> tuple[int]:
         """
         Get the shape of the array.
 
@@ -1214,11 +1211,11 @@ class Dataset(ndarray):
         Dataset
             The rolled Dataset.
         """
-        _new = np.roll(self, shift, axis)
+        _new = np.roll(self, shift, axis)  # noqa E1101
         if self.ndim == 0:
             return _new
         elif self.ndim == 1:
-            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))
+            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))  # noqa E1101
             return _new
         if axis is None:
             warnings.warn(
@@ -1228,7 +1225,7 @@ class Dataset(ndarray):
                 UserWarning,
             )
             return _new
-        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))
+        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))  # noqa E1101
         return _new
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:

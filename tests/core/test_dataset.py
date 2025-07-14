@@ -764,11 +764,6 @@ class TestDataset(unittest.TestCase):
         obj = self.create_simple_dataset()
         self.assertIsInstance(obj.array, np.ndarray)
 
-    def test_update_axis_range__wrong_index(self):
-        obj = self.create_large_dataset()
-        with self.assertRaises(ValueError):
-            obj.update_axis_range(-4, 12)
-
     def test_update_axis_range__single_val(self):
         _val = 12
         obj = Dataset(np.random.random((10, 1, 10)))
@@ -787,11 +782,6 @@ class TestDataset(unittest.TestCase):
         with self.assertRaises(ValueError):
             obj.update_axis_range(1, _val)
 
-    def test_update_axis_label__wrong_index(self):
-        obj = self.create_large_dataset()
-        with self.assertRaises(ValueError):
-            obj.update_axis_label(-4, 12)
-
     def test_update_axis_label__single_val(self):
         _val = "a new label"
         obj = self.create_large_dataset()
@@ -802,11 +792,6 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         with self.assertRaises(ValueError):
             obj.update_axis_label(1, None)
-
-    def test_update_axis_unit__wrong_index(self):
-        obj = self.create_large_dataset()
-        with self.assertRaises(ValueError):
-            obj.update_axis_unit(-4, 12)
 
     def test_update_axis_unit__single_val(self):
         _val = "a new unit"

@@ -258,7 +258,8 @@ def test_execute__multiple_frames(
     for _key in ["data_label", "data_unit", "axis_labels", "axis_units"]:
         assert getattr(_data, _key) == _ref[_key]
     assert all(
-        np.allclose(_data.axis_ranges[i], _ref["axis_ranges"][i]) for i in range(output_dim)
+        np.allclose(_data.axis_ranges[i], _ref["axis_ranges"][i])
+        for i in range(output_dim)
     )
     match multi_frame:
         case "Average":

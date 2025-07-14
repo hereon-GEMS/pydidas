@@ -334,7 +334,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
     "files_per_directory": {
         "type": int,
         "default": -1,
-        "name": "Images per directory",
+        "name": "Files per directory",
         "choices": None,
         "unit": "",
         "allow_None": False,
@@ -410,7 +410,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "type": int,
         "default": 2,
         "name": "Data dimensionality",
-        "choices": [1, 2, 3],
+        "choices": [1, 2],
         "unit": "",
         "allow_None": False,
         "tooltip": "The dimensionality of the data to be loaded.",

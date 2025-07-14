@@ -54,9 +54,15 @@ class Hdf5fileSeriesLoader(InputPlugin):
     ----------
     hdf5_key : str, optional
         The key to access the hdf5 dataset in the file. The default is entry/data/data.
+    hdf5_slicing_axis : int, optional
+        The axis along which the images are sliced in the hdf5 file. If None, the
+        images are assumed to be stored in a single 2d array. If an integer is
+        provided, it is assumed that the images are stored in a 3d array and the
+        images are sliced along the given axis. The default is None.
     images_per_file : int, optional
-        The number of images per file. If -1, pydidas will auto-discover the number
-        of images per file based on the first file. The default is -1.
+        The number of images (or spectra in the case of 1d data)  per file.
+        If -1, pydidas will auto-discover the number of images per file based on
+        the first file. The default is -1.
     """
 
     plugin_name = "HDF5 file series loader"
@@ -119,6 +125,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
         kwargs["indices"] = self._index_func(_hdf_index)
 
         _data = import_data(_fname, roi=self._get_own_roi(), **kwargs)
-        _data.axis_units = ["pixel", "pixel"]
-        _data.axis_labels = ["detector y", "detector x"]
+        if _data.ndim == 2:
+            _data.axis_units = ["pixel", "pixel"]
+            _data.axis_labels = ["detector y", "detector x"]
         return _data, kwargs

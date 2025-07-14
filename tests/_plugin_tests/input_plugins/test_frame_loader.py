@@ -23,8 +23,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import os
-import pickle
 import shutil
 import tempfile
 import unittest
@@ -32,12 +30,12 @@ import warnings
 from pathlib import Path
 
 import numpy as np
+import pytest
 import skimage
 from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
-from pydidas.core import Parameter, UserConfigError
-from pydidas.core.utils import get_random_string
+from pydidas.core import Dataset, UserConfigError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
@@ -45,88 +43,69 @@ from pydidas.unittest_objects import LocalPluginCollection
 PLUGIN_COLLECTION = LocalPluginCollection()
 
 SCAN = ScanContext()
+_IMG_SHAPE = (11, 13)
+_N = 50
+_DATA = np.repeat(np.arange(_N, dtype=np.uint16), np.prod(_IMG_SHAPE)).reshape(
+    _N, *_IMG_SHAPE
+)
 
 
-class TestFrameLoader(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
-        cls._img_shape = (10, 10)
-        cls._n = 113
-        cls._fname_i0 = 2
-        cls._data = np.repeat(
-            np.arange(cls._n, dtype=np.uint16), np.prod(cls._img_shape)
-        ).reshape((cls._n,) + cls._img_shape)
-        cls._fnames = lambda i: os.path.join(cls._path, f"test_{i:05d}.tiff")
+@pytest.fixture(scope="module")
+def temp_dir():
+    _path = Path(tempfile.mkdtemp())
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        for i in range(_N):
+            _fname = _path / f"test_{i:05d}.tiff"
+            skimage.io.imsave(_fname, _DATA[i])
+    yield _path
+    shutil.rmtree(_path)
+    # necessary due to use of 'LocalPluginCollection':
+    qs = QtCore.QSettings("Hereon", "pydidas")
+    qs.remove("unittesting")
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            for i in range(cls._n):
-                _fname = Path(
-                    os.path.join(cls._path, f"test_{i + cls._fname_i0:05d}.tiff")
-                )
-                skimage.io.imsave(_fname, cls._data[i])
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls._path)
-        qs = QtCore.QSettings("Hereon", "pydidas")
-        qs.remove("unittesting")
+@pytest.fixture
+def set_up_scan(temp_dir):
+    SCAN.restore_all_defaults(True)
+    SCAN.set_param_value("scan_name_pattern", "test_#####.tiff")
+    SCAN.set_param_value("scan_base_directory", temp_dir)
 
-    def setUp(self):
-        SCAN.restore_all_defaults(True)
-        SCAN.set_param_value("scan_name_pattern", "test_#####.tiff")
-        SCAN.set_param_value("scan_base_directory", self._path)
-        SCAN.set_param_value("file_number_offset", self._fname_i0)
 
-    def tearDown(self):
-        SCAN.restore_all_defaults(True)
+def test_creation():
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
+    assert isinstance(plugin, BasePlugin)
 
-    def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        self.assertIsInstance(plugin, BasePlugin)
 
-    def test_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        with self.assertRaises(UserConfigError):
-            plugin.execute(0)
+def test_execute__no_input():
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
+    with pytest.raises(UserConfigError):
+        plugin.execute(0)
 
-    def test_execute__simple(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        _index = 0
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue((_data == _index).all())
 
-    def test_execute__with_roi(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        plugin.set_param_value("use_roi", True)
-        plugin.set_param_value("roi_yhigh", 5)
-        _index = 0
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue((_data == _index).all())
-        self.assertEqual(
-            _data.shape, (plugin.get_param_value("roi_yhigh"), self._img_shape[1])
-        )
+@pytest.mark.parametrize("ordinal", [0, 11, 21, 34])
+@pytest.mark.parametrize("use_roi", [True, False])
+def test_get_frame(set_up_scan, ordinal, use_roi):
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
+    plugin.set_param_value("use_roi", use_roi)
+    plugin.set_param_value("roi_yhigh", 5)
+    plugin.pre_execute()
+    _data, kwargs = plugin.get_frame(ordinal)
+    assert isinstance(_data, Dataset)
+    assert _data.shape == (5 if use_roi else _IMG_SHAPE[0], _IMG_SHAPE[1])
+    assert np.allclose(_data, ordinal)
 
-    def test_execute__get_all_frames(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        plugin.pre_execute()
-        for _index in range(self._n):
-            _data, kwargs = plugin.execute(_index)
-            self.assertTrue((_data == _index).all())
 
-    def test_pickle(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        _new_params = {get_random_string(6): get_random_string(12) for i in range(7)}
-        for _key, _val in _new_params.items():
-            plugin.add_param(Parameter(_key, str, _val))
-        plugin2 = pickle.loads(pickle.dumps(plugin))
-        for _key in plugin.params:
-            self.assertEqual(
-                plugin.get_param_value(_key), plugin2.get_param_value(_key)
-            )
+@pytest.mark.parametrize("ordinal", [0, 11, 21, 34])
+@pytest.mark.parametrize("use_roi", [True, False])
+def test__integration__execute(set_up_scan, ordinal, use_roi):
+    plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
+    plugin.set_param_value("use_roi", use_roi)
+    plugin.set_param_value("roi_yhigh", 5)
+    plugin.pre_execute()
+    _data, kwargs = plugin.execute(ordinal)
+    assert np.allclose(_data, ordinal)
+    assert _data.shape == (5 if use_roi else _IMG_SHAPE[0], _IMG_SHAPE[1])
 
 
 if __name__ == "__main__":

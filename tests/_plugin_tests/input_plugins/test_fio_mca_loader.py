@@ -29,6 +29,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
 from pydidas.plugins import InputPlugin
@@ -71,6 +72,9 @@ def config():
             _file.write("\n".join(str(val) for val in _config._data[_ifile]))
     yield _config
     shutil.rmtree(_config._path)
+    # necessary due to use of 'LocalPluginCollection':
+    qs = QtCore.QSettings("Hereon", "pydidas")
+    qs.remove("unittesting")
 
 
 @pytest.fixture

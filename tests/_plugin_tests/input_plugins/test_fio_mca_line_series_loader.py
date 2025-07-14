@@ -29,6 +29,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
 from pydidas.core import FileReadError, UserConfigError
@@ -73,6 +74,9 @@ def temp_dir_w_files():
                 _file.write("\n".join(str(val) for val in _data[_global_index]))
     yield _path, _fnames
     shutil.rmtree(_path)
+    # necessary due to use of 'LocalPluginCollection':
+    qs = QtCore.QSettings("Hereon", "pydidas")
+    qs.remove("unittesting")
 
 
 @pytest.fixture

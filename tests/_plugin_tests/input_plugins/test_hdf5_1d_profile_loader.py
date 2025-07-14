@@ -31,6 +31,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pytest
+from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter, UserConfigError
@@ -66,6 +67,9 @@ def config():
             f["/entry/data/data"] = _config.data[_slice]
     yield _config
     shutil.rmtree(_config.path)
+    # necessary due to use of 'LocalPluginCollection':
+    qs = QtCore.QSettings("Hereon", "pydidas")
+    qs.remove("unittesting")
 
 
 @pytest.fixture

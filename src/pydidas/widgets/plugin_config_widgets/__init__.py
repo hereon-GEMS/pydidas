@@ -28,6 +28,7 @@ __status__ = "Production"
 from .edit_plugin_parameters_widget import *
 from .fit_plugin_config_widget import *
 from .generic_plugin_config_widget import *
+from .plugin_config_widget_with_custom_xscale import *
 from .pyfai_integration_config_widget import *
 
 
@@ -36,6 +37,7 @@ __all__ = (
     + generic_plugin_config_widget.__all__
     + fit_plugin_config_widget.__all__
     + pyfai_integration_config_widget.__all__
+    + plugin_config_widget_with_custom_xscale.__all__,
 )
 
 del (
@@ -43,4 +45,5 @@ del (
     generic_plugin_config_widget,
     fit_plugin_config_widget,
     pyfai_integration_config_widget,
+    plugin_config_widget_with_custom_xscale,
 )

@@ -34,19 +34,16 @@ from typing import Any
 from pydidas.contexts import ScanContext
 from pydidas.core import (
     Dataset,
-    get_generic_param_collection,
+    Parameter,
 )
 from pydidas.core.utils import fio_utils as fio
-from pydidas.plugins import InputPlugin
-from pydidas.widgets.plugin_config_widgets.plugin_config_widget_with_custom_xscale import (
-    PluginConfigWidgetWithCustomXscale,
-)
+from pydidas.plugins import Input1dXRangeMixin, InputPlugin
 
 
 SCAN = ScanContext()
 
 
-class FioMcaLoader(InputPlugin):
+class FioMcaLoader(Input1dXRangeMixin, InputPlugin):
     """
     Load 1d data from a series of .fio files with MCA data (in a single directory).
 
@@ -80,17 +77,8 @@ class FioMcaLoader(InputPlugin):
     """
 
     plugin_name = "Fio MCA loader"
-    base_output_data_dim = 1
-    default_params = get_generic_param_collection(
-        "use_custom_xscale",
-        "x0_offset",
-        "x_delta",
-        "x_label",
-        "x_unit",
-    )
-    has_unique_parameter_config_widget = True
 
-    def __init__(self, *args: tuple, **kwargs: Any):
+    def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self._config.update({"header_lines": 0})
 
@@ -98,8 +86,8 @@ class FioMcaLoader(InputPlugin):
         """
         Prepare loading spectra from a file series.
         """
+        super().pre_execute()
         _index = 0 if Path(self.get_filename(0)).is_file() else 1
-        InputPlugin.pre_execute(self)
         fio.update_config_from_fio_file(
             self.get_filename(_index), self._config, self.params
         )
@@ -125,7 +113,3 @@ class FioMcaLoader(InputPlugin):
         """
         _dataset = fio.load_fio_spectrum(self.get_filename(index), self._config)
         return _dataset, kwargs
-
-    def get_parameter_config_widget(self):
-        """Get the parameter config widget for the plugin."""
-        return PluginConfigWidgetWithCustomXscale

@@ -191,14 +191,14 @@ GENERIC_PARAMS_DATA_IMPORT = {
     "images_per_file": {
         "type": int,
         "default": -1,
-        "name": "Images per file",
+        "name": "Images/spectra per file",
         "choices": None,
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of images in the file. For hdf5 files, this corresponds to "
-            "the number of frames in the hdf5 dataset. A value -1 auto-discovers "
-            "the number of images per file."
+            "The number of images or spectra in the file. For hdf5 files, this "
+            "corresponds to the number of image frames/spectra in the hdf5 dataset. "
+            "A value -1 auto-discovers the number of images per file."
         ),
     },
     "profiles_per_file": {

@@ -53,8 +53,8 @@ PARAMS_WITH_INT = [
     "scan_dim1_n_points",
     "scan_dim2_n_points",
     "scan_dim3_n_points",
-    "file_number_offset",
-    "file_number_delta",
+    "pattern_number_offset",
+    "pattern_number_delta",
     "scan_frames_per_scan_point",
     "frame_indices_per_scan_point",
 ]

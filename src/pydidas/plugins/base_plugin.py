@@ -31,7 +31,7 @@ __all__ = ["BasePlugin"]
 
 import copy
 from numbers import Integral
-from typing import NoReturn, Self
+from typing import Any, NoReturn, Self
 
 from qtpy import QtCore
 
@@ -39,6 +39,7 @@ from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import (
     Dataset,
     ObjectWithParameterCollection,
+    Parameter,
     ParameterCollection,
     UserConfigError,
     get_generic_param_collection,
@@ -283,7 +284,7 @@ class BasePlugin(ObjectWithParameterCollection):
             return "None"
         return str(cls.output_data_dim)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__()
         if self.plugin_type not in [
             BASE_PLUGIN,

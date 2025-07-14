@@ -79,7 +79,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
     sig_updated_plugins = QtCore.Signal()
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         ObjectWithParameterCollection.__init__(self, **kwargs)
         self.plugins = {}
         self._plugin_types = {}
@@ -127,7 +127,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             )
         return _existing_paths
 
-    def verify_is_initialized(self):
+    def verify_is_initialized(self) -> None:
         """
         Verify that the instance is initialized.
 
@@ -196,13 +196,15 @@ class PluginRegistry(ObjectWithParameterCollection):
             )
         return _existing_paths
 
-    def find_and_register_plugins(self, *plugin_paths: Path, reload: bool = True):
+    def find_and_register_plugins(
+        self, *plugin_paths: Path, reload: bool = True
+    ) -> None:
         """
         Find plugins in the given path(s) and register them in the PluginCollection.
 
         Parameters
         ----------
-        plugin_paths : Path
+        *plugin_paths : Path
             Any number of file system paths.
         reload : bool, optional
             Flag to handle reloading of plugins if a plugin with an identical
@@ -220,7 +222,9 @@ class PluginRegistry(ObjectWithParameterCollection):
         else:
             self._config["must_emit_signal"] = True
 
-    def _find_and_register_plugins_in_path(self, path: Path, reload: bool = True):
+    def _find_and_register_plugins_in_path(
+        self, path: Path, reload: bool = True
+    ) -> None:
         """
         Find the plugin in a specific path.
 
@@ -239,7 +243,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             for _name, _cls in _class_members:
                 self.check_and_register_class(_cls, reload)
 
-    def _store_plugin_path(self, plugin_path: Path, verbose: bool = False):
+    def _store_plugin_path(self, plugin_path: Path, verbose: bool = False) -> None:
         """
         Store the plugin path.
 
@@ -311,7 +315,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
     def check_and_register_class(
         self, class_: Type[BasePlugin] | Type[type], reload: bool = False
-    ):
+    ) -> None:
         """
         Check whether a class is a valid plugin and register it.
 
@@ -338,7 +342,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             self.remove_plugin_from_collection(class_)
             self.__add_new_class(class_)
 
-    def __add_new_class(self, class_: Type[BasePlugin]):
+    def __add_new_class(self, class_: Type[BasePlugin]) -> None:
         """
         Add a new class to the collection.
 
@@ -363,7 +367,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         )
         self._plugin_names[class_.plugin_name] = class_.__name__
 
-    def remove_plugin_from_collection(self, class_: Type[BasePlugin]):
+    def remove_plugin_from_collection(self, class_: Type[BasePlugin]) -> None:
         """
         Remove a Plugin from the PluginCollection.
 
@@ -389,7 +393,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.verify_is_initialized()
         return list(self.plugins.keys())
 
-    def get_plugin_by_plugin_name(self, plugin_name: str) -> type:
+    def get_plugin_by_plugin_name(self, plugin_name: str) -> Type[BasePlugin]:
         """
         Get a plugin by its plugin name.
 
@@ -410,7 +414,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             f"No plugin with plugin_name `{plugin_name}` has been registered!"
         )
 
-    def get_plugin_by_name(self, name: str) -> type:
+    def get_plugin_by_name(self, name: str) -> Type[BasePlugin]:
         """
         Get a plugin by its class name.
 
@@ -431,7 +435,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             return self._plugin_basic_types[name]
         raise KeyError(f"No plugin with name `{name}` has been registered!")
 
-    def get_all_plugins(self) -> list[type]:
+    def get_all_plugins(self) -> list[Type[BasePlugin]]:
         """
         Get a list of all plugins.
 
@@ -445,7 +449,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
     def get_all_plugins_of_type(
         self, plugin_type: Literal["base", "input", "proc", "output"]
-    ):
+    ) -> list[Type[BasePlugin]]:
         """
         Get all Plugins of a specific type (base, input, proc, or output).
 
@@ -482,7 +486,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.verify_is_initialized()
         return self._plugin_paths[:]
 
-    def unregister_plugin_path(self, path: Path | str):
+    def unregister_plugin_path(self, path: Path | str) -> None:
         """
         Unregister the given path from the PluginCollection.
 
@@ -511,7 +515,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.clear_collection(confirmation=True)
         self.verify_is_initialized()
 
-    def unregister_all_paths(self, confirmation: bool = False):
+    def unregister_all_paths(self, confirmation: bool = False) -> None:
         """
         Unregister all paths.
 
@@ -528,7 +532,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.q_settings_set("user/plugin_path", None)
         self.clear_collection(True)
 
-    def clear_collection(self, confirmation: bool = False):
+    def clear_collection(self, confirmation: bool = False) -> None:
         """
         Clear the collection and remove all registered plugins.
 

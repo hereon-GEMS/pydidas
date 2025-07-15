@@ -62,7 +62,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         self._autoscale_height = kwargs.pop("autoscale_height", False)
         self._qtapp = PydidasQApplication.instance()
         QtWidgets.QTableWidget.__init__(
-            self, kwargs.pop("columnCount", 0), kwargs.pop("rowCount", 0)
+            self, kwargs.pop("rowCount", 0), kwargs.pop("columnCount", 0)
         )
         PydidasWidgetMixin.__init__(self, **kwargs)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)

@@ -145,7 +145,7 @@ GENERIC_PARAMS_SCAN = (
                 "multiplicity to the scan."
             ),
         },
-        "scan_frames_per_scan_point": {
+        "scan_frames_per_point": {
             "type": int,
             "default": 1,
             "name": "Frames to process per scan point",

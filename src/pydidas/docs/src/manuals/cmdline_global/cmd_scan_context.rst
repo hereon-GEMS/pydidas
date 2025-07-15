@@ -88,7 +88,7 @@ has *global* Parameters for generic information, listed in detail below:
     * - pattern_number_offset
       - int
       - The starting index to substitute the wildcards in the name pattern.
-    * - scan_frames_per_scan_point
+    * - scan_frames_per_point
       - int
       - The number of frames acquired at each scan point.
         Note: If you want to handle multiple images individually, add them as 

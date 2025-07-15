@@ -36,7 +36,7 @@ SCAN_GENERIC_PARAM_NAMES = [
     "pattern_number_offset",
     "pattern_number_delta",
     "frame_indices_per_scan_point",
-    "scan_frames_per_scan_point",
+    "scan_frames_per_point",
     "scan_multi_frame_handling",
 ]
 

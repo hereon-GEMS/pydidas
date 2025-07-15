@@ -336,7 +336,7 @@ def _global_settings_config() -> list[list[str, tuple, dict[str, Any]]]:
         "pattern_number_offset",
         "pattern_number_delta",
         "frame_indices_per_scan_point",
-        "scan_frames_per_scan_point",
+        "scan_frames_per_point",
         "scan_multi_frame_handling",
     ]:
         if _name == "frame_indices_per_scan_point":

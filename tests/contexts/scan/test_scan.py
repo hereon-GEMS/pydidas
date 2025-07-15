@@ -158,7 +158,7 @@ def test_get_metadata_for_dim():
 def test_get_indices_from_ordinal(n_frames):
     scan = Scan()
     set_scan_params(scan)
-    scan.set_param_value("scan_frames_per_scan_point", n_frames)
+    scan.set_param_value("scan_frames_per_point", n_frames)
     _pos = tuple(i - 2 for i in _scan_param_values["shape"])
     _shape = _scan_param_values["shape"] + (1,)
     _n = np.sum(
@@ -265,7 +265,7 @@ def test_update_from_dictionary__all_entries_present():
         "scan_name_pattern": "test_###",
         "pattern_number_offset": 1,
         "frame_indices_per_scan_point": 1,
-        "scan_frames_per_scan_point": 1,
+        "scan_frames_per_point": 1,
         "scan_multi_frame_handling": "Sum",
         0: {
             "label": get_random_string(5),
@@ -306,7 +306,7 @@ def test_set_param_value__deprecated():
 def test_get_frame_indices_from_ordinal(indices, frames, ordinal):
     scan = Scan()
     set_scan_params(scan)
-    scan.set_param_value("scan_frames_per_scan_point", frames)
+    scan.set_param_value("scan_frames_per_point", frames)
     scan.set_param_value("frame_indices_per_scan_point", indices)
     _indices = scan.get_frame_indices_from_ordinal(ordinal)
     assert _indices == [ordinal * indices + _i for _i in range(frames)]

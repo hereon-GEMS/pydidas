@@ -148,7 +148,7 @@ def test__init__correct_params(base_output_data_dim):
 def test_output_data_dim(reset_scan, base_dim, n_frames, multi_frame):
     plugin = create_plugin_class(INPUT_PLUGIN)()
     plugin.base_output_data_dim = base_dim
-    SCAN.set_param_value("scan_frames_per_scan_point", n_frames)
+    SCAN.set_param_value("scan_frames_per_point", n_frames)
     SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
     _expected_dim = base_dim
     if n_frames > 1 and multi_frame == "Stack":
@@ -228,7 +228,7 @@ def test_pickle():
 @pytest.mark.parametrize("i_per_point", [1, 4, 7])
 @pytest.mark.parametrize("output_dim", [1, 2])
 def test_execute__single(reset_scan, ordinal, multi_frame, i_per_point, output_dim):
-    SCAN.set_param_value("scan_frames_per_scan_point", 1)
+    SCAN.set_param_value("scan_frames_per_point", 1)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
     plugin = TestInputPlugin(ndim=output_dim)
@@ -247,7 +247,7 @@ def test_execute__single(reset_scan, ordinal, multi_frame, i_per_point, output_d
 def test_execute__multiple_frames(
     reset_scan, ordinal, multi_frame, i_per_point, n_frames, output_dim
 ):
-    SCAN.set_param_value("scan_frames_per_scan_point", n_frames)
+    SCAN.set_param_value("scan_frames_per_point", n_frames)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
     plugin = TestInputPlugin(ndim=output_dim)
@@ -282,7 +282,7 @@ def test_execute__multiple_frames(
 def test_execute__multiple_frame_stack(
     reset_scan, ordinal, i_per_point, n_frames, output_dim
 ):
-    SCAN.set_param_value("scan_frames_per_scan_point", n_frames)
+    SCAN.set_param_value("scan_frames_per_point", n_frames)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", "Stack")
     plugin = TestInputPlugin(ndim=output_dim)

@@ -94,7 +94,7 @@ def test_pre_execute__no_input(setup_scan):
 def test_execute(setup_scan, ordinal, frame_indices, custom_xscale, handling):
     _ref_range = _CUSTOM_XRANGE if custom_xscale else np.arange(_DUMMY_SHAPE_1d[0])
     SCAN.set_param_value("scan_multi_frame_handling", handling)
-    SCAN.set_param_value("scan_frames_per_scan_point", frame_indices)
+    SCAN.set_param_value("scan_frames_per_point", frame_indices)
     plugin = TestInputPlugin()
     plugin.set_param_value("use_custom_xscale", custom_xscale)
     plugin.set_param_value("x0_offset", _X_OFFSET)

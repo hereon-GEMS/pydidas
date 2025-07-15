@@ -151,13 +151,13 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
                 cls.imported_params.pop("scan_index_stepping")
             )
         if "scan_multiplicity" in cls.imported_params:
-            if "scan_frames_per_scan_point" in cls.imported_params:
+            if "scan_frames_per_point" in cls.imported_params:
                 raise UserConfigError(
                     "The parameter `scan_multiplicity` is deprecated and has been "
-                    "replaced by `scan_frames_per_scan_point`. However, both "
+                    "replaced by `scan_frames_per_point`. However, both "
                     "parameter keys are present. Please verify the input file."
                 )
-            cls.imported_params["scan_frames_per_scan_point"] = cls.imported_params.pop(
+            cls.imported_params["scan_frames_per_point"] = cls.imported_params.pop(
                 "scan_multiplicity"
             )
         if "scan_multi_image_handling" in cls.imported_params:

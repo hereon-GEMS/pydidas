@@ -41,7 +41,7 @@ List of all ScanContext Parameters
     Define the handling of images if multiple images were acquired per scan point.
     If all individual images should be kept, please set the scan multiplicity to 1
     and add an additional dimension with the multiplicity to the scan.
-- scan_frames_per_scan_point (type: int, default: 1, unit: )
+- scan_frames_per_point (type: int, default: 1, unit: )
     The number of frames to process at *each* scan point. The default of `1`
     corresponds to one image per scan point. Please note that the value for the
     points. If this setting is used for `averaging` images, please reduce the number

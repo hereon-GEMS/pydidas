@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = ["ScanFileNamingInformationWindow"]
 
 
-from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore, QtWidgets

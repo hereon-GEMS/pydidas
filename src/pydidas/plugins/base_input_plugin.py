@@ -94,7 +94,7 @@ class InputPlugin(BasePlugin):
         """
         return self.base_output_data_dim + (
             1
-            if self._SCAN.get_param_value("scan_frames_per_scan_point") > 1
+            if self._SCAN.get_param_value("scan_frames_per_point") > 1
             and self._SCAN.get_param_value("scan_multi_frame_handling") == "Stack"
             else 0
         )

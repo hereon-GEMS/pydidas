@@ -81,7 +81,7 @@ class ScanIoFio(ScanIoBase):
             "pattern_number_offset": 0,
             "pattern_number_delta": 1,
             "frame_indices_per_scan_point": 1,
-            "scan_frames_per_scan_point": 1,
+            "scan_frames_per_point": 1,
             "scan_multi_frame_handling": "Average",
             "scan_name_pattern": filepath.stem,
             "scan_base_directory": filepath.parents[1],

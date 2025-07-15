@@ -122,13 +122,13 @@ class TestScanIoBase(unittest.TestCase):
     def test_convert_legacy_params__w_scan_multiplicity(self):
         SCAN_IO.imported_params = {"scan_multiplicity": 7}
         SCAN_IO._convert_legacy_param_names()
-        self.assertEqual(SCAN_IO.imported_params["scan_frames_per_scan_point"], 7)
+        self.assertEqual(SCAN_IO.imported_params["scan_frames_per_point"], 7)
         self.assertNotIn("scan_multiplicity", SCAN_IO.imported_params)
 
     def test_convert_legacy_params__w_scan_multiplicity__duplicate(self):
         SCAN_IO.imported_params = {
             "scan_multiplicity": 7,
-            "scan_frames_per_scan_point": 2,
+            "scan_frames_per_point": 2,
         }
         with self.assertRaises(UserConfigError):
             SCAN_IO._convert_legacy_param_names()

@@ -55,7 +55,7 @@ PARAMS_WITH_INT = [
     "scan_dim3_n_points",
     "pattern_number_offset",
     "pattern_number_delta",
-    "scan_frames_per_scan_point",
+    "scan_frames_per_point",
     "frame_indices_per_scan_point",
 ]
 PARAMS_WITH_STR = [

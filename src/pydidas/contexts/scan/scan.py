@@ -48,7 +48,7 @@ SCAN_DEFAULT_PARAMS = get_generic_param_collection(
     "pattern_number_offset",
     "pattern_number_delta",
     "frame_indices_per_scan_point",
-    "scan_frames_per_scan_point",
+    "scan_frames_per_point",
     "scan_multi_frame_handling",
     "scan_dim0_label",
     "scan_dim1_label",
@@ -74,7 +74,7 @@ SCAN_DEFAULT_PARAMS = get_generic_param_collection(
 SCAN_LEGACY_PARAMS = {
     "scan_start_index": "pattern_number_offset",
     "scan_index_stepping": "frame_indices_per_scan_point",
-    "scan_multiplicity": "scan_frames_per_scan_point",
+    "scan_multiplicity": "scan_frames_per_point",
     "scan_multi_image_handling": "scan_multi_frame_handling",
 }
 
@@ -245,7 +245,7 @@ class Scan(ObjectWithParameterCollection):
             "scan_name_pattern",
             "pattern_number_offset",
             "frame_indices_per_scan_point",
-            "scan_frames_per_scan_point",
+            "scan_frames_per_point",
             "scan_multi_frame_handling",
         ]:
             self.set_param_value(_pname, scan_dict[_pname])
@@ -426,5 +426,5 @@ class Scan(ObjectWithParameterCollection):
             The list of frame indices for this scan point.
         """
         _i0 = ordinal * self.get_param_value("frame_indices_per_scan_point")
-        _n_frames = self.get_param_value("scan_frames_per_scan_point")
+        _n_frames = self.get_param_value("scan_frames_per_point")
         return [_i0 + _i for _i in range(_n_frames)]

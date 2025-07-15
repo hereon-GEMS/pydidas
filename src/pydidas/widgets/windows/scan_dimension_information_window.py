@@ -28,12 +28,14 @@ __all__ = ["ScanDimensionInformationWindow"]
 
 
 from pathlib import Path
+from typing import Any
 
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtGui
 
 from pydidas.core import constants
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.scroll_area import ScrollArea
+from pydidas_qtcore import PydidasQApplication
 
 
 INTRO_TEXT = (
@@ -60,11 +62,11 @@ INTRO_TEXT = (
 
 EXAMPLE_0 = (
     "Consider the following example of a two-dimensional mesh scan in <i>x</i> and "
-    "<i>z</i>: Three linescans with 6 points each in <i>x</i> inside a loop over 3 "
+    "<i>z</i>: Three line scans with 6 points each in <i>x</i> inside a loop over 3 "
     "<i>z</i> positions:"
 )
 EXAMPLE_1 = (
-    "Programmaticly, this scan is written as:"
+    "Programmatically, this scan is written as:"
     "<pre><code>n = 0"
     "<br>for <i>i_z</i> in [0, 1, 2]:"
     "<br>    move z-motor to position z(i_z)"
@@ -93,10 +95,10 @@ class ScanDimensionInformationWindow(PydidasWindow):
     show_frame = False
     width_factor = 88
 
-    def __init__(self, **kwargs: dict):
-        PydidasWindow.__init__(self, title="Scan dimension help", **kwargs)
+    def __init__(self, **kwargs: Any):
+        PydidasWindow.__init__(self, title="Scan dimension help", **kwargs)  # noqa
         self.setMinimumHeight(600)
-        self._qtapp = QtWidgets.QApplication.instance()
+        self._qtapp = PydidasQApplication.instance()
         self.process_new_font_metrics(*self._qtapp.font_metrics)
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
@@ -213,7 +215,7 @@ class ScanDimensionInformationWindow(PydidasWindow):
         self._widgets["but_close"].clicked.connect(self.close)
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
+    def process_new_font_metrics(self, char_width: float, char_height: float):  # noqa
         """
         Set the fixed width of the widget dynamically from the font height metric.
 

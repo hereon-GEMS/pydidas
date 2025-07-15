@@ -28,95 +28,65 @@ __all__ = ["ScanFileNamingInformationWindow"]
 
 
 from pathlib import Path
+from typing import Any
 
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import constants
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.scroll_area import ScrollArea
+from pydidas_qtcore import PydidasQApplication
 
 
 INTRO_TEXT = """
 The scan/file naming pattern determines how the input plugins in the pydidas Workflow
-interpret the path to the detector images. For most input plugins, the 
-scan/file naming pattern corresponds directly to the file names of the files.
-
+interpret the path to the detector images. <br>
+<br>
+For most input plugins, the scan/file naming pattern corresponds directly to the
+file names of the files. <br>
+<br>
 Some plugins use the scan/file naming pattern not only for the file names but also
 to access files in a nested directory structure. Please check the documentation
 of the individual input plugins for details on how the scan/file naming pattern is 
-used by the particular plugin.
-
+used by the particular plugin. <br>
+<br>
 If multiple files are used in a scan, the scan/file naming pattern must be set up
 to specify which part of the file name corresponds to the counting variable.
 The dynamic part of the file name must be replaced by a placeholder of hash characters
 `<b>#</b>` of the same length as the digits of the number to be replaced. Files which
 include a counter of variable length (e.g. `image_9.tif`, `image_10.tif`, etc.)
-should use a placeholder of the minimum length of the counter.
-
+should use a placeholder of the minimum length of the counter. <br>
+<br>
 The <i>First filename number</i> is the first number that should be used in the 
-scan/file naming pattern. The index stepping of filenames defined, by how much the 
+scan/file naming pattern. The index stepping of filenames defines by how much the 
 counter should be incremented for each file."""
 
+_TEXT_ACCESS_INTRO = (
+    "For accessing the ScanContext parameters programmatically, the following keys "
+    "must be used:"
+)
 
-SCAN_PARAMS_PROGRAMMATIC_ACCESS = """
-For accessing the ScanContext parameters programmatically, the following keys must
-be used:
-- Scan/file naming pattern: <code>scan_name_pattern</code>
-- First filename number: <code>file_number_offset</code>
-- index stepping of filenames: <code>file_number_delta</code>
-
-For example:
-<pre><code>
-Scan = pydidas.contexts.ScanContext()
-<br>Scan.set_param("scan_name_pattern", "image_####.tif")
-<br>Scan.set_param("file_number_offset", 1)
+_TEXT_ACCESS_EXAMPLE = """
+An example of modifying the scan/file naming pattern programmatically is shown below: 
+<pre><code>Scan = pydidas.contexts.ScanContext()
+Scan.set_param("scan_name_pattern", "image_####.tif")
+Scan.set_param("pattern_number_offset", 1)
 </code></pre>
 """
 
 
-EXAMPLE_0 = """
-<i>image_0001.tif, image_0002.tif, image_0003.tif, ...</i>
-
-The scan/file naming pattern for the above example would be:
-- Scan/file naming pattern:<pre><t>   <code>image_####.tif</code>
-- First filename number:     <code>1</code>
-"""
-
-
-EXAMPLE_1 = (
-    "Programmaticly, this scan is written as:"
-    "<pre><code>n = 0"
-    "<br>for <i>i_z</i> in [0, 1, 2]:"
-    "<br>    move z-motor to position z(i_z)"
-    "<br>    for <i>j_x</i> in <i>[0, 1, 2, 3, 4, 5]</i>:"
-    "<br>        move x-motor to position x(j_x)"
-    "<br>        acquire image <i>n</i>"
-    "<br>        <i>n = n + 1</i></code></pre>"
-    "The (detector) frame numbers <i>n</i> are given by incrementing a global index, "
-    "starting with <code>n = 0</code>:"
-)
-
-EXAMPLE_2 = (
-    "Because <i>x</i> is iterating faster than <i>z</i>, it is considered the fast "
-    "axis and must be put as scan dimension 2 in pydidas to be consistent with the "
-    "programmatical scan order."
-)
-
-IMAGE_PATH = Path(__file__).parent.parent.parent.joinpath("resources", "images")
-
-
 class ScanFileNamingInformationWindow(PydidasWindow):
     """
-    Window which displays information about scan dimensions and their order.
+    Window which displays information about scan naming conventions.
     """
 
     show_frame = False
-    width_factor = 88
+    width_factor = 110
 
-    def __init__(self, **kwargs: dict):
-        PydidasWindow.__init__(self, title="Scan file naming help", **kwargs)
+    def __init__(self, **kwargs: Any):
+        PydidasWindow.__init__(self, title="Scan file naming help", **kwargs)  # noqa
         self.setMinimumHeight(600)
-        self._qtapp = QtWidgets.QApplication.instance()
+        self._qtapp = PydidasQApplication.instance()
         self.process_new_font_metrics(*self._qtapp.font_metrics)
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
@@ -124,6 +94,15 @@ class ScanFileNamingInformationWindow(PydidasWindow):
         """
         Build the frame and create all widgets.
         """
+        _label_kwargs = dict(
+            openExternalLinks=True,
+            textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
+            textFormat=QtCore.Qt.RichText,
+            gridPos=(-1, 0, 1, 1),
+            font_metric_width_factor=self.width_factor,
+            parent_widget="canvas",
+            wordWrap=True,
+        )
 
         self.create_empty_widget(
             "canvas",
@@ -150,74 +129,96 @@ class ScanFileNamingInformationWindow(PydidasWindow):
         )
         self.create_spacer(None, parent_widget="canvas")
         self.create_label(
-            "label_intro",
-            INTRO_TEXT,
-            openExternalLinks=True,
-            textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
-            textFormat=QtCore.Qt.RichText,
-            gridPos=(-1, 0, 1, 1),
-            font_metric_width_factor=self.width_factor,
-            font_metric_height_factor=19,
-            parent_widget="canvas",
-            wordWrap=True,
+            "label_intro", INTRO_TEXT, font_metric_height_factor=17, **_label_kwargs
         )
-        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
-            "example_title",
-            "Example:",
+            "label_programmatic_access",
+            "Programmatic access:",
             underline=True,
             bold=True,
             font_metric_width_factor=self.width_factor,
             parent_widget="canvas",
         )
         self.create_label(
-            "example_0",
-            EXAMPLE_0,
-            font_metric_width_factor=self.width_factor,
-            font_metric_height_factor=2,
+            "access_intro",
+            _TEXT_ACCESS_INTRO,
+            font_metric_height_factor=1,
+            **_label_kwargs,
+        )
+        self.create_table(
+            "scan_params_table",
             parent_widget="canvas",
-            wordWrap=True,
+            horizontal_header=True,
+            columnCount=2,
+            font_metric_width_factor=3 * self.width_factor // 4,
+            horizontalHeaderLabels=[["item", "reference key"]],
+            selectionMode=QtWidgets.QAbstractItemView.NoSelection,
+        )
+        self._widgets["scan_params_table"].add_row(
+            "Scan/file naming pattern", "scan_name_pattern"
+        )
+        self._widgets["scan_params_table"].add_row(
+            "First filename number", "pattern_number_offset"
+        )
+        self._widgets["scan_params_table"].add_row(
+            "Index stepping of filenames", "pattern_number_delta"
+        )
+        self.create_label(
+            "access_example",
+            _TEXT_ACCESS_EXAMPLE,
+            font_metric_height_factor=4.5,
+            **_label_kwargs,
         )
 
-        _image0 = QtGui.QPixmap(
-            IMAGE_PATH.joinpath("scan_scheme_with_lines.png").as_posix()
-        )
+        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
-            "example_image0",
-            "",
-            pixmap=_image0,
-            fixedWidth=_image0.width(),
-            fixedHeight=_image0.height(),
-            parent_widget="canvas",
-        )
-        self.create_label(
-            "example_1",
-            EXAMPLE_1,
+            "label_examples",
+            "Examples:",
+            underline=True,
+            bold=True,
             font_metric_width_factor=self.width_factor,
-            font_metric_height_factor=11,
             parent_widget="canvas",
-            wordWrap=True,
-        )
-        _image1 = QtGui.QPixmap(
-            IMAGE_PATH.joinpath("scan_scheme_with_points.png").as_posix()
-        )
-        self.create_label(
-            "example_image1",
-            "",
-            pixmap=_image1,
-            fixedWidth=_image1.width(),
-            fixedHeight=_image1.height(),
-            parent_widget="canvas",
-        )
-        self.create_label(
-            "example_2",
-            EXAMPLE_2,
-            font_metric_width_factor=self.width_factor,
-            font_metric_height_factor=2,
-            parent_widget="canvas",
-            wordWrap=True,
         )
 
+        self.create_table(
+            "example_table",
+            autoscale_height=True,
+            columnCount=4,
+            font_metric_width_factor=self.width_factor,
+            parent_widget="canvas",
+            relative_column_widths=[0.25, 0.15, 0.15, 0.4],
+            selectionMode=QtWidgets.QAbstractItemView.NoSelection,
+        )
+        self._widgets["example_table"].add_row(
+            "naming pattern",
+            "first number",
+            "index stepping",
+            "resulting filenames",
+        )
+        self._widgets["example_table"].add_row(
+            "image_####.tif",
+            "1",
+            "1",
+            "image_0001.tif, image_0002.tif, image_0003.tif, ...",
+        )
+        self._widgets["example_table"].add_row(
+            "image_##.tif",
+            "0",
+            "10",
+            "image_00.tif, image_10.tif, ..., image_90.tif, image_100.tif, ...",
+        )
+        self._widgets["example_table"].add_row(
+            "scan_42_######_data.h5",
+            "3",
+            "3",
+            "scan_42_00003_data.h5, scan_42_00006_data.h5, ...",
+        )
+        self._widgets["example_table"].add_row(
+            "scan_42a_#.fio",
+            "0",
+            "5",
+            "scan_42a_0.fio, scan_42a_5.fio, scan_42a_10.fio, scan_42a_15.fio, ...",
+        )
         self.create_button(
             "but_close",
             "Close",
@@ -233,7 +234,7 @@ class ScanFileNamingInformationWindow(PydidasWindow):
         self._widgets["but_close"].clicked.connect(self.close)
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
+    def process_new_font_metrics(self, char_width: float, char_height: float):  # noqa
         """
         Set the fixed width of the widget dynamically from the font height metric.
 
@@ -244,4 +245,20 @@ class ScanFileNamingInformationWindow(PydidasWindow):
         char_height : float
             The font height in pixels.
         """
-        self.setFixedWidth(int(100 * char_width) + self._qtapp.scrollbar_width + 30)
+        self.setFixedWidth(
+            int((self.width_factor + 12) * char_width)
+            + self._qtapp.scrollbar_width
+            + 30
+        )
+
+
+if __name__ == "__main__":
+    # This is only for testing purposes and should not be used in production code.
+    # It is here to allow running this file directly to test the window.
+    import pydidas_qtcore
+
+    app = pydidas_qtcore.PydidasQApplication([])
+
+    window = ScanFileNamingInformationWindow()
+    window.show()
+    app.exec_()

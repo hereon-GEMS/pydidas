@@ -44,6 +44,9 @@ from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import ItemInListSelectionWidget
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.windows import ScanDimensionInformationWindow
+from pydidas.widgets.windows.scan_file_naming_information_window import (
+    ScanFileNamingInformationWindow,
+)
 from pydidas.workflow import WorkflowTree
 from pydidas_qtcore import PydidasQApplication
 
@@ -84,6 +87,7 @@ class DefineScanFrame(BaseFrame):
         self._io_dialog = PydidasFileDialog()
         self._qtapp = PydidasQApplication.instance()
         self.__scan_dim_info_window = ScanDimensionInformationWindow()
+        self.__scan_file_naming_info_window = ScanFileNamingInformationWindow()
 
     def build_frame(self):
         """
@@ -114,7 +118,12 @@ class DefineScanFrame(BaseFrame):
             self._import_from_beamline_file_format
         )
         self._widgets["but_reset"].clicked.connect(self.reset_entries)
-        self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_info_window)
+        self._widgets["but_more_scan_dim_info"].clicked.connect(
+            self._show_scan_dim_info_window
+        )
+        self._widgets["but_file_naming_help"].clicked.connect(
+            self._show_scan_file_naming_info_window
+        )
         self.param_widgets["scan_dim"].sig_value_changed.connect(
             self.update_dim_visibility
         )
@@ -129,14 +138,17 @@ class DefineScanFrame(BaseFrame):
             self.set_new_base_directory
         )
         self._qtapp.sig_exit_pydidas.connect(self.__scan_dim_info_window.close)
+        self._qtapp.sig_exit_pydidas.connect(self.__scan_file_naming_info_window.close)
 
     def finalize_ui(self):
         """
         Finalize the UI initialization.
         """
-        self.__scan_dim_info_window.frame_activated(
-            self.__scan_dim_info_window.frame_index
-        )
+        for _window in [
+            self.__scan_dim_info_window,
+            self.__scan_file_naming_info_window,
+        ]:
+            _window.frame_activated(_window.frame_index)
         self.update_dim_visibility()
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
@@ -304,9 +316,17 @@ class DefineScanFrame(BaseFrame):
         self.q_settings_set("dialogues/DefineScanFrame__scan_name_pattern", basedir)
 
     @QtCore.Slot()
-    def _show_info_window(self):
+    def _show_scan_dim_info_window(self):
         """
         Show the information window about scan dimensions.
         """
         self.__scan_dim_info_window.show()
         self.__scan_dim_info_window.raise_()
+
+    @QtCore.Slot()
+    def _show_scan_file_naming_info_window(self):
+        """
+        Show the information window about scan file naming.
+        """
+        self.__scan_file_naming_info_window.show()
+        self.__scan_file_naming_info_window.raise_()

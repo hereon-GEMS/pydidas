@@ -389,7 +389,7 @@ def __file_naming_header_config() -> list[list[str, tuple, dict[str, Any]]]:
         ],
         [
             "create_button",
-            ("but_file_name_pattern_help", "More information about file naming"),
+            ("but_file_naming_help", "More information about file naming"),
             {
                 "icon": "qt-std::SP_MessageBoxInformation",
                 "parent_widget": "_file_header",

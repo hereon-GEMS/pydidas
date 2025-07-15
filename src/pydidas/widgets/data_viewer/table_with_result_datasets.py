@@ -77,11 +77,9 @@ class TableWithResultDatasets(PydidasQTable):
         """
         _labels = results.result_titles
         self.remove_all_rows()
-        self._row_items = {_i: _nodeid for _i, _nodeid in enumerate(_labels)}
+        self._row_items = {_i: _node_id for _i, _node_id in enumerate(_labels)}
         self.setRowCount(len(_labels))
         for _i_row, (_node_id, _label) in enumerate(_labels.items()):
-            _title = f"Node #{_node_id:02d}" + ("" if _label == "" else f": {_label}")
-            _widget = QtWidgets.QTableWidgetItem(_label)
-            self.setItem(_i_row, 0, _widget)
+            self.setItem(_i_row, 0, QtWidgets.QTableWidgetItem(_label))
         self.setVisible(True)
         self.setFixedHeight(self.table_display_height)

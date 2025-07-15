@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasQTable"]
 
+
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
@@ -45,27 +46,47 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         "font_metric_width_factor",
         "vertical_header",
         "horizontal_header",
+        "relative_column_widths",
+        "autoscale_height",
+        # need to handle the Qt properties for columnCount and rowCount here tó
+        # handle the relative column widths correctly
+        "columnCount",
+        "rowCount",
     ]
 
     sig_row_selected = QtCore.Signal(int)
 
     def __init__(self, **kwargs: Any):
-        QtWidgets.QTableWidget.__init__(self, kwargs.get("parent", None))
-        PydidasWidgetMixin.__init__(self, **kwargs)
+        kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 6)
+        self._rel_column_widths = kwargs.pop("relative_column_widths", None)
+        self._autoscale_height = kwargs.pop("autoscale_height", False)
         self._qtapp = PydidasQApplication.instance()
+        QtWidgets.QTableWidget.__init__(
+            self, kwargs.pop("columnCount", 0), kwargs.pop("rowCount", 0)
+        )
+        PydidasWidgetMixin.__init__(self, **kwargs)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-        self.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.Stretch
+            if self._rel_column_widths is None
+            else QtWidgets.QHeaderView.Interactive
+        )
         self.horizontalHeader().setVisible(kwargs.get("horizontal_header", False))
         self.verticalHeader().setVisible(kwargs.get("vertical_header", False))
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.selectionModel().selectionChanged.connect(self.emit_row_selection)
+        if self._autoscale_height:
+            self.setWordWrap(True)
 
     @property
     def table_display_height(self) -> int:
         """Calculate the required height for the table"""
-        _n_rows = min(self.rowCount(), self._font_metric_height_factor)
+        _count = self.rowCount() or 1
+        _height = self._font_metric_height_factor or 1
+        _n_rows = min(_count, _height)
         return self.horizontalHeader().height() + sum(
             (self.rowHeight(_i) + 1) for _i in range(_n_rows)
         )
@@ -107,7 +128,27 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         if self._font_metric_width_factor is not None:
             _new_width = int(self._font_metric_width_factor * char_width)
             self.setFixedWidth(_new_width)
-        self.setFixedHeight(self.table_display_height)
+            if self._rel_column_widths is not None:
+                if len(self._rel_column_widths) != self.columnCount():
+                    raise UserConfigError(
+                        f"Expected {self.columnCount()} relative column widths, "
+                        f"got {len(self._rel_column_widths)}."
+                    )
+                _total_width_mult = sum(self._rel_column_widths)
+                for _i_col, _rel_width in enumerate(self._rel_column_widths):
+                    _width_i = int(_new_width * (_rel_width / _total_width_mult))
+                    if (_i_col + 1) == self.columnCount():
+                        _width_i -= self._qtapp.scrollbar_width
+                    self.setColumnWidth(_i_col, _width_i)
+
+    def _set_new_height(self):
+        """Set the new height of the table based on the number of rows."""
+        if self._autoscale_height:
+            self.resizeRowsToContents()
+            _height = sum(1 + self.rowHeight(row) for row in range(self.rowCount()))
+        else:
+            _height = self.table_display_height
+        self.setFixedHeight(_height)
 
     @QtCore.Slot()
     def remove_all_rows(self) -> None:
@@ -129,14 +170,13 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         *labels : str
             The labels of the cells.
         """
+        self.setVisible(True)
         if len(labels) != self.columnCount():
             raise UserConfigError(
                 f"Expected {self.columnCount()} labels, got {len(labels)}."
             )
         _i_row = self.rowCount()
-        for _col, _label in enumerate(labels):
-            _widget = QtWidgets.QTableWidgetItem(_label)
-            self.setItem(_i_row, _col, _widget)
         self.setRowCount(_i_row + 1)
-        self.setFixedHeight(self.table_display_height)
-        self.setVisible(True)
+        for _col, _label in enumerate(labels):
+            self.setItem(_i_row, _col, QtWidgets.QTableWidgetItem(_label))
+        self._set_new_height()

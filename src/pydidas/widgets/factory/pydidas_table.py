@@ -80,6 +80,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         self.selectionModel().selectionChanged.connect(self.emit_row_selection)
         if self._autoscale_height:
             self.setWordWrap(True)
+        self._wrapped_cells = False
 
     @property
     def table_display_height(self) -> int:
@@ -145,10 +146,44 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         """Set the new height of the table based on the number of rows."""
         if self._autoscale_height:
             self.resizeRowsToContents()
+            if self._wrapped_cells:
+                self._handle_wrapped_cell_heights()
             _height = sum(1 + self.rowHeight(row) for row in range(self.rowCount()))
         else:
             _height = self.table_display_height
         self.setFixedHeight(_height)
+
+    def _handle_wrapped_cell_heights(self):
+        """
+        Handle the heights of wrapped cells in the table.
+
+        This method adjusts the heights of rows with wrapped cells to ensure
+        they are displayed correctly.
+        """
+        _metrics = self._qtapp.qFontMetrics()
+        _col_widths = [self.columnWidth(c) for c in range(self.columnCount())]
+        for row in range(self.rowCount()):
+            _items = [
+                (col, self.item(row, col))
+                for col in range(self.columnCount())
+                if self.item(row, col)
+            ]
+            if not _items:
+                self.setRowHeight(row, 0)
+                continue
+            _item_widths = [
+                sum(_col_widths[col + c] for c in range(self.columnSpan(row, col)))
+                for col, _ in _items
+            ]
+            # adjust the width of the cells by -10 to account for padding
+            _required_height = [
+                _metrics.boundingRect(
+                    0, 0, _width - 10, 0, QtCore.Qt.TextWordWrap, item.text()
+                ).height()
+                for (col, item), _width in zip(_items, _item_widths)
+            ]
+            # add 10 pixels to the height for padding
+            self.setRowHeight(row, 10 + max(_required_height))
 
     @QtCore.Slot()
     def remove_all_rows(self) -> None:
@@ -160,6 +195,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
                 self.removeRow(0)
         self.setRowCount(0)
         self.setVisible(False)
+        self._wrapped_cells = False
 
     def add_row(self, *labels: str) -> None:
         """
@@ -179,4 +215,30 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         self.setRowCount(_i_row + 1)
         for _col, _label in enumerate(labels):
             self.setItem(_i_row, _col, QtWidgets.QTableWidgetItem(_label))
+        self._set_new_height()
+
+    def add_multicolumn_cell(
+        self, label: str, start_col: int = 0, n_col: int | None = None
+    ) -> None:
+        """
+        Add a cell which spans all columns in the table.
+
+        Parameters
+        ----------
+        label : str
+            The label of the spanned row.
+        start_col : int, optional
+            The column index at which the spanned cell starts, by default 0.
+        n_col : int, optional
+            The number of columns to span, by default None which spans all columns.
+        """
+        self._wrapped_cells = True
+        self.setVisible(True)
+        _i_row = self.rowCount()
+        self.setRowCount(_i_row + 1)
+        if n_col is None:
+            n_col = self.columnCount() - start_col
+        _item = QtWidgets.QTableWidgetItem(label)
+        self.setItem(_i_row, start_col, _item)
+        self.setSpan(_i_row, start_col, 1, n_col)
         self._set_new_height()

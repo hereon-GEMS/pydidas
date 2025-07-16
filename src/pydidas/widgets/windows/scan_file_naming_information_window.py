@@ -249,15 +249,3 @@ class ScanFileNamingInformationWindow(PydidasWindow):
             + self._qtapp.scrollbar_width
             + 30
         )
-
-
-if __name__ == "__main__":
-    # This is only for testing purposes and should not be used in production code.
-    # It is here to allow running this file directly to test the window.
-    import pydidas_qtcore
-
-    app = pydidas_qtcore.PydidasQApplication([])
-
-    window = ScanFileNamingInformationWindow()
-    window.show()
-    app.exec_()

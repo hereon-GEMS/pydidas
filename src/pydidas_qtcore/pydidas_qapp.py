@@ -322,6 +322,17 @@ class PydidasQApplication(QApplication):
         self.sig_font_size_changed.emit()
         self._update_matplotlib_font_family()
 
+    def qFontMetrics(self) -> QtGui.QFontMetrics:  # noqa C0103
+        """
+        Get the QFontMetrics object for the current font.
+
+        Returns
+        -------
+        QtGui.QFontMetrics
+            The QFontMetrics object.
+        """
+        return QtGui.QFontMetrics(self.font())
+
     def reset_font_to_standard(self):
         """
         Reset all font settings to the standard values.

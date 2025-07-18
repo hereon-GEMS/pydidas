@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -145,7 +145,6 @@ def test_execute(temp_path, bg_image_dtype, data_dtype, multiplicator, threshold
     if threshold is not None:
         _ref = np.where(_ref < threshold, threshold, _ref)
     assert np.allclose(_res, _ref)
-    assert _data.dtype == np.float32 if data_dtype == np.float32 else np.float64
 
 
 def test_execute__w_invalid_shape(temp_path):

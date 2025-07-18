@@ -151,7 +151,7 @@ class Hdf5Io(IoBase):
                 of integers in the format (y_low, y_high, x_low, x_high) or
                 2-tuples of integers or slice objects. If None, the full image
                 will be returned. The default is None.
-            returnType : type | 'auto'] optional
+            returnType : type | 'auto', optional
                 If 'auto', the image will be returned in its native data type.
                 If a specific datatype has been selected, the image is converted
                 to this type. The default is 'auto'.

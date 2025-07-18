@@ -182,7 +182,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
     "bg_hdf5_frame": {
         "type": int,
         "default": 0,
-        "name": "Background image number",
+        "name": "Background image frame",
         "choices": None,
         "unit": "",
         "allow_None": False,

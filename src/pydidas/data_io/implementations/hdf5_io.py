@@ -30,7 +30,7 @@ __all__ = []
 import os
 from numbers import Integral
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 import h5py
 from numpy import ndarray, squeeze
@@ -126,7 +126,7 @@ class Hdf5Io(IoBase):
     dimensions = [1, 2, 3, 4, 5, 6, 7, 8]
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
+    def import_from_file(cls, filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Read data from an Hdf5 file.
 
@@ -134,9 +134,9 @@ class Hdf5Io(IoBase):
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path | str
             The filename of the file with the data to be imported.
-        **kwargs : dict
+        **kwargs : Any
             The following kwargs are supported:
 
             dataset : str, optional
@@ -146,12 +146,12 @@ class Hdf5Io(IoBase):
                 Ranges for each axis. Can be given as a single data point, a tuple
                 of (min, max) or None to use the full range for each axis. The
                 default is an empty tuple ().
-            roi : Union[tuple, None], optional
+            roi : tuple | None, optional
                 A region of interest for cropping. Acceptable are both 4-tuples
                 of integers in the format (y_low, y_high, x_low, x_high) or
                 2-tuples of integers or slice objects. If None, the full image
                 will be returned. The default is None.
-            returnType : Union[datatype, 'auto'], optional
+            returnType : type | 'auto'] optional
                 If 'auto', the image will be returned in its native data type.
                 If a specific datatype has been selected, the image is converted
                 to this type. The default is 'auto'.
@@ -255,17 +255,17 @@ class Hdf5Io(IoBase):
                 setattr(data, _key, h5file[_root][_key][()].decode())
 
     @classmethod
-    def export_to_file(cls, filename: Union[Path, str], data: ndarray, **kwargs: dict):
+    def export_to_file(cls, filename: Path | str, data: ndarray, **kwargs: Any):
         """
         Export data to an Hdf5 file.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path | str
             The filename
         data : np.ndarray
             The data to be written to file.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments. Supported keyword arguments are:
 
             dataset : str, optional

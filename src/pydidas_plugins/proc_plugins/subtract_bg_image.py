@@ -28,13 +28,17 @@ __status__ = "Production"
 __all__ = ["SubtractBackgroundImage"]
 
 
-import os
-from typing import Union
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
+from pydidas.core import (
+    Dataset,
+    Parameter,
+    UserConfigError,
+    get_generic_param_collection,
+)
 from pydidas.core.constants import HDF5_EXTENSIONS, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import get_extension
 from pydidas.data_io import import_data
@@ -63,6 +67,7 @@ class SubtractBackgroundImage(ProcPlugin):
         "bg_file",
         "bg_hdf5_key",
         "bg_hdf5_frame",
+        "hdf5_slicing_axis",
         "threshold_low",
         "multiplicator",
         "use_roi",
@@ -73,6 +78,7 @@ class SubtractBackgroundImage(ProcPlugin):
         "binning",
     )
     advanced_parameters = [
+        "hdf5_slicing_axis",
         "use_roi",
         "roi_xlow",
         "roi_xhigh",
@@ -86,50 +92,43 @@ class SubtractBackgroundImage(ProcPlugin):
     output_data_unit = "counts"
     has_unique_parameter_config_widget = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Parameter, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._bg_image = None
         self._thresh = None
-        self.params["multiplicator"]._Parameter__meta["tooltip"] = (
-            "The multiplication scaling factor to be applied to the background image "
-            "before subtracting it from the input data."
-        )
 
-    def pre_execute(self):
-        """
-        Load the background image.
-        """
+    def pre_execute(self) -> None:
+        """Load the background image."""
         _bg_fname = self.get_param_value("bg_file")
-        if not os.path.isfile(_bg_fname):
+        if not _bg_fname.is_file():
             raise UserConfigError(
                 f'The filename "{_bg_fname}" does not point to a valid file. Please '
                 "verify the path."
             )
+        _slice_ax = self.get_param_value("hdf5_slicing_axis")
+        _indices = (None,) * _slice_ax + (self.get_param_value("bg_hdf5_frame"),)
         self._bg_image = import_data(
             _bg_fname,
             dataset=self.get_param_value("bg_hdf5_key"),
-            frame=self.get_param_value("bg_hdf5_frame"),
-            indices=[0],
+            indices=_indices,
             binning=self.get_param_value("binning"),
             roi=self._get_own_roi(),
         )
         if self.get_param_value("multiplicator") != 1.0:
-            self._bg_image *= self.get_param_value("multiplicator")
+            self._bg_image = self._bg_image * self.get_param_value("multiplicator")
         self._thresh = self.get_param_value("threshold_low")
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None
 
-    def execute(
-        self, data: Union[Dataset, np.ndarray], **kwargs: dict
-    ) -> tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Subtract a background image from the input data.
 
         Parameters
         ----------
-        data : Union[pydidas.core.Dataset, np.ndarray]
-            The image / frame data .
-        **kwargs : dict
+        data :Dataset
+            The image / frame data.
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns
@@ -147,7 +146,9 @@ class SubtractBackgroundImage(ProcPlugin):
             )
         _corrected_data = data - self._bg_image
         if self._thresh is not None:
-            _corrected_data[_corrected_data < self._thresh] = self._thresh
+            _corrected_data = np.where(
+                _corrected_data < self._thresh, self._thresh, _corrected_data
+            )
         return _corrected_data, kwargs
 
     def get_parameter_config_widget(self):

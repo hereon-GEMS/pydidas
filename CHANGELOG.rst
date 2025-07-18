@@ -31,6 +31,9 @@ Bugfixes
   and html documentation build.
 - Fixed an issue in the AxesSelector when switching between Datasets of different dimensionality.
 - Fixed an issue where the toolbars would not expand when the main window was too small.
+- Fixed an issue with data type mismatches in the Subtract1dBackgroundProfile and
+    SubtractBackgroundImage plugins when the input data was integer and the data
+   to subtract was float.
 
 
 v25.05.16

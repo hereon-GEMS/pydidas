@@ -14,6 +14,7 @@ The ScanContext class
     :local:
     :backlinks: none
 
+
 Introduction
 ------------
 
@@ -44,7 +45,7 @@ and to add metadata about the scan to plots and stored datasets.
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in :ref:`List of all ScanContext Parameters <scan_context_parameters>`\ .
+given in `List of all ScanContext Parameters <../global/scan/scan_params.html>`_\ .
 
 Its instance can be obtained by calling the following code:
 
@@ -52,7 +53,6 @@ Its instance can be obtained by calling the following code:
 
     >>> import pydidas
     >>> SCAN = pydidas.contexts.ScanContext()
-    
 
 Configuring the ScanContext
 ---------------------------
@@ -192,6 +192,14 @@ contact your beamline local contact for details.
 Import functions will be implemented as required and depending on the scan
 metadata available at the beamlines.
 
-.. _scan_context_parameters:
 
-.. include:: ../global/scan_context_params.rst
+In-depth documentation about ScanContext
+----------------------------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    ../global/scan/scan_params.rst
+    ../global/scan/dimension_help
+    ../global/scan/file_naming_help.rst
+    ../global/scan/multi_frame_help.rst

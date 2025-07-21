@@ -136,7 +136,7 @@ html_context = {
 _fname = Path(__file__).parent / "dev_guide" / "dev_guide_list_of_generic_params.rst"
 generic_params.create_generic_params_rst_docs(_fname)
 
-_fname = Path(__file__).parent / "manuals" / "global" / "scan_context_params.rst"
+_fname = Path(__file__).parent / "manuals" / "global" / "scan" / "scan_params.rst"
 generic_params.create_scan_context_params_rst_docs(_fname)
 
 

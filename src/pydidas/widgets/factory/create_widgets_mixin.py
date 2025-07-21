@@ -362,7 +362,7 @@ class CreateWidgetsMixIn:
 
         Parameters
         ----------
-        ref : str |None,
+        ref : str | None,
             The reference string for storing the widget.
         svg_path : str | Path
             The path to the SVG file to be displayed in the widget.

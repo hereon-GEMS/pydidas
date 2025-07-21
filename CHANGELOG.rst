@@ -26,7 +26,7 @@ Improvements
 	  of wildcard hashes centrally in the scan.
 	- Added option to process multiple frames as `Stack` to the Scan
     - Added option to differentiate between index stepping and the number of frames used
-      per scan point to allow rolling averages and staggered processing.	
+      per scan point to allow rolling averages and staggered processing.
 
 Bugfixes
 --------

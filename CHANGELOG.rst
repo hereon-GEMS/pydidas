@@ -35,9 +35,14 @@ Bugfixes
 - Fixed an issue in the GeneralAsciiSaver where exporting data with a metadata header.
 - Fixed an issue where the splash screen would only show after the package imports/exports
   and html documentation build.
-- Fixed an issue in the AxesSelector when switching between Datasets of different dimensionality.
+- Fixed an issue in the AxesSelector when switching between Datasets of different
+  dimensionality.
 - Fixed an issue where the toolbars would not expand when the main window was too small.
-- Fixed an issue in AverageDataDimension plugin when averaging over 1D data which returned a scalar.
+- Fixed an issue in AverageDataDimension plugin when averaging over 1D data which returned
+a scalar.
+- Fixed an issue with data type mismatches in the Subtract1dBackgroundProfile and
+    SubtractBackgroundImage plugins when the input data was integer and the data
+   to subtract was float.
 
 
 v25.05.16

@@ -30,13 +30,17 @@ __all__ = ["Subtract1dBackgroundProfile"]
 
 
 from pathlib import Path
-from typing import Union
+from typing import Any, Union
 
 import numpy as np
 
-from pydidas.core import Dataset, Parameter, get_generic_param_collection
+from pydidas.core import (
+    Dataset,
+    Parameter,
+    UserConfigError,
+    get_generic_param_collection,
+)
 from pydidas.core.constants import PROC_PLUGIN_INTEGRATED
-from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
 
@@ -74,6 +78,8 @@ class Subtract1dBackgroundProfile(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._thresh = None
+        self._profile = None
+        self._profile_cast = None
 
     def pre_execute(self):
         """
@@ -83,14 +89,13 @@ class Subtract1dBackgroundProfile(ProcPlugin):
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None
 
-        _fname = self.get_param_value("profile_name")
+        _fname = self.get_param_value("profile_file")
         self._profile = import_data(_fname)
         if self.get_param_value("multiplicator") != 1.0:
-            self._profile *= self.get_param_value("multiplicator")
+            self._profile = self._profile * self.get_param_value("multiplicator")
 
-    @process_1d_with_multi_input_dims
     def execute(
-        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+        self, data: Union[Dataset, np.ndarray], **kwargs: Any
     ) -> tuple[Dataset, dict]:
         """
         Subtract a one-dimensional background profile.
@@ -99,7 +104,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
         ----------
         data : Union[pydidas.core.Dataset, np.ndarray]
             The image / frame data .
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns
@@ -109,8 +114,40 @@ class Subtract1dBackgroundProfile(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        data = data - self._profile
+        if data.ndim > 1:
+            if self._profile_cast is None:
+                self._cast_profile_to_shape(data.shape)
+            data = data - self._profile_cast
+        else:
+            data = data - self._profile
         if self._thresh is not None:
-            _indices = np.where(data < self._thresh)[0]
-            data[_indices] = self._thresh
+            data = np.where(data < self._thresh, self._thresh, data)
         return data, kwargs
+
+    def _cast_profile_to_shape(self, shape: tuple[int, ...]) -> None:
+        """
+        Cast the profile to the given shape.
+
+        Parameters
+        ----------
+        shape : tuple[int, ...]
+            The shape to which the profile should be cast.
+
+        Returns
+        -------
+        np.ndarray
+            The cast profile.
+        """
+        _ndim = len(shape)
+        _dim_to_process = self.get_param_value("process_data_dim") % _ndim
+        if not shape[_dim_to_process] == self._profile.size:
+            raise UserConfigError(
+                f"The profile has {self._profile.size} elements, "
+                f"but the data to process has {shape[_dim_to_process]} "
+                "elements in the processing dimension. Please verify that the "
+                "profile is correct and that the processing dimension is set "
+                "correctly."
+            )
+        _profile_shape = [1] * _ndim
+        _profile_shape[_dim_to_process] = -1
+        self._profile_cast = self._profile.reshape(_profile_shape)

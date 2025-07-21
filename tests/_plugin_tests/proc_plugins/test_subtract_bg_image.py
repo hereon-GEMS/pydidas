@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,134 +15,147 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""
+Tests for the SubtractBackgroundImage plugin.
+"""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Production"
+__status__ = "Development"
 
-import os
+
 import shutil
 import tempfile
-import unittest
+from pathlib import Path
 
 import h5py
 import numpy as np
-from qtpy import QtCore
+import pytest
 
-from pydidas.core.utils import get_random_string, rebin2d
-from pydidas.plugins import BasePlugin
-from pydidas.unittest_objects import LocalPluginCollection
+from pydidas_plugins.proc_plugins.subtract_bg_image import SubtractBackgroundImage
+
+from pydidas.core import Dataset, UserConfigError
+from pydidas.data_io import export_data
+from pydidas.plugins import ProcPlugin
 
 
-PLUGIN_COLLECTION = LocalPluginCollection()
+_IMAGE = np.arange(400).reshape(20, 20)
 
 
-class TestSubtractBgImage(unittest.TestCase):
-    @classmethod
-    def tearDownClass(cls):
-        qs = QtCore.QSettings("Hereon", "pydidas")
-        qs.remove("unittesting")
+@pytest.fixture(scope="module")
+def temp_path():
+    _path = Path(tempfile.mkdtemp())
+    yield _path
+    shutil.rmtree(_path)
 
-    def setUp(self):
-        self._temppath = tempfile.mkdtemp()
-        self._shape = (20, 20)
-        self._bg = np.random.random(self._shape)
-        self._data = np.ones(self._shape)
 
-    def tearDown(self):
-        shutil.rmtree(self._temppath)
+def get_image_file(temp_path, filename, dtype, **kwargs) -> Path:
+    fname = temp_path / filename
+    kwargs["overwrite"] = True
+    export_data(fname, _IMAGE.astype(dtype), **kwargs)
+    return fname
 
-    def create_bg_image(self):
-        _fname = os.path.join(self._temppath, "bg_image.npy")
-        np.save(_fname, self._bg)
-        return _fname
 
-    def create_bg_hdf5_image(self):
-        _fname = os.path.join(self._temppath, "bg_image.h5")
-        _dset = get_random_string(4) + "/" + get_random_string(4) + "data"
-        with h5py.File(_fname, "w") as _f:
-            _f[_dset] = self._bg[None]
-        return _fname, _dset
+def test_init():
+    plugin = SubtractBackgroundImage()
+    assert isinstance(plugin, ProcPlugin)
+    assert plugin._bg_image is None
+    assert plugin._thresh is None
 
-    def create_plugin(self, hdf5=False):
-        _cls = PLUGIN_COLLECTION.get_plugin_by_name("SubtractBackgroundImage")
-        plugin = _cls()
-        if hdf5:
-            _fname, _dset = self.create_bg_hdf5_image()
-            plugin.set_param_value("bg_file", _fname)
-            plugin.set_param_value("bg_hdf5_key", _dset)
-        else:
-            _fname = self.create_bg_image()
-            plugin.set_param_value("bg_file", _fname)
-        return plugin
 
-    def test_creation(self):
-        plugin = self.create_plugin()
-        self.assertIsInstance(plugin, BasePlugin)
+@pytest.mark.parametrize("image_dtype", [float, np.float32, int, np.uint32])
+@pytest.mark.parametrize("filename", ["image.npy", "image.tiff"])
+def test_pre_execute__simple_input_files(
+    temp_path,
+    image_dtype,
+    filename,
+):
+    plugin = SubtractBackgroundImage()
+    image_file = get_image_file(temp_path, filename, image_dtype)
+    plugin.set_param_value("bg_file", image_file)
+    plugin.pre_execute()
+    assert (
+        plugin._bg_image.dtype == np.float32
+        if image_dtype == np.float32
+        else np.float64
+    )
+    assert plugin._bg_image.shape == _IMAGE.shape
 
-    def test_pre_execute__simple_bg_image(self):
-        plugin = self.create_plugin(hdf5=False)
-        plugin.pre_execute()
-        self.assertTrue(np.all(plugin._bg_image == self._bg))
 
-    def test_pre_execute__hdf5_bg_image(self):
-        plugin = self.create_plugin(hdf5=True)
-        plugin.pre_execute()
-        self.assertTrue(np.all(plugin._bg_image == self._bg))
+@pytest.mark.parametrize("ax", [0, 1, 2])
+@pytest.mark.parametrize("index", [0, 3])
+@pytest.mark.parametrize("key", ["entry/data/data", "/test/data"])
+def test_pre_execute__hdf5(temp_path, ax, key, index):
+    plugin = SubtractBackgroundImage()
+    _shape = list(_IMAGE.shape)
+    _shape.insert(ax, 30)
+    _tmp_data = np.random.random((_shape))
+    _data_slice = (slice(None),) * ax + (index,) + (slice(None),) * (2 - ax)
+    _tmp_data[_data_slice] = _IMAGE
+    with h5py.File(temp_path / "test.h5", "w") as f:
+        f[key] = _tmp_data
+    plugin.set_param_value("bg_file", temp_path / "test.h5")
+    plugin.set_param_value("bg_hdf5_key", key)
+    plugin.set_param_value("bg_hdf5_frame", index)
+    plugin.set_param_value("hdf5_slicing_axis", ax)
+    plugin.pre_execute()
+    assert np.allclose(plugin._bg_image, _IMAGE)
 
-    def test_pre_execute__None_threshold(self):
-        plugin = self.create_plugin(hdf5=True)
-        plugin.set_param_value("threshold_low", None)
-        plugin.pre_execute()
-        self.assertIsNone(plugin._thresh)
 
-    def test_pre_execute__nan_threshold(self):
-        plugin = self.create_plugin(hdf5=True)
-        plugin.set_param_value("threshold_low", np.nan)
-        plugin.pre_execute()
-        self.assertIsNone(plugin._thresh)
+@pytest.mark.parametrize("multiplicator", [0.1, 1.0, 2.5])
+@pytest.mark.parametrize("threshold", [None, np.inf, np.nan, -1, 0, 1.5])
+@pytest.mark.parametrize("ROI", [[0, 20, 0, 20], [2, 14, 5, None]])
+@pytest.mark.parametrize("use_roi", [True, False])
+def test_pre_execute__outputs(temp_path, multiplicator, threshold, ROI, use_roi):
+    plugin = SubtractBackgroundImage()
+    image_file = get_image_file(temp_path, "image.npy", float)
+    plugin.set_param_value("bg_file", image_file)
+    plugin.set_param_value("multiplicator", multiplicator)
+    plugin.set_param_value("threshold_low", threshold)
+    plugin.set_param_value("roi_ylow", ROI[0])
+    plugin.set_param_value("roi_yhigh", ROI[1])
+    plugin.set_param_value("roi_xlow", ROI[2])
+    plugin.set_param_value("roi_xhigh", ROI[3])
+    plugin.set_param_value("use_roi", use_roi)
+    plugin.pre_execute()
+    _slicer = (slice(ROI[0], ROI[1]), slice(ROI[2], ROI[3])) if use_roi else None
+    assert np.allclose(plugin._bg_image, multiplicator * _IMAGE[_slicer])
+    if threshold in [None, np.inf, np.nan]:
+        assert plugin._thresh is None
+    else:
+        assert plugin._thresh == threshold
 
-    def test_pre_execute_finite_threshold(self):
-        _thresh = 42.567
-        plugin = self.create_plugin(hdf5=True)
-        plugin.set_param_value("threshold_low", _thresh)
-        plugin.pre_execute()
-        self.assertEqual(plugin._thresh, _thresh)
 
-    def test_execute__simple(self):
-        _thresh = 0.12
-        _kwargs = {"key": 1, "another_key": "another_val"}
-        plugin = self.create_plugin(hdf5=False)
-        plugin.set_param_value("threshold_low", _thresh)
-        plugin.pre_execute()
-        _new_data, _new_kwargs = plugin.execute(self._data, **_kwargs)
-        self.assertEqual(_kwargs, _new_kwargs)
-        self.assertTrue(np.all(_new_data >= _thresh))
-        self.assertTrue(np.all(self._data - self._bg <= _new_data))
+@pytest.mark.parametrize("bg_image_dtype", [float, np.float32, int, np.uint32])
+@pytest.mark.parametrize("data_dtype", [float, np.float32, np.uint16, np.int32])
+@pytest.mark.parametrize("multiplicator", [0.1, 1.0, 2.5])
+@pytest.mark.parametrize("threshold", [None, -1, 0, 1.5])
+def test_execute(temp_path, bg_image_dtype, data_dtype, multiplicator, threshold):
+    plugin = SubtractBackgroundImage()
+    image_file = get_image_file(temp_path, "test.npy", bg_image_dtype)
+    plugin.set_param_value("bg_file", image_file)
+    plugin.set_param_value("multiplicator", multiplicator)
+    plugin.set_param_value("threshold_low", threshold)
+    plugin.pre_execute()
+    _data = np.ones(_IMAGE.shape, dtype=data_dtype) * 400
+    _res, _kws = plugin.execute(_data)
+    _ref = _data - multiplicator * _IMAGE
+    if threshold is not None:
+        _ref = np.where(_ref < threshold, threshold, _ref)
+    assert np.allclose(_res, _ref)
 
-    def test_execute__with_roi_and_binning(self):
-        _thresh = 0.12
-        _kwargs = {"key": 1, "another_key": "another_val"}
-        plugin = self.create_plugin(hdf5=False)
-        plugin.set_param_value("threshold_low", _thresh)
-        plugin.set_param_value("binning", 2)
-        plugin.set_param_value("use_roi", True)
-        plugin.set_param_value("roi_xlow", 3)
-        plugin.set_param_value("roi_xhigh", self._shape[0])
-        plugin.set_param_value("roi_ylow", 1)
-        plugin.set_param_value("roi_yhigh", self._shape[1])
-        plugin.pre_execute()
-        _data = rebin2d(self._data[1:, 3:], 2)
-        _new_data, _new_kwargs = plugin.execute(_data, **_kwargs)
-        self.assertEqual(_kwargs, _new_kwargs)
-        self.assertEqual(
-            _new_data.shape, ((self._shape[0] - 1) // 2, (self._shape[1] - 3) // 2)
-        )
-        self.assertTrue(np.all(_new_data >= _thresh))
+
+def test_execute__w_invalid_shape(temp_path):
+    plugin = SubtractBackgroundImage()
+    image_file = get_image_file(temp_path, "test.npy", float)
+    plugin.set_param_value("bg_file", image_file)
+    _data = Dataset(np.arange(2000, dtype=float)).reshape(50, 40)
+    plugin.pre_execute()
+    with pytest.raises(UserConfigError):
+        plugin.execute(_data)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

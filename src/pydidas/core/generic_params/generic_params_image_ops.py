@@ -183,7 +183,7 @@ GENERIC_PARAMS_IMAGE_OPS = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The multiplication scaling factor to be applied to the resulting Dataset."
+            "The multiplication scaling factor to be applied to the input data."
         ),
     },
 }

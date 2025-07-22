@@ -132,7 +132,7 @@ this page.
     The detailed explanation for the scan file naming pattern are given in
     `Explanations of Scan file naming <../../global/scan/file_naming_help.html>`_\ .
 
-    The detailed explanation for multi-frame handling are given in 
+    The detailed explanation for multi-frame handling are given in
     `Explanations of Scan multi-frame handling <../../global/scan/multi_frame_help.html>`_\ .
 
 

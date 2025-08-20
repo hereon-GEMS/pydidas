@@ -101,7 +101,7 @@ class TestDiffractionExperiment(unittest.TestCase):
         )
 
     def test_get_detector__from_param_name(self):
-        _shape = (1000, 1000)
+        _shape = (999, 1111)
         obj = DiffractionExperimentContext()
         obj.set_param_value("detector_name", "Eiger 9M")
         obj.set_param_value("detector_npixy", _shape[0])
@@ -111,7 +111,7 @@ class TestDiffractionExperiment(unittest.TestCase):
         self.assertEqual(_det.max_shape, _shape)
 
     def test_get_detector__new_name(self):
-        _shape = (1000, 1000)
+        _shape = (999, 1111)
         _pixelsize = 100
         obj = DiffractionExperimentContext()
         obj.set_param_value("detector_name", "No Eiger")
@@ -125,6 +125,13 @@ class TestDiffractionExperiment(unittest.TestCase):
         self.assertEqual(_det.pixel1, 1e-6 * _pixelsize)
         self.assertEqual(_det.pixel2, 1e-6 * _pixelsize)
 
+    def test_det_shape(self):
+        _shape = (999, 1111)
+        obj = DiffractionExperimentContext()
+        obj.set_param_value("detector_npixy", _shape[0])
+        obj.set_param_value("detector_npixx", _shape[1])
+        self.assertEqual(obj.det_shape, _shape)
+
     def test_detector_is_valid__no_detector(self):
         obj = DiffractionExperiment()
         self.assertFalse(obj.detector_is_valid)
@@ -136,7 +143,7 @@ class TestDiffractionExperiment(unittest.TestCase):
 
     def test_detector_is_valid__manual_detector(self):
         obj = DiffractionExperiment()
-        _shape = (1000, 1000)
+        _shape = (999, 1111)
         _pixelsize = 100
         obj.set_param_value("detector_name", "No Eiger")
         obj.set_param_value("detector_npixy", _shape[0])
@@ -147,7 +154,7 @@ class TestDiffractionExperiment(unittest.TestCase):
 
     def test_detector_is_valid__incomplete_manual_detector(self):
         obj = DiffractionExperiment()
-        _shape = (1000, 1000)
+        _shape = (999, 1111)
         obj.set_param_value("detector_name", "No Eiger")
         obj.set_param_value("detector_npixy", _shape[0])
         obj.set_param_value("detector_npixx", _shape[1])

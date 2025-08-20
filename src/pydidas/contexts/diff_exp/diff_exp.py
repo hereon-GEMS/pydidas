@@ -193,6 +193,21 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
     detector_dist_in_m = det_dist_in_m
 
+    @property
+    def det_shape(self) -> tuple[int, int]:
+        """
+        Get the detector shape as a tuple of (n_pix_y, n_pix_x).
+
+        Returns
+        -------
+        tuple[int, int]
+            The detector shape as (n_pix_y, n_pix_x).
+        """
+        return (
+            self.get_param_value("detector_npixy"),
+            self.get_param_value("detector_npixx"),
+        )
+
     def as_pyfai_geometry(self) -> Geometry:
         """
         Get an equivalent pyFAI Geometry object.

@@ -27,6 +27,8 @@ Improvements
 	- Added option to process multiple frames as `Stack` to the Scan
     - Added option to differentiate between index stepping and the number of frames used
       per scan point to allow rolling averages and staggered processing.
+- Changed the DiffractionExperiment to update detector parameters automatically, if 
+  the selected detector name is known in pyFAI.
 
 Bugfixes
 --------
@@ -39,10 +41,13 @@ Bugfixes
   dimensionality.
 - Fixed an issue where the toolbars would not expand when the main window was too small.
 - Fixed an issue in AverageDataDimension plugin when averaging over 1D data which returned
-a scalar.
+  a scalar.
 - Fixed an issue with data type mismatches in the Subtract1dBackgroundProfile and
-    SubtractBackgroundImage plugins when the input data was integer and the data
-   to subtract was float.
+  SubtractBackgroundImage plugins when the input data was integer and the data
+  to subtract was float.
+- Fixed an issue in the QuickIntegrationFrame where the correct detector choice was
+  overwritten on data loading.
+- Fixed an error when computing histograms for auto-scaling of data.
 
 
 v25.05.16

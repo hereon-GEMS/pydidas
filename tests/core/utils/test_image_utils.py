@@ -18,107 +18,145 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright  2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
-
 import numpy as np
+import pytest
 
 from pydidas.core import PydidasQsettings, UserConfigError
-from pydidas.core.utils import (
-    calculate_histogram_limits,
-)
+from pydidas.core.utils import calculate_histogram_limits
 
 
-class TestImageUtils(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.qsettings = PydidasQsettings()
-        cls._std_low = cls.qsettings.value(
-            "user/histogram_outlier_fraction_low", dtype=float
-        )
-        cls._std_high = cls.qsettings.value(
-            "user/histogram_outlier_fraction_high", dtype=float
-        )
+@pytest.fixture(autouse=True)
+def standard_qsettings():
+    qsettings = PydidasQsettings()
+    std_low = qsettings.value("user/histogram_outlier_fraction_low", dtype=float)
+    std_high = qsettings.value("user/histogram_outlier_fraction_high", dtype=float)
+    yield qsettings
+    qsettings.set_value("user/histogram_outlier_fraction_low", std_low)
+    qsettings.set_value("user/histogram_outlier_fraction_high", std_high)
 
-    def tearDown(self):
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", self._std_low)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", self._std_high)
 
-    def test_calculate_histogram_limits__wrong_limits(self):
-        data = np.arange(100**2).reshape((100, 100))
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.6)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.4)
-        with self.assertRaises(UserConfigError):
-            calculate_histogram_limits(data)
+def test_calculate_histogram_limits__wrong_limits(standard_qsettings):
+    data = np.arange(100**2).reshape((100, 100))
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.6)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.4)
+    with pytest.raises(UserConfigError):
+        calculate_histogram_limits(data)
 
-    def test_calculate_histogram_limits__simple(self):
-        raw_data = np.arange(100**2)
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
-        for _offset in [0, -500, -5e4, 12000, 120000]:
-            with self.subTest(offset=_offset):
-                data = raw_data + _offset
-                low, high = calculate_histogram_limits(data)
-                self.assertTrue(abs(low - (500 + _offset)) < 25)
-                self.assertTrue(abs(high - (9500 + _offset)) < 25)
 
-    def test_calculate_histogram_limits__only_high_lim_very_low(self):
-        raw_data = np.arange(1000**2)
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", 1 - 1e-6)
-        low, high = calculate_histogram_limits(raw_data)
-        self.assertIsNone(low)
-        self.assertTrue(high < 500)
+@pytest.mark.parametrize("offset", [0, -500, -5e4, 12000, 120000])
+def test_calculate_histogram_limits__simple(standard_qsettings, offset):
+    raw_data = np.arange(100**2)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+    data = raw_data + offset
+    low, high = calculate_histogram_limits(data)
+    assert abs(low - (500 + offset)) < 25
+    assert abs(high - (9500 + offset)) < 25
 
-    def test_calculate_histogram_limits__constant_arr_values(self):
-        raw_data = np.ones(100**2)
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
-        data = raw_data
-        low, high = calculate_histogram_limits(data)
-        self.assertTrue(abs(low - 1) < 1e-4)
-        self.assertTrue(abs(high - 1) < 1e-4)
 
-    def test_calculate_histogram_limits__no_upper_limit(self):
-        raw_data = np.arange(100**2)
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", 0)
-        for _offset in [0, -500, -5e4, 12000, 120000]:
-            with self.subTest(offset=_offset):
-                data = raw_data + _offset
-                low, high = calculate_histogram_limits(data)
-                self.assertTrue(abs(low - (500 + _offset)) < 25)
-                self.assertIsNone(high)
+def test_calculate_histogram_limits__all_outliers_cropped(standard_qsettings):
+    data = np.arange(10000)
+    data[4000:4498] = 1e8  # Add some outliers
+    data[5000:5498] = 0
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+    low, high = calculate_histogram_limits(data)
+    assert abs(low) < 5
+    assert abs(high - 10000) < 5
 
-    def test_calculate_histogram_limits__no_lower_limit(self):
-        raw_data = np.arange(100**2)
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.0)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
-        for _offset in [0, -500, -5e4, 12000, 120000]:
-            with self.subTest(offset=_offset):
-                data = raw_data + _offset
-                low, high = calculate_histogram_limits(data)
-                self.assertIsNone(low)
-                self.assertTrue(abs(high - (9500 + _offset)) < 25)
 
-    def test_calculate_histogram_limits__big_low_outlier(self):
-        raw_data = 0.01 * np.arange(1000**2)
-        raw_data[0] = -1e6
-        self.qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
-        self.qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
-        for _offset in [0, -500, -5e4, 12000, 120000]:
-            with self.subTest(offset=_offset):
-                _tolerance = 400 * (1 + abs(_offset) / 1e5)
-                data = raw_data + _offset
-                low, high = calculate_histogram_limits(data)
-                self.assertTrue(abs(low - (500 + _offset)) < _tolerance)
-                self.assertTrue(abs(high - (9500 + _offset)) < _tolerance)
+def test_calculate_histogram_limits__too_many_outliers(standard_qsettings):
+    data = np.arange(10000)
+    data[4000:4510] = 1e8  # Add some outliers
+    data[5000:5498] = 0
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+    low, high = calculate_histogram_limits(data)
+    assert abs(low) < 5
+    assert abs(high - 1e8) < 5
+
+
+def test_calculate_histogram_limits__constant_outliers(standard_qsettings):
+    data = np.linspace(0, 1, 10000)
+    data[4000:4600] = 1e8
+    data[5000:5498] = 0
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+    low, high = calculate_histogram_limits(data)
+    assert abs(low) < 5
+    assert abs(high - 1e8) < 5
+
+
+def test_calculate_histogram_limits__high_outlier_fraction_very_small(
+    standard_qsettings,
+):
+    data = np.linspace(0, 1, 10000)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 1e-7)
+    low, high = calculate_histogram_limits(data)
+    assert abs(low) < 0.1
+    assert abs(high - 1) < 0.1
+
+
+def test_calculate_histogram_limits__only_high_lim_very_low(standard_qsettings):
+    raw_data = np.arange(1000**2)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 1 - 1e-6)
+    low, high = calculate_histogram_limits(raw_data)
+    assert low is None
+    assert high < 500
+
+
+def test_calculate_histogram_limits__constant_arr_values(standard_qsettings):
+    raw_data = np.ones(100**2)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+    data = raw_data
+    low, high = calculate_histogram_limits(data)
+    assert abs(low - 1) < 1e-4
+    assert abs(high - 1) < 1e-4
+
+
+@pytest.mark.parametrize("offset", [0, -500, -5e4, 12000, 120000])
+def test_calculate_histogram_limits__no_upper_limit(standard_qsettings, offset):
+    raw_data = np.arange(100**2)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0)
+    data = raw_data + offset
+    low, high = calculate_histogram_limits(data)
+    assert abs(low - (500 + offset)) < 25
+    assert high is None
+
+
+@pytest.mark.parametrize("offset", [0, -500, -5e4, 12000, 120000])
+def test_calculate_histogram_limits__no_lower_limit(standard_qsettings, offset):
+    raw_data = np.arange(100**2)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.0)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+    data = raw_data + offset
+    low, high = calculate_histogram_limits(data)
+    assert low is None
+    assert abs(high - (9500 + offset)) < 25
+
+
+@pytest.mark.parametrize("offset", [0, -500, -5e4, 12000, 120000])
+def test_calculate_histogram_limits__big_low_outlier(standard_qsettings, offset):
+    raw_data = 0.01 * np.arange(1000**2)
+    raw_data[0] = -1e6
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+    _tolerance = 400 * (1 + abs(offset) / 1e5)
+    data = raw_data + offset
+    low, high = calculate_histogram_limits(data)
+    assert abs(low - (500 + offset)) < _tolerance
+    assert abs(high - (9500 + offset)) < _tolerance
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

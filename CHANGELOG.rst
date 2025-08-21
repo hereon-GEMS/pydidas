@@ -48,6 +48,7 @@ Bugfixes
 - Fixed an issue in the QuickIntegrationFrame where the correct detector choice was
   overwritten on data loading.
 - Fixed an error when computing histograms for auto-scaling of data.
+- Fixed an issue when importing PONI files with custom detectors.
 
 
 v25.05.16

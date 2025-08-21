@@ -35,10 +35,7 @@ __all__ = [
 ]
 
 
-import pyFAI.detectors as __det
-
-
-__class_names = __det._detector_class_names
+from pyFAI.detectors import Detector as _Detector
 
 
 pyFAI_UNITS = {
@@ -69,23 +66,22 @@ PYFAI_MANUFACTURERS_OF_DETECTORS = {}
 PYFAI_SHAPES_OF_DETECTOR_MODELS = {}
 PYFAI_DETECTOR_MODELS_OF_SHAPES = {}
 
-for __name in __class_names:
-    __cls = getattr(__det, __name)
-    __manufacturer = "Custom" if __cls.MANUFACTURER is None else __cls.MANUFACTURER
+for __name, __class in _Detector.registry.items():
+    __manufacturer = "Custom" if __class.MANUFACTURER is None else __class.MANUFACTURER
     if isinstance(__manufacturer, list):
         __manufacturer = " / ".join(__manufacturer)
-    __model = __cls.aliases
+    __model = __class.aliases
     if len(__model) > 0:
         PYFAI_DETECTOR_NAMES.update(__model)
         PYFAI_MANUFACTURERS_OF_DETECTORS[__model[0]] = __manufacturer
-        PYFAI_SHAPES_OF_DETECTOR_MODELS[__model[0]] = __cls.MAX_SHAPE
+        PYFAI_SHAPES_OF_DETECTOR_MODELS[__model[0]] = __class.MAX_SHAPE
         PYFAI_DETECTOR_MANUFACTURERS.add(__manufacturer)
-        if __cls.MAX_SHAPE in PYFAI_DETECTOR_MODELS_OF_SHAPES:
-            PYFAI_DETECTOR_MODELS_OF_SHAPES[__cls.MAX_SHAPE] = (
-                PYFAI_DETECTOR_MODELS_OF_SHAPES[__cls.MAX_SHAPE]
+        if __class.MAX_SHAPE in PYFAI_DETECTOR_MODELS_OF_SHAPES:
+            PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = (
+                PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE]
                 + [f"[{__manufacturer}] {__model[0]}"]
             )
         else:
-            PYFAI_DETECTOR_MODELS_OF_SHAPES[__cls.MAX_SHAPE] = [
+            PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = [
                 f"[{__manufacturer}] {__model[0]}"
             ]

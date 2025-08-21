@@ -31,11 +31,12 @@ __all__ = ["DiffractionExperimentIoPoni"]
 from typing import Union
 
 import pyFAI
+from pyFAI.io.ponifile import PoniFile
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
 from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
-from pydidas.core.constants import LAMBDA_IN_M_TO_E
+from pydidas.core.constants import LAMBDA_IN_M_TO_E, PYFAI_DETECTOR_NAMES
 
 
 EXP = DiffractionExperimentContext()
@@ -67,7 +68,8 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         _pdata = {}
         for key in ["rot1", "rot2", "rot3", "poni1", "poni2"]:
             _pdata[key] = _EXP.get_param_value(f"detector_{key}")
-        _pdata["detector"] = _EXP.get_param_value("detector_name")
+        _det = _EXP.get_param_value("detector_name")
+        _pdata["detector"] = _det if _det in PYFAI_DETECTOR_NAMES else "Detector"
         _pdata["distance"] = _EXP.get_param_value("detector_dist")
         if (
             _pdata["detector"] in pyFAI.detectors.Detector.registry
@@ -84,10 +86,11 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
                 ),
             )
         _pdata["wavelength"] = _EXP.get_param_value("xray_wavelength") * 1e-10
-        pfile = pyFAI.io.ponifile.PoniFile()
-        pfile.read_from_dict(_pdata)
+        pfile = pyFAI.io.ponifile.PoniFile(data=_pdata)
         with open(filename, "w") as stream:
             pfile.write(stream)
+            stream.write("\n# This file was created by pydidas.")
+            stream.write(f"\n# pydidas_det_name = {_det}")
 
     @classmethod
     def import_from_file(
@@ -103,10 +106,15 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         diffraction_exp : Union[DiffractionExperiment, None], optional
             The DiffractionExperiment instance to be updated.
         """
-        geo = pyFAI.geometry.Geometry().load(filename)
+        geo = pyFAI.geometry.Geometry().load(PoniFile(data=filename))
+        with open(filename, "r") as stream:
+            _content = stream.read()
         cls.imported_params = {}
         cls._update_detector_from_pyFAI(geo.detector)
         cls._update_geometry_from_pyFAI(geo)
+        if "pydidas_det_name = " in _content:
+            _det_name = _content.split("pydidas_det_name = ")[1].split("\n")[0].strip()
+            cls.imported_params["detector_name"] = _det_name
         cls._verify_all_entries_present(exclude_det_mask=True)
         cls._write_to_exp_settings(diffraction_exp=diffraction_exp)
 

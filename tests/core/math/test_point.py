@@ -52,6 +52,36 @@ def test_point_initialization__w_wrong_tuple(value):
         Point(value)
 
 
+def test_point__len():
+    point = Point(3.5, 7.2)
+    assert len(point) == 2
+
+
+def test_point__iter():
+    point = Point(3.5, 7.2)
+    iterator = iter(point)
+    assert next(iterator) == 3.5
+    assert next(iterator) == 7.2
+    with pytest.raises(StopIteration):
+        next(iterator)  # noqa
+
+
+def test_point__getitem():
+    point = Point(3.5, 7.2)
+    assert point[0] == 3.5
+    assert point[1] == 7.2
+    with pytest.raises(IndexError):
+        _ = point[2]  # noqa
+
+
+def test_point__contains():
+    point = Point(3.5, 7.2)
+    assert 3.5 in point
+    assert 7.2 in point
+    assert 4.0 not in point
+    assert "3.5" not in point  # noqa
+
+
 def test_point_equality():
     point1 = Point(1.0, 2.0)
     point2 = Point(1.0, 2.0)

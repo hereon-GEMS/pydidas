@@ -111,11 +111,37 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._update_position_widget()
         self._add_canvas_resize_actions()
         self._add_histogram_actions()
+        self._default_unit = "no unit"
         if self._config["cs_transform"]:
             self._add_cs_transform_actions()
         self._set_colormap_and_bar()
         if self._config["use_data_info_action"]:
             self._add_data_info_action()
+
+    @property
+    def default_unit(self) -> str:
+        """
+        The default unit for the plot axes.
+
+        Returns
+        -------
+        str
+            The default unit for the plot axes.
+        """
+        return self._default_unit
+
+    @default_unit.setter
+    def default_unit(self, value: str):
+        """
+        Set the default unit for the plot axes.
+
+        Parameters
+        ----------
+        value : str
+            The new default unit for the plot axes.
+        """
+        self._default_unit = value
+        self.update_cs_units(value, value)
 
     def _update_config(self, kwargs: dict):
         """
@@ -293,8 +319,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         y_unit : str
             The unit for the data y-axis
         """
-        x_unit = "no unit" if x_unit == "" else x_unit
-        y_unit = "no unit" if y_unit == "" else y_unit
+        x_unit = self._default_unit if x_unit == "" else x_unit
+        y_unit = self._default_unit if y_unit == "" else y_unit
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
     def addImage(self, data: Dataset | np.ndarray, **kwargs: Any):

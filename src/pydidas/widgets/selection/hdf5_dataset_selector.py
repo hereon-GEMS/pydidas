@@ -131,7 +131,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         update_child_qobject(self, "layout", horizontalSpacing=2)
         self.create_button(
             "button_inspect",
-            "Inspect hdf5 tree structure",
+            "Inspect HDF5 tree structure",
             gridPos=(0, 2, 1, 1),
             icon="qt-std::SP_MessageBoxInformation",
         )

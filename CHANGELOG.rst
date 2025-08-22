@@ -29,6 +29,7 @@ Improvements
       per scan point to allow rolling averages and staggered processing.
 - Changed the DiffractionExperiment to update detector parameters automatically, if 
   the selected detector name is known in pyFAI.
+- Added an option to disable automatic state export on exit for the GUI.
 
 Bugfixes
 --------

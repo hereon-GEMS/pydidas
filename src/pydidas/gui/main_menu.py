@@ -83,6 +83,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         The geometry as a 4-tuple or list. The entries are the top left
         corner coordinates (x0, y0) and width and height. If None, the
         default values will be used. The default is None.
+    export_exit_state : bool, optional
+        Flag to export the GUI state on exit. If True, the state will be
+        exported to a file. The default is True.
     """
 
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
@@ -95,6 +98,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self,
         parent: Optional[QtWidgets.QWidget] = None,
         geometry: Union[QtCore.QRect, list, tuple] = None,
+        export_exit_state: bool = True,
     ):
         QtWidgets.QMainWindow.__init__(self, parent)
         PydidasQsettingsMixin.__init__(self)
@@ -106,6 +110,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._actions = {}
         self._menus = {}
         self.__window_counter = 0
+        self.__export_exit_state = export_exit_state
 
         self._setup_main_window_widget(geometry)
         self._create_logging_info_widget()
@@ -717,8 +722,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         if not _reply:
             event.ignore()
             return
-        self.export_gui_state(
-            PYDIDAS_STANDARD_CONFIG_PATH.joinpath(self.EXIT_STATE_FILENAME)
-        )
+        if self.__export_exit_state:
+            self.export_gui_state(
+                PYDIDAS_STANDARD_CONFIG_PATH.joinpath(self.EXIT_STATE_FILENAME)
+            )
         self.sig_close_main_window.emit()
         event.accept()

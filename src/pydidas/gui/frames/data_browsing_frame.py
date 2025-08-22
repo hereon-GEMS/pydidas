@@ -80,10 +80,10 @@ class DataBrowsingFrame(BaseFrame):
         Connect all required signals and slots between widgets and class
         methods.
         """
-        self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         self._widgets["explorer"].sig_new_file_selected.connect(
             self._widgets["raw_metadata_selector"].new_filename
         )
+        self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
         )
@@ -146,14 +146,17 @@ class DataBrowsingFrame(BaseFrame):
             return
         if self.__browser_window is not None:
             self.__browser_window.hide()
-        self.__check_for_and_process_hdf5_file(filename)
         self.__current_filename = filename
         self._widgets["filename"].setText(self.__current_filename)
-        if _extension not in BINARY_EXTENSIONS + HDF5_EXTENSIONS:
+
+        self._widgets["hdf5_dataset_selector"].setVisible(_extension in HDF5_EXTENSIONS)
+        if _extension in HDF5_EXTENSIONS:
+            self.__open_hdf5_file(filename)
+        elif _extension not in BINARY_EXTENSIONS:
             _data = import_data(filename)
             self.__display_dataset(_data)
 
-    def __check_for_and_process_hdf5_file(self, filename: str):
+    def __open_hdf5_file(self, filename: str):
         """
         Process the input file and check whether it is a hdf5 file.
 
@@ -166,17 +169,12 @@ class DataBrowsingFrame(BaseFrame):
         if self.__open_file is not None:
             self.__open_file.close()
             self.__open_file = None
-        if get_extension(filename) not in HDF5_EXTENSIONS:
-            self._widgets["hdf5_dataset_selector"].setVisible(False)
-            return
         with CatchFileErrors(
             filename, KeyError, raise_file_read_error=False
         ) as catcher:
             self.__open_file = h5py.File(filename, mode="r")
             self._widgets["hdf5_dataset_selector"].new_filename(filename)
-            if filename == self._config.get("last_opened_hdf5_file"):
-                self._widgets["hdf5_dataset_selector"].display_dataset()
-            self._config["last_opened_hdf5_file"] = filename
+            self.__display_hdf5_dataset(self._widgets["hdf5_dataset_selector"].dataset)
         if catcher.raised_exception:
             try:
                 self.__open_file.close()
@@ -184,8 +182,7 @@ class DataBrowsingFrame(BaseFrame):
                 pass
             self.__open_file = None
             self._widgets["hdf5_dataset_selector"].clear()
-            if get_extension(self.__current_filename) in HDF5_EXTENSIONS:
-                self._widgets["filename"].setText("")
+            self._widgets["filename"].setText("")
             self.__current_filename = None
             raise FileReadError(catcher.exception_message)
 

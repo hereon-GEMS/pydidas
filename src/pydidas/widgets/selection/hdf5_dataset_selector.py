@@ -224,7 +224,11 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         _param_widget.view().setMinimumWidth(
             get_max_pixel_width_of_entries(_datasets) + 50
         )
-        self.display_dataset()
+
+    @property
+    def dataset(self) -> str:
+        """Get the currently selected dataset."""
+        return self.get_param_value("dataset")
 
     @QtCore.Slot()
     def display_dataset(self):
@@ -279,12 +283,15 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         """
         _filename = Path(filename)
         _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
-        _is_current = _filename == self._config["current_filename"]
         self.setVisible(_is_hdf5)
-        self._config["current_filename"] = filename if _is_hdf5 else ""
-        if _is_hdf5 and _filename.is_file() and not _is_current:
+        if not _is_hdf5:
+            return
+        _is_current = _filename == self._config["current_filename"]
+        self._config["current_filename"] = filename
+        if _filename.is_file() and not _is_current:
             self._config["current_dataset"] = ""
             self.__populate_dataset_list()
+        self.display_dataset()
 
     def clear(self):
         """

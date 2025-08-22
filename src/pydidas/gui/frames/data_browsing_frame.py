@@ -162,8 +162,8 @@ class DataBrowsingFrame(BaseFrame):
         filename : str
             The filename of the hdf5 file to open.
         """
+        self._widgets["viewer"].setData(None)
         if self.__open_file is not None:
-            self._widgets["viewer"].setData(None)
             self.__open_file.close()
             self.__open_file = None
         if get_extension(filename) not in HDF5_EXTENSIONS:
@@ -174,6 +174,9 @@ class DataBrowsingFrame(BaseFrame):
         ) as catcher:
             self.__open_file = h5py.File(filename, mode="r")
             self._widgets["hdf5_dataset_selector"].new_filename(filename)
+            if filename == self._config.get("last_opened_hdf5_file"):
+                self._widgets["hdf5_dataset_selector"].display_dataset()
+            self._config["last_opened_hdf5_file"] = filename
         if catcher.raised_exception:
             try:
                 self.__open_file.close()

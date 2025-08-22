@@ -51,6 +51,8 @@ Bugfixes
 - Fixed an issue when importing PONI files with custom detectors.
 - Fixed an issue where the QuickIntegrationFrame would automatically reset a 
   user-defined detector pixel size.
+- Fixed an issue in the DataDrowsingFrame where selection the latest HDF5 file after
+  a different file would not reload the data.
 
 
 v25.05.16

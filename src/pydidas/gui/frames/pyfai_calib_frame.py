@@ -361,8 +361,7 @@ class PyfaiCalibFrame(BaseFrame):
         """
         _maskfile = self._model.experimentSettingsModel().mask().filename()
         if _maskfile is not None:
-            if _maskfile.startswith("fabio:///"):
-                _maskfile = _maskfile[9:]
+            _maskfile = _maskfile.removeprefix("fabio:///")
         return _maskfile
 
     @QtCore.Slot()

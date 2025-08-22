@@ -58,13 +58,11 @@ def configure_pyFAI():
     Configure pyFAI to be used with pydidas.
     """
     for _key in [QStandardPaths.AppDataLocation, QStandardPaths.ConfigLocation]:
-        _pyFAI_calib2_config = (
-            Path(QStandardPaths.writableLocation(_key)).parents[1]
-            / "pyfai"
-            / "pyfai-calib2.ini"
-        )
-        if _pyFAI_calib2_config.is_file():
-            _pyFAI_calib2_config.unlink()
+        _path = Path(QStandardPaths.writableLocation(_key))
+        for _directory in [_path, _path.parent, _path.parents[1]]:
+            _pyFAI_calib2_config = _directory / "pyfai" / "pyfai-calib2.ini"
+            if _pyFAI_calib2_config.is_file():
+                _pyFAI_calib2_config.unlink()
 
     # Disable the pyFAI logging to console
     os.environ["PYFAI_NO_LOGGING"] = "1"

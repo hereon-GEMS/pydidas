@@ -53,6 +53,8 @@ Bugfixes
   user-defined detector pixel size.
 - Fixed an issue in the DataDrowsingFrame where selection the latest HDF5 file after
   a different file would not reload the data.
+- Fixed an issue where the pyfai-calib2.ini file was not localized correctly on Unix 
+  systems.
 
 
 v25.05.16

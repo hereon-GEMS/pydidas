@@ -707,7 +707,9 @@ class Dataset(ndarray):
     # Metadata and description methods
     # ################################
 
-    def get_axis_description(self, index: int) -> str:
+    def get_axis_description(
+        self, index: int, sep: Literal["/", "_", "(", "["] = "/"
+    ) -> str:
         """
         Get the description for the given axis, based on the axis label and unit.
 
@@ -715,17 +717,31 @@ class Dataset(ndarray):
         ----------
         index : int
             The axis index.
+        sep : Literal["/", "/", "_", "(", "["], optional
+            The separator between label and unit. The default is "/".
+            For slash and brackets, whitespaces will be added around the separator.
+            For underscore, no whitespaces will be added.
+            For bracket characters, a closing bracket will be added automatically.
 
         Returns
         -------
         str
             The description for the given axis.
         """
-        return self._meta["axis_labels"][index] + (
-            " / " + self._meta["axis_units"][index]
-            if len(self._meta["axis_units"][index]) > 0
-            else ""
-        )
+        if len(self._meta["axis_units"][index]) == 0:
+            return self._meta["axis_labels"][index]
+        if sep in ["/", "_"]:
+            sep = " / " if sep == "/" else sep
+            return (
+                self._meta["axis_labels"][index] + sep + self._meta["axis_units"][index]
+            )
+        elif sep in ["(", "["]:
+            return self._meta["axis_labels"][index] + (
+                f" {sep}"
+                + self._meta["axis_units"][index]
+                + (")" if sep == "(" else "]")
+            )
+        raise ValueError("The separator must be one of '/', '_', '(', '['.")
 
     def get_axis_range(self, index: int) -> ndarray:
         """

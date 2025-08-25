@@ -451,9 +451,7 @@ class Dataset(ndarray):
         str
             The descriptive string for the data.
         """
-        return self.data_label + (
-            " / " + self.data_unit if len(self.data_unit) > 0 else ""
-        )
+        return self.__get_description(self.data_label, self.data_unit)
 
     @property
     def metadata(self) -> dict:
@@ -707,6 +705,25 @@ class Dataset(ndarray):
     # Metadata and description methods
     # ################################
 
+    def get_data_description(self, sep: Literal["/", "_", "(", "["] = "/") -> str:
+        """
+        Get a description for the data, based on the data label and unit.
+
+        Parameters
+        ----------
+        sep : Literal["/", "/", "_", "(", "["], optional
+            The separator between label and unit. The default is "/".
+            For slash and brackets, whitespaces will be added around the separator.
+            For underscore, no whitespaces will be added.
+            For bracket characters, a closing bracket will be added automatically.
+
+        Returns
+        -------
+        str
+            The description for the data.
+        """
+        return self.__get_description(self.data_label, self.data_unit, sep)
+
     def get_axis_description(
         self, index: int, sep: Literal["/", "_", "(", "["] = "/"
     ) -> str:
@@ -728,19 +745,39 @@ class Dataset(ndarray):
         str
             The description for the given axis.
         """
-        if len(self._meta["axis_units"][index]) == 0:
-            return self._meta["axis_labels"][index]
+        return self.__get_description(
+            self._meta["axis_labels"][index], self._meta["axis_units"][index], sep
+        )
+
+    def __get_description(
+        self, label: str, unit: str, sep: Literal["/", "/", "_", "(", "["] = "/"
+    ) -> str:
+        """
+        Get a description based on label and unit.
+
+        Parameters
+        ----------
+        label : str
+            The label.
+        unit : str
+            The unit.
+        sep : Literal["/", "/", "_", "(", "["], optional
+            The separator between label and unit. The default is "/".
+            For slash and brackets, whitespaces will be added around the separator.
+            For underscore, no whitespaces will be added.
+            For bracket characters, a closing bracket will be added automatically.
+
+        Returns
+        -------
+        str
+            The descriptive string based on label and unit.
+        """
+        if len(unit) == 0:
+            return label
         if sep in ["/", "_"]:
-            sep = " / " if sep == "/" else sep
-            return (
-                self._meta["axis_labels"][index] + sep + self._meta["axis_units"][index]
-            )
+            return label + (" / " if sep == "/" else sep) + unit
         elif sep in ["(", "["]:
-            return self._meta["axis_labels"][index] + (
-                f" {sep}"
-                + self._meta["axis_units"][index]
-                + (")" if sep == "(" else "]")
-            )
+            return label + (f" {sep}" + unit + (")" if sep == "(" else "]"))
         raise ValueError("The separator must be one of '/', '_', '(', '['.")
 
     def get_axis_range(self, index: int) -> ndarray:

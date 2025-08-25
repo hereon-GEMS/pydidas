@@ -994,6 +994,24 @@ class TestDataset(unittest.TestCase):
         obj.data_unit = _test_unit
         self.assertEqual(obj.data_description, f"{_test_label} / {_test_unit}")
 
+    def test_get_data_description__no_unit(self):
+        obj = self.create_simple_dataset()
+        for _char in ["/", "_", "(", "["]:
+            with self.subTest(sep=_char):
+                _str = obj.get_data_description(sep=_char)
+                self.assertEqual(_str, obj.data_label)
+
+    def test_get_data_description__w_unit(self):
+        obj = self.create_simple_dataset()
+        obj.data_unit = "Tm"
+        for _char in ["/", "_", "(", "["]:
+            with self.subTest(sep=_char):
+                _str = obj.get_data_description(sep=_char)
+                _label, _unit = _str.split(_char, 1)
+                _unit = _unit.strip(" )]")
+                self.assertEqual(_label.strip(), obj.data_label)
+                self.assertEqual(_unit.strip(), obj.data_unit)
+
     def test_get_axis_description__no_unit(self):
         obj = self.create_simple_dataset()
         for index in range(2):

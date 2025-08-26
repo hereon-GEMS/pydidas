@@ -143,7 +143,7 @@ class Dataset(ndarray):
         ----------
         array : ndarray
             The data array.
-        **kwargs : type
+        **kwargs : Any
             Accepted keywords are axis_labels, axis_ranges, axis_units,
             metadata, data_unit. For information on the keywords please refer
             to the class docstring.
@@ -264,7 +264,7 @@ class Dataset(ndarray):
             _vals.insert(dim, _new_entry)
             self._meta[_item] = {_i: _val for _i, _val in enumerate(_vals)}
 
-    def flatten_dims(self, *args: tuple[int], **kwargs: dict):
+    def flatten_dims(self, *args: tuple[int], **kwargs: Any):
         """
         Flatten the specified dimensions **in place** in the Dataset.
 
@@ -279,7 +279,7 @@ class Dataset(ndarray):
         *args : tuple[int]
             The tuple of the dimensions to be flattened. Each dimension must
             be an integer entry.
-        **kwargs: dict
+        **kwargs: Any
             Additional keyword arguments. Supported keywords are:
 
             new_dim_label : str, optional
@@ -1099,7 +1099,7 @@ class Dataset(ndarray):
         axis: int | tuple[int] | None = None,
         dtype: DTypeLike = None,
         out: ArrayLike | None = None,
-        **kwargs: dict,
+        **kwargs: Any,
     ) -> Self:
         """
         Reimplement a NumPy method with additional metadata handling.
@@ -1119,7 +1119,7 @@ class Dataset(ndarray):
             Alternative output array in which to place the result. It must have the
             same shape as the expected output, but the type will be cast if necessary.
             The default is None.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments, which are only passed when specified.
             Supported keywords are:
 

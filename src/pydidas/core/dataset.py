@@ -47,6 +47,7 @@ from pydidas.core.utils.dataset_utils import (
     dataset_default_attribute,
     get_axis_item_representation,
     get_corresponding_dims,
+    get_description_string,
     get_dict_with_string_entries,
     get_input_as_dict,
     get_number_of_entries,
@@ -100,7 +101,7 @@ class Dataset(ndarray):
         similar arguments as the numpy function but preserves the metadata.
     - numpy.rollaxis:
         This function is deprecated and moveaxes should be used instead.
-    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc:
+    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc.:
         These functions work but return pure ndarrays without metadata.
 
 
@@ -451,7 +452,7 @@ class Dataset(ndarray):
         str
             The descriptive string for the data.
         """
-        return self.__get_description(self.data_label, self.data_unit)
+        return get_description_string(self.data_label, self.data_unit)
 
     @property
     def metadata(self) -> dict:
@@ -722,7 +723,7 @@ class Dataset(ndarray):
         str
             The description for the data.
         """
-        return self.__get_description(self.data_label, self.data_unit, sep)
+        return get_description_string(self.data_label, self.data_unit, sep)
 
     def get_axis_description(
         self, index: int, sep: Literal["/", "_", "(", "["] = "/"
@@ -745,40 +746,9 @@ class Dataset(ndarray):
         str
             The description for the given axis.
         """
-        return self.__get_description(
+        return get_description_string(
             self._meta["axis_labels"][index], self._meta["axis_units"][index], sep
         )
-
-    def __get_description(
-        self, label: str, unit: str, sep: Literal["/", "/", "_", "(", "["] = "/"
-    ) -> str:
-        """
-        Get a description based on label and unit.
-
-        Parameters
-        ----------
-        label : str
-            The label.
-        unit : str
-            The unit.
-        sep : Literal["/", "/", "_", "(", "["], optional
-            The separator between label and unit. The default is "/".
-            For slash and brackets, whitespaces will be added around the separator.
-            For underscore, no whitespaces will be added.
-            For bracket characters, a closing bracket will be added automatically.
-
-        Returns
-        -------
-        str
-            The descriptive string based on label and unit.
-        """
-        if len(unit) == 0:
-            return label
-        if sep in ["/", "_"]:
-            return label + (" / " if sep == "/" else sep) + unit
-        elif sep in ["(", "["]:
-            return label + (f" {sep}" + unit + (")" if sep == "(" else "]"))
-        raise ValueError("The separator must be one of '/', '_', '(', '['.")
 
     def get_axis_range(self, index: int) -> ndarray:
         """
@@ -1271,7 +1241,7 @@ class Dataset(ndarray):
         if self.ndim == 0:
             return _new
         elif self.ndim == 1:
-            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))
+            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))  # noqa E1101
             return _new
         if axis is None:
             warnings.warn(
@@ -1281,7 +1251,7 @@ class Dataset(ndarray):
                 UserWarning,
             )
             return _new
-        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))
+        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))  # noqa E1101
         return _new
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
@@ -1401,7 +1371,7 @@ class Dataset(ndarray):
             for the full documentation. The class' state is appended with
             the class' __dict__
         """
-        _ndarray_reduced = ndarray.__reduce__(self)
+        _ndarray_reduced: tuple = ndarray.__reduce__(self)
         _dataset_state = _ndarray_reduced[2] + (self.__dict__,)
         return _ndarray_reduced[0], _ndarray_reduced[1], _dataset_state
 

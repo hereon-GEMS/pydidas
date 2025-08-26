@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = [
     "FLATTEN_DIM_DEFAULTS",
     "METADATA_KEYS",
+    "get_description_string",
     "get_default_property_dict",
     "dataset_default_attribute",
     "update_dataset_properties_from_kwargs",
@@ -44,7 +45,7 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
-from typing import List, Literal, NewType, Sequence, Tuple, Union
+from typing import Literal, NewType, Sequence, Union
 
 import numpy as np
 
@@ -68,6 +69,38 @@ METADATA_KEYS = [
     "axis_labels",
     "axis_ranges",
 ]
+
+
+def get_description_string(
+    label: str, unit: str, sep: Literal["/", "/", "_", "(", "["] = "/"
+) -> str:
+    """
+    Get a description based on label and unit.
+
+    Parameters
+    ----------
+    label : str
+        The label.
+    unit : str
+        The unit.
+    sep : Literal["/", "/", "_", "(", "["], optional
+        The separator between label and unit. The default is "/".
+        For slash and brackets, whitespaces will be added around the separator.
+        For underscore, no whitespaces will be added.
+        For bracket characters, a closing bracket will be added automatically.
+
+    Returns
+    -------
+    str
+        The descriptive string based on label and unit.
+    """
+    if len(unit) == 0:
+        return label
+    if sep in ["/", "_"]:
+        return label + (" / " if sep == "/" else sep) + unit
+    elif sep in ["(", "["]:
+        return label + (f" {sep}" + unit + (")" if sep == "(" else "]"))
+    raise ValueError("The separator must be one of '/', '_', '(', '['.")
 
 
 def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset:
@@ -150,7 +183,7 @@ def dataset_default_attribute(key: str, shape: tuple[int]) -> str | dict | tuple
     raise ValueError(f"No default available for `{key}`.")
 
 
-def _dataset_ax_default_ranges(shape: Tuple[int]) -> dict:
+def _dataset_ax_default_ranges(shape: tuple[int]) -> dict:
     """
     Generate default values for the axis ranges in a Dataset.
 
@@ -202,7 +235,7 @@ def get_axis_item_representation(
     key: Literal["axis_labels", "axis_ranges", "axis_units", "metadata"],
     item: object,
     use_key: bool = True,
-) -> List[str]:
+) -> list[str]:
     """
     Get a string representation for a dictionary item.
 
@@ -239,16 +272,16 @@ def get_axis_item_representation(
 
 
 def get_dict_with_string_entries(
-    entries: Union[Iterable, dict], shape: Tuple[int], name_reference: str
+    entries: Iterable | dict, shape: tuple[int], name_reference: str
 ) -> dict:
     """
     Get a dictionary with string entries.
 
     Parameters
     ----------
-    entries : Union[Iterable, dict]
+    entries : Iterable | dict
         The entries to be processed.
-    shape : int
+    shape : tuple[int]
         The shape of the calling Dataset.
     name_reference : str
         The reference name from the calling method for a possible error message.
@@ -267,8 +300,8 @@ def get_dict_with_string_entries(
 
 
 def get_input_as_dict(
-    data: Union[dict, Sequence[float]],
-    target_shape: Tuple[int],
+    data: dict | Sequence[float],
+    target_shape: tuple[int],
     calling_method_name: str = "axis_labels",
 ) -> dict:
     """
@@ -282,7 +315,7 @@ def get_input_as_dict(
     ----------
     data : Union[dict, Sequence[float]]
         The keys for the axis metadata.
-    target_shape: Tuple[int]
+    target_shape: tuple[int]
         The shape of the target Dataset. This number is needed to sanity-check that
         the input has the correct length.
     calling_method_name : str

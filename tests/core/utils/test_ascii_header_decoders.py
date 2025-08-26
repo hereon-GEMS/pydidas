@@ -1,0 +1,193 @@
+# This file is part of pydidas.
+#
+# Copyright 2025, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
+"""Unit tests for pydidas modules."""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
+__maintainer__ = "Malte Storm"
+__status__ = "Production"
+
+
+import numpy as np
+import pytest
+
+from pydidas.core import Dataset, FileReadError
+from pydidas.core.utils.ascii_header_decoders import (
+    decode_chi_header,
+    decode_specfile_header,
+    decode_txt_header,
+)
+
+
+_x_data = np.linspace(-10, 11, 62)
+_y_data = np.sin(_x_data) + 0.1 * np.random.random(_x_data.size)
+
+_test_data = Dataset(
+    _y_data,
+    axis_ranges=[_x_data],
+    axis_labels=["2theta"],
+    axis_units=["deg"],
+    data_label="test data",
+    data_unit="counts",
+)
+
+
+@pytest.mark.parametrize(
+    "written_ax_label, ax_label, ax_unit",
+    [
+        ["2theta", "2theta", ""],
+        ["2theta (deg)", "2theta", "deg"],
+        ["2theta_deg", "2theta", "deg"],
+        ["2theta [deg]", "2theta [deg]", ""],
+        ["2theta_2_deg", "2theta_2", "deg"],
+        ["2theta (test) (deg)", "2theta (test)", "deg"],
+    ],
+)
+def test_decode_chi_header__w_correct_ax_label(
+    temp_path, written_ax_label, ax_label, ax_unit
+):
+    with open(temp_path / "test.chi", "w") as f:
+        f.write("test.h5\n")
+        f.write(f"{written_ax_label}\n")
+        f.write("y data\n")
+        f.write("\t62\n")
+        for x, y in zip(_x_data, _y_data):
+            f.write(f"{x:.6e}\t{y:.6e}\n")
+    _data_label, _ax_label, _ax_unit = decode_chi_header(temp_path / "test.chi")
+    assert _ax_label == ax_label
+    assert _ax_unit == ax_unit
+    assert _data_label == "y data"
+
+
+def test_decode_chi_header__incorrect_header(temp_path):
+    with open(temp_path / "test.chi", "w") as f:
+        f.write("test.h5\n")
+        for x, y in zip(_x_data, _y_data):
+            f.write(f"{x:.6e}\t{y:.6e}\n")
+    with pytest.raises(FileReadError):
+        _data = decode_chi_header(temp_path / "test.chi")
+
+
+def test_decode_chi_header__no_file(temp_path):
+    with pytest.raises(FileReadError):
+        _data = decode_chi_header(temp_path / "test_42.chi")
+
+
+@pytest.mark.parametrize(
+    "labels, xlabel, xunit, ylabel, yunit",
+    [
+        (("2theta", "y data"), "", "", "2theta y data", ""),
+        (("2theta (deg)", "y data (counts)"), "2theta", "deg", "y data", "counts"),
+        (("2theta / deg", "y data_counts"), "2theta", "deg", "y data_counts", ""),
+        (("2theta [deg]", "y data [counts]"), "2theta", "deg", "y data", "counts"),
+        (("2theta / deg", "y data  / counts"), "2theta", "deg", "y data", "counts"),
+        (("chi angle / deg", "y data  / ct"), "chi angle", "deg", "y data", "ct"),
+        (("chi angle / deg", "y data  /"), "chi angle", "deg", "y data", ""),
+    ],
+)
+def test_decode_specfile_header__specfile_2col(
+    temp_path, labels, xlabel, xunit, ylabel, yunit
+):
+    with open(temp_path / "test.dat", "w") as f:
+        f.write("#F test.dat")
+        f.write("#S 1 test.h5\n")
+        f.write("#N 2\n")
+        f.write(f"#L {labels[0]} {labels[1]}\n")
+        for x, y in zip(_x_data, _y_data):
+            f.write(f"{x:.6e}\t{y:.6e}\n")
+    _labels, _units = decode_specfile_header(temp_path / "test.dat")
+    assert _labels == [xlabel, ylabel]
+    assert _units == [xunit, yunit]
+
+
+@pytest.mark.parametrize(
+    "labels", ["x / unit_a y / unit_b z / unit_c t / ms", "x y z t"]
+)
+def test_decode_specfile_header__specfile_4col(temp_path, labels):
+    with open(temp_path / "test.dat", "w") as f:
+        f.write("#F test.dat")
+        f.write("#S 1 test.h5\n")
+        f.write("#N 4\n")
+        f.write(f"#L {labels}\n")
+        for x, y, z, t in zip(_x_data, _y_data, _y_data, _y_data):
+            f.write(f"{x:.6e}\t{y:.6e}\t{z:.6e}\t{t:.6e}\n")
+    _labels, _units = decode_specfile_header(temp_path / "test.dat")
+    if "unit_" in labels:
+        assert _labels == ["x", "0: y; 1: z; 2: t", "y / unit_b; z / unit_c; t / ms"]
+        assert _units == ["unit_a", "", ""]
+    else:
+        assert _labels == ["x", "0: y; 1: z; 2: t", "y; z; t"]
+        assert _units == ["", "", ""]
+
+
+def test_decode_specfile_header__no_file(temp_path):
+    with pytest.raises(FileReadError):
+        _data = decode_specfile_header(temp_path / "test_42.dat")
+
+
+@pytest.mark.parametrize("skip", ["#N", "#L"])
+def test_decode_specfile_header__missing_key(temp_path, skip):
+    with open(temp_path / "test.dat", "w") as f:
+        f.write("#F test.dat")
+        f.write("#S 1 test.h5\n")
+        if skip != "#N":
+            f.write("#N 4\n")
+        if skip != "#L":
+            f.write("#L a b c d\n")
+        for x, y, z, t in zip(_x_data, _y_data, _y_data, _y_data):
+            f.write(f"{x:.6e}\t{y:.6e}\t{z:.6e}\t{t:.6e}\n")
+    with pytest.raises(FileReadError):
+        _labels, _units = decode_specfile_header(temp_path / "test.dat")
+
+
+def test_decode_txt_header__no_file(temp_path):
+    with pytest.raises(FileReadError):
+        _ = decode_specfile_header(temp_path / "test_42.txt")
+
+
+@pytest.mark.parametrize("ax_label", ["chi", None])
+@pytest.mark.parametrize("ax_unit", ["deg", None])
+@pytest.mark.parametrize("data_label", ["Intensity", None])
+@pytest.mark.parametrize("data_unit", ["cts", None])
+def test_decode_txt_header(temp_path, ax_label, ax_unit, data_label, data_unit):
+    if (temp_path / "test.txt").exists():
+        (temp_path / "test.txt").unlink()
+    with open(temp_path / "test.txt", "w") as f:
+        f.write("# Metadata:\n")
+        if ax_label is not None:
+            f.write(f"# Axis label: {ax_label}\n")
+        if ax_unit is not None:
+            f.write(f"# Axis unit: {ax_unit}\n")
+        if data_label is not None:
+            f.write(f"# Data label: {data_label}\n")
+        if data_unit is not None:
+            f.write(f"# Data unit: {data_unit}\n")
+        f.write("# --- end of metadata ---\n")
+        f.write("# axis\tvalue\n")
+        for x, y in zip(_x_data, _y_data):
+            f.write(f"{x:.6e}\t{y:.6e}\n")
+    _metadata = decode_txt_header(temp_path / "test.txt")
+    assert _metadata.get("ax_label") == ax_label
+    assert _metadata.get("ax_unit") == ax_unit
+    assert _metadata.get("data_label") == data_label
+    assert _metadata.get("data_unit") == data_unit
+
+
+if __name__ == "__main__":
+    pytest.main()

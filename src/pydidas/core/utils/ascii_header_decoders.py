@@ -79,7 +79,7 @@ def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:
         The axis labels and axis units.
     """
     _n_col = None
-    _raw_labels = None
+    _raw_labels = ""
     with CatchFileErrors(filename), open(filename, "r") as _file:
         _lines = _file.readlines()
     for _line in _lines:
@@ -90,8 +90,11 @@ def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:
         if _line.startswith("#L"):
             _raw_labels = _line.removeprefix("#L").strip()
             break
-    if not _n_col or not _raw_labels:
-        raise FileReadError("The SpecFile does not contain valid header information.")
+    if not _n_col:
+        for _line in _lines:
+            if not _line.startswith("#"):
+                _n_col = len(_line.split())
+                break
     _labels_split = _raw_labels.split()
     _units = []
     if len(_labels_split) == _n_col == 2:
@@ -116,23 +119,32 @@ def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:
                 _curr = (_curr + " " + _label).strip()
         if _curr:
             _labels.append(_curr)
-    if len(_labels) < _n_col:
-        if len(_labels) == 1:
-            _labels = [""] * (_n_col - len(_labels)) + _labels
+            _units.append("")
+    if _n_col == 1:
+        _labels = [""] * (2 - len(_labels)) + _labels
+        _units = [""] * (2 - len(_units)) + _units
+    elif _n_col == 2:
+        if len(_labels) > len(_units):
+            _units = _units + [""] * (len(_labels) - len(_units))
         else:
-            _labels = _labels + [""] * (_n_col - len(_labels))
-    if len(_units) < _n_col:
+            _units = [""] * (_n_col - len(_units)) + _units
+        _labels = [""] * (_n_col - len(_labels)) + _labels
+    else:
+        _labels = _labels + [""] * (_n_col - len(_labels))
         _units = _units + [""] * (_n_col - len(_units))
-    if _n_col > 2:
         _labels = [
             _labels[0],
-            "; ".join(f"{i}: {_l}" for i, _l in enumerate(_labels[1:], start=0)),
+            "; ".join(
+                f"{i}: {_l if _l else 'no label'}"
+                for i, _l in enumerate(_labels[1:], start=0)
+            ),
             "; ".join(
                 (f"{_l} / {_u}" if _u else _l)
                 for _l, _u in zip(_labels[1:], _units[1:])
+                if _l or _u
             ),
         ]
-        _units = [_units[0], "", ""]
+        _units = [_units[0] if _units else "", "", ""]
     return _labels, _units
 
 

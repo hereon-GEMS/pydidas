@@ -90,30 +90,71 @@ def test_decode_chi_header__no_file(temp_path):
 
 
 @pytest.mark.parametrize(
-    "labels, xlabel, xunit, ylabel, yunit",
+    "written_label, label, unit",
     [
-        (("2theta", "y data"), "", "", "2theta y data", ""),
-        (("2theta (deg)", "y data (counts)"), "2theta", "deg", "y data", "counts"),
-        (("2theta / deg", "y data_counts"), "2theta", "deg", "y data_counts", ""),
-        (("2theta [deg]", "y data [counts]"), "2theta", "deg", "y data", "counts"),
-        (("2theta / deg", "y data  / counts"), "2theta", "deg", "y data", "counts"),
-        (("chi angle / deg", "y data  / ct"), "chi angle", "deg", "y data", "ct"),
-        (("chi angle / deg", "y data  /"), "chi angle", "deg", "y data", ""),
+        ("", "", ""),
+        ("2theta", "2theta", ""),
+        ("2theta (deg)", "2theta", "deg"),
+        ("2theta / deg", "2theta", "deg"),
+        ("2theta [deg]", "2theta", "deg"),
+        ("2theta random val / deg", "2theta random val", "deg"),
+        ("chi angle /", "chi angle", ""),
+    ],
+)
+def test_decode_specfile_header__specfile_1col(temp_path, written_label, label, unit):
+    _header = f"F test.dat\nS 1 test.h5\nN 1\nL {written_label}\n"
+    np.savetxt(
+        temp_path / "test.dat", _x_data, header=_header, fmt="%.6e", comments="#"
+    )
+    _labels, _units = decode_specfile_header(temp_path / "test.dat")
+    assert _labels == ["", label]
+    assert _units == ["", unit]
+
+
+@pytest.mark.parametrize(
+    "written_label, xlabel, xunit, ylabel, yunit",
+    [
+        ("", "", "", "", ""),
+        ("2theta y data", "", "", "2theta y data", ""),
+        ("2theta (deg) y data (counts)", "2theta", "deg", "y data", "counts"),
+        ("2theta / deg y data_counts", "2theta", "deg", "y data_counts", ""),
+        ("2theta y data_counts / ct", "", "", "2theta y data_counts", "ct"),
+        ("2theta [deg] y data [counts]", "2theta", "deg", "y data", "counts"),
+        ("2theta / deg y data  / counts", "2theta", "deg", "y data", "counts"),
+        ("chi angle / deg y data  / ct", "chi angle", "deg", "y data", "ct"),
+        ("chi angle / deg y data  /", "chi angle", "deg", "y data", ""),
     ],
 )
 def test_decode_specfile_header__specfile_2col(
-    temp_path, labels, xlabel, xunit, ylabel, yunit
+    temp_path, written_label, xlabel, xunit, ylabel, yunit
 ):
-    with open(temp_path / "test.dat", "w") as f:
-        f.write("#F test.dat")
-        f.write("#S 1 test.h5\n")
-        f.write("#N 2\n")
-        f.write(f"#L {labels[0]} {labels[1]}\n")
-        for x, y in zip(_x_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\n")
+    _header = f"F test.dat\nS 1 test.h5\nN 2\nL {written_label}\n"
+    np.savetxt(
+        temp_path / "test.dat",
+        np.column_stack((_x_data, _y_data)),
+        header=_header,
+        fmt="%.6e",
+        comments="#",
+    )
     _labels, _units = decode_specfile_header(temp_path / "test.dat")
     assert _labels == [xlabel, ylabel]
     assert _units == [xunit, yunit]
+
+
+@pytest.mark.parametrize("ncol", [1, 2, 3, 4, 5])
+def test_decode_specfile_header__specfile_no_header(temp_path, ncol):
+    np.savetxt(
+        temp_path / "test.dat",
+        np.column_stack((_x_data,) + (ncol - 1) * (_y_data,)),
+        fmt="%.6e",
+    )
+    _labels, _units = decode_specfile_header(temp_path / "test.dat")
+    if ncol <= 2:
+        assert _labels == ["", ""]
+        assert _units == ["", ""]
+    else:
+        assert _labels == ["", "; ".join(f"{i}: no label" for i in range(ncol - 1)), ""]
+        assert _units == ["", "", ""]
 
 
 @pytest.mark.parametrize(
@@ -139,21 +180,6 @@ def test_decode_specfile_header__specfile_4col(temp_path, labels):
 def test_decode_specfile_header__no_file(temp_path):
     with pytest.raises(FileReadError):
         _data = decode_specfile_header(temp_path / "test_42.dat")
-
-
-@pytest.mark.parametrize("skip", ["#N", "#L"])
-def test_decode_specfile_header__missing_key(temp_path, skip):
-    with open(temp_path / "test.dat", "w") as f:
-        f.write("#F test.dat")
-        f.write("#S 1 test.h5\n")
-        if skip != "#N":
-            f.write("#N 4\n")
-        if skip != "#L":
-            f.write("#L a b c d\n")
-        for x, y, z, t in zip(_x_data, _y_data, _y_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\t{z:.6e}\t{t:.6e}\n")
-    with pytest.raises(FileReadError):
-        _labels, _units = decode_specfile_header(temp_path / "test.dat")
 
 
 def test_decode_txt_header__no_file(temp_path):

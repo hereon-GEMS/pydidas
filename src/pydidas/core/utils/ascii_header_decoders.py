@@ -93,25 +93,19 @@ def decode_specfile_header(
     with CatchFileErrors(filename), open(filename, "r") as _file:
         _lines = _file.readlines()
     for _line in _lines:
-        if _line.startswith("#N"):
+        if _line.startswith("#N") and _n_col is None:
             _n_col = int(_line.removeprefix("#N"))
-            break
-    for _line in _lines:
-        if _line.startswith("#L"):
+        elif _line.startswith("#L"):
             _raw_labels = _line.removeprefix("#L").strip()
+        elif not _line.startswith("#") and _n_col is None:
+            _n_col = len(_line.split())
+        if _n_col is not None and _raw_labels:
             break
-    if not _n_col:
-        for _line in _lines:
-            if not _line.startswith("#"):
-                _n_col = len(_line.split())
-                break
     _labels_split = _raw_labels.split()
     _units = []
     if len(_labels_split) == _n_col == 2 and read_x_column:
         return _labels_split, ["", ""]
-    elif len(_labels_split) == _n_col:
-        _labels = _labels_split
-    elif len(_labels_split) < _n_col:
+    elif len(_labels_split) <= _n_col:
         _labels = _labels_split + [""] * (_n_col - len(_labels_split))
         _units = [""] * _n_col
     else:

@@ -27,7 +27,7 @@ __status__ = "Production"
 import numpy as np
 import pytest
 
-from pydidas.core import Dataset, FileReadError
+from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.data_io.implementations.ascii_io import AsciiIo
 
 
@@ -44,6 +44,119 @@ _test_data = Dataset(
 )
 
 
+def get_data_with_ncols(ncols):
+    if ncols == 1:
+        return _test_data
+    _new = np.column_stack((_test_data,) * ncols)
+    _properties = _test_data.property_dict
+    _properties["axis_labels"][1] = "stack axis"
+    _properties["axis_units"][1] = ""
+    _properties["axis_ranges"][1] = np.arange(ncols)
+    return Dataset(_new, **_properties)
+
+
+@pytest.mark.parametrize("x_column", [True, False])
+@pytest.mark.parametrize("input_type", [Dataset, np.ndarray])
+@pytest.mark.parametrize("ncols", [1, 2, 3])
+def test_export_to_file__x_column_keyword(temp_path, x_column, input_type, ncols):
+    _temp_data = get_data_with_ncols(ncols)
+    if input_type == np.ndarray:
+        _temp_data = _temp_data.array
+    # use .csv as example because it does not write and metadata
+    AsciiIo.export_to_file(
+        temp_path / "test_export.csv", _temp_data, x_column=x_column, overwrite=True
+    )
+    _reimported = np.loadtxt(temp_path / "test_export.csv", delimiter=",")
+    if x_column:
+        assert np.allclose(_reimported[:, 1:].squeeze(), _temp_data)
+        if input_type == Dataset:
+            assert np.allclose(_reimported[:, 0], _test_data.axis_ranges[0])
+        else:
+            assert np.allclose(_reimported[:, 0], np.arange(_temp_data.shape[0]))
+    else:
+        assert np.allclose(_reimported, _temp_data)
+
+
+def test_export_to_file__w_str_filename(temp_path):
+    AsciiIo.export_to_file(
+        str(temp_path / "test_export.csv"), _test_data, overwrite=True
+    )
+    _imported_data = np.loadtxt(temp_path / "test_export.csv", delimiter=",")
+    assert np.allclose(_imported_data[:, 0], _test_data.axis_ranges[0])
+    assert np.allclose(_imported_data[:, 1], _test_data.array)
+
+
+def test_export_to_file__chi__no_x_column(temp_path):
+    with pytest.raises(UserConfigError):
+        AsciiIo.export_to_file(
+            temp_path / "test_export.chi", _test_data, x_column=False, overwrite=True
+        )
+
+
+def test_export_to_file__chi(temp_path):
+    AsciiIo.export_to_file(temp_path / "test_export.chi", _test_data, overwrite=True)
+    with open(temp_path / "test_export.chi", "r") as f:
+        _lines = f.readlines()
+    assert _lines[0].strip() == "test_export.chi"
+    assert _lines[1].strip() == _test_data.get_axis_description(0, sep="(")
+    assert _lines[2].strip() == _test_data.get_data_description(sep="(")
+    assert int(_lines[3].strip()) == _test_data.size
+    _data = np.loadtxt(temp_path / "test_export.chi", skiprows=4)
+    assert np.allclose(_data[:, 0], _test_data.axis_ranges[0])
+    assert np.allclose(_data[:, 1], _test_data.array)
+
+
+def test_export_to_chi__2d_data(temp_path):
+    _data = get_data_with_ncols(3)
+    with pytest.raises(UserConfigError):
+        AsciiIo.export_to_file(temp_path / "test_export.chi", _data, overwrite=True)
+
+
+@pytest.mark.parametrize("ncols", [1, 2, 3])
+@pytest.mark.parametrize("x_column", [True, False])
+@pytest.mark.parametrize("metadata", [{}, {"test_key": "test_value"}])
+def test_export_to_file__txt(temp_path, ncols, x_column, metadata):
+    _temp_data = get_data_with_ncols(ncols)
+    _temp_data.metadata = metadata
+    AsciiIo.export_to_file(
+        temp_path / "test_export.txt", _temp_data, x_column=x_column, overwrite=True
+    )
+    with open(temp_path / "test_export.txt", "r") as f:
+        _lines = f.readlines()
+    if x_column:
+        assert f"# Axis label: {_temp_data.axis_labels[0]}\n" in _lines
+        assert f"# Axis unit: {_temp_data.axis_units[0]}\n" in _lines
+    if metadata:
+        for _key, _val in metadata.items():
+            assert f"#     {_key}: {_val}\n" in _lines
+    assert f"# First column is x-axis: {x_column}\n" in _lines
+    assert f"# Data label: {_temp_data.data_label}\n" in _lines
+    assert f"# Data unit: {_temp_data.data_unit}\n" in _lines
+    _imported_data = np.loadtxt(temp_path / "test_export.txt")
+    if x_column:
+        assert np.allclose(_imported_data[:, 0], _temp_data.axis_ranges[0])
+        _imported_data = _imported_data[:, 1:].squeeze()
+    assert np.allclose(_imported_data, _temp_data)
+
+
+@pytest.mark.parametrize("ncols", [1, 2, 3])
+@pytest.mark.parametrize("x_column", [True, False])
+def test_export_to_file__specfile(temp_path, ncols, x_column):
+    _temp_data = get_data_with_ncols(ncols)
+    AsciiIo.export_to_file(
+        temp_path / "test_export.dat", _temp_data, x_column=x_column, overwrite=True
+    )
+    with open(temp_path / "test_export.dat", "r") as f:
+        _lines = f.readlines()
+    assert "#F test_export.dat\n" in _lines
+    assert f"#N {ncols + x_column}\n" in _lines
+    _imported_data = np.loadtxt(temp_path / "test_export.dat")
+    if x_column:
+        assert np.allclose(_imported_data[:, 0], _temp_data.axis_ranges[0])
+        _imported_data = _imported_data[:, 1:].squeeze()
+    assert np.allclose(_imported_data, _temp_data)
+
+
 @pytest.mark.parametrize(
     "written_ax_label, ax_label, ax_unit",
     [
@@ -58,27 +171,37 @@ _test_data = Dataset(
 def test_import_from_file__chi__w_correct_ax_label(
     temp_path, written_ax_label, ax_label, ax_unit
 ):
-    with open(temp_path / "test.chi", "w") as f:
-        f.write("test.h5\n")
-        f.write(f"{written_ax_label}\n")
-        f.write("y data\n")
-        f.write("\t62\n")
-        for x, y in zip(_x_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\n")
-    _data = AsciiIo.import_from_file(temp_path / "test.chi")
+    _header = f"test.h5\n{written_ax_label}\ny data / counts\n\t62\n"
+    written_data = np.column_stack((_x_data, _y_data))
+    np.savetxt(temp_path / "test_import.chi", written_data, header=_header, comments="")
+    _data = AsciiIo.import_from_file(temp_path / "test_import.chi")
     assert np.allclose(_data, _y_data)
     assert np.allclose(_data.axis_ranges[0], _x_data)
     assert _data.axis_labels[0] == ax_label
     assert _data.axis_units[0] == ax_unit
+    assert _data.data_label == "y data"
+    assert _data.data_unit == "counts"
 
 
 def test_import_from_file__chi__incorrect_header(temp_path):
-    with open(temp_path / "test.chi", "w") as f:
-        f.write("test.h5\n")
-        for x, y in zip(_x_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\n")
+    _header = "test.h5\n"
+    written_data = np.column_stack((_x_data, _y_data))
+    np.savetxt(temp_path / "test.chi", written_data, header=_header, comments="")
     with pytest.raises(FileReadError):
         _data = AsciiIo.import_from_file(temp_path / "test.chi")
+
+
+@pytest.mark.parametrize("labels", ["x / unit_a", "x"])
+def test_import_from_file__specfile_1col(temp_path, labels):
+    _header = f"F test.dat\nS 1 test.h5\nN 1\nL {labels}\n"
+    np.savetxt(temp_path / "test.dat", _x_data, header=_header, comments="#")
+    _data = AsciiIo.import_from_file(temp_path / "test.dat")
+    assert np.allclose(_data, _x_data)
+    assert np.allclose(_data.axis_ranges[0], np.arange(_x_data.size))
+    assert _data.axis_labels == {0: ""}
+    assert _data.axis_units == {0: ""}
+    assert _data.data_label == "x"
+    assert _data.data_unit == ("unit_a" if "unit_" in labels else "")
 
 
 @pytest.mark.parametrize(
@@ -96,13 +219,9 @@ def test_import_from_file__chi__incorrect_header(temp_path):
 def test_import_from_file__specfile_2col(
     temp_path, labels, xlabel, xunit, ylabel, yunit
 ):
-    with open(temp_path / "test.dat", "w") as f:
-        f.write("#F test.dat")
-        f.write("#S 1 test.h5\n")
-        f.write("#N 2\n")
-        f.write(f"#L {labels[0]} {labels[1]}\n")
-        for x, y in zip(_x_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\n")
+    _header = f"F test.dat\nS 1 test.h5\nN 2\nL {labels[0]} {labels[1]}\n"
+    _temp_data = np.column_stack((_x_data, _y_data))
+    np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
     _data = AsciiIo.import_from_file(temp_path / "test.dat")
     assert np.allclose(_data, _y_data)
     assert np.allclose(_data.axis_ranges[0], _x_data)
@@ -112,41 +231,20 @@ def test_import_from_file__specfile_2col(
     assert _data.data_unit == yunit
 
 
-@pytest.mark.parametrize(
-    "labels", ["x / unit_a y / unit_b z / unit_c t / ms", "x y z t"]
-)
+@pytest.mark.parametrize("labels", ["x / unit_a y / u_b z / u_c t / ms", "x y z t"])
 def test_import_from_file__specfile_4col(temp_path, labels):
-    with open(temp_path / "test.dat", "w") as f:
-        f.write("#F test.dat")
-        f.write("#S 1 test.h5\n")
-        f.write("#N 4\n")
-        f.write(f"#L {labels}\n")
-        for x, y, z, t in zip(_x_data, _y_data, _y_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\t{z:.6e}\t{t:.6e}\n")
+    _header = f"F test.dat\nS 1 test.h5\nN 4\nL {labels}\n"
+    _temp_data = np.column_stack((_x_data, _y_data, _y_data, _y_data))
+    np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
     _data = AsciiIo.import_from_file(temp_path / "test.dat")
     assert np.allclose(_data, np.asarray((_y_data, _y_data, _y_data)).T)
     assert np.allclose(_data.axis_ranges[0], _x_data)
     assert _data.axis_labels == {0: "x", 1: "0: y; 1: z; 2: t"}
     assert _data.axis_units == {0: "unit_a" if "unit_" in labels else "", 1: ""}
     assert (
-        _data.data_label == "y / unit_b; z / unit_c; t / ms"
-        if "unit_" in labels
-        else "y z t"
+        _data.data_label == "y / u_b; z / u_c; t / ms" if "unit_" in labels else "y z t"
     )
     assert _data.data_unit == ""
-
-
-def test_export_to_file__chi(temp_path):
-    AsciiIo.export_to_file(temp_path / "test_export.chi", _test_data, overwrite=True)
-    with open(temp_path / "test_export.chi", "r") as f:
-        _lines = f.readlines()
-    assert _lines[0].strip() == "test_export.chi"
-    assert _lines[1].strip() == _test_data.get_axis_description(0, sep="(")
-    assert _lines[2].strip() == _test_data.get_data_description(sep="(")
-    assert int(_lines[3].strip()) == _test_data.size
-    _data = np.loadtxt(temp_path / "test_export.chi", skiprows=4)
-    assert np.allclose(_data[:, 0], _test_data.axis_ranges[0])
-    assert np.allclose(_data[:, 1], _test_data.array)
 
 
 if __name__ == "__main__":

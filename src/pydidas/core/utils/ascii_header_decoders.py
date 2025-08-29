@@ -44,8 +44,8 @@ def decode_chi_header(filename: Path | str) -> tuple[str, str, str]:
 
     Returns
     -------
-    tuple[str, str, str]
-        The data label, x-label and x-unit.
+    tuple[str, str, str, str]
+        The data label, data unit, x-label and x-unit.
     """
     with CatchFileErrors(filename), open(filename, "r") as _file:
         _lines = _file.readlines()
@@ -53,15 +53,20 @@ def decode_chi_header(filename: Path | str) -> tuple[str, str, str]:
         _size = int(_lines[3].strip())
     except Exception:
         raise FileReadError("Cannot read CHI header.")
-    _data_label = _lines[2].strip()
-    _ax_unit = ""
-    _ax_label = _lines[1].strip()
-    if "(" in _ax_label and ")" in _ax_label:
-        _ax_label, _ax_unit = _ax_label.strip().rsplit("(", 1)
-        _ax_unit = _ax_unit.rstrip(")")
-    elif "_" in _ax_label:
-        _ax_label, _ax_unit = _ax_label.strip().rsplit("_", 1)
-    return _data_label, _ax_label.strip(), _ax_unit.strip()
+    _meta = {}
+    for _key, _line_no in (("data", 2), ("ax", 1)):
+        _label = _lines[_line_no].strip()
+        _unit = ""
+        if "(" in _label and ")" in _label:
+            _label, _unit = _label.strip().rsplit("(", 1)
+            _unit = _unit.rstrip(")")
+        elif "_" in _label:
+            _label, _unit = _label.strip().rsplit("_", 1)
+        elif "/" in _label:
+            _label, _unit = _label.split("/", 1)
+        _meta[f"{_key}_label"] = _label.strip()
+        _meta[f"{_key}_unit"] = _unit.strip()
+    return _meta["data_label"], _meta["data_unit"], _meta["ax_label"], _meta["ax_unit"]
 
 
 def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:  # noqa

@@ -65,14 +65,15 @@ def test_decode_chi_header__w_correct_ax_label(
     with open(temp_path / "test.chi", "w") as f:
         f.write("test.h5\n")
         f.write(f"{written_ax_label}\n")
-        f.write("y data\n")
+        f.write("y data / counts\n")
         f.write("\t62\n")
         for x, y in zip(_x_data, _y_data):
             f.write(f"{x:.6e}\t{y:.6e}\n")
-    _data_label, _ax_label, _ax_unit = decode_chi_header(temp_path / "test.chi")
-    assert _ax_label == ax_label
-    assert _ax_unit == ax_unit
-    assert _data_label == "y data"
+    _data_l, _data_u, _ax_l, _ax_u = decode_chi_header(temp_path / "test.chi")
+    assert _ax_l == ax_label
+    assert _ax_u == ax_unit
+    assert _data_l == "y data"
+    assert _data_u == "counts"
 
 
 def test_decode_chi_header__incorrect_header(temp_path):
@@ -116,6 +117,7 @@ def test_decode_specfile_header__specfile_1col(temp_path, written_label, label, 
     [
         ("", "", "", "", ""),
         ("2theta y data", "", "", "2theta y data", ""),
+        ("2theta intensity", "2theta", "", "intensity", ""),
         ("2theta (deg) y data (counts)", "2theta", "deg", "y data", "counts"),
         ("2theta / deg y data_counts", "2theta", "deg", "y data_counts", ""),
         ("2theta y data_counts / ct", "", "", "2theta y data_counts", "ct"),
@@ -157,20 +159,29 @@ def test_decode_specfile_header__specfile_no_header(temp_path, ncol):
         assert _units == ["", "", ""]
 
 
-@pytest.mark.parametrize(
-    "labels", ["x / unit_a y / unit_b z / unit_c t / ms", "x y z t"]
-)
+def test_decode_specfile_header__specfile_no_ncol_in_header(temp_path):
+    np.savetxt(
+        temp_path / "test.dat",
+        np.column_stack((_x_data, _y_data)),
+        fmt="%.6e",
+        header="F test.dat\nS 1 test.h5\n",
+        comments="#",
+    )
+    _labels, _units = decode_specfile_header(temp_path / "test.dat")
+    assert _labels == ["", ""]
+    assert _units == ["", ""]
+
+
+@pytest.mark.parametrize("labels", ["x / unit_a y / u_b z / u_c t / ms", "x y z t"])
 def test_decode_specfile_header__specfile_4col(temp_path, labels):
-    with open(temp_path / "test.dat", "w") as f:
-        f.write("#F test.dat")
-        f.write("#S 1 test.h5\n")
-        f.write("#N 4\n")
-        f.write(f"#L {labels}\n")
-        for x, y, z, t in zip(_x_data, _y_data, _y_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\t{z:.6e}\t{t:.6e}\n")
+    _header = f"F test.dat\nS 1 test.h5\nN 4\nL {labels}\n"
+    _temp_data = np.column_stack((_x_data, _y_data, _y_data, _y_data))
+    np.savetxt(
+        temp_path / "test.dat", _temp_data, header=_header, fmt="%.6e", comments="#"
+    )
     _labels, _units = decode_specfile_header(temp_path / "test.dat")
     if "unit_" in labels:
-        assert _labels == ["x", "0: y; 1: z; 2: t", "y / unit_b; z / unit_c; t / ms"]
+        assert _labels == ["x", "0: y; 1: z; 2: t", "y / u_b; z / u_c; t / ms"]
         assert _units == ["unit_a", "", ""]
     else:
         assert _labels == ["x", "0: y; 1: z; 2: t", "y; z; t"]

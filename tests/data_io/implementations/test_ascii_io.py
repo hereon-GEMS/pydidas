@@ -192,10 +192,18 @@ def test_import_from_file__chi__incorrect_header(temp_path):
 
 
 @pytest.mark.parametrize("labels", ["x / unit_a", "x"])
+def test_import_from_file__specfile_1col_w_xcol(temp_path, labels):
+    _header = f"F test.dat\nS 1 test.h5\nN 1\nL {labels}\n"
+    np.savetxt(temp_path / "test.dat", _x_data, header=_header, comments="#")
+    with pytest.raises(UserConfigError):
+        _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=True)
+
+
+@pytest.mark.parametrize("labels", ["x / unit_a", "x"])
 def test_import_from_file__specfile_1col(temp_path, labels):
     _header = f"F test.dat\nS 1 test.h5\nN 1\nL {labels}\n"
     np.savetxt(temp_path / "test.dat", _x_data, header=_header, comments="#")
-    _data = AsciiIo.import_from_file(temp_path / "test.dat")
+    _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=False)
     assert np.allclose(_data, _x_data)
     assert np.allclose(_data.axis_ranges[0], np.arange(_x_data.size))
     assert _data.axis_labels == {0: ""}
@@ -205,26 +213,48 @@ def test_import_from_file__specfile_1col(temp_path, labels):
 
 
 @pytest.mark.parametrize(
-    "labels, xlabel, xunit, ylabel, yunit",
+    "written_label, xlabel, xunit, ylabel, yunit",
     [
-        (("2theta", "y data"), "", "", "2theta y data", ""),
-        (("2theta (deg)", "y data (counts)"), "2theta", "deg", "y data", "counts"),
-        (("2theta / deg", "y data_counts"), "2theta", "deg", "y data_counts", ""),
-        (("2theta [deg]", "y data [counts]"), "2theta", "deg", "y data", "counts"),
-        (("2theta / deg", "y data  / counts"), "2theta", "deg", "y data", "counts"),
-        (("chi angle / deg", "y data  / ct"), "chi angle", "deg", "y data", "ct"),
-        (("chi angle / deg", "y data  /"), "chi angle", "deg", "y data", ""),
+        ("2theta y data", "", "", "2theta y data", ""),
+        ("2theta (deg) y data (counts)", "2theta", "deg", "y data", "counts"),
+        ("2theta / deg y data_counts", "2theta", "deg", "y data_counts", ""),
+        ("2theta [deg] y data [counts]", "2theta", "deg", "y data", "counts"),
+        ("2theta / deg y data  / counts", "2theta", "deg", "y data", "counts"),
+        ("chi angle / deg y data  / ct", "chi angle", "deg", "y data", "ct"),
+        ("chi angle / deg y data  /", "chi angle", "deg", "y data", ""),
     ],
 )
-def test_import_from_file__specfile_2col(
-    temp_path, labels, xlabel, xunit, ylabel, yunit
+def test_import_from_file__specfile_2col_w_xcolumn(
+    temp_path, written_label, xlabel, xunit, ylabel, yunit
 ):
-    _header = f"F test.dat\nS 1 test.h5\nN 2\nL {labels[0]} {labels[1]}\n"
+    _header = f"F test.dat\nS 1 test.h5\nN 2\nL {written_label}\n"
     _temp_data = np.column_stack((_x_data, _y_data))
     np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
-    _data = AsciiIo.import_from_file(temp_path / "test.dat")
+    _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=True)
     assert np.allclose(_data, _y_data)
     assert np.allclose(_data.axis_ranges[0], _x_data)
+    assert _data.axis_labels[0] == xlabel
+    assert _data.axis_units[0] == xunit
+    assert _data.data_label == ylabel
+    assert _data.data_unit == yunit
+
+
+@pytest.mark.parametrize(
+    "written_label, xlabel, xunit, ylabel, yunit",
+    [
+        ("2theta y data", "", "", "2theta y data", ""),
+        # ("chi angle / deg y data  / ct", "chi angle", "deg", "y data", "ct"),
+    ],
+)
+def test_import_from_file__specfile_2col_no_xcolumn(
+    temp_path, written_label, xlabel, xunit, ylabel, yunit
+):
+    _header = f"F test.dat\nS 1 test.h5\nN 2\nL {written_label}\n"
+    _temp_data = np.column_stack((_x_data, _y_data))
+    np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
+    _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=False)
+    assert np.allclose(_data, _temp_data)
+    assert np.allclose(_data.axis_ranges[0], np.arange(_temp_data.shape[0]))
     assert _data.axis_labels[0] == xlabel
     assert _data.axis_units[0] == xunit
     assert _data.data_label == ylabel

@@ -33,7 +33,7 @@ from pydidas.core import FileReadError
 from pydidas.core.utils import CatchFileErrors
 
 
-def decode_chi_header(filename: Path | str) -> tuple[str, str, str]:
+def decode_chi_header(filename: Path | str) -> tuple[str, str, str, str]:
     """
     Decode the header of a CHI file.
 
@@ -53,7 +53,7 @@ def decode_chi_header(filename: Path | str) -> tuple[str, str, str]:
         _size = int(_lines[3].strip())
     except Exception:
         raise FileReadError("Cannot read CHI header.")
-    _meta = {}
+    _meta: dict[str, str] = {}
     for _key, _line_no in (("data", 2), ("ax", 1)):
         _label = _lines[_line_no].strip()
         _unit = ""
@@ -69,7 +69,9 @@ def decode_chi_header(filename: Path | str) -> tuple[str, str, str]:
     return _meta["data_label"], _meta["data_unit"], _meta["ax_label"], _meta["ax_unit"]
 
 
-def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:  # noqa
+def decode_specfile_header(
+    filename: Path | str, read_x_column: bool = True
+) -> tuple[list[str], list[str]]:  # noqa
     """
     Decode the header of a SpecFile (.dat) file.
 
@@ -77,6 +79,9 @@ def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:
     ----------
     filename : Path | str
         The filename of the SpecFile to be decoded.
+    read_x_column : bool, optional
+        Whether to read the first column as x column label and unit. If False,
+        all columns are assumed to be y data columns. The default is True.
 
     Returns
     -------
@@ -102,10 +107,13 @@ def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:
                 break
     _labels_split = _raw_labels.split()
     _units = []
-    if len(_labels_split) == _n_col == 2:
+    if len(_labels_split) == _n_col == 2 and read_x_column:
         return _labels_split, ["", ""]
     elif len(_labels_split) == _n_col:
         _labels = _labels_split
+    elif len(_labels_split) < _n_col:
+        _labels = _labels_split + [""] * (_n_col - len(_labels_split))
+        _units = [""] * _n_col
     else:
         _labels = []
         _curr = ""
@@ -128,7 +136,7 @@ def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:
     if _n_col == 1:
         _labels = [""] * (2 - len(_labels)) + _labels
         _units = [""] * (2 - len(_units)) + _units
-    elif _n_col == 2:
+    elif _n_col == 2 and read_x_column:
         if len(_labels) > len(_units):
             _units = _units + [""] * (len(_labels) - len(_units))
         else:
@@ -136,20 +144,26 @@ def decode_specfile_header(filename: Path | str) -> tuple[list[str], list[str]]:
         _labels = [""] * (_n_col - len(_labels)) + _labels
     else:
         _labels = _labels + [""] * (_n_col - len(_labels))
+        if "" in _labels and max(len(_l) for _l in _labels) > 0:
+            _labels = [_l if _l else "no label" for _l in _labels]
         _units = _units + [""] * (_n_col - len(_units))
+        _i_start = 1 if read_x_column else 0
+
         _labels = [
-            _labels[0],
-            "; ".join(
+            _labels[0] if read_x_column else "",
+            ""
+            if "" in _labels
+            else "; ".join(
                 f"{i}: {_l if _l else 'no label'}"
-                for i, _l in enumerate(_labels[1:], start=0)
+                for i, _l in enumerate(_labels[_i_start:])
             ),
             "; ".join(
                 (f"{_l} / {_u}" if _u else _l)
-                for _l, _u in zip(_labels[1:], _units[1:])
+                for _l, _u in zip(_labels[_i_start:], _units[_i_start:])
                 if _l or _u
             ),
         ]
-        _units = [_units[0] if _units else "", "", ""]
+        _units = [_units[0] if _units and read_x_column else "", "", ""]
     return _labels, _units
 
 

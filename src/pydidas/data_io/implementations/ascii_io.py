@@ -297,19 +297,28 @@ class AsciiIo(IoBase):
             The imported data.
         """
         _labels, _units = decode_specfile_header(filename)
+        print("labels:", _labels)
+        print("units:", _units)
         _data_label = _labels.pop(-1)
         _data_unit = _units.pop(-1)
         _imported_data = np.loadtxt(filename, comments="#")
-        if _imported_data.ndim == 1:
-            _data = _imported_data
-            _ax_ranges = [np.arange(_data.size)]
-        else:
-            _data = _imported_data[:, 1:].squeeze()
+        if read_x_column:
+            if _imported_data.ndim == 1:
+                raise UserConfigError(
+                    "Cannot read x-column from 1d SPEC file. Please check the file "
+                    "and assure it has two columns"
+                )
             _ax_ranges = [_imported_data[:, 0]]
-            if _data.ndim > 1:
-                _ax_ranges.append(np.arange(_data.shape[1]))
+            _imported_data = _imported_data[:, 1:].squeeze()
+        else:
+            _ax_ranges = [np.arange(n) for n in _imported_data.shape]
+            # _data = _imported_data[:, 1:].squeeze()
+            # _ax_ranges = [_imported_data[:, 0]]
+            # if _data.ndim > 1:
+            #     _ax_ranges.append(np.arange(_data.shape[1]))
+        print("axranges:", _ax_ranges)
         return Dataset(
-            _data,
+            _imported_data,
             axis_units=_units,
             axis_labels=_labels,
             axis_ranges=_ax_ranges,

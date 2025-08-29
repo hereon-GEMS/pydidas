@@ -69,6 +69,30 @@ def decode_chi_header(filename: Path | str) -> tuple[str, str, str, str]:
     return _meta["data_label"], _meta["data_unit"], _meta["ax_label"], _meta["ax_unit"]
 
 
+def __split_key_list(key_list: list[str]) -> tuple[list[str], list[str]]:
+    """Split a list of labels and units into separate lists."""
+    _units = []
+    _labels = []
+    _curr = ""
+    while key_list:
+        _label = key_list.pop(0)
+        if _label == "/":
+            _labels.append(_curr)
+            if key_list:
+                _units.append(key_list.pop(0))
+            _curr = ""
+        elif _label.startswith("(") or _label.startswith("["):
+            _labels.append(_curr)
+            _units.append(_label.lstrip("([").rstrip("])"))
+            _curr = ""
+        else:
+            _curr = (_curr + " " + _label).strip()
+    if _curr:
+        _labels.append(_curr)
+        _units.append("")
+    return _labels, _units
+
+
 def decode_specfile_header(
     filename: Path | str, read_x_column: bool = True
 ) -> tuple[list[str], list[str]]:  # noqa
@@ -103,30 +127,16 @@ def decode_specfile_header(
             break
     _labels_split = _raw_labels.split()
     _units = []
+    # Create initial label and unit lists
     if len(_labels_split) == _n_col == 2 and read_x_column:
         return _labels_split, ["", ""]
     elif len(_labels_split) <= _n_col:
         _labels = _labels_split + [""] * (_n_col - len(_labels_split))
         _units = [""] * _n_col
     else:
-        _labels = []
-        _curr = ""
-        while _labels_split:
-            _label = _labels_split.pop(0)
-            if _label == "/":
-                _labels.append(_curr)
-                if _labels_split:
-                    _units.append(_labels_split.pop(0))
-                _curr = ""
-            elif _label.startswith("(") or _label.startswith("["):
-                _labels.append(_curr)
-                _units.append(_label.lstrip("([").rstrip("])"))
-                _curr = ""
-            else:
-                _curr = (_curr + " " + _label).strip()
-        if _curr:
-            _labels.append(_curr)
-            _units.append("")
+        _labels, _units = __split_key_list(_labels_split)
+
+    # Modify label and unit lists to fit n_col and read_x_column parameter
     if _n_col == 1:
         _labels = [""] * (2 - len(_labels)) + _labels
         _units = [""] * (2 - len(_units)) + _units
@@ -138,25 +148,24 @@ def decode_specfile_header(
         _labels = [""] * (_n_col - len(_labels)) + _labels
     else:
         _labels = _labels + [""] * (_n_col - len(_labels))
-        if "" in _labels and max(len(_l) for _l in _labels) > 0:
+        if "" in _labels and any(_labels):
             _labels = [_l if _l else "no label" for _l in _labels]
         _units = _units + [""] * (_n_col - len(_units))
         _i_start = 1 if read_x_column else 0
-
-        _labels = [
-            _labels[0] if read_x_column else "",
+        _col_label = (
             ""
-            if "" in _labels
+            if not all(_labels)
             else "; ".join(
                 f"{i}: {_l if _l else 'no label'}"
                 for i, _l in enumerate(_labels[_i_start:])
-            ),
-            "; ".join(
-                (f"{_l} / {_u}" if _u else _l)
-                for _l, _u in zip(_labels[_i_start:], _units[_i_start:])
-                if _l or _u
-            ),
-        ]
+            )
+        )
+        _data_label = "; ".join(
+            (f"{_l} / {_u}" if _u else _l)
+            for _l, _u in zip(_labels[_i_start:], _units[_i_start:])
+            if _l or _u
+        )
+        _labels = [_labels[0] if read_x_column else "", _col_label, _data_label]
         _units = [_units[0] if _units and read_x_column else "", "", ""]
     return _labels, _units
 

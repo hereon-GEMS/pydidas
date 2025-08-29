@@ -240,40 +240,68 @@ def test_import_from_file__specfile_2col_w_xcolumn(
 
 
 @pytest.mark.parametrize(
-    "written_label, xlabel, xunit, ylabel, yunit",
-    [
-        ("2theta y data", "", "", "2theta y data", ""),
-        # ("chi angle / deg y data  / ct", "chi angle", "deg", "y data", "ct"),
-    ],
+    "labels", ["x / unit_a y / u_b z / u_c t / ms", "x y z t", "x y", "a b c d e"]
 )
-def test_import_from_file__specfile_2col_no_xcolumn(
-    temp_path, written_label, xlabel, xunit, ylabel, yunit
-):
+@pytest.mark.parametrize("x_column", [True, False])
+def test_import_from_file__specfile_4col(temp_path, labels, x_column):
+    _header = f"F test.dat\nS 1 test.h5\nN 4\nL {labels}\n"
+    _temp_data = np.column_stack((_x_data, _y_data, _y_data, _y_data))
+    np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
+    _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=x_column)
+    if x_column:
+        assert np.allclose(_data, np.asarray((_y_data, _y_data, _y_data)).T)
+        assert np.allclose(_data.axis_ranges[0], _x_data)
+    else:
+        assert np.allclose(_data, np.asarray((_x_data, _y_data, _y_data, _y_data)).T)
+        assert np.allclose(_data.axis_ranges[0], np.arange(_x_data.size))
+    assert _data.axis_units == {
+        0: "unit_a" if (x_column and "unit" in labels) else "",
+        1: "",
+    }
+    if labels == "x y" and x_column:
+        assert _data.axis_labels == {0: "x", 1: "0: y; 1: no label; 2: no label"}
+        assert _data.data_label == "y; no label; no label"
+    elif labels == "x y" and not x_column:
+        assert _data.axis_labels == {0: "", 1: "0: x; 1: y; 2: no label; 3: no label"}
+        assert _data.data_label == "x; y; no label; no label"
+    elif labels == "a b c d e":
+        assert _data.axis_labels == {0: "", 1: ""}
+        assert _data.axis_units == {0: "", 1: ""}
+        assert _data.data_label == "a b c d e"
+    elif x_column:
+        assert _data.axis_labels == {0: "x", 1: "0: y; 1: z; 2: t"}
+        assert _data.axis_units == {0: "unit_a" if "unit_" in labels else "", 1: ""}
+        assert (
+            _data.data_label == "y / u_b; z / u_c; t / ms"
+            if "unit_" in labels
+            else "y z t"
+        )
+    else:
+        assert _data.axis_labels == {0: "", 1: "0: x; 1: y; 2: z; 3: t"}
+        assert (
+            _data.data_label == "x / unit_a; y / u_b; z / u_c; t / ms"
+            if "unit_" in labels
+            else "x y z t"
+        )
+    assert _data.data_unit == ""
+
+
+@pytest.mark.parametrize(
+    "written_label", ["chi y_data", "chi / deg y_data / ct", "non matching labels"]
+)
+def test_import_from_file__specfile_2col_no_xcolumn(temp_path, written_label):
     _header = f"F test.dat\nS 1 test.h5\nN 2\nL {written_label}\n"
     _temp_data = np.column_stack((_x_data, _y_data))
     np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
     _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=False)
     assert np.allclose(_data, _temp_data)
     assert np.allclose(_data.axis_ranges[0], np.arange(_temp_data.shape[0]))
-    assert _data.axis_labels[0] == xlabel
-    assert _data.axis_units[0] == xunit
-    assert _data.data_label == ylabel
-    assert _data.data_unit == yunit
-
-
-@pytest.mark.parametrize("labels", ["x / unit_a y / u_b z / u_c t / ms", "x y z t"])
-def test_import_from_file__specfile_4col(temp_path, labels):
-    _header = f"F test.dat\nS 1 test.h5\nN 4\nL {labels}\n"
-    _temp_data = np.column_stack((_x_data, _y_data, _y_data, _y_data))
-    np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
-    _data = AsciiIo.import_from_file(temp_path / "test.dat")
-    assert np.allclose(_data, np.asarray((_y_data, _y_data, _y_data)).T)
-    assert np.allclose(_data.axis_ranges[0], _x_data)
-    assert _data.axis_labels == {0: "x", 1: "0: y; 1: z; 2: t"}
-    assert _data.axis_units == {0: "unit_a" if "unit_" in labels else "", 1: ""}
-    assert (
-        _data.data_label == "y / u_b; z / u_c; t / ms" if "unit_" in labels else "y z t"
-    )
+    if written_label == "non matching labels":
+        assert _data.axis_labels == {0: "", 1: ""}
+    else:
+        assert _data.axis_labels == {0: "", 1: "0: chi; 1: y_data"}
+    assert _data.axis_units == {0: "", 1: ""}
+    assert _data.data_label == written_label.replace(" y_data", "; y_data")
     assert _data.data_unit == ""
 
 

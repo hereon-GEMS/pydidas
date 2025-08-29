@@ -97,7 +97,7 @@ class AsciiIo(IoBase):
             _header = cls.__create_chi_header(filename, data)
             _comment_prefix = ""
         elif _ext == "txt":
-            _header = cls.__create_txt_header(filename, data, _write_x_column)
+            _header = cls.__create_txt_header(data, _write_x_column)
         elif _ext == "csv":
             _header = ""
             _delimiter = ","
@@ -140,14 +140,12 @@ class AsciiIo(IoBase):
         return _header
 
     @staticmethod
-    def __create_txt_header(filename: Path, data: Dataset, write_x_column: bool):
+    def __create_txt_header(data: Dataset, write_x_column: bool):
         """
         Export data to a text file.
 
         Parameters
         ----------
-        filename : Path
-            The filename of the text file to be written.
         data : pydidas.core.Dataset
             The data to be written to the text file.
         write_x_column : bool
@@ -296,9 +294,7 @@ class AsciiIo(IoBase):
         pydidas.core.Dataset
             The imported data.
         """
-        _labels, _units = decode_specfile_header(filename)
-        print("labels:", _labels)
-        print("units:", _units)
+        _labels, _units = decode_specfile_header(filename, read_x_column)
         _data_label = _labels.pop(-1)
         _data_unit = _units.pop(-1)
         _imported_data = np.loadtxt(filename, comments="#")
@@ -310,13 +306,10 @@ class AsciiIo(IoBase):
                 )
             _ax_ranges = [_imported_data[:, 0]]
             _imported_data = _imported_data[:, 1:].squeeze()
+            if _imported_data.ndim == 2:
+                _ax_ranges.append(np.arange(_imported_data.shape[1]))
         else:
             _ax_ranges = [np.arange(n) for n in _imported_data.shape]
-            # _data = _imported_data[:, 1:].squeeze()
-            # _ax_ranges = [_imported_data[:, 0]]
-            # if _data.ndim > 1:
-            #     _ax_ranges.append(np.arange(_data.shape[1]))
-        print("axranges:", _ax_ranges)
         return Dataset(
             _imported_data,
             axis_units=_units,

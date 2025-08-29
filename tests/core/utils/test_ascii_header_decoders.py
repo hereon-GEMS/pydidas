@@ -145,11 +145,7 @@ def test_decode_specfile_header__specfile_2col(
 
 @pytest.mark.parametrize(
     "written_label",
-    [
-        "",
-        "2theta y_data",
-        "2theta / deg y_data / cts",
-    ],
+    ["", "2theta y_data", "2theta / deg y_data / cts", "a random header", "x / deg"],
 )
 def test_decode_specfile_header__specfile_2col_no_x_col(temp_path, written_label):
     _header = f"F test.dat\nS 1 test.h5\nN 2\nL {written_label}\n"
@@ -163,13 +159,17 @@ def test_decode_specfile_header__specfile_2col_no_x_col(temp_path, written_label
     _labels, _units = decode_specfile_header(
         temp_path / "test.dat", read_x_column=False
     )
-    assert _units == ["", "", ""]
+    assert _units == ["", "", "deg"] if written_label == "x / deg" else ["", "", ""]
     if written_label == "":
         assert _labels == ["", "", ""]
     elif written_label == "2theta y_data":
         assert _labels == ["", "0: 2theta; 1: y_data", "2theta; y_data"]
     elif written_label == "2theta / deg y_data / cts":
         assert _labels == ["", "0: 2theta; 1: y_data", "2theta / deg; y_data / cts"]
+    elif written_label == "a random header":
+        assert _labels == ["", "", "a random header"]
+    elif written_label == "x / deg":
+        assert _labels == ["", "", "x"]
 
 
 @pytest.mark.parametrize("ncols", [1, 2, 3, 4, 5])

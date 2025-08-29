@@ -135,7 +135,6 @@ def decode_specfile_header(
         _units = [""] * _n_col
     else:
         _labels, _units = __split_key_list(_labels_split)
-
     # Modify label and unit lists to fit n_col and read_x_column parameter
     if _n_col == 1:
         _labels = [""] * (2 - len(_labels)) + _labels
@@ -147,9 +146,10 @@ def decode_specfile_header(
             _units = [""] * (_n_col - len(_units)) + _units
         _labels = [""] * (_n_col - len(_labels)) + _labels
     else:
+        if len(_labels) == 1:
+            return ["", "", _labels[0]], ["", "", _units[0] if _units else ""]
         _labels = _labels + [""] * (_n_col - len(_labels))
-        if "" in _labels and any(_labels):
-            _labels = [_l if _l else "no label" for _l in _labels]
+        _labels = [_l if _l else ("no label" if any(_labels) else "") for _l in _labels]
         _units = _units + [""] * (_n_col - len(_units))
         _i_start = 1 if read_x_column else 0
         _col_label = (

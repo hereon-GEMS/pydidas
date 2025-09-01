@@ -243,7 +243,8 @@ def test_decode_txt_header__no_file(temp_path):
 @pytest.mark.parametrize("ax_unit", ["deg", None])
 @pytest.mark.parametrize("data_label", ["Intensity", None])
 @pytest.mark.parametrize("data_unit", ["cts", None])
-def test_decode_txt_header(temp_path, ax_label, ax_unit, data_label, data_unit):
+@pytest.mark.parametrize("xcol", [True, False])
+def test_decode_txt_header(temp_path, ax_label, ax_unit, data_label, data_unit, xcol):
     if (temp_path / "test.txt").exists():
         (temp_path / "test.txt").unlink()
     with open(temp_path / "test.txt", "w") as f:
@@ -252,6 +253,7 @@ def test_decode_txt_header(temp_path, ax_label, ax_unit, data_label, data_unit):
             f.write(f"# Axis label: {ax_label}\n")
         if ax_unit is not None:
             f.write(f"# Axis unit: {ax_unit}\n")
+        f.write(f"# First column is x-axis: {xcol}\n")
         if data_label is not None:
             f.write(f"# Data label: {data_label}\n")
         if data_unit is not None:
@@ -265,6 +267,7 @@ def test_decode_txt_header(temp_path, ax_label, ax_unit, data_label, data_unit):
     assert _metadata.get("ax_unit") == ax_unit
     assert _metadata.get("data_label") == data_label
     assert _metadata.get("data_unit") == data_unit
+    assert _metadata.get("use_x_column") == xcol
 
 
 if __name__ == "__main__":

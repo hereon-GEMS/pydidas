@@ -79,6 +79,9 @@ class AsciiIo(IoBase):
                 A flag which indicates whether the x-axis should be written as
                 a first column. If False, only the data array will be written. The
                 default is True.
+            write_header : bool, optional
+                A flag which indicates whether a metadata header should be
+                written. The default is True.
         """
         cls.check_for_existing_file(filename, **kwargs)
         if data.ndim > 2:
@@ -96,11 +99,10 @@ class AsciiIo(IoBase):
                 raise UserConfigError("CHI files always need an x-column.")
             _header = cls.__create_chi_header(filename, data)
             _comment_prefix = ""
-        elif _ext == "txt":
+        elif _ext in ["txt", "csv"]:
             _header = cls.__create_txt_header(data, _write_x_column)
-        elif _ext == "csv":
-            _header = ""
-            _delimiter = ","
+            if _ext == "csv":
+                _delimiter = ","
         elif _ext == "dat":
             _header = cls.__create_specfile_header(filename, data, _write_x_column)
         else:
@@ -109,6 +111,8 @@ class AsciiIo(IoBase):
             _data = np.column_stack((data.axis_ranges[0], data.array))
         else:
             _data = data.array
+        if not kwargs.get("write_header", True):
+            _header = ""
         with CatchFileErrors(filename):
             np.savetxt(
                 filename,
@@ -235,15 +239,18 @@ class AsciiIo(IoBase):
             The data in the form of a pydidas Dataset (with embedded metadata)
         """
         _ext = get_extension(filename)
-        _read_x_column = kwargs.get("x_column", _ext in ["dat"])
+        _x_column = kwargs.get("x_column", _ext in ["dat"])
         with CatchFileErrors(filename), warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             if _ext == "chi":
                 cls._data = cls.__import_chi(filename)
             elif _ext == "dat":
-                cls._data = cls.__import_specfile(filename, _read_x_column)
+                cls._data = cls.__import_specfile(filename, _x_column)
             elif _ext in ["txt", "csv"]:
-                cls._data = cls.__import_txt(filename, _read_x_column)
+                _delim = "," if _ext == "csv" else None
+                cls._data = cls.__import_txt(
+                    filename, delimiter=_delim, x_column=_x_column
+                )
             else:
                 raise UserConfigError(
                     f"File extension '{_ext}' not supported for import."
@@ -319,7 +326,10 @@ class AsciiIo(IoBase):
             data_unit=_data_unit,
         )
 
-    def __import_txt(cls, filename: Path | str) -> Dataset:
+    @classmethod
+    def __import_txt(
+        cls, filename: Path | str, delimiter: str | None = None, x_column: bool = True
+    ) -> Dataset:
         """
         Import a text file.
 
@@ -327,23 +337,42 @@ class AsciiIo(IoBase):
         ----------
         filename : Path | str
             The filename of the text file to be imported.
+        delimiter : str, optional
+            The delimiter used in the text file. The default is None which
+            resolves to any whitespace.
+        x_column : bool, optional
+            A flag which indicates whether the first column of the data
+            should be treated as x-axis. This flag is only used if the text
+            file does not contain a metadata header. The default is True.
 
         Returns
         -------
         pydidas.core.Dataset
             The imported data.
         """
-        _data = np.loadtxt(
-            filename, comments="#"
-        )  # TODO: check if necessary: delimiter=None)
-        if _data.shape[1] == 2:
-            _metadata = decode_txt_header(filename)
-            return Dataset(
-                _data[:, 1],
-                axis_ranges=[_data[:, 0]],
-                axis_labels=[_metadata.get("ax_label", "axis_0")],
-                axis_units=[_metadata.get("ax_unit", "")],
-                data_label=_metadata.get("data_label", "data"),
-                data_unit=_metadata.get("data_unit", ""),
+        _data = np.loadtxt(filename, comments="#", delimiter=delimiter)
+        if _data.ndim == 1 and x_column:
+            raise UserConfigError(
+                "Cannot read x-column from 1d text file. Please check the file "
+                "and assure it has two columns"
             )
-        return Dataset(_data)
+        _metadata = decode_txt_header(filename)
+        if x_column or _metadata.get("use_x_column", False):
+            _axes = [_data[:, 0]]
+            _data = _data[:, 1:].squeeze()
+        else:
+            _axes = [None]
+        _labels = [_metadata.get("ax_label", "axis_0")]
+        _units = [_metadata.get("ax_unit", "")]
+        if _data.ndim > 1:
+            _axes.append(None)
+            _labels.append("")
+            _units.append("")
+        return Dataset(
+            _data,
+            axis_ranges=_axes,
+            axis_labels=_labels,
+            axis_units=_units,
+            data_label=_metadata.get("data_label", ""),
+            data_unit=_metadata.get("data_unit", ""),
+        )

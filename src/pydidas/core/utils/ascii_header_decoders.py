@@ -196,6 +196,10 @@ def decode_txt_header(filename: Path | str) -> dict[str, str]:
             _metadata["data_label"] = _line.removeprefix("# Data label:").strip()
         elif _line.startswith("# Data unit:"):
             _metadata["data_unit"] = _line.removeprefix("# Data unit:").strip()
+        elif _line.startswith("# First column is x-axis: "):
+            _metadata["use_x_column"] = _line.removeprefix(
+                "# First column is x-axis: "
+            ).strip().lower() in ("true", "1")
         if not _line.startswith("#"):
             break
     return _metadata

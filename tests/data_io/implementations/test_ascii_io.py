@@ -55,6 +55,21 @@ def get_data_with_ncols(ncols):
     return Dataset(_new, **_properties)
 
 
+def test_export_to_file__higher_data_dim(temp_path):
+    _temp_data = np.ones((10, 10, 10))
+    with pytest.raises(UserConfigError):
+        AsciiIo.export_to_file(
+            temp_path / "test_export_3d.csv", _temp_data, overwrite=True
+        )
+
+
+def test_export_to_file__wrong_format(temp_path):
+    with pytest.raises(UserConfigError):
+        AsciiIo.export_to_file(
+            temp_path / "test_export.silly_format", _test_data, overwrite=True
+        )
+
+
 @pytest.mark.parametrize("x_column", [True, False])
 @pytest.mark.parametrize("input_type", [Dataset, np.ndarray])
 @pytest.mark.parametrize("ncols", [1, 2, 3])
@@ -155,6 +170,11 @@ def test_export_to_file__specfile(temp_path, ncols, x_column):
         assert np.allclose(_imported_data[:, 0], _temp_data.axis_ranges[0])
         _imported_data = _imported_data[:, 1:].squeeze()
     assert np.allclose(_imported_data, _temp_data)
+
+
+def test_import_from_file__wrong_ext(temp_path):
+    with pytest.raises(UserConfigError):
+        AsciiIo.import_from_file(temp_path / "test.silly_ext")
 
 
 @pytest.mark.parametrize(
@@ -303,6 +323,47 @@ def test_import_from_file__specfile_2col_no_xcolumn(temp_path, written_label):
     assert _data.axis_units == {0: "", 1: ""}
     assert _data.data_label == written_label.replace(" y_data", "; y_data")
     assert _data.data_unit == ""
+
+
+@pytest.mark.parametrize("x_column", [True, False])
+@pytest.mark.parametrize("ncols", [1, 2, 3, 4])
+@pytest.mark.parametrize("extension", ["txt", "csv"])
+@pytest.mark.parametrize("header", [True, False])
+def test_import_from_file__txt(temp_path, x_column, ncols, extension, header):
+    _temp_data = get_data_with_ncols(ncols)
+    _fname = temp_path / f"test.{extension}"
+    AsciiIo.export_to_file(
+        _fname, _temp_data, x_column=x_column, write_header=header, overwrite=True
+    )
+    _data = AsciiIo.import_from_file(_fname, x_column=x_column)
+    assert np.allclose(_data, _temp_data)
+    _ax_ref = np.arange(_data.shape[0]) if not x_column else _temp_data.axis_ranges[0]
+    assert np.allclose(_data.axis_ranges[0], _ax_ref)
+    match ncols:
+        case 1:
+            assert _data.axis_labels == {
+                0: "2theta" if (header and x_column) else "axis_0"
+            }
+            assert _data.axis_units == {0: "deg" if (header and x_column) else ""}
+        case _:
+            if header and x_column:
+                assert _data.axis_labels == {0: "2theta", 1: ""}
+                assert _data.axis_units == {0: "deg", 1: ""}
+            else:
+                assert _data.axis_labels == {0: "axis_0", 1: ""}
+                assert _data.axis_units == {0: "", 1: ""}
+    assert _data.data_label == ("test data" if header else "")
+    assert _data.data_unit == ("counts" if header else "")
+
+
+def test_import_from_file__txt__1d_w_xcolumn(temp_path):
+    _temp_data = get_data_with_ncols(1)
+    _fname = temp_path / "test_1d_no_x.txt"
+    AsciiIo.export_to_file(
+        _fname, _temp_data, x_column=False, write_header=False, overwrite=True
+    )
+    with pytest.raises(UserConfigError):
+        AsciiIo.import_from_file(_fname, x_column=True)
 
 
 if __name__ == "__main__":

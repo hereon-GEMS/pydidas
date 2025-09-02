@@ -309,7 +309,7 @@ def test_import_from_file__specfile_1col(temp_path, labels):
 def test_import_from_file__specfile_2col_w_xcolumn(
     temp_path, written_label, xlabel, xunit, ylabel, yunit
 ):
-    _header = f"F test.dat\nS 1 test.h5\nN 2\nL {written_label}\n"
+    _header = f"F test.dat\nS 1 test.h5\n\nN 2\nL {written_label}\n"
     _temp_data = np.column_stack((_x_data, _y_data))
     np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
     _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=True)

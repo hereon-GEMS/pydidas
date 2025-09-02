@@ -21,6 +21,7 @@ Improvements
     - Added classes Point and PointList to handle 2-dimensional points and lists of
       points in a more generic way.
     - Added a pydidas.core.math subpackage to handle mathematical operations.
+- Added a data_io class for importing/exporting ASCII data files with different headers.
 	
 Bugfixes
 --------

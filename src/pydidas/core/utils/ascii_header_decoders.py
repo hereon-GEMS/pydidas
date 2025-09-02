@@ -121,7 +121,7 @@ def decode_specfile_header(
             _n_col = int(_line.removeprefix("#N"))
         elif _line.startswith("#L"):
             _raw_labels = _line.removeprefix("#L").strip()
-        elif not _line.startswith("#") and _n_col is None:
+        elif len(_line.strip()) > 0 and not _line.startswith("#") and _n_col is None:
             _n_col = len(_line.split())
         if _n_col is not None and _raw_labels:
             break

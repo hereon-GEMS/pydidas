@@ -27,32 +27,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-# import  items from modules:
-# need to import all modules to have the IO classes
-# registered in the IOManager metaclass
-from . import (
-    fabio_io,
-    hdf5_io,
-    io_exporter_matplotlib,
-    jpeg_io,
-    numpy_io,
-    png_io,
-    raw_io,
-    tiff_io,
-)
+import importlib as __importlib
+import pathlib as __pathlib
+
 from .io_base import *
 
 
 __all__ = io_base.__all__
 
-# Clean up the namespace:
-del (
-    fabio_io,
-    hdf5_io,
-    io_exporter_matplotlib,
-    jpeg_io,
-    numpy_io,
-    png_io,
-    raw_io,
-    tiff_io,
-)
+for _item in __pathlib.Path(__file__).parent.iterdir():
+    if (
+        _item.is_file()
+        and _item.suffix == ".py"
+        and _item.stem not in ("__init__", "io_base")
+    ):
+        __importlib.import_module(
+            "pydidas.data_io.implementations." + _item.stem, __package__
+        )

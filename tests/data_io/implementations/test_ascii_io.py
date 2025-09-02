@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -42,6 +43,37 @@ _test_data = Dataset(
     data_label="test data",
     data_unit="counts",
 )
+
+
+@pytest.fixture(scope="module")
+def temp_fio_file(temp_path):
+    _fio_header = (
+        "!\n! Comments\n!\n%c\nA random comment\n!\n! Parameter\n!\n%p\nparam0 = 1\n"
+        "param1 = 2.0\nparam2 = -42\n!\n! Data\n!\n%d\n Col 1 c0_label DOUBLE\n"
+        " Col 2 c1_label DOUBLE\n Col 3 c2_label DOUBLE\n Col 4 c3_label DOUBLE"
+    )
+    _data = np.random.random((25, 4))
+    _fname = temp_path / "test.fio"
+    np.savetxt(_fname, _data, header=_fio_header, comments="")
+    yield _data.copy(), _fname
+    _fname.unlink()
+
+
+@pytest.fixture(scope="module")
+def temp_fio_file_2col(temp_path):
+    _fio_header = (
+        "!\n! Comments\n!\n%c\nA random comment\n!\n! Parameter\n!\n%p\nparam0 = 1\n"
+        "param1 = 2.0\nparam2 = -42\n!\n! Data\n!\n%d\n Col 1 c0_label DOUBLE\n"
+        " Col 2 c1_label DOUBLE"
+    )
+    _data = np.random.random((25, 2))
+    _fname = temp_path / "test_2col.fio"
+    np.savetxt(_fname, _data, header=_fio_header, comments="")
+    yield _data.copy(), _fname
+    _fname.unlink()
+
+
+_TEST_DIR = Path(__file__).parents[2] / "_data"
 
 
 def get_data_with_ncols(ncols):
@@ -362,8 +394,85 @@ def test_import_from_file__txt__1d_w_xcolumn(temp_path):
     AsciiIo.export_to_file(
         _fname, _temp_data, x_column=False, write_header=False, overwrite=True
     )
+    with open(_fname, "r") as f:
+        _lines = f.readlines()
+    print(_lines)
     with pytest.raises(UserConfigError):
         AsciiIo.import_from_file(_fname, x_column=True)
+
+
+def test_import_from_file__fio__1d_w_xcol():
+    with pytest.raises(UserConfigError):
+        AsciiIo.import_from_file(_TEST_DIR / "fio_spectrum.fio", x_column=True)
+
+
+def test_import_from_file__fio__1d_no_xcol():
+    _fname = _TEST_DIR / "fio_spectrum.fio"
+    _data = AsciiIo.import_from_file(_fname, x_column=False)
+    assert np.allclose(_data, np.loadtxt(_fname, skiprows=13).squeeze())
+    assert np.allclose(_data.axis_ranges[0], np.arange(_data.size))
+    assert _data.axis_labels[0] == "index"
+    assert _data.data_label == "test_spectrum"
+
+
+def test_import_from_file__fio__empty_file(temp_path):
+    _fname = temp_path / "test_empty.fio"
+    with open(_fname, "w") as f:
+        f.write("")
+    with pytest.raises(FileReadError):
+        AsciiIo.import_from_file(_fname)
+
+
+def test_import_from_file__fio__no_data_in_file(temp_path):
+    _fname = temp_path / "test_no_data.fio"
+    with open(_fname, "w") as f:
+        f.write(
+            "!Test\n%c\nA comment%\n! No data section\n%d \n Col 0 Test DOUBLE\n"
+            " Col 1 Test2 DOUBLE\n! Final comment"
+        )
+    with pytest.raises(FileReadError):
+        AsciiIo.import_from_file(_fname)
+
+
+@pytest.mark.parametrize("xcol", [0, 1])
+def test_import_from_file__fio__2d_w_xcolumn(temp_fio_file_2col, xcol):
+    _raw_data, _fname = temp_fio_file_2col
+    _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_no=xcol)
+    _keys = ["c0_label", "c1_label"]
+    assert _data.ndim == 1
+    assert np.allclose(_data, _raw_data[:, 1 - xcol].squeeze())
+    assert np.allclose(_data.axis_ranges[0], _raw_data[:, xcol])
+    assert _data.axis_labels[0] == _keys[xcol]
+    assert _data.data_label == _keys[1 - xcol]
+
+
+@pytest.mark.parametrize("x_column", [0, 1, 2, 3])
+def test_import_from_file__fio_file__w_xcol(temp_fio_file, x_column):
+    _raw_data, _fname = temp_fio_file
+    _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_no=x_column)
+    _keys = ["c0_label", "c1_label", "c2_label", "c3_label"]
+    _xlabel = _keys.pop(x_column)
+    _x_range = _raw_data[:, x_column]
+    _raw_data = np.delete(_raw_data, x_column, axis=1)
+    assert _data.axis_labels[0] == _xlabel
+    assert _data.axis_labels[1] == "; ".join(f"{i}: {_k}" for i, _k in enumerate(_keys))
+    assert _data.axis_units[0] == ""
+    assert np.allclose(_data.axis_ranges[0], _x_range)
+    assert np.allclose(_data, _raw_data)
+    assert _data.data_label == "; ".join(_keys)
+    assert _data.data_unit == ""
+
+
+def test_import_from_file__fio_file__no_xcol(temp_fio_file):
+    _raw_data, _fname = temp_fio_file
+    _data = AsciiIo.import_from_file(_fname, x_column=False)
+    _keys = ["c0_label", "c1_label", "c2_label", "c3_label"]
+    assert np.allclose(_data, _raw_data)
+    assert np.allclose(_data.axis_ranges[0], np.arange(_raw_data.shape[0]))
+    assert _data.axis_labels[0] == "index"
+    assert _data.axis_labels[1] == "; ".join(f"{i}: {_k}" for i, _k in enumerate(_keys))
+    assert _data.axis_units == {0: "", 1: ""}
+    assert _data.data_label == "; ".join(_keys)
 
 
 if __name__ == "__main__":

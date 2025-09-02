@@ -150,7 +150,7 @@ class AsciiIo(IoBase):
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
+        data : Dataset
             The data to be written to the text file.
         write_x_column : bool
             A flag which indicates whether the output will be a single column,
@@ -178,7 +178,7 @@ class AsciiIo(IoBase):
         ----------
         filename : Path
             The filename of the SpecFile to be written.
-        data : pydidas.core.Dataset
+        data : Dataset
             The data to be written to the SpecFile.
         write_x_column : bool
             A flag which indicates whether a column with the x-axis will be written
@@ -235,7 +235,7 @@ class AsciiIo(IoBase):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        data : Dataset
             The data in the form of a pydidas Dataset (with embedded metadata)
         """
         _ext = get_extension(filename)
@@ -250,6 +250,11 @@ class AsciiIo(IoBase):
                 _delim = "," if _ext == "csv" else None
                 cls._data = cls.__import_txt(
                     filename, delimiter=_delim, x_column=_x_column
+                )
+            elif _ext == "fio":
+                _col_no = kwargs.get("x_column_no", 0)
+                cls._data = cls.__import_fio(
+                    filename, x_column=_x_column, x_column_no=_col_no
                 )
             else:
                 raise UserConfigError(
@@ -269,7 +274,7 @@ class AsciiIo(IoBase):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The imported data.
         """
         _data_label, _data_unit, _ax_label, _ax_unit = decode_chi_header(filename)
@@ -298,7 +303,7 @@ class AsciiIo(IoBase):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The imported data.
         """
         _labels, _units = decode_specfile_header(filename, read_x_column)
@@ -347,7 +352,7 @@ class AsciiIo(IoBase):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The imported data.
         """
         _data = np.loadtxt(filename, comments="#", delimiter=delimiter)
@@ -375,4 +380,72 @@ class AsciiIo(IoBase):
             axis_units=_units,
             data_label=_metadata.get("data_label", ""),
             data_unit=_metadata.get("data_unit", ""),
+        )
+
+    @classmethod
+    def __import_fio(
+        cls, filename: Path | str, x_column: bool = True, x_column_no: int = 0
+    ) -> Dataset:
+        """
+        Import a .fio file.
+
+        Parameters
+        ----------
+        filename : Path | str
+            The filename of the .fio file to be imported.
+        x_column : bool, optional
+            A flag which indicates whether the first column of the data
+            should be treated as x-axis. The default is True.
+        x_column_no : int, optional
+            The column number (0-indexed) to be used as x-column if
+            x_column is True. The default is 0.
+
+        Returns
+        -------
+        Dataset
+            The imported data.
+        """
+        with open(filename, "r") as f:
+            _lines = f.readlines()
+        _n_lines = len(_lines)
+        # discard all lines until the data section starts:
+        while _lines:
+            _line = _lines.pop(0)
+            if _line.strip() == "%d":
+                break
+        _col_keys = {}
+        while _lines:
+            if _lines[0].startswith(" Col "):
+                _i, _key = _lines.pop(0).strip().split()[1:3]
+                _col_keys[int(_i) - 1] = _key.strip()
+            else:
+                break
+        _len_header = _n_lines - len(_lines)
+        _data = np.loadtxt(filename, comments="!", skiprows=_len_header)
+        if _data.size == 0:
+            raise ValueError("No data found in .fio file.")
+        if _data.ndim == 1 and x_column:
+            raise UserConfigError(
+                "Cannot read x-column from 1d .fio file. Please check the file "
+                "and assure it has two columns or disable x_column reading."
+            )
+        if x_column:
+            _axes = [_data[:, x_column_no]]
+            _data = np.delete(_data, x_column_no, axis=1).squeeze()
+            _ax_labels = [_col_keys.pop(x_column_no, "unknown")]
+            if _data.ndim == 1:
+                _data_label = "".join(_col_keys.values())
+            else:
+                _data_label = "; ".join(_k for _k in _col_keys.values())
+        else:
+            _axes = [np.arange(_data.shape[0])]
+            _ax_labels = ["index"]
+            _data_label = "; ".join(_k for _k in _col_keys.values())
+        if _data.ndim == 2:
+            _axes.append(np.arange(_data.shape[1]))
+            _ax_labels.append(
+                "; ".join(f"{i}: {k}" for i, k in enumerate(_col_keys.values()))
+            )
+        return Dataset(
+            _data, axis_ranges=_axes, axis_labels=_ax_labels, data_label=_data_label
         )

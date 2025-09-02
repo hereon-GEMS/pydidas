@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from pathlib import Path
 
 import numpy as np
@@ -43,6 +44,8 @@ _test_data = Dataset(
     data_label="test data",
     data_unit="counts",
 )
+
+_TEST_DIR = Path(__file__).parents[2] / "_data"
 
 
 @pytest.fixture(scope="module")
@@ -73,7 +76,34 @@ def temp_fio_file_2col(temp_path):
     _fname.unlink()
 
 
-_TEST_DIR = Path(__file__).parents[2] / "_data"
+def temp_asc_file(filename, skip_keys: list[str] | None = None, write_header=True):
+    _full_header = [
+        "*TYPE		=  Raw\n",
+        "*CLASS		=  ASCII CLASS\n",
+        "*SAMPLE		= Test sample\n",
+        "*COMMENT	=\n",
+        "*SCAN_AXIS	=  2theta/theta\n",
+        "*XUNIT		=  deg\n",
+        "*YUNIT		=  cps\n",
+        "*START		=  10\n",
+        "*STOP		=  60\n",
+        "*STEP		=  0.1\n",
+        "*COUNT		=  501\n",
+    ]
+    if skip_keys and write_header:
+        for _key in skip_keys:
+            _full_header = [
+                line for line in _full_header if not line.startswith(f"*{_key}")
+            ]
+    _full_header = "".join(_full_header) if write_header else ""
+    _raw_data = (50 * np.random.random((501))).astype(int)
+    _x_range = np.linspace(10, 60, 501)
+    with open(filename, "w") as f:
+        f.write(_full_header)
+        for i in range(0, _raw_data.size, 4):
+            _tmp = _raw_data[i : min(i + 4, _raw_data.size)]
+            f.write(", ".join(f"{val:d}" for val in _tmp) + "\n")
+    return _raw_data, _x_range
 
 
 def get_data_with_ncols(ncols):
@@ -473,6 +503,47 @@ def test_import_from_file__fio_file__no_xcol(temp_fio_file):
     assert _data.axis_labels[1] == "; ".join(f"{i}: {_k}" for i, _k in enumerate(_keys))
     assert _data.axis_units == {0: "", 1: ""}
     assert _data.data_label == "; ".join(_keys)
+
+
+def test_import_from_file__asc__full_header(temp_path):
+    _raw_data, _x_range = temp_asc_file(temp_path / "test.asc")
+    _data = AsciiIo.import_from_file(temp_path / "test.asc")
+    assert np.allclose(_data, _raw_data)
+    assert np.allclose(_data.axis_ranges[0], _x_range)
+    assert _data.axis_labels[0] == "2theta/theta"
+    assert _data.axis_units[0] == "deg"
+    assert _data.data_label == "Test sample"
+    assert _data.data_unit == "cps"
+
+
+@pytest.mark.parametrize(
+    "skip_key", ["XUNIT", "YUNIT", "START", "STOP", "STEP", "SAMPLE", "SCAN_AXIS"]
+)
+def test_import_from_file__asc__partial_header(temp_path, skip_key):
+    _raw_data, _x_range = temp_asc_file(temp_path / "test.asc", skip_keys=[skip_key])
+    _data = AsciiIo.import_from_file(temp_path / "test.asc")
+    _ax = "" if skip_key == "SCAN_AXIS" else "2theta/theta"
+    if skip_key in ["START", "STOP", "STEP"]:
+        _x_range = np.arange(_raw_data.size)
+        _ax = "index"
+    assert np.allclose(_data, _raw_data)
+    assert np.allclose(_data.axis_ranges[0], _x_range)
+    assert _data.axis_labels[0] == _ax
+    assert _data.axis_units[0] == ("deg" if skip_key != "XUNIT" else "")
+    assert _data.data_label == ("Test sample" if skip_key != "SAMPLE" else "")
+    assert _data.data_unit == ("cps" if skip_key != "YUNIT" else "")
+
+
+def test_import_from_file__asc__no_header(temp_path):
+    _raw_data, _x_data = temp_asc_file(temp_path / "test.asc", write_header=False)
+    _data = AsciiIo.import_from_file(temp_path / "test.asc")
+    assert _data.shape == (501,)
+    assert np.allclose(_data, _raw_data)
+    assert np.allclose(_data.axis_ranges[0], np.arange(_raw_data.size))
+    assert _data.axis_labels[0] == "index"
+    assert _data.axis_units[0] == ""
+    assert _data.data_label == ""
+    assert _data.data_unit == ""
 
 
 if __name__ == "__main__":

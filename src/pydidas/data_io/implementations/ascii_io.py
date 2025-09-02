@@ -247,15 +247,17 @@ class AsciiIo(IoBase):
             elif _ext == "dat":
                 cls._data = cls.__import_specfile(filename, _x_column)
             elif _ext in ["txt", "csv"]:
-                _delim = "," if _ext == "csv" else None
+                _delimiter = "," if _ext == "csv" else None
                 cls._data = cls.__import_txt(
-                    filename, delimiter=_delim, x_column=_x_column
+                    filename, delimiter=_delimiter, x_column=_x_column
                 )
             elif _ext == "fio":
                 _col_no = kwargs.get("x_column_no", 0)
                 cls._data = cls.__import_fio(
                     filename, x_column=_x_column, x_column_no=_col_no
                 )
+            elif _ext == "asc":
+                cls._data = cls.__import_asc(filename)
             else:
                 raise UserConfigError(
                     f"File extension '{_ext}' not supported for import."
@@ -316,7 +318,7 @@ class AsciiIo(IoBase):
                     "Cannot read x-column from 1d SPEC file. Please check the file "
                     "and assure it has two columns"
                 )
-            _ax_ranges = [_imported_data[:, 0]]
+            _ax_ranges: list[Any] = [_imported_data[:, 0]]
             _imported_data = _imported_data[:, 1:].squeeze()
             if _imported_data.ndim == 2:
                 _ax_ranges.append(np.arange(_imported_data.shape[1]))
@@ -363,10 +365,10 @@ class AsciiIo(IoBase):
             )
         _metadata = decode_txt_header(filename)
         if x_column or _metadata.get("use_x_column", False):
-            _axes = [_data[:, 0]]
+            _axes: list[Any] = [_data[:, 0]]
             _data = _data[:, 1:].squeeze()
         else:
-            _axes = [None]
+            _axes: list[Any] = [None]
         _labels = [_metadata.get("ax_label", "axis_0")]
         _units = [_metadata.get("ax_unit", "")]
         if _data.ndim > 1:
@@ -430,7 +432,7 @@ class AsciiIo(IoBase):
                 "and assure it has two columns or disable x_column reading."
             )
         if x_column:
-            _axes = [_data[:, x_column_no]]
+            _axes: list[Any] = [_data[:, x_column_no]]
             _data = np.delete(_data, x_column_no, axis=1).squeeze()
             _ax_labels = [_col_keys.pop(x_column_no, "unknown")]
             if _data.ndim == 1:
@@ -438,7 +440,7 @@ class AsciiIo(IoBase):
             else:
                 _data_label = "; ".join(_k for _k in _col_keys.values())
         else:
-            _axes = [np.arange(_data.shape[0])]
+            _axes: list[Any] = [np.arange(_data.shape[0])]
             _ax_labels = ["index"]
             _data_label = "; ".join(_k for _k in _col_keys.values())
         if _data.ndim == 2:
@@ -448,4 +450,48 @@ class AsciiIo(IoBase):
             )
         return Dataset(
             _data, axis_ranges=_axes, axis_labels=_ax_labels, data_label=_data_label
+        )
+
+    @classmethod
+    def __import_asc(cls, filename: Path | str) -> Dataset:
+        """
+        Import an .asc file.
+
+        Parameters
+        ----------
+        filename : Path | str
+            The filename of the .asc file to be imported.
+
+        Returns
+        -------
+        Dataset
+            The imported data.
+        """
+        with open(filename, "r") as f:
+            _lines = f.readlines()
+        _metadata = {
+            _key.removeprefix("*").strip(): _val.strip()
+            for _key, _val in (
+                _line.split("=", 1)
+                for _line in _lines
+                if (_line.startswith("*") and "=" in _line)
+            )
+        }
+        _data_str = ", ".join(_line for _line in _lines if not _line.startswith("*"))
+        _data = np.fromstring(_data_str, sep=",")
+        if "START" in _metadata and "STOP" in _metadata and "STEP" in _metadata:
+            _x_start = float(_metadata["START"])
+            _x_stop = float(_metadata["STOP"])
+            _x_step = float(_metadata["STEP"])
+            _x_data = np.arange(_x_start, _x_stop + _x_step, _x_step)
+        else:
+            _x_data = np.arange(_data.size)
+            _metadata["SCAN_AXIS"] = "index"
+        return Dataset(
+            _data,
+            axis_ranges=[_x_data],
+            axis_labels=[_metadata.get("SCAN_AXIS", "")],
+            axis_units=[_metadata.get("XUNIT", "")],
+            data_label=_metadata.get("SAMPLE", ""),
+            data_unit=_metadata.get("YUNIT", ""),
         )

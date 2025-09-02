@@ -477,7 +477,11 @@ class AsciiIo(IoBase):
                 if (_line.startswith("*") and "=" in _line)
             )
         }
-        _data_str = ", ".join(_line for _line in _lines if not _line.startswith("*"))
+        _data_str = ", ".join(
+            _line.strip()
+            for _line in _lines
+            if (len(_line.strip()) > 0 and not _line.startswith("*"))
+        )
         _data = np.fromstring(_data_str, sep=",")
         if "START" in _metadata and "STOP" in _metadata and "STEP" in _metadata:
             _x_start = float(_metadata["START"])

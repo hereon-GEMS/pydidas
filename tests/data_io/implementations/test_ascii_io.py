@@ -81,7 +81,7 @@ def temp_asc_file(filename, skip_keys: list[str] | None = None, write_header=Tru
         "*TYPE		=  Raw\n",
         "*CLASS		=  ASCII CLASS\n",
         "*SAMPLE		= Test sample\n",
-        "*COMMENT	=\n",
+        "*COMMENT	=\n\n",
         "*SCAN_AXIS	=  2theta/theta\n",
         "*XUNIT		=  deg\n",
         "*YUNIT		=  cps\n",

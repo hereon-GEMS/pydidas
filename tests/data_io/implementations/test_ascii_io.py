@@ -418,6 +418,18 @@ def test_import_from_file__txt(temp_path, x_column, ncols, extension, header):
     assert _data.data_unit == ("counts" if header else "")
 
 
+@pytest.mark.parametrize("x_index", [0, 1, 2])
+def test_import_from_file__txt__w_x_index(temp_path, x_index):
+    _temp_data = get_data_with_ncols(3) + np.arange(3)[None, :]
+    _fname = temp_path / "test.txt"
+    AsciiIo.export_to_file(
+        _fname, _temp_data, x_column=False, write_header=True, overwrite=True
+    )
+    _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_index=x_index)
+    assert np.allclose(_data, np.delete(_temp_data, x_index, axis=1))
+    assert np.allclose(_data.axis_ranges[0], _temp_data[:, x_index])
+
+
 def test_import_from_file__txt__1d_w_xcolumn(temp_path):
     _temp_data = get_data_with_ncols(1)
     _fname = temp_path / "test_1d_no_x.txt"
@@ -426,7 +438,6 @@ def test_import_from_file__txt__1d_w_xcolumn(temp_path):
     )
     with open(_fname, "r") as f:
         _lines = f.readlines()
-    print(_lines)
     with pytest.raises(UserConfigError):
         AsciiIo.import_from_file(_fname, x_column=True)
 
@@ -467,7 +478,7 @@ def test_import_from_file__fio__no_data_in_file(temp_path):
 @pytest.mark.parametrize("xcol", [0, 1])
 def test_import_from_file__fio__2d_w_xcolumn(temp_fio_file_2col, xcol):
     _raw_data, _fname = temp_fio_file_2col
-    _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_no=xcol)
+    _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_index=xcol)
     _keys = ["c0_label", "c1_label"]
     assert _data.ndim == 1
     assert np.allclose(_data, _raw_data[:, 1 - xcol].squeeze())
@@ -479,7 +490,7 @@ def test_import_from_file__fio__2d_w_xcolumn(temp_fio_file_2col, xcol):
 @pytest.mark.parametrize("x_column", [0, 1, 2, 3])
 def test_import_from_file__fio_file__w_xcol(temp_fio_file, x_column):
     _raw_data, _fname = temp_fio_file
-    _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_no=x_column)
+    _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_index=x_column)
     _keys = ["c0_label", "c1_label", "c2_label", "c3_label"]
     _xlabel = _keys.pop(x_column)
     _x_range = _raw_data[:, x_column]

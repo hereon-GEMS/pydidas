@@ -35,6 +35,7 @@ from typing import Any
 import numpy as np
 
 from pydidas.core import Dataset, UserConfigError
+from pydidas.core.constants import ASCII_EXPORT_EXTENSIONS, ASCII_IMPORT_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors, get_extension
 from pydidas.core.utils.ascii_header_decoders import (
     decode_chi_header,
@@ -47,8 +48,8 @@ from pydidas.data_io.implementations.io_base import IoBase
 class AsciiIo(IoBase):
     """I/O implementation for ASCII files."""
 
-    extensions_export = ["txt", "csv", "chi", "dat"]
-    extensions_import = ["txt", "csv", "chi", "dat", "asc", "fio"]
+    extensions_export = ASCII_EXPORT_EXTENSIONS
+    extensions_import = ASCII_IMPORT_EXTENSIONS
     format_name = "ASCII"
     dimensions = [1, 2]
 
@@ -240,6 +241,7 @@ class AsciiIo(IoBase):
         """
         _ext = get_extension(filename)
         _x_column = kwargs.get("x_column", _ext in ["dat"])
+        _col_no = kwargs.get("x_column_index", 0)
         with CatchFileErrors(filename), warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             if _ext == "chi":
@@ -249,12 +251,14 @@ class AsciiIo(IoBase):
             elif _ext in ["txt", "csv"]:
                 _delimiter = "," if _ext == "csv" else None
                 cls._data = cls.__import_txt(
-                    filename, delimiter=_delimiter, x_column=_x_column
+                    filename,
+                    delimiter=_delimiter,
+                    x_column=_x_column,
+                    x_column_index=_col_no,
                 )
             elif _ext == "fio":
-                _col_no = kwargs.get("x_column_no", 0)
                 cls._data = cls.__import_fio(
-                    filename, x_column=_x_column, x_column_no=_col_no
+                    filename, x_column=_x_column, x_column_index=_col_no
                 )
             elif _ext == "asc":
                 cls._data = cls.__import_asc(filename)
@@ -335,7 +339,11 @@ class AsciiIo(IoBase):
 
     @classmethod
     def __import_txt(
-        cls, filename: Path | str, delimiter: str | None = None, x_column: bool = True
+        cls,
+        filename: Path | str,
+        delimiter: str | None = None,
+        x_column: bool = True,
+        x_column_index: int = 0,
     ) -> Dataset:
         """
         Import a text file.
@@ -351,6 +359,9 @@ class AsciiIo(IoBase):
             A flag which indicates whether the first column of the data
             should be treated as x-axis. This flag is only used if the text
             file does not contain a metadata header. The default is True.
+        x_column_index : int, optional
+            The column number (0-indexed) to be used as x-column if x_column
+            is True. The default is 0.
 
         Returns
         -------
@@ -365,8 +376,8 @@ class AsciiIo(IoBase):
             )
         _metadata = decode_txt_header(filename)
         if x_column or _metadata.get("use_x_column", False):
-            _axes: list[Any] = [_data[:, 0]]
-            _data = _data[:, 1:].squeeze()
+            _axes: list[Any] = [_data[:, x_column_index]]
+            _data = np.delete(_data, x_column_index, axis=1).squeeze()
         else:
             _axes: list[Any] = [None]
         _labels = [_metadata.get("ax_label", "axis_0")]
@@ -386,7 +397,7 @@ class AsciiIo(IoBase):
 
     @classmethod
     def __import_fio(
-        cls, filename: Path | str, x_column: bool = True, x_column_no: int = 0
+        cls, filename: Path | str, x_column: bool = True, x_column_index: int = 0
     ) -> Dataset:
         """
         Import a .fio file.
@@ -398,7 +409,7 @@ class AsciiIo(IoBase):
         x_column : bool, optional
             A flag which indicates whether the first column of the data
             should be treated as x-axis. The default is True.
-        x_column_no : int, optional
+        x_column_index : int, optional
             The column number (0-indexed) to be used as x-column if
             x_column is True. The default is 0.
 
@@ -432,9 +443,9 @@ class AsciiIo(IoBase):
                 "and assure it has two columns or disable x_column reading."
             )
         if x_column:
-            _axes: list[Any] = [_data[:, x_column_no]]
-            _data = np.delete(_data, x_column_no, axis=1).squeeze()
-            _ax_labels = [_col_keys.pop(x_column_no, "unknown")]
+            _axes: list[Any] = [_data[:, x_column_index]]
+            _data = np.delete(_data, x_column_index, axis=1).squeeze()
+            _ax_labels = [_col_keys.pop(x_column_index, "unknown")]
             if _data.ndim == 1:
                 _data_label = "".join(_col_keys.values())
             else:

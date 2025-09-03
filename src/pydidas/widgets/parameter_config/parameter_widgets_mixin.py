@@ -55,14 +55,14 @@ class ParameterWidgetsMixIn:
         if not hasattr(self, "params"):
             self.params = ParameterCollection()
 
-    def create_param_widget(self, param: Parameter, **kwargs: Any):
+    def create_param_widget(self, param: Parameter | str, **kwargs: Any):
         """
         Add a name label and input widget for a specific parameter to the
         widget.
 
         Parameters
         ----------
-        param : Parameter
+        param : Parameter |str
             A Parameter class instance.
         **kwargs : Any
             Optional keyword arguments. Supported keys are:
@@ -94,6 +94,8 @@ class ParameterWidgetsMixIn:
         _parent = kwargs.get("parent_widget", self)
         if isinstance(_parent, str):
             _parent = self._widgets[_parent]
+        if isinstance(param, str):
+            param = self.params[param]
         _widget = ParameterWidget(param, **kwargs)
         self.param_composite_widgets[param.refkey] = _widget
         self.param_widgets[param.refkey] = _widget.io_widget

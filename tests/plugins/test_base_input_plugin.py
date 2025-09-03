@@ -26,7 +26,6 @@ __status__ = "Production"
 import pickle
 import shutil
 import tempfile
-import unittest
 from pathlib import Path
 
 import h5py

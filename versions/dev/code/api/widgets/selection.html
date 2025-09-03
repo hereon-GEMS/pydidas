@@ -514,6 +514,22 @@ Qt attribute name with a lowercase first character. Examples are
 <dd><p>Clear all entries for the widget.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.dataset">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dataset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.dataset" title="Link to this definition">#</a></dt>
+<dd><p>Get the currently selected dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset">
+<span class="sig-name descname"><span class="pre">display_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Select a dataset from the drop-down list.</p>
+<p>This internal method is called by the Qt event system if the QComBoBox
+text has changed to notify the main program that the user has selected
+a different dataset to be visualized. This method also updates the
+accepted frame range for the sliders.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.new_filename">
 <span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename" title="Link to this definition">#</a></dt>
@@ -610,6 +626,8 @@ show the widget.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.clear"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.clear</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.dataset"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.dataset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.display_dataset</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.new_filename</span></code></a></li>
 </ul>
 </li>

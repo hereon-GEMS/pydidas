@@ -537,6 +537,11 @@ ordering of scan scan dimensions. The <em>slowest</em> scan dimension is dimensi
 0 and the fastest is the last scan dimension. This ordering corresponds to how
 the scan must be performed algorithmically. The button opens a window with an
 in-depth explanation, including images.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The detailed explanation for the scan dimensions can be found at
+<a class="reference external" href="../../global/scan/dimension_help.html">Explanations of Scan dimensions</a>.</p>
+</div>
 </section>
 <section id="global-parameters">
 <h2>Global Parameters<a class="headerlink" href="#global-parameters" title="Link to this heading">#</a></h2>
@@ -550,6 +555,13 @@ defines the number of the first data file.</p>
 <p>For a detailed description of each Parameter, please refer to the
 <a class="reference internal" href="#scan-context-params"><span class="std std-ref">list of ScanContext Parameters</span></a> found at the bottom of
 this page.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The detailed explanation for the scan file naming pattern are given in
+<a class="reference external" href="../../global/scan/file_naming_help.html">Explanations of Scan file naming</a>.</p>
+<p>The detailed explanation for multi-frame handling are given in
+<a class="reference external" href="../../global/scan/multi_frame_help.html">Explanations of Scan multi-frame handling</a>.</p>
+</div>
 </section>
 <section id="configuring-a-scan-dimension">
 <h2>Configuring a scan dimension<a class="headerlink" href="#configuring-a-scan-dimension" title="Link to this heading">#</a></h2>
@@ -580,79 +592,98 @@ dimension range.</p>
 <h2>List of all ScanContext Parameters<a class="headerlink" href="#list-of-all-scancontext-parameters" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><dl class="simple">
-<dt>scan_dim (type: int, default: 2, unit: “”)</dt><dd><p>The scan dimensionality. This defines the number of processed dimensions.</p>
+<dt>scan_title (type: str, default: , unit: )</dt><dd><p>The scan name or title. This is used exclusively for reference in result
+exporters.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_title (type: str, default: “”, unit: “”)</dt><dd><p>The scan name or title. This is used exclusively for reference in axis
-labels and result exporters.</p>
+<dt>scan_base_directory (type: Path, default: , unit: )</dt><dd><p>The absolute path of the base directory in which to find this scan. Note that
+individual plugins may automatically discover and use subdirectories. Please
+refer to the specific InputPlugin in use for more information.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_base_directory (type: Path, default: “.”, unit: “”)</dt><dd><p>The base directory in which the raw scan data is stored.</p>
+<dt>scan_name_pattern (type: Path, default: , unit: )</dt><dd><p>The pattern used for naming scan (files). Use hashes ‘#’ for wildcards which
+will be filled in with numbers for the various files. Note that individual
+plugins may use this Parameter for either directory or file names. Please refer
+to the specific InputPlugin in use for more information.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_name_pattern (type: str, default: “”, unit: “”)</dt><dd><p>The name pattern for scan files, subdirectories etc. User hashes (“#”) to
-mark wildcard characters to be filled in with the current index.</p>
+<dt>pattern_number_offset (type: int, default: 0, unit: )</dt><dd><p>The first number in the pattern to be used in processing. This number will be
+applied as offset in the scan naming pattern to identify the respective filename
+for scan points. For example, if the first file is named <cite>scan_0001.h5</cite>, the
+offset should be set to 1.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_start_index (type: int, default: 0, unit: “”)</dt><dd><p>The starting index for files etc. of the first point in the scan.</p>
+<dt>pattern_number_delta (type: int, default: 1, unit: )</dt><dd><p>The difference in the index between two consecutive pattern points. A value of 1
+would mean that each index is processed in the pattern whereas a value of n
+would mean that only every n-th index (e.g. filename) is processed.For example,
+a value of 3 would process the files with the names <cite>scan_0000.h5</cite>,
+<cite>scan_0003.h5</cite>, <cite>scan_0006.h5</cite> etc.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_index_stepping (type: int, default: 1, unit: “”)</dt><dd><p>The stepping of the index, i.e. the difference in the index between two
-adjacent scan points.</p>
+<dt>frame_indices_per_scan_point (type: int, default: 1, unit: )</dt><dd><p>The number of frame indices (in frames) between two scan points. A value of 1
+would increment the image index by 1 for each scan point whereas a value of n
+corresponds to only using every n-th index. For example, a value of 3 frame
+indices per scan point process the frame 0 for scan point 0, frame 3 for scan
+point 1 etc.Please note that the index stepping refers to the frames, not the
+filenames. In the case of container files (e.g. hdf5), the index stepping will
+skip process every n-th frame, not every n-th file.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_multiplicity (type: int, default: 1, unit: “”)</dt><dd><p>The image multiplicity: The number of frames acquired at each unique scan
-point. Use this value only if the multiple images should be combined.
-Otherwise, use an additional scan dimension for the multiplicity.</p>
+<dt>scan_multi_frame_handling (type: str, default: Average, unit: )</dt><dd><p>Define the handling of images if multiple images were acquired per scan point.
+If all individual images should be kept, please set the scan multiplicity to 1
+and add an additional dimension with the multiplicity to the scan.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_multi_image_handling (type: str, default: “Average”, unit: “”)</dt><dd><p>The handling instructions for multiple frames at each scan point. Can be
-either “Average” or “Sum”.</p>
+<dt>scan_frames_per_point (type: int, default: 1, unit: )</dt><dd><p>The number of frames to process at <em>each</em> scan point. The default of <cite>1</cite>
+corresponds to one image per scan point. Please note that the value for the
+points. If this setting is used for <cite>averaging</cite> images, please reduce the number
+of scan points correspondingly.</p>
 </dd>
 </dl>
 </li>
 </ul>
-<p>The following Parameters exist for each scan dimension, i.e. scan_dim<em>{i}</em>_label stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
+<p>The following Parameters exist for each scan dimension, i.e. scan_dim{i}_label
+stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
 scan_dim3_label. For clarity, only the generic form is described here.</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
+<dt>scan_dim{i}_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
 for labelling.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
+<dt>scan_dim{i}_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
+<dt>scan_dim{i}_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
+<dt>scan_dim{i}_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
 counter / motor position for scan step #0).</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
+<dt>scan_dim{i}_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
 </dd>
 </dl>
 </li>

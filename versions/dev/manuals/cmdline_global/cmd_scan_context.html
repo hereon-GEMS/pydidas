@@ -57,7 +57,7 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="The WorkflowTree class" href="cmd_workflow_tree.html" />
+    <link rel="next" title="List of all ScanContext Parameters" href="../global/scan/scan_params.html" />
     <link rel="prev" title="The DiffractionExperimentContext class" href="cmd_diffraction_exp_context.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -362,7 +362,13 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../commandline_start.html">Command line manuals</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cmd_global.html">pydidas general command line tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_diffraction_exp_context.html">The DiffractionExperimentContext class</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The ScanContext class</a></li>
+<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">The ScanContext class</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../global/scan/scan_params.html">List of all ScanContext Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../global/scan/dimension_help.html">Explanations of Scan dimension handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../global/scan/file_naming_help.html">Explanations of Scan file naming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../global/scan/multi_frame_help.html">Explanations of Scan multi-frame handling</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_workflow_tree.html">The WorkflowTree class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_workflow_results.html">The WorkflowResults class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_running_workflows.html">Running pydidas workflows from the command line</a></li>
@@ -445,7 +451,7 @@
 </ul>
 </li>
 <li><p><a class="reference internal" href="#import-of-scan-metadata" id="id5">Import of scan metadata</a></p></li>
-<li><p><a class="reference internal" href="#list-of-all-scancontext-parameters" id="id6">List of all ScanContext Parameters</a></p></li>
+<li><p><a class="reference internal" href="#in-depth-documentation-about-scancontext" id="id6">In-depth documentation about ScanContext</a></p></li>
 </ul>
 </nav>
 <section id="introduction">
@@ -481,7 +487,7 @@ layout and generic infomation like title, directory and file naming patterns.</p
 and to add metadata about the scan to plots and stored datasets.</p>
 <p>All objects are stored as <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in <a class="reference internal" href="#scan-context-parameters"><span class="std std-ref">List of all ScanContext Parameters</span></a>.</p>
+given in <a class="reference external" href="../global/scan/scan_params.html">List of all ScanContext Parameters</a>.</p>
 <p>Its instance can be obtained by calling the following code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
@@ -520,17 +526,17 @@ metadata.</p></td>
 <td><p>The naming pattern of the scan files. Use hashes ‘#’ for wildcards
 which will be replaced by indices.</p></td>
 </tr>
-<tr class="row-even"><td><p>scan_start_index</p></td>
+<tr class="row-even"><td><p>pattern_number_offset</p></td>
 <td><p>int</p></td>
-<td><p>The starting index to subsititute the wildcards in the name pattern.</p></td>
+<td><p>The starting index to substitute the wildcards in the name pattern.</p></td>
 </tr>
-<tr class="row-odd"><td><p>scan_multiplicity</p></td>
+<tr class="row-odd"><td><p>scan_frames_per_point</p></td>
 <td><p>int</p></td>
 <td><p>The number of frames acquired at each scan point.
 Note: If you want to handle multiple images individually, add them as
 an additional scan dimension.</p></td>
 </tr>
-<tr class="row-even"><td><p>scan_multi_image_handling</p></td>
+<tr class="row-even"><td><p>scan_multi_frame_handling</p></td>
 <td><p>str</p></td>
 <td><p>Flag how to handle multiple images. Choices are averaging or summation.</p></td>
 </tr>
@@ -638,88 +644,17 @@ the fast motor is the z-axis with 100 points in the range [150 nm, 225, nm, …,
 contact your beamline local contact for details.</p>
 <p>Import functions will be implemented as required and depending on the scan
 metadata available at the beamlines.</p>
-<span class="target" id="scan-context-parameters"></span></section>
-<section id="list-of-all-scancontext-parameters">
-<h2>List of all ScanContext Parameters<a class="headerlink" href="#list-of-all-scancontext-parameters" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><dl class="simple">
-<dt>scan_dim (type: int, default: 2, unit: “”)</dt><dd><p>The scan dimensionality. This defines the number of processed dimensions.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_title (type: str, default: “”, unit: “”)</dt><dd><p>The scan name or title. This is used exclusively for reference in axis
-labels and result exporters.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_base_directory (type: Path, default: “.”, unit: “”)</dt><dd><p>The base directory in which the raw scan data is stored.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_name_pattern (type: str, default: “”, unit: “”)</dt><dd><p>The name pattern for scan files, subdirectories etc. User hashes (“#”) to
-mark wildcard characters to be filled in with the current index.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_start_index (type: int, default: 0, unit: “”)</dt><dd><p>The starting index for files etc. of the first point in the scan.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_index_stepping (type: int, default: 1, unit: “”)</dt><dd><p>The stepping of the index, i.e. the difference in the index between two
-adjacent scan points.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_multiplicity (type: int, default: 1, unit: “”)</dt><dd><p>The image multiplicity: The number of frames acquired at each unique scan
-point. Use this value only if the multiple images should be combined.
-Otherwise, use an additional scan dimension for the multiplicity.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_multi_image_handling (type: str, default: “Average”, unit: “”)</dt><dd><p>The handling instructions for multiple frames at each scan point. Can be
-either “Average” or “Sum”.</p>
-</dd>
-</dl>
-</li>
+</section>
+<section id="in-depth-documentation-about-scancontext">
+<h2>In-depth documentation about ScanContext<a class="headerlink" href="#in-depth-documentation-about-scancontext" title="Link to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../global/scan/scan_params.html">List of all ScanContext Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../global/scan/dimension_help.html">Explanations of Scan dimension handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../global/scan/file_naming_help.html">Explanations of Scan file naming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../global/scan/multi_frame_help.html">Explanations of Scan multi-frame handling</a></li>
 </ul>
-<p>The following Parameters exist for each scan dimension, i.e. scan_dim<em>{i}</em>_label stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
-scan_dim3_label. For clarity, only the generic form is described here.</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
-for labelling.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
-counter / motor position for scan step #0).</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>scan_dim<em>{i}</em>_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
-</dd>
-</dl>
-</li>
-</ul>
+</div>
 </section>
 </section>
 
@@ -743,11 +678,11 @@ counter / motor position for scan step #0).</p>
       </div>
     </a>
     <a class="right-next"
-       href="cmd_workflow_tree.html"
+       href="../global/scan/scan_params.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The WorkflowTree class</p>
+        <p class="prev-next-title">List of all ScanContext Parameters</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -777,7 +712,7 @@ counter / motor position for scan step #0).</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-of-scan-metadata">Import of scan metadata</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-all-scancontext-parameters">List of all ScanContext Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#in-depth-documentation-about-scancontext">In-depth documentation about ScanContext</a></li>
 </ul>
   </nav></div>
 

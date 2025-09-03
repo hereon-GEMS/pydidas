@@ -41,814 +41,6 @@ available:
    :local:
 
 
-Experiment
-~~~~~~~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`xray_wavelength`
-     - | **type** : float
-       | **default** : 1
-       | **name** : X-ray wavelength
-       | **choices** : None
-       | **unit** : A
-       | **allow_None** : False
-       | **tooltip** : The X-ray wavelength. Any changes to the wavelength will also update the X-ray energy setting.
-   * - :py:data:`xray_energy`
-     - | **type** : float
-       | **default** : 12.398
-       | **name** : X-ray energy
-       | **choices** : None
-       | **unit** : keV
-       | **allow_None** : False
-       | **tooltip** : The X-ray energy. Changing this parameter will also update the X-ray wavelength setting.
-   * - :py:data:`detector_name`
-     - | **type** : str
-       | **default** : detector
-       | **name** : Detector name
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The detector name in pyFAI nomenclature.
-   * - :py:data:`detector_npixx`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Detector size X
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The number of detector pixels in x direction (horizontal).
-   * - :py:data:`detector_npixy`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Detector size Y
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The number of detector pixels in x direction (vertical).
-   * - :py:data:`detector_pxsizex`
-     - | **type** : float
-       | **default** : 100
-       | **name** : Detector pixel size X
-       | **choices** : None
-       | **unit** : um
-       | **allow_None** : False
-       | **tooltip** : The detector pixel size in X-direction.
-   * - :py:data:`detector_pxsizey`
-     - | **type** : float
-       | **default** : 100
-       | **name** : Detector pixel size Y
-       | **choices** : None
-       | **unit** : um
-       | **allow_None** : False
-       | **tooltip** : The detector pixel size in Y-direction.
-   * - :py:data:`detector_pxsize`
-     - | **type** : float
-       | **default** : 100
-       | **name** : Detector pixel size
-       | **choices** : None
-       | **unit** : um
-       | **allow_None** : False
-       | **tooltip** : The detector pixel size in both X- and Y-direction.
-   * - :py:data:`detector_dist`
-     - | **type** : float
-       | **default** : 1
-       | **name** : Sample-detector distance
-       | **choices** : None
-       | **unit** : m
-       | **allow_None** : False
-       | **tooltip** : The sample-detector distance.
-   * - :py:data:`detector_mask_file`
-     - | **type** : Path
-       | **default** : 
-       | **name** : Detector mask file
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The path to the detector mask file.
-   * - :py:data:`detector_poni1`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Detector PONI1
-       | **choices** : None
-       | **unit** : m
-       | **allow_None** : False
-       | **tooltip** : The detector PONI1 (point of normal incidence; in y direction). This is measured in meters from the detector origin.
-   * - :py:data:`detector_poni2`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Detector PONI2
-       | **choices** : None
-       | **unit** : m
-       | **allow_None** : False
-       | **tooltip** : The detector PONI2 (point of normal incidence; in x direction). This is measured in meters from the detector origin.
-   * - :py:data:`detector_rot1`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Detector Rot1
-       | **choices** : None
-       | **unit** : rad
-       | **allow_None** : False
-       | **tooltip** : The detector rotation 1 (lefthanded around the "up"-axis)
-   * - :py:data:`detector_rot2`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Detector Rot2
-       | **choices** : None
-       | **unit** : rad
-       | **allow_None** : False
-       | **tooltip** : The detector rotation 2 (pitching the detector; positive direction is tilting the detector top upstream while keeping the bottom of the detector stationary.
-   * - :py:data:`detector_rot3`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Detector Rot3
-       | **choices** : None
-       | **unit** : rad
-       | **allow_None** : False
-       | **tooltip** : The detector rotation 3 (around the beam axis; right-handed when looking downstream with the beam.)
-   * - :py:data:`beamcenter_x`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Beamcenter x
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The detector x-coordinate for the beamcenter.
-   * - :py:data:`beamcenter_y`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Beamcenter y
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The detector y-coordinate for the beamcenter.
-   * - :py:data:`detector_tilt_angle`
-     - | **type** : float
-       | **default** : 0
-       | **name** : detector tilt angle
-       | **choices** : None
-       | **unit** : deg
-       | **allow_None** : False
-       | **tooltip** : The detector tilt angle (relative to the beam normal).
-   * - :py:data:`detector_tilt_plane`
-     - | **type** : float
-       | **default** : 0
-       | **name** : detector tilt plane
-       | **choices** : None
-       | **unit** : deg
-       | **allow_None** : False
-       | **tooltip** : The detector tilt plane orientation (relative to positive x-axis).
-   * - :py:data:`detector_dist_fit2d`
-     - | **type** : float
-       | **default** : 1
-       | **name** : Sample-detector distance
-       | **choices** : None
-       | **unit** : mm
-       | **allow_None** : False
-       | **tooltip** : The sample-detector distance.
-
-Settings
-~~~~~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`mp_n_workers`
-     - | **type** : int
-       | **default** : 4
-       | **name** : Number of MP workers
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of multiprocessing workers. Note that this number should not be set too high for two reasons:
-       | 1. File reading processes interfere with each other if too many are active at once.
-       | 2. pyFAI already inherently uses parallelization and you can only gain limited performance increases for multiple parallel processes.
-   * - :py:data:`data_buffer_size`
-     - | **type** : float
-       | **default** : 1500
-       | **name** : Data buffer size
-       | **choices** : None
-       | **unit** : MB
-       | **allow_None** : False
-       | **tooltip** : The maximum size of the data buffer (for each display widget). Any data which is smaller than the buffer size will be stored in memory. Larger data will be read from disk in chunks.
-   * - :py:data:`shared_buffer_size`
-     - | **type** : float
-       | **default** : 100
-       | **name** : Shared buffer size limit
-       | **choices** : None
-       | **unit** : MB
-       | **allow_None** : False
-       | **tooltip** : A shared buffer is used to efficiently transport data between the main App and multiprocessing Processes. This buffer must be large enough to store at least one instance of all result data.
-   * - :py:data:`shared_buffer_max_n`
-     - | **type** : int
-       | **default** : 20
-       | **name** : Buffer dataframe limit
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The maximum number of datasets in the buffer. A dataset consists of all results for one frame. For performance reasons, the buffer should not be too large.
-   * - :py:data:`max_image_size`
-     - | **type** : float
-       | **default** : 100
-       | **name** : Maximum image size
-       | **choices** : None
-       | **unit** : Mpx
-       | **allow_None** : False
-       | **tooltip** : The maximum size (in megapixels) of images.
-   * - :py:data:`use_detector_mask`
-     - | **type** : bool
-       | **default** : False
-       | **name** : Use detector mask
-       | **choices** : [True, False]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Flag to use a detector mask file and value. If False, no detector mask will be used.
-   * - :py:data:`detector_mask_val`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Masked pixels display value
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The value to be used for the pixels masked on the detector. Note that this value will only be used for displaying the images. For pyFAI integration, the pixels will be fully masked and not be included.
-   * - :py:data:`mosaic_border_width`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Mosaic tiling border width
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The width of the border inserted between adjacent frames in the mosaic creation.
-   * - :py:data:`mosaic_border_value`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Mosaic border value
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The value to be put in the border pixels in mosaics.
-   * - :py:data:`run_type`
-     - | **type** : str
-       | **default** : Process in GUI
-       | **name** : Run type
-       | **choices** : ['Process in GUI', 'Command line']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Specify how the processing shall be performed.
-   * - :py:data:`plugin_path`
-     - | **type** : str
-       | **default** : 
-       | **name** : Custom plugin paths
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The paths to all custom plugin locations. Individual entries must be separated by a double semicolon `;;`.
-   * - :py:data:`plot_update_time`
-     - | **type** : float
-       | **default** : 1.0
-       | **name** : Plot update time
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : s
-       | **tooltip** : The delay before any plot updates will be processed. This will prevent multiple frequent update of plots.
-   * - :py:data:`max_number_curves`
-     - | **type** : int
-       | **default** : 40
-       | **name** : Maximum number of curves
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The maximum number of curves to plot. Increasing this number will allow more curves to be plotted simultaneously, but at the cost of significant performance decrease.
-   * - :py:data:`histogram_outlier_fraction_high`
-     - | **type** : float
-       | **default** : 0.07
-       | **name** : Histogram outlier fraction (high)
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The fraction of pixels with high values which will be ignored when cropping the histogram for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger detector.
-   * - :py:data:`histogram_outlier_fraction_low`
-     - | **type** : float
-       | **default** : 0.02
-       | **name** : Histogram outlier fraction (low)
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The fraction of pixels with low values which will be ignored when cropping the histogram for 2d plots. 
-   * - :py:data:`cmap_name`
-     - | **type** : str
-       | **default** : Gray
-       | **name** : Default colormap
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The default colormap used in pydidas plots.
-   * - :py:data:`cmap_nan_color`
-     - | **type** : str
-       | **default** : #9AFEFF
-       | **name** : Color for invalid data / no data
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The RGB color used to fill missing or invalid data points. Invalid data points are labeled with np.NaN values.
-
-Fit
-~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`fit_sigma_threshold`
-     - | **type** : float
-       | **default** : 0.25
-       | **name** : Fit σ rejection threshold
-       | **choices** : None
-       | **allow_None** : False
-       | **unit** : 
-       | **tooltip** : The threshold to select which fitting points to reject, based on the normalized standard deviation. Any fit which has a normalized std which is worse than the threshold will be rejected as failed.
-   * - :py:data:`fit_min_peak_height`
-     - | **type** : float
-       | **default** : None
-       | **name** : Minimum peak height to fit
-       | **choices** : None
-       | **allow_None** : True
-       | **unit** : 
-       | **tooltip** : The minimum height a peak must have to attempt a fit. A value of 'None' will not impose any limits on the peak height.
-   * - :py:data:`fit_func`
-     - | **type** : str
-       | **default** : Gaussian
-       | **name** : Fit function
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Select the type of fit function to be used in the single peak fit.
-   * - :py:data:`fit_bg_order`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Fit background order
-       | **choices** : [None, 0, 1]
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The order of the background. None corresponds to no background.
-   * - :py:data:`fit_upper_limit`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak fit upper limit
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.
-   * - :py:data:`fit_lower_limit`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak fit lower limit
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.
-   * - :py:data:`fit_output`
-     - | **type** : str
-       | **default** : position; area; FWHM
-       | **name** : Output
-       | **choices** : ['no output', 'position', 'amplitude', 'area', 'FWHM', 'background at peak', 'total count intensity', 'position; amplitude', 'position; area', 'position; FWHM', 'position; background at peak', 'position; total count intensity', 'amplitude; area', 'amplitude; FWHM', 'amplitude; background at peak', 'amplitude; total count intensity', 'area; FWHM', 'area; background at peak', 'area; total count intensity', 'FWHM; background at peak', 'FWHM; total count intensity', 'background at peak; total count intensity', 'position; amplitude; area', 'position; amplitude; FWHM', 'position; amplitude; background at peak', 'position; amplitude; total count intensity', 'position; area; FWHM', 'position; area; background at peak', 'position; area; total count intensity', 'position; FWHM; background at peak', 'position; FWHM; total count intensity', 'position; background at peak; total count intensity', 'amplitude; area; FWHM', 'amplitude; area; background at peak', 'amplitude; area; total count intensity', 'amplitude; FWHM; background at peak', 'amplitude; FWHM; total count intensity', 'amplitude; background at peak; total count intensity', 'area; FWHM; background at peak', 'area; FWHM; total count intensity', 'area; background at peak; total count intensity', 'FWHM; background at peak; total count intensity', 'position; amplitude; area; FWHM', 'position; amplitude; area; background at peak', 'position; amplitude; area; total count intensity', 'position; amplitude; FWHM; background at peak', 'position; amplitude; FWHM; total count intensity', 'position; amplitude; background at peak; total count intensity', 'position; area; FWHM; background at peak', 'position; area; FWHM; total count intensity', 'position; area; background at peak; total count intensity', 'position; FWHM; background at peak; total count intensity', 'amplitude; area; FWHM; background at peak', 'amplitude; area; FWHM; total count intensity', 'amplitude; area; background at peak; total count intensity', 'amplitude; FWHM; background at peak; total count intensity', 'area; FWHM; background at peak; total count intensity', 'position; amplitude; area; FWHM; background at peak', 'position; amplitude; area; FWHM; total count intensity', 'position; amplitude; area; background at peak; total count intensity', 'position; amplitude; FWHM; background at peak; total count intensity', 'position; area; FWHM; background at peak; total count intensity', 'amplitude; area; FWHM; background at peak; total count intensity', 'position; amplitude; area; FWHM; background at peak; total count intensity']
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The output of the fitting plugin. The plugin can either return the peak area, the peak position or the FWHM. Alternatively, any combination of these values can be retured as well. Note that the fit parameters are always stored in the metadata.
-   * - :py:data:`fit_peak_xlow`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak low x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower boundary in x for the center position of the  peak to be fitted.
-   * - :py:data:`fit_peak0_xlow`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #0 low x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower boundary in x for the center position of the 0th peak to be fitted.
-   * - :py:data:`fit_peak1_xlow`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #1 low x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower boundary in x for the center position of the 1st peak to be fitted.
-   * - :py:data:`fit_peak2_xlow`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #2 low x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower boundary in x for the center position of the 2nd peak to be fitted.
-   * - :py:data:`fit_peak3_xlow`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #3 low x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower boundary in x for the center position of the 3rd peak to be fitted.
-   * - :py:data:`fit_peak_xhigh`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak high x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper boundary in x for the center position of the  peak to be fitted.
-   * - :py:data:`fit_peak0_xhigh`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #0 high x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper boundary in x for the center position of the 0th peak to be fitted.
-   * - :py:data:`fit_peak1_xhigh`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #1 high x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper boundary in x for the center position of the 1st peak to be fitted.
-   * - :py:data:`fit_peak2_xhigh`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #2 high x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper boundary in x for the center position of the 2nd peak to be fitted.
-   * - :py:data:`fit_peak3_xhigh`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #3 high x boundary
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper boundary in x for the center position of the 3rd peak to be fitted.
-   * - :py:data:`fit_peak_xstart`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak fit x0 start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak0_xstart`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #0 fit x0 start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak1_xstart`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #1 fit x0 start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak2_xstart`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #2 fit x0 start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak3_xstart`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #3 fit x0 start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak_width`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak fit σ or Γ start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak0_width`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #0 fit σ or Γ start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak1_width`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #1 fit σ or Γ start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak2_width`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #2 fit σ or Γ start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
-   * - :py:data:`fit_peak3_width`
-     - | **type** : float
-       | **default** : None
-       | **name** : Peak #3 fit σ or Γ start guess
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
-
-Stress strain
-~~~~~~~~~~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`sin_square_chi_low_fit_limit`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Lower bounds for fitting
-       | **choices** : None
-       | **unit** : 
-       | **range** : (0, 1)
-       | **allow_None** : False
-       | **tooltip** : The lower boundary for the fitting range (in sin^2(chi)). This parameter is used to set the lower limit for the fitting range and it allows to ignore the first few points of the data.
-   * - :py:data:`sin_square_chi_high_fit_limit`
-     - | **type** : float
-       | **default** : 1
-       | **name** : Upper bounds for fitting
-       | **choices** : None
-       | **unit** : 
-       | **range** : (0, 1)
-       | **allow_None** : False
-       | **tooltip** : The upper boundary for the fitting range (in sin^2(chi)). This parameter is used to set the upper limit for the fitting range and it allows to ignore the last few points of the data.
-   * - :py:data:`selected_data_source`
-     - | **type** : str
-       | **default** : None
-       | **name** : Selected data source
-       | **choices** : None
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : The data source to be used for the visualization.
-   * - :py:data:`selected_sin_square_chi_node`
-     - | **type** : str
-       | **default** : no selection
-       | **name** : Selected sin^2(chi) node
-       | **choices** : ['no selection']
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : The node which includes the stored information with the results of the fit plotted vs sin^2(chi).
-   * - :py:data:`selected_sin_2chi_node`
-     - | **type** : str
-       | **default** : no selection
-       | **name** : Selected sin(2*chi) node
-       | **choices** : ['no selection']
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : The node which includes the stored information with the results of the fit results plotted vs. sin(2*chi).
-   * - :py:data:`plot_type`
-     - | **type** : str
-       | **default** : Inspect data and fits in plot grid
-       | **name** : Autoscale sin^2(chi) results
-       | **choices** : ['Inspect data and fits in plot grid', 'Calculate relative stress']
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : Flag to autoscale the results of the sin^2(chi) analysis in the plot. If False, the plot will not be autoscaled.
-   * - :py:data:`show_sin_square_chi_results`
-     - | **type** : bool
-       | **default** : True
-       | **choices** : [True, False]
-       | **name** : Show sin^2(chi) results in plot
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : Flag to show the results of the sin^2(chi) analysis in the plot. If False, no results will be shown.
-   * - :py:data:`show_sin_square_chi_branches`
-     - | **type** : bool
-       | **default** : False
-       | **choices** : [True, False]
-       | **name** : Show sin^2(chi) branches in plot
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : Flag to show the positive and negative branches of the sin^2(chi) analysis in the plot. If False, no branches will be shown but only the average and the fit results.
-   * - :py:data:`autoscale_sin_square_chi_results`
-     - | **type** : bool
-       | **default** : True
-       | **choices** : [True, False]
-       | **name** : Autoscale sin^2(chi) results
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : Flag to autoscale the results of the sin^2(chi) analysis in the plot. If False, the plot will not be autoscaled.
-   * - :py:data:`sin_square_chi_limit_low`
-     - | **type** : float
-       | **default** : 0.0
-       | **name** : Lower limit for sin^2(chi) results
-       | **choices** : None
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : The lower limit for the sin^2(chi) results in the plot. If autoscaling is enabled, this value will be ignored.
-   * - :py:data:`sin_square_chi_limit_high`
-     - | **type** : float
-       | **default** : 1.0
-       | **name** : Upper limit for sin^2(chi) results
-       | **choices** : None
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : The upper limit for the sin^2(chi) results in the plot. If autoscaling is enabled, this value will be ignored.
-   * - :py:data:`show_sin_2chi_results`
-     - | **type** : bool
-       | **default** : True
-       | **choices** : [True, False]
-       | **name** : Show sin(2*chi) results in plot
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : Flag to show the results of the sin(2*chi) analysis in the plot. If False, no results will be shown.
-   * - :py:data:`autoscale_sin_2chi_results`
-     - | **type** : bool
-       | **default** : True
-       | **choices** : [True, False]
-       | **name** : Autoscale sin(2*chi) results
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : Flag to autoscale the results of the sin(2*chi) analysis in the plot. If False, the plot will not be autoscaled.
-   * - :py:data:`sin_2chi_limit_low`
-     - | **type** : float
-       | **default** : 0.0
-       | **name** : Lower limit for sin(2*chi) results
-       | **choices** : None
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : The lower limit for the sin(2*chi) results in the plot. If autoscaling is enabled, this value will be ignored.
-   * - :py:data:`sin_2chi_limit_high`
-     - | **type** : float
-       | **default** : 1.0
-       | **name** : Upper limit for sin(2*chi) results
-       | **choices** : None
-       | **unit** : 
-       | **range** : None
-       | **allow_None** : False
-       | **tooltip** : The upper limit for the sin(2*chi) results in the plot. If autoscaling is enabled, this value will be ignored.
-
-Image ops
-~~~~~~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`use_roi`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Use ROI
-       | **choices** : [True, False]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Keyword to toggle use of the ROI for cropping the original images before processing them.
-   * - :py:data:`roi_xlow`
-     - | **type** : int
-       | **default** : 0
-       | **name** : ROI lower x limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The lower boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width.
-   * - :py:data:`roi_xhigh`
-     - | **type** : int
-       | **default** : None
-       | **name** : ROI upper x limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : True
-       | **tooltip** : The upper boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
-   * - :py:data:`roi_ylow`
-     - | **type** : int
-       | **default** : 0
-       | **name** : ROI lower y limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The lower boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width.
-   * - :py:data:`roi_yhigh`
-     - | **type** : int
-       | **default** : None
-       | **name** : ROI upper y limit
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : True
-       | **tooltip** : The upper boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
-   * - :py:data:`use_thresholds`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Use thresholds
-       | **choices** : [True, False]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Keyword to toggle use of the thresholds for clipping the data range in the original images before combining them.
-   * - :py:data:`threshold_low`
-     - | **type** : float
-       | **default** : None
-       | **name** : Lower threshold
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The lower threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
-   * - :py:data:`threshold_high`
-     - | **type** : float
-       | **default** : None
-       | **name** : Upper threshold
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The upper threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
-   * - :py:data:`binning`
-     - | **type** : int
-       | **default** : 1
-       | **name** : Binning factor
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The re-binning factor for the images in the composite. The binning will be applied to the cropped images.
-   * - :py:data:`image_shape`
-     - | **type** : tuple
-       | **default** : (0, 0)
-       | **name** : Image shape
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The shape of an image.
-   * - :py:data:`raw_image_shape`
-     - | **type** : tuple
-       | **default** : (0, 0)
-       | **name** : Raw image shape
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The image shape of the original image as loaded from the file.
-   * - :py:data:`datatype`
-     - | **type** : None
-       | **default** : <class 'numpy.float32'>
-       | **name** : Datatype
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The datatype.
-   * - :py:data:`multiplicator`
-     - | **type** : float
-       | **default** : 1.0
-       | **name** : Multiplication factor
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The multiplication scaling factor to be applied to the input data.
-
 Other
 ~~~~~
 
@@ -1291,8 +483,8 @@ Other
        | **allow_None** : False
        | **tooltip** : This parameter allows the user to activate/deactivate the automatic checking for updates at startup.
 
-Pyfai
-~~~~~
+Image ops
+~~~~~~~~~
 
 .. list-table::
    :widths: 20 80
@@ -1301,475 +493,110 @@ Pyfai
 
    * - Parameter
      - Description
-   * - :py:data:`rad_npoint`
+   * - :py:data:`use_roi`
      - | **type** : int
-       | **default** : 1000
-       | **name** : Num points radial integration
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of bins in radial direction for the pyFAI integration.
-   * - :py:data:`rad_unit`
-     - | **type** : str
-       | **default** : 2theta / deg
-       | **name** : Radial unit
-       | **choices** : ['Q / nm^-1', 'Q / A^-1', 'r / mm', '2theta / deg', '2theta / rad']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit and type of the azimuthal profile.
-   * - :py:data:`rad_use_range`
-     - | **type** : str
-       | **default** : Full detector
-       | **name** : Radial range
-       | **choices** : ['Full detector', 'Specify radial range']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Toggle to limit the radial integration range or use the full data range. If 'Specify radial range' is used, boundaries need to be defined in the lower and upper radial range Parameters.
-   * - :py:data:`rad_range_lower`
-     - | **type** : float
        | **default** : 0
-       | **name** : Radial lower range
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The lower boundary of the radial integration range. This setting is only used if the 'Specify radial range' is set. This value needs to be given in the unit selected as radial unit.
-   * - :py:data:`rad_range_upper`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Radial upper range
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The upper boundary of the radial integration range. This setting is only used if 'Specify radial range' is set. This value needs to be given in the unit selected as radial unit.
-   * - :py:data:`azi_npoint`
-     - | **type** : int
-       | **default** : 1000
-       | **name** : Num points azimuthal integration
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of bins in azimuthal direction for the pyFAI integration.
-   * - :py:data:`azi_unit`
-     - | **type** : str
-       | **default** : chi / deg
-       | **name** : Azimuthal unit
-       | **choices** : ['chi / deg', 'chi / rad']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit and type of the azimuthal profile.
-   * - :py:data:`azi_use_range`
-     - | **type** : str
-       | **default** : Full detector
-       | **name** : Azimuthal range
-       | **choices** : ['Full detector', 'Specify azimuthal range']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Toggle to limit the azimuthal integration range or use the full data range. If 'Specify azimuthal range' is used, boundaries need to be defined in the lower and upper azimuthal range Parameters.
-   * - :py:data:`azi_range_lower`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Azimuthal lower range
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The lower boundary of the azimuthal integration range. This setting is only used if 'Specify azimuthal range' is set. This value needs to be given in the unit selected as azimuthal unit.
-   * - :py:data:`azi_range_upper`
-     - | **type** : float
-       | **default** : 0
-       | **name** : Azimuthal upper range
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The upper boundary of the azimuthal integration range. This setting is only used if 'Specify azimuthal range' is set. This value needs to be given in the unit selected as azimuthal unit.
-   * - :py:data:`azi_sector_width`
-     - | **type** : float
-       | **default** : 20
-       | **name** : Azimuthal sector width
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The width of each azimuthal sector (in azimuthal units).
-   * - :py:data:`azi_sector_centers`
-     - | **type** : str
-       | **default** : 0; 90; 180; 270
-       | **name** : Azimuthal sector centers
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The centers of the azimuthal sectors to be integrated (in azimuthal units). Separate multiple sectors by semicolons.
-   * - :py:data:`int_method`
-     - | **type** : str
-       | **default** : CSR
-       | **name** : PyFAI integration method
-       | **choices** : ['CSR', 'CSR OpenCL', 'CSR full', 'CSR full OpenCL', 'LUT', 'LUT OpenCL', 'LUT full', 'LUT full OpenCL']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The integration method. For a full reference, please visit the pyfai documentation available at: https://pyfai.readthedocs.io/
-   * - :py:data:`integration_direction`
-     - | **type** : str
-       | **default** : Azimuthal integration
-       | **name** : Integration direction
-       | **choices** : ['Azimuthal integration', 'Radial integration', '2D integration']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The integration direction.
-   * - :py:data:`detector_model`
-     - | **type** : str
-       | **default** : Custom detector
-       | **name** : Detector model
-       | **choices** : ['Custom detector']
-       | **unit** : 
-       | **allow_None** : None
-       | **tooltip** : The model name of the detector.
-   * - :py:data:`polarization_factor`
-     - | **type** : float
-       | **default** : 0.99
-       | **name** : Polarization factor
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : True
-       | **tooltip** : The Polarization factor. Must be a number between -1 (vertical) and +1 (horizontal). 0 corresponds to circular polarizazion, None corresponds to no correction.
-   * - :py:data:`correct_solid_angle`
-     - | **type** : bool
-       | **default** : True
-       | **name** : Correct solid angle
+       | **name** : Use ROI
        | **choices** : [True, False]
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The correct solid angle Parameter in pyFAI (de)activates the correction for the solid angle of the detector pixels. Detector pixels further away from the beam axis see a smaller projected intensity. Using this parameter allows to correct for this effect, if set to True.
-
-Data import
-~~~~~~~~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`filename`
-     - | **type** : Path
-       | **default** : 
-       | **name** : Filename
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The file name of the input file.
-   * - :py:data:`current_filename`
-     - | **type** : str
-       | **default** : 
-       | **name** : Current input filename
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The filename of the currently active file.
-   * - :py:data:`filename_pattern`
-     - | **type** : Path
-       | **default** : 
-       | **name** : The filename pattern
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The pattern of the filename. Use hashes '#' for wildcards which will be filled in with numbers. This Parameter must be set if scan_for_all is False.
-   * - :py:data:`first_file`
-     - | **type** : Path
-       | **default** : 
-       | **name** : First file name
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The name of the first file for a file series or of the hdf5 file in case of hdf5 file input.
-   * - :py:data:`last_file`
-     - | **type** : Path
-       | **default** : 
-       | **name** : Last file name
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Used only for file series: The name of the last file to be used for this app or tool.
-   * - :py:data:`file_stepping`
-     - | **type** : int
-       | **default** : 1
-       | **name** : File stepping
-       | **choices** : None
-       | **allow_None** : False
-       | **tooltip** : The step width (in files), A value n > 1 will only process every n-th file.
-   * - :py:data:`hdf5_key`
-     - | **type** : Hdf5key
-       | **default** : /entry/data/data
-       | **name** : Hdf5 dataset key
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Used only for hdf5 files: The dataset key.
-   * - :py:data:`hdf5_frame`
+       | **tooltip** : Keyword to toggle use of the ROI for cropping the original images before processing them.
+   * - :py:data:`roi_xlow`
      - | **type** : int
        | **default** : 0
-       | **name** : Frame number
+       | **name** : ROI lower x limit
        | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : For hdf5 image files: The frame number in the dataset
-   * - :py:data:`hdf5_first_image_num`
+       | **unit** : px
+       | **allow_None** : True
+       | **tooltip** : The lower boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width.
+   * - :py:data:`roi_xhigh`
+     - | **type** : int
+       | **default** : None
+       | **name** : ROI upper x limit
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : True
+       | **tooltip** : The upper boundary (in pixel) for cropping images in x, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
+   * - :py:data:`roi_ylow`
      - | **type** : int
        | **default** : 0
-       | **name** : First image number
+       | **name** : ROI lower y limit
        | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The first image in the hdf5-dataset to be used.
-   * - :py:data:`hdf5_last_image_num`
+       | **unit** : px
+       | **allow_None** : True
+       | **tooltip** : The lower boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width.
+   * - :py:data:`roi_yhigh`
      - | **type** : int
-       | **default** : -1
-       | **name** : Last image number
+       | **default** : None
+       | **name** : ROI upper y limit
        | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The last image in the hdf5-dataset to be used. The value -1 will default to the last image.
-   * - :py:data:`hdf5_stepping`
-     - | **type** : int
-       | **default** : 1
-       | **name** : Hdf5 dataset stepping
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The step width (in frames). A value n > 1 will only process every n-th frame.
-   * - :py:data:`hdf5_slicing_axis`
+       | **unit** : px
+       | **allow_None** : True
+       | **tooltip** : The upper boundary (in pixel) for cropping images in y, if use_roi is enabled. Negative values will be modulated with the image width, i.e. -1 is equivalent with the full image size minus 1. To take the full image, use 'None' as value for the upper ROI limit.
+   * - :py:data:`use_thresholds`
      - | **type** : int
        | **default** : 0
-       | **name** : Hdf5 frame slicing axes
+       | **name** : Use thresholds
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Keyword to toggle use of the thresholds for clipping the data range in the original images before combining them.
+   * - :py:data:`threshold_low`
+     - | **type** : float
+       | **default** : None
+       | **name** : Lower threshold
        | **choices** : None
        | **unit** : 
        | **allow_None** : True
-       | **tooltip** : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to `None`. A `None` setting will also ignore the hdf5 frame number Parameter.
-   * - :py:data:`bg_file`
-     - | **type** : Path
-       | **default** : 
-       | **name** : Background image file
+       | **tooltip** : The lower threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
+   * - :py:data:`threshold_high`
+     - | **type** : float
+       | **default** : None
+       | **name** : Upper threshold
        | **choices** : None
        | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The name of the file used for background correction.
-   * - :py:data:`bg_hdf5_key`
-     - | **type** : Hdf5key
-       | **default** : /entry/data/data
-       | **name** : Background image Hdf5 dataset key
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : For hdf5 background image files: The dataset key.
-   * - :py:data:`bg_hdf5_frame`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Background image frame
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : For hdf5 background image files: The image number in the dataset
-   * - :py:data:`images_per_file`
-     - | **type** : int
-       | **default** : -1
-       | **name** : Images per file
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of images in the file. For hdf5 files, this corresponds to the number of frames in the hdf5 dataset. A value -1 auto-discovers the number of images per file.
-   * - :py:data:`profiles_per_file`
-     - | **type** : int
-       | **default** : -1
-       | **name** : Profiles per file
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of 1d profiles in the file. For hdf5 files, this corresponds to the number of frames in the hdf5 dataset. A value -1 auto-discovers the number of profiles per file.
-   * - :py:data:`_counted_images_per_file`
+       | **allow_None** : True
+       | **tooltip** : The upper threshold of the image. If any finite value (i.e. not np.nan or None) is used, the value of any pixels with a value below the threshold will be replaced by the threshold value. A value of np.nan or None will ignore the threshold.
+   * - :py:data:`binning`
      - | **type** : int
        | **default** : 1
-       | **name** : Processed images per file
+       | **name** : Binning factor
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The number of images per file pydidas counted from the first file.
-   * - :py:data:`directory_path`
-     - | **type** : Path
-       | **default** : 
-       | **name** : Directory path
+       | **tooltip** : The re-binning factor for the images in the composite. The binning will be applied to the cropped images.
+   * - :py:data:`image_shape`
+     - | **type** : tuple
+       | **default** : (0, 0)
+       | **name** : Image shape
        | **choices** : None
-       | **unit** : 
+       | **unit** : px
        | **allow_None** : False
-       | **tooltip** : The absolute path of the directory to be used.
-   * - :py:data:`current_directory`
-     - | **type** : Path
-       | **default** : 
-       | **name** : Current directory
+       | **tooltip** : The shape of an image.
+   * - :py:data:`raw_image_shape`
+     - | **type** : tuple
+       | **default** : (0, 0)
+       | **name** : Raw image shape
        | **choices** : None
-       | **unit** : 
+       | **unit** : px
        | **allow_None** : False
-       | **tooltip** : The name of the currently active directory.
-   * - :py:data:`eiger_filename_suffix`
-     - | **type** : str
-       | **default** : _data_000001.h5
-       | **name** : Eiger filename suffix
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The suffix to be appended to the filename pattern to get the full filename for the data file.
-   * - :py:data:`eiger_dir`
-     - | **type** : str
-       | **default** : eiger9m
-       | **name** : Eiger directory key
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The name of the sub-directory for each scan in which the Eiger detector writes its data files.
-   * - :py:data:`raw_datatype`
-     - | **type** : str
-       | **default** : float 64 bit
+       | **tooltip** : The image shape of the original image as loaded from the file.
+   * - :py:data:`datatype`
+     - | **type** : None
+       | **default** : <class 'numpy.float32'>
        | **name** : Datatype
-       | **choices** : ['boolean (1 bit integer)', 'float 16 bit', 'float 32 bit', 'float 64 bit', 'float 128 bit', 'int 8 bit', 'int 16 bit', 'int 32 bit', 'int 64 bit', ' unsigned int 8 bit', ' unsigned int 16 bit', ' unsigned int 32 bit', ' unsigned int 64 bit']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The data type to be used for decoding. Note that numpy data types are used for decoding with native byteorder.
-   * - :py:data:`raw_shape_x`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Raw shape x
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The x shape of the raw data file. Following the python convention,the first axis is y and the second axis is x.
-   * - :py:data:`raw_shape_y`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Raw shape y
-       | **choices** : None
-       | **unit** : px
-       | **allow_None** : False
-       | **tooltip** : The y shape of the raw data file. Following the python convention,the first axis is y and the second axis is x.
-   * - :py:data:`raw_header`
-     - | **type** : int
-       | **default** : 0
-       | **name** : Raw file header length
-       | **choices** : None
-       | **unit** : bytes
-       | **allow_None** : False
-       | **tooltip** : The length of the file header in bytes. The header will not be decoded as image data.
-   * - :py:data:`num_frames_to_use`
-     - | **type** : int
-       | **default** : 2
-       | **name** : Number of frame to use
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The number of frames to be loaded and included in the stack. Frames are loaded starting with the first frame index and thus allow a rolling average over the frames.
-   * - :py:data:`files_per_directory`
-     - | **type** : int
-       | **default** : -1
-       | **name** : Images per directory
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The number of files in the directory.
-   * - :py:data:`_counted_files_per_directory`
-     - | **type** : int
-       | **default** : 1
-       | **name** : Processed images per directory
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The counted number of images per directory.
-   * - :py:data:`fio_suffix`
-     - | **type** : str
-       | **default** : _mca_s#.fio
-       | **name** : FIO file suffix
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The file suffix for teh individual MCA files.
-   * - :py:data:`use_custom_xscale`
-     - | **type** : bool
-       | **default** : False
-       | **name** : Use custom scale for x-axis
-       | **choices** : [True, False]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : Use a custom scale for the x-axis. If False, the scale will be created in channel numbers.
-   * - :py:data:`x0_offset`
-     - | **type** : float
-       | **default** : 0.0
-       | **name** : x0 offset
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The offset for the zeroth channel.
-   * - :py:data:`x_delta`
+       | **tooltip** : The datatype.
+   * - :py:data:`multiplicator`
      - | **type** : float
        | **default** : 1.0
-       | **name** : Channel Delta x
+       | **name** : Multiplication factor
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The width of each channel.
-   * - :py:data:`x_unit`
-     - | **type** : str
-       | **default** : a.u.
-       | **name** : x-axis unit
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit of the x-axis.
-   * - :py:data:`x_label`
-     - | **type** : str
-       | **default** : x
-       | **name** : x-axis label
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The label for the x-axis.
-   * - :py:data:`data_dimensionality`
-     - | **type** : int
-       | **default** : 2
-       | **name** : Data dimensionality
-       | **choices** : [1, 2, 3]
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The dimensionality of the data to be loaded.
-   * - :py:data:`detector_axis_label`
-     - | **type** : str
-       | **default** : detector
-       | **name** : Detector axis label
-       | **choices** : None
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The label for the detector axis.
-
-Proc
-~~~~
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-   :class: tight-table
-
-   * - Parameter
-     - Description
-   * - :py:data:`d_spacing_unit`
-     - | **type** : str
-       | **default** : Angstrom
-       | **name** : d-spacing unit
-       | **choices** : ['Angstrom', 'nm']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The output d-spacing unit. Å for Angstroms and nm for nanometers.
-   * - :py:data:`output_type`
-     - | **type** : str
-       | **default** : Same as input
-       | **name** : Output data type
-       | **choices** : ['Same as input', '2theta / deg', '2theta / rad', 'd-spacing / nm', 'd-spacing / A', 'Q / nm^-1', 'Q / A^-1', 'r / mm']
-       | **unit** : 
-       | **allow_None** : False
-       | **tooltip** : The unit of the output data. The default is `Same as input`, which means that the output data will have the same unit as the input data. Choosing a different unit will convert the data to the selected unit.
+       | **tooltip** : The multiplication scaling factor to be applied to the input data.
 
 Scan
 ~~~~
@@ -1784,7 +611,7 @@ Scan
    * - :py:data:`scan_dim`
      - | **type** : int
        | **default** : 1
-       | **name** : Scan dimensionsionality
+       | **name** : Scan dimensionality
        | **choices** : [1, 2, 3, 4]
        | **unit** : 
        | **allow_None** : False
@@ -1800,52 +627,59 @@ Scan
    * - :py:data:`scan_base_directory`
      - | **type** : Path
        | **default** : 
-       | **name** : Scan base directory path
+       | **name** : Scan base directory
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The absolute path of the base directory in which to find this scan. Note that indivual plugins may automatically discover and use subdirectories. Please refer to the specific InputPlugin in use for more information.
+       | **tooltip** : The absolute path of the base directory in which to find this scan. Note that individual plugins may automatically discover and use subdirectories. Please refer to the specific InputPlugin in use for more information.
    * - :py:data:`scan_name_pattern`
      - | **type** : Path
        | **default** : 
-       | **name** : The scan naming pattern
+       | **name** : The scan/file naming pattern
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The pattern used for naming scan (files). Use hashes '#' for wildcards which will be filled in with numbers for the various files. Note that individual plugins may use this Parameter for either directory or file names. Please refer to the specific InputPlugin in use for more information.
-   * - :py:data:`scan_start_index`
+   * - :py:data:`pattern_number_offset`
      - | **type** : int
        | **default** : 0
-       | **name** : First filename number
+       | **name** : First pattern number
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The number of the first file to be used in processing. This number will be applied as offset in the scan naming pattern to identify the respective filename for scan points.
-   * - :py:data:`scan_index_stepping`
+       | **tooltip** : The first number in the pattern to be used in processing. This number will be applied as offset in the scan naming pattern to identify the respective filename for scan points. For example, if the first file is named `scan_0001.h5`, the offset should be set to 1.
+   * - :py:data:`pattern_number_delta`
      - | **type** : int
        | **default** : 1
-       | **name** : Frame index stepping
+       | **name** : Index stepping of pattern
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The stepping of the index in frames. A value of n corresponds to only using every n-th index. For example, an index stepping of 3 with an offset of 5 would process the frames 5, 8, 11, 14 etc. 
-       | Please note that the index stepping refers to the frames, not the filenames. In the case of container files (e.g. hdf5), the index stepping will skip process every n-th frame, not every n-th file.
-   * - :py:data:`scan_multi_image_handling`
+       | **tooltip** : The difference in the index between two consecutive pattern points. A value of 1 would mean that each index is processed in the pattern whereas a value of n would mean that only every n-th index (e.g. filename) is processed.For example, a value of 3 would process the files with the names `scan_0000.h5`, `scan_0003.h5`, `scan_0006.h5` etc.
+   * - :py:data:`frame_indices_per_scan_point`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Frame index stepping per scan point
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of frame indices (in frames) between two scan points. A value of 1 would increment the image index by 1 for each scan point whereas a value of n corresponds to only using every n-th index. For example, a value of 3 frame indices per scan point process the frame 0 for scan point 0, frame 3 for scan point 1 etc.Please note that the index stepping refers to the frames, not the filenames. In the case of container files (e.g. hdf5), the index stepping will skip process every n-th frame, not every n-th file.
+   * - :py:data:`scan_multi_frame_handling`
      - | **type** : str
        | **default** : Average
-       | **name** : Multi-image handling
-       | **choices** : ['Average', 'Sum', 'Maximum']
+       | **name** : Multi-frame handling
+       | **choices** : ['Average', 'Sum', 'Maximum', 'Stack']
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : Define the handling of images if multiple images were acquired per scan point. If all individual images should be kept, please set the scan multiplicity to 1 and add an additional dimension with the multiplicity to the scan.
-   * - :py:data:`scan_multiplicity`
+   * - :py:data:`scan_frames_per_point`
      - | **type** : int
        | **default** : 1
-       | **name** : Image multiplicity
+       | **name** : Frames to process per scan point
        | **choices** : None
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : The number of images acquired at *each* scan point. The default of '1' corresponds to one image per scan point. Please note that the value for the multiplicity will be multiplied with the number of scan points. If this setting is used for 'averaging' images, please reduce the number of scan points correspondingly.
+       | **tooltip** : The number of frames to process at *each* scan point. The default of `1` corresponds to one image per scan point. Please note that the value for the  points. If this setting is used for `averaging` images, please reduce the number of scan points correspondingly.
    * - :py:data:`scan_dim0_label`
      - | **type** : str
        | **default** : 
@@ -2038,3 +872,1176 @@ Scan
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The position index for the scan dimension 3.
+
+Pyfai
+~~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`rad_npoint`
+     - | **type** : int
+       | **default** : 1000
+       | **name** : Num points radial integration
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of bins in radial direction for the pyFAI integration.
+   * - :py:data:`rad_unit`
+     - | **type** : str
+       | **default** : 2theta / deg
+       | **name** : Radial unit
+       | **choices** : ['Q / nm^-1', 'Q / A^-1', 'r / mm', '2theta / deg', '2theta / rad']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit and type of the azimuthal profile.
+   * - :py:data:`rad_use_range`
+     - | **type** : str
+       | **default** : Full detector
+       | **name** : Radial range
+       | **choices** : ['Full detector', 'Specify radial range']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Toggle to limit the radial integration range or use the full data range. If 'Specify radial range' is used, boundaries need to be defined in the lower and upper radial range Parameters.
+   * - :py:data:`rad_range_lower`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Radial lower range
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The lower boundary of the radial integration range. This setting is only used if the 'Specify radial range' is set. This value needs to be given in the unit selected as radial unit.
+   * - :py:data:`rad_range_upper`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Radial upper range
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The upper boundary of the radial integration range. This setting is only used if 'Specify radial range' is set. This value needs to be given in the unit selected as radial unit.
+   * - :py:data:`azi_npoint`
+     - | **type** : int
+       | **default** : 1000
+       | **name** : Num points azimuthal integration
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of bins in azimuthal direction for the pyFAI integration.
+   * - :py:data:`azi_unit`
+     - | **type** : str
+       | **default** : chi / deg
+       | **name** : Azimuthal unit
+       | **choices** : ['chi / deg', 'chi / rad']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit and type of the azimuthal profile.
+   * - :py:data:`azi_use_range`
+     - | **type** : str
+       | **default** : Full detector
+       | **name** : Azimuthal range
+       | **choices** : ['Full detector', 'Specify azimuthal range']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Toggle to limit the azimuthal integration range or use the full data range. If 'Specify azimuthal range' is used, boundaries need to be defined in the lower and upper azimuthal range Parameters.
+   * - :py:data:`azi_range_lower`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Azimuthal lower range
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The lower boundary of the azimuthal integration range. This setting is only used if 'Specify azimuthal range' is set. This value needs to be given in the unit selected as azimuthal unit.
+   * - :py:data:`azi_range_upper`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Azimuthal upper range
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The upper boundary of the azimuthal integration range. This setting is only used if 'Specify azimuthal range' is set. This value needs to be given in the unit selected as azimuthal unit.
+   * - :py:data:`azi_sector_width`
+     - | **type** : float
+       | **default** : 20
+       | **name** : Azimuthal sector width
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The width of each azimuthal sector (in azimuthal units).
+   * - :py:data:`azi_sector_centers`
+     - | **type** : str
+       | **default** : 0; 90; 180; 270
+       | **name** : Azimuthal sector centers
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The centers of the azimuthal sectors to be integrated (in azimuthal units). Separate multiple sectors by semicolons.
+   * - :py:data:`int_method`
+     - | **type** : str
+       | **default** : CSR
+       | **name** : PyFAI integration method
+       | **choices** : ['CSR', 'CSR OpenCL', 'CSR full', 'CSR full OpenCL', 'LUT', 'LUT OpenCL', 'LUT full', 'LUT full OpenCL']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The integration method. For a full reference, please visit the pyfai documentation available at: https://pyfai.readthedocs.io/
+   * - :py:data:`integration_direction`
+     - | **type** : str
+       | **default** : Azimuthal integration
+       | **name** : Integration direction
+       | **choices** : ['Azimuthal integration', 'Radial integration', '2D integration']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The integration direction.
+   * - :py:data:`detector_model`
+     - | **type** : str
+       | **default** : Custom detector
+       | **name** : Detector model
+       | **choices** : ['Custom detector']
+       | **unit** : 
+       | **allow_None** : None
+       | **tooltip** : The model name of the detector.
+   * - :py:data:`polarization_factor`
+     - | **type** : float
+       | **default** : 0.99
+       | **name** : Polarization factor
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The Polarization factor. Must be a number between -1 (vertical) and +1 (horizontal). 0 corresponds to circular polarizazion, None corresponds to no correction.
+   * - :py:data:`correct_solid_angle`
+     - | **type** : bool
+       | **default** : True
+       | **name** : Correct solid angle
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The correct solid angle Parameter in pyFAI (de)activates the correction for the solid angle of the detector pixels. Detector pixels further away from the beam axis see a smaller projected intensity. Using this parameter allows to correct for this effect, if set to True.
+
+Settings
+~~~~~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`mp_n_workers`
+     - | **type** : int
+       | **default** : 4
+       | **name** : Number of MP workers
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of multiprocessing workers. Note that this number should not be set too high for two reasons:
+       | 1. File reading processes interfere with each other if too many are active at once.
+       | 2. pyFAI already inherently uses parallelization and you can only gain limited performance increases for multiple parallel processes.
+   * - :py:data:`data_buffer_size`
+     - | **type** : float
+       | **default** : 1500
+       | **name** : Data buffer size
+       | **choices** : None
+       | **unit** : MB
+       | **allow_None** : False
+       | **tooltip** : The maximum size of the data buffer (for each display widget). Any data which is smaller than the buffer size will be stored in memory. Larger data will be read from disk in chunks.
+   * - :py:data:`shared_buffer_size`
+     - | **type** : float
+       | **default** : 100
+       | **name** : Shared buffer size limit
+       | **choices** : None
+       | **unit** : MB
+       | **allow_None** : False
+       | **tooltip** : A shared buffer is used to efficiently transport data between the main App and multiprocessing Processes. This buffer must be large enough to store at least one instance of all result data.
+   * - :py:data:`shared_buffer_max_n`
+     - | **type** : int
+       | **default** : 20
+       | **name** : Buffer dataframe limit
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The maximum number of datasets in the buffer. A dataset consists of all results for one frame. For performance reasons, the buffer should not be too large.
+   * - :py:data:`max_image_size`
+     - | **type** : float
+       | **default** : 100
+       | **name** : Maximum image size
+       | **choices** : None
+       | **unit** : Mpx
+       | **allow_None** : False
+       | **tooltip** : The maximum size (in megapixels) of images.
+   * - :py:data:`use_detector_mask`
+     - | **type** : bool
+       | **default** : False
+       | **name** : Use detector mask
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Flag to use a detector mask file and value. If False, no detector mask will be used.
+   * - :py:data:`detector_mask_val`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Masked pixels display value
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The value to be used for the pixels masked on the detector. Note that this value will only be used for displaying the images. For pyFAI integration, the pixels will be fully masked and not be included.
+   * - :py:data:`mosaic_border_width`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Mosaic tiling border width
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The width of the border inserted between adjacent frames in the mosaic creation.
+   * - :py:data:`mosaic_border_value`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Mosaic border value
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The value to be put in the border pixels in mosaics.
+   * - :py:data:`run_type`
+     - | **type** : str
+       | **default** : Process in GUI
+       | **name** : Run type
+       | **choices** : ['Process in GUI', 'Command line']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Specify how the processing shall be performed.
+   * - :py:data:`plugin_path`
+     - | **type** : str
+       | **default** : 
+       | **name** : Custom plugin paths
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The paths to all custom plugin locations. Individual entries must be separated by a double semicolon `;;`.
+   * - :py:data:`plot_update_time`
+     - | **type** : float
+       | **default** : 1.0
+       | **name** : Plot update time
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : s
+       | **tooltip** : The delay before any plot updates will be processed. This will prevent multiple frequent update of plots.
+   * - :py:data:`max_number_curves`
+     - | **type** : int
+       | **default** : 40
+       | **name** : Maximum number of curves
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The maximum number of curves to plot. Increasing this number will allow more curves to be plotted simultaneously, but at the cost of significant performance decrease.
+   * - :py:data:`histogram_outlier_fraction_high`
+     - | **type** : float
+       | **default** : 0.07
+       | **name** : Histogram outlier fraction (high)
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The fraction of pixels with high values which will be ignored when cropping the histogram for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger detector.
+   * - :py:data:`histogram_outlier_fraction_low`
+     - | **type** : float
+       | **default** : 0.02
+       | **name** : Histogram outlier fraction (low)
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The fraction of pixels with low values which will be ignored when cropping the histogram for 2d plots. 
+   * - :py:data:`cmap_name`
+     - | **type** : str
+       | **default** : Gray
+       | **name** : Default colormap
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The default colormap used in pydidas plots.
+   * - :py:data:`cmap_nan_color`
+     - | **type** : str
+       | **default** : #9AFEFF
+       | **name** : Color for invalid data / no data
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The RGB color used to fill missing or invalid data points. Invalid data points are labeled with np.NaN values.
+
+Proc
+~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`d_spacing_unit`
+     - | **type** : str
+       | **default** : Angstrom
+       | **name** : d-spacing unit
+       | **choices** : ['Angstrom', 'nm']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The output d-spacing unit. Å for Angstroms and nm for nanometers.
+   * - :py:data:`output_type`
+     - | **type** : str
+       | **default** : Same as input
+       | **name** : Output data type
+       | **choices** : ['Same as input', '2theta / deg', '2theta / rad', 'd-spacing / nm', 'd-spacing / A', 'Q / nm^-1', 'Q / A^-1', 'r / mm']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit of the output data. The default is `Same as input`, which means that the output data will have the same unit as the input data. Choosing a different unit will convert the data to the selected unit.
+
+Experiment
+~~~~~~~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`xray_wavelength`
+     - | **type** : float
+       | **default** : 1
+       | **name** : X-ray wavelength
+       | **choices** : None
+       | **unit** : A
+       | **allow_None** : False
+       | **tooltip** : The X-ray wavelength. Any changes to the wavelength will also update the X-ray energy setting.
+   * - :py:data:`xray_energy`
+     - | **type** : float
+       | **default** : 12.39842
+       | **name** : X-ray energy
+       | **choices** : None
+       | **unit** : keV
+       | **allow_None** : False
+       | **tooltip** : The X-ray energy. Changing this parameter will also update the X-ray wavelength setting.
+   * - :py:data:`detector_name`
+     - | **type** : str
+       | **default** : detector
+       | **name** : Detector name
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The detector name in pyFAI nomenclature.
+   * - :py:data:`detector_npixx`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Detector size X
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The number of detector pixels in x direction (horizontal).
+   * - :py:data:`detector_npixy`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Detector size Y
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The number of detector pixels in x direction (vertical).
+   * - :py:data:`detector_pxsizex`
+     - | **type** : float
+       | **default** : 100
+       | **name** : Detector pixel size X
+       | **choices** : None
+       | **unit** : um
+       | **allow_None** : False
+       | **tooltip** : The detector pixel size in X-direction.
+   * - :py:data:`detector_pxsizey`
+     - | **type** : float
+       | **default** : 100
+       | **name** : Detector pixel size Y
+       | **choices** : None
+       | **unit** : um
+       | **allow_None** : False
+       | **tooltip** : The detector pixel size in Y-direction.
+   * - :py:data:`detector_pxsize`
+     - | **type** : float
+       | **default** : 100
+       | **name** : Detector pixel size
+       | **choices** : None
+       | **unit** : um
+       | **allow_None** : False
+       | **tooltip** : The detector pixel size in both X- and Y-direction.
+   * - :py:data:`detector_dist`
+     - | **type** : float
+       | **default** : 1
+       | **name** : Sample-detector distance
+       | **choices** : None
+       | **unit** : m
+       | **allow_None** : False
+       | **tooltip** : The sample-detector distance.
+   * - :py:data:`detector_mask_file`
+     - | **type** : Path
+       | **default** : 
+       | **name** : Detector mask file
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The path to the detector mask file.
+   * - :py:data:`detector_poni1`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Detector PONI1
+       | **choices** : None
+       | **unit** : m
+       | **allow_None** : False
+       | **tooltip** : The detector PONI1 (point of normal incidence; in y direction). This is measured in meters from the detector origin.
+   * - :py:data:`detector_poni2`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Detector PONI2
+       | **choices** : None
+       | **unit** : m
+       | **allow_None** : False
+       | **tooltip** : The detector PONI2 (point of normal incidence; in x direction). This is measured in meters from the detector origin.
+   * - :py:data:`detector_rot1`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Detector Rot1
+       | **choices** : None
+       | **unit** : rad
+       | **allow_None** : False
+       | **tooltip** : The detector rotation 1 (lefthanded around the "up"-axis)
+   * - :py:data:`detector_rot2`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Detector Rot2
+       | **choices** : None
+       | **unit** : rad
+       | **allow_None** : False
+       | **tooltip** : The detector rotation 2 (pitching the detector; positive direction is tilting the detector top upstream while keeping the bottom of the detector stationary.
+   * - :py:data:`detector_rot3`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Detector Rot3
+       | **choices** : None
+       | **unit** : rad
+       | **allow_None** : False
+       | **tooltip** : The detector rotation 3 (around the beam axis; right-handed when looking downstream with the beam.)
+   * - :py:data:`beamcenter_x`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Beamcenter x
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The detector x-coordinate for the beamcenter.
+   * - :py:data:`beamcenter_y`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Beamcenter y
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The detector y-coordinate for the beamcenter.
+   * - :py:data:`detector_tilt_angle`
+     - | **type** : float
+       | **default** : 0
+       | **name** : detector tilt angle
+       | **choices** : None
+       | **unit** : deg
+       | **allow_None** : False
+       | **tooltip** : The detector tilt angle (relative to the beam normal).
+   * - :py:data:`detector_tilt_plane`
+     - | **type** : float
+       | **default** : 0
+       | **name** : detector tilt plane
+       | **choices** : None
+       | **unit** : deg
+       | **allow_None** : False
+       | **tooltip** : The detector tilt plane orientation (relative to positive x-axis).
+   * - :py:data:`detector_dist_fit2d`
+     - | **type** : float
+       | **default** : 1
+       | **name** : Sample-detector distance
+       | **choices** : None
+       | **unit** : mm
+       | **allow_None** : False
+       | **tooltip** : The sample-detector distance.
+
+Data import
+~~~~~~~~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`filename`
+     - | **type** : Path
+       | **default** : 
+       | **name** : Filename
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The file name of the input file.
+   * - :py:data:`current_filename`
+     - | **type** : str
+       | **default** : 
+       | **name** : Current input filename
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The filename of the currently active file.
+   * - :py:data:`filename_pattern`
+     - | **type** : Path
+       | **default** : 
+       | **name** : The filename pattern
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The pattern of the filename. Use hashes '#' for wildcards which will be filled in with numbers. This Parameter must be set if scan_for_all is False.
+   * - :py:data:`first_file`
+     - | **type** : Path
+       | **default** : 
+       | **name** : First file name
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The name of the first file for a file series or of the hdf5 file in case of hdf5 file input.
+   * - :py:data:`last_file`
+     - | **type** : Path
+       | **default** : 
+       | **name** : Last file name
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Used only for file series: The name of the last file to be used for this app or tool.
+   * - :py:data:`file_stepping`
+     - | **type** : int
+       | **default** : 1
+       | **name** : File stepping
+       | **choices** : None
+       | **allow_None** : False
+       | **tooltip** : The step width (in files), A value n > 1 will only process every n-th file.
+   * - :py:data:`hdf5_key`
+     - | **type** : Hdf5key
+       | **default** : /entry/data/data
+       | **name** : Hdf5 dataset key
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Used only for hdf5 files: The dataset key.
+   * - :py:data:`hdf5_frame`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Frame number
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : For hdf5 image files: The frame number in the dataset
+   * - :py:data:`hdf5_first_image_num`
+     - | **type** : int
+       | **default** : 0
+       | **name** : First image number
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The first image in the hdf5-dataset to be used.
+   * - :py:data:`hdf5_last_image_num`
+     - | **type** : int
+       | **default** : -1
+       | **name** : Last image number
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The last image in the hdf5-dataset to be used. The value -1 will default to the last image.
+   * - :py:data:`hdf5_stepping`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Hdf5 dataset stepping
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The step width (in frames). A value n > 1 will only process every n-th frame.
+   * - :py:data:`hdf5_slicing_axis`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Hdf5 frame slicing axes
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to `None`. A `None` setting will also ignore the hdf5 frame number Parameter.
+   * - :py:data:`bg_file`
+     - | **type** : Path
+       | **default** : 
+       | **name** : Background image file
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The name of the file used for background correction.
+   * - :py:data:`bg_hdf5_key`
+     - | **type** : Hdf5key
+       | **default** : /entry/data/data
+       | **name** : Background image Hdf5 dataset key
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : For hdf5 background image files: The dataset key.
+   * - :py:data:`bg_hdf5_frame`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Background image frame
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : For hdf5 background image files: The image number in the dataset
+   * - :py:data:`images_per_file`
+     - | **type** : int
+       | **default** : -1
+       | **name** : Images/spectra per file
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of images or spectra in the file. For hdf5 files, this corresponds to the number of image frames/spectra in the hdf5 dataset. A value -1 auto-discovers the number of images per file.
+   * - :py:data:`profiles_per_file`
+     - | **type** : int
+       | **default** : -1
+       | **name** : Profiles per file
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of 1d profiles in the file. For hdf5 files, this corresponds to the number of frames in the hdf5 dataset. A value -1 auto-discovers the number of profiles per file.
+   * - :py:data:`_counted_images_per_file`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Processed images per file
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of images per file pydidas counted from the first file.
+   * - :py:data:`directory_path`
+     - | **type** : Path
+       | **default** : 
+       | **name** : Directory path
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The absolute path of the directory to be used.
+   * - :py:data:`current_directory`
+     - | **type** : Path
+       | **default** : 
+       | **name** : Current directory
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The name of the currently active directory.
+   * - :py:data:`eiger_filename_suffix`
+     - | **type** : str
+       | **default** : _data_000001.h5
+       | **name** : Eiger filename suffix
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The suffix to be appended to the filename pattern to get the full filename for the data file.
+   * - :py:data:`eiger_dir`
+     - | **type** : str
+       | **default** : eiger9m
+       | **name** : Eiger directory key
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The name of the sub-directory for each scan in which the Eiger detector writes its data files.
+   * - :py:data:`raw_datatype`
+     - | **type** : str
+       | **default** : float 64 bit
+       | **name** : Datatype
+       | **choices** : ['boolean (1 bit integer)', 'float 16 bit', 'float 32 bit', 'float 64 bit', 'float 128 bit', 'int 8 bit', 'int 16 bit', 'int 32 bit', 'int 64 bit', ' unsigned int 8 bit', ' unsigned int 16 bit', ' unsigned int 32 bit', ' unsigned int 64 bit']
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The data type to be used for decoding. Note that numpy data types are used for decoding with native byteorder.
+   * - :py:data:`raw_shape_x`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Raw shape x
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The x shape of the raw data file. Following the python convention,the first axis is y and the second axis is x.
+   * - :py:data:`raw_shape_y`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Raw shape y
+       | **choices** : None
+       | **unit** : px
+       | **allow_None** : False
+       | **tooltip** : The y shape of the raw data file. Following the python convention,the first axis is y and the second axis is x.
+   * - :py:data:`raw_header`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Raw file header length
+       | **choices** : None
+       | **unit** : bytes
+       | **allow_None** : False
+       | **tooltip** : The length of the file header in bytes. The header will not be decoded as image data.
+   * - :py:data:`num_frames_to_use`
+     - | **type** : int
+       | **default** : 2
+       | **name** : Number of frame to use
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of frames to be loaded and included in the stack. Frames are loaded starting with the first frame index and thus allow a rolling average over the frames.
+   * - :py:data:`files_per_directory`
+     - | **type** : int
+       | **default** : -1
+       | **name** : Files per directory
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The number of files in the directory.
+   * - :py:data:`_counted_files_per_directory`
+     - | **type** : int
+       | **default** : 1
+       | **name** : Processed images per directory
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The counted number of images per directory.
+   * - :py:data:`fio_suffix`
+     - | **type** : str
+       | **default** : _mca_s#.fio
+       | **name** : FIO file suffix
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The file suffix for teh individual MCA files.
+   * - :py:data:`use_custom_xscale`
+     - | **type** : bool
+       | **default** : False
+       | **name** : Use custom scale for x-axis
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Use a custom scale for the x-axis. If False, the scale will be created in channel numbers.
+   * - :py:data:`x0_offset`
+     - | **type** : float
+       | **default** : 0.0
+       | **name** : x0 offset
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The offset for the zeroth channel.
+   * - :py:data:`x_delta`
+     - | **type** : float
+       | **default** : 1.0
+       | **name** : Channel Delta x
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The width of each channel.
+   * - :py:data:`x_unit`
+     - | **type** : str
+       | **default** : a.u.
+       | **name** : x-axis unit
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The unit of the x-axis.
+   * - :py:data:`x_label`
+     - | **type** : str
+       | **default** : x
+       | **name** : x-axis label
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The label for the x-axis.
+   * - :py:data:`data_dimensionality`
+     - | **type** : int
+       | **default** : 2
+       | **name** : Data dimensionality
+       | **choices** : [1, 2]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The dimensionality of the data to be loaded.
+   * - :py:data:`detector_axis_label`
+     - | **type** : str
+       | **default** : detector
+       | **name** : Detector axis label
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The label for the detector axis.
+
+Fit
+~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`fit_sigma_threshold`
+     - | **type** : float
+       | **default** : 0.25
+       | **name** : Fit σ rejection threshold
+       | **choices** : None
+       | **allow_None** : False
+       | **unit** : 
+       | **tooltip** : The threshold to select which fitting points to reject, based on the normalized standard deviation. Any fit which has a normalized std which is worse than the threshold will be rejected as failed.
+   * - :py:data:`fit_min_peak_height`
+     - | **type** : float
+       | **default** : None
+       | **name** : Minimum peak height to fit
+       | **choices** : None
+       | **allow_None** : True
+       | **unit** : 
+       | **tooltip** : The minimum height a peak must have to attempt a fit. A value of 'None' will not impose any limits on the peak height.
+   * - :py:data:`fit_func`
+     - | **type** : str
+       | **default** : Gaussian
+       | **name** : Fit function
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : Select the type of fit function to be used in the single peak fit.
+   * - :py:data:`fit_bg_order`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Fit background order
+       | **choices** : [None, 0, 1]
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The order of the background. None corresponds to no background.
+   * - :py:data:`fit_upper_limit`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak fit upper limit
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The upper limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.
+   * - :py:data:`fit_lower_limit`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak fit lower limit
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The lower limit (in the x-axis´ unit) to the fit region. None corresponds to using no upper limit but the data limits.
+   * - :py:data:`fit_output`
+     - | **type** : str
+       | **default** : position; area; FWHM
+       | **name** : Output
+       | **choices** : ['no output', 'position', 'amplitude', 'area', 'FWHM', 'background at peak', 'total count intensity', 'position; amplitude', 'position; area', 'position; FWHM', 'position; background at peak', 'position; total count intensity', 'amplitude; area', 'amplitude; FWHM', 'amplitude; background at peak', 'amplitude; total count intensity', 'area; FWHM', 'area; background at peak', 'area; total count intensity', 'FWHM; background at peak', 'FWHM; total count intensity', 'background at peak; total count intensity', 'position; amplitude; area', 'position; amplitude; FWHM', 'position; amplitude; background at peak', 'position; amplitude; total count intensity', 'position; area; FWHM', 'position; area; background at peak', 'position; area; total count intensity', 'position; FWHM; background at peak', 'position; FWHM; total count intensity', 'position; background at peak; total count intensity', 'amplitude; area; FWHM', 'amplitude; area; background at peak', 'amplitude; area; total count intensity', 'amplitude; FWHM; background at peak', 'amplitude; FWHM; total count intensity', 'amplitude; background at peak; total count intensity', 'area; FWHM; background at peak', 'area; FWHM; total count intensity', 'area; background at peak; total count intensity', 'FWHM; background at peak; total count intensity', 'position; amplitude; area; FWHM', 'position; amplitude; area; background at peak', 'position; amplitude; area; total count intensity', 'position; amplitude; FWHM; background at peak', 'position; amplitude; FWHM; total count intensity', 'position; amplitude; background at peak; total count intensity', 'position; area; FWHM; background at peak', 'position; area; FWHM; total count intensity', 'position; area; background at peak; total count intensity', 'position; FWHM; background at peak; total count intensity', 'amplitude; area; FWHM; background at peak', 'amplitude; area; FWHM; total count intensity', 'amplitude; area; background at peak; total count intensity', 'amplitude; FWHM; background at peak; total count intensity', 'area; FWHM; background at peak; total count intensity', 'position; amplitude; area; FWHM; background at peak', 'position; amplitude; area; FWHM; total count intensity', 'position; amplitude; area; background at peak; total count intensity', 'position; amplitude; FWHM; background at peak; total count intensity', 'position; area; FWHM; background at peak; total count intensity', 'amplitude; area; FWHM; background at peak; total count intensity', 'position; amplitude; area; FWHM; background at peak; total count intensity']
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The output of the fitting plugin. The plugin can either return the peak area, the peak position or the FWHM. Alternatively, any combination of these values can be retured as well. Note that the fit parameters are always stored in the metadata.
+   * - :py:data:`fit_peak_xlow`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak low x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The lower boundary in x for the center position of the  peak to be fitted.
+   * - :py:data:`fit_peak0_xlow`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #0 low x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The lower boundary in x for the center position of the 0th peak to be fitted.
+   * - :py:data:`fit_peak1_xlow`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #1 low x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The lower boundary in x for the center position of the 1st peak to be fitted.
+   * - :py:data:`fit_peak2_xlow`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #2 low x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The lower boundary in x for the center position of the 2nd peak to be fitted.
+   * - :py:data:`fit_peak3_xlow`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #3 low x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The lower boundary in x for the center position of the 3rd peak to be fitted.
+   * - :py:data:`fit_peak_xhigh`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak high x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The upper boundary in x for the center position of the  peak to be fitted.
+   * - :py:data:`fit_peak0_xhigh`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #0 high x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The upper boundary in x for the center position of the 0th peak to be fitted.
+   * - :py:data:`fit_peak1_xhigh`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #1 high x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The upper boundary in x for the center position of the 1st peak to be fitted.
+   * - :py:data:`fit_peak2_xhigh`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #2 high x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The upper boundary in x for the center position of the 2nd peak to be fitted.
+   * - :py:data:`fit_peak3_xhigh`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #3 high x boundary
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The upper boundary in x for the center position of the 3rd peak to be fitted.
+   * - :py:data:`fit_peak_xstart`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak fit x0 start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak0_xstart`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #0 fit x0 start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak1_xstart`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #1 fit x0 start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak2_xstart`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #2 fit x0 start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak3_xstart`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #3 fit x0 start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the peak center position in x. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak_width`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak fit σ or Γ start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak0_width`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #0 fit σ or Γ start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak1_width`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #1 fit σ or Γ start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak2_width`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #2 fit σ or Γ start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
+   * - :py:data:`fit_peak3_width`
+     - | **type** : float
+       | **default** : None
+       | **name** : Peak #3 fit σ or Γ start guess
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The starting guess for the parameter value for the fit sigma/gamma peak width. Note: This is only the starting value for the fit, not a fixed value.
+
+Stress strain
+~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+
+   * - Parameter
+     - Description
+   * - :py:data:`sin_square_chi_low_fit_limit`
+     - | **type** : float
+       | **default** : 0
+       | **name** : Lower bounds for fitting
+       | **choices** : None
+       | **unit** : 
+       | **range** : (0, 1)
+       | **allow_None** : False
+       | **tooltip** : The lower boundary for the fitting range (in sin^2(chi)). This parameter is used to set the lower limit for the fitting range and it allows to ignore the first few points of the data.
+   * - :py:data:`sin_square_chi_high_fit_limit`
+     - | **type** : float
+       | **default** : 1
+       | **name** : Upper bounds for fitting
+       | **choices** : None
+       | **unit** : 
+       | **range** : (0, 1)
+       | **allow_None** : False
+       | **tooltip** : The upper boundary for the fitting range (in sin^2(chi)). This parameter is used to set the upper limit for the fitting range and it allows to ignore the last few points of the data.
+   * - :py:data:`selected_data_source`
+     - | **type** : str
+       | **default** : None
+       | **name** : Selected data source
+       | **choices** : None
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : The data source to be used for the visualization.
+   * - :py:data:`selected_sin_square_chi_node`
+     - | **type** : str
+       | **default** : no selection
+       | **name** : Selected sin^2(chi) node
+       | **choices** : ['no selection']
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : The node which includes the stored information with the results of the fit plotted vs sin^2(chi).
+   * - :py:data:`selected_sin_2chi_node`
+     - | **type** : str
+       | **default** : no selection
+       | **name** : Selected sin(2*chi) node
+       | **choices** : ['no selection']
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : The node which includes the stored information with the results of the fit results plotted vs. sin(2*chi).
+   * - :py:data:`plot_type`
+     - | **type** : str
+       | **default** : Inspect data and fits in plot grid
+       | **name** : Autoscale sin^2(chi) results
+       | **choices** : ['Inspect data and fits in plot grid', 'Calculate relative stress']
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : Flag to autoscale the results of the sin^2(chi) analysis in the plot. If False, the plot will not be autoscaled.
+   * - :py:data:`show_sin_square_chi_results`
+     - | **type** : bool
+       | **default** : True
+       | **choices** : [True, False]
+       | **name** : Show sin^2(chi) results in plot
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : Flag to show the results of the sin^2(chi) analysis in the plot. If False, no results will be shown.
+   * - :py:data:`show_sin_square_chi_branches`
+     - | **type** : bool
+       | **default** : False
+       | **choices** : [True, False]
+       | **name** : Show sin^2(chi) branches in plot
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : Flag to show the positive and negative branches of the sin^2(chi) analysis in the plot. If False, no branches will be shown but only the average and the fit results.
+   * - :py:data:`autoscale_sin_square_chi_results`
+     - | **type** : bool
+       | **default** : True
+       | **choices** : [True, False]
+       | **name** : Autoscale sin^2(chi) results
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : Flag to autoscale the results of the sin^2(chi) analysis in the plot. If False, the plot will not be autoscaled.
+   * - :py:data:`sin_square_chi_limit_low`
+     - | **type** : float
+       | **default** : 0.0
+       | **name** : Lower limit for sin^2(chi) results
+       | **choices** : None
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : The lower limit for the sin^2(chi) results in the plot. If autoscaling is enabled, this value will be ignored.
+   * - :py:data:`sin_square_chi_limit_high`
+     - | **type** : float
+       | **default** : 1.0
+       | **name** : Upper limit for sin^2(chi) results
+       | **choices** : None
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : The upper limit for the sin^2(chi) results in the plot. If autoscaling is enabled, this value will be ignored.
+   * - :py:data:`show_sin_2chi_results`
+     - | **type** : bool
+       | **default** : True
+       | **choices** : [True, False]
+       | **name** : Show sin(2*chi) results in plot
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : Flag to show the results of the sin(2*chi) analysis in the plot. If False, no results will be shown.
+   * - :py:data:`autoscale_sin_2chi_results`
+     - | **type** : bool
+       | **default** : True
+       | **choices** : [True, False]
+       | **name** : Autoscale sin(2*chi) results
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : Flag to autoscale the results of the sin(2*chi) analysis in the plot. If False, the plot will not be autoscaled.
+   * - :py:data:`sin_2chi_limit_low`
+     - | **type** : float
+       | **default** : 0.0
+       | **name** : Lower limit for sin(2*chi) results
+       | **choices** : None
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : The lower limit for the sin(2*chi) results in the plot. If autoscaling is enabled, this value will be ignored.
+   * - :py:data:`sin_2chi_limit_high`
+     - | **type** : float
+       | **default** : 1.0
+       | **name** : Upper limit for sin(2*chi) results
+       | **choices** : None
+       | **unit** : 
+       | **range** : None
+       | **allow_None** : False
+       | **tooltip** : The upper limit for the sin(2*chi) results in the plot. If autoscaling is enabled, this value will be ignored.

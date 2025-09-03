@@ -83,7 +83,7 @@ class ScanIoYaml(ScanIoBase):
         with open(filename, "r") as stream:
             try:
                 cls.imported_params = yaml.safe_load(stream)
-            except yaml.YAMLError as yerr:
+            except (yaml.YAMLError, UnicodeError) as yerr:
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
         if not isinstance(cls.imported_params, dict):

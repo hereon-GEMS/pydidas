@@ -29,7 +29,7 @@ import unittest
 from pydidas.core.utils.decorators import copy_docstring
 
 
-class TestClass:
+class _TestClass:
     """Class docstring."""
 
     def __init__(self):
@@ -55,19 +55,19 @@ class Test_copy_docstring(unittest.TestCase):
         class NewTest:
             def __init__(self): ...
 
-            @copy_docstring(TestClass)
+            @copy_docstring(_TestClass)
             def method1(self): ...
 
-        self.assertEqual(NewTest.method1.__doc__, TestClass.method1.__doc__)
+        self.assertEqual(NewTest.method1.__doc__, _TestClass.method1.__doc__)
 
     def test_copy_from_method(self):
         class NewTest:
             def __init__(self): ...
 
-            @copy_docstring(TestClass.method2)
+            @copy_docstring(_TestClass.method2)
             def method3(self): ...
 
-        self.assertEqual(NewTest.method3.__doc__, TestClass.method2.__doc__)
+        self.assertEqual(NewTest.method3.__doc__, _TestClass.method2.__doc__)
 
 
 if __name__ == "__main__":

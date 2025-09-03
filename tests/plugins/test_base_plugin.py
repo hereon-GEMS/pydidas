@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -141,7 +141,7 @@ class TestBasePlugin(unittest.TestCase):
         _this_roi = (3, 436, 17, 357)
         plugin = create_plugin_class(BASE_PLUGIN)()
         plugin.output_data_dim = 3
-        plugin._roi_data_dim = 2
+        plugin.base_output_data_dim = 2
         for _name in ["use_roi", "roi_ylow", "roi_yhigh", "roi_xlow", "roi_xhigh"]:
             plugin.add_param(get_generic_parameter(_name))
         plugin.set_param_value("use_roi", True)

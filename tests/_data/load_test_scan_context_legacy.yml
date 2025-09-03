@@ -1,0 +1,28 @@
+scan_dim0_delta: 1
+scan_dim1_delta: 0.1
+scan_dim2_delta: 10
+scan_dim3_delta: 1
+scan_dim0_n_points: 4
+scan_dim1_n_points: 21
+scan_dim2_n_points: 0
+scan_dim3_n_points: 0
+scan_dim0_offset: -40
+scan_dim1_offset: 10.0
+scan_dim2_offset: 0
+scan_dim3_offset: 0
+scan_dim0_label: Direction 1
+scan_dim1_label: Dir 2
+scan_dim3_label: Direction 3
+scan_dim2_label: ''
+scan_dim0_unit: m
+scan_dim1_unit: um
+scan_dim2_unit: mm
+scan_dim3_unit: ''
+scan_title: Test
+scan_dim: 2
+scan_base_directory: .
+scan_name_pattern: test_####
+scan_start_index: 7
+scan_index_stepping: 2
+scan_multiplicity: 4
+scan_multi_image_handling: Maximum

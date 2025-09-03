@@ -28,26 +28,22 @@ __status__ = "Production"
 __all__ = ["FioMcaLoader"]
 
 
-import os
+from pathlib import Path
+from typing import Any
 
 from pydidas.contexts import ScanContext
 from pydidas.core import (
     Dataset,
-    UserConfigError,
-    get_generic_param_collection,
+    Parameter,
 )
-from pydidas.core.utils import copy_docstring
 from pydidas.core.utils import fio_utils as fio
-from pydidas.plugins import InputPlugin, InputPlugin1d
-from pydidas.widgets.plugin_config_widgets.plugin_config_widget_with_custom_xscale import (
-    PluginConfigWidgetWithCustomXscale,
-)
+from pydidas.plugins import Input1dXRangeMixin, InputPlugin
 
 
 SCAN = ScanContext()
 
 
-class FioMcaLoader(InputPlugin1d):
+class FioMcaLoader(Input1dXRangeMixin, InputPlugin):
     """
     Load 1d data from a series of .fio files with MCA data (in a single directory).
 
@@ -63,18 +59,6 @@ class FioMcaLoader(InputPlugin1d):
 
     Parameters
     ----------
-    directory_path : Union[str, pathlib.Path]
-        The base path to the directory with all the scan subdirectories.
-    filename_pattern : str
-        The name pattern of the filenames.
-    live_processing : bool, optional
-        Flag to toggle file system checks. In live_processing mode, checks
-        for the size and existence of files are disabled. The default is False.
-    file_stepping : int, optional
-        The stepping width through all files in the file list, determined
-        by fist and last file. The default is 1.
-    filename_suffix : str, optional
-        The end of the filename. The default is ".fio"
     use_custom_xscale : bool, optional
         Keyword to toggle an absolute energy scale for the channels. If False,
         pydidas will simply use the channel number. The default is False.
@@ -84,20 +68,17 @@ class FioMcaLoader(InputPlugin1d):
     x_delta : float, optional
         The width of each energy channel. This value is given in units and only
         used when the absolute x-scale is enabled. The default is 1.
+    x_label : str, optional
+        The label for the x-axis of the plot. This is only used when the
+        absolute x-scale is enabled. The default is "Energy".
+    x_unit : str, optional
+        The unit for the x-axis of the plot. This is only used when the
+        absolute x-scale is enabled. The default is "eV".
     """
 
     plugin_name = "Fio MCA loader"
-    default_params = get_generic_param_collection(
-        "live_processing",
-        "use_custom_xscale",
-        "x0_offset",
-        "x_delta",
-        "x_label",
-        "x_unit",
-    )
-    has_unique_parameter_config_widget = True
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self._config.update({"header_lines": 0})
 
@@ -105,23 +86,14 @@ class FioMcaLoader(InputPlugin1d):
         """
         Prepare loading spectra from a file series.
         """
-        InputPlugin1d.pre_execute(self)
-        fio.update_config_from_fio_file(self.get_filename(0), self._config, self.params)
+        super().pre_execute()
+        _index = 0 if Path(self.get_filename(0)).is_file() else 1
+        fio.update_config_from_fio_file(
+            self.get_filename(_index), self._config, self.params
+        )
         self._config["roi"] = self._get_own_roi()
 
-    def update_filename_string(self):
-        """
-        Set up the generator that can create the full file names to load images.
-        """
-        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
-        _len_pattern = _pattern.count("#")
-        if _len_pattern < 1:
-            raise UserConfigError("No filename pattern detected in the Input plugin!")
-        _pattern = _pattern.replace("#" * _len_pattern, "{index0:d}")
-        self.filename_string = os.path.join(_basepath, _pattern)
-
-    def get_frame(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+    def get_frame(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Get the frame for the given index.
 
@@ -129,31 +101,15 @@ class FioMcaLoader(InputPlugin1d):
         ----------
         index : int
             The index of the scan point.
-        **kwargs : dict
+        **kwargs : Any
             Keyword arguments for loading frames.
 
         Returns
         -------
-        _dataset : pydidas.core.Dataset
+        dataset : Dataset
             The loaded dataset.
-        kwargs : dict
+        kwargs : Any
             The updated kwargs.
         """
         _dataset = fio.load_fio_spectrum(self.get_filename(index), self._config)
         return _dataset, kwargs
-
-    @copy_docstring(InputPlugin)
-    def get_filename(self, index: int) -> str:
-        """
-        Get the filename for the given index.
-
-        For the full docstring, please refer to the
-        :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
-        <InputPlugin>` class.
-        """
-        _index = self._SCAN.get_param_value("scan_start_index") + index
-        return self.filename_string.format(index0=_index)
-
-    def get_parameter_config_widget(self):
-        """Get the parameter config widget for the plugin."""
-        return PluginConfigWidgetWithCustomXscale

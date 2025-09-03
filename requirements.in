@@ -18,7 +18,6 @@ requests>=2.31.0
 PyQt5==5.15.11
 PySide6>=6.9
 build>=1.0.3
-setuptools>69.0.0
 siphash24>=1.6
 imagecodecs>=2025.3
 pyqtgraph>=0.13.7

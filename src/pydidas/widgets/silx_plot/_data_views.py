@@ -84,6 +84,7 @@ class Pydidas_Plot2dView(_Plot2dView):
 
     def createWidget(self, parent):
         widget = PydidasPlot2D(parent=parent)
+        widget.default_unit = "px"
         # TODO : Required for silx 2.2.2
         # widget.setDefaultColormap(self.defaultColormap())
         # widget.getColormapAction().setColormapDialog(self.defaultColorDialog())

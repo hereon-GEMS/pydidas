@@ -37,6 +37,12 @@ from pydidas.core.pydidas_q_settings import PydidasQsettings
 
 __NUM_BINS = 32768
 
+__ERROR_MSG = (
+    "Internal error: Numpy cannot create a histogram for the data. Please "
+    "use manual scaling for this dataset. Probably reason: The data values are "
+    "all equal."
+)
+
 
 def calculate_histogram_limits(data: np.ndarray) -> tuple:
     """
@@ -99,23 +105,33 @@ def __calc_upper_limit(data: np.ndarray, threshold_high: float) -> float:
     float
         The upper limit for the histogram display.
     """
-    _counts, _edges = np.histogram(data, bins=__NUM_BINS)
-    _cumcounts = np.cumsum(_counts / data.size)
-    _bin_index_low = np.max(np.where(_cumcounts <= threshold_high)[0], initial=-1)
     try:
-        # new range must be range of bin following low bin:
-        _new_range = (_edges[_bin_index_low + 1], _edges[_bin_index_low + 2])
-    except IndexError:
-        _index = max(_bin_index_low, 0)
-        _new_range = (_edges[_index], _edges[_index + 1])
-    _counts_fine, _edges_fine = np.histogram(data, bins=__NUM_BINS, range=_new_range)
-    _cumcounts_fine = np.cumsum(_counts_fine / data.size) + _cumcounts[_bin_index_low]
+        _counts, _edges = np.histogram(data, bins=__NUM_BINS)
+    except ValueError as error:
+        raise UserConfigError(__ERROR_MSG) from error
+    _cumcounts = np.cumsum(_counts / data.size)
+    _valid_bins = np.where(_cumcounts <= threshold_high)[0]
+    if _valid_bins.size == 0:
+        _new_range = (_edges[0], _edges[1])
+        _offset = 0
+    elif _valid_bins.size == __NUM_BINS:
+        _new_range = (_edges[-2], _edges[-1])
+        _offset = _cumcounts[-2]
+    else:
+        _bin_index_low = np.max(_valid_bins, initial=0) + 1
+        _new_range = (_edges[_bin_index_low], _edges[_bin_index_low + 1])
+        _offset = _cumcounts[_bin_index_low - 1]
+    try:
+        _counts_new, _edges_fine = np.histogram(data, bins=__NUM_BINS, range=_new_range)
+    except ValueError as error:
+        raise UserConfigError(__ERROR_MSG) from error
+    _cumcounts_fine = np.cumsum(_counts_new / data.size) + _offset
     _index_new = np.max(np.where(_cumcounts_fine <= threshold_high)[0], initial=0)
     return _edges_fine[_index_new + 1]
 
 
 def __calc_lower_limit(
-    data: np.ndarray, threshold_low: float, cmap_high_lim: float
+    data: np.ndarray, threshold_low: float, cmap_high_lim: float | None
 ) -> float:
     """
     Calculate the lower limit for the histogram display.
@@ -126,7 +142,7 @@ def __calc_lower_limit(
         The image data to calculate the histogram limits for.
     threshold_low : float
         The relative threshold of low data values data to be ignored.
-    cmap_high_lim : float
+    cmap_high_lim : float | None
         The upper limit for the histogram display.
 
     Returns
@@ -140,15 +156,23 @@ def __calc_lower_limit(
     )
     if _range[1] - _range[0] <= 1e-4:
         _range = (min(_range) - 1e-4, max(_range) + 1e-4)
-    _counts, _edges = np.histogram(data, bins=__NUM_BINS, range=_range)
+    try:
+        _counts, _edges = np.histogram(data, bins=__NUM_BINS, range=_range)
+    except ValueError as error:
+        raise UserConfigError(__ERROR_MSG) from error
     _cumcounts = np.cumsum(_counts / data.size)
     _bin_index_fine = np.max(np.where(_cumcounts <= threshold_low)[0], initial=0)
     _new_range = (_edges[_bin_index_fine], _edges[_bin_index_fine + 1])
-    _counts_fine, _edges_fine = np.histogram(
-        data,
-        bins=__NUM_BINS,
-        range=(_edges[_bin_index_fine], _edges[_bin_index_fine + 1]),
-    )
-    _cumcounts_fine = np.cumsum(_counts_fine / data.size) + _cumcounts[_bin_index_fine]
-    _index_new = np.min(np.where(_cumcounts_fine >= threshold_low)[0], initial=0)
+    try:
+        _counts_new, _edges_fine = np.histogram(
+            data,
+            bins=__NUM_BINS,
+            range=(_edges[_bin_index_fine], _edges[_bin_index_fine + 1]),
+        )
+    except ValueError as error:
+        raise UserConfigError(__ERROR_MSG) from error
+    _offset = _cumcounts[_bin_index_fine - 1] if _bin_index_fine > 0 else 0
+    _cumcounts_fine = np.cumsum(_counts_new / data.size) + _offset
+    _limits = np.where(_cumcounts_fine >= threshold_low)[0]
+    _index_new = 0 if _limits.size == 0 else _limits[0]
     return _edges_fine[_index_new]

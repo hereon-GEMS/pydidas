@@ -33,26 +33,26 @@ from qtpy import QtCore
 from pydidas.core import SingletonObject
 
 
-class BaseClass:
+class _BaseClass:
     init_called = False
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.init_called = True
 
 
-class SecondBase:
+class _SecondBase:
     second_init_called = False
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.second_init_called = True
 
 
-class SubClass(BaseClass):
+class _SubBaseClass(_BaseClass):
     is_sub = True
     sub_init_called = False
 
 
-class DirectClass(SingletonObject):
+class _DirectClass(SingletonObject):
     def initialize(self, *args: Any, **kwargs: Any):
         self.initialize_called = True
         if hasattr(self, "init_calls"):
@@ -61,7 +61,7 @@ class DirectClass(SingletonObject):
             self.init_calls = 1
 
 
-class TestClass(SingletonObject, BaseClass):
+class _ClassWithBaseClass(SingletonObject, _BaseClass):
     def initialize(self, *args: Any, **kwargs: Any):
         self.initialize_called = True
         self.args = args
@@ -72,7 +72,7 @@ class TestClass(SingletonObject, BaseClass):
             self.init_calls = 1
 
 
-class TestSubClass(SingletonObject, SubClass):
+class _SubClass(SingletonObject, _SubBaseClass):
     def initialize(self, *args: Any, **kwargs: Any):
         self.initialize_called = True
         self.sub_init_called = True
@@ -84,36 +84,36 @@ class TestSubClass(SingletonObject, SubClass):
             self.init_calls = 1
 
 
-class MultipleBaseClass(SingletonObject, BaseClass, SecondBase): ...
+class MultipleBaseClass(SingletonObject, _BaseClass, _SecondBase): ...
 
 
 @pytest.fixture
 def singleton_class():
-    TestClass._instance = None
-    TestClass._initialized = False
-    yield TestClass
+    _ClassWithBaseClass._instance = None
+    _ClassWithBaseClass._initialized = False
+    yield _ClassWithBaseClass
 
 
 @pytest.fixture
 def singleton_subclass():
-    TestSubClass._instance = None
-    TestSubClass._initialized = False
-    yield TestSubClass
+    _SubClass._instance = None
+    _SubClass._initialized = False
+    yield _SubClass
 
 
 @pytest.fixture
 def direct_class():
-    DirectClass._instance = None
-    DirectClass._initialized = False
-    yield DirectClass
+    _DirectClass._instance = None
+    _DirectClass._initialized = False
+    yield _DirectClass
 
 
 @pytest.mark.parametrize(
     "test_class",
     [
-        ["singleton_class", BaseClass],
-        ["singleton_subclass", SubClass],
-        ["direct_class", DirectClass],
+        ["singleton_class", _BaseClass],
+        ["singleton_subclass", _SubBaseClass],
+        ["direct_class", _DirectClass],
     ],
 )
 def test_init(request, test_class):
@@ -127,7 +127,7 @@ def test_init(request, test_class):
     assert isinstance(obj, SingletonObject)
     assert isinstance(obj, _base_class)
     assert obj.initialize_called
-    if _base_class != DirectClass:
+    if _base_class != _DirectClass:
         assert obj.args == _args
         assert obj.kwargs == _kwargs
     assert obj.init_calls == 1
@@ -138,9 +138,9 @@ def test_init(request, test_class):
 @pytest.mark.parametrize(
     "test_class",
     [
-        ["singleton_class", BaseClass],
-        ["singleton_subclass", SubClass],
-        ["direct_class", DirectClass],
+        ["singleton_class", _BaseClass],
+        ["singleton_subclass", _SubBaseClass],
+        ["direct_class", _DirectClass],
     ],
 )
 def test_init__repeated_calls(request, test_class):
@@ -183,8 +183,8 @@ def test_init__w_skip_base_init(singleton_class):
 def test_init__w_multiple_bases():
     obj = MultipleBaseClass()
     assert isinstance(obj, SingletonObject)
-    assert isinstance(obj, BaseClass)
-    assert isinstance(obj, SecondBase)
+    assert isinstance(obj, _BaseClass)
+    assert isinstance(obj, _SecondBase)
     assert obj.init_called
     assert obj.second_init_called
 

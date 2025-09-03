@@ -29,7 +29,7 @@ __all__ = ["ParameterCollectionMixIn"]
 
 
 from numbers import Integral
-from typing import Any
+from typing import Any, NoReturn
 
 from numpy import mod
 
@@ -201,7 +201,7 @@ class ParameterCollectionMixIn:
 
         Returns
         -------
-        object
+        Any
             The value of the Parameter.
         """
         if param_key not in self.params:
@@ -404,7 +404,7 @@ class ParameterCollectionMixIn:
         for _key in self.params.keys():
             self.params[_key].restore_default()
 
-    def _check_key(self, key: str):
+    def _check_key(self, key: str) -> NoReturn | None:
         """
         Check a key exists.
 

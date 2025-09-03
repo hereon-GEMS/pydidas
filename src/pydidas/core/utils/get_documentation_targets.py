@@ -36,6 +36,7 @@ __all__ = [
     "doc_qurl_for_frame_manual",
     "doc_qurl_for_window_manual",
     "doc_filename_for_window_manual",
+    "doc_qurl_for_rel_address",
 ]
 
 
@@ -98,6 +99,28 @@ def doc_qurl_for_frame_manual(name: str) -> QtCore.QUrl:
     """
     _path = doc_filename_for_frame_manual(name)
     _url = QtCore.QUrl("file:///" + _path.replace("\\", "/"))
+    return _url
+
+
+def doc_qurl_for_rel_address(rel_address: str | Path) -> QtCore.QUrl:
+    """
+    Get the QUrl for a relative address in the documentation.
+
+    Parameters
+    ----------
+    rel_address : str | Path
+        The relative address to the documentation file starting from the
+        build directory.
+
+    Returns
+    -------
+    QtCore.QUrl
+        The QUrl object with the encoded path to the documentation file.
+    """
+    if isinstance(rel_address, Path):
+        rel_address = str(rel_address)
+    _path = os.path.join(DOC_BUILD_DIRECTORY, "html", rel_address).replace("\\", "/")
+    _url = QtCore.QUrl("file:///" + _path)
     return _url
 
 

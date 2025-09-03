@@ -31,7 +31,7 @@ import argparse
 import signal
 import sys
 import weakref
-from typing import Self, Tuple
+from typing import Tuple
 
 import matplotlib as mpl
 import matplotlib.font_manager as mpl_font_manager
@@ -51,7 +51,7 @@ QtCore.QLocale.setDefault(_LOCALE)
 
 
 _TEST_TEXT = (
-    "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z abcdefghijklmnopqrstuvwxyz"
+    "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z abcdefghijklmnopqrstuvwxyz"  # noqa
 )
 
 
@@ -82,7 +82,7 @@ def parse_cmd_args():
     return _kwargs
 
 
-def sigint_signal_handler(signal_num: int, frame: object):
+def sigint_signal_handler(signal_num: int, frame: object):  # noqa
     """
     Handle the SIGINT signal to gracefully shut down when pressing Ctrl+C.
 
@@ -168,7 +168,7 @@ class PydidasQApplication(QApplication):
     _instance = None
 
     @staticmethod
-    def instance() -> Self:
+    def instance() -> "PydidasQApplication":
         return PydidasQApplication._instance
 
     def __init__(self, args):
@@ -321,6 +321,17 @@ class PydidasQApplication(QApplication):
         self.sig_font_family_changed.emit()
         self.sig_font_size_changed.emit()
         self._update_matplotlib_font_family()
+
+    def qFontMetrics(self) -> QtGui.QFontMetrics:  # noqa C0103
+        """
+        Get the QFontMetrics object for the current font.
+
+        Returns
+        -------
+        QtGui.QFontMetrics
+            The QFontMetrics object.
+        """
+        return QtGui.QFontMetrics(self.font())
 
     def reset_font_to_standard(self):
         """

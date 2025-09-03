@@ -42,7 +42,7 @@ from pydidas.core import (
 from pydidas_qtcore import PydidasQApplication
 
 
-class TestApp(BaseApp):
+class _TestApp(BaseApp):
     default_params = get_generic_param_collection("label", "n_image", "active_node")
 
     def __init__(self, *args, **kwargs):
@@ -126,7 +126,7 @@ class TestBaseApp(unittest.TestCase):
             app.multiprocessing_func(None)
 
     def test_multiprocessing_carryon(self):
-        app = TestApp()
+        app = _TestApp()
         self.assertTrue(app.multiprocessing_carryon())
         self.assertFalse(app.multiprocessing_carryon())
 
@@ -168,7 +168,7 @@ class TestBaseApp(unittest.TestCase):
         _label = "the new label value"
         _node = 17
         _item1 = 42.12345
-        app = TestApp()
+        app = _TestApp()
         app.set_param_value("label", _label)
         app.set_param_value("active_node", _node)
         app._config["new_key"] = True
@@ -191,7 +191,7 @@ class TestBaseApp(unittest.TestCase):
                 "item3": "new_dummy",
             },
         }
-        app = TestApp()
+        app = _TestApp()
         app.import_state(_state)
         for _key, _val in _state["params"].items():
             self.assertEqual(app.get_param_value(_key), _val)
@@ -200,7 +200,7 @@ class TestBaseApp(unittest.TestCase):
         self.assertEqual(app._config["item2"], slice(1, 7, 2))
 
     def test_run(self):
-        app = TestApp()
+        app = _TestApp()
         app.run()
         self.assertEqual(app.stored, app.multiprocessing_get_tasks())
 

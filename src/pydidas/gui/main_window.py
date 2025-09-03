@@ -62,8 +62,8 @@ class MainWindow(MainMenu):
         default values will be used. The default is None.
     """
 
-    def __init__(self, parent=None, geometry=None):
-        MainMenu.__init__(self, parent, geometry)
+    def __init__(self, parent=None, geometry=None, export_exit_state: bool = True):
+        MainMenu.__init__(self, parent, geometry, export_exit_state)
 
         self._toolbar_metadata = {}
         self._frames_to_add = []

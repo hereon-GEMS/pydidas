@@ -105,12 +105,24 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             If the key does not exist.
         """
         self._check_key(param_key)
+        if self.get_param_value(param_key) == value:
+            return
         if param_key == "xray_energy":
             self.params.set_value("xray_energy", value)
             self.params["xray_wavelength"].value = LAMBDA_IN_A_TO_E / value
         elif param_key == "xray_wavelength":
             self.params.set_value("xray_wavelength", value)
             self.params["xray_energy"].value = LAMBDA_IN_A_TO_E / value
+        elif param_key == "detector_name":
+            self.params.set_value(param_key, value)
+            if value in PYFAI_DETECTOR_NAMES:
+                self.set_detector_params_from_name(value, suppress_signal=True)
+        elif "npix" in param_key or "pxsize" in param_key:
+            _name = self.get_param_value("detector_name")
+            if _name in PYFAI_DETECTOR_NAMES:
+                # modify the detector name to indicate that the parameters were changed
+                self.params.set_value("detector_name", _name + " [modified]")
+            self.params.set_value(param_key, value)
         else:
             self.params.set_value(param_key, value)
         self.sig_params_changed.emit()
@@ -136,13 +148,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         for key, value in [
             ["pixel1", self.get_param_value("detector_pxsizey") * 1e-6],
             ["pixel2", self.get_param_value("detector_pxsizex") * 1e-6],
-            [
-                "max_shape",
-                (
-                    self.get_param_value("detector_npixy"),
-                    self.get_param_value("detector_npixx"),
-                ),
-            ],
+            ["max_shape", self.det_shape],
         ]:
             setattr(_det, key, value)
         return _det
@@ -193,6 +199,45 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
     detector_dist_in_m = det_dist_in_m
 
+    @property
+    def det_shape(self) -> tuple[int, int]:
+        """
+        Get the detector shape as a tuple of (n_pix_y, n_pix_x).
+
+        Returns
+        -------
+        tuple[int, int]
+            The detector shape as (n_pix_y, n_pix_x).
+        """
+        return (
+            self.get_param_value("detector_npixy"),
+            self.get_param_value("detector_npixx"),
+        )
+
+    @det_shape.setter
+    def det_shape(self, shape: tuple[int, int]):
+        """
+        Set the detector shape from a tuple of (n_pix_y, n_pix_x).
+
+        Parameters
+        ----------
+        shape : tuple[int, int]
+            The detector shape as (n_pix_y, n_pix_x).
+        """
+        if len(shape) != 2:
+            raise UserConfigError("The detector shape must be a tuple of length 2.")
+        _current_shape = self.det_shape
+        with QtCore.QSignalBlocker(self):
+            self.set_param_value("detector_npixy", shape[0])
+            self.set_param_value("detector_npixx", shape[1])
+        if (
+            _current_shape != shape
+            and self.get_param_value("detector_name") in PYFAI_DETECTOR_NAMES
+        ):
+            # If the shape has changed, reset the detector name to keep consistency.
+            self.set_param_value("detector_name", "Custom Detector")
+        self.sig_params_changed.emit()
+
     def as_pyfai_geometry(self) -> Geometry:
         """
         Get an equivalent pyFAI Geometry object.
@@ -212,7 +257,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             detector=self.get_detector(),
         )
 
-    def set_detector_params_from_name(self, det_name: str):
+    def set_detector_params_from_name(
+        self, det_name: str, suppress_signal: bool = False
+    ):
         """
         Set the detector parameters based on a detector name.
 
@@ -223,6 +270,10 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         ----------
         det_name : str
             The pyFAI name for the detector.
+        suppress_signal : bool, optional
+            Flag to suppress the signal emission for parameter changes. The default is
+            False. If set to True, the signal will not be emitted after the parameters
+            have been set.
 
         Raises
         ------
@@ -236,12 +287,14 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                 f"The detector name '{det_name}' is unknown to pyFAI."
             )
         with QtCore.QSignalBlocker(self):
-            self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
-            self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
-            self.set_param_value("detector_npixy", _det.max_shape[0])
-            self.set_param_value("detector_npixx", _det.max_shape[1])
-            self.set_param_value("detector_name", _det.name)
-        self.sig_params_changed.emit()
+            self.params.set_value("detector_pxsizey", _det.pixel1 * 1e6)
+            self.params.set_value("detector_pxsizex", _det.pixel2 * 1e6)
+            self.params.set_value("detector_npixy", _det.max_shape[0])
+            self.params.set_value("detector_npixx", _det.max_shape[1])
+            if self.get_param_value("detector_name") != det_name:
+                self.params.set_value("detector_name", det_name)
+        if not suppress_signal:
+            self.sig_params_changed.emit()
 
     def update_from_diffraction_exp(self, diffraction_exp: Self):
         """
@@ -384,15 +437,15 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         _f2d = self.as_fit2d_geometry_values()
         return Point(_f2d["center_x"], _f2d["center_y"])
 
-    def as_fit2d_geometry_values(self) -> dict:
+    def as_fit2d_geometry_values(self) -> dict[str, float]:
         """
         Get the DiffractionExperiment configuration as values in Fit2D geometry.
 
         Returns
         -------
-        dict :
+        dict[str, float] :
             The geometry in Fit2D nomenclature with center_x, center_y, det_dist,
-            tilt and tilt_plane keys.
+            tilt and tilt_plane keys and float values.
         """
         if (
             self.get_param_value("detector_pxsizex") == 0

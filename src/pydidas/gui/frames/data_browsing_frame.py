@@ -96,13 +96,11 @@ class DataBrowsingFrame(BaseFrame):
         Connect all required signals and slots between widgets and class
         methods.
         """
-        self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         self._widgets["explorer"].sig_new_file_selected.connect(
             self._widgets["raw_metadata_selector"].new_filename
         )
-        self.param_widgets["xcol"].sig_new_value.connect(
-            self.__import_ascii_w_xcol_handling
-        )
+        self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
+        self.param_widgets["xcol"].sig_new_value.connect(self.__open_ascii_file)
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
         )
@@ -165,19 +163,21 @@ class DataBrowsingFrame(BaseFrame):
             return
         if self.__browser_window is not None:
             self.__browser_window.hide()
-        self.__check_for_and_process_hdf5_file(filename)
         self.__current_filename = filename
         self._widgets["filename"].setText(self.__current_filename)
         self.param_composite_widgets["xcol"].setVisible(
             _extension in ASCII_IMPORT_EXTENSIONS
         )
+        self._widgets["hdf5_dataset_selector"].setVisible(_extension in HDF5_EXTENSIONS)
         if _extension in ASCII_IMPORT_EXTENSIONS:
-            self.__import_ascii_w_xcol_handling(self.get_param_value("xcol"))
-        elif _extension not in BINARY_EXTENSIONS + HDF5_EXTENSIONS:
+            self.__open_ascii_file(self.get_param_value("xcol"))
+        elif _extension in HDF5_EXTENSIONS:
+            self.__open_hdf5_file()
+        elif _extension not in BINARY_EXTENSIONS:
             _data = import_data(filename)
             self.__display_dataset(_data)
 
-    def __check_for_and_process_hdf5_file(self, filename: str):
+    def __open_hdf5_file(self):
         """
         Process the input file and check whether it is a hdf5 file.
 
@@ -186,18 +186,16 @@ class DataBrowsingFrame(BaseFrame):
         filename : str
             The filename of the hdf5 file to open.
         """
+        self._widgets["viewer"].setData(None)
         if self.__open_file is not None:
-            self._widgets["viewer"].setData(None)
             self.__open_file.close()
             self.__open_file = None
-        if get_extension(filename) not in HDF5_EXTENSIONS:
-            self._widgets["hdf5_dataset_selector"].setVisible(False)
-            return
         with CatchFileErrors(
-            filename, KeyError, raise_file_read_error=False
+            self.__current_filename, KeyError, raise_file_read_error=False
         ) as catcher:
-            self.__open_file = h5py.File(filename, mode="r")
-            self._widgets["hdf5_dataset_selector"].new_filename(filename)
+            self.__open_file = h5py.File(self.__current_filename, mode="r")
+            self._widgets["hdf5_dataset_selector"].new_filename(self.__current_filename)
+            self.__display_hdf5_dataset(self._widgets["hdf5_dataset_selector"].dataset)
         if catcher.raised_exception:
             try:
                 self.__open_file.close()
@@ -205,8 +203,7 @@ class DataBrowsingFrame(BaseFrame):
                 pass
             self.__open_file = None
             self._widgets["hdf5_dataset_selector"].clear()
-            if get_extension(self.__current_filename) in HDF5_EXTENSIONS:
-                self._widgets["filename"].setText("")
+            self._widgets["filename"].setText("")
             self.__current_filename = None
             raise FileReadError(catcher.exception_message)
 
@@ -287,32 +284,33 @@ class DataBrowsingFrame(BaseFrame):
         self.__browser_window.open_file(self.__current_filename)
 
     @QtCore.Slot(str)
-    def __import_ascii_w_xcol_handling(self, value: str):
+    def __open_ascii_file(self, use_x_col: str):
         """
-        Import ASCII data with handling of the x-column
+        Import ASCII data with the desired handling of the x-column data.
 
         Parameters
         ----------
-        value : str
+        use_x_col : str
             The new value for the xcol parameter. This can be "None" or an integer.
         """
-        value = None if value in [None, "None"] else int(value)
+        use_x_col = None if use_x_col in [None, "None"] else int(use_x_col)
         if self.__current_filename is None:
             return
         _data = import_data(self.__current_filename, x_column=False)
         if _data.ndim == 1:
-            value = None
+            use_x_col = None
             _new_choices = [None]
         else:
             _new_choices = [None] + list(range(_data.shape[1]))
-            if value not in _new_choices:
-                value = 0
-        self.params["xcol"].update_value_and_choices(value, _new_choices)
+            if use_x_col not in _new_choices:
+                use_x_col = 0
+        self.params["xcol"].update_value_and_choices(use_x_col, _new_choices)
         with QtCore.QSignalBlocker(self.param_widgets["xcol"]):
             self.param_widgets["xcol"].update_choices(_new_choices)
-            self.update_widget_value("xcol", value)
+            self.update_widget_value("xcol", use_x_col)
         _data = import_data(
-            self.__current_filename, x_column=value is not None, x_column_index=value
+            self.__current_filename,
+            x_column=use_x_col is not None,
+            x_column_index=use_x_col,
         )
-
         self.__display_dataset(_data)

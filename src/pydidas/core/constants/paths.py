@@ -50,6 +50,4 @@ for _path in QtCore.QStandardPaths.standardLocations(
 
 PYDIDAS_STANDARD_CONFIG_PATH = PYDIDAS_CONFIG_PATHS[0]
 
-GENERIC_PLUGIN_PATH = (
-    Path(__file__).absolute().parent.parent.parent.parent.joinpath("pydidas_plugins")
-)
+GENERIC_PLUGIN_PATH = Path(__file__).absolute().parents[3].joinpath("pydidas_plugins")

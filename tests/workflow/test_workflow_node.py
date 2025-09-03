@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -191,7 +191,7 @@ class TestWorkflowNode(unittest.TestCase):
     def test_consistency_check__parent_out_any(self):
         obj = WorkflowNode(plugin=DummyLoader())
         obj2 = WorkflowNode(plugin=DummyProc(), parent=obj)
-        obj.plugin.output_data_dim = -1
+        obj.plugin.base_output_data_dim = 2
         obj2.plugin.input_data_dim = 2
         self.assertTrue(obj2.consistency_check())
 

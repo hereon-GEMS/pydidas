@@ -32,7 +32,7 @@ import os
 
 from pydidas_plugins.input_plugins.hdf5_file_series_loader import Hdf5fileSeriesLoader
 
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core import get_generic_param_collection
 
 
 class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
@@ -70,28 +70,21 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
     """
 
     plugin_name = "Eiger scan series loader"
-    default_params = get_generic_param_collection("eiger_dir", "eiger_filename_suffix")
-    default_params.add_params(Hdf5fileSeriesLoader.default_params.copy())
-
-    advanced_parameters = Hdf5fileSeriesLoader.advanced_parameters.copy() + [
-        "hdf5_slicing_axis",
-        "images_per_file",
-    ]
+    default_params = get_generic_param_collection(
+        "eiger_dir", "eiger_filename_suffix", *list(Hdf5fileSeriesLoader.default_params)
+    )
+    advanced_parameters = Hdf5fileSeriesLoader.advanced_parameters.copy()
 
     def update_filename_string(self):
         """
         Set up the generator that can create the full file names to load images.
         """
-        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
+        _pattern = self._SCAN.processed_file_naming_pattern
         _eigerkey = self.get_param_value("eiger_dir")
         _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
+        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
         if _pattern.endswith(_suffix):
             _pattern = _pattern[: -len(_suffix)]
-        _len_pattern = _pattern.count("#")
-        if _len_pattern < 1:
-            raise UserConfigError("No filename pattern detected in the Input plugin!")
-        _name = os.path.join(_basepath, _pattern, _eigerkey, _pattern + _suffix)
-        self.filename_string = _name.replace(
-            "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
+        self.filename_string = os.path.join(
+            _basepath, _pattern, _eigerkey, _pattern + _suffix
         )

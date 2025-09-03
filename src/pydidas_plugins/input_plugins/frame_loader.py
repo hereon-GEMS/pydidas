@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["FrameLoader"]
 
+from typing import Any
 
 from pydidas.core import Dataset
 from pydidas.data_io import import_data
@@ -39,8 +40,6 @@ class FrameLoader(InputPlugin):
 
     This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.
-    Filesystem checks can be disabled using the live_processing keyword but
-    are enabled by default.
 
     A region of interest and image binning can be supplied to apply directly
     to the raw image.
@@ -48,7 +47,7 @@ class FrameLoader(InputPlugin):
 
     plugin_name = "Single frame loader"
 
-    def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+    def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Load a frame and pass it on.
 
@@ -56,13 +55,13 @@ class FrameLoader(InputPlugin):
         ----------
         frame_index : int
             The frame index.
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments. Can be used to apply a ROI or
             binning to the raw image.
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        data : Dataset
             The image data.
         kwargs : dict
             The updated calling keyword arguments.

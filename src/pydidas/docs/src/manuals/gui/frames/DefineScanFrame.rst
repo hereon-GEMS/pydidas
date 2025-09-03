@@ -101,6 +101,13 @@ ordering of scan scan dimensions. The *slowest* scan dimension is dimension no.
 the scan must be performed algorithmically. The button opens a window with an
 in-depth explanation, including images.
 
+
+.. tip::
+
+    The detailed explanation for the scan dimensions can be found at
+    `Explanations of Scan dimensions <../../global/scan/dimension_help.html>`_\ .
+
+
 Global Parameters
 -----------------
 
@@ -119,6 +126,15 @@ defines the number of the first data file.
 For a detailed description of each Parameter, please refer to the 
 :ref:`list of ScanContext Parameters <scan_context_params>` found at the bottom of 
 this page.
+
+.. tip::
+
+    The detailed explanation for the scan file naming pattern are given in
+    `Explanations of Scan file naming <../../global/scan/file_naming_help.html>`_\ .
+
+    The detailed explanation for multi-frame handling are given in
+    `Explanations of Scan multi-frame handling <../../global/scan/multi_frame_help.html>`_\ .
+
 
 Configuring a scan dimension
 ----------------------------
@@ -155,4 +171,4 @@ The range of each scan dimension is determined by the number of points
 
 .. _scan_context_params:
 
-.. include:: ../../global/scan_context_params.rst
+.. include:: ../../global/scan/scan_params.rst

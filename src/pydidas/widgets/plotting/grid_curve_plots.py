@@ -664,7 +664,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         for _iplot in range(self.n_plots):
             _key = self._config["active_plot_keys"][_iplot] + "_title"
             _scan_index = _iplot + self._current_index
-            _indices = self._local_scan.get_index_position_in_scan(_scan_index)
+            _indices = self._local_scan.get_indices_from_ordinal(_scan_index)
             _indices_str = " / ".join(str(_i) for _i in _indices)
             _label = self._widgets[_key]
             _label.setText(f"Scan point #{_scan_index} (indices {_indices_str})")

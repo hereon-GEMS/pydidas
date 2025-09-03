@@ -36,7 +36,7 @@ from numbers import Integral
 from typing import Optional, Union
 
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
@@ -51,6 +51,7 @@ from pydidas.core.utils import pydidas_logger
 from pydidas.core.utils.dataset_utils import get_default_property_dict
 from pydidas.workflow import WorkflowResults, WorkflowTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta
+from pydidas_qtcore import PydidasQApplication
 
 
 TREE = WorkflowTree()
@@ -566,10 +567,9 @@ class ExecuteWorkflowApp(BaseApp):
             return
         if self._shared_arrays == dict():
             self._initialize_arrays_from_shared_memory()
-        # the ExecutiveWorkflowApp only uses the first argument of the variadict data:
         if data_index == -1:
             _filename = TREE.root.plugin.get_filename(index)
-            QtWidgets.QApplication.instance().set_status_message(
+            PydidasQApplication.instance().set_status_message(
                 f"File reading error during processing of scan index #{index}."
                 f" (filename: {_filename})"
             )

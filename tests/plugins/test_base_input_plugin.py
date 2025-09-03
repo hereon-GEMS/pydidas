@@ -23,15 +23,14 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
-import os
 import pickle
 import shutil
 import tempfile
-import unittest
+from pathlib import Path
 
 import h5py
 import numpy as np
+import pytest
 
 from pydidas.contexts import ScanContext
 from pydidas.core import Dataset, Parameter
@@ -43,205 +42,275 @@ from pydidas.unittest_objects import create_plugin_class
 
 
 _DUMMY_SHAPE = (130, 140)
+_DUMMY_SHAPE_1d = (145,)
 
 SCAN = ScanContext()
 
 
 class TestInputPlugin(InputPlugin):
-    def __init__(self, filename=""):
+    output_data_label = "Test data"
+    output_data_unit = "some counts"
+
+    def __init__(self, filename="", ndim=2):
+        self.base_output_data_dim = ndim
         InputPlugin.__init__(self)
-        self.filename_string = filename
+        self.filename_string = str(filename)
 
     def get_frame(self, index, **kwargs):
-        _frame = index * SCAN.get_param_value(
-            "scan_index_stepping"
-        ) + SCAN.get_param_value("scan_start_index")
-        kwargs["indices"] = (_frame,)
-        return import_data(self.filename_string, **kwargs), kwargs
+        _shape = _DUMMY_SHAPE if self.base_output_data_dim == 2 else _DUMMY_SHAPE_1d
+        _frame = Dataset(
+            np.zeros(_shape, dtype=np.uint16) + index,
+            axis_labels=["det y", "det x"] if self.base_output_data_dim == 2 else ["x"],
+            axis_units=["px", "px"] if self.base_output_data_dim == 2 else ["channels"],
+            data_unit=self.output_data_unit,
+            data_label=self.output_data_label,
+        )
+        return _frame, kwargs
+
+    def read_frame(self, index, **kwargs):
+        return import_data(self.filename_string, **kwargs)
 
     def update_filename_string(self):
         pass
 
-    def get_filename(self, index):
-        return self.filename_string
+
+@pytest.fixture(scope="module")
+def temp_dir_w_file():
+    """Fixture to create a temporary directory for testing."""
+    temp_dir = Path(tempfile.mkdtemp())
+    _fname = temp_dir / "test.h5"
+    with h5py.File(_fname, "w") as f:
+        f["entry/data/data"] = np.repeat(
+            np.arange(30, dtype=np.uint16), np.prod(_DUMMY_SHAPE)
+        ).reshape((30,) + _DUMMY_SHAPE)
+    yield temp_dir
+    shutil.rmtree(temp_dir)
+    SCAN.restore_all_defaults(True)
 
 
-def dummy_update_filename_string(plugin):
-    plugin.filename_string = str(plugin._image_metadata.filename)
+@pytest.fixture
+def reset_scan():
+    SCAN.restore_all_defaults(True)
 
 
-class TestBaseInputPlugin(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._testpath = tempfile.mkdtemp()
-        cls._datashape = _DUMMY_SHAPE
-        cls._fname = os.path.join(cls._testpath, "test.h5")
-        with h5py.File(cls._fname, "w") as f:
-            f["entry/data/data"] = np.repeat(
-                np.arange(30, dtype=np.uint16), np.prod(_DUMMY_SHAPE)
-            ).reshape((30,) + _DUMMY_SHAPE)
+def test_is_basic_plugin__baseclass():
+    for _plugin in [InputPlugin, InputPlugin()]:
+        assert _plugin.is_basic_plugin()
 
-    @classmethod
-    def tearDownClass(cls):
-        SCAN.restore_all_defaults(True)
-        shutil.rmtree(cls._testpath)
 
-    def setUp(self):
-        SCAN.restore_all_defaults(True)
+def test_is_basic_plugin__subclass():
+    class TestPlugin(InputPlugin):
+        pass
 
-    def tearDown(self): ...
+    for _plugin in [TestPlugin, TestPlugin()]:
+        assert not _plugin.is_basic_plugin()
 
-    def test_is_basic_plugin__baseclass(self):
-        for _plugin in [InputPlugin, InputPlugin()]:
-            self.assertTrue(_plugin.is_basic_plugin())
 
-    def test_is_basic_plugin__subclass(self):
-        class TestPlugin(InputPlugin):
-            pass
+def test_create_base_plugin():
+    plugin = create_plugin_class(INPUT_PLUGIN)
+    assert isinstance(plugin(), InputPlugin)
 
-        for _plugin in [TestPlugin, TestPlugin()]:
-            self.assertFalse(_plugin.is_basic_plugin())
 
-    def test_create_base_plugin(self):
-        plugin = create_plugin_class(INPUT_PLUGIN)
-        self.assertIsInstance(plugin(), InputPlugin)
+def test_class_attributes():
+    plugin = create_plugin_class(INPUT_PLUGIN)
+    for att in (
+        "plugin_type",
+        "plugin_name",
+        "default_params",
+        "generic_params",
+        "input_data_dim",
+        "output_data_dim",
+    ):
+        assert hasattr(plugin, att)
 
-    def test_class_attributes(self):
-        plugin = create_plugin_class(INPUT_PLUGIN)
-        for att in (
-            "plugin_type",
-            "plugin_name",
-            "default_params",
-            "generic_params",
-            "input_data_dim",
-            "output_data_dim",
-        ):
-            self.assertTrue(hasattr(plugin, att))
 
-    def test_class_generic_params(self):
-        plugin = create_plugin_class(INPUT_PLUGIN)
-        for att in (
-            "use_roi",
-            "roi_xlow",
-            "roi_xhigh",
-            "roi_ylow",
-            "roi_yhigh",
-            "binning",
-        ):
-            _param = plugin.generic_params.get_param(att)
-            self.assertIsInstance(_param, Parameter)
+@pytest.mark.parametrize("base_output_data_dim", [1, 2])
+def test__init__correct_params(base_output_data_dim):
+    plugin_class = create_plugin_class(INPUT_PLUGIN)
+    plugin_class.base_output_data_dim = base_output_data_dim
+    plugin = plugin_class()
+    for att in (
+        "use_roi",
+        "roi_xlow",
+        "roi_xhigh",
+        "binning",
+    ):
+        assert isinstance(plugin.get_param(att), Parameter)
+    if base_output_data_dim == 2:
+        assert isinstance(plugin.get_param("roi_ylow"), Parameter)
+        assert isinstance(plugin.get_param("roi_yhigh"), Parameter)
 
-    def test_get_filename(self):
-        plugin = create_plugin_class(INPUT_PLUGIN)()
-        _fname = plugin.get_filename(1)
-        self.assertEqual(_fname, "")
 
-    def test_input_available__file_exists_and_readable(self):
-        _data = np.zeros((10, 10))
-        for _ext in ["tif", "npy", "h5"]:
-            with self.subTest(extension=_ext):
-                _fname = os.path.join(self._testpath, f"test_dummy.{_ext}")
-                export_data(_fname, _data, overwrite=True)
-                plugin = TestInputPlugin(filename=_fname)
-                plugin.pre_execute()
-                self.assertTrue(plugin.input_available(5))
+@pytest.mark.parametrize("base_dim", [1, 2, 3])
+@pytest.mark.parametrize("n_frames", [1, 3, 4])
+@pytest.mark.parametrize("multi_frame", ["Average", "Sum", "Maximum", "Stack"])
+def test_output_data_dim(reset_scan, base_dim, n_frames, multi_frame):
+    plugin = create_plugin_class(INPUT_PLUGIN)()
+    plugin.base_output_data_dim = base_dim
+    SCAN.set_param_value("scan_frames_per_point", n_frames)
+    SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
+    _expected_dim = base_dim
+    if n_frames > 1 and multi_frame == "Stack":
+        _expected_dim += 1
+    assert plugin.output_data_dim == _expected_dim
 
-    def test_input_available__file_exists_w_no_data(self):
-        for _ext in ["tif", "npy", "h5"]:
-            with self.subTest(extension=_ext):
-                _fname = os.path.join(self._testpath, f"test_dummy.{_ext}")
-                with open(_fname, "wb") as f:
-                    f.write(b"")
-                plugin = TestInputPlugin(filename=_fname)
-                plugin.pre_execute()
-                self.assertFalse(plugin.input_available(5))
 
-    def test_pickle(self):
-        plugin = InputPlugin()
-        _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
-        for _key, _val in _new_params.items():
-            plugin.add_param(Parameter(_key, str, _val))
-        plugin2 = pickle.loads(pickle.dumps(plugin))
-        for _key in plugin.params:
-            self.assertEqual(
-                plugin.get_param_value(_key), plugin2.get_param_value(_key)
+@pytest.mark.parametrize(
+    "pattern",
+    ["test_1244.tiff", "test_0_22.npy", "test_###.tiff", "test_######0_22.npy"],
+)
+@pytest.mark.parametrize("directory", [Path(__file__).parent, None])
+def test_update_filename_string__valid_pattern(
+    reset_scan, pattern, directory, temp_dir_w_file
+):
+    _dir = directory or temp_dir_w_file
+    SCAN.set_param_value("scan_base_directory", _dir)
+    SCAN.set_param_value("scan_name_pattern", pattern)
+    plugin = InputPlugin()
+    plugin.update_filename_string()
+    _target = str(_dir / pattern)
+    if "#" in pattern:
+        _target = _target.replace(
+            "#" * pattern.count("#"), "{index:0" + str(pattern.count("#")) + "d}"
+        )
+    assert plugin.filename_string == _target
+
+
+@pytest.mark.parametrize("frame_index", [0, 1, 37])
+@pytest.mark.parametrize("delta", [1, 3])
+@pytest.mark.parametrize("offset", [0, 2, 5])
+@pytest.mark.parametrize("images_per_file", [1, 11, 47])
+def test_get_filename(offset, delta, frame_index, images_per_file, reset_scan):
+    _input_fname = "test_name_{index:03d}.h5"
+    SCAN.set_param_value("pattern_number_offset", offset)
+    SCAN.set_param_value("pattern_number_delta", delta)
+    plugin = TestInputPlugin(filename=_input_fname)
+    plugin.set_param_value("_counted_images_per_file", images_per_file)
+    _fname = plugin.get_filename(frame_index)
+    _target_index = (frame_index // images_per_file) * delta + offset
+    assert _fname == _input_fname.format(index=_target_index)
+
+
+@pytest.mark.parametrize("ext", ["tif", "npy", "h5"])
+def test_input_available__file_exists_and_readable(temp_dir_w_file, ext, reset_scan):
+    _data = np.zeros((10, 10))
+    _fname = temp_dir_w_file / f"test_dummy.{ext}"
+    export_data(_fname, _data, overwrite=True)
+    plugin = TestInputPlugin(filename=_fname)
+    plugin.pre_execute()
+    assert plugin.input_available(5)
+
+
+@pytest.mark.parametrize("ext", ["tif", "npy", "h5"])
+def test_input_available__file_exists_w_no_data(temp_dir_w_file, ext, reset_scan):
+    _fname = temp_dir_w_file / f"test_empty_dummy.{ext}"
+    with open(_fname, "wb") as f:
+        f.write(b"")
+    plugin = TestInputPlugin(filename=_fname)
+    plugin.get_frame = plugin.read_frame
+    plugin.pre_execute()
+    assert not plugin.input_available(5)
+
+
+def test_pickle():
+    plugin = InputPlugin()
+    _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
+    for _key, _val in _new_params.items():
+        plugin.add_param(Parameter(_key, str, _val))
+    plugin2 = pickle.loads(pickle.dumps(plugin))
+    for _key in plugin.params:
+        assert plugin.get_param_value(_key) == plugin2.get_param_value(_key)
+
+
+@pytest.mark.parametrize("ordinal", [0, 1, 37])
+@pytest.mark.parametrize("multi_frame", ["Average", "Sum", "Maximum", "Stack"])
+@pytest.mark.parametrize("i_per_point", [1, 4, 7])
+@pytest.mark.parametrize("output_dim", [1, 2])
+def test_execute__single(reset_scan, ordinal, multi_frame, i_per_point, output_dim):
+    SCAN.set_param_value("scan_frames_per_point", 1)
+    SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
+    SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
+    plugin = TestInputPlugin(ndim=output_dim)
+    plugin.pre_execute()
+    _data, _ = plugin.execute(ordinal)
+    assert _data.shape == (_DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d)
+    assert _data.mean() == ordinal * i_per_point
+    assert isinstance(_data, Dataset)
+
+
+@pytest.mark.parametrize("ordinal", [0, 1, 37])
+@pytest.mark.parametrize("multi_frame", ["Average", "Sum", "Maximum"])
+@pytest.mark.parametrize("i_per_point", [1, 7, 13])
+@pytest.mark.parametrize("n_frames", [2, 5, 11])
+@pytest.mark.parametrize("output_dim", [1, 2])
+def test_execute__multiple_frames(
+    reset_scan, ordinal, multi_frame, i_per_point, n_frames, output_dim
+):
+    SCAN.set_param_value("scan_frames_per_point", n_frames)
+    SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
+    SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
+    plugin = TestInputPlugin(ndim=output_dim)
+    plugin.pre_execute()
+    _data, _ = plugin.execute(ordinal)
+    _ref = plugin.get_frame(ordinal)[0].property_dict
+    assert _data.shape == (_DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d)
+    for _key in ["data_label", "data_unit", "axis_labels", "axis_units"]:
+        assert getattr(_data, _key) == _ref[_key]
+    assert all(
+        np.allclose(_data.axis_ranges[i], _ref["axis_ranges"][i])
+        for i in range(output_dim)
+    )
+    match multi_frame:
+        case "Average":
+            assert np.isclose(_data.mean(), ordinal * i_per_point + (n_frames - 1) / 2)
+        case "Sum":
+            assert _data.mean() == pytest.approx(
+                ordinal * i_per_point * n_frames + sum(i for i in range(n_frames))
             )
+        case "Maximum":
+            assert _data.mean() == pytest.approx(ordinal * i_per_point + n_frames - 1)
+        case _:
+            raise ValueError(f"Unknown multi-frame handling: {multi_frame}")
+    assert isinstance(_data, Dataset)
 
-    def test_execute__simple(self):
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.pre_execute()
-        _data, _ = plugin.execute(0)
-        self.assertIsInstance(_data, Dataset)
-        self.assertTrue(np.allclose(_data, 0))
 
-    def test_execute__w_multiplicity_and_average(self):
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Average")
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.pre_execute()
-        _data, _ = plugin.execute(0)
-        self.assertTrue(np.allclose(_data, 1.5))
+@pytest.mark.parametrize("ordinal", [0, 1, 37])
+@pytest.mark.parametrize("i_per_point", [1, 7, 13])
+@pytest.mark.parametrize("n_frames", [2, 5, 11])
+@pytest.mark.parametrize("output_dim", [1, 2])
+def test_execute__multiple_frame_stack(
+    reset_scan, ordinal, i_per_point, n_frames, output_dim
+):
+    SCAN.set_param_value("scan_frames_per_point", n_frames)
+    SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
+    SCAN.set_param_value("scan_multi_frame_handling", "Stack")
+    plugin = TestInputPlugin(ndim=output_dim)
+    plugin.pre_execute()
+    _data, _ = plugin.execute(ordinal)
+    _ref = plugin.get_frame(ordinal)[0].property_dict
+    assert _data.shape == (n_frames,) + (
+        _DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d
+    )
+    _ref = plugin.get_frame(ordinal)[0].property_dict
+    assert list(_data.axis_labels.values()) == ["image number"] + list(
+        _ref["axis_labels"].values()
+    )
+    assert list(_data.axis_units.values()) == [""] + list(_ref["axis_units"].values())
+    assert all(
+        np.allclose(_data.axis_ranges[i + 1], _ref["axis_ranges"][i])
+        for i in range(output_dim)
+    )
+    for _n in range(n_frames):
+        assert _data[_n].mean() == ordinal * i_per_point + _n
+    assert isinstance(_data, Dataset)
 
-    def test_execute__w_multiplicity_and_sum(self):
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Sum")
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.pre_execute()
-        _data, _ = plugin.execute(0)
-        self.assertTrue(np.allclose(_data, 6))
 
-    def test_execute__w_multiplicity_and_max(self):
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Maximum")
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.pre_execute()
-        _data, _ = plugin.execute(0)
-        self.assertTrue(np.allclose(_data, 3))
-
-    def test_execute__w_start_index(self):
-        SCAN.set_param_value("scan_start_index", 4)
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.pre_execute()
-        _data, _ = plugin.execute(0)
-        self.assertTrue(np.allclose(_data, 4))
-
-    def test_execute__w_start_index_w_delta(self):
-        SCAN.set_param_value("scan_start_index", 4)
-        SCAN.set_param_value("scan_index_stepping", 3)
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.pre_execute()
-        _data, _ = plugin.execute(0)
-        _data2, _ = plugin.execute(1)
-        self.assertTrue(np.allclose(_data, 4))
-        self.assertTrue(np.allclose(_data2, 7))
-
-    def test_execute__full_complexity(self):
-        SCAN.set_param_value("scan_start_index", 4)
-        SCAN.set_param_value("scan_index_stepping", 3)
-        SCAN.set_param_value("scan_multiplicity", 4)
-        SCAN.set_param_value("scan_multi_image_handling", "Sum")
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.pre_execute()
-        _result_0 = 4 + 7 + 10 + 13
-        _result_1 = 16 + 19 + 22 + 25
-        _data, _ = plugin.execute(0)
-        _data_1, _ = plugin.execute(1)
-        self.assertTrue(np.allclose(_data, _result_0))
-        self.assertTrue(np.allclose(_data_1, _result_1))
-
-    def test_execute__with_roi(self):
-        plugin = TestInputPlugin(filename=self._fname)
-        plugin.set_param_value("use_roi", True)
-        plugin.set_param_value("roi_yhigh", 5)
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(0)
-
-    def test_copy(self):
-        plugin = TestInputPlugin(filename=self._fname)
-        copy = plugin.copy()
-        self.assertEqual(plugin._SCAN, SCAN)
-        self.assertEqual(copy._SCAN, SCAN)
+def test_copy():
+    plugin = TestInputPlugin()
+    copy = plugin.copy()
+    assert plugin._SCAN == SCAN
+    assert copy._SCAN == SCAN
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

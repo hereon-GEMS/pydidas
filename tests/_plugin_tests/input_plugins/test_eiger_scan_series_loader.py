@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,23 +18,20 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import os
-import pickle
-import shutil
-import tempfile
-import unittest
 
-import h5py
-import numpy as np
+import os
+from pathlib import Path
+
+import pytest
+from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
-from pydidas.core import Dataset, FileReadError, Parameter, UserConfigError
-from pydidas.core.utils import get_random_string
+from pydidas.core import FileReadError
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
@@ -44,172 +41,61 @@ COLLECTION = LocalPluginCollection()
 SCAN = ScanContext()
 
 
-class TestEigerScanSeriesLoader(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
-        cls._img_shape = (10, 10)
-        cls._n_per_file = 13
-        cls._n_files = 11
-        cls._n = cls._n_files * cls._n_per_file
-        cls._fname_i0 = 2
-        cls._params = {
-            "eiger_dir": "eiger9m",
-            "eiger_filename_suffix": "_data.h5",
-            "hdf5_key": "/entry/data/data",
-            "images_per_file": -1,
-        }
-        cls._data = np.repeat(
-            np.arange(cls._n, dtype=np.uint16), np.prod(cls._img_shape)
-        ).reshape((cls._n,) + cls._img_shape)
+@pytest.fixture(scope="module")
+def config():
+    yield
+    # necessary due to use of 'LocalPluginCollection':
+    qs = QtCore.QSettings("Hereon", "pydidas")
+    qs.remove("unittesting")
 
-        cls._hdf5_fnames = []
-        for i in range(cls._n_files):
-            _dir = os.path.join(
-                cls._path, f"test_{i + cls._fname_i0:05d}", cls._params["eiger_dir"]
-            )
-            os.makedirs(_dir)
-            _fname = os.path.join(
-                _dir,
-                f"test_{i + cls._fname_i0:05d}" + cls._params["eiger_filename_suffix"],
-            )
-            cls._hdf5_fnames.append(_fname)
-            _slice = slice(i * cls._n_per_file, (i + 1) * cls._n_per_file, 1)
-            with h5py.File(_fname, "w") as f:
-                f[cls._params["hdf5_key"]] = cls._data[_slice]
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls._path)
+@pytest.fixture
+def plugin(config):
+    SCAN.restore_all_defaults(True)
+    return COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
 
-    def setUp(self):
-        SCAN.restore_all_defaults(True)
-        SCAN.set_param_value("scan_name_pattern", "test_#####")
-        SCAN.set_param_value("scan_base_directory", self._path)
-        SCAN.set_param_value("scan_start_index", self._fname_i0)
 
-    def tearDown(self):
-        SCAN.restore_all_defaults(True)
+def test_creation():
+    plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
+    assert isinstance(plugin, BasePlugin)
 
-    def create_standard_plugin(self):
-        plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
-        for _key, _val in self._params.items():
-            plugin.set_param_value(_key, _val)
-        return plugin
 
-    def get_index_in_file(self, index):
-        return index % self._n_per_file
-
-    def test_creation(self):
-        plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
-        self.assertIsInstance(plugin, BasePlugin)
-
-    def test_pre_execute__no_input(self):
-        plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
-        with self.assertRaises(FileReadError):
-            plugin.pre_execute()
-
-    def test_pre_execute__no_images_per_file_set(self):
-        plugin = self.create_standard_plugin()
-        plugin.set_param_value("images_per_file", -1)
+def test_pre_execute__no_input():
+    plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
+    with pytest.raises(FileReadError):
         plugin.pre_execute()
-        self.assertEqual(
-            plugin.get_param_value("_counted_images_per_file"), self._n_per_file
-        )
 
-    def test_execute__no_input(self):
-        plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")(
-            images_per_file=1
-        )
-        with self.assertRaises(UserConfigError):
-            plugin.execute(0)
 
-    def test_execute__simple(self):
-        plugin = self.create_standard_plugin()
-        _index = 0
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
-        self.assertEqual(
-            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
-        )
+@pytest.mark.parametrize("eiger_dir", ["eiger9m", "eiger10m"])
+@pytest.mark.parametrize("eiger_filename_suffix", ["_data_000001.h5", "_scan42.hdf5"])
+@pytest.mark.parametrize(
+    "scan_name_pattern", ["test_scan", "test_###_a1", "###_scan", "test_#####"]
+)
+def test_update_filename_string(
+    plugin, eiger_dir, eiger_filename_suffix, scan_name_pattern
+):
+    plugin.set_param_value("eiger_dir", eiger_dir)
+    plugin.set_param_value("eiger_filename_suffix", eiger_filename_suffix)
+    SCAN.set_param_value("scan_name_pattern", scan_name_pattern)
+    _proc_pattern = SCAN.processed_file_naming_pattern
+    plugin.update_filename_string()
+    assert plugin.filename_string == f".{os.sep}" + str(
+        Path() / _proc_pattern / eiger_dir / f"{_proc_pattern}{eiger_filename_suffix}"
+    )
 
-    def test_execute__slicing_ax_1(self):
-        plugin = self.create_standard_plugin()
-        plugin.set_param_value("hdf5_slicing_axis", 1)
-        _index = 0
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue(np.allclose(_data, self._data[: self._n_per_file, _index]))
-        self.assertEqual(
-            kwargs["indices"],
-            (
-                None,
-                self.get_index_in_file(_index),
-            ),
-        )
-        self.assertEqual(
-            _data.metadata["indices"], f"[:, {self.get_index_in_file(_index)}]"
-        )
 
-    def test_execute__with_roi(self):
-        plugin = self.create_standard_plugin()
-        plugin.set_param_value("use_roi", True)
-        plugin.set_param_value("roi_yhigh", 5)
-        _index = 2
-        plugin.pre_execute()
-        _data, kwargs = plugin.execute(_index)
-        self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
-        self.assertEqual(
-            _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
-        )
-        self.assertEqual(
-            _data.shape, (plugin.get_param_value("roi_yhigh"), self._img_shape[1])
-        )
-
-    def test_execute__get_all_frames(self):
-        plugin = self.create_standard_plugin()
-        plugin.pre_execute()
-        for _index in range(self._n):
-            _data, kwargs = plugin.execute(_index)
-            self.assertTrue((_data == _index).all())
-            self.assertEqual(kwargs["indices"], (self.get_index_in_file(_index),))
-            self.assertEqual(
-                _data.metadata["indices"], f"[{self.get_index_in_file(_index)}]"
-            )
-
-    def test_pickle(self):
-        plugin = self.create_standard_plugin()
-        _new_params = {get_random_string(6): get_random_string(12) for _ in range(7)}
-        for _key, _val in _new_params.items():
-            plugin.add_param(Parameter(_key, str, _val))
-        plugin2 = pickle.loads(pickle.dumps(plugin))
-        for _key in plugin.params:
-            self.assertEqual(
-                plugin.get_param_value(_key), plugin2.get_param_value(_key)
-            )
-
-    def test_get_frame__no_pre_exec(self):
-        plugin = self.create_standard_plugin()
-        with self.assertRaises(UserConfigError):
-            plugin.get_frame(0)
-
-    def test_get_frame__w_pre_exec(self):
-        plugin = self.create_standard_plugin()
-        plugin.pre_execute()
-        _data, kwargs = plugin.get_frame(0)
-        self.assertIsInstance(_data, Dataset)
-        self.assertTrue(np.allclose(_data, 0))
-
-    def test_get_filename(self):
-        _index = 5
-        plugin = self.create_standard_plugin()
-        plugin.pre_execute()
-        _fname = plugin.get_filename(_index * self._n_per_file)
-        self.assertEqual(_fname, self._hdf5_fnames[_index])
+def test_update_filename_string__w_suffix_in_name(plugin):
+    _eiger_dir = "eiger4x"
+    _eiger_filename_suffix = "_data_007.h5"
+    plugin.set_param_value("eiger_dir", _eiger_dir)
+    plugin.set_param_value("eiger_filename_suffix", _eiger_filename_suffix)
+    SCAN.set_param_value("scan_name_pattern", "test_###_a1" + _eiger_filename_suffix)
+    _proc_pattern = SCAN.processed_file_naming_pattern
+    plugin.update_filename_string()
+    assert plugin.filename_string == os.sep.join(
+        [".", "test_{index:03d}_a1", "eiger4x", "test_{index:03d}_a1_data_007.h5"]
+    )
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

@@ -131,7 +131,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         update_child_qobject(self, "layout", horizontalSpacing=2)
         self.create_button(
             "button_inspect",
-            "Inspect hdf5 tree structure",
+            "Inspect HDF5 tree structure",
             gridPos=(0, 2, 1, 1),
             icon="qt-std::SP_MessageBoxInformation",
         )
@@ -184,7 +184,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self.param_widgets["min_datadim"].sig_new_value.connect(
             self.__process_min_datadim
         )
-        self.param_widgets["dataset"].sig_value_changed.connect(self.__select_dataset)
+        self.param_widgets["dataset"].sig_value_changed.connect(self.display_dataset)
         self._widgets["button_inspect"].clicked.connect(self.sig_request_hdf5_browser)
 
     @QtCore.Slot(str)
@@ -224,10 +224,14 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         _param_widget.view().setMinimumWidth(
             get_max_pixel_width_of_entries(_datasets) + 50
         )
-        self.__select_dataset()
+
+    @property
+    def dataset(self) -> str:
+        """Get the currently selected dataset."""
+        return self.get_param_value("dataset")
 
     @QtCore.Slot()
-    def __select_dataset(self):
+    def display_dataset(self):
         """
         Select a dataset from the drop-down list.
 
@@ -280,12 +284,14 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         _filename = Path(filename)
         _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
-        if (not _filename.is_file()) or filename == self._config["current_filename"]:
+        if not _is_hdf5:
             return
-        self._config["current_filename"] = filename if _is_hdf5 else ""
-        self._config["current_dataset"] = ""
-        if _is_hdf5:
+        _is_current = _filename == self._config["current_filename"]
+        self._config["current_filename"] = filename
+        if _filename.is_file() and not _is_current:
+            self._config["current_dataset"] = ""
             self.__populate_dataset_list()
+        self.display_dataset()
 
     def clear(self):
         """

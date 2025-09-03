@@ -286,12 +286,12 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         self.prepare_with_defaults()
         _data = self.get_datasets()
         _index = 5
-        _scanindex = SCAN.get_frame_position_in_scan(_index)
+        _scan_indices = SCAN.get_indices_from_ordinal(_index)
         H5SAVER.export_frame_to_file(_index, _data, SCAN)
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
             with h5py.File(_fname, "r") as _file:
-                _written_data = _file["entry/data/data"][_scanindex]
+                _written_data = _file["entry/data/data"][_scan_indices]
             self.assertTrue(np.allclose(_written_data, _data[_node_id].array))
 
     def test_import_results_from_file(self):

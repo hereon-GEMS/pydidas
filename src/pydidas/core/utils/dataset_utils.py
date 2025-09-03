@@ -45,7 +45,7 @@ import textwrap
 import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
-from typing import Literal, NewType, Sequence, Union
+from typing import Any, Literal, NewType, Sequence, Union
 
 import numpy as np
 
@@ -183,7 +183,7 @@ def dataset_default_attribute(key: str, shape: tuple[int]) -> str | dict | tuple
     raise ValueError(f"No default available for `{key}`.")
 
 
-def _dataset_ax_default_ranges(shape: tuple[int]) -> dict:
+def _dataset_ax_default_ranges(shape: tuple[int]) -> dict[int, np.ndarray]:
     """
     Generate default values for the axis ranges in a Dataset.
 
@@ -201,7 +201,7 @@ def _dataset_ax_default_ranges(shape: tuple[int]) -> dict:
     return {index: np.arange(length) for index, length in enumerate(shape)}
 
 
-def get_number_of_entries(obj: object) -> int:
+def get_number_of_entries(obj: Any) -> int:
     """
     Get the number of entries / items of an object.
 
@@ -209,7 +209,7 @@ def get_number_of_entries(obj: object) -> int:
 
     Parameters
     ----------
-    obj : object
+    obj : Any
         The object to be analyzed.
 
     Raises
@@ -300,7 +300,7 @@ def get_dict_with_string_entries(
 
 
 def get_input_as_dict(
-    data: dict | Sequence[float],
+    data: Union[dict, Sequence[float]],
     target_shape: tuple[int],
     calling_method_name: str = "axis_labels",
 ) -> dict:
@@ -379,7 +379,7 @@ def replace_none_entries(metadict: dict) -> dict:
 
 
 def convert_ranges_and_check_length(
-    ranges: dict[int, Union[np.ndarray, tuple, list]], shape: tuple[int]
+    ranges: dict[int, Union[np.ndarray, list]], shape: tuple[int]
 ) -> dict[int, np.ndarray]:
     """
     Convert ranges to ndarrays and check their length with respect to the shape.
@@ -391,7 +391,7 @@ def convert_ranges_and_check_length(
 
     Parameters
     ----------
-    ranges : dict[int, Union[np.ndarray, tuple, list]]
+    ranges : dict[int, Union[np.ndarray, list]]
         The dictionary with the loaded ranges.
     shape : tuple[int]
         The shape of the Dataset.

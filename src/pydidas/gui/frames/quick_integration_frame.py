@@ -84,6 +84,8 @@ class QuickIntegrationFrame(BaseFrame):
         "rad_npoint",
         "detector_model",
         "detector_mask_file",
+        "detector_npixx",
+        "detector_npixy",
     ]
 
     def __init__(self, **kwargs: Any):
@@ -220,8 +222,6 @@ class QuickIntegrationFrame(BaseFrame):
             Additional parameters to open a specific frame in a file.
         """
         self._image = import_data(filename, **open_image_kwargs)
-        self._EXP.set_param_value("detector_npixx", self._image.shape[1])
-        self._EXP.set_param_value("detector_npixy", self._image.shape[0])
         self._widgets["input_plot"].plot_pydidas_dataset(self._image)
         self._widgets["input_plot"].changeCanvasToDataAction._actionTriggered()
         self._roi_controller.show_plot_items("roi")
@@ -251,19 +251,28 @@ class QuickIntegrationFrame(BaseFrame):
         self.toggle_param_widget_visibility("detector_model", is_valid)
 
     def _update_detector_model(self):
-        """
-        Update the detector model selection based on the input image shape.
-        """
+        """Update the detector model selection based on the input image shape."""
         _shape = self._image.shape
-        _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(_shape, [])
-        _model = "Custom detector" if len(_det_models) == 0 else _det_models[0]
-        self.params["detector_model"].update_value_and_choices(
-            _model, _det_models + ["Custom detector"]
+        _det_models = (
+            PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._image.shape, [])
+            + ["Custom detector"]  # noqa
         )
+        _old_model = self.get_param_value("detector_model")
+        _old_available = _old_model in _det_models and _shape == self._EXP.det_shape
+        if _old_available:
+            _model = _old_model
+        elif len(_det_models) == 1:
+            _model = "Custom detector"
+        else:
+            _model = _det_models[0]
+        self._EXP.set_param_value("detector_npixx", self._image.shape[1])
+        self._EXP.set_param_value("detector_npixy", self._image.shape[0])
+        self.params["detector_model"].update_value_and_choices(_model, _det_models)
         self.param_widgets["detector_model"].update_choices(
-            _det_models + ["Custom detector"]
+            _det_models, selection=_model
         )
-        self._change_detector_model()
+        if not (_model == _old_model and _old_available):
+            self._change_detector_model()
 
     def set_param_value_and_widget(self, key, value):
         """
@@ -322,8 +331,6 @@ class QuickIntegrationFrame(BaseFrame):
         ----------
         new_pxsize : str
             The new pixelsize.
-        manual : bool, optional
-            Flag for manual
         """
         _pxsize = float(new_pxsize)
         _current_pxsize = self._config["previous_det_pxsize"]

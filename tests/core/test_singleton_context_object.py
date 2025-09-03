@@ -30,7 +30,7 @@ from pydidas.core import ObjectWithParameterCollection, Parameter, PydidasQsetti
 from pydidas.core.singleton_context_object import SingletonContextObject
 
 
-class TestNonContextClass(ObjectWithParameterCollection):
+class ImplementedNonContextClass(ObjectWithParameterCollection):
     """Testing class to test SingletonContextObject."""
 
     def __init__(self):
@@ -41,20 +41,20 @@ class TestNonContextClass(ObjectWithParameterCollection):
         )
 
 
-class TestClass(SingletonContextObject, TestNonContextClass):
-    non_context_class = TestNonContextClass
+class ImplementedClass(SingletonContextObject, ImplementedNonContextClass):
+    non_context_class = ImplementedNonContextClass
 
 
-class SubClass(TestClass):
+class SubClass(ImplementedClass):
     pass
 
 
 @pytest.fixture
 def singleton_class():
     """Fixture to create a SingletonContextObject instance."""
-    TestClass._instance = None
-    TestClass._initialized = False
-    yield TestClass
+    ImplementedClass._instance = None
+    ImplementedClass._initialized = False
+    yield ImplementedClass
 
 
 @pytest.fixture
@@ -90,11 +90,11 @@ def test_init__w_modified_non_context_class(singleton_subclass):
 
 
 def test_init__w_incompatible_non_context_class():
-    class TestClass(SingletonContextObject, PydidasQsettingsMixin):
+    class IncompatibleClass(SingletonContextObject, PydidasQsettingsMixin):
         non_context_class = PydidasQsettingsMixin
 
     with pytest.raises(TypeError):
-        _ = TestClass()
+        _ = IncompatibleClass()
 
 
 def test_copy(singleton_class):

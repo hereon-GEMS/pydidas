@@ -43,7 +43,7 @@ GENERIC_PARAMS_EXPERIMENT = {
     },
     "xray_energy": {
         "type": float,
-        "default": 12.398,
+        "default": 12.398420,
         "name": "X-ray energy",
         "choices": None,
         "unit": "keV",

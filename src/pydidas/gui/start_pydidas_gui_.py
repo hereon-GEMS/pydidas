@@ -50,6 +50,7 @@ def start_pydidas_gui(
     custom_mainwindow: Type[MainWindow] | None = None,
     custom_splash_image: Path | None = None,
     splash_screen: PydidasSplashScreen | None = None,
+    export_exit_state: bool = True,
 ):
     """
     Open the pydidas GUI with the given frames and run the QEventLoop.
@@ -73,6 +74,9 @@ def start_pydidas_gui(
     splash_screen : PydidasSplashScreen, optional
         An existing splash screen instance to be used. If not provided, a new
         PydidasSplashScreen instance will be created.
+    export_exit_state : bool, optional
+        Flag to export the state of the pydidas GUI on exit. If True, the state will
+        be exported on exit.
     """
     main_window_cls = MainWindow if custom_mainwindow is None else custom_mainwindow
     restore_state = "None" if restore_state is None else restore_state
@@ -90,7 +94,7 @@ def start_pydidas_gui(
         _app = _get_pydidas_qapplication()
         _app.sig_gui_exception_occurred.connect(_splash.close)
         _splash.show_aligned_message("Creating objects")
-        _gui = main_window_cls()
+        _gui = main_window_cls(export_exit_state=export_exit_state)
         for frame in frames:
             _gui.register_frame(frame)
         _splash.show_aligned_message("Creating widgets")

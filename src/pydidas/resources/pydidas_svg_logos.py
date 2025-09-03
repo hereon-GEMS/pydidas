@@ -48,7 +48,7 @@ def pydidas_logo_svg() -> QSvgWidget:
 
     Returns
     -------
-    QtSvg.QSvgWidget
+    QSvgWidget
         The QSvgWidget with the pydidas logo.
     """
     return QSvgWidget(os.path.join(ICON_PATH, "pydidas_snakes.svg"))
@@ -60,7 +60,7 @@ def pydidas_error_svg() -> QSvgWidget:
 
     Returns
     -------
-    QtSvg.QSvgWidget
+    QSvgWidget
         The QSvgWidget with the pydidas error image.
     """
     return QSvgWidget(os.path.join(ICON_PATH, "pydidas_error.svg"))

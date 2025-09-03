@@ -29,12 +29,18 @@ __all__ = ["PydidasSvgWidget"]
 
 from pathlib import Path
 
-from qtpy import QtSvg
+import qtpy
+
+
+if qtpy.QT5:
+    from qtpy.QtSvg import QSvgWidget
+elif qtpy.QT6:
+    from qtpy.QtSvgWidgets import QSvgWidget
 
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
-class PydidasSvgWidget(PydidasWidgetMixin, QtSvg.QSvgWidget):
+class PydidasSvgWidget(PydidasWidgetMixin, QSvgWidget):
     """
     Create a QLineEdit with automatic font formatting.
     """
@@ -47,5 +53,5 @@ class PydidasSvgWidget(PydidasWidgetMixin, QtSvg.QSvgWidget):
             )
         filename = str(args[0])
         parent = args[1] if len(args) == 2 else kwargs.get("parent", None)
-        QtSvg.QSvgWidget.__init__(self, filename, parent)
+        QSvgWidget.__init__(self, filename, parent)
         PydidasWidgetMixin.__init__(self, **kwargs)

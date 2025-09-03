@@ -4,7 +4,7 @@
     Copyright 2025, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
-.. _file_naming_help:
+.. _multi_frame_help:
 
 Explanations of Scan multi-frame handling
 -----------------------------------------

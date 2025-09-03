@@ -110,21 +110,21 @@ List of all ScanContext Parameters
 
 __SCAN_DIM_PARAMS = """
 
-The following Parameters exist for each scan dimension, i.e. scan_dim\ *{i}*\ 
-_label stands for scan_dim0_label, scan_dim1_label, scan_dim2_label, 
+The following Parameters exist for each scan dimension, i.e. scan_dim{i}_label 
+stands for scan_dim0_label, scan_dim1_label, scan_dim2_label, 
 scan_dim3_label. For clarity, only the generic form is described here.
 
-- scan_dim\ *{i}*\ _label (type: str, default: "")
+- scan_dim{i}_label (type: str, default: "")
     The axis name for scan direction *{i}*. This information will only be used
     for labelling.
-- scan_dim\ *{i}*\ _n_points (type: int, default: 0)
+- scan_dim{i}_n_points (type: int, default: 0)
     The number of scan points in scan direction *{i}*.
-- scan_dim\ *{i}*\ _delta (type: float, default: 1)
+- scan_dim{i}_delta (type: float, default: 1)
     The step width between two scan points in scan direction *{i}*.
-- scan_dim\ *{i}*\ _offset (type: float, default: 0)
+- scan_dim{i}_offset (type: float, default: 0)
     The coordinate offset of the movement in scan direction *{i}* (i.e. the
     counter / motor position for scan step #0).
-- scan_dim\ *{i}*\ _unit (type: str, default: "")
+- scan_dim{i}_unit (type: str, default: "")
     The unit of the movement / steps / offset in scan direction *{i}*.
 """
 

@@ -30,7 +30,7 @@ __status__ = "Production"
 
 
 from .base_input_plugin import *
-from .base_input_plugin_1d import *
+from .input_1d_xrange_mixin import *
 from .base_output_plugin import *
 from .base_plugin import *
 from .base_proc_plugin import *
@@ -45,7 +45,7 @@ from .pyfai_integration_base import *  # noqa: I001
 __all__ = (
     base_fit_plugin.__all__
     + base_input_plugin.__all__
-    + base_input_plugin_1d.__all__
+    + input_1d_xrange_mixin.__all__
     + base_output_plugin.__all__
     + base_plugin.__all__
     + base_proc_plugin.__all__
@@ -57,7 +57,7 @@ __all__ = (
 del (
     base_plugin,
     base_input_plugin,
-    base_input_plugin_1d,
+    input_1d_xrange_mixin,
     base_output_plugin,
     base_proc_plugin,
     plugin_collection,

@@ -439,6 +439,19 @@ class Test_str_utils(unittest.TestCase):
         _new = format_input_to_multiline_str(_test, max_line_length=6)
         self.assertEqual(_new, "test\ntest2\ntest3\ntest4")
 
+    def test_format_input_to_multiline_str__w_indent(self):
+        _test = "test1 test2 test3 test4 "
+        for _indent in [0, 1, 2, 3]:
+            with self.subTest(indent=_indent):
+                _new = format_input_to_multiline_str(
+                    _test, max_line_length=5 + _indent, indent=_indent
+                )
+                _expected = " " * _indent
+                _expected += ("\n" + " " * _indent).join(
+                    _item for _item in ["test1", "test2", "test3", "test4"]
+                )
+                self.assertEqual(_new, _expected)
+
     def test_format_input_to_multiline_str__too_long_with_space(self):
         _test = "test testtest"
         _new = format_input_to_multiline_str(_test, max_line_length=12)

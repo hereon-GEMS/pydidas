@@ -66,14 +66,14 @@ class ProcessingResults(ObjectWithParameterCollection):
 
     Parameters
     ----------
-    scan_context : Optional[pydidas.contexts.Scan]
+    scan_context : Scan, optional
         The scan context. If None, the generic context will be used. Only specify this,
         if you explicitly require a different context. The default is None.
-    diffraction_exp_context : Union[DiffractionExp, None], optional
+    diffraction_exp_context : DiffractionExp, optional
         The diffraction experiment context. If None, the generic context will be used.
         Only specify this if you explicitly require a different context. The default
         is None.
-    workflow_tree : Union[WorkflowTree, None], optional
+    workflow_tree : WorkflowTree, optional
         The WorkflowTree. If None, the generic WorkflowTree will be used. Only specify
         this if you explicitly require a different context. The default is None.
     """
@@ -94,7 +94,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             else diffraction_exp_context
         )
         self._TREE = WorkflowTree() if workflow_tree is None else workflow_tree
-        self._config = {
+        self._config: dict[str, Any] = {
             "frozen_SCAN": self._SCAN.copy(),
             "frozen_EXP": self._EXP.copy(),
             "frozen_TREE": self._TREE.copy(),
@@ -103,7 +103,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         self.__source_hash = -1
         self.clear_all_results()
 
-    def clear_all_results(self):
+    def clear_all_results(self) -> None:
         """
         Clear all internally stored results and reset the instance attributes.
         """
@@ -120,7 +120,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         for _key in ("metadata_complete", "composites_created", "shapes_set"):
             self._config[_key] = False
 
-    def prepare_new_results(self):
+    def prepare_new_results(self) -> None:
         """
         Prepare the ProcessingResults for new results.
         """
@@ -138,7 +138,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._config["frozen_TREE"].update_from_tree(self._TREE)
         self._config["frozen_TREE"].prepare_execution()
 
-    def store_frame_shapes(self, shapes: dict[int, tuple[int]]):
+    def store_frame_shapes(self, shapes: dict[int, tuple[int]]) -> None:
         """
         Store the shapes of the results in the ProcessingResults.
 
@@ -160,7 +160,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._config["shapes"] = _shapes
         self._config["shapes_set"] = True
 
-    def store_frame_metadata(self, metadata: dict[int, dict]):
+    def store_frame_metadata(self, metadata: dict[int, dict]) -> None:
         """
         Store the metadata for plugin results.
 
@@ -209,7 +209,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._config["metadata_complete"] = True
         ResultSaver.push_metadata_to_active_savers(_meta, self._config["frozen_SCAN"])
 
-    def store_results(self, index: int, results: dict[int, Dataset]):
+    def store_results(self, index: int, results: dict[int, Dataset]) -> None:
         """
         Store results from one scan point in the ProcessingResults.
 
@@ -227,12 +227,12 @@ class ProcessingResults(ObjectWithParameterCollection):
             )
         if not self._config["composites_created"]:
             self._create_composites()
-        _scan_index = self._SCAN.get_index_position_in_scan(index)
+        _scan_index = self._SCAN.get_indices_from_ordinal(index)
         for _key, _val in results.items():
             self._composites[_key][_scan_index] = _val
         self.new_results.emit()
 
-    def _create_composites(self):
+    def _create_composites(self) -> None:
         """
         Create the composite datasets for all node results.
         """

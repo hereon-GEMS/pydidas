@@ -575,7 +575,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             handlelength=5,
             handleheight=1.8,
         )
-        _indices = self._SCAN.get_index_position_in_scan(self._config["global_index"])
+        _indices = self._SCAN.get_indices_from_ordinal(self._config["global_index"])
         self._figure.suptitle(
             f"Sin^2(chi) analysis for scan point #{self._config['global_index']} "
             + "\n(position in scan:"

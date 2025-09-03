@@ -32,7 +32,7 @@ from typing import Union
 
 import h5py
 
-from pydidas.contexts.scan.scan import Scan
+from pydidas.contexts.scan.scan import SCAN_LEGACY_PARAMS, Scan
 from pydidas.contexts.scan.scan_context import ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
 from pydidas.core import UserConfigError
@@ -40,6 +40,7 @@ from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors
 from pydidas.core.utils.hdf5_dataset_utils import (
     export_context_to_hdf5,
+    get_hdf5_populated_dataset_keys,
     read_and_decode_hdf5_dataset,
 )
 
@@ -88,16 +89,23 @@ class ScanIoHdf5(ScanIoBase):
             CatchFileErrors(filename, KeyError, raise_file_read_error=False) as catcher,
             h5py.File(filename, "r") as file,
         ):
+            _present_keys = [
+                _key.removeprefix("/entry/pydidas_config/scan/")
+                for _key in get_hdf5_populated_dataset_keys(
+                    file["entry/pydidas_config/scan"], min_dim=0, min_size=0
+                )
+            ]
             cls.imported_params = {}
-            for _key in _scan.params.keys():
+            for _key in list(_scan.params) + list(SCAN_LEGACY_PARAMS):
+                if _key not in _present_keys:
+                    continue
                 cls.imported_params[_key] = read_and_decode_hdf5_dataset(
                     file[f"entry/pydidas_config/scan/{_key}"]
                 )
         if catcher.raised_exception:
             raise UserConfigError(
                 f"Cannot interpret the selected file {filename} as a saved instance of "
-                "DiffractionExperimentContext. Please check the file format and "
+                "ScanContext. Please check the file format and "
                 "content."
             )
-        cls._verify_all_entries_present()
-        cls._write_to_scan_settings(scan=_scan)
+        cls.update_scan_from_import(scan)

@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["AverageDataDimension"]
 
+import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.plugins import ProcPlugin
@@ -62,4 +63,7 @@ class AverageDataDimension(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        return data.mean(axis=self.get_param_value("process_data_dim")), kwargs
+        _res = data.mean(axis=self.get_param_value("process_data_dim"))
+        if not isinstance(_res, Dataset):
+            _res = Dataset(np.atleast_1d(_res), name=data.name, unit=data.unit)
+        return _res, kwargs

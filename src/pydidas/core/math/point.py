@@ -99,6 +99,59 @@ class Point:
         """
         return self.x, self.y
 
+    def __len__(self) -> int:
+        """Return the number of dimensions of the Point."""
+        return 2
+
+    def __iter__(self):
+        """Iterate over the coordinates of the Point."""
+        yield self.x
+        yield self.y
+
+    def __getitem__(self, index: int) -> float:
+        """
+        Get the coordinate at the specified index.
+
+        Parameters
+        ----------
+        index : int
+            The index of the coordinate to retrieve (0 for x, 1 for y).
+
+        Returns
+        -------
+        float
+            The coordinate at the specified index.
+
+        Raises
+        ------
+        IndexError
+            If the index is not 0 or 1.
+        """
+        if index == 0:
+            return self.x
+        elif index == 1:
+            return self.y
+        else:
+            raise IndexError("Index must be 0 or 1.")
+
+    def __contains__(self, item: Any) -> bool:
+        """
+        Check if the Point contains a given item.
+
+        Parameters
+        ----------
+        item : Any
+            The item to check for containment.
+
+        Returns
+        -------
+        bool
+            True if the item is either equal to x or y coordinates.
+        """
+        return isinstance(item, Real) and (
+            np.isclose(item, self.x) or np.isclose(item, self.y)
+        )
+
     def __add__(self, other) -> "Point":
         """
         Add another Point or a tuple to this Point.

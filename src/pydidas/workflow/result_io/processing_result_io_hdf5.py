@@ -123,7 +123,7 @@ def _get_pydidas_context_config_entries(
         [
             "entry/instrument/detector/COLLECTION",
             "frame_start_number",
-            {"data": scan.get_param_value("scan_start_index")},
+            {"data": scan.get_param_value("pattern_number_offset")},
             {"NX_class": "NX_INT", "units": ""},
         ],
         [
@@ -335,7 +335,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             Kwargs which should be passed to the underlying exporter.
         """
         _scan = ScanContext() if scan_context is None else scan_context
-        _indices = _scan.get_index_position_in_scan(index)
+        _indices = _scan.get_indices_from_ordinal(index)
         if not cls._metadata_written:
             _metadata = cls.update_with_scan_metadata(frame_result_dict, _scan)
             cls.update_metadata(_metadata)

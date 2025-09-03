@@ -31,20 +31,19 @@ __all__ = ["DefineScanFrame"]
 from functools import partial
 from typing import Any
 
-from qtpy import QtCore
+from qtpy import QtCore, QtGui
 
 from pydidas.contexts import ScanContext, ScanIo
 from pydidas.core import UserConfigError, constants, utils
+from pydidas.core.utils import doc_qurl_for_rel_address
 from pydidas.gui.frames.builders.define_scan_frame_builder import (
-    build_header_config,
-    build_scan_dim_groups,
     column_width_factor,
+    scan_frame_build_config,
 )
 from pydidas.plugins import PluginCollection
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import ItemInListSelectionWidget
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.windows import ScanDimensionInformationWindow
 from pydidas.workflow import WorkflowTree
 from pydidas_qtcore import PydidasQApplication
 
@@ -80,13 +79,12 @@ class DefineScanFrame(BaseFrame):
     menu_title = "Define\nscan"
     menu_entry = "Workflow processing/Define scan"
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
         self._io_dialog = PydidasFileDialog()
         self._qtapp = PydidasQApplication.instance()
-        self.__info_window = ScanDimensionInformationWindow()
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Populate the frame with widgets.
         """
@@ -95,20 +93,15 @@ class DefineScanFrame(BaseFrame):
             horizontalSpacing=25,
             alignment=constants.ALIGN_TOP_LEFT,
         )
-        for _name, _args, _kwargs in build_header_config():
+        for _name, _args, _kwargs in scan_frame_build_config():
             _method = getattr(self, _name)
             if "widget" in _kwargs:
                 _kwargs["widget"] = self._widgets[_kwargs["widget"]]
             _method(*_args, **_kwargs)
-        for _name, _args, _kwargs in build_scan_dim_groups(
-            self._widgets["main"].layout().rowCount()
-        ):
-            _method = getattr(self, _name)
-            _method(*_args, **_kwargs)
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Connect all required signals and slots.
         """
@@ -120,7 +113,13 @@ class DefineScanFrame(BaseFrame):
             self._import_from_beamline_file_format
         )
         self._widgets["but_reset"].clicked.connect(self.reset_entries)
-        self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_info_window)
+        self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_scan_dim_doc)
+        self._widgets["but_file_naming_help"].clicked.connect(
+            self._show_file_naming_doc
+        )
+        self._widgets["but_multi_frame_help"].clicked.connect(
+            self._show_multi_frame_doc
+        )
         self.param_widgets["scan_dim"].sig_value_changed.connect(
             self.update_dim_visibility
         )
@@ -134,19 +133,17 @@ class DefineScanFrame(BaseFrame):
         self.param_widgets["scan_base_directory"].sig_new_value.connect(
             self.set_new_base_directory
         )
-        self._qtapp.sig_exit_pydidas.connect(self.__info_window.close)
 
-    def finalize_ui(self):
+    def finalize_ui(self) -> None:
         """
         Finalize the UI initialization.
         """
-        self.__info_window.frame_activated(self.__info_window.frame_index)
         self.update_dim_visibility()
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
 
     @QtCore.Slot()
-    def update_dim_visibility(self):
+    def update_dim_visibility(self) -> None:
         """
         Update the visibility of dimensions based on the selected number
         of scan dimensions.
@@ -174,7 +171,7 @@ class DefineScanFrame(BaseFrame):
         self._widgets["config_area"].force_width_from_size_hint()
 
     @QtCore.Slot()
-    def _import_from_pydidas_file(self):
+    def _import_from_pydidas_file(self) -> None:
         """
         Load ScanContext from a file.
 
@@ -191,7 +188,7 @@ class DefineScanFrame(BaseFrame):
                 self.param_widgets[param.refkey].set_value(param.value)
 
     @QtCore.Slot()
-    def _import_from_beamline_file_format(self):
+    def _import_from_beamline_file_format(self) -> None:
         """
         Load ScanContext from a file or multiple files in the beamline format.
 
@@ -237,7 +234,7 @@ class DefineScanFrame(BaseFrame):
                 self.param_widgets[param.refkey].set_value(param.value)
 
     @QtCore.Slot()
-    def export_to_file(self):
+    def export_to_file(self) -> None:
         """
         Save ScanContext to a file.
 
@@ -254,7 +251,7 @@ class DefineScanFrame(BaseFrame):
             SCAN.export_to_file(_fname, overwrite=True)
 
     @QtCore.Slot()
-    def reset_entries(self):
+    def reset_entries(self) -> None:
         """
         Reset all ScanSetting entries to their default values.
         """
@@ -263,7 +260,7 @@ class DefineScanFrame(BaseFrame):
             self.param_widgets[param.refkey].set_value(param.value)
 
     @QtCore.Slot(int, int)
-    def move_dim(self, dim_index: int, direction: int):
+    def move_dim(self, dim_index: int, direction: int) -> None:
         """
         Move the selected dimension' position in the scan.
 
@@ -296,7 +293,7 @@ class DefineScanFrame(BaseFrame):
             )
 
     @QtCore.Slot(str)
-    def set_new_base_directory(self, basedir: str):
+    def set_new_base_directory(self, basedir: str) -> None:
         """
         Set the new base directory for the scan.
 
@@ -308,9 +305,19 @@ class DefineScanFrame(BaseFrame):
         self.q_settings_set("dialogues/DefineScanFrame__scan_name_pattern", basedir)
 
     @QtCore.Slot()
-    def _show_info_window(self):
-        """
-        Show the information window about scan dimensions.
-        """
-        self.__info_window.show()
-        self.__info_window.raise_()
+    def _show_scan_dim_doc(self) -> None:
+        """Show the documentation about scan dimensions."""
+        _qurl = doc_qurl_for_rel_address("manuals/global/scan/dimension_help.html")
+        _ = QtGui.QDesktopServices.openUrl(_qurl)
+
+    @QtCore.Slot()
+    def _show_multi_frame_doc(self) -> None:
+        """Show the documentation window about multi-frame handling in scans."""
+        _qurl = doc_qurl_for_rel_address("manuals/global/scan/multi_frame_help.html")
+        _ = QtGui.QDesktopServices.openUrl(_qurl)
+
+    @QtCore.Slot()
+    def _show_file_naming_doc(self) -> None:
+        """Show the documentation about scan file naming."""
+        _qurl = doc_qurl_for_rel_address("manuals/global/scan/file_naming_help.html")
+        _ = QtGui.QDesktopServices.openUrl(_qurl)

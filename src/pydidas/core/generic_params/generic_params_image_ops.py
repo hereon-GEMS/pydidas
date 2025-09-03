@@ -50,7 +50,7 @@ GENERIC_PARAMS_IMAGE_OPS = {
         "name": "ROI lower x limit",
         "choices": None,
         "unit": "px",
-        "allow_None": False,
+        "allow_None": True,
         "tooltip": (
             "The lower boundary (in pixel) for cropping images in x, if use_roi is "
             "enabled. Negative values will be modulated with the image width."
@@ -76,7 +76,7 @@ GENERIC_PARAMS_IMAGE_OPS = {
         "name": "ROI lower y limit",
         "choices": None,
         "unit": "px",
-        "allow_None": False,
+        "allow_None": True,
         "tooltip": (
             "The lower boundary (in pixel) for cropping images in y, if use_roi is "
             "enabled. Negative values will be modulated with the image width."

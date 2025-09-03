@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["Hdf5fileSeriesLoader"]
 
 
-from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
-from pydidas.core.utils import copy_docstring, get_hdf5_metadata
+from pydidas.core import Dataset, get_generic_param_collection
+from pydidas.core.utils import get_hdf5_metadata
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
 
@@ -54,12 +54,15 @@ class Hdf5fileSeriesLoader(InputPlugin):
     ----------
     hdf5_key : str, optional
         The key to access the hdf5 dataset in the file. The default is entry/data/data.
+    hdf5_slicing_axis : int, optional
+        The axis along which the images are sliced in the hdf5 file. If None, the
+        images are assumed to be stored in a single 2d array. If an integer is
+        provided, it is assumed that the images are stored in a 3d array and the
+        images are sliced along the given axis. The default is None.
     images_per_file : int, optional
-        The number of images per file. If -1, pydidas will auto-discover the number
-        of images per file based on the first file. The default is -1.
-    file_stepping : int, optional
-        The stepping width through all files in the file list, determined
-        by fist and last file. The default is 1.
+        The number of images (or spectra in the case of 1d data)  per file.
+        If -1, pydidas will auto-discover the number of images per file based on
+        the first file. The default is -1.
     """
 
     plugin_name = "HDF5 file series loader"
@@ -67,13 +70,10 @@ class Hdf5fileSeriesLoader(InputPlugin):
         "hdf5_key",
         "hdf5_slicing_axis",
         "images_per_file",
-        "file_stepping",
-        "_counted_images_per_file",
     )
     advanced_parameters = InputPlugin.advanced_parameters.copy() + [
         "hdf5_slicing_axis",
         "images_per_file",
-        "file_stepping",
     ]
 
     def pre_execute(self):
@@ -83,14 +83,12 @@ class Hdf5fileSeriesLoader(InputPlugin):
         InputPlugin.pre_execute(self)
         _i_per_file = self.get_param_value("images_per_file")
         _slice_ax = self.get_param_value("hdf5_slicing_axis")
-        if _i_per_file == -1:
-            _i_per_file = (
-                1
-                if _slice_ax is None
-                else get_hdf5_metadata(
-                    self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
-                )[_slice_ax]
-            )
+        if _slice_ax is None:
+            _i_per_file = 1
+        elif _i_per_file == -1:
+            _i_per_file = get_hdf5_metadata(
+                self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
+            )[_slice_ax]
         self.set_param_value("_counted_images_per_file", _i_per_file)
         self._standard_kwargs = {
             "dataset": self.get_param_value("hdf5_key"),
@@ -127,27 +125,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
         kwargs["indices"] = self._index_func(_hdf_index)
 
         _data = import_data(_fname, roi=self._get_own_roi(), **kwargs)
-        _data.axis_units = ["pixel", "pixel"]
-        _data.axis_labels = ["detector y", "detector x"]
+        if _data.ndim == 2:
+            _data.axis_units = ["pixel", "pixel"]
+            _data.axis_labels = ["detector y", "detector x"]
         return _data, kwargs
-
-    @copy_docstring(InputPlugin)
-    def get_filename(self, frame_index: int) -> str:
-        """
-        Get the input filename.
-
-        For the full docstring, please refer to the
-        :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
-        <InputPlugin>` class.
-        """
-        if self.filename_string == "":
-            raise UserConfigError(
-                "`pre_execute` has not been called for the Hdf5FileSeriesLoader plugin "
-                "and no filename generator has been created."
-            )
-        _i_file = (
-            frame_index // self.get_param_value("_counted_images_per_file")
-        ) * self.get_param_value("file_stepping") + self._SCAN.get_param_value(
-            "scan_start_index"
-        )
-        return self.filename_string.format(index=_i_file)

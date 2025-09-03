@@ -30,26 +30,24 @@ __all__ = ["FioMcaLineScanSeriesLoader"]
 
 import os
 from pathlib import Path
+from typing import Any
+
+from pydidas_plugins.input_plugins.fio_mca_loader import FioMcaLoader
 
 from pydidas.contexts import ScanContext
 from pydidas.core import (
-    Dataset,
-    FileReadError,
+    Parameter,
     UserConfigError,
     get_generic_param_collection,
 )
 from pydidas.core.utils import copy_docstring
-from pydidas.core.utils import fio_utils as fio
-from pydidas.plugins import InputPlugin, InputPlugin1d
-from pydidas.widgets.plugin_config_widgets.plugin_config_widget_with_custom_xscale import (
-    PluginConfigWidgetWithCustomXscale,
-)
+from pydidas.plugins import InputPlugin
 
 
 SCAN = ScanContext()
 
 
-class FioMcaLineScanSeriesLoader(InputPlugin1d):
+class FioMcaLineScanSeriesLoader(FioMcaLoader):
     """
     Load 1d data from a series of Fio files with MCA data.
 
@@ -83,17 +81,6 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
 
     Parameters
     ----------
-    directory_path : Union[str, pathlib.Path]
-        The base path to the directory with all the scan subdirectories.
-    filename_pattern : str
-        The name and pattern of the subdirectories and the prefixes in the
-        filename.
-    live_processing : bool, optional
-        Flag to toggle file system checks. In live_processing mode, checks
-        for the size and existence of files are disabled. The default is False.
-    file_stepping : int, optional
-        The stepping width through all files in the file list, determined
-        by fist and last file. The default is 1.
     filename_suffix : str, optional
         The end of the filename. The default is ".fio"
     files_per_directory : int, optional
@@ -112,64 +99,53 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     """
 
     plugin_name = "Fio MCA line scan series loader"
-    default_params = get_generic_param_collection(
-        "live_processing",
-        "files_per_directory",
-        "_counted_files_per_directory",
-        "fio_suffix",
-        "use_custom_xscale",
-        "x0_offset",
-        "x_delta",
-        "x_label",
-        "x_unit",
+    default_params = FioMcaLoader.default_params.copy()
+    default_params.add_params(
+        get_generic_param_collection(
+            "files_per_directory",
+            "_counted_files_per_directory",
+            "fio_suffix",
+        )
     )
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self.set_param_value("live_processing", False)
-        self._config.update({"header_lines": 0})
+        self._config["header_lines"] = 0
 
     def pre_execute(self):
-        """
-        Prepare loading spectra from a file series.
-        """
-        InputPlugin1d.pre_execute(self)
+        """Prepare loading spectra from a file series."""
+        FioMcaLoader.pre_execute(self)
         self._check_files_per_directory()
-        fio.update_config_from_fio_file(self.get_filename(0), self._config, self.params)
-        self._config["roi"] = self._get_own_roi()
 
     def update_filename_string(self):
         """
         Set up the generator that can create the full file names to load images.
         """
         _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
-        _len_pattern = _pattern.count("#")
-        if _len_pattern < 1:
-            raise UserConfigError("No filename pattern detected in the Input plugin!")
-        _pattern = _pattern.replace(
-            "#" * _len_pattern, "{index0:0" + str(_len_pattern) + "d}"
-        )
+        _pattern = self._SCAN.processed_file_naming_pattern.replace("index", "index0")
         _fio_suffix = self.get_param_value("fio_suffix").replace("#", "{index1:d}")
         self.filename_string = os.path.join(_basepath, _pattern, _pattern + _fio_suffix)
 
     def _check_files_per_directory(self):
         """
-        Check the number of files in each directory to compose the filename
-        correctly.
+        Check the number of files in each directory.
         """
         if self.get_param_value("files_per_directory") == -1:
-            _i_start = self._SCAN.get_param_value("scan_start_index")
+            _i_start = self._SCAN.get_param_value("pattern_number_offset")
             _path = Path(self.filename_string.format(index0=_i_start, index1=1)).parent
             if not _path.is_dir():
-                raise FileReadError(
+                raise UserConfigError(
                     "The given directory for the first batch of fio files does not "
                     "exist. Please check the scan base directory and naming "
                     f"pattern. \n\nDirectory name not found:\n{str(_path)}"
                 )
-            _n_files = sum(1 for _name in _path.iterdir() if _name.is_file())
+            _n_files = sum(
+                1
+                for _name in _path.iterdir()
+                if _name.is_file() and _name.suffix == ".fio"
+            )
             self.set_param_value("_counted_files_per_directory", _n_files)
-            if self.get_param_value("_counted_files_per_directory") == 0:
+            if _n_files == 0:
                 raise UserConfigError(
                     "There are no files in the given first directory. Please check the "
                     f"path. \nGiven path:\n{_path}"
@@ -180,29 +156,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
                 self.get_param_value("files_per_directory"),
             )
 
-    def get_frame(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
-        """
-        Get the frame for the given index.
-
-        Parameters
-        ----------
-        index : int
-            The index of the scan point.
-        **kwargs : dict
-            Keyword arguments for loading frames.
-
-        Returns
-        -------
-        _dataset : pydidas.core.Dataset
-            The loaded dataset.
-        kwargs : dict
-            The updated kwargs.
-        """
-        _dataset = fio.load_fio_spectrum(self.get_filename(index), self._config)
-        return _dataset, kwargs
-
     @copy_docstring(InputPlugin)
-    def get_filename(self, index: int) -> str:
+    def get_filename(self, frame_index: int) -> str:
         """
         Get the filename for the given index.
 
@@ -211,12 +166,10 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         <InputPlugin>` class.
         """
         _n_per_dir = self.get_param_value("_counted_files_per_directory")
-        _path_index = index // _n_per_dir + self._SCAN.get_param_value(
-            "scan_start_index"
-        )
-        _file_index = index % _n_per_dir + 1
+        _path_index = (frame_index // _n_per_dir) * self._SCAN.get_param_value(
+            "pattern_number_delta"
+        ) + self._SCAN.get_param_value("pattern_number_offset")
+        _file_index = (
+            frame_index % _n_per_dir + 1
+        )  # +1 because the filenames start at 1
         return self.filename_string.format(index0=_path_index, index1=_file_index)
-
-    def get_parameter_config_widget(self):
-        """Get the parameter config widget for the plugin."""
-        return PluginConfigWidgetWithCustomXscale

@@ -21,7 +21,16 @@ Improvements
     - Added classes Point and PointList to handle 2-dimensional points and lists of
       points in a more generic way.
     - Added a pydidas.core.math subpackage to handle mathematical operations.
-	
+- Modified Scan:
+    - Added a `processed_file_naming_pattern` property to the Scan to handle conversion
+	  of wildcard hashes centrally in the scan.
+	- Added option to process multiple frames as `Stack` to the Scan
+    - Added option to differentiate between index stepping and the number of frames used
+      per scan point to allow rolling averages and staggered processing.
+- Changed the DiffractionExperiment to update detector parameters automatically, if 
+  the selected detector name is known in pyFAI.
+- Added an option to disable automatic state export on exit for the GUI.
+
 Bugfixes
 --------
 - Fixed an issue where the import of frame states would alter the frame index
@@ -29,11 +38,24 @@ Bugfixes
 - Fixed an issue in the GeneralAsciiSaver where exporting data with a metadata header.
 - Fixed an issue where the splash screen would only show after the package imports/exports
   and html documentation build.
-- Fixed an issue in the AxesSelector when switching between Datasets of different dimensionality.
+- Fixed an issue in the AxesSelector when switching between Datasets of different
+  dimensionality.
 - Fixed an issue where the toolbars would not expand when the main window was too small.
+- Fixed an issue in AverageDataDimension plugin when averaging over 1D data which returned
+  a scalar.
 - Fixed an issue with data type mismatches in the Subtract1dBackgroundProfile and
-    SubtractBackgroundImage plugins when the input data was integer and the data
-   to subtract was float.
+  SubtractBackgroundImage plugins when the input data was integer and the data
+  to subtract was float.
+- Fixed an issue in the QuickIntegrationFrame where the correct detector choice was
+  overwritten on data loading.
+- Fixed an error when computing histograms for auto-scaling of data.
+- Fixed an issue when importing PONI files with custom detectors.
+- Fixed an issue where the QuickIntegrationFrame would automatically reset a 
+  user-defined detector pixel size.
+- Fixed an issue in the DataDrowsingFrame where selection the latest HDF5 file after
+  a different file would not reload the data.
+- Fixed an issue where the pyfai-calib2.ini file was not localized correctly on Unix 
+  systems.
 
 
 v25.05.16

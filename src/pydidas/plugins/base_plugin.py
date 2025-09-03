@@ -31,7 +31,7 @@ __all__ = ["BasePlugin"]
 
 import copy
 from numbers import Integral
-from typing import NoReturn, Self
+from typing import Any, NoReturn, Self
 
 from qtpy import QtCore
 
@@ -39,6 +39,7 @@ from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import (
     Dataset,
     ObjectWithParameterCollection,
+    Parameter,
     ParameterCollection,
     UserConfigError,
     get_generic_param_collection,
@@ -283,7 +284,7 @@ class BasePlugin(ObjectWithParameterCollection):
             return "None"
         return str(cls.output_data_dim)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__()
         if self.plugin_type not in [
             BASE_PLUGIN,
@@ -300,9 +301,7 @@ class BasePlugin(ObjectWithParameterCollection):
                 self.set_param_value(_kw, _item)
         self._config["test_mode"]: bool = False
         self._config["input_data"]: int | Dataset | None = None
-
         self.node_id = None
-        self._roi_data_dim = None
 
     def __copy__(self) -> Self:
         """
@@ -536,15 +535,9 @@ class BasePlugin(ObjectWithParameterCollection):
             (depending on the data dimensionality) which define the image ROI
             or None if the Plugin does not define a ROI.
         """
-        if "use_roi" not in self.params.keys():
+        if "use_roi" not in self.params.keys() or not self.get_param_value("use_roi"):
             return None
-        if not self.get_param_value("use_roi"):
-            return None
-        _roi_data_dim = (
-            self._roi_data_dim
-            if self._roi_data_dim is not None
-            else self.output_data_dim
-        )
+        _roi_data_dim = getattr(self, "base_output_data_dim", self.output_data_dim)
         if _roi_data_dim == 1:
             return slice(
                 self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")

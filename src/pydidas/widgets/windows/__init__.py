@@ -38,7 +38,6 @@ from .image_series_operations_window import *
 from .manually_set_beamcenter_window import *
 from .mask_editor_window import *
 from .qt_paths_window import *
-from .scan_dimension_information_window import *
 from .select_integration_region_window import *
 from .show_detailed_plugin_results_window import *
 from .show_information_for_result import *
@@ -57,7 +56,6 @@ __all__ = (
     + manually_set_beamcenter_window.__all__
     + mask_editor_window.__all__
     + qt_paths_window.__all__
-    + scan_dimension_information_window.__all__
     + select_integration_region_window.__all__
     + show_information_for_result.__all__
     + tweak_plugin_parameter_window.__all__
@@ -77,7 +75,6 @@ del (
     manually_set_beamcenter_window,
     mask_editor_window,
     qt_paths_window,
-    scan_dimension_information_window,
     select_integration_region_window,
     show_information_for_result,
     tweak_plugin_parameter_window,

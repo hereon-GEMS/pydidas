@@ -33,10 +33,11 @@ SCAN_GENERIC_PARAM_NAMES = [
     "scan_title",
     "scan_base_directory",
     "scan_name_pattern",
-    "scan_start_index",
-    "scan_index_stepping",
-    "scan_multiplicity",
-    "scan_multi_image_handling",
+    "pattern_number_offset",
+    "pattern_number_delta",
+    "frame_indices_per_scan_point",
+    "scan_frames_per_point",
+    "scan_multi_frame_handling",
 ]
 
 

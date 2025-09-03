@@ -60,7 +60,7 @@ EXP = DiffractionExperimentContext()
 
 IMAGE_SELECTION_PARAM = Parameter(
     "image_selection",
-    str,
+    str,  # noqa
     "Use global index",
     name="Scan point selection",
     choices=[
@@ -89,8 +89,6 @@ def _create_str_description_of_node_result(
         The WorkflowNode which created the results.
     plugin_results : pydidas.core.Dataset
         The resulting Dataset.
-    config : dict
-        The
 
     Returns
     -------
@@ -215,7 +213,7 @@ class WorkflowTestFrame(BaseFrame):
         self.param_widgets["image_selection"].sig_new_value.connect(
             self.__update_image_selection_visibility
         )
-        self._widgets["result_table"].sig_new_selection.connect(self._selected_new_node)
+        self._widgets["result_table"].sig_node_selected.connect(self._selected_new_node)
         self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)
         self._widgets["but_reload_tree"].clicked.connect(self.reload_workflow)
         self._widgets["but_show_details"].clicked.connect(self.show_plugin_details)
@@ -261,9 +259,9 @@ class WorkflowTestFrame(BaseFrame):
         TREE.nodes[node_id].plugin.params = copy.deepcopy(
             self._tree.nodes[node_id].plugin.params
         )
-
-        _arg = copy.copy(self._tree.nodes[node_id].plugin._config["input_data"])
-        _kwargs = self._tree.nodes[node_id].plugin._config["input_kwargs"].copy() | {
+        _plugin_config = self._tree.nodes[node_id].plugin._config  # noqa W0212
+        _arg = copy.copy(_plugin_config["input_data"])
+        _kwargs = _plugin_config["input_kwargs"].copy() | {
             "force_store_results": True,
             "store_input_data": True,
         }
@@ -396,7 +394,7 @@ class WorkflowTestFrame(BaseFrame):
         _nums = [
             self.get_param_value(f"scan_index{_index}") for _index in range(SCAN.ndim)
         ]
-        _index = SCAN.get_frame_from_indices(_nums)
+        _index = SCAN.get_ordinal_from_indices(_nums)
         if _index >= SCAN.n_points:
             raise UserConfigError(
                 f"The selected scan point {_nums} is outside the scope of the scan "
@@ -413,8 +411,8 @@ class WorkflowTestFrame(BaseFrame):
         int
             The global index.
         """
-        _i0 = SCAN.get_param_value("scan_start_index")
-        _delta = SCAN.get_param_value("scan_index_stepping")
+        _i0 = SCAN.get_param_value("pattern_number_offset")
+        _delta = SCAN.get_param_value("frame_indices_per_scan_point")
         _num = self.get_param_value("detector_image_index")
         _index = (_num - _i0) // _delta
         if not 0 <= _index < SCAN.n_points:

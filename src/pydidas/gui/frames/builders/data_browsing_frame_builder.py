@@ -114,6 +114,15 @@ def get_widget_creation_information() -> list[list[str, tuple, dict]]:
             },
         ],
         [
+            "create_param_widget",
+            ("xcol",),
+            {
+                "gridPos": (-1, 1, 1, 2),
+                "parent_widget": "viewer_and_filename",
+                "visible": False,
+            },
+        ],
+        [
             "create_any_widget",
             ("raw_metadata_selector", RawMetadataSelector),
             {

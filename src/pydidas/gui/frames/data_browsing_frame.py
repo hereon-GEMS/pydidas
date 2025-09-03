@@ -39,8 +39,12 @@ from silx.gui.hdf5 import H5Node
 from silx.gui.hdf5.Hdf5Item import Hdf5Item
 from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
-from pydidas.core import Dataset
-from pydidas.core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
+from pydidas.core import Dataset, Parameter, ParameterCollection
+from pydidas.core.constants import (
+    ASCII_IMPORT_EXTENSIONS,
+    BINARY_EXTENSIONS,
+    HDF5_EXTENSIONS,
+)
 from pydidas.core.exceptions import FileReadError
 from pydidas.core.utils import CatchFileErrors, get_extension
 from pydidas.data_io import IoManager, import_data
@@ -65,6 +69,17 @@ class DataBrowsingFrame(BaseFrame):
     menu_icon = "pydidas::frame_icon_data_browsing"
     menu_title = "Data browsing"
     menu_entry = "Data browsing"
+    default_params = ParameterCollection(
+        Parameter(
+            "xcol",
+            int,
+            None,
+            name="[ASCII] Use data column as x values:",
+            allow_None=True,
+            choices=[None],
+        )
+    )
+    params_not_to_restore = ["xcol"]
 
     def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
@@ -74,6 +89,7 @@ class DataBrowsingFrame(BaseFrame):
         self.__open_file = None
         self.__hdf5node = Hdf5Node()
         self.__browser_window = None
+        self.set_default_params()
 
     def connect_signals(self):
         """
@@ -83,6 +99,9 @@ class DataBrowsingFrame(BaseFrame):
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         self._widgets["explorer"].sig_new_file_selected.connect(
             self._widgets["raw_metadata_selector"].new_filename
+        )
+        self.param_widgets["xcol"].sig_new_value.connect(
+            self.__import_ascii_w_xcol_handling
         )
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
@@ -149,7 +168,12 @@ class DataBrowsingFrame(BaseFrame):
         self.__check_for_and_process_hdf5_file(filename)
         self.__current_filename = filename
         self._widgets["filename"].setText(self.__current_filename)
-        if _extension not in BINARY_EXTENSIONS + HDF5_EXTENSIONS:
+        self.param_composite_widgets["xcol"].setVisible(
+            _extension in ASCII_IMPORT_EXTENSIONS
+        )
+        if _extension in ASCII_IMPORT_EXTENSIONS:
+            self.__import_ascii_w_xcol_handling(self.get_param_value("xcol"))
+        elif _extension not in BINARY_EXTENSIONS + HDF5_EXTENSIONS:
             _data = import_data(filename)
             self.__display_dataset(_data)
 
@@ -261,3 +285,34 @@ class DataBrowsingFrame(BaseFrame):
         if self.__browser_window is None:
             self.__browser_window = Hdf5BrowserWindow()
         self.__browser_window.open_file(self.__current_filename)
+
+    @QtCore.Slot(str)
+    def __import_ascii_w_xcol_handling(self, value: str):
+        """
+        Import ASCII data with handling of the x-column
+
+        Parameters
+        ----------
+        value : str
+            The new value for the xcol parameter. This can be "None" or an integer.
+        """
+        value = None if value in [None, "None"] else int(value)
+        if self.__current_filename is None:
+            return
+        _data = import_data(self.__current_filename, x_column=False)
+        if _data.ndim == 1:
+            value = None
+            _new_choices = [None]
+        else:
+            _new_choices = [None] + list(range(_data.shape[1]))
+            if value not in _new_choices:
+                value = 0
+        self.params["xcol"].update_value_and_choices(value, _new_choices)
+        with QtCore.QSignalBlocker(self.param_widgets["xcol"]):
+            self.param_widgets["xcol"].update_choices(_new_choices)
+            self.update_widget_value("xcol", value)
+        _data = import_data(
+            self.__current_filename, x_column=value is not None, x_column_index=value
+        )
+
+        self.__display_dataset(_data)

@@ -375,7 +375,5 @@ def test_hash(exp_with_Eiger9M):
     assert hash(exp_with_Eiger9M) == hash(_copy)
 
 
-# raise UserConfigError("Must finish work on tests")
-
 if __name__ == "__main__":
     pytest.main()

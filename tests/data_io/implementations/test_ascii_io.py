@@ -403,16 +403,14 @@ def test_import_from_file__txt(temp_path, x_column, ncols, extension, header):
     assert np.allclose(_data.axis_ranges[0], _ax_ref)
     match ncols:
         case 1:
-            assert _data.axis_labels == {
-                0: "2theta" if (header and x_column) else "axis_0"
-            }
+            assert _data.axis_labels == {0: "2theta" if (header and x_column) else ""}
             assert _data.axis_units == {0: "deg" if (header and x_column) else ""}
         case _:
             if header and x_column:
                 assert _data.axis_labels == {0: "2theta", 1: ""}
                 assert _data.axis_units == {0: "deg", 1: ""}
             else:
-                assert _data.axis_labels == {0: "axis_0", 1: ""}
+                assert _data.axis_labels == {0: "", 1: ""}
                 assert _data.axis_units == {0: "", 1: ""}
     assert _data.data_label == ("test data" if header else "")
     assert _data.data_unit == ("counts" if header else "")

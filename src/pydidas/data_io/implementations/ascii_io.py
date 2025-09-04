@@ -380,7 +380,7 @@ class AsciiIo(IoBase):
             _data = np.delete(_data, x_column_index, axis=1).squeeze()
         else:
             _axes: list[Any] = [None]
-        _labels = [_metadata.get("ax_label", "axis_0")]
+        _labels = [_metadata.get("ax_label", "")]
         _units = [_metadata.get("ax_unit", "")]
         if _data.ndim > 1:
             _axes.append(None)

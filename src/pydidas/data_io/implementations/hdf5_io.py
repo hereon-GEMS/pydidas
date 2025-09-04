@@ -180,7 +180,9 @@ class Hdf5Io(IoBase):
                 else tuple(_create_slice_object(_item) for _item in _input_indices)
             )
         )
-
+        if "dset" in kwargs and "dataset" not in kwargs:
+            raise Warning("dset keyword is deprecated. Please use dataset instead.")
+            kwargs["dataset"] = kwargs.pop("dset")
         dataset = kwargs.get("dataset", "entry/data/data")
         auto_squeeze = kwargs.get("auto_squeeze", True)
 

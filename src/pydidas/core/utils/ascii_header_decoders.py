@@ -94,7 +94,7 @@ def __split_key_list(key_list: list[str]) -> tuple[list[str], list[str]]:
 
 
 def decode_specfile_header(
-    filename: Path | str, read_x_column: bool = True
+    filename: Path | str, read_x_column: bool = True, x_column_index: int = 0
 ) -> tuple[list[str], list[str]]:  # noqa
     """
     Decode the header of a SpecFile (.dat) file.
@@ -106,6 +106,9 @@ def decode_specfile_header(
     read_x_column : bool, optional
         Whether to read the first column as x column label and unit. If False,
         all columns are assumed to be y data columns. The default is True.
+    x_column_index : int, optional
+        The index of the x column, if read_x_column is True. The default is
+        0 (first column).
 
     Returns
     -------
@@ -115,13 +118,13 @@ def decode_specfile_header(
     _n_col = None
     _raw_labels = ""
     with CatchFileErrors(filename), open(filename, "r") as _file:
-        _lines = _file.readlines()
+        _lines = [_l.strip() for _l in _file.readlines()]
     for _line in _lines:
         if _line.startswith("#N") and _n_col is None:
             _n_col = int(_line.removeprefix("#N"))
         elif _line.startswith("#L"):
-            _raw_labels = _line.removeprefix("#L").strip()
-        elif len(_line.strip()) > 0 and not _line.startswith("#") and _n_col is None:
+            _raw_labels = _line.removeprefix("#L")
+        elif _line and not _line.startswith("#") and _n_col is None:
             _n_col = len(_line.split())
         if _n_col is not None and _raw_labels:
             break
@@ -129,7 +132,7 @@ def decode_specfile_header(
     _units = []
     # Create initial label and unit lists
     if len(_labels_split) == _n_col == 2 and read_x_column:
-        return _labels_split, ["", ""]
+        return _labels_split[::-1] if x_column_index else _labels_split, ["", ""]
     elif len(_labels_split) <= _n_col:
         _labels = _labels_split + [""] * (_n_col - len(_labels_split))
         _units = [""] * _n_col
@@ -140,33 +143,33 @@ def decode_specfile_header(
         _labels = [""] * (2 - len(_labels)) + _labels
         _units = [""] * (2 - len(_units)) + _units
     elif _n_col == 2 and read_x_column:
-        if len(_labels) > len(_units):
-            _units = _units + [""] * (len(_labels) - len(_units))
-        else:
-            _units = [""] * (_n_col - len(_units)) + _units
+        _units = _units + [""] * max(0, (len(_labels) - len(_units)))
+        _units = [""] * (_n_col - len(_units)) + _units
         _labels = [""] * (_n_col - len(_labels)) + _labels
+        if x_column_index == 1 and all(_labels):
+            _labels = _labels[::-1]
+            _units = _units[::-1]
     else:
         if len(_labels) == 1:
             return ["", "", _labels[0]], ["", "", _units[0] if _units else ""]
         _labels = _labels + [""] * (_n_col - len(_labels))
         _labels = [_l if _l else ("no label" if any(_labels) else "") for _l in _labels]
         _units = _units + [""] * (_n_col - len(_units))
-        _i_start = 1 if read_x_column else 0
+        _data_label = "; ".join(
+            f"{_l} / {_u}" if _u else _l
+            for _i, (_l, _u) in enumerate(zip(_labels, _units))
+            if (_i != x_column_index or not read_x_column) and (_l or _u)
+        )
+        _xlabel = _labels.pop(x_column_index) if read_x_column else ""
         _col_label = (
             ""
             if not all(_labels)
             else "; ".join(
-                f"{i}: {_l if _l else 'no label'}"
-                for i, _l in enumerate(_labels[_i_start:])
+                f"{i}: {_l if _l else 'no label'}" for i, _l in enumerate(_labels)
             )
         )
-        _data_label = "; ".join(
-            (f"{_l} / {_u}" if _u else _l)
-            for _l, _u in zip(_labels[_i_start:], _units[_i_start:])
-            if _l or _u
-        )
-        _labels = [_labels[0] if read_x_column else "", _col_label, _data_label]
-        _units = [_units[0] if _units and read_x_column else "", "", ""]
+        _labels = [_xlabel, _col_label, _data_label]
+        _units = [_units[x_column_index] if _units and read_x_column else "", "", ""]
     return _labels, _units
 
 

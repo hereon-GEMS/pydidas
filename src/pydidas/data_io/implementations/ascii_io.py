@@ -322,7 +322,9 @@ class AsciiIo(IoBase):
         Dataset
             The imported data.
         """
-        _labels, _units = decode_specfile_header(filename, read_x_column)
+        _labels, _units = decode_specfile_header(
+            filename, read_x_column, x_column_index=x_column_index
+        )
         _data_label = _labels.pop(-1)
         _data_unit = _units.pop(-1)
         _imported_data = np.loadtxt(filename, comments="#")

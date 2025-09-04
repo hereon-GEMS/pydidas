@@ -306,19 +306,32 @@ def test_import_from_file__specfile_1col(temp_path, labels):
         ("chi angle / deg y data  /", "chi angle", "deg", "y data", ""),
     ],
 )
+@pytest.mark.parametrize("x_column_index", [0, 1])
 def test_import_from_file__specfile_2col_w_xcolumn(
-    temp_path, written_label, xlabel, xunit, ylabel, yunit
+    temp_path, written_label, xlabel, xunit, ylabel, yunit, x_column_index
 ):
+    print("x_column_index:", x_column_index)
+    print("written_label:", written_label)
     _header = f"F test.dat\nS 1 test.h5\n\nN 2\nL {written_label}\n"
     _temp_data = np.column_stack((_x_data, _y_data))
     np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
-    _data = AsciiIo.import_from_file(temp_path / "test.dat", x_column=True)
-    assert np.allclose(_data, _y_data)
-    assert np.allclose(_data.axis_ranges[0], _x_data)
-    assert _data.axis_labels[0] == xlabel
-    assert _data.axis_units[0] == xunit
-    assert _data.data_label == ylabel
-    assert _data.data_unit == yunit
+    _data = AsciiIo.import_from_file(
+        temp_path / "test.dat", x_column=True, x_column_index=x_column_index
+    )
+    print("axis labels:", _data.axis_labels)
+    print("data label", _data.data_label)
+    assert np.allclose(_data, _y_data if x_column_index == 0 else _x_data)
+    assert np.allclose(
+        _data.axis_ranges[0], _x_data if x_column_index == 0 else _y_data
+    )
+    if xlabel and ylabel:
+        assert _data.axis_labels[0] == (xlabel if x_column_index == 0 else ylabel)
+        assert _data.data_label == (ylabel if x_column_index == 0 else xlabel)
+    else:
+        assert _data.axis_labels == {0: ""}
+        assert _data.data_label == ylabel
+    assert _data.axis_units[0] == (xunit if x_column_index == 0 else yunit)
+    assert _data.data_unit == (yunit if x_column_index == 0 else xunit)
 
 
 @pytest.mark.parametrize(
@@ -376,11 +389,17 @@ def test_import_from_file__specfile_4col_w_col_index(temp_path, x_column):
     _data = AsciiIo.import_from_file(
         temp_path / "test.dat", x_column=True, x_column_index=x_column
     )
+    _ref_labels = ["x", "y", "z", "t"]
+    _ref_units = ["xu", "yu", "zu", "tu"]
+    _x_label = _ref_labels.pop(x_column)
+    _x_unit = _ref_units.pop(x_column)
+    _data_label = "; ".join(f"{_l} / {_u}" for _l, _u in zip(_ref_labels, _ref_units))
+    _ax1_label = "; ".join(f"{i}: {_l}" for i, _l in enumerate(_ref_labels))
     assert np.allclose(_data, np.delete(_temp_data, x_column, axis=1))
     assert np.allclose(_data.axis_ranges[0], _y_data * (0.5 + x_column))
-    assert _data.axis_labels == {0: "x", 1: "0: y; 1: z; 2: t"}
-    assert _data.axis_units == {0: "xu", 1: ""}
-    assert _data.data_label == "y / yu; z / zu; t / tu"
+    assert _data.axis_labels == {0: _x_label, 1: _ax1_label}
+    assert _data.axis_units == {0: _x_unit, 1: ""}
+    assert _data.data_label == _data_label
     assert _data.data_unit == ""
 
 

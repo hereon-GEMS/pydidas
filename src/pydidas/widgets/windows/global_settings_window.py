@@ -94,20 +94,19 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         self.create_label(
             "section_multiprocessing", "Multiprocessing settings", **_section_options
         )
-        self.create_param_widget(self.get_param("mp_n_workers"), **_param_options)
-        self.create_param_widget(
-            self.get_param("shared_buffer_max_n"), **_param_options
-        )
+        self.create_param_widget("mp_n_workers", **_param_options)
+        self.create_param_widget("shared_buffer_max_n", **_param_options)
         self.create_spacer("spacer_1")
 
         self.create_label("section_memory", "Memory settings", **_section_options)
-        self.create_param_widget(self.get_param("data_buffer_size"), **_param_options)
-        self.create_param_widget(self.get_param("shared_buffer_size"), **_param_options)
-        self.create_param_widget(self.get_param("max_image_size"), **_param_options)
+        self.create_param_widget("data_buffer_size", **_param_options)
+        self.create_param_widget("data_buffer_hdf5_max_size", **_param_options)
+        self.create_param_widget("shared_buffer_size", **_param_options)
+        self.create_param_widget("max_image_size", **_param_options)
         self.create_spacer("spacer_3")
 
         self.create_label("section_gui", "GUI behaviour", **_section_options)
-        self.create_param_widget(self.get_param("plot_update_time"), **_param_options)
+        self.create_param_widget("plot_update_time", **_param_options)
         self.process_new_font_metrics()
 
     def connect_signals(self):

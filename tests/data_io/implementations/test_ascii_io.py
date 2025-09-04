@@ -368,6 +368,22 @@ def test_import_from_file__specfile_4col(temp_path, labels, x_column):
     assert _data.data_unit == ""
 
 
+@pytest.mark.parametrize("x_column", [0, 1, 2, 3])
+def test_import_from_file__specfile_4col_w_col_index(temp_path, x_column):
+    _header = "F test.dat\nS 1 test.h5\nN 4\nL x / xu y / yu z / zu t / tu\n"
+    _temp_data = (_y_data * (0.5 + np.arange(4))[:, None]).T
+    np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
+    _data = AsciiIo.import_from_file(
+        temp_path / "test.dat", x_column=True, x_column_index=x_column
+    )
+    assert np.allclose(_data, np.delete(_temp_data, x_column, axis=1))
+    assert np.allclose(_data.axis_ranges[0], _y_data * (0.5 + x_column))
+    assert _data.axis_labels == {0: "x", 1: "0: y; 1: z; 2: t"}
+    assert _data.axis_units == {0: "xu", 1: ""}
+    assert _data.data_label == "y / yu; z / zu; t / tu"
+    assert _data.data_unit == ""
+
+
 @pytest.mark.parametrize(
     "written_label", ["chi y_data", "chi / deg y_data / ct", "non matching labels"]
 )

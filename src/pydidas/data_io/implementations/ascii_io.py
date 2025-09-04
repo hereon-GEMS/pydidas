@@ -233,6 +233,9 @@ class AsciiIo(IoBase):
                 importing .dat and .csv files or .txt files without a metadata
                 header. The default is True for .dat and False for .csv and .txt
                 files.
+            x_column_index : int, optional
+                The column number to be used as x-column. This is only used if
+                x_column is True. The default is 0.
 
         Returns
         -------
@@ -247,7 +250,9 @@ class AsciiIo(IoBase):
             if _ext == "chi":
                 cls._data = cls.__import_chi(filename)
             elif _ext == "dat":
-                cls._data = cls.__import_specfile(filename, _x_column)
+                cls._data = cls.__import_specfile(
+                    filename, _x_column, x_column_index=_col_no
+                )
             elif _ext in ["txt", "csv"]:
                 _delimiter = "," if _ext == "csv" else None
                 cls._data = cls.__import_txt(
@@ -295,7 +300,9 @@ class AsciiIo(IoBase):
         )
 
     @classmethod
-    def __import_specfile(cls, filename: Path | str, read_x_column: bool) -> Dataset:
+    def __import_specfile(
+        cls, filename: Path | str, read_x_column: bool, x_column_index: int = 0
+    ) -> Dataset:
         """
         Import a SpecFile (.dat) file.
 
@@ -306,6 +313,9 @@ class AsciiIo(IoBase):
         read_x_column : bool
             A flag which indicates whether the first column of the data
             should be treated as x-axis.
+        x_column_index : int, optional
+            The column number to be used as x-column. This is only used if
+            read_x_column is True. The default is 0.
 
         Returns
         -------
@@ -322,8 +332,8 @@ class AsciiIo(IoBase):
                     "Cannot read x-column from 1d SPEC file. Please check the file "
                     "and assure it has two columns"
                 )
-            _ax_ranges: list[Any] = [_imported_data[:, 0]]
-            _imported_data = _imported_data[:, 1:].squeeze()
+            _ax_ranges: list[Any] = [_imported_data[:, x_column_index]]
+            _imported_data = np.delete(_imported_data, x_column_index, axis=1).squeeze()
             if _imported_data.ndim == 2:
                 _ax_ranges.append(np.arange(_imported_data.shape[1]))
         else:

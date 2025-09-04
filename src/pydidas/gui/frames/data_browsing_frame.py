@@ -46,7 +46,7 @@ from pydidas.core.constants import (
     HDF5_EXTENSIONS,
 )
 from pydidas.core.exceptions import FileReadError
-from pydidas.core.utils import CatchFileErrors, get_extension
+from pydidas.core.utils import CatchFileErrors, get_extension, get_hdf5_metadata
 from pydidas.data_io import IoManager, import_data
 from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     create_splitter,
@@ -190,9 +190,12 @@ class DataBrowsingFrame(BaseFrame):
         if self.__open_file is not None:
             self.__open_file.close()
             self.__open_file = None
-        with CatchFileErrors(
-            self.__current_filename, KeyError, raise_file_read_error=False
-        ) as catcher:
+        with (
+            CatchFileErrors(
+                self.__current_filename, KeyError, raise_file_read_error=False
+            ) as catcher,
+            QtCore.QSignalBlocker(self._widgets["hdf5_dataset_selector"]),
+        ):
             self.__open_file = h5py.File(self.__current_filename, mode="r")
             self._widgets["hdf5_dataset_selector"].new_filename(self.__current_filename)
             self.__display_hdf5_dataset(self._widgets["hdf5_dataset_selector"].dataset)
@@ -243,21 +246,27 @@ class DataBrowsingFrame(BaseFrame):
         if dataset == "":
             self._widgets["viewer"].setData(None)
             return
-        try:
-            _item = Hdf5Item(
-                text=dataset,
-                obj=self.__open_file[dataset],
-                parent=self.__hdf5node,
-                openedPath=self.__current_filename,
-            )
-            _data = H5Node(_item)
-            self.__display_dataset(_data)
-        except KeyError:
-            self._widgets["viewer"].setData(None)
-            raise FileReadError(
-                f"Dataset `{dataset}` could not be read from the file "
-                f"`{Path(self.__current_filename).name}`."
-            )
+        _max_size = self.q_settings_get("global/data_buffer_hdf5_max_size", dtype=int)
+        _nbytes = get_hdf5_metadata(self.__current_filename, "nbytes", dset=dataset)
+        _size_mb = int(_nbytes) / 1_048_576
+        if _size_mb > _max_size:
+            try:
+                _item = Hdf5Item(
+                    text=dataset,
+                    obj=self.__open_file[dataset],
+                    parent=self.__hdf5node,
+                    openedPath=self.__current_filename,
+                )
+                _data = H5Node(_item)
+            except KeyError:
+                self._widgets["viewer"].setData(None)
+                raise FileReadError(
+                    f"Dataset `{dataset}` could not be read from the file "
+                    f"`{Path(self.__current_filename).name}`."
+                )
+        else:
+            _data = import_data(self.__current_filename, dataset=dataset)
+        self.__display_dataset(_data)
 
     @QtCore.Slot(object)
     def __display_raw_data(self, kwargs: dict):

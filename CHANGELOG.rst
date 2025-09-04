@@ -31,6 +31,10 @@ Improvements
   the selected detector name is known in pyFAI.
 - Added an option to disable automatic state export on exit for the GUI.
 - Added a data_io class for importing/exporting ASCII data files with different headers.
+- Added support for displaying ASCII data in the DataBrowsingFrame
+- Small HDF5 datasets (size can be configured in the options) will now be fully loaded
+  into memory in the DataBrowsingFrame and keep their metadata.
+
 
 Bugfixes
 --------

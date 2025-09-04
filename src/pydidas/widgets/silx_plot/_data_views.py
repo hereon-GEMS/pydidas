@@ -30,6 +30,7 @@ __all__ = ["PydidasImageDataView", "Pydidas_Plot1dView", "Pydidas_Plot1dGroupVie
 from functools import partialmethod
 from typing import Optional
 
+import numpy as np
 import silx.gui.data
 from qtpy import QtWidgets
 from silx.gui import icons
@@ -134,16 +135,13 @@ class Pydidas_Plot1dView(_Plot1dView):
         if not isinstance(data, Dataset):
             data = Dataset(data)
         _x_desc = data.get_axis_description(0)
-        _xlabel = _x_desc if len(_x_desc) > 0 else "x"
-        _ylabel = data.data_description if len(data.data_description) > 0 else "y"
         _widget = self.getWidget()
-
         _widget.addCurve(
             legend="data",
             x=data.axis_ranges[0],
             y=data.array,
-            xlabel=_xlabel,
-            ylabel=_ylabel,
+            xlabel=_x_desc if _x_desc else "x",
+            ylabel=data.data_description if data.data_description else "y",
         )
         _widget.setActiveCurve("data")
 
@@ -270,5 +268,21 @@ def _Axis_setAxisNames(self, axesNames):
     self._Axis__updateSliderVisibility()
 
 
+def data(self) -> np.ndarray | None:
+    """Returns the stored input data."""
+    if self._NumpyAxesSelector__data is None:
+        return None
+    return np.asanyarray(self._NumpyAxesSelector__data)
+
+
+def selectedData(self) -> np.ndarray | None:
+    """Returns the output data."""
+    if self._NumpyAxesSelector__selectedData is None:
+        return None
+    return np.asanyarray(self._NumpyAxesSelector__selectedData)
+
+
 silx.gui.data.NumpyAxesSelector._Axis.setAxis = _Axis_setAxis
 silx.gui.data.NumpyAxesSelector._Axis.setAxisNames = _Axis_setAxisNames
+silx.gui.data.NumpyAxesSelector.NumpyAxesSelector.data = data
+silx.gui.data.NumpyAxesSelector.NumpyAxesSelector.selectedData = selectedData

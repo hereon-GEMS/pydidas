@@ -577,7 +577,7 @@ def test_import_from_file__asc__no_header(temp_path):
     assert _data.data_unit == ""
 
 
-def test_read_metadata_from_file__empty_file(temp_path):
+def test_read_metadata_from_file__wrong_ext(temp_path):
     with pytest.raises(UserConfigError):
         _metadata = AsciiIo.read_metadata_from_file(temp_path / "test_empty.dummy")
 
@@ -647,6 +647,7 @@ def test_read_metadata_from_file__txt(temp_path, ncols, x_column):
     assert _metadata["First column is x-axis"] == str(x_column)
     assert _metadata["Data label"] == _data.data_label
     assert _metadata["Data unit"] == _data.data_unit
+    assert "Metadata" not in _metadata
 
 
 def test_read_metadata_from_file__txt_corrupt_header(temp_path):

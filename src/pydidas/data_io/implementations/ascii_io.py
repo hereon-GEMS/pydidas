@@ -36,7 +36,7 @@ import numpy as np
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import ASCII_EXPORT_EXTENSIONS, ASCII_IMPORT_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors, get_extension
+from pydidas.core.utils import CatchFileErrors, convert_str_to_number, get_extension
 from pydidas.core.utils.ascii_header_decoders import (
     decode_chi_header,
     decode_specfile_header,
@@ -644,22 +644,20 @@ class AsciiIo(IoBase):
             A dictionary with any found metadata keys.
         """
         _metadata: dict[str, Any] = {}
-        try:
-            while lines:
-                _line = lines.pop(0).strip()
-                if not _line.startswith("#"):
-                    break
-                _line = _line.removeprefix("#")
-                if _line.startswith("    "):
-                    if "metadata" not in _metadata:
-                        _metadata["metadata"] = {}
-                    _key, _val = _line.split(":", 1)
-                    _metadata["metadata"][_key.strip()] = _val.strip()
-                elif ":" in _line:
-                    _key, _val = _line.split(":", 1)
-                    _metadata[_key.strip()] = _val.strip()
-        except (IndexError, ValueError) as error:
-            raise UserConfigError("Cannot read text file header:", error)
+        while lines:
+            _line = lines.pop(0).strip()
+            if not _line.startswith("#"):
+                break
+            _line = _line.removeprefix("#")
+            if _line.startswith("    ") and ":" in _line:
+                if "metadata" not in _metadata:
+                    _metadata["metadata"] = {}
+                _key, _val = _line.split(":", 1)
+                _val = convert_str_to_number(_val)
+                _metadata["metadata"][_key.strip()] = _val
+            elif ":" in _line and "Metadata" not in _line:
+                _key, _val = _line.split(":", 1)
+                _metadata[_key.strip()] = convert_str_to_number(_val)
         return _metadata
 
     @staticmethod
@@ -687,13 +685,7 @@ class AsciiIo(IoBase):
                 if _line == "%p":
                     while lines and not lines[0].startswith("!"):
                         _key, _val = lines.pop(0).split("=", 1)
-                        try:
-                            if "." in _val:
-                                _val = float(_val)
-                            else:
-                                _val = int(_val)
-                        except ValueError:
-                            _val = _val.strip()
+                        _val = convert_str_to_number(_val)
                         _metadata["parameters"][_key.strip()] = _val
                 if _line == "%d":
                     while lines and lines[0].startswith(" Col"):

@@ -199,7 +199,7 @@ def test_decode_specfile_header__specfile_2col_no_x_col(temp_path, written_label
 @pytest.mark.parametrize("x_col", [True, False])
 def test_decode_specfile_header__specfile_no_header(temp_path, ncols, x_col):
     if ncols == 1 and x_col:
-        pytest.skip("not a valid case")
+        return
     np.savetxt(
         temp_path / "test.dat",
         np.column_stack((_x_data,) + (ncols - 1) * (_y_data,)),

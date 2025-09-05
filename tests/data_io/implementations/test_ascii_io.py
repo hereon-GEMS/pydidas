@@ -23,7 +23,8 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
+import datetime
+import time
 from pathlib import Path
 
 import numpy as np
@@ -43,40 +44,23 @@ _test_data = Dataset(
     axis_units=["deg"],
     data_label="test data",
     data_unit="counts",
+    metadata={"test_metadata": 42, "creator": "pytest"},
 )
 
 _TEST_DIR = Path(__file__).parents[2] / "_data"
 
 
-@pytest.fixture(scope="module")
-def temp_fio_file(temp_path):
+def write_fio_file_with_n_col(filename, ncols=2):
     _fio_header = (
-        "!\n! Comments\n!\n%c\nA random comment\n!\n! Parameter\n!\n%p\nparam0 = 1\n"
-        "param1 = 2.0\nparam2 = -42\n!\n! Data\n!\n%d\n Col 1 c0_label DOUBLE\n"
-        " Col 2 c1_label DOUBLE\n Col 3 c2_label DOUBLE\n Col 4 c3_label DOUBLE"
-    )
-    _data = np.random.random((25, 4))
-    _fname = temp_path / "test.fio"
-    np.savetxt(_fname, _data, header=_fio_header, comments="")
-    yield _data.copy(), _fname
-    _fname.unlink()
+        "!\n! Comments\n!\n%c\nA random comment\nAnother comment\n!\n! Parameter\n!\n"
+        "%p\nparam0 = 1\nparam1 = 2.0\nparam2 = -42\nparam3 = abc\n!\n! Data\n!\n%d\n"
+    ) + "\n".join(f" Col {i + 1} c{i}_label DOUBLE" for i in range(ncols))
+    _data = np.random.random((25, ncols))
+    np.savetxt(filename, _data, header=_fio_header, comments="")
+    return _data
 
 
-@pytest.fixture(scope="module")
-def temp_fio_file_2col(temp_path):
-    _fio_header = (
-        "!\n! Comments\n!\n%c\nA random comment\n!\n! Parameter\n!\n%p\nparam0 = 1\n"
-        "param1 = 2.0\nparam2 = -42\n!\n! Data\n!\n%d\n Col 1 c0_label DOUBLE\n"
-        " Col 2 c1_label DOUBLE"
-    )
-    _data = np.random.random((25, 2))
-    _fname = temp_path / "test_2col.fio"
-    np.savetxt(_fname, _data, header=_fio_header, comments="")
-    yield _data.copy(), _fname
-    _fname.unlink()
-
-
-def temp_asc_file(filename, skip_keys: list[str] | None = None, write_header=True):
+def write_asc_file(filename, skip_keys: list[str] | None = None, write_header=True):
     _full_header = [
         "*TYPE		=  Raw\n",
         "*CLASS		=  ASCII CLASS\n",
@@ -109,7 +93,7 @@ def temp_asc_file(filename, skip_keys: list[str] | None = None, write_header=Tru
 def get_data_with_ncols(ncols):
     if ncols == 1:
         return _test_data
-    _new = np.column_stack((_test_data,) * ncols)
+    _new = (_test_data * (0.5 + np.arange(ncols)[:, None])).T
     _properties = _test_data.property_dict
     _properties["axis_labels"][1] = "stack axis"
     _properties["axis_units"][1] = ""
@@ -509,8 +493,9 @@ def test_import_from_file__fio__no_data_in_file(temp_path):
 
 
 @pytest.mark.parametrize("xcol", [0, 1])
-def test_import_from_file__fio__2d_w_xcolumn(temp_fio_file_2col, xcol):
-    _raw_data, _fname = temp_fio_file_2col
+def test_import_from_file__fio__2d_w_xcolumn(temp_path, xcol):
+    _fname = temp_path / "test.fio"
+    _raw_data = write_fio_file_with_n_col(_fname, ncols=2)
     _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_index=xcol)
     _keys = ["c0_label", "c1_label"]
     assert _data.ndim == 1
@@ -521,8 +506,9 @@ def test_import_from_file__fio__2d_w_xcolumn(temp_fio_file_2col, xcol):
 
 
 @pytest.mark.parametrize("x_column", [0, 1, 2, 3])
-def test_import_from_file__fio_file__w_xcol(temp_fio_file, x_column):
-    _raw_data, _fname = temp_fio_file
+def test_import_from_file__fio_file__w_xcol(temp_path, x_column):
+    _fname = temp_path / "test.fio"
+    _raw_data = write_fio_file_with_n_col(_fname, ncols=4)
     _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_index=x_column)
     _keys = ["c0_label", "c1_label", "c2_label", "c3_label"]
     _xlabel = _keys.pop(x_column)
@@ -537,8 +523,9 @@ def test_import_from_file__fio_file__w_xcol(temp_fio_file, x_column):
     assert _data.data_unit == ""
 
 
-def test_import_from_file__fio_file__no_xcol(temp_fio_file):
-    _raw_data, _fname = temp_fio_file
+def test_import_from_file__fio_file__no_xcol(temp_path):
+    _fname = temp_path / "test.fio"
+    _raw_data = write_fio_file_with_n_col(_fname, ncols=4)
     _data = AsciiIo.import_from_file(_fname, x_column=False)
     _keys = ["c0_label", "c1_label", "c2_label", "c3_label"]
     assert np.allclose(_data, _raw_data)
@@ -550,7 +537,7 @@ def test_import_from_file__fio_file__no_xcol(temp_fio_file):
 
 
 def test_import_from_file__asc__full_header(temp_path):
-    _raw_data, _x_range = temp_asc_file(temp_path / "test.asc")
+    _raw_data, _x_range = write_asc_file(temp_path / "test.asc")
     _data = AsciiIo.import_from_file(temp_path / "test.asc")
     assert np.allclose(_data, _raw_data)
     assert np.allclose(_data.axis_ranges[0], _x_range)
@@ -564,7 +551,7 @@ def test_import_from_file__asc__full_header(temp_path):
     "skip_key", ["XUNIT", "YUNIT", "START", "STOP", "STEP", "SAMPLE", "SCAN_AXIS"]
 )
 def test_import_from_file__asc__partial_header(temp_path, skip_key):
-    _raw_data, _x_range = temp_asc_file(temp_path / "test.asc", skip_keys=[skip_key])
+    _raw_data, _x_range = write_asc_file(temp_path / "test.asc", skip_keys=[skip_key])
     _data = AsciiIo.import_from_file(temp_path / "test.asc")
     _ax = "" if skip_key == "SCAN_AXIS" else "2theta/theta"
     if skip_key in ["START", "STOP", "STEP"]:
@@ -579,7 +566,7 @@ def test_import_from_file__asc__partial_header(temp_path, skip_key):
 
 
 def test_import_from_file__asc__no_header(temp_path):
-    _raw_data, _x_data = temp_asc_file(temp_path / "test.asc", write_header=False)
+    _raw_data, _x_data = write_asc_file(temp_path / "test.asc", write_header=False)
     _data = AsciiIo.import_from_file(temp_path / "test.asc")
     assert _data.shape == (501,)
     assert np.allclose(_data, _raw_data)
@@ -588,6 +575,126 @@ def test_import_from_file__asc__no_header(temp_path):
     assert _data.axis_units[0] == ""
     assert _data.data_label == ""
     assert _data.data_unit == ""
+
+
+def test_read_metadata_from_file__empty_file(temp_path):
+    with pytest.raises(UserConfigError):
+        _metadata = AsciiIo.read_metadata_from_file(temp_path / "test_empty.dummy")
+
+
+@pytest.mark.parametrize("suffix", AsciiIo.extensions_import)
+def test_read_metadata_from_file__empty_file(temp_path, suffix):
+    _fname = temp_path / f"test_empty.{suffix}"
+    with open(_fname, "w") as f:
+        f.write("")
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+    if suffix == "fio":
+        assert _metadata == {"comments": [], "parameters": {}, "data_columns": []}
+    else:
+        assert _metadata == {}
+
+
+def test_read_metadata_from_file__chi(temp_path):
+    _fname = temp_path / "test.chi"
+    AsciiIo.export_to_file(_fname, _test_data, overwrite=True)
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+    assert _metadata["title"] == _fname.name
+    assert _metadata["x_axis"] == _test_data.get_axis_description(0, sep="(")
+    assert _metadata["data"] == _test_data.get_data_description(sep="(")
+    assert _metadata["n_points"] == _test_data.size
+
+
+def test_read_metadata_from_file__specfile(temp_path):
+    _fname = temp_path / "test.dat"
+    _epoch = time.time()
+    _datetime = datetime.datetime.now()
+    AsciiIo.export_to_file(_fname, _test_data, x_column=True, overwrite=True)
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+    assert _metadata["filename"] == _fname.name
+    assert _metadata["epoch"] - _epoch < 5  # within 5 seconds
+    assert (
+        _datetime
+        - datetime.datetime.strptime(_metadata["date"], "%a %b %d %H:%M:%S %Y")
+    ).seconds < 5
+    assert _metadata["n_columns"] == 2
+    assert _metadata["scan_title"] == "1 pydidas results"
+    assert _metadata["labels"] == _test_data.get_axis_description(
+        0, sep="("
+    ) + " " + _test_data.get_data_description(sep="(")
+
+
+def test_read_metadata_from_file__specfile__corrupt_header(temp_path):
+    with open(temp_path / "test.dat", "w") as f:
+        f.write("#N ab\n1 2 3\n4 5 6\n7 8 9\n")
+    with pytest.raises(UserConfigError):
+        _metadata = AsciiIo.read_metadata_from_file(temp_path / "test.dat")
+
+
+@pytest.mark.parametrize("ncols", [1, 2, 3])
+@pytest.mark.parametrize("x_column", [True, False])
+def test_read_metadata_from_file__txt(temp_path, ncols, x_column):
+    _fname = temp_path / "test.txt"
+    _data = get_data_with_ncols(ncols)
+    AsciiIo.export_to_file(_fname, _data, x_column=x_column, overwrite=True)
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+    assert _metadata["metadata"] == _data.metadata
+    if x_column:
+        assert _metadata["Axis label"] == _data.axis_labels[0]
+        assert _metadata["Axis unit"] == _data.axis_units[0]
+    else:
+        assert "Axis label" not in _metadata
+        assert "Axis unit" not in _metadata
+    assert _metadata["First column is x-axis"] == str(x_column)
+    assert _metadata["Data label"] == _data.data_label
+    assert _metadata["Data unit"] == _data.data_unit
+
+
+def test_read_metadata_from_file__txt_corrupt_header(temp_path):
+    _fname = temp_path / "test.txt"
+    with open(_fname, "w") as f:
+        f.write("# This is a corrupt header line:\n1 2 3\n4 5 6\n7 8 9\n")
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+
+
+def test_read_metadata_from_file__fio_corrupt_header(temp_path):
+    _fname = temp_path / "test.fio"
+    with open(_fname, "w") as f:
+        f.write("%p\ntest\n")
+    with pytest.raises(UserConfigError):
+        AsciiIo.read_metadata_from_file(_fname)
+
+
+@pytest.mark.parametrize("ncols", [1, 2, 3])
+def test_read_metadata_from_file__fio(temp_path, ncols):
+    _fname = temp_path / "test.fio"
+    _data = write_fio_file_with_n_col(_fname, ncols=ncols)
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+    assert _metadata["comments"] == ["A random comment", "Another comment"]
+    assert _metadata["parameters"] == {
+        "param0": 1,
+        "param1": 2.0,
+        "param2": -42,
+        "param3": "abc",
+    }
+    assert _metadata["data_columns"] == [
+        f"Col {i + 1} c{i}_label DOUBLE" for i in range(ncols)
+    ]
+
+
+@pytest.mark.parametrize("skip_key", ["XUNIT", "YUNIT", "START", "STOP", "STEP"])
+def test_read_metadata_from_file__asc(temp_path, skip_key):
+    _fname = temp_path / "test.asc"
+    _, _ = write_asc_file(_fname, skip_keys=[skip_key])
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+    with open(_fname, "r") as f:
+        _metadata_ref = {
+            _key.removeprefix("*").strip(): _val.strip()
+            for _line in f.readlines()
+            if _line.startswith("*") and "=" in _line
+            for _key, _val in [_line.split("=", 1)]
+        }
+    for _key, _val in _metadata_ref.items():
+        assert _metadata[_key] == _val
 
 
 if __name__ == "__main__":

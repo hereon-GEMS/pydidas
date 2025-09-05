@@ -520,3 +520,207 @@ class AsciiIo(IoBase):
             data_label=_metadata.get("SAMPLE", ""),
             data_unit=_metadata.get("YUNIT", ""),
         )
+
+    @classmethod
+    def read_metadata_from_file(
+        cls, filename: Path | str, **kwargs: Any
+    ) -> dict[str, Any]:
+        """
+        Read only the metadata from an ASCII file.
+
+        Parameters
+        ----------
+        filename : Path | str
+            The filename of the file with the data to be imported.
+        **kwargs : Any
+            Supported arguments are:
+
+        Returns
+        -------
+        dict
+            A dictionary with any found metadata keys.
+        """
+        _ext = get_extension(filename)
+        if _ext not in cls.extensions_import:
+            raise UserConfigError(
+                f"File extension '{_ext}' not supported for import: Cannot read "
+                "the metadata from the file."
+            )
+        with (
+            CatchFileErrors(filename),
+            warnings.catch_warnings(),
+            open(filename, "r") as f,
+        ):
+            warnings.simplefilter("ignore", UserWarning)
+            _lines = f.readlines()
+        if _ext == "chi":
+            _metadata = cls.__read_chi_metadata(_lines)
+        elif _ext == "dat":
+            _metadata = cls.__read_specfile_metadata(_lines)
+        elif _ext in ["txt", "csv"]:
+            _metadata = cls.__read_txt_metadata(_lines)
+        elif _ext == "fio":
+            _metadata = cls.__read_fio_metadata(_lines)
+        elif _ext == "asc":
+            _metadata = cls.__read_asc_metadata(_lines)
+        return _metadata
+
+    @staticmethod
+    def __read_chi_metadata(lines: list[str]) -> dict[str, Any]:
+        """
+        Read metadata from a chi file.
+
+        Parameters
+        ----------
+        lines : list[str]
+            The lines of the chi file.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with any found metadata keys.
+        """
+        try:
+            _metadata: dict[str, Any] = {
+                "title": lines[0].strip(),
+                "x_axis": lines[1].strip(),
+                "data": lines[2].strip(),
+                "n_points": int(lines[3].strip()),
+            }
+        except (IndexError, ValueError):
+            return {}
+        return _metadata
+
+    @staticmethod
+    def __read_specfile_metadata(lines: list[str]) -> dict[str, Any]:
+        """
+        Read metadata from a SpecFile (.dat) file.
+
+        Parameters
+        ----------
+        lines : list[str]
+            The lines of the SpecFile.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with any found metadata keys.
+        """
+        _metadata: dict[str, Any] = {}
+        try:
+            while lines:
+                _line = lines.pop(0).strip().removeprefix("#")
+                if not _line:
+                    continue
+                if _line.startswith("F "):
+                    _metadata["filename"] = _line.removeprefix("F ")
+                elif _line.startswith("E "):
+                    _metadata["epoch"] = float(_line.removeprefix("E "))
+                elif _line.startswith("D "):
+                    _metadata["date"] = _line.removeprefix("D ")
+                elif _line.startswith("S "):
+                    _metadata["scan_title"] = _line.removeprefix("S ")
+                elif _line.startswith("N "):
+                    _metadata["n_columns"] = int(_line.removeprefix("N "))
+                elif _line.startswith("L "):
+                    _metadata["labels"] = _line.removeprefix("L ")
+        except (IndexError, ValueError) as error:
+            raise UserConfigError("Cannot read SpecFile header:", error)
+        return _metadata
+
+    @staticmethod
+    def __read_txt_metadata(lines: list[str]) -> dict[str, Any]:
+        """
+        Read metadata from a text file.
+
+        Parameters
+        ----------
+        lines : list[str]
+            The lines of the text file.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with any found metadata keys.
+        """
+        _metadata: dict[str, Any] = {}
+        try:
+            while lines:
+                _line = lines.pop(0).strip()
+                if not _line.startswith("#"):
+                    break
+                _line = _line.removeprefix("#")
+                if _line.startswith("    "):
+                    if "metadata" not in _metadata:
+                        _metadata["metadata"] = {}
+                    _key, _val = _line.split(":", 1)
+                    _metadata["metadata"][_key.strip()] = _val.strip()
+                elif ":" in _line:
+                    _key, _val = _line.split(":", 1)
+                    _metadata[_key.strip()] = _val.strip()
+        except (IndexError, ValueError) as error:
+            raise UserConfigError("Cannot read text file header:", error)
+        return _metadata
+
+    @staticmethod
+    def __read_fio_metadata(lines: list[str]) -> dict[str, Any]:
+        """
+        Read metadata from a .fio file.
+
+        Parameters
+        ----------
+        lines : list[str]
+            The lines of the .fio file.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with any found metadata keys.
+        """
+        _metadata = {"comments": [], "parameters": {}, "data_columns": []}
+        try:
+            while lines:
+                _line = lines.pop(0).strip()
+                if _line == "%c":
+                    while lines and not lines[0].startswith("!"):
+                        _metadata["comments"].append(lines.pop(0).strip())
+                if _line == "%p":
+                    while lines and not lines[0].startswith("!"):
+                        _key, _val = lines.pop(0).split("=", 1)
+                        try:
+                            if "." in _val:
+                                _val = float(_val)
+                            else:
+                                _val = int(_val)
+                        except ValueError:
+                            _val = _val.strip()
+                        _metadata["parameters"][_key.strip()] = _val
+                if _line == "%d":
+                    while lines and lines[0].startswith(" Col"):
+                        _metadata["data_columns"].append(lines.pop(0).strip())
+
+        except (IndexError, ValueError) as error:
+            raise UserConfigError("Cannot read .fio header:", error)
+        return _metadata
+
+    @staticmethod
+    def __read_asc_metadata(lines: list[str]) -> dict[str, Any]:
+        """
+        Read metadata from an .asc file.
+
+        Parameters
+        ----------
+        lines : list[str]
+            The lines of the .asc file.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with any found metadata keys.
+        """
+        _metadata: dict[str, Any] = {}
+        for _line in lines:
+            if _line.startswith("*") and "=" in _line:
+                _key, _val = _line.split("=", 1)
+                _metadata[_key.removeprefix("*").strip()] = _val.strip()
+        return _metadata

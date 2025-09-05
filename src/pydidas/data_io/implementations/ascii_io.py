@@ -112,14 +112,12 @@ class AsciiIo(IoBase):
             _data = np.column_stack((data.axis_ranges[0], data.array))
         else:
             _data = data.array
-        if not kwargs.get("write_header", True):
-            _header = ""
         with CatchFileErrors(filename):
             np.savetxt(
                 filename,
                 _data,
                 delimiter=_delimiter,
-                header=_header,
+                header=_header if kwargs.get("write_header", True) else "",
                 fmt=_format,
                 comments=_comment_prefix,
             )

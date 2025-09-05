@@ -36,6 +36,7 @@ from contextlib import redirect_stdout
 from pydidas.core.utils import get_formatted_dict_representation
 from pydidas.core.utils.str_utils import (
     convert_special_chars_to_unicode,
+    convert_str_to_number,
     convert_unicode_to_ascii,
     format_input_to_multiline_str,
     get_fixed_length_str,
@@ -57,6 +58,21 @@ class Test_str_utils(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
+
+    def test_convert_str_to_number__int(self):
+        for _s in ["-42", "   -42 ", "\n-42", "   -42  \n"]:
+            with self.subTest(s=_s):
+                self.assertEqual(-42, convert_str_to_number(_s))
+
+    def test_convert_str_to_number__float(self):
+        for _s in ["-42.5", "   -42.5 ", "\n-42.5", "   -42.5  \n"]:
+            with self.subTest(s=_s):
+                self.assertEqual(-42.5, convert_str_to_number(_s))
+
+    def test_convert_str_to_number__nan(self):
+        for _s in ["-42.5.5", "   abc ", "\n a -42.5", "this is -42.5  \n"]:
+            with self.subTest(s=_s):
+                self.assertEqual(_s.strip(), convert_str_to_number(_s))
 
     def test_get_fixed_length_str_length(self):
         self.assertEqual(len(get_fixed_length_str("test", self.length)), self.length)

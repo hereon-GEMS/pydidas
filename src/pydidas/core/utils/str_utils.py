@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "convert_str_to_number",
     "get_fixed_length_str",
     "get_time_string",
     "get_short_time_string",
@@ -58,6 +59,34 @@ from typing import Any
 import numpy as np
 
 from pydidas.core.constants import ASCII_TO_UNI, UNI_TO_ASCII
+
+
+def convert_str_to_number(input: str) -> Real | Integral | str:
+    """
+    Convert a string to a number if possible.
+
+    This function will try to convert the input string to an integer or float.
+    If this is not possible, the original string will be returned (stripped of
+    whitespaces).
+
+    Parameters
+    ----------
+    input : str
+        The input string.
+
+    Returns
+    -------
+    Real | Integral | str
+        The converted number or the original string.
+    """
+    try:
+        if "." in input:
+            input = float(input)
+        else:
+            input = int(input)
+    except ValueError:
+        input = input.strip()
+    return input
 
 
 def get_fixed_length_str(

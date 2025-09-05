@@ -86,11 +86,16 @@ def get_widget_creation_information() -> list[list[str, tuple, dict]]:
             },
         ],
         [
+            "create_empty_widget",
+            ("plot_header",),
+            {"parent_widget": "viewer_and_filename", "gridPos": (1, 1, 1, 1)},
+        ],
+        [
             "create_label",
             ("filename_label", "Filename:"),
             {
-                "parent_widget": "viewer_and_filename",
-                "gridPos": (0, 1, 1, 1),
+                "parent_widget": "plot_header",
+                "gridPos": (0, 0, 1, 1),
                 "font_metric_width_factor": 12,
             },
         ],
@@ -98,26 +103,52 @@ def get_widget_creation_information() -> list[list[str, tuple, dict]]:
             "create_lineedit",
             ("filename",),
             {
-                "gridPos": (0, 2, 1, 1),
-                "parent_widget": "viewer_and_filename",
+                "gridPos": (0, 1, 1, 2),
+                "parent_widget": "plot_header",
                 "readOnly": True,
                 "sizePolicy": POLICY_EXP_EXP,
             },
         ],
         [
-            "create_any_widget",
-            ("hdf5_dataset_selector", Hdf5DatasetSelector),
+            "create_empty_widget",
+            ("ascii_widgets",),
             {
-                "gridPos": (-1, 1, 1, 2),
-                "parent_widget": "viewer_and_filename",
+                "parent_widget": "plot_header",
+                "gridPos": (-1, 0, 1, 3),
                 "visible": False,
+            },
+        ],
+        [
+            "create_spacer",
+            ("ascii_spacer",),
+            {
+                "gridPos": (0, 0, 1, 1),
+                "parent_widget": "ascii_widgets",
+                "fixedHeight": 20,
             },
         ],
         [
             "create_param_widget",
             ("xcol",),
             {
-                "gridPos": (-1, 1, 1, 2),
+                "gridPos": (-1, 0, 1, 2),
+                "parent_widget": "ascii_widgets",
+            },
+        ],
+        [
+            "create_button",
+            ("button_ascii_metadata", "Display ASCII metadata"),
+            {
+                "gridPos": (-1, 1, 1, 1),
+                "font_metric_width_factor": 30,
+                "parent_widget": "ascii_widgets",
+            },
+        ],
+        [
+            "create_any_widget",
+            ("hdf5_dataset_selector", Hdf5DatasetSelector),
+            {
+                "gridPos": (-1, 1, 1, 1),
                 "parent_widget": "viewer_and_filename",
                 "visible": False,
             },
@@ -126,7 +157,7 @@ def get_widget_creation_information() -> list[list[str, tuple, dict]]:
             "create_any_widget",
             ("raw_metadata_selector", RawMetadataSelector),
             {
-                "gridPos": (-1, 1, 1, 2),
+                "gridPos": (-1, 1, 1, 1),
                 "parent_widget": "viewer_and_filename",
                 "visible": False,
             },
@@ -134,7 +165,11 @@ def get_widget_creation_information() -> list[list[str, tuple, dict]]:
         [
             "add_any_widget",
             ("viewer", SilxDataViewer()),
-            {"gridPos": (-1, 1, 1, 2), "parent_widget": "viewer_and_filename"},
+            {
+                "gridPos": (-1, 1, 1, 1),
+                "parent_widget": "viewer_and_filename",
+                "sizePolicy": POLICY_EXP_EXP,
+            },
         ],
     ]
 

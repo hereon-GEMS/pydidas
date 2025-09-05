@@ -48,6 +48,7 @@ from pydidas.core.constants import (
 from pydidas.core.exceptions import FileReadError
 from pydidas.core.utils import CatchFileErrors, get_extension, get_hdf5_metadata
 from pydidas.data_io import IoManager, import_data
+from pydidas.data_io.implementations.ascii_io import AsciiIo
 from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     create_splitter,
     get_widget_creation_information,
@@ -110,6 +111,9 @@ class DataBrowsingFrame(BaseFrame):
         self._widgets["hdf5_dataset_selector"].sig_request_hdf5_browser.connect(
             self.__inspect_hdf5_tree
         )
+        self._widgets["button_ascii_metadata"].clicked.connect(
+            self.__display_ascii_metadata
+        )
 
     def build_frame(self):
         """
@@ -126,6 +130,8 @@ class DataBrowsingFrame(BaseFrame):
                 self.width(),
             ),
         )
+        _viewer_layout = self._widgets["viewer_and_filename"].layout()
+        _viewer_layout.setRowStretch(_viewer_layout.rowCount() - 1, 1)
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int):
@@ -161,15 +167,16 @@ class DataBrowsingFrame(BaseFrame):
         _extension = get_extension(filename)
         if _extension not in self.__supported_extensions:
             return
+        _is_ascii = _extension in ASCII_IMPORT_EXTENSIONS
         if self.__browser_window is not None:
             self.__browser_window.hide()
         self.__current_filename = filename
+        self._widgets["viewer"].setData(None)
         self._widgets["filename"].setText(self.__current_filename)
-        self.param_composite_widgets["xcol"].setVisible(
-            _extension in ASCII_IMPORT_EXTENSIONS
-        )
+        self._widgets["ascii_widgets"].setVisible(_is_ascii)
+
         self._widgets["hdf5_dataset_selector"].setVisible(_extension in HDF5_EXTENSIONS)
-        if _extension in ASCII_IMPORT_EXTENSIONS:
+        if _is_ascii:
             self.__open_ascii_file(self.get_param_value("xcol"))
         elif _extension in HDF5_EXTENSIONS:
             self.__open_hdf5_file()
@@ -186,7 +193,6 @@ class DataBrowsingFrame(BaseFrame):
         filename : str
             The filename of the hdf5 file to open.
         """
-        self._widgets["viewer"].setData(None)
         if self.__open_file is not None:
             self.__open_file.close()
             self.__open_file = None
@@ -323,3 +329,13 @@ class DataBrowsingFrame(BaseFrame):
             x_column_index=use_x_col,
         )
         self.__display_dataset(_data)
+
+    def __display_ascii_metadata(self):
+        """
+        Display the metadata of the current ASCII file in a message box.
+        """
+        if self.__current_filename is None or self._widgets["viewer"].data() is None:
+            return
+        _metadata = AsciiIo.read_metadata_from_file(self.__current_filename)
+        # TODO: implement window to display metadata
+        print("Metadata:", _metadata)

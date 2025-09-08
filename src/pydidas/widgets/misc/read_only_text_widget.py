@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ReadOnlyTextWidget"]
 
-from typing import Optional, Union
+from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -47,7 +47,9 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         at creation.
     """
 
-    def __init__(self, parent: Union[None, QtWidgets.QWidget] = None, **kwargs: dict):
+    init_kwargs = PydidasWidgetMixin.init_kwargs + ["line_wrap_width"]
+
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any):
         QtWidgets.QTextEdit.__init__(self, parent)
         kwargs["minimumWidth"] = kwargs.get("minimumWidth", 300)
         kwargs["readOnly"] = kwargs.get("readOnly", True)
@@ -74,7 +76,7 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         self.__char_format_bold = QtGui.QTextCharFormat()
         self.__char_format_bold.setFontWeight(QtGui.QFont.Bold)
         self.setLineWrapMode(QtWidgets.QTextEdit.FixedColumnWidth)
-        self.setLineWrapColumnOrWidth(80)
+        self.setLineWrapColumnOrWidth(kwargs.get("line_wrap_width", 80))
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
 
     def setText(
@@ -119,7 +121,7 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
     def set_text_from_list(
         self,
         text_list: list[str, str],
-        title: Optional[str] = None,
+        title: str | None = None,
     ):
         """
         Set the widget's text from a list of entries.

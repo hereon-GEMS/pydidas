@@ -42,7 +42,7 @@ __all__ = [
     "get_param_description_from_docstring",
     "strip_param_description_from_docstring",
     "get_formatted_blocks_from_docstring",
-    "get_formatted_dict_representation",
+    "formatted_str_repr_of_dict",
 ]
 
 
@@ -660,7 +660,7 @@ def get_formatted_blocks_from_docstring(docstring: str) -> list[str]:
     return _blocks
 
 
-def get_formatted_dict_representation(
+def formatted_str_repr_of_dict(
     input_dict: dict, indent: int = 0, digits: int = 6
 ) -> str:
     """
@@ -685,7 +685,7 @@ def get_formatted_dict_representation(
         _formatted_str += " " * indent + f"{_key}:"
         if isinstance(_value, dict):
             _formatted_str += "\n"
-            _formatted_str += get_formatted_dict_representation(
+            _formatted_str += formatted_str_repr_of_dict(
                 _value, indent=max(2 * indent, indent + 2), digits=digits
             )
         elif isinstance(_value, (list, tuple)):

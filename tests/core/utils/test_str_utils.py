@@ -33,7 +33,7 @@ import time
 import unittest
 from contextlib import redirect_stdout
 
-from pydidas.core.utils import get_formatted_dict_representation
+from pydidas.core.utils import formatted_str_repr_of_dict
 from pydidas.core.utils.str_utils import (
     convert_special_chars_to_unicode,
     convert_str_to_number,
@@ -491,9 +491,7 @@ class Test_str_utils(unittest.TestCase):
         _test_dict = {"a": 1, "b": 2.3, "c": "a", "d": 0.0000004, "e": 556744335.2}
         for _indent in [0, 1, 3, 6]:
             with self.subTest(indent=_indent):
-                _formatted = get_formatted_dict_representation(
-                    _test_dict, indent=_indent
-                )
+                _formatted = formatted_str_repr_of_dict(_test_dict, indent=_indent)
                 for _line in _formatted.split("\n"):
                     self.assertTrue(_line.startswith(" " * _indent))
 
@@ -501,9 +499,7 @@ class Test_str_utils(unittest.TestCase):
         _test_dict = {"a": 2.3}
         for _digits in [2, 4, 6, 9]:
             with self.subTest(digits=_digits):
-                _formatted = get_formatted_dict_representation(
-                    _test_dict, digits=_digits
-                )
+                _formatted = formatted_str_repr_of_dict(_test_dict, digits=_digits)
                 self.assertEqual(_formatted, f"a: {2.3:.{_digits}f}")
 
     def test_get_formatted_dict_representation__small_float(self):
@@ -511,9 +507,7 @@ class Test_str_utils(unittest.TestCase):
         _test_dict = {"a": _value}
         for _digits in [2, 4, 6, 9]:
             with self.subTest(digits=_digits):
-                _formatted = get_formatted_dict_representation(
-                    _test_dict, digits=_digits
-                )
+                _formatted = formatted_str_repr_of_dict(_test_dict, digits=_digits)
                 self.assertEqual(_formatted, f"a: {_value:.{_digits}e}")
 
     def test_get_formatted_dict_representation__large_float(self):
@@ -521,15 +515,13 @@ class Test_str_utils(unittest.TestCase):
         _test_dict = {"a": _value}
         for _digits in [2, 4, 6, 9]:
             with self.subTest(digits=_digits):
-                _formatted = get_formatted_dict_representation(
-                    _test_dict, digits=_digits
-                )
+                _formatted = formatted_str_repr_of_dict(_test_dict, digits=_digits)
                 self.assertEqual(_formatted, f"a: {_value:.{_digits}e}")
 
     def test_get_formatted_dict_representation__large_int(self):
         _value = 534636333
         _test_dict = {"a": _value}
-        _formatted = get_formatted_dict_representation(_test_dict)
+        _formatted = formatted_str_repr_of_dict(_test_dict)
         self.assertEqual(_formatted, f"a: {_value}")
 
 

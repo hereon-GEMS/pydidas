@@ -678,7 +678,11 @@ def test_read_metadata_from_file__fio(temp_path, ncols):
         "param3": "abc",
     }
     assert _metadata["data_columns"] == [
-        f"Col {i + 1} c{i}_label DOUBLE" for i in range(ncols)
+        (
+            f"Col {i + 1} c{i}_label DOUBLE    [note: in Python indexing, this column "
+            f"is indexed as #{i}]"
+        )
+        for i in range(ncols)
     ]
 
 

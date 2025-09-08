@@ -690,8 +690,13 @@ class AsciiIo(IoBase):
                         _metadata["parameters"][_key.strip()] = _val
                 if _line == "%d":
                     while lines and lines[0].startswith(" Col"):
-                        _metadata["data_columns"].append(lines.pop(0).strip())
-
+                        _line = lines.pop(0).strip()
+                        _i = int(_line.removeprefix("Col").split()[0])
+                        _line += (
+                            "    [note: in Python indexing, this column is indexed "
+                            f"as #{_i - 1}]"
+                        )
+                        _metadata["data_columns"].append(_line)
         except (IndexError, ValueError) as error:
             raise UserConfigError("Cannot read .fio header:", error)
         return _metadata

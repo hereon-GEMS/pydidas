@@ -61,7 +61,7 @@ import numpy as np
 from pydidas.core.constants import ASCII_TO_UNI, UNI_TO_ASCII
 
 
-def convert_str_to_number(input: str) -> Real | Integral | str:
+def convert_str_to_number(input_str: str) -> Real | Integral | str:
     """
     Convert a string to a number if possible.
 
@@ -71,7 +71,7 @@ def convert_str_to_number(input: str) -> Real | Integral | str:
 
     Parameters
     ----------
-    input : str
+    input_str : str
         The input string.
 
     Returns
@@ -80,13 +80,13 @@ def convert_str_to_number(input: str) -> Real | Integral | str:
         The converted number or the original string.
     """
     try:
-        if "." in input:
-            input = float(input)
+        if "." in input_str:
+            _output = float(input_str)
         else:
-            input = int(input)
+            _output = int(input_str)
     except ValueError:
-        input = input.strip()
-    return input
+        _output = input_str.strip()
+    return _output
 
 
 def get_fixed_length_str(
@@ -274,6 +274,8 @@ def get_warning(message: str | Iterable[str], **kwargs: Any) -> str:
         message = [message]
     elif isinstance(message, Iterable):
         _max = np.amax(np.r_[[len(_s) for _s in message]])
+    else:
+        raise TypeError("The message must be a string or an Iterable of strings.")
     _length = 60 if _max <= 54 else 80
     _s = "\n" * _new_lines + _severe * ("=" * _length + "\n") + "-" * _length + "\n"
     for item in message:
@@ -378,13 +380,13 @@ def convert_unicode_to_ascii(obj: str | list[str]) -> str | list[str]:
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
-def get_range_as_formatted_string(obj: np.ndarray | Iterable[float, ...]) -> str:
+def get_range_as_formatted_string(obj: str | np.ndarray | Iterable[float]) -> str:
     """
     Get a formatted string representation of an iterable range.
 
     Parameters
     ----------
-    obj : np.ndarray | Iterable[float, ...]
+    obj : str | np.ndarray | Iterable[float]
         The input range.
 
     Returns
@@ -541,7 +543,7 @@ def _get_unformatted_lines(input_str: str, max_line_length: int = 60) -> list:
     result_lines : list
         The list with the individual lines.
     """
-    _words = [s for s in re.split(" |\n", input_str) if len(s) > 0]
+    _words = [s for s in re.split("[ \n]", input_str) if len(s) > 0]
     _result_lines = []
     _current_str = _words.pop(0) if len(_words) > 0 else ""
     while len(_words) > 0:
@@ -594,6 +596,7 @@ def get_param_description_from_docstring(docstring: str) -> dict[str, str]:
         _param_str = (
             docstring[docstring.find("Parameters") + 10 :].strip("\n -").split("\n")
         )
+        _key = ""
         while len(_param_str) > 0:
             if not _param_str[0].startswith(8 * " "):
                 _key = _param_str.pop(0).strip()
@@ -681,7 +684,7 @@ def get_formatted_dict_representation(
     for _key, _value in input_dict.items():
         _formatted_str += " " * indent + f"{_key}:"
         if isinstance(_value, Real) and not isinstance(_value, Integral):
-            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"
+            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"  # noqa
             _formatted_str += f" {_value:.{digits}{_formatter}}\n"
         elif isinstance(_value, dict):
             _formatted_str += (

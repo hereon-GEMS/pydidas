@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["import_data", "export_data"]
+__all__ = ["import_data", "export_data", "read_metadata"]
 
 
 from pathlib import Path
@@ -70,3 +70,20 @@ def import_data(filename: Path | str, **kwargs: Any) -> Dataset:
     """
     _data = IoManager.import_from_file(filename, **kwargs)
     return _data
+
+
+def read_metadata(filename: Path | str, **kwargs: Any) -> dict:
+    """
+    Read metadata from a file using the pydidas.data_io.IoManager metaclass.
+
+    Parameters
+    ----------
+    filename : Path | str
+        The filename to be used for the exported data.
+    **kwargs : Any
+        Any keyword arguments. These will be passed to the implemented importer,
+        and the supported keywords vary depending on the selected file
+        extension.
+    """
+    _metadata = IoManager.read_metadata_from_file(filename, **kwargs)
+    return _metadata

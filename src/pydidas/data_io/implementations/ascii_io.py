@@ -52,6 +52,7 @@ class AsciiIo(IoBase):
     extensions_import = ASCII_IMPORT_EXTENSIONS
     format_name = "ASCII"
     dimensions = [1, 2]
+    allows_metadata_import = True
 
     @classmethod
     def export_to_file(cls, filename: str | Path, data: np.ndarray, **kwargs: Any):

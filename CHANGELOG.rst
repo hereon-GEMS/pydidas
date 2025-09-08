@@ -34,6 +34,8 @@ Improvements
 - Added support for displaying ASCII data in the DataBrowsingFrame
 - Small HDF5 datasets (size can be configured in the options) will now be fully loaded
   into memory in the DataBrowsingFrame and keep their metadata.
+- Added a 'read_metadata' function to data_io and a 'read_metadata_from_file' method to
+  IoManager.
 
 
 Bugfixes

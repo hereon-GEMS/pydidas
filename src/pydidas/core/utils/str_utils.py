@@ -683,17 +683,20 @@ def get_formatted_dict_representation(
     _formatted_str = ""
     for _key, _value in input_dict.items():
         _formatted_str += " " * indent + f"{_key}:"
-        if isinstance(_value, Real) and not isinstance(_value, Integral):
-            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"  # noqa
-            _formatted_str += f" {_value:.{digits}{_formatter}}\n"
-        elif isinstance(_value, dict):
-            _formatted_str += (
-                "\n"
-                + get_formatted_dict_representation(
-                    _value, indent=indent + 2, digits=digits
-                )
-                + "\n"
+        if isinstance(_value, dict):
+            _formatted_str += "\n"
+            _formatted_str += get_formatted_dict_representation(
+                _value, indent=max(2 * indent, indent + 2), digits=digits
             )
+        elif isinstance(_value, (list, tuple)):
+            _formatted_str += "\n"
+            _formatted_str += "\n".join(
+                " " * max(2 * indent, indent + 2) + f"{_item}" for _item in _value
+            )
+        elif isinstance(_value, Real) and not isinstance(_value, Integral):
+            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"  # noqa
+            _formatted_str += f" {_value:.{digits}{_formatter}}"
         else:
-            _formatted_str += f" {_value}\n"
+            _formatted_str += f" {_value}"
+        _formatted_str += "\n"
     return _formatted_str.rstrip()

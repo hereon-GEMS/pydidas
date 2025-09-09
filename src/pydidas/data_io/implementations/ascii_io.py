@@ -386,7 +386,10 @@ class AsciiIo(IoBase):
                 "and assure it has two columns"
             )
         _metadata = decode_txt_header(filename)
-        if x_column or _metadata.get("use_x_column", False):
+        if _metadata.get("use_x_column", False):
+            x_column = True
+            x_column_index = 0
+        if x_column:
             _axes: list[Any] = [_data[:, x_column_index]]
             _data = np.delete(_data, x_column_index, axis=1).squeeze()
         else:

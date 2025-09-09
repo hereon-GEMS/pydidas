@@ -447,6 +447,16 @@ def test_import_from_file__txt__w_x_index(temp_path, x_index):
     assert np.allclose(_data.axis_ranges[0], _temp_data[:, x_index])
 
 
+def test_import_from_file__txt__w_metadata_x_column_and_index_none(temp_path):
+    _fname = temp_path / "test.txt"
+    AsciiIo.export_to_file(
+        _fname, _test_data, x_column=True, write_header=True, overwrite=True
+    )
+    _data = AsciiIo.import_from_file(_fname, x_column=False, x_column_index=None)
+    assert np.allclose(_data, _test_data)
+    assert np.allclose(_data.axis_ranges[0], _test_data.axis_ranges[0])
+
+
 def test_import_from_file__txt__1d_w_xcolumn(temp_path):
     _temp_data = get_data_with_ncols(1)
     _fname = temp_path / "test_1d_no_x.txt"

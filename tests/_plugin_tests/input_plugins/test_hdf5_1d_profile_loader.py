@@ -100,7 +100,7 @@ def test_pre_execute__no_input(setup_scan):
     assert "dataset" in plugin._standard_kwargs
     assert "binning" in plugin._standard_kwargs
     assert plugin._standard_kwargs["forced_dimension"] == 1
-    assert not plugin._standard_kwargs["import_pydidas_metadata"]
+    assert not plugin._standard_kwargs["import_metadata"]
     assert plugin._config["xrange"] is None
 
 

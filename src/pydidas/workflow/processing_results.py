@@ -600,6 +600,9 @@ class ProcessingResults(ObjectWithParameterCollection):
             squeeze_results=squeeze_results,
         )
 
+    # alias
+    export_data_to_directory = save_results_to_disk
+
     def prepare_files_for_saving(
         self,
         save_dir: str | Path,

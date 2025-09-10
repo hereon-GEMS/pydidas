@@ -36,7 +36,6 @@ __all__ = [
     "create_nx_entry_groups",
     "create_nx_dataset",
     "create_nxdata_entry",
-    "create_nxdata_axis_entry",
     "get_nx_class_for_param",
 ]
 
@@ -453,7 +452,7 @@ def create_nx_entry_groups(
     **attributes: Any,
 ) -> h5py.Group:
     """
-    Create the NXentry groups in the hdf5 file and return the final group.
+    Create the NXentry groups recursively in the hdf5 file and return the final group.
 
     Note that the final group is set to be a NXdata group unless the `group_type`
     is specified differently. If the group already exists, the function will
@@ -479,7 +478,7 @@ def create_nx_entry_groups(
         _group = parent[group_name]
         if _group.attrs.get("NX_class", group_type) != group_type:
             raise ValueError(
-                "Error when creating the group {group_name}: The group already exists"
+                f"Error when creating the group {group_name}: The group already exists"
                 f"but is not of specified type {group_type} (existing group: "
                 f"{_group.attrs.get('NX_class')})."
             )
@@ -533,66 +532,22 @@ def create_nxdata_entry(
         parent,
         _data_group_name,
         signal=_dset_name,
-        axes=[f"axis_{_i}_repr" for _i in range(data.ndim)],
+        axes=[f"axis_{_i}" for _i in range(data.ndim)],
         title=data.data_label,
-        **{f"axis_{_n}_repr_indices": [_n] for _n in range(data.ndim)},
+        **{f"axis_{_n}_indices": [_n] for _n in range(data.ndim)},
         **attributes,
     )
-    create_nx_dataset(
-        _data_group,
-        _dset_name,
-        data,
-        units=data.data_unit,
-        long_name=data.data_description,
-        NX_class="NX_NUMBER",
-    )
+    create_nx_dataset(_data_group, _dset_name, data, units=data.data_unit, signal=1)
     for _dim in range(data.ndim):
-        create_nxdata_axis_entry(
+        _ = create_nx_dataset(
             _data_group,
-            _dim,
-            data.axis_labels[_dim],
-            data.axis_units[_dim],
+            f"axis_{_dim}",
             data.axis_ranges[_dim],
+            units=data.axis_units[_dim],
+            long_name=data.axis_labels[_dim],
+            axis=_dim,
         )
     return _data_group
-
-
-def create_nxdata_axis_entry(
-    group: h5py.Group, dim: int, label: str, unit: str, axdata: np.ndarray
-):
-    """
-    Create an entry for the given axis in the given group.
-
-    Parameters
-    ----------
-    group : h5py.Group
-        The group to create the axis entry in.
-    dim : int
-        The dimension of the axis.
-    label : str
-        The label of the axis.
-    unit : str
-        The unit of the axis.
-    axdata : np.ndarray
-        The data of the axis.
-
-    Returns
-    -------
-    h5py.Dataset
-        The created dataset.
-    """
-    _group = group.create_group(f"axis_{dim}")
-    _group.create_dataset("label", data=label)
-    _group.create_dataset("unit", data=unit)
-    _ax = _group.create_dataset("range", data=axdata)
-    _ = create_nx_dataset(
-        group,
-        f"axis_{dim}_repr",
-        _ax,
-        units=unit,
-        long_name=label + (" / " + unit if len(unit) > 0 else ""),
-        axis=dim,
-    )
 
 
 def create_nx_dataset(

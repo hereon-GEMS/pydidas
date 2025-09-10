@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -100,7 +100,7 @@ class TestHdf5Io(unittest.TestCase):
             self.assertIn(_ext, Hdf5Io.extensions_import)
 
     def test_import_from_file__simple(self):
-        _data = Hdf5Io.import_from_file(self._fname, import_pydidas_metadata=False)
+        _data = Hdf5Io.import_from_file(self._fname, import_metadata=False)
         self.assertTrue(np.allclose(_data, self._data[self._data_slice]))
 
     def test_import_from_file__full(self):
@@ -134,7 +134,7 @@ class TestHdf5Io(unittest.TestCase):
             with self.subTest(slice=_slice):
                 _index = _slice[0] if isinstance(_slice[0], Integral) else _slice[0][0]
                 _data = Hdf5Io.import_from_file(
-                    self._fname, indices=_slice, import_pydidas_metadata=False
+                    self._fname, indices=_slice, import_metadata=False
                 )
                 self.assertTrue(
                     np.allclose(_data, self._data[(_index, *self._data_slice[1:])])
@@ -142,13 +142,13 @@ class TestHdf5Io(unittest.TestCase):
 
     def test_import_from_file__w_none_indices(self):
         _data = Hdf5Io.import_from_file(
-            self._fname, indices=None, import_pydidas_metadata=False
+            self._fname, indices=None, import_metadata=False
         )
         self.assertTrue(np.allclose(_data, self._data[*self._data_slice]))
 
     def test_import_from_file__w_none_index(self):
         _data = Hdf5Io.import_from_file(
-            self._fname, indices=(None,), import_pydidas_metadata=False
+            self._fname, indices=(None,), import_metadata=False
         )
         self.assertTrue(np.allclose(_data, self._data[*self._data_slice]))
 
@@ -160,13 +160,13 @@ class TestHdf5Io(unittest.TestCase):
 
     def test_import_from_file__2_consecutive_indices(self):
         _data = Hdf5Io.import_from_file(
-            self._fname, indices=(1, 3), import_pydidas_metadata=False
+            self._fname, indices=(1, 3), import_metadata=False
         )
         self.assertTrue(np.allclose(_data, self._data[(1, 3, *self._data_slice[2:])]))
 
     def test_import_from_file__2_separate_slicing_axes(self):
         _data = Hdf5Io.import_from_file(
-            self._fname, indices=(5, None, 3), import_pydidas_metadata=False
+            self._fname, indices=(5, None, 3), import_metadata=False
         )
         self.assertTrue(
             np.allclose(
@@ -178,13 +178,13 @@ class TestHdf5Io(unittest.TestCase):
         _data = Hdf5Io.import_from_file(
             self._fname,
             indices=((5, None), None, (None, 3)),
-            import_pydidas_metadata=False,
+            import_metadata=False,
         )
         self.assertTrue(np.allclose(_data, self._data[5:, :, :3, self._data_slice[3]]))
 
     def test_import_from_file__w_dataset(self):
         _data = Hdf5Io.import_from_file(
-            self._fname, dataset="test/path/data", import_pydidas_metadata=False
+            self._fname, dataset="test/path/data", import_metadata=False
         )
         self.assertTrue(np.allclose(_data, self._data))
 
@@ -192,13 +192,13 @@ class TestHdf5Io(unittest.TestCase):
         _data = Hdf5Io.import_from_file(
             self._fname,
             dataset="test/path/data",
-            import_pydidas_metadata=True,
+            import_metadata=True,
             indices=(1, 4),
         )
         self.assertTrue(np.allclose(_data, self._data[1, 4]))
 
     def test_import_from_file__metadata_was_copied(self):
-        _data = Hdf5Io.import_from_file(self._fname, import_pydidas_metadata=False)
+        _data = Hdf5Io.import_from_file(self._fname, import_metadata=False)
         self.assertIn("indices", _data.metadata)
         self.assertIn("dataset", _data.metadata)
 

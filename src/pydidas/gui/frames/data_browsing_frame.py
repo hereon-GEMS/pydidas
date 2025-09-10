@@ -109,7 +109,7 @@ class DataBrowsingFrame(BaseFrame):
             self._widgets["raw_metadata_selector"].new_filename
         )
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
-        self.param_widgets["xcol"].sig_new_value.connect(self.__open_ascii_file)
+        self.param_widgets["xcol"].sig_new_value.connect(self.__display_ascii_data)
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
         )
@@ -187,7 +187,7 @@ class DataBrowsingFrame(BaseFrame):
 
         self._widgets["hdf5_dataset_selector"].setVisible(_extension in HDF5_EXTENSIONS)
         if _is_ascii:
-            self.__open_ascii_file(self.get_param_value("xcol"))
+            self.__open_ascii_file()
         elif _extension in HDF5_EXTENSIONS:
             self.__open_hdf5_file()
         elif _extension not in BINARY_EXTENSIONS:
@@ -308,10 +308,37 @@ class DataBrowsingFrame(BaseFrame):
             self.__browser_window = Hdf5BrowserWindow()
         self.__browser_window.open_file(self.__current_filename)
 
-    @QtCore.Slot(str)
-    def __open_ascii_file(self, use_x_col: str):
+    def __open_ascii_file(self):
         """
-        Import ASCII data with the desired handling of the x-column data.
+        Import ASCII raw data.
+
+        Parameters
+        ----------
+        use_x_col : str
+            The new value for the xcol parameter. This can be "None" or an integer.
+        """
+        if self.__current_filename is None:
+            return
+        _ascii_data = import_data(self.__current_filename, x_column=False)
+        _new_choices = [None]
+        _curr_choice = None
+        if _ascii_data.ndim > 1:
+            _curr_choice = self.get_param_value("xcol")
+            _new_choices = _new_choices + list(range(_ascii_data.shape[1]))
+            if _curr_choice not in _new_choices:
+                _curr_choice = None
+            if _ascii_data.shape[1] == 2:
+                _curr_choice = 0
+        self.params["xcol"].update_value_and_choices(_curr_choice, _new_choices)
+        self.param_composite_widgets["xcol"].setVisible(_ascii_data.ndim > 1)
+        with QtCore.QSignalBlocker(self.param_widgets["xcol"]):
+            self.param_widgets["xcol"].update_choices(_new_choices)
+            self.update_widget_value("xcol", _curr_choice)
+        self.__display_ascii_data(_curr_choice)
+
+    def __display_ascii_data(self, use_x_col: str):
+        """
+        Display the ASCII data with the new x-column setting.
 
         Parameters
         ----------
@@ -319,20 +346,6 @@ class DataBrowsingFrame(BaseFrame):
             The new value for the xcol parameter. This can be "None" or an integer.
         """
         use_x_col = None if use_x_col in [None, "None"] else int(use_x_col)
-        if self.__current_filename is None:
-            return
-        _data = import_data(self.__current_filename, x_column=False)
-        if _data.ndim == 1:
-            use_x_col = None
-            _new_choices = [None]
-        else:
-            _new_choices = [None] + list(range(_data.shape[1]))
-            if use_x_col not in _new_choices:
-                use_x_col = 0
-        self.params["xcol"].update_value_and_choices(use_x_col, _new_choices)
-        with QtCore.QSignalBlocker(self.param_widgets["xcol"]):
-            self.param_widgets["xcol"].update_choices(_new_choices)
-            self.update_widget_value("xcol", use_x_col)
         _data = import_data(
             self.__current_filename,
             x_column=use_x_col is not None,

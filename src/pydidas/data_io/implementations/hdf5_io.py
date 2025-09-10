@@ -28,6 +28,7 @@ __all__ = []
 
 
 import os
+import warnings
 from numbers import Integral
 from pathlib import Path
 from typing import Any
@@ -35,7 +36,7 @@ from typing import Any
 import h5py
 from numpy import ndarray, squeeze
 
-from pydidas.core import Dataset, UserConfigError
+from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors
 from pydidas.core.utils.hdf5_dataset_utils import (
@@ -161,8 +162,8 @@ class Hdf5Io(IoBase):
             auto_squeeze : bool, optional
                 Flag to automatically squeeze data dimensions before returning
                 the data. The default is True.
-            import_pydidas_metadata : bool, optional
-                Flag to get the Dataset metadata from the hdf5 file, if supplied.
+            import_metadata : bool, optional
+                Flag to get the nexus metadata from the hdf5 file, if supplied.
                 The default is True.
 
         Returns
@@ -181,7 +182,7 @@ class Hdf5Io(IoBase):
             )
         )
         if "dset" in kwargs and "dataset" not in kwargs:
-            raise Warning("dset keyword is deprecated. Please use dataset instead.")
+            warnings.warn("dset keyword is deprecated. Please use dataset instead.")
             kwargs["dataset"] = kwargs.pop("dset")
         dataset = kwargs.get("dataset", "entry/data/data")
         auto_squeeze = kwargs.get("auto_squeeze", True)
@@ -203,7 +204,7 @@ class Hdf5Io(IoBase):
                 _raw_data,
                 metadata={"indices": _human_readable_indices, "dataset": dataset},
             )
-            if kwargs.get("import_pydidas_metadata", True):
+            if kwargs.get("import_metadata", True):
                 cls._update_dataset_metadata(_data, _h5file, dataset, _indices)
             if auto_squeeze:
                 _data = squeeze(_data)
@@ -233,8 +234,37 @@ class Hdf5Io(IoBase):
         _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
         if _root == "":
             return
+        _data_group = h5file[_data_group_name]
+        _axes_names = _data_group.attrs.get("axes", [])
+        _valid_metadata = []
+        # read NeXus-compliant axis names and indices, where available:
+        try:
+            for _item_idx, _name in enumerate(_axes_names):
+                _name = _name if isinstance(_name, str) else _name.decode()
+                _idx = _data_group.attrs.get(f"{_name}_indices", [_item_idx])[0]
+                _range = _data_group[_name][_slicers.get(_idx, slice(None))]
+                data.update_axis_range(_idx, _range)
+                _unit = _data_group[_name].attrs.get("units", "")
+                _label = _data_group[_name].attrs.get("long_name", _name)
+                # TODO : deprecate check for unit in label from legacy files
+                if _unit and _unit in _label:
+                    _label = _label.replace(f" / {_unit}", "")
+                data.update_axis_label(_idx, _label)
+                data.update_axis_unit(_idx, _data_group[_name].attrs.get("units", ""))
+                _valid_metadata.append(_idx)
+            data.data_label = _data_group.attrs.get("title", "")
+            if not data.data_label:
+                data.data_label = _data_group.attrs.get("signal", "")
+            data.data_unit = h5file[dataset].attrs.get("units", "")
+        except (ValueError, KeyError):
+            raise FileReadError(
+                "The HDF5 file is not NeXus compliant and the metadata. Please load "
+                "the data without metadata import and/or check the file."
+            )
+        # TODO: deprecate the axes group reading from legacy export results
         _items = {_key: _item for _key, _item in h5file[_data_group_name].items()}
-        for _ax in range(data.ndim):
+        _axes_to_check = [_i for _i in range(data.ndim) if _i not in _valid_metadata]
+        for _ax in _axes_to_check:
             _curr_ax = f"axis_{_ax}"
             if _curr_ax not in _items:
                 continue
@@ -253,7 +283,7 @@ class Hdf5Io(IoBase):
                 _meth = getattr(data, f"update_axis_{_key}")
                 _meth(_ax, _val if _val is not None else "None")
         for _key in ["data_label", "data_unit"]:
-            if _key in h5file[_root]:
+            if _key in h5file[_root] and getattr(data, _key) == "":
                 setattr(data, _key, h5file[_root][_key][()].decode())
 
     @classmethod
@@ -290,6 +320,3 @@ class Hdf5Io(IoBase):
             data = Dataset(data)
         with h5py.File(filename, "w") as _file:
             _data_group = create_nxdata_entry(_file, _dataset, data)
-            _root_group = _file[_root_group_name]
-            _root_group.create_dataset("data_label", data=data.data_label)
-            _root_group.create_dataset("data_unit", data=data.data_unit)

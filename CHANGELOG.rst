@@ -204,7 +204,7 @@ Improvements
 - Added import functionality for Sardana FIO files to the Scan import.
 - Added a range property to the Parameter to limit the allowed range of Parameters
   for numerical values.
-- Pydidas result exports in hdf5 format writes metadata neXus-compatible
+- Pydidas result exports in hdf5 format writes metadata NeXus-compatible
 - Added a new interface for browsing and slicing data based on its metadata.
 - Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
   (for the general class) and WorkflowResults (for the singleton instance)

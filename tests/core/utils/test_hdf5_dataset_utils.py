@@ -475,14 +475,14 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         for key, value in attributes.items():
             self.assertEqual(group.attrs[key], value)
         for dim in range(data.ndim):
-            self.assertIn(f"axis_{dim}_repr", group)
+            self.assertIn(f"axis_{dim}", group)
             self.assertTrue(
-                np.allclose(group[f"axis_{dim}_repr"][()], data.axis_ranges[dim])
+                np.allclose(group[f"axis_{dim}"][()], data.axis_ranges[dim])
             )
-            axis_group = group[f"axis_{dim}"]
-            self.assertEqual(axis_group["label"][()].decode(), data.axis_labels[dim])
-            self.assertEqual(axis_group["unit"][()].decode(), data.axis_units[dim])
-            self.assertTrue(np.allclose(axis_group["range"][()], data.axis_ranges[dim]))
+            _ax = group[f"axis_{dim}"]
+            self.assertEqual(_ax.attrs["long_name"], data.axis_labels[dim])
+            self.assertEqual(_ax.attrs["units"], data.axis_units[dim])
+            self.assertTrue(np.allclose(_ax[()], data.axis_ranges[dim]))
 
     def test_create_nx_dataset__basic(self):
         group = self.file.create_group("entry")

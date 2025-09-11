@@ -29,100 +29,26 @@ __all__ = []
 
 import os
 import warnings
-from numbers import Integral
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 import h5py
 from numpy import ndarray, squeeze
 
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors
+from pydidas.core.utils import CatchFileErrors, str_repr_of_slice
+from pydidas.core.utils.converters import convert_to_slice
 from pydidas.core.utils.hdf5_dataset_utils import (
     create_nxdata_entry,
 )
 from pydidas.data_io.implementations.io_base import IoBase
 
 
-def _create_slice_object(entry: object):
-    """
-    Create a slice object from the entry.
-
-    The input can be None to disable slicing, or slices can be given as individual
-    slice or integer objects or tuples with (low, high) entries for the boundaries.
-
-    Parameters
-    ----------
-    entry : object
-        The input object.
-
-    Returns
-    -------
-    slice
-        The selection slice.
-    """
-    if entry is None:
-        return slice(None, None)
-    if isinstance(entry, slice):
-        return entry
-    if isinstance(entry, Integral):
-        return slice(entry, entry + 1)
-    if (
-        isinstance(entry, (list, tuple))
-        and len(entry) == 1
-        and isinstance(entry[0], Integral)
-    ):
-        return slice(entry[0], entry[0] + 1)
-    if isinstance(entry, (list, tuple)) and len(entry) == 2:
-        if not (isinstance(entry[0], Integral) or entry[0] is None) or not (
-            isinstance(entry[1], Integral) or entry[1] is None
-        ):
-            raise ValueError(
-                "Only integers are allowed for slicing objects. Given input: "
-                f"`[{entry[0]}, {entry[1]}]`."
-            )
-        return slice(entry[0], entry[1])
-    raise ValueError(f"Could not convert the entry `{entry}` to a slice object.")
-
-
-def _get_slice_repr(obj: tuple[slice | Integral]) -> str:
-    """
-    Get a string representation of the tuple of slice objects
-
-    Parameters
-    ----------
-    obj : tuple[slice | Integral]
-        The tuple of slice objects.
-
-    Returns
-    -------
-    str
-        The string representation of the slicing objects.
-    """
-    _repr = []
-    for _slice in obj:
-        if isinstance(_slice, Integral):
-            _repr.append(str(_slice))
-        elif _slice.start is None and _slice.stop is None:
-            _repr.append(":")
-        elif _slice.start is None and isinstance(_slice.stop, Integral):
-            _repr.append(f":{_slice.stop}")
-        elif isinstance(_slice.start, Integral) and _slice.stop is None:
-            _repr.append(f"{_slice.start}:")
-        elif isinstance(_slice.stop, Integral) and isinstance(_slice.stop, Integral):
-            if _slice.stop == _slice.start + 1:
-                _repr.append(f"{_slice.start}")
-            else:
-                _repr.append(f"{_slice.start}:{_slice.stop}")
-    return "[" + ", ".join(_repr) + "]"
-
-
 class Hdf5Io(IoBase):
     """IoBase implementation for Hdf5 files."""
 
-    extensions_export = HDF5_EXTENSIONS
-    extensions_import = HDF5_EXTENSIONS
+    extensions_import = extensions_export = HDF5_EXTENSIONS
     format_name = "Hdf5"
     dimensions = [1, 2, 3, 4, 5, 6, 7, 8]
 
@@ -172,15 +98,9 @@ class Hdf5Io(IoBase):
             The data in the form of a pydidas Dataset (with embedded metadata)
         """
         _input_indices = kwargs.get("indices", slice(None))
-        _indices = (
-            (slice(None),)
-            if _input_indices in [None, slice(None)]
-            else (
-                (_input_indices,)
-                if isinstance(_input_indices, Integral)
-                else tuple(_create_slice_object(_item) for _item in _input_indices)
-            )
-        )
+        if not isinstance(_input_indices, Iterable):
+            _input_indices = (_input_indices,)
+        _indices = tuple(convert_to_slice(_item) for _item in _input_indices)
         if "dset" in kwargs and "dataset" not in kwargs:
             warnings.warn("dset keyword is deprecated. Please use dataset instead.")
             kwargs["dataset"] = kwargs.pop("dset")
@@ -192,7 +112,9 @@ class Hdf5Io(IoBase):
             h5py.File(filename, "r") as _h5file,
         ):
             _raw_data = _h5file[dataset][_indices]
-            _human_readable_indices = _get_slice_repr(_indices)
+            _human_readable_indices = (
+                "[" + ", ".join(str_repr_of_slice(_item) for _item in _indices) + "]"
+            )
             if 0 in _raw_data.shape:
                 _full_shape = _h5file[dataset].shape
                 raise UserConfigError(
@@ -206,6 +128,9 @@ class Hdf5Io(IoBase):
             )
             if kwargs.get("import_metadata", True):
                 cls._update_dataset_metadata(_data, _h5file, dataset, _indices)
+                # TODO: deprecate the axes group reading from legacy export results
+                cls.__read_legacy_metadata(_data, _h5file, dataset, _indices)
+
             if auto_squeeze:
                 _data = squeeze(_data)
             cls._data = _data
@@ -217,6 +142,9 @@ class Hdf5Io(IoBase):
     ):
         """
         Check the hdf5 file for Dataset metadata and update the data's properties.
+
+        This method reads NeXus-compliant metadata from the hdf5 file and updates
+        the Dataset's axis labels, units, and ranges accordingly.
 
         Parameters
         ----------
@@ -236,32 +164,61 @@ class Hdf5Io(IoBase):
             return
         _data_group = h5file[_data_group_name]
         _axes_names = _data_group.attrs.get("axes", [])
-        _valid_metadata = []
-        # read NeXus-compliant axis names and indices, where available:
+        _valid_metadata_axes = []
         try:
             for _item_idx, _name in enumerate(_axes_names):
                 _name = _name if isinstance(_name, str) else _name.decode()
                 _idx = _data_group.attrs.get(f"{_name}_indices", [_item_idx])[0]
-                _range = _data_group[_name][_slicers.get(_idx, slice(None))]
-                data.update_axis_range(_idx, _range)
-                _unit = _data_group[_name].attrs.get("units", "")
-                _label = _data_group[_name].attrs.get("long_name", _name)
-                # TODO : deprecate check for unit in label from legacy files
-                if _unit and _unit in _label:
-                    _label = _label.replace(f" / {_unit}", "")
-                data.update_axis_label(_idx, _label)
-                data.update_axis_unit(_idx, _data_group[_name].attrs.get("units", ""))
-                _valid_metadata.append(_idx)
+                if isinstance(_data_group[_name], h5py.Dataset):
+                    _range = _data_group[_name][_slicers.get(_idx, slice(None))]
+                    data.update_axis_range(_idx, _range)
+                    _unit = _data_group[_name].attrs.get("units", "")
+                    _label = _data_group[_name].attrs.get("long_name", _name)
+                    # TODO : deprecate check for unit in label from legacy files
+                    if _unit and _unit in _label:
+                        _label = _label.replace(f" / {_unit}", "")
+                    data.update_axis_label(_idx, _label)
+                    data.update_axis_unit(
+                        _idx, _data_group[_name].attrs.get("units", "")
+                    )
+                    _valid_metadata_axes.append(_idx)
             data.data_label = _data_group.attrs.get("title", "")
             if not data.data_label:
                 data.data_label = _data_group.attrs.get("signal", "")
             data.data_unit = h5file[dataset].attrs.get("units", "")
+            data.metadata = data.metadata | {"valid_metadata": _valid_metadata_axes}
         except (ValueError, KeyError):
             raise FileReadError(
                 "The HDF5 file is not NeXus compliant and the metadata. Please load "
                 "the data without metadata import and/or check the file."
             )
-        # TODO: deprecate the axes group reading from legacy export results
+
+    @staticmethod
+    def __read_legacy_metadata(
+        data: Dataset, h5file: h5py.File, dataset: str, slicing_indices: tuple[slice]
+    ):
+        """
+        Read legacy metadata from hdf5 files.
+
+        Parameters
+        ----------
+        data : pydidas.core.Dataset
+            The Dataset with the raw data.
+        h5file : h5py.File
+            The open h5py file object.
+        dataset : str
+            The dataset location. This is required to find the metadata.
+        slicing_indices : tuple[slice]
+            The slicing indices used on the loaded data.
+        """
+        _data_group_name = os.path.dirname(dataset)
+        _root = os.path.dirname(_data_group_name)
+        if _root == "":
+            return
+        _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
+        _metadata = data.metadata
+        _valid_metadata = _metadata.pop("valid_metadata", [])
+        data.metadata = _metadata
         _items = {_key: _item for _key, _item in h5file[_data_group_name].items()}
         _axes_to_check = [_i for _i in range(data.ndim) if _i not in _valid_metadata]
         for _ax in _axes_to_check:

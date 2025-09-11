@@ -43,6 +43,7 @@ __all__ = [
     "strip_param_description_from_docstring",
     "get_formatted_blocks_from_docstring",
     "formatted_str_repr_of_dict",
+    "str_repr_of_slice",
 ]
 
 
@@ -700,3 +701,32 @@ def formatted_str_repr_of_dict(
             _formatted_str += f" {_value}"
         _formatted_str += "\n"
     return _formatted_str.rstrip()
+
+
+def str_repr_of_slice(item: slice | Integral) -> str:
+    """
+    Get a string representation of a slice or integer object used for slicing.
+
+    Parameters
+    ----------
+    item : slice | Integral
+        The input object
+
+    Returns
+    -------
+    str
+        The string representation of the slice.
+    """
+    if not isinstance(item, (slice, Integral)):
+        raise ValueError("Only slice and integer objects are supported.")
+    if isinstance(item, Integral):
+        return str(item)
+    if item.start is not None and item.stop is not None and item.stop - item.start == 1:
+        return str(item.start)
+    _parts = [
+        "" if item.start is None else str(item.start),
+        "" if item.stop is None else str(item.stop),
+    ]
+    if item.step is not None:
+        _parts.append((str(item.step)))
+    return ":".join(_parts)

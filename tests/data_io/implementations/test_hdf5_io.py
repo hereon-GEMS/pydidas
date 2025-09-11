@@ -24,204 +24,277 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
-import shutil
-import tempfile
-import unittest
-from numbers import Integral
-from pathlib import Path
-
 import h5py
 import numpy as np
+import pytest
 
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import create_nxdata_entry
 from pydidas.data_io.implementations.hdf5_io import Hdf5Io
 
 
-class TestHdf5Io(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._path = Path(tempfile.mkdtemp())
-        cls._fname = cls._path.joinpath("test.h5")
-        cls._data_shape = (12, 13, 14, 15)
-        cls._data_slice = (
-            slice(None, None),
-            slice(None, None),
-            slice(None, None),
-            slice(0, 4),
+@pytest.fixture()
+def config(temp_path):
+    fname = temp_path / "test.h5"
+    data_shape = (12, 13, 14, 15)
+    data_slice = (
+        slice(None),
+        slice(None),
+        slice(None),
+        slice(0, 4),
+    )
+    data = Dataset(
+        np.random.random(data_shape),
+        axis_labels=["x", "y", "z", "chi"],
+        axis_units=["x_unit", "unit4y", "z unit", "deg"],
+        axis_ranges=[
+            5 * np.arange(data_shape[0]) + 42,
+            0.3 * np.arange(data_shape[1]) - 5,
+            4 * np.arange(data_shape[2]),
+            -42 * np.arange(data_shape[3]) + 127,
+        ],
+        data_label="test data",
+        data_unit="hbar / lightyear",
+    )
+    with h5py.File(fname, "w") as _file:
+        _file["test/path/res"] = data
+        _file["entry/data/data"] = data[data_slice]
+        _file["data"] = np.arange(10)
+        for _path in ["test/path/res", "entry/data/data"]:
+            _local_data = data if _path == "test/path/res" else data[data_slice]
+            create_nxdata_entry(_file, _path, _local_data)
+    yield {
+        "path": temp_path,
+        "fname": fname,
+        "data": data,
+        "data_shape": data_shape,
+        "data_slice": data_slice,
+    }
+
+
+def test_class_attributes():
+    assert Hdf5Io.extensions_import == HDF5_EXTENSIONS
+    assert Hdf5Io.extensions_export == HDF5_EXTENSIONS
+    assert Hdf5Io.format_name == "Hdf5"
+    for _dim in [1, 2, 3, 4, 5, 6]:
+        assert _dim in Hdf5Io.dimensions
+
+
+def test_import_from_file__no_metadata(config):
+    _data = Hdf5Io.import_from_file(config["fname"], import_metadata=False)
+    assert np.allclose(_data, config["data"][config["data_slice"]])
+    assert _data.data_label == ""
+    assert _data.data_unit == ""
+    assert "indices" in _data.metadata
+    assert "dataset" in _data.metadata
+
+
+def test_import_from_file__w_metadata(config):
+    _data = Hdf5Io.import_from_file(config["fname"])
+    _ref_data = config["data"][config["data_slice"]]
+    assert np.allclose(_data, _ref_data)
+    for _ax in range(_data.ndim):
+        for _key in ["axis_labels", "axis_units"]:
+            assert getattr(_data, _key)[_ax] == getattr(_ref_data, _key)[_ax]
+        assert np.allclose(_data.axis_ranges[_ax], _ref_data.axis_ranges[_ax])
+    assert _data.data_label == config["data"].data_label
+    assert _data.data_unit == config["data"].data_unit
+
+
+def test_import_from_file__w_metadata_from_root(config):
+    _data = Hdf5Io.import_from_file(
+        config["fname"], dataset="data", import_metadata=True
+    )
+    assert "indices" in _data.metadata
+    assert "dataset" in _data.metadata
+    assert _data.data_label == ""
+    assert _data.data_unit == ""
+    assert np.allclose(_data, np.arange(10))
+
+
+def test_import_from_file__wrong_name(temp_path):
+    with pytest.raises(FileReadError):
+        Hdf5Io.import_from_file(temp_path / "dummy_hdf5_name.h5")
+
+
+def test_import_from_file__wrong_filetype(config):
+    _fname_new = config["path"] / "test2.dat"
+    with open(_fname_new, "w") as f:
+        f.write("now it's just an ASCII text file.")
+    with pytest.raises(FileReadError):
+        Hdf5Io.import_from_file(_fname_new)
+
+
+@pytest.mark.parametrize(
+    "indices", [((7, 8),), 7, [7], (7,), slice(7, 8), (slice(7, 8),)]
+)
+def test_import_from_file__w_single_index(config, indices):
+    _data = Hdf5Io.import_from_file(
+        config["fname"], indices=indices, import_metadata=False
+    )
+    assert np.allclose(_data, config["data"][(7, *config["data_slice"][1:])])
+
+
+@pytest.mark.parametrize("indices", [None, (None,), slice(None), (slice(None),)])
+def test_import_from_file__w_none_indices(config, indices):
+    _data = Hdf5Io.import_from_file(
+        config["fname"], indices=indices, import_metadata=False
+    )
+    assert np.allclose(_data, config["data"][*config["data_slice"]])
+
+
+def test_import_from_file__w_dset_kw(config):
+    with pytest.warns():
+        _data = Hdf5Io.import_from_file(
+            config["fname"], import_metadata=False, dset="test/path/res"
         )
-        cls._data = Dataset(
-            np.random.random(cls._data_shape),
-            axis_labels=["x", "y", "z", "chi"],
-            axis_units=["x_unit", "unit4y", "z unit", "deg"],
-            axis_ranges=[
-                5 * np.arange(cls._data_shape[0]) + 42,
-                0.3 * np.arange(cls._data_shape[1]) - 5,
-                4 * np.arange(cls._data_shape[2]),
-                -42 * np.arange(cls._data_shape[3]) + 127,
-            ],
-            data_label="test data",
-            data_unit="hbar / lightyear",
+    assert np.allclose(_data, config["data"])
+
+
+@pytest.mark.parametrize("_slice", [(25,), (None, 27), (26, 65)])
+def test_import_from_file__zeros_dim_results(config, _slice):
+    with pytest.raises(UserConfigError):
+        Hdf5Io.import_from_file(config["fname"], indices=_slice)
+
+
+@pytest.mark.parametrize(
+    "indices, slicing",
+    [
+        ((1, 3), (slice(1, 2), slice(3, 4))),
+        ((5, None, 3), (slice(5, 6), slice(None), slice(3, 4))),
+        (((5, None), None, (None, 3)), (slice(5, None), slice(None), slice(0, 3))),
+    ],
+)
+@pytest.mark.parametrize("squeeze", [True, False])
+def test_import_from_file__complex_indexing(config, indices, slicing, squeeze):
+    _data = Hdf5Io.import_from_file(
+        config["fname"], indices=indices, import_metadata=False, auto_squeeze=squeeze
+    )
+    _ref = config["data"][config["data_slice"]][slicing]
+    if squeeze:
+        _ref = _ref.squeeze()
+    assert np.allclose(_data, _ref)
+
+
+def test_import_from_file__w_dataset(config):
+    _data = Hdf5Io.import_from_file(
+        config["fname"], dataset="test/path/res", import_metadata=False
+    )
+    assert np.allclose(_data, config["data"])
+
+
+def test_import_from_file__w_dataset_and_indices(config):
+    _data = Hdf5Io.import_from_file(
+        config["fname"],
+        dataset="test/path/res",
+        import_metadata=True,
+        indices=(1, 4),
+    )
+    _ref_data = config["data"][1, 4]
+    assert np.allclose(_data, _ref_data)
+    assert _data.data_label == _ref_data.data_label
+    assert _data.data_unit == _ref_data.data_unit
+    for _dim in range(_data.ndim):
+        assert _data.axis_labels[_dim] == _ref_data.axis_labels[_dim]
+        assert _data.axis_units[_dim] == _ref_data.axis_units[_dim]
+        assert np.allclose(_data.axis_ranges[_dim], _ref_data.axis_ranges[_dim])
+
+
+def test_import_from_file__w_unit_in_label_metadata(config):
+    _ref = config["data"].copy()
+    _ref.update_axis_label(0, f"{_ref.axis_labels[0]} / {_ref.axis_units[0]}")
+    Hdf5Io.export_to_file(config["path"] / "test_unit_label.h5", _ref)
+    _data = Hdf5Io.import_from_file(
+        config["path"] / "test_unit_label.h5", import_metadata=True
+    )
+    assert np.allclose(_data, _ref)
+    assert _data.axis_labels[0] == config["data"].axis_labels[0]
+
+
+def test_import_from_file__missing_keys(config):
+    Hdf5Io.export_to_file(config["path"] / "w_missing_key.h5", config["data"])
+    with h5py.File(config["path"] / "w_missing_key.h5", "r+") as _file:
+        del _file["entry/data/axis_0"]
+    with pytest.raises(FileReadError):
+        Hdf5Io.import_from_file(
+            config["path"] / "w_missing_key.h5", import_metadata=True
         )
-        with h5py.File(cls._fname, "w") as _file:
-            _file["test/path/data"] = cls._data
-            _file["entry/data/data"] = cls._data[cls._data_slice]
-            cls._written_shape = _file["entry/data/data"].shape
-            for _path in ["test/path", "entry/data"]:
-                _local_data = (
-                    cls._data if _path == "test/path" else cls._data[cls._data_slice]
-                )
-                _file[os.path.dirname(_path)].create_dataset(
-                    "data_label", data=_local_data.data_label
-                )
-                _file[os.path.dirname(_path)].create_dataset(
-                    "data_unit", data=_local_data.data_unit
-                )
-                for _ax in range(_local_data.ndim):
-                    _group = _file[_path].create_group(f"axis_{_ax}")
-                    for _key in ["axis_labels", "axis_units", "axis_ranges"]:
-                        _group.create_dataset(
-                            _key[5:-1], data=getattr(_local_data, _key)[_ax]
-                        )
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls._path)
 
-    def setUp(self):
-        self._target_roi = (slice(0, 5, None), slice(0, 5, None))
+def test_import_from_file__group_instead_of_dataset(config):
+    Hdf5Io.export_to_file(config["path"] / "w_group_not_dataset.h5", config["data"])
+    with h5py.File(config["path"] / "w_group_not_dataset.h5", "r+") as _file:
+        del _file["entry/data/axis_0"]
+        _file["entry/data"].create_group("axis_0")
+    _data = Hdf5Io.import_from_file(
+        config["path"] / "w_group_not_dataset.h5", import_metadata=True
+    )
+    assert _data.axis_labels == {
+        _i: ("" if _i == 0 else _v) for _i, _v in config["data"].axis_labels.items()
+    }
+    assert _data.axis_units == {
+        _i: ("" if _i == 0 else _v) for _i, _v in config["data"].axis_units.items()
+    }
 
-    def tearDown(self): ...
 
-    def test_class_extensions(self):
-        for _ext in HDF5_EXTENSIONS:
-            self.assertIn(_ext, Hdf5Io.extensions_export)
-            self.assertIn(_ext, Hdf5Io.extensions_import)
-
-    def test_import_from_file__simple(self):
-        _data = Hdf5Io.import_from_file(self._fname, import_metadata=False)
-        self.assertTrue(np.allclose(_data, self._data[self._data_slice]))
-
-    def test_import_from_file__full(self):
-        _data = Hdf5Io.import_from_file(self._fname)
-        _ref_data = self._data[self._data_slice]
-        self.assertTrue(np.allclose(_data, self._data[self._data_slice]))
-        for _ax in range(_data.ndim):
-            for _key in ["axis_labels", "axis_units"]:
-                self.assertEqual(
-                    getattr(_data, _key)[_ax], getattr(_ref_data, _key)[_ax]
-                )
-            self.assertTrue(
-                np.allclose(_data.axis_ranges[_ax], _ref_data.axis_ranges[_ax])
+def test_import_from_file__w_legacy_data(config):
+    _ref = config["data"].copy()
+    Hdf5Io.export_to_file(config["path"] / "w_legacy_data.h5", _ref)
+    with h5py.File(config["path"] / "w_legacy_data.h5", "r+") as _file:
+        for _i in range(_ref.ndim):
+            del _file[f"entry/data/axis_{_i}"]
+            _file["entry/data/"].create_group(f"axis_{_i}")
+            _file[f"entry/data/axis_{_i}"].create_dataset(
+                "range", data=_ref.axis_ranges[_i]
             )
-        self.assertEqual(_data.data_label, self._data.data_label)
-        self.assertEqual(_data.data_unit, self._data.data_unit)
-
-    def test_import_from_file__wrong_name(self):
-        with self.assertRaises(FileReadError):
-            Hdf5Io.import_from_file(self._fname.joinpath("dummy"), datatype=np.float64)
-
-    def test_import_from_file__wrong_type(self):
-        _fname_new = self._path.joinpath("test2.dat")
-        with open(_fname_new, "w") as f:
-            f.write("now it's just an ASCII text file.")
-        with self.assertRaises(FileReadError):
-            Hdf5Io.import_from_file(_fname_new, datatype=np.float64)
-
-    def test_import_from_file__w_single_index(self):
-        for _slice in [((7, 8),), [7], (7,)]:
-            with self.subTest(slice=_slice):
-                _index = _slice[0] if isinstance(_slice[0], Integral) else _slice[0][0]
-                _data = Hdf5Io.import_from_file(
-                    self._fname, indices=_slice, import_metadata=False
-                )
-                self.assertTrue(
-                    np.allclose(_data, self._data[(_index, *self._data_slice[1:])])
-                )
-
-    def test_import_from_file__w_none_indices(self):
-        _data = Hdf5Io.import_from_file(
-            self._fname, indices=None, import_metadata=False
-        )
-        self.assertTrue(np.allclose(_data, self._data[*self._data_slice]))
-
-    def test_import_from_file__w_none_index(self):
-        _data = Hdf5Io.import_from_file(
-            self._fname, indices=(None,), import_metadata=False
-        )
-        self.assertTrue(np.allclose(_data, self._data[*self._data_slice]))
-
-    def test_import_from_file__zeros_dim_results(self):
-        for _slice in [(25,), (None, 27), (26, 65)]:
-            with self.subTest(slice=_slice):
-                with self.assertRaises(UserConfigError):
-                    Hdf5Io.import_from_file(self._fname, indices=_slice)
-
-    def test_import_from_file__2_consecutive_indices(self):
-        _data = Hdf5Io.import_from_file(
-            self._fname, indices=(1, 3), import_metadata=False
-        )
-        self.assertTrue(np.allclose(_data, self._data[(1, 3, *self._data_slice[2:])]))
-
-    def test_import_from_file__2_separate_slicing_axes(self):
-        _data = Hdf5Io.import_from_file(
-            self._fname, indices=(5, None, 3), import_metadata=False
-        )
-        self.assertTrue(
-            np.allclose(
-                _data, self._data[5, self._data_slice[1], 3, self._data_slice[3]]
+            _file[f"entry/data/axis_{_i}"].create_dataset(
+                "label", data=_ref.axis_labels[_i]
             )
+            _file[f"entry/data/axis_{_i}"].create_dataset(
+                "unit", data=_ref.axis_units[_i]
+            )
+        # deliberately remove a label
+        del _file["entry/data/axis_0/label"]
+    _data = Hdf5Io.import_from_file(
+        config["path"] / "w_legacy_data.h5", import_metadata=True
+    )
+    assert np.allclose(_data, _ref)
+    for _i in range(_ref.ndim):
+        assert np.allclose(_data.axis_ranges[_i], _ref.axis_ranges[_i])
+        assert _data.axis_units[_i] == _ref.axis_units[_i]
+        assert _data.axis_labels[_i] == ("" if _i == 0 else _ref.axis_labels[_i])
+
+
+def test_export_to_file__wrong_structure(config):
+    with pytest.raises(UserConfigError):
+        Hdf5Io.export_to_file(
+            config["fname"], config["data"], dataset="data", overwrite=True
         )
 
-    def test_complex_indexing(self):
-        _data = Hdf5Io.import_from_file(
-            self._fname,
-            indices=((5, None), None, (None, 3)),
-            import_metadata=False,
-        )
-        self.assertTrue(np.allclose(_data, self._data[5:, :, :3, self._data_slice[3]]))
 
-    def test_import_from_file__w_dataset(self):
-        _data = Hdf5Io.import_from_file(
-            self._fname, dataset="test/path/data", import_metadata=False
-        )
-        self.assertTrue(np.allclose(_data, self._data))
+def test_export_to_file__file_exists(config):
+    with pytest.raises(FileExistsError):
+        Hdf5Io.export_to_file(config["fname"], config["data"])
 
-    def test_import_from_file__w_dataset_and_indices(self):
-        _data = Hdf5Io.import_from_file(
-            self._fname,
-            dataset="test/path/data",
-            import_metadata=True,
-            indices=(1, 4),
-        )
-        self.assertTrue(np.allclose(_data, self._data[1, 4]))
 
-    def test_import_from_file__metadata_was_copied(self):
-        _data = Hdf5Io.import_from_file(self._fname, import_metadata=False)
-        self.assertIn("indices", _data.metadata)
-        self.assertIn("dataset", _data.metadata)
+def test_export_to_file_file_exists_and_overwrite(config):
+    _fname = config["path"].joinpath("test_new.h5")
+    Hdf5Io.export_to_file(_fname, config["data"])
+    Hdf5Io.export_to_file(_fname, config["data"][:11], overwrite=True)
+    _data = Hdf5Io.import_from_file(_fname)
+    assert _data.shape == (11,) + config["data_shape"][1:]
 
-    def test_export_to_file__file_exists(self):
-        with self.assertRaises(FileExistsError):
-            Hdf5Io.export_to_file(self._fname, self._data)
 
-    def test_export_to_file__file_exists_and_overwrite(self):
-        _fname = self._path.joinpath("test_new.h5")
-        Hdf5Io.export_to_file(_fname, self._data)
-        Hdf5Io.export_to_file(_fname, self._data[:11], overwrite=True)
-        _data = Hdf5Io.import_from_file(_fname)
-        self.assertEqual(_data.shape, (11,) + self._data_shape[1:])
-
-    def test_export_to_file__w_groupname(self):
-        _fname = self._path.joinpath("test_gname.h5")
-        Hdf5Io.export_to_file(_fname, self._data, dataset="test/new/new_data")
-        _data = Hdf5Io.import_from_file(
-            _fname, dataset="test/new/new_data", slicing_axes=[]
-        )
-        self.assertEqual(_data.shape, self._data_shape)
-        self.assertTrue(np.allclose(_data, self._data))
+def test_export_to_file_w_groupname(config):
+    _fname = config["path"].joinpath("test_gname.h5")
+    Hdf5Io.export_to_file(_fname, config["data"], dataset="test/new/new_data")
+    _data = Hdf5Io.import_from_file(
+        _fname, dataset="test/new/new_data", slicing_axes=[]
+    )
+    assert _data.shape == config["data_shape"]
+    assert np.allclose(_data, config["data"])
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

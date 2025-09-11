@@ -35,9 +35,10 @@ __all__ = [
 
 import itertools
 from collections.abc import Iterable
+from typing import Any
 
 
-def flatten(nested_iterable: Iterable, astype: type = list) -> object:
+def flatten(nested_iterable: Iterable, astype: type = list) -> Iterable:
     """
     Flatten a nested iterable.
 
@@ -58,13 +59,13 @@ def flatten(nested_iterable: Iterable, astype: type = list) -> object:
 
     Returns
     -------
-    astype
+    Iterable
         The flattened data in the specified type.
     """
     return astype(itertools.chain.from_iterable(nested_iterable))
 
 
-def flatten_all(nested_iterable: Iterable[Iterable], astype: type = list) -> object:
+def flatten_all(nested_iterable: Iterable[Iterable], astype: type = list) -> Iterable:
     """
     Flatten a nested iterable.
 
@@ -77,9 +78,6 @@ def flatten_all(nested_iterable: Iterable[Iterable], astype: type = list) -> obj
     astype : type, optional
         The return type of the flattened data, i.e. list, tuple or set. The default is
         list.
-    iterations : int, optional
-        The number of iterations. This defines the maximum nesting level. The default
-        is 1.
 
     Returns
     -------
@@ -96,7 +94,7 @@ def flatten_all(nested_iterable: Iterable[Iterable], astype: type = list) -> obj
     return astype(_new)
 
 
-def insert_item_in_tuple(obj: tuple, index: int, item: object) -> tuple:
+def insert_item_in_tuple(obj: tuple, index: int, item: Any) -> tuple:
     """
     Insert an item into a tuple.
 
@@ -106,7 +104,7 @@ def insert_item_in_tuple(obj: tuple, index: int, item: object) -> tuple:
         The original tuple
     index : int
         The index for the new item.
-    item : object
+    item : Any
         The new item to be inserted.
 
     Returns
@@ -119,9 +117,11 @@ def insert_item_in_tuple(obj: tuple, index: int, item: object) -> tuple:
     return tuple(_new)
 
 
-def insert_items_in_tuple(obj: tuple, index: int, *items: tuple[object]) -> tuple:
+def insert_items_in_tuple(obj: tuple, index: int, *items: Any) -> tuple:
     """
-    Insert iterable items into a tuple.
+    Insert items into a tuple.
+
+    All items wil be inserted after the index in the given order.
 
     Parameters
     ----------
@@ -129,8 +129,8 @@ def insert_items_in_tuple(obj: tuple, index: int, *items: tuple[object]) -> tupl
         The original tuple
     index : int
         The index for the new item.
-    item : object
-        The new item to be inserted.
+    items : Any
+        The new items to be inserted.
 
     Returns
     -------
@@ -141,22 +141,22 @@ def insert_items_in_tuple(obj: tuple, index: int, *items: tuple[object]) -> tupl
     return tuple(_new[:index] + list(items) + _new[index:])
 
 
-def replace_item_in_iterable(obj: Iterable, index: int, item: object) -> Iterable:
+def replace_item_in_iterable(obj: Iterable, index: int, item: Any) -> Iterable:
     """
     Replace an item in an existing tuple.
 
     Parameters
     ----------
-    obj : type
+    obj : Iterable
         The original iterable
     index : int
-        The index for the new item
-    item : type
+        The index for the new item.
+    item : Any
         The new item to be inserted.
 
     Returns
     -------
-    type
+    Iterable
         The updated iterable.
     """
     _type = type(obj)
@@ -172,14 +172,14 @@ def remove_item_at_index_from_iterable(obj: Iterable, index: int) -> Iterable:
 
     Parameters
     ----------
-    obj : type
-        The iterable
+    obj : Iterable
+        The iterable object
     index : int
         The index of the item to be removed.
 
     Returns
     -------
-    type
+    Iterable
         The updated iterable.
     """
     _type = type(obj)

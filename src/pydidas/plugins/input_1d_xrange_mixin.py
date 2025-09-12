@@ -79,27 +79,23 @@ class Input1dXRangeMixin:
             The updated kwargs.
         """
         _data, kwargs = super().execute(ordinal, **kwargs)
-        if self._config["xrange"] is None:
-            self.calculate_xrange(_data.shape[-1])
-        _data.update_axis_range(-1, self._config["xrange"])
-        _data.update_axis_unit(-1, self._config["axis_unit"])
-        _data.update_axis_label(-1, self._config["axis_label"])
+        if self.params.get_value("use_custom_xscale"):
+            if self._config["xrange"] is None:
+                self.calculate_xrange(_data.shape[-1])
+            _data.update_axis_range(-1, self._config["xrange"])
+            _data.update_axis_unit(-1, self._config["axis_unit"])
+            _data.update_axis_label(-1, self._config["axis_label"])
         return _data, kwargs
 
     def calculate_xrange(self, n_points: int):
         """
         Calculate the x-range for the data.
         """
-        if self.params.get_value("use_custom_xscale"):
-            self._config["axis_unit"] = self.params.get_value("x_unit")
-            self._config["axis_label"] = self.params.get_value("x_label")
-            self._config["xrange"] = np.arange(n_points) * self.params.get_value(
-                "x_delta"
-            ) + self.params.get_value("x0_offset")
-        else:
-            self._config["axis_unit"] = "channel"
-            self._config["axis_label"] = "detector x"
-            self._config["xrange"] = np.arange(n_points)
+        self._config["axis_unit"] = self.params.get_value("x_unit")
+        self._config["axis_label"] = self.params.get_value("x_label")
+        self._config["xrange"] = np.arange(n_points) * self.params.get_value(
+            "x_delta"
+        ) + self.params.get_value("x0_offset")
 
     def get_parameter_config_widget(self):
         """Get the parameter config widget for the plugin."""

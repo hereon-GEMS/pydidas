@@ -51,6 +51,7 @@ class Hdf51dProfileLoader(Input1dXRangeMixin, Hdf5fileSeriesLoader):
     """
 
     plugin_name = "HDF5 1d profile loader"
+    base_output_data_dim = 1
 
     def pre_execute(self):
         """

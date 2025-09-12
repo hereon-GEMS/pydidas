@@ -63,6 +63,7 @@ Bugfixes
   a different file would not reload the data.
 - Fixed an issue where the pyfai-calib2.ini file was not localized correctly on Unix 
   systems.
+- Fixed an issue with InputPlugins for 1-dimensional data in the GUI.
 
 
 v25.05.16

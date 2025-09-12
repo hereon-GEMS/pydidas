@@ -182,7 +182,7 @@ def test_decode_specfile_header__specfile_2col_no_x_col(temp_path, written_label
     _labels, _units = decode_specfile_header(
         temp_path / "test.dat", read_x_column=False
     )
-    assert _units == ["", "", "deg"] if written_label == "x / deg" else ["", "", ""]
+    assert _units == (["", "", "deg"] if written_label == "x / deg" else ["", "", ""])
     if written_label == "":
         assert _labels == ["", "", ""]
     elif written_label == "2theta y_data":
@@ -249,7 +249,7 @@ def test_decode_specfile_header__specfile_4col(temp_path, labels):
             "0: y; 1: no label; 2: no label",
             "y; no label; no label",
         ]
-    assert _units == ["unit_a", "", ""] if "unit" in labels else ["", "", ""]
+    assert _units == (["unit_a", "", ""] if "unit" in labels else ["", "", ""])
 
 
 @pytest.mark.parametrize("x_column_index", [0, 1, 2, 3])
@@ -280,20 +280,6 @@ def test_decode_specfile_header__specfile_4col_w_xcol_index(
         if not use_units
         else "; ".join(f"{_l} / {_u}" for _l, _u in zip(_ref_labels, _ref_units)),
     ]
-
-    # if "unit_" in labels:
-    #     assert _labels == ["x", "0: y; 1: z; 2: t", "y / u_b; z / u_c; t / ms"]
-    # elif labels == "":
-    #     assert _labels == ["", "", ""]
-    # elif labels == "x y z t":
-    #     assert _labels == ["x", "0: y; 1: z; 2: t", "y; z; t"]
-    # elif labels == "x y":
-    #     assert _labels == [
-    #         "x",
-    #         "0: y; 1: no label; 2: no label",
-    #         "y; no label; no label",
-    #     ]
-    # assert _units == ["unit_a", "", ""] if "unit" in labels else ["", "", ""]
 
 
 def test_decode_specfile_header__no_file(temp_path):

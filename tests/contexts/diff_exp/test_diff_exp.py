@@ -110,7 +110,7 @@ def test_set_param__detector_name(name):
     _spy = QtTest.QSignalSpy(obj.sig_params_changed)
     obj.set_param_value("detector_name", name)
     assert obj.get_param_value("detector_name") == name
-    assert obj.det_shape == (3269, 3110) if name == "Eiger 9M" else _TEST_SHAPE
+    assert obj.det_shape == ((3269, 3110) if name == "Eiger 9M" else _TEST_SHAPE)
     if name == "Eiger 9M":
         assert obj.get_param_value("detector_pxsizex") == pytest.approx(75)
         assert obj.get_param_value("detector_pxsizey") == pytest.approx(75)
@@ -139,7 +139,7 @@ def test_set_param_detector__det_param(det_name, key, value):
         if det_name == "Custom 9M"
         else "Eiger 9M [modified]"
     )
-    assert 2 == _spy.count() if IS_QT6 else len(_spy)
+    assert 2 == (_spy.count() if IS_QT6 else len(_spy))
 
 
 @pytest.mark.parametrize("key, value", [[k, v] for k, v in _pyfai_geo_params.items()])
@@ -164,7 +164,7 @@ def test_get_detector(det_name):
     _target_pxsize = _pixelsize * 1e-6 if det_name == "Custom 9M" else 75e-6
     _det = obj.get_detector()
     assert isinstance(_det, pyFAI.detectors.Detector)
-    assert _det.max_shape == _TEST_SHAPE if det_name == "Custom 9M" else (3269, 3110)
+    assert _det.max_shape == (_TEST_SHAPE if det_name == "Custom 9M" else (3269, 3110))
     assert _det.pixel1 == pytest.approx(_target_pxsize)
     assert _det.pixel2 == pytest.approx(_target_pxsize)
 

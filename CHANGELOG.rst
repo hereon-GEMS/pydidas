@@ -36,6 +36,8 @@ Improvements
   into memory in the DataBrowsingFrame and keep their metadata.
 - Added a 'read_metadata' function to data_io and a 'read_metadata_from_file' method to
   IoManager.
+- Removed FioMcaLoader plugin. The new ASCII1dProfileLoader plugin allows to load
+  fio files.
 
 
 Bugfixes

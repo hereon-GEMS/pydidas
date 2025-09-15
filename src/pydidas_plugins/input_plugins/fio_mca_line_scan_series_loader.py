@@ -32,22 +32,22 @@ import os
 from pathlib import Path
 from typing import Any
 
-from pydidas_plugins.input_plugins.fio_mca_loader import FioMcaLoader
-
 from pydidas.contexts import ScanContext
 from pydidas.core import (
+    Dataset,
     Parameter,
     UserConfigError,
     get_generic_param_collection,
 )
 from pydidas.core.utils import copy_docstring
-from pydidas.plugins import InputPlugin
+from pydidas.core.utils import fio_utils as fio
+from pydidas.plugins import Input1dXRangeMixin, InputPlugin
 
 
 SCAN = ScanContext()
 
 
-class FioMcaLineScanSeriesLoader(FioMcaLoader):
+class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
     """
     Load 1d data from a series of Fio files with MCA data.
 
@@ -99,7 +99,7 @@ class FioMcaLineScanSeriesLoader(FioMcaLoader):
     """
 
     plugin_name = "Fio MCA line scan series loader"
-    default_params = FioMcaLoader.default_params.copy()
+    default_params = InputPlugin.default_params.copy()
     default_params.add_params(
         get_generic_param_collection(
             "files_per_directory",
@@ -107,6 +107,7 @@ class FioMcaLineScanSeriesLoader(FioMcaLoader):
             "fio_suffix",
         )
     )
+    base_output_data_dim = 1
 
     def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__(*args, **kwargs)
@@ -114,7 +115,12 @@ class FioMcaLineScanSeriesLoader(FioMcaLoader):
 
     def pre_execute(self):
         """Prepare loading spectra from a file series."""
-        FioMcaLoader.pre_execute(self)
+        super().pre_execute()
+        _index = 0 if Path(self.get_filename(0)).is_file() else 1
+        fio.update_config_from_fio_file(
+            self.get_filename(_index), self._config, self.params
+        )
+        self._config["roi"] = self._get_own_roi()
         self._check_files_per_directory()
 
     def update_filename_string(self):
@@ -173,3 +179,24 @@ class FioMcaLineScanSeriesLoader(FioMcaLoader):
             frame_index % _n_per_dir + 1
         )  # +1 because the filenames start at 1
         return self.filename_string.format(index0=_path_index, index1=_file_index)
+
+    def get_frame(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
+        """
+        Get the frame for the given index.
+
+        Parameters
+        ----------
+        index : int
+            The index of the scan point.
+        **kwargs : Any
+            Keyword arguments for loading frames.
+
+        Returns
+        -------
+        dataset : Dataset
+            The loaded dataset.
+        kwargs : Any
+            The updated kwargs.
+        """
+        _dataset = fio.load_fio_spectrum(self.get_filename(index), self._config)
+        return _dataset, kwargs

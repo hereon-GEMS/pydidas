@@ -424,4 +424,32 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "allow_None": False,
         "tooltip": "The label for the detector axis.",
     },
+    "x_column": {
+        "type": int,
+        "default": None,
+        "name": "Import x-axis from column",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "Note that this Parameter is ignored, if the ASCII metadata specifies the "
+            "x-axis. The column index (0-based) from which to import the x-axis. If "
+            "None is selected, the x-axis will be the integer indices of the data "
+            "points."
+        ),
+    },
+    "y_column": {
+        "type": int,
+        "default": None,
+        "name": "Import data from column",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The column index (0-based) from which to import the y data. Use this "
+            "Parameter only if the data contains multiple columns. If None is "
+            "selected, the full data will be read (which will raise an error if there "
+            "are multiple columns in the final dataset)."
+        ),
+    },
 }

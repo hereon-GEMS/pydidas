@@ -300,7 +300,7 @@ class AsciiIo(IoBase):
 
     @classmethod
     def __import_specfile(
-        cls, filename: Path | str, read_x_column: bool, x_column_index: int = 0
+        cls, filename: Path | str, x_column: bool, x_column_index: int = 0
     ) -> Dataset:
         """
         Import a SpecFile (.dat) file.
@@ -309,12 +309,11 @@ class AsciiIo(IoBase):
         ----------
         filename : Path | str
             The filename of the SpecFile to be imported.
-        read_x_column : bool
-            A flag which indicates whether the first column of the data
-            should be treated as x-axis.
+        x_column : bool
+            A flag which indicates whether the to read the x-axis from the data.
         x_column_index : int, optional
             The column number to be used as x-column. This is only used if
-            read_x_column is True. The default is 0.
+            x_column is True. The default is 0.
 
         Returns
         -------
@@ -322,12 +321,12 @@ class AsciiIo(IoBase):
             The imported data.
         """
         _labels, _units = decode_specfile_header(
-            filename, read_x_column, x_column_index=x_column_index
+            filename, x_column, x_column_index=x_column_index
         )
         _data_label = _labels.pop(-1)
         _data_unit = _units.pop(-1)
         _imported_data = np.loadtxt(filename, comments="#")
-        if read_x_column:
+        if x_column:
             if _imported_data.ndim == 1:
                 raise UserConfigError(
                     "Cannot read x-column from 1d SPEC file. Please check the file "
@@ -346,6 +345,7 @@ class AsciiIo(IoBase):
             axis_ranges=_ax_ranges,
             data_label=_data_label,
             data_unit=_data_unit,
+            metadata=({"raw_data_x_column": x_column_index} if x_column else {}),
         )
 
     @classmethod
@@ -367,9 +367,7 @@ class AsciiIo(IoBase):
             The delimiter used in the text file. The default is None which
             resolves to any whitespace.
         x_column : bool, optional
-            A flag which indicates whether the first column of the data
-            should be treated as x-axis. This flag is only used if the text
-            file does not contain a metadata header. The default is True.
+            A flag which indicates whether the to read the x-axis from the data.
         x_column_index : int, optional
             The column number (0-indexed) to be used as x-column if x_column
             is True. The default is 0.
@@ -407,6 +405,7 @@ class AsciiIo(IoBase):
             axis_units=_units,
             data_label=_metadata.get("data_label", ""),
             data_unit=_metadata.get("data_unit", ""),
+            metadata=({"raw_data_x_column": x_column_index} if x_column else {}),
         )
 
     @classmethod
@@ -421,8 +420,7 @@ class AsciiIo(IoBase):
         filename : Path | str
             The filename of the .fio file to be imported.
         x_column : bool, optional
-            A flag which indicates whether the first column of the data
-            should be treated as x-axis. The default is True.
+            A flag which indicates whether the to read the x-axis from the data.
         x_column_index : int, optional
             The column number (0-indexed) to be used as x-column if
             x_column is True. The default is 0.
@@ -474,7 +472,11 @@ class AsciiIo(IoBase):
                 "; ".join(f"{i}: {k}" for i, k in enumerate(_col_keys.values()))
             )
         return Dataset(
-            _data, axis_ranges=_axes, axis_labels=_ax_labels, data_label=_data_label
+            _data,
+            axis_ranges=_axes,
+            axis_labels=_ax_labels,
+            data_label=_data_label,
+            metadata=({"raw_data_x_column": x_column_index} if x_column else {}),
         )
 
     @classmethod
@@ -537,7 +539,7 @@ class AsciiIo(IoBase):
         filename : Path | str
             The filename of the file with the data to be imported.
         **kwargs : Any
-            Supported arguments are:
+            Currently not used but included for consistency.
 
         Returns
         -------

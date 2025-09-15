@@ -294,16 +294,12 @@ def test_import_from_file__specfile_1col(temp_path, labels):
 def test_import_from_file__specfile_2col_w_xcolumn(
     temp_path, written_label, xlabel, xunit, ylabel, yunit, x_column_index
 ):
-    print("x_column_index:", x_column_index)
-    print("written_label:", written_label)
     _header = f"F test.dat\nS 1 test.h5\n\nN 2\nL {written_label}\n"
     _temp_data = np.column_stack((_x_data, _y_data))
     np.savetxt(temp_path / "test.dat", _temp_data, header=_header, comments="#")
     _data = AsciiIo.import_from_file(
         temp_path / "test.dat", x_column=True, x_column_index=x_column_index
     )
-    print("axis labels:", _data.axis_labels)
-    print("data label", _data.data_label)
     assert np.allclose(_data, _y_data if x_column_index == 0 else _x_data)
     assert np.allclose(
         _data.axis_ranges[0], _x_data if x_column_index == 0 else _y_data
@@ -330,6 +326,7 @@ def test_import_from_file__specfile_4col(temp_path, labels, x_column):
     if x_column:
         assert np.allclose(_data, np.asarray((_y_data, _y_data, _y_data)).T)
         assert np.allclose(_data.axis_ranges[0], _x_data)
+        assert _data.metadata.get("raw_data_x_column") == 0
     else:
         assert np.allclose(_data, np.asarray((_x_data, _y_data, _y_data, _y_data)).T)
         assert np.allclose(_data.axis_ranges[0], np.arange(_x_data.size))
@@ -385,6 +382,7 @@ def test_import_from_file__specfile_4col_w_col_index(temp_path, x_column):
     assert _data.axis_units == {0: _x_unit, 1: ""}
     assert _data.data_label == _data_label
     assert _data.data_unit == ""
+    assert _data.metadata.get("raw_data_x_column") == x_column
 
 
 @pytest.mark.parametrize(
@@ -404,6 +402,7 @@ def test_import_from_file__specfile_2col_no_xcolumn(temp_path, written_label):
     assert _data.axis_units == {0: "", 1: ""}
     assert _data.data_label == written_label.replace(" y_data", "; y_data")
     assert _data.data_unit == ""
+    assert _data.metadata.get("raw_data_x_column", None) is None
 
 
 @pytest.mark.parametrize("x_column", [True, False])
@@ -433,6 +432,7 @@ def test_import_from_file__txt(temp_path, x_column, ncols, extension, header):
                 assert _data.axis_units == {0: "", 1: ""}
     assert _data.data_label == ("test data" if header else "")
     assert _data.data_unit == ("counts" if header else "")
+    assert _data.metadata.get("raw_data_x_column", -1) == (0 if x_column else -1)
 
 
 @pytest.mark.parametrize("x_index", [0, 1, 2])
@@ -445,6 +445,7 @@ def test_import_from_file__txt__w_x_index(temp_path, x_index):
     _data = AsciiIo.import_from_file(_fname, x_column=True, x_column_index=x_index)
     assert np.allclose(_data, np.delete(_temp_data, x_index, axis=1))
     assert np.allclose(_data.axis_ranges[0], _temp_data[:, x_index])
+    assert _data.metadata.get("raw_data_x_column", -1) == x_index
 
 
 def test_import_from_file__txt__w_metadata_x_column_and_index_none(temp_path):
@@ -481,6 +482,7 @@ def test_import_from_file__fio__1d_no_xcol():
     assert np.allclose(_data.axis_ranges[0], np.arange(_data.size))
     assert _data.axis_labels[0] == "index"
     assert _data.data_label == "test_spectrum"
+    assert _data.metadata.get("raw_data_x_column", None) is None
 
 
 def test_import_from_file__fio__empty_file(temp_path):
@@ -513,6 +515,7 @@ def test_import_from_file__fio__2d_w_xcolumn(temp_path, xcol):
     assert np.allclose(_data.axis_ranges[0], _raw_data[:, xcol])
     assert _data.axis_labels[0] == _keys[xcol]
     assert _data.data_label == _keys[1 - xcol]
+    assert _data.metadata.get("raw_data_x_column", -1) == xcol
 
 
 @pytest.mark.parametrize("x_column", [0, 1, 2, 3])
@@ -531,6 +534,7 @@ def test_import_from_file__fio_file__w_xcol(temp_path, x_column):
     assert np.allclose(_data, _raw_data)
     assert _data.data_label == "; ".join(_keys)
     assert _data.data_unit == ""
+    assert _data.metadata.get("raw_data_x_column", -1) == x_column
 
 
 def test_import_from_file__fio_file__no_xcol(temp_path):
@@ -544,6 +548,7 @@ def test_import_from_file__fio_file__no_xcol(temp_path):
     assert _data.axis_labels[1] == "; ".join(f"{i}: {_k}" for i, _k in enumerate(_keys))
     assert _data.axis_units == {0: "", 1: ""}
     assert _data.data_label == "; ".join(_keys)
+    assert _data.metadata.get("raw_data_x_column", None) is None
 
 
 def test_import_from_file__asc__full_header(temp_path):
@@ -555,6 +560,7 @@ def test_import_from_file__asc__full_header(temp_path):
     assert _data.axis_units[0] == "deg"
     assert _data.data_label == "Test sample"
     assert _data.data_unit == "cps"
+    assert _data.metadata.get("raw_data_x_column", None) is None
 
 
 @pytest.mark.parametrize(
@@ -573,6 +579,7 @@ def test_import_from_file__asc__partial_header(temp_path, skip_key):
     assert _data.axis_units[0] == ("deg" if skip_key != "XUNIT" else "")
     assert _data.data_label == ("Test sample" if skip_key != "SAMPLE" else "")
     assert _data.data_unit == ("cps" if skip_key != "YUNIT" else "")
+    assert _data.metadata.get("raw_data_x_column", None) is None
 
 
 def test_import_from_file__asc__no_header(temp_path):

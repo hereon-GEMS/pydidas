@@ -44,7 +44,7 @@ from pydidas.core import (
 )
 from pydidas.core.constants import GENERIC_PLUGIN_PATH
 from pydidas.core.utils import find_valid_python_files
-from pydidas.plugins import BasePlugin
+from pydidas.plugins import BasePlugin, InputPlugin, OutputPlugin, ProcPlugin
 
 
 class PluginRegistry(ObjectWithParameterCollection):
@@ -147,7 +147,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.find_and_register_plugins(*self._get_user_plugin_paths())
         self._config["initialized"] = True
         if self._config["must_emit_signal"]:
-            self.sig_updated_plugins.emit()
+            self.sig_updated_plugins.emit()  # noqa E0602
 
     def _get_user_plugin_paths(self) -> list[Path]:
         """
@@ -218,7 +218,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             if _path != Path() and _path.is_dir():
                 self._find_and_register_plugins_in_path(_path, reload)
         if self._config["initialized"]:
-            self.sig_updated_plugins.emit()
+            self.sig_updated_plugins.emit()  # noqa E0602
         else:
             self._config["must_emit_signal"] = True
 
@@ -289,7 +289,9 @@ class PluginRegistry(ObjectWithParameterCollection):
         return _modules
 
     @staticmethod
-    def __get_classes_in_module(modname: str, filepath: Path) -> list[tuple[str, type]]:
+    def __get_classes_in_module(
+        modname: str, filepath: Path
+    ) -> list[tuple[str, Type[type]]]:
         """
         Import a module from a file and get all class members of the module.
 
@@ -306,8 +308,8 @@ class PluginRegistry(ObjectWithParameterCollection):
             A list with class members with entries for each class in the
             form of (name, class).
         """
-        spec = importlib.util.spec_from_file_location(modname, filepath)
-        tmp_module = importlib.util.module_from_spec(spec)
+        spec = importlib.util.spec_from_file_location(modname, filepath)  # noqa E0602
+        tmp_module = importlib.util.module_from_spec(spec)  # noqa E0602
         spec.loader.exec_module(tmp_module)
         cls_members = inspect.getmembers(tmp_module, inspect.isclass)
         del spec, tmp_module
@@ -333,7 +335,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         ]
         if "pydidas.plugins.base_plugin.BasePlugin" not in _class_bases:
             return
-        if class_.is_basic_plugin() is True:
+        if class_.is_basic_plugin():
             self._plugin_basic_types[class_.__name__] = class_
             return
         if class_.__name__ not in self.plugins:
@@ -414,7 +416,9 @@ class PluginRegistry(ObjectWithParameterCollection):
             f"No plugin with plugin_name `{plugin_name}` has been registered!"
         )
 
-    def get_plugin_by_name(self, name: str) -> Type[BasePlugin]:
+    def get_plugin_by_name(
+        self, name: str
+    ) -> Type[InputPlugin | ProcPlugin | OutputPlugin]:
         """
         Get a plugin by its class name.
 
@@ -425,7 +429,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
         Returns
         -------
-        plugin : pydidas.plugins.BasePlugin
+        plugin : InputPlugin | ProcPlugin | OutputPlugin
             The Plugin class.
         """
         self.verify_is_initialized()
@@ -548,6 +552,6 @@ class PluginRegistry(ObjectWithParameterCollection):
             self._plugin_names = {}
             self._plugin_paths = []
             self._config["initialized"] = False
-            self.sig_updated_plugins.emit()
+            self.sig_updated_plugins.emit()  # noqa E0602
             return
         print("No confirmation was given: The PluginCollection has not been reset.")

@@ -36,6 +36,7 @@ from pydidas.contexts import ScanContext
 from pydidas.core import (
     Dataset,
     Parameter,
+    UserConfigError,
     get_generic_param_collection,
 )
 from pydidas.data_io import import_data
@@ -89,6 +90,8 @@ class ASCII1dProfileLoader(Input1dXRangeMixin, InputPlugin):
         super().__init__(*args, **kwargs)
         self._config.update({"header_lines": 0})
         self.__xscale_valid = False
+        self.__yslice = None
+        self._standard_kwargs = {}
 
     def pre_execute(self):
         """
@@ -96,7 +99,12 @@ class ASCII1dProfileLoader(Input1dXRangeMixin, InputPlugin):
         """
         super().pre_execute()
         self.__xscale_valid = False
-        self._standard_kwargs = {"forced_dimension": 1, "roi": self._get_own_roi()}
+        self.__yslice = None
+        self._standard_kwargs = {
+            "roi": self._get_own_roi(),
+            "x_column": self.get_param_value("x_column") is not None,
+            "x_column_index": self.get_param_value("x_column"),
+        }
 
     def get_frame(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
@@ -119,6 +127,25 @@ class ASCII1dProfileLoader(Input1dXRangeMixin, InputPlugin):
         _dataset = import_data(
             self.get_filename(index), **(self._standard_kwargs | kwargs)
         )
+        if self.__yslice is None:
+            if self.get_param_value("y_column") is None:
+                self.__yslice = slice(None)
+            elif _dataset.metadata.get("raw_data_x_column", None) is not None:
+                _ix = _dataset.metadata.get("raw_data_x_column")
+                _iy = self.get_param_value("y_column")
+                if _ix < _iy:
+                    _iy -= 1
+                self.__yslice = slice(_iy, _iy + 1)
+            else:
+                _iy = self.get_param_value("y_column")
+                self.__yslice = slice(_iy, _iy + 1)
+        if _dataset.ndim == 2:
+            _dataset = _dataset[:, self.__yslice].squeeze()
+        if _dataset.ndim != 1:
+            raise UserConfigError(
+                "The imported ASCII data is not 1-dimensional. Please check the "
+                "x_column and y_column settings."
+            )
         if self.get_param_value("use_custom_xscale"):
             if not self.__xscale_valid:
                 self.__create_x_scale(_dataset.size)

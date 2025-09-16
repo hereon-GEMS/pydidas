@@ -38,6 +38,8 @@ Improvements
   IoManager.
 - Removed FioMcaLoader plugin. The new ASCII1dProfileLoader plugin allows to load
   fio files.
+- Added ASCII1dProfileLoader plugin to import 1d data from various ASCII formats 
+  (csv, txt, fio, dat)
 
 
 Bugfixes

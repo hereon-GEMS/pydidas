@@ -33,6 +33,7 @@ from qtpy import QtCore
 
 from pydidas.contexts import ScanContext
 from pydidas.core import FileReadError, UserConfigError
+from pydidas.core.utils import get_random_string
 from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
@@ -137,11 +138,10 @@ def test_check_files_per_directory__no_dir(temp_dir_w_files, plugin):
         plugin._check_files_per_directory()
 
 
-def test_check_files_per_directory__empty_dir(temp_dir_w_files, plugin):
-    temp_dir_w_files[0].joinpath("empty_dir").mkdir()
-    plugin._SCAN.set_param_value(
-        "scan_base_directory", temp_dir_w_files[0] / "empty_dir"
-    )
+def test_check_files_per_directory__empty_dir(temp_path, plugin):
+    _new_dir = temp_path / get_random_string(6) / get_random_string(6)
+    (_new_dir / "test_00001").mkdir(parents=True)
+    plugin._SCAN.set_param_value("scan_base_directory", _new_dir)
     plugin.update_filename_string()
     with pytest.raises(UserConfigError):
         plugin._check_files_per_directory()

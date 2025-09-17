@@ -499,6 +499,32 @@ dictionary.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.workflow_results.ProcessingResults.export_data_to_directory">
+<span class="sig-name descname"><span class="pre">export_data_to_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">save_formats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.workflow_results.ProcessingResults.export_data_to_directory" title="Link to this definition">#</a></dt>
+<dd><p>Save results to disk.</p>
+<p>By default, this method saves all results to disk using the specified
+formats and directory.
+Note that the directory needs to be empty (or non-existing) if
+the overwrite keyword is not set.</p>
+<p>Results from a single node can be saved by passing a value for the
+node_id keyword.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>save_dir</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The basepath for all saved data.</p></li>
+<li><p><strong>save_formats</strong> (<em>str</em>) – Strings of all formats to be written. Individual formats can be
+also be given in a single string if they are separated by comma
+(“,”), ampersand (”&amp;”) or slash (“/”) characters.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to enable overwriting of existing files. The default is False.</p></li>
+<li><p><strong>squeeze_results</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to enable squeezing of empty dimensions. The default is False.</p></li>
+<li><p><strong>node_id</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – The node ID for which data shall be saved. If None, this defaults
+to all nodes. The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.workflow_results.ProcessingResults.frozen_exp">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frozen_exp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></em><a class="headerlink" href="#pydidas.workflow.workflow_results.ProcessingResults.frozen_exp" title="Link to this definition">#</a></dt>
@@ -2048,6 +2074,7 @@ parameters as the current instance.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.clear_all_results"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.clear_all_results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.data_labels"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.data_labels</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.data_units"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.data_units</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.export_data_to_directory"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.export_data_to_directory</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.frozen_exp"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.frozen_exp</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.frozen_scan"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.frozen_scan</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.workflow_results.ProcessingResults.frozen_tree"><code class="docutils literal notranslate"><span class="pre">ProcessingResults.frozen_tree</span></code></a></li>

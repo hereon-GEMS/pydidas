@@ -362,12 +362,12 @@ Other
        | **tooltip** : The node ID of the currently selected node.
    * - :py:data:`type_selection`
      - | **type** : str
-       | **default** : Data values
+       | **default** : Axis values
        | **name** : Data selection
-       | **choices** : ['Data values', 'Indices']
+       | **choices** : ['Axis values', 'Indices']
        | **unit** : 
        | **allow_None** : False
-       | **tooltip** : Select between using the axis values (in the respective.unit) and the axis indices.
+       | **tooltip** : Select between using the axis values (in the respective unit) and the axis indices.
    * - :py:data:`plot_ax1`
      - | **type** : int
        | **default** : 0
@@ -1048,6 +1048,15 @@ Settings
        | **unit** : MB
        | **allow_None** : False
        | **tooltip** : The maximum size of the data buffer (for each display widget). Any data which is smaller than the buffer size will be stored in memory. Larger data will be read from disk in chunks.
+   * - :py:data:`data_buffer_hdf5_max_size`
+     - | **type** : float
+       | **default** : 200
+       | **name** : HDF5 max. dataset size to load
+       | **choices** : None
+       | **unit** : MB
+       | **allow_None** : False
+       | **tooltip** : The maximum size of HDF5 datasets to be loaded fully into the memory. Any dataset which is larger than the buffer size will be opened lazily and only be read from disk in chunks as required.
+       | This parameter is only relevant for the data browsing frame.
    * - :py:data:`shared_buffer_size`
      - | **type** : float
        | **default** : 100
@@ -1672,6 +1681,22 @@ Data import
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The label for the detector axis.
+   * - :py:data:`x_column`
+     - | **type** : int
+       | **default** : None
+       | **name** : Import x-axis from column
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : Note that this Parameter is ignored, if the ASCII metadata specifies the x-axis. The column index (0-based) from which to import the x-axis. If None is selected, the x-axis will be the integer indices of the data points.
+   * - :py:data:`y_column`
+     - | **type** : int
+       | **default** : None
+       | **name** : Import data from column
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The column index (0-based) from which to import the y data. Use this Parameter only if the data contains multiple columns. If None is selected, the full data will be read (which will raise an error if there are multiple columns in the final dataset).
 
 Fit
 ~~~

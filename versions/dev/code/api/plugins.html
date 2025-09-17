@@ -552,7 +552,7 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name">
-<span class="sig-name descname"><span class="pre">get_plugin_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_plugin_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.base_input_plugin.InputPlugin"><span class="pre">InputPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.base_proc_plugin.ProcPlugin"><span class="pre">ProcPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.base_output_plugin.OutputPlugin"><span class="pre">OutputPlugin</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name" title="Link to this definition">#</a></dt>
 <dd><p>Get a plugin by its class name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -562,7 +562,7 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 <dd class="field-even"><p><strong>plugin</strong> – The Plugin class.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin">pydidas.plugins.BasePlugin</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin">InputPlugin</a> | <a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin">ProcPlugin</a> | <a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin">OutputPlugin</a></p>
 </dd>
 </dl>
 </dd></dl>

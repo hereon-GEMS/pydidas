@@ -943,12 +943,12 @@ available:</p>
 <tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">type_selection</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
-<div class="line"><strong>default</strong> : Data values</div>
+<div class="line"><strong>default</strong> : Axis values</div>
 <div class="line"><strong>name</strong> : Data selection</div>
-<div class="line"><strong>choices</strong> : [‘Data values’, ‘Indices’]</div>
+<div class="line"><strong>choices</strong> : [‘Axis values’, ‘Indices’]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Select between using the axis values (in the respective.unit) and the axis indices.</div>
+<div class="line"><strong>tooltip</strong> : Select between using the axis values (in the respective unit) and the axis indices.</div>
 </div>
 </td>
 </tr>
@@ -1972,7 +1972,20 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_size</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">data_buffer_hdf5_max_size</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : float</div>
+<div class="line"><strong>default</strong> : 200</div>
+<div class="line"><strong>name</strong> : HDF5 max. dataset size to load</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> : MB</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The maximum size of HDF5 datasets to be loaded fully into the memory. Any dataset which is larger than the buffer size will be opened lazily and only be read from disk in chunks as required.</div>
+<div class="line">This parameter is only relevant for the data browsing frame.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_size</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 100</div>
@@ -1984,7 +1997,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_max_n</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">shared_buffer_max_n</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 20</div>
@@ -1996,7 +2009,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_image_size</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_image_size</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 100</div>
@@ -2008,7 +2021,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_detector_mask</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_detector_mask</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : bool</div>
 <div class="line"><strong>default</strong> : False</div>
@@ -2020,7 +2033,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_val</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_val</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2032,7 +2045,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_width</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_width</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2044,7 +2057,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_value</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">mosaic_border_value</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2056,7 +2069,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">run_type</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">run_type</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : Process in GUI</div>
@@ -2068,7 +2081,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_path</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_path</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> :</div>
@@ -2080,7 +2093,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_update_time</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_update_time</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 1.0</div>
@@ -2092,7 +2105,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_number_curves</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">max_number_curves</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 40</div>
@@ -2104,7 +2117,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_high</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_high</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0.07</div>
@@ -2116,7 +2129,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_low</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">histogram_outlier_fraction_low</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0.02</div>
@@ -2128,7 +2141,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_name</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : Gray</div>
@@ -2140,7 +2153,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_nan_color</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">cmap_nan_color</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : #9AFEFF</div>
@@ -2907,6 +2920,30 @@ available:</p>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
 <div class="line"><strong>tooltip</strong> : The label for the detector axis.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_column</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Import x-axis from column</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : Note that this Parameter is ignored, if the ASCII metadata specifies the x-axis. The column index (0-based) from which to import the x-axis. If None is selected, the x-axis will be the integer indices of the data points.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">y_column</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Import data from column</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The column index (0-based) from which to import the y data. Use this Parameter only if the data contains multiple columns. If None is selected, the full data will be read (which will raise an error if there are multiple columns in the final dataset).</div>
 </div>
 </td>
 </tr>

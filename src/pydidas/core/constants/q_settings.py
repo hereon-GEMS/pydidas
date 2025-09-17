@@ -40,6 +40,7 @@ __all__ = [
 QSETTINGS_GLOBAL_KEYS = [
     "mp_n_workers",
     "data_buffer_size",
+    "data_buffer_hdf5_max_size",
     "shared_buffer_size",
     "shared_buffer_max_n",
     "max_image_size",

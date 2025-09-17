@@ -23,19 +23,21 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
-import unittest
+from typing import Literal
 
 import numpy as np
+import pytest
 
-from pydidas.core import UserConfigError, utils
+from pydidas.core import UserConfigError
+from pydidas.core.utils import get_random_string
 from pydidas.data_io import IoManager
+from pydidas.data_io.implementations import IoBase
 
 
-class Tester:
+class _IoTestClass(IoBase):
     extensions_export = ["test", "export"]
     extensions_import = ["test", "import"]
-    format_name = "Tester"
+    format_name = "_IoTestClass"
 
     @classmethod
     def export_to_file(cls, filename, data, **kwargs):
@@ -47,139 +49,145 @@ class Tester:
         return np.zeros((10, 10))
 
 
-class TestIoManager(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._stored_exts_import = IoManager.registry_import.copy()
-        cls._stored_exts_export = IoManager.registry_export.copy()
+class _IoTestClassWithMetadataImporter(_IoTestClass):
+    extensions_import = ["meta_test"]
+    extensions_export = []
+    format_name = "_IoTestClassWithMetadataImporter"
+    allows_metadata_import = True
 
     @classmethod
-    def tearDownClass(cls):
-        IoManager.registry_import = cls._stored_exts_import
-        IoManager.registry_export = cls._stored_exts_export
+    def read_metadata_from_file(cls, _, **kwargs):  # noqa
+        return {"meta_data": True}
 
-    def setUp(self):
-        IoManager.clear_registry()
 
-    def tearDown(self): ...
+@pytest.fixture(autouse=True)
+def clear_registry():
+    stored_import = IoManager.registry_import.copy()
+    stored_export = IoManager.registry_export.copy()
+    IoManager.clear_registry()
+    yield
+    IoManager.registry_import = stored_import
+    IoManager.registry_export = stored_export
 
-    def test_register_class__plain(self):
-        IoManager.register_class(Tester)
-        for _ext in Tester.extensions_export:
-            self.assertEqual(IoManager.registry_export[_ext], Tester)
-        for _ext in Tester.extensions_import:
-            self.assertEqual(IoManager.registry_import[_ext], Tester)
 
-    def test_register_class__add_class_and_verify_entries_not_deleted(self):
-        IoManager.registry_import = {".no_ext": None}
-        IoManager.register_class(Tester)
-        self.assertIsNone(IoManager.registry_import[".no_ext"])
+@pytest.fixture
+def io_manager_with_test_class(clear_registry):
+    IoManager.register_class(_IoTestClass)
+    return IoManager
 
-    def test_register_class__add_class_and_overwrite_old_entry_import(self):
-        IoManager.registry_import = {"test": None}
-        IoManager.register_class(Tester, update_registry=True)
-        self.assertEqual(IoManager.registry_import["test"], Tester)
 
-    def test_register_class__add_class_and_overwrite_old_entry_export(self):
-        IoManager.registry_export = {"test": None}
-        IoManager.register_class(Tester, update_registry=True)
-        self.assertEqual(IoManager.registry_import["test"], Tester)
+def test_register_class_plain(io_manager_with_test_class):
+    for _ext in _IoTestClass.extensions_export:
+        assert IoManager.registry_export[_ext] == _IoTestClass
+    for _ext in _IoTestClass.extensions_import:
+        assert IoManager.registry_import[_ext] == _IoTestClass
 
-    def test_register_class__add_and_keep_old_entry_import(self):
-        IoManager.registry_import = {"test": None}
-        with self.assertRaises(KeyError):
-            IoManager.register_class(Tester, update_registry=False)
 
-    def test_register_class__add_and_keep_old_entry_export(self):
-        IoManager.registry_export = {"test": None}
-        with self.assertRaises(KeyError):
-            IoManager.register_class(Tester, update_registry=False)
+def test_register_class_add_class_and_verify_entries_not_deleted():
+    IoManager.registry_import = {".no_ext": None}
+    IoManager.register_class(_IoTestClass)
+    assert IoManager.registry_import[".no_ext"] is None
 
-    def test_clear_registry(self):
-        IoManager.register_class(Tester)
-        IoManager.clear_registry()
-        self.assertEqual(IoManager.registry_import, {})
-        self.assertEqual(IoManager.registry_export, {})
 
-    def test_is_extension_registered__True(self):
-        IoManager.register_class(Tester)
-        for _mode in ["import", "export"]:
-            with self.subTest():
-                self.assertTrue(
-                    IoManager.is_extension_registered(f"{_mode}", mode=_mode)
-                )
+@pytest.mark.parametrize("mode", ["import", "export"])
+def test_register_class__add_class_and_overwrite_old_entry(mode):
+    _registry = getattr(IoManager, f"registry_{mode}")
+    _registry["test"] = None
+    IoManager.register_class(_IoTestClass, update_registry=True)
+    assert getattr(IoManager, f"registry_{mode}")["test"] == _IoTestClass
 
-    def test_is_extension_registered__False(self):
-        IoManager.register_class(Tester)
-        for _mode in ["import", "export"]:
-            with self.subTest():
-                self.assertFalse(IoManager.is_extension_registered("false", mode=_mode))
 
-    def test_get_registry__import(self):
-        _reg = dict(a=1, b=12, c=None)
-        IoManager.registry_import = _reg
-        self.assertEqual(_reg, IoManager._get_registry("import"))
+@pytest.mark.parametrize("mode", ["import", "export"])
+def test_register_class_add_and_keep_old_entry(mode):
+    _registry = getattr(IoManager, f"registry_{mode}")
+    _registry["test"] = None
+    with pytest.raises(KeyError):
+        IoManager.register_class(_IoTestClass, update_registry=False)
 
-    def test_get_registry__export(self):
-        _reg = dict(a=1, b=12, c=None)
-        IoManager.registry_export = _reg
-        self.assertEqual(_reg, IoManager._get_registry("export"))
 
-    def test_get_registry__wrong_key(self):
-        with self.assertRaises(ValueError):
-            IoManager._get_registry("other")
+def test_clear_registry(io_manager_with_test_class):
+    IoManager.clear_registry()
+    assert IoManager.registry_import == {}
+    assert IoManager.registry_export == {}
 
-    def test_verify_extension_is_registered__okay(self):
-        IoManager.register_class(Tester)
-        for _mode in ["import", "export"]:
-            with self.subTest():
-                IoManager.verify_extension_is_registered(f"{_mode}", mode=_mode)
-            # assert does not raise Exception
 
-    def test_verify_extension_is_registered_import_error(self):
-        for _mode in ["import", "export"]:
-            with self.subTest():
-                with self.assertRaises(UserConfigError):
-                    IoManager.verify_extension_is_registered("something", mode=_mode)
+@pytest.mark.parametrize("mode", ["import", "export", "metadata"])
+@pytest.mark.parametrize("ext", ["test", "export", "import", "never", "meta_test"])
+def test_is_extension_registered(
+    mode: Literal["import", "export", "metadata"], ext, io_manager_with_test_class
+):
+    IoManager.register_class(_IoTestClassWithMetadataImporter)
+    _ref = (
+        ext == "meta_test"
+        if mode == "metadata"
+        else (ext == "test" or mode == ext or (mode == "import" and ext == "meta_test"))
+    )
+    assert IoManager.is_extension_registered(ext, mode=mode) == _ref
 
-    def test_get_string_of_formats__empty(self):
-        for _mode in ["import", "export"]:
-            with self.subTest():
-                _str = IoManager.get_string_of_formats(mode=_mode)
-                self.assertEqual("All supported files ()", _str)
 
-    def test_get_string_of_formats__plain(self):
-        IoManager.register_class(Tester)
-        for _mode in ["import", "export"]:
-            with self.subTest():
-                _str = IoManager.get_string_of_formats(mode=_mode)
-                for _ext in getattr(Tester, f"extensions_{_mode}"):
-                    self.assertIn(f"*.{_ext}", _str)
+@pytest.mark.parametrize("mode", ["import", "export"])
+@pytest.mark.parametrize("ext", ["test", "export", "import", "never"])
+def test_verify_extension_is_registered(
+    mode: Literal["import", "export", "metadata"], ext, io_manager_with_test_class
+):
+    if ext == "test" or mode == ext:
+        IoManager.verify_extension_is_registered(ext, mode=mode)
+        assert True  # no exception raised
+    else:
+        with pytest.raises(UserConfigError):
+            IoManager.verify_extension_is_registered(ext, mode=mode)
 
-    def test_export_to_file(self):
-        _fname = utils.get_random_string(24) + ".test"
-        _data = np.random.random((10, 10))
-        _kws = dict(test_kw=True)
-        IoManager.register_class(Tester)
-        IoManager.export_to_file(_fname, _data, **_kws)
-        self.assertEqual(Tester._exported[0], _fname)
-        self.assertTrue(np.allclose(Tester._exported[1], _data))
-        self.assertEqual(Tester._exported[2], _kws)
 
-    def test_import_from_file(self):
-        _fname = utils.get_random_string(24) + ".test"
-        _kws = dict(test_kw=True)
-        IoManager.register_class(Tester)
-        IoManager.import_from_file(_fname, **_kws)
-        self.assertEqual(Tester._imported[0], _fname)
-        self.assertEqual(Tester._imported[1], _kws)
+@pytest.mark.parametrize("mode", ["import", "export"])
+def test_get_string_of_formats__empty(mode: Literal["import", "export"]):
+    _str = IoManager.get_string_of_formats(mode=mode)
+    assert _str == "All supported files ()"
 
-    def test_import_from_file__w_forced_dim(self):
-        _fname = utils.get_random_string(24) + ".test"
-        IoManager.register_class(Tester)
-        with self.assertRaises(UserConfigError):
-            IoManager.import_from_file(_fname, forced_dimension=5)
+
+@pytest.mark.parametrize("mode", ["import", "export"])
+def test_get_string_of_formats__simple(
+    mode: Literal["import", "export"], io_manager_with_test_class
+):
+    _str = IoManager.get_string_of_formats(mode=mode)
+    for _ext in getattr(_IoTestClass, f"extensions_{mode}"):
+        assert f"*.{_ext}" in _str
+
+
+def test_export_to_file(io_manager_with_test_class):
+    _fname = get_random_string(12) + ".test"
+    _data = np.random.random((10, 10))
+    _kws = dict(test_kw=True)
+    IoManager.export_to_file(_fname, _data, **_kws)
+    assert _IoTestClass._exported[0] == _fname
+    assert np.allclose(_IoTestClass._exported[1], _data)
+    assert _IoTestClass._exported[2] == _kws
+
+
+def test_import_from_file(io_manager_with_test_class):
+    _fname = get_random_string(12) + ".test"
+    _kws = dict(test_kw=True)
+    IoManager.import_from_file(_fname, **_kws)
+    assert _IoTestClass._imported[0] == _fname
+    assert _IoTestClass._imported[1] == _kws
+
+
+def test_import_from_file__w_forced_dim_kw():
+    _fname = get_random_string(12) + ".test"
+    IoManager.register_class(_IoTestClass)
+    with pytest.raises(UserConfigError):
+        IoManager.import_from_file(_fname, forced_dimension=5)
+
+
+@pytest.mark.parametrize("ext", ["meta_test", "test", "import", "export"])
+def test_import_metadata_from_file(io_manager_with_test_class, ext):
+    IoManager.register_class(_IoTestClassWithMetadataImporter)
+    if ext == "meta_test":
+        _metadata = IoManager.read_metadata_from_file(get_random_string(12) + f".{ext}")
+        assert _metadata == {"meta_data": True}
+    else:
+        with pytest.raises(UserConfigError):
+            IoManager.read_metadata_from_file(get_random_string(12) + f".{ext}")
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

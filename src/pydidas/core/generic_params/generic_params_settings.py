@@ -57,6 +57,20 @@ GENERIC_PARAMS_SETTINGS = {
             "memory. Larger data will be read from disk in chunks."
         ),
     },
+    "data_buffer_hdf5_max_size": {
+        "type": float,
+        "default": 200,
+        "name": "HDF5 max. dataset size to load",
+        "choices": None,
+        "unit": "MB",
+        "allow_None": False,
+        "tooltip": (
+            "The maximum size of HDF5 datasets to be loaded fully into the memory. "
+            "Any dataset which is larger than the buffer size will be opened lazily "
+            "and only be read from disk in chunks as required.\n"
+            "This parameter is only relevant for the data browsing frame."
+        ),
+    },
     "shared_buffer_size": {
         "type": float,
         "default": 100,

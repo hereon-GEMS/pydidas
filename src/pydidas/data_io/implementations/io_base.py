@@ -50,6 +50,7 @@ class IoBase(metaclass=IoManager):
     extensions_import = []
     format_name = ""
     dimensions = []
+    allows_metadata_import = False
 
     _roi_controller = RoiSliceManager()
     _data = None

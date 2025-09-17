@@ -232,6 +232,7 @@ class CatchFileErrors:
             ValueError,
             FileNotFoundError,
             OSError,
+            PermissionError,
         )
         self._filename = str(filename)
         self._raised_exception = False

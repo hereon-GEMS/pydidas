@@ -30,6 +30,17 @@ Improvements
 - Changed the DiffractionExperiment to update detector parameters automatically, if 
   the selected detector name is known in pyFAI.
 - Added an option to disable automatic state export on exit for the GUI.
+- Added a data_io class for importing/exporting ASCII data files with different headers.
+- Added support for displaying ASCII data in the DataBrowsingFrame
+- Small HDF5 datasets (size can be configured in the options) will now be fully loaded
+  into memory in the DataBrowsingFrame and keep their metadata.
+- Added a 'read_metadata' function to data_io and a 'read_metadata_from_file' method to
+  IoManager.
+- Removed FioMcaLoader plugin. The new ASCII1dProfileLoader plugin allows to load
+  fio files.
+- Added ASCII1dProfileLoader plugin to import 1d data from various ASCII formats 
+  (csv, txt, fio, dat)
+
 
 Bugfixes
 --------
@@ -56,6 +67,7 @@ Bugfixes
   a different file would not reload the data.
 - Fixed an issue where the pyfai-calib2.ini file was not localized correctly on Unix 
   systems.
+- Fixed an issue with InputPlugins for 1-dimensional data in the GUI.
 
 
 v25.05.16
@@ -197,7 +209,7 @@ Improvements
 - Added import functionality for Sardana FIO files to the Scan import.
 - Added a range property to the Parameter to limit the allowed range of Parameters
   for numerical values.
-- Pydidas result exports in hdf5 format writes metadata neXus-compatible
+- Pydidas result exports in hdf5 format writes metadata NeXus-compatible
 - Added a new interface for browsing and slicing data based on its metadata.
 - Renamed WorkflowResults and WorkflowResultsContext to ProcessingResults
   (for the general class) and WorkflowResults (for the singleton instance)

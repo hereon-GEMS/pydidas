@@ -48,7 +48,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         "horizontal_header",
         "relative_column_widths",
         "autoscale_height",
-        # need to handle the Qt properties for columnCount and rowCount here tó
+        # need to handle the Qt properties for columnCount and rowCount here to
         # handle the relative column widths correctly
         "columnCount",
         "rowCount",

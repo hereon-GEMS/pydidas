@@ -94,7 +94,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
             "dataset": self.get_param_value("hdf5_key"),
             "binning": self.get_param_value("binning"),
             "forced_dimension": 2,
-            "import_pydidas_metadata": False,
+            "import_metadata": False,
         }
         self._index_func = lambda i: (
             None if _slice_ax is None else ((None,) * _slice_ax + (i,))

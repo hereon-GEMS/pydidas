@@ -63,8 +63,6 @@ class InputPlugin(BasePlugin):
         "use_roi",
         "roi_xlow",
         "roi_xhigh",
-        "roi_ylow",
-        "roi_yhigh",
         "binning",
     ]
 
@@ -81,6 +79,8 @@ class InputPlugin(BasePlugin):
                 get_generic_parameter("roi_ylow"),
                 get_generic_parameter("roi_yhigh"),
             )
+            self.advanced_parameters.insert(3, "roi_ylow")
+            self.advanced_parameters.insert(4, "roi_yhigh")
 
     @property
     def output_data_dim(self) -> int:

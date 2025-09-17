@@ -28,6 +28,8 @@ __all__ = [
     "HDF5_EXTENSIONS",
     "NUMPY_EXTENSIONS",
     "BINARY_EXTENSIONS",
+    "ASCII_EXPORT_EXTENSIONS",
+    "ASCII_IMPORT_EXTENSIONS",
     "TIFF_EXTENSIONS",
     "JPG_EXTENSIONS",
     "FABIO_EXTENSIONS",
@@ -40,7 +42,10 @@ HDF5_EXTENSIONS = ["h5", "hdf", "nxs", "hdf5", "HDF5"]
 
 NUMPY_EXTENSIONS = ["npy"]
 
-BINARY_EXTENSIONS = ["raw", "bin", "dat"]
+BINARY_EXTENSIONS = ["raw", "bin"]
+
+ASCII_EXPORT_EXTENSIONS = ["txt", "csv", "chi", "dat"]
+ASCII_IMPORT_EXTENSIONS = ["txt", "csv", "chi", "dat", "asc", "fio"]
 
 TIFF_EXTENSIONS = ["tif", "tiff", "TIF", "TIFF"]
 

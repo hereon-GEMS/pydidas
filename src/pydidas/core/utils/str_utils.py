@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "convert_str_to_number",
     "get_fixed_length_str",
     "get_time_string",
     "get_short_time_string",
@@ -41,7 +42,8 @@ __all__ = [
     "get_param_description_from_docstring",
     "strip_param_description_from_docstring",
     "get_formatted_blocks_from_docstring",
-    "get_formatted_dict_representation",
+    "formatted_str_repr_of_dict",
+    "str_repr_of_slice",
 ]
 
 
@@ -58,6 +60,34 @@ from typing import Any
 import numpy as np
 
 from pydidas.core.constants import ASCII_TO_UNI, UNI_TO_ASCII
+
+
+def convert_str_to_number(input_str: str) -> Real | Integral | str:
+    """
+    Convert a string to a number if possible.
+
+    This function will try to convert the input string to an integer or float.
+    If this is not possible, the original string will be returned (stripped of
+    whitespaces).
+
+    Parameters
+    ----------
+    input_str : str
+        The input string.
+
+    Returns
+    -------
+    Real | Integral | str
+        The converted number or the original string.
+    """
+    input_str = input_str.strip()
+    try:
+        return int(input_str)
+    except ValueError:
+        try:
+            return float(input_str)
+        except ValueError:
+            return input_str
 
 
 def get_fixed_length_str(
@@ -245,6 +275,8 @@ def get_warning(message: str | Iterable[str], **kwargs: Any) -> str:
         message = [message]
     elif isinstance(message, Iterable):
         _max = np.amax(np.r_[[len(_s) for _s in message]])
+    else:
+        raise TypeError("The message must be a string or an Iterable of strings.")
     _length = 60 if _max <= 54 else 80
     _s = "\n" * _new_lines + _severe * ("=" * _length + "\n") + "-" * _length + "\n"
     for item in message:
@@ -349,13 +381,13 @@ def convert_unicode_to_ascii(obj: str | list[str]) -> str | list[str]:
     raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
-def get_range_as_formatted_string(obj: np.ndarray | Iterable[float, ...]) -> str:
+def get_range_as_formatted_string(obj: str | np.ndarray | Iterable[float]) -> str:
     """
     Get a formatted string representation of an iterable range.
 
     Parameters
     ----------
-    obj : np.ndarray | Iterable[float, ...]
+    obj : str | np.ndarray | Iterable[float]
         The input range.
 
     Returns
@@ -512,7 +544,7 @@ def _get_unformatted_lines(input_str: str, max_line_length: int = 60) -> list:
     result_lines : list
         The list with the individual lines.
     """
-    _words = [s for s in re.split(" |\n", input_str) if len(s) > 0]
+    _words = [s for s in re.split("[ \n]", input_str) if len(s) > 0]
     _result_lines = []
     _current_str = _words.pop(0) if len(_words) > 0 else ""
     while len(_words) > 0:
@@ -565,6 +597,7 @@ def get_param_description_from_docstring(docstring: str) -> dict[str, str]:
         _param_str = (
             docstring[docstring.find("Parameters") + 10 :].strip("\n -").split("\n")
         )
+        _key = ""
         while len(_param_str) > 0:
             if not _param_str[0].startswith(8 * " "):
                 _key = _param_str.pop(0).strip()
@@ -628,7 +661,7 @@ def get_formatted_blocks_from_docstring(docstring: str) -> list[str]:
     return _blocks
 
 
-def get_formatted_dict_representation(
+def formatted_str_repr_of_dict(
     input_dict: dict, indent: int = 0, digits: int = 6
 ) -> str:
     """
@@ -651,17 +684,49 @@ def get_formatted_dict_representation(
     _formatted_str = ""
     for _key, _value in input_dict.items():
         _formatted_str += " " * indent + f"{_key}:"
-        if isinstance(_value, Real) and not isinstance(_value, Integral):
-            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"
-            _formatted_str += f" {_value:.{digits}{_formatter}}\n"
-        elif isinstance(_value, dict):
-            _formatted_str += (
-                "\n"
-                + get_formatted_dict_representation(
-                    _value, indent=indent + 2, digits=digits
-                )
-                + "\n"
+        if isinstance(_value, dict):
+            _formatted_str += "\n"
+            _formatted_str += formatted_str_repr_of_dict(
+                _value, indent=max(2 * indent, indent + 2), digits=digits
             )
+        elif isinstance(_value, (list, tuple)):
+            _formatted_str += "\n"
+            _formatted_str += "\n".join(
+                " " * max(2 * indent, indent + 2) + f"{_item}" for _item in _value
+            )
+        elif isinstance(_value, Real) and not isinstance(_value, Integral):
+            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"  # noqa
+            _formatted_str += f" {_value:.{digits}{_formatter}}"
         else:
-            _formatted_str += f" {_value}\n"
+            _formatted_str += f" {_value}"
+        _formatted_str += "\n"
     return _formatted_str.rstrip()
+
+
+def str_repr_of_slice(item: slice | Integral) -> str:
+    """
+    Get a string representation of a slice or integer object used for slicing.
+
+    Parameters
+    ----------
+    item : slice | Integral
+        The input object
+
+    Returns
+    -------
+    str
+        The string representation of the slice.
+    """
+    if not isinstance(item, (slice, Integral)):
+        raise ValueError("Only slice and integer objects are supported.")
+    if isinstance(item, Integral):
+        return str(item)
+    if item.start is not None and item.stop is not None and item.stop - item.start == 1:
+        return str(item.start)
+    _parts = [
+        "" if item.start is None else str(item.start),
+        "" if item.stop is None else str(item.stop),
+    ]
+    if item.step is not None:
+        _parts.append((str(item.step)))
+    return ":".join(_parts)

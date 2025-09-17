@@ -47,6 +47,7 @@ from pydidas.core.utils.dataset_utils import (
     dataset_default_attribute,
     get_axis_item_representation,
     get_corresponding_dims,
+    get_description_string,
     get_dict_with_string_entries,
     get_input_as_dict,
     get_number_of_entries,
@@ -143,7 +144,7 @@ class Dataset(ndarray):
         ----------
         array : ndarray
             The data array.
-        **kwargs : type
+        **kwargs : Any
             Accepted keywords are axis_labels, axis_ranges, axis_units,
             metadata, data_unit. For information on the keywords please refer
             to the class docstring.
@@ -264,7 +265,7 @@ class Dataset(ndarray):
             _vals.insert(dim, _new_entry)
             self._meta[_item] = {_i: _val for _i, _val in enumerate(_vals)}
 
-    def flatten_dims(self, *args: tuple[int], **kwargs: dict):
+    def flatten_dims(self, *args: tuple[int], **kwargs: Any):
         """
         Flatten the specified dimensions **in place** in the Dataset.
 
@@ -279,7 +280,7 @@ class Dataset(ndarray):
         *args : tuple[int]
             The tuple of the dimensions to be flattened. Each dimension must
             be an integer entry.
-        **kwargs: dict
+        **kwargs: Any
             Additional keyword arguments. Supported keywords are:
 
             new_dim_label : str, optional
@@ -451,9 +452,7 @@ class Dataset(ndarray):
         str
             The descriptive string for the data.
         """
-        return self.data_label + (
-            " / " + self.data_unit if len(self.data_unit) > 0 else ""
-        )
+        return get_description_string(self.data_label, self.data_unit)
 
     @property
     def metadata(self) -> dict:
@@ -704,7 +703,28 @@ class Dataset(ndarray):
     # Metadata and description methods
     # ################################
 
-    def get_axis_description(self, index: int) -> str:
+    def get_data_description(self, sep: Literal["/", "_", "(", "["] = "/") -> str:
+        """
+        Get a description for the data, based on the data label and unit.
+
+        Parameters
+        ----------
+        sep : Literal["/", "/", "_", "(", "["], optional
+            The separator between label and unit. The default is "/".
+            For slash and brackets, whitespaces will be added around the separator.
+            For underscore, no whitespaces will be added.
+            For bracket characters, a closing bracket will be added automatically.
+
+        Returns
+        -------
+        str
+            The description for the data.
+        """
+        return get_description_string(self.data_label, self.data_unit, sep)
+
+    def get_axis_description(
+        self, index: int, sep: Literal["/", "_", "(", "["] = "/"
+    ) -> str:
         """
         Get the description for the given axis, based on the axis label and unit.
 
@@ -712,16 +732,19 @@ class Dataset(ndarray):
         ----------
         index : int
             The axis index.
+        sep : Literal["/", "/", "_", "(", "["], optional
+            The separator between label and unit. The default is "/".
+            For slash and brackets, whitespaces will be added around the separator.
+            For underscore, no whitespaces will be added.
+            For bracket characters, a closing bracket will be added automatically.
 
         Returns
         -------
         str
             The description for the given axis.
         """
-        return self._meta["axis_labels"][index] + (
-            " / " + self._meta["axis_units"][index]
-            if len(self._meta["axis_units"][index]) > 0
-            else ""
+        return get_description_string(
+            self._meta["axis_labels"][index], self._meta["axis_units"][index], sep
         )
 
     def get_axis_range(self, index: int) -> ndarray:
@@ -1043,7 +1066,7 @@ class Dataset(ndarray):
         axis: int | tuple[int] | None = None,
         dtype: DTypeLike = None,
         out: ArrayLike | None = None,
-        **kwargs: dict,
+        **kwargs: Any,
     ) -> Self:
         """
         Reimplement a NumPy method with additional metadata handling.
@@ -1063,7 +1086,7 @@ class Dataset(ndarray):
             Alternative output array in which to place the result. It must have the
             same shape as the expected output, but the type will be cast if necessary.
             The default is None.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments, which are only passed when specified.
             Supported keywords are:
 
@@ -1345,7 +1368,7 @@ class Dataset(ndarray):
             for the full documentation. The class' state is appended with
             the class' __dict__
         """
-        _ndarray_reduced = ndarray.__reduce__(self)
+        _ndarray_reduced: tuple = ndarray.__reduce__(self)
         _dataset_state = _ndarray_reduced[2] + (self.__dict__,)
         return _ndarray_reduced[0], _ndarray_reduced[1], _dataset_state
 

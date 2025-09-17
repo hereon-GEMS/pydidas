@@ -29,7 +29,7 @@ __all__ = ["IoManager"]
 
 
 from pathlib import Path
-from typing import Literal, NewType, Union
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
@@ -37,7 +37,8 @@ from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_extension
 
 
-IoBase = NewType("IoBase", str)
+if TYPE_CHECKING:
+    from pydidas.data_io.implementations import IoBase
 
 
 class IoManager(type):
@@ -48,7 +49,7 @@ class IoManager(type):
     registry_import = {}
     registry_export = {}
 
-    def __new__(cls, clsname: str, bases: tuple[type], attrs: dict) -> IoBase:
+    def __new__(cls, clsname: str, bases: tuple[type], attrs: dict) -> type["IoBase"]:
         """
         Call the class' (i.e., the WorkflowTree exporter) __new__ method
         and register the class with the registry.
@@ -64,21 +65,21 @@ class IoManager(type):
 
         Returns
         -------
-        type
+        IoBase
             The new class.
         """
-        _new_class = super(IoManager, cls).__new__(cls, clsname, bases, attrs)
+        _new_class: type["IoBase"] = type.__new__(cls, clsname, bases, attrs)  # noqa
         cls.register_class(_new_class)
         return _new_class
 
     @classmethod
-    def register_class(cls, new_class: IoBase, update_registry: bool = False):
+    def register_class(cls, new_class: type["IoBase"], update_registry: bool = False):
         """
         Register a class as an object for its native extensions.
 
         Parameters
         ----------
-        new_class : IoBase
+        new_class : type["IoBase"]
             The class to be registered.
         update_registry : bool, optional
             Keyword to allow updating / overwriting of registered extensions.
@@ -117,8 +118,8 @@ class IoManager(type):
     def verify_extension_is_registered(
         cls,
         ext: str,
-        mode: Literal["import", "export"] = "import",
-        filename: Union[str, None] = None,
+        mode: Literal["import", "export", "metadata"] = "import",
+        filename: str | None = None,
     ):
         """
         Verify the extension is registered with the MetaClass.
@@ -127,10 +128,10 @@ class IoManager(type):
         ----------
         ext : str
             The file extension
-        mode : str[import, export], optional
-            The mode to use: Choose between import and export. The default is
-            import.
-        filename : Union[None, str]
+        mode : str["import", "export", "metadata"], optional
+            The mode to use: Choose between import and export or metadata.
+            The default is import.
+        filename : str | None
             The filename of the file to be checked.
 
         Raises
@@ -151,7 +152,7 @@ class IoManager(type):
 
     @classmethod
     def is_extension_registered(
-        cls, extension: str, mode: Literal["import", "export"] = "import"
+        cls, extension: str, mode: Literal["import", "export", "metadata"] = "import"
     ):
         """
         Check if the extension of the filename corresponds to a registered class.
@@ -166,47 +167,21 @@ class IoManager(type):
         extension : str
             The extension to be checked. If the extension includes a leading
             dot, it is stripped.
-        mode : Literal["import", "export"]
+        mode : Literal["import", "export", "metadata"]
             The mode to use: Choose between import and export. The default is
             import.
+
         Returns
         -------
         bool
             Flag whether the extension is registered or not.
         """
-        if extension.startswith("."):
-            extension = extension[1:]
-        if extension in cls._get_registry(mode):
-            return True
-        return False
-
-    @classmethod
-    def _get_registry(cls, mode: Literal["import", "export"]):
-        """
-        Get the registry for the selected mode.
-
-        Parameters
-        ----------
-        mode : Literal["import", "export"]
-            The mode. Must be one of import or export.
-
-        Raises
-        ------
-        ValueError
-            If the mode is not import or export.
-
-        Returns
-        -------
-        _reg : dict
-            The selected registry, based on the mode.
-        """
-        if mode == "import":
-            _reg = cls.registry_import
-        elif mode == "export":
-            _reg = cls.registry_export
-        else:
-            raise ValueError('The "mode" must be either import or export.')
-        return _reg
+        extension = extension.removeprefix(".")
+        _registry = cls.registry_export if mode == "export" else cls.registry_import
+        _in_registry = extension in _registry
+        if mode == "metadata":
+            return _in_registry and _registry[extension].allows_metadata_import
+        return _in_registry
 
     @classmethod
     def get_string_of_formats(cls, mode: Literal["import", "export"] = "import"):
@@ -218,7 +193,7 @@ class IoManager(type):
 
         Parameters
         ----------
-        mode : Literal["import", "export"]
+        mode : Literal["import", "export", "metadata"]
             The mode to use: Choose between import and export. The default is
             import.
 
@@ -229,7 +204,7 @@ class IoManager(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats(mode=mode)
-        _extensions = [f"*.{_key}" for _key in cls._get_registry(mode)]
+        _extensions = [f"*.{_key}" for _key in getattr(cls, f"registry_{mode}")]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
             f"{_name} files (*.{' *.'.join(_ext)})" for _name, _ext in _formats.items()
         ]
@@ -266,9 +241,7 @@ class IoManager(type):
         return _formats
 
     @classmethod
-    def export_to_file(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
-    ):
+    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: Any):
         """
         Export the data to a file using the exporter based on the extension.
 
@@ -278,7 +251,7 @@ class IoManager(type):
             The full filename and path.
         data : np.ndarray
             The data to be exported.
-        **kwargs : dict
+        **kwargs : Any
             Any kwargs that should be passed to the underlying exporter.
         """
         _extension = get_extension(filename)
@@ -287,15 +260,15 @@ class IoManager(type):
         _io_class.export_to_file(filename, data, **kwargs)
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
+    def import_from_file(cls, filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Import data from a file, using the importer based on the extension.
 
         Parameters
         ----------
-        filename : Union[Path, str]
+        filename : Path | str
             The full filename and path.
-        **kwargs : dict
+        **kwargs : Any
             Keyword arguments for the concrete importer implementation call.
 
         Returns
@@ -315,3 +288,33 @@ class IoManager(type):
                 "control the given input and configuration."
             )
         return _data
+
+    @classmethod
+    def read_metadata_from_file(
+        cls, filename: Path | str, **kwargs: Any
+    ) -> dict[str, Any]:
+        """
+        Read metadata from a file, using the importer based on the extension.
+
+        If no reader for the given extension is registered, this method will return
+        an empty dictionary.
+
+        Parameters
+        ----------
+        filename : Path | str
+            The full filename and path.
+        **kwargs : Any
+            Keyword arguments for the concrete importer implementation call.
+
+        Returns
+        -------
+        dict
+            The read metadata.
+        """
+        _extension = get_extension(filename)
+        cls.verify_extension_is_registered(
+            _extension, mode="metadata", filename=filename
+        )
+        _importer = cls.registry_import[_extension]
+        _metadata = _importer.read_metadata_from_file(filename, **kwargs)
+        return _metadata

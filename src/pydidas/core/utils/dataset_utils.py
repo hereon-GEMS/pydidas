@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = [
     "FLATTEN_DIM_DEFAULTS",
     "METADATA_KEYS",
+    "get_description_string",
     "get_default_property_dict",
     "dataset_default_attribute",
     "update_dataset_properties_from_kwargs",
@@ -68,6 +69,38 @@ METADATA_KEYS = [
     "axis_labels",
     "axis_ranges",
 ]
+
+
+def get_description_string(
+    label: str, unit: str, sep: Literal["/", "/", "_", "(", "["] = "/"
+) -> str:
+    """
+    Get a description based on label and unit.
+
+    Parameters
+    ----------
+    label : str
+        The label.
+    unit : str
+        The unit.
+    sep : Literal["/", "/", "_", "(", "["], optional
+        The separator between label and unit. The default is "/".
+        For slash and brackets, whitespaces will be added around the separator.
+        For underscore, no whitespaces will be added.
+        For bracket characters, a closing bracket will be added automatically.
+
+    Returns
+    -------
+    str
+        The descriptive string based on label and unit.
+    """
+    if len(unit) == 0:
+        return label
+    if sep in ["/", "_"]:
+        return label + (" / " if sep == "/" else sep) + unit
+    elif sep in ["(", "["]:
+        return label + (f" {sep}" + unit + (")" if sep == "(" else "]"))
+    raise ValueError("The separator must be one of '/', '_', '(', '['.")
 
 
 def update_dataset_properties_from_kwargs(obj: Dataset, kwargs: dict) -> Dataset:
@@ -239,14 +272,14 @@ def get_axis_item_representation(
 
 
 def get_dict_with_string_entries(
-    entries: Union[Iterable, dict], shape: tuple[int], name_reference: str
+    entries: Iterable | dict, shape: tuple[int], name_reference: str
 ) -> dict:
     """
     Get a dictionary with string entries.
 
     Parameters
     ----------
-    entries : Union[Iterable, dict]
+    entries : Iterable | dict
         The entries to be processed.
     shape : tuple[int]
         The shape of the calling Dataset.

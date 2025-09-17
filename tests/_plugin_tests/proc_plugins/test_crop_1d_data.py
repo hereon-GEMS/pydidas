@@ -108,7 +108,7 @@ def test_get_slices__valid_data_dim__w_indices(plugin, data, process_data_dim):
 def test_get_slices__valid_data_dim__w_data_range(plugin, data, proc_dim, cropping):
     crop_low, crop_high = cropping
     plugin.set_param_value("process_data_dim", proc_dim)
-    plugin.set_param_value("type_selection", "Data values")
+    plugin.set_param_value("type_selection", "Axis values")
     _xlow = data.axis_ranges[proc_dim][crop_low] if crop_low is not None else None
     plugin.set_param_value("crop_low", _xlow)
     _xhigh = data.axis_ranges[proc_dim][crop_high] if crop_high is not None else None

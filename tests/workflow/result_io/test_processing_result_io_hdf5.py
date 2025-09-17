@@ -163,11 +163,11 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
             with h5py.File(_fname, "r") as _file:
                 self.assertEqual(
-                    read_and_decode_hdf5_dataset(_file["entry/data_label"]),
+                    _file["entry/data"].attrs["title"],
                     metadata[_node_id]["data_label"],
                 )
                 self.assertEqual(
-                    read_and_decode_hdf5_dataset(_file["entry/data_unit"]),
+                    _file["entry/data/data"].attrs["units"],
                     metadata[_node_id]["data_unit"],
                 )
                 for _ax in range(3, data[_node_id].ndim):

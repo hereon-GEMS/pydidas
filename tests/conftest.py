@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,31 +16,26 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The data__io.implementations package includes imports/exporters for data
-in different formats.
+Module with the TiffIo class for importing and exporting tiff data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+__all__ = []
 
 
-import importlib as __importlib
-import pathlib as __pathlib
+import shutil
+import tempfile
+from pathlib import Path
 
-from .io_base import *
+import pytest
 
 
-__all__ = io_base.__all__
-
-for _item in __pathlib.Path(__file__).parent.iterdir():
-    if (
-        _item.is_file()
-        and _item.suffix == ".py"
-        and _item.stem not in ("__init__", "io_base")
-    ):
-        __importlib.import_module(
-            "pydidas.data_io.implementations." + _item.stem, __package__
-        )
+@pytest.fixture(scope="session", autouse=True)
+def temp_path():
+    _path = Path(tempfile.mkdtemp())
+    yield _path
+    shutil.rmtree(_path)

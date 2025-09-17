@@ -25,8 +25,9 @@ __copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["create_splitter", "get_widget_creation_information"]
+__all__ = ["create_splitter", "DATA_BROWSING_FRAME_BUILD_CONFIG"]
 
+from typing import Any
 
 from qtpy import QtGui, QtWidgets
 
@@ -39,95 +40,120 @@ from pydidas.widgets.selection import (
 from pydidas.widgets.silx_plot import SilxDataViewer
 
 
-def get_widget_creation_information() -> list[list[str, tuple, dict]]:
-    """
-    Get the widget creation information for the DataBrowsingFrame.
-
-    Returns
-    -------
-    list[list[str, tuple, dict]]
-        The widget creation information. Each list entry includes all the
-        necessary information to create a single widget in the form of a
-        list with the following entries:
-
-        - The widget creation method name.
-        - The arguments for the widget creation method.
-        - The keyword arguments for the widget creation method.
-    """
-    return [
-        ["create_label", (None, "Data browser"), {"fontsize_offset": 4, "bold": True}],
-        [
-            "create_empty_widget",
-            ("browser",),
-            {"sizePolicy": POLICY_EXP_EXP, "minimumWidth": 200},
-        ],
-        [
-            "create_any_widget",
-            ("explorer", DirectoryExplorer),
-            {"gridPos": (0, 0, 1, 1), "parent_widget": "browser"},
-        ],
-        [
-            "create_spacer",
-            ("explorer_spacer",),
-            {"gridPos": (0, -1, 1, 1), "parent_widget": "browser", "fixedWidth": 5},
-        ],
-        [
-            "create_empty_widget",
-            ("viewer_and_filename",),
-            {"parent_widget": None, "sizePolicy": POLICY_EXP_EXP},
-        ],
-        [
-            "create_spacer",
-            ("spacer",),
-            {
-                "gridPos": (0, 0, 1, 1),
-                "parent_widget": "viewer_and_filename",
-                "fixedWidth": 5,
-            },
-        ],
-        [
-            "create_label",
-            ("filename_label", "Filename:"),
-            {
-                "parent_widget": "viewer_and_filename",
-                "gridPos": (0, 1, 1, 1),
-                "font_metric_width_factor": 12,
-            },
-        ],
-        [
-            "create_lineedit",
-            ("filename",),
-            {
-                "gridPos": (0, 2, 1, 1),
-                "parent_widget": "viewer_and_filename",
-                "readOnly": True,
-                "sizePolicy": POLICY_EXP_EXP,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("hdf5_dataset_selector", Hdf5DatasetSelector),
-            {
-                "gridPos": (-1, 1, 1, 2),
-                "parent_widget": "viewer_and_filename",
-                "visible": False,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("raw_metadata_selector", RawMetadataSelector),
-            {
-                "gridPos": (-1, 1, 1, 2),
-                "parent_widget": "viewer_and_filename",
-                "visible": False,
-            },
-        ],
-        [
-            "add_any_widget",
-            ("viewer", SilxDataViewer()),
-            {"gridPos": (-1, 1, 1, 2), "parent_widget": "viewer_and_filename"},
-        ],
-    ]
+DATA_BROWSING_FRAME_BUILD_CONFIG: list[str, tuple[Any], dict[str, Any]] = [
+    ["create_label", (None, "Data browser"), {"fontsize_offset": 4, "bold": True}],
+    [
+        "create_empty_widget",
+        ("browser",),
+        {"sizePolicy": POLICY_EXP_EXP, "minimumWidth": 200},
+    ],
+    [
+        "create_any_widget",
+        ("explorer", DirectoryExplorer),
+        {"gridPos": (0, 0, 1, 1), "parent_widget": "browser"},
+    ],
+    [
+        "create_spacer",
+        ("explorer_spacer",),
+        {"gridPos": (0, -1, 1, 1), "parent_widget": "browser", "fixedWidth": 5},
+    ],
+    [
+        "create_empty_widget",
+        ("viewer_and_filename",),
+        {"parent_widget": None, "sizePolicy": POLICY_EXP_EXP},
+    ],
+    [
+        "create_spacer",
+        ("spacer",),
+        {
+            "gridPos": (0, 0, 1, 1),
+            "parent_widget": "viewer_and_filename",
+            "fixedWidth": 5,
+        },
+    ],
+    [
+        "create_empty_widget",
+        ("plot_header",),
+        {"parent_widget": "viewer_and_filename", "gridPos": (1, 1, 1, 1)},
+    ],
+    [
+        "create_label",
+        ("filename_label", "Filename:"),
+        {
+            "parent_widget": "plot_header",
+            "gridPos": (0, 0, 1, 1),
+            "font_metric_width_factor": 12,
+        },
+    ],
+    [
+        "create_lineedit",
+        ("filename",),
+        {
+            "gridPos": (0, 1, 1, 2),
+            "parent_widget": "plot_header",
+            "readOnly": True,
+            "sizePolicy": POLICY_EXP_EXP,
+        },
+    ],
+    [
+        "create_empty_widget",
+        ("ascii_widgets",),
+        {
+            "parent_widget": "plot_header",
+            "gridPos": (-1, 0, 1, 3),
+            "visible": False,
+        },
+    ],
+    [
+        "create_spacer",
+        ("ascii_spacer",),
+        {
+            "gridPos": (0, 0, 1, 1),
+            "parent_widget": "ascii_widgets",
+            "fixedHeight": 20,
+        },
+    ],
+    [
+        "create_param_widget",
+        ("xcol",),
+        {
+            "gridPos": (-1, 0, 1, 2),
+            "parent_widget": "ascii_widgets",
+        },
+    ],
+    [
+        "create_button",
+        ("button_ascii_metadata", "Display ASCII metadata"),
+        {
+            "gridPos": (-1, 1, 1, 1),
+            "font_metric_width_factor": 30,
+            "parent_widget": "ascii_widgets",
+        },
+    ],
+    [
+        "create_any_widget",
+        ("hdf5_dataset_selector", Hdf5DatasetSelector),
+        {
+            "gridPos": (-1, 1, 1, 2),
+            "parent_widget": "viewer_and_filename",
+            "visible": False,
+        },
+    ],
+    [
+        "create_any_widget",
+        ("raw_metadata_selector", RawMetadataSelector),
+        {
+            "gridPos": (-1, 1, 1, 2),
+            "parent_widget": "viewer_and_filename",
+            "visible": False,
+        },
+    ],
+    [
+        "add_any_widget",
+        ("viewer", SilxDataViewer()),
+        {"gridPos": (-1, 1, 1, 2), "parent_widget": "viewer_and_filename"},
+    ],
+]
 
 
 def create_splitter(

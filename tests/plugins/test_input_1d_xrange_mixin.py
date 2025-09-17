@@ -52,8 +52,8 @@ class TestInputPlugin(Input1dXRangeMixin, InputPlugin):
     def get_frame(self, index, **kwargs):
         _frame = Dataset(
             np.zeros(_DUMMY_SHAPE_1d, dtype=np.uint16) + index,
-            axis_labels=["det x"],
-            axis_units=["px"],
+            axis_labels=["det x0"],
+            axis_units=["pixxxel"],
             data_unit=self.output_data_unit,
             data_label=self.output_data_label,
         )
@@ -119,8 +119,8 @@ def test_execute(setup_scan, ordinal, frame_indices, custom_xscale, handling):
         assert _data.axis_units[0] == ""
     else:
         assert _data.mean() == pytest.approx(ordinal + (frame_indices - 1) / 2)
-    assert _data.axis_labels[_dim_data] == _X_LABEL if custom_xscale else "detector x"
-    assert _data.axis_units[_dim_data] == _X_UNIT if custom_xscale else "channel"
+    assert _data.axis_labels[_dim_data] == (_X_LABEL if custom_xscale else "det x0")
+    assert _data.axis_units[_dim_data] == (_X_UNIT if custom_xscale else "pixxxel")
     assert np.all(_data.axis_ranges[_dim_data] == _ref_range)
     assert _data.data_unit == plugin.output_data_unit
     assert _data.data_label == plugin.output_data_label

@@ -979,22 +979,43 @@ class TestDataset(unittest.TestCase):
         obj.data_unit = _test_unit
         self.assertEqual(obj.data_description, f"{_test_label} / {_test_unit}")
 
+    def test_get_data_description__no_unit(self):
+        obj = self.create_simple_dataset()
+        for _char in ["/", "_", "(", "["]:
+            with self.subTest(sep=_char):
+                _str = obj.get_data_description(sep=_char)
+                self.assertEqual(_str, obj.data_label)
+
+    def test_get_data_description__w_unit(self):
+        obj = self.create_simple_dataset()
+        obj.data_unit = "Tm"
+        for _char in ["/", "_", "(", "["]:
+            with self.subTest(sep=_char):
+                _str = obj.get_data_description(sep=_char)
+                _label, _unit = _str.split(_char, 1)
+                _unit = _unit.strip(" )]")
+                self.assertEqual(_label.strip(), obj.data_label)
+                self.assertEqual(_unit.strip(), obj.data_unit)
+
     def test_get_axis_description__no_unit(self):
         obj = self.create_simple_dataset()
         for index in range(2):
-            with self.subTest(index=index):
-                obj.update_axis_unit(index, "")
-                _ax_str = obj.get_axis_description(index)
-                self.assertEqual(_ax_str, self._axis_labels[index])
+            for _char in ["/", "_", "(", "["]:
+                with self.subTest(index=index, sep=_char):
+                    obj.update_axis_unit(index, "")
+                    _ax_str = obj.get_axis_description(index, sep=_char)
+                    self.assertEqual(_ax_str, self._axis_labels[index])
 
     def test_get_axis_description__w_unit(self):
         obj = self.create_simple_dataset()
         for index in range(2):
-            with self.subTest(index=index):
-                _ax_str = obj.get_axis_description(index)
-                self.assertEqual(
-                    _ax_str, f"{self._axis_labels[index]} / {self._axis_units[index]}"
-                )
+            for _char in ["/", "_", "(", "["]:
+                with self.subTest(index=index, sep=_char):
+                    _ax_str = obj.get_axis_description(index, sep=_char)
+                    _label, _unit = _ax_str.split(_char, 1)
+                    _unit = _unit.strip(" )]")
+                    self.assertEqual(_label.strip(), self._axis_labels[index])
+                    self.assertEqual(_unit.strip(), self._axis_units[index])
 
     def test_np_reimplementation__invalid_kwargs(self):
         for _method_name in _IMPLEMENTED_METHODS:

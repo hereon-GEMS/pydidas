@@ -521,7 +521,7 @@ class DirectorySpyApp(BaseApp):
                 else ((None,) * _slice_ax + (_shape[_slice_ax] - 1,))
             ),
             "dataset": _dataset,
-            "import_pydidas_metadata": False,
+            "import_metadata": False,
         }
 
     def __store_image_in_shared_memory(self, image: np.ndarray):

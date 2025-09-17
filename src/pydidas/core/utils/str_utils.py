@@ -80,14 +80,14 @@ def convert_str_to_number(input_str: str) -> Real | Integral | str:
     Real | Integral | str
         The converted number or the original string.
     """
+    input_str = input_str.strip()
     try:
-        if "." in input_str:
-            _output = float(input_str)
-        else:
-            _output = int(input_str)
+        return int(input_str)
     except ValueError:
-        _output = input_str.strip()
-    return _output
+        try:
+            return float(input_str)
+        except ValueError:
+            return input_str
 
 
 def get_fixed_length_str(

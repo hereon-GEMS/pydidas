@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -79,7 +79,7 @@ class TestSum2dData(unittest.TestCase):
                 plugin._data = data
                 plugin.set_param_value(f"lower_limit_ax{_int}", _ax[_low])
                 plugin.set_param_value(f"upper_limit_ax{_int}", _ax[_high])
-                plugin.set_param_value("type_selection", "Data values")
+                plugin.set_param_value("type_selection", "Axis values")
                 _range = plugin._get_valid_indices(_int, _int)
                 _ref_range = np.zeros((plugin._data.shape[_int],), dtype=bool)
                 _ref_range[_low : _high + 1] = True
@@ -92,7 +92,7 @@ class TestSum2dData(unittest.TestCase):
         _x = data.axis_ranges[1]
         plugin.set_param_value("lower_limit_ax1", _x[-1] + 5)
         plugin.set_param_value("upper_limit_ax1", _x[-1] + 10)
-        plugin.set_param_value("type_selection", "Data values")
+        plugin.set_param_value("type_selection", "Axis values")
         _range = plugin._get_valid_indices(1, 1)
         self.assertTrue(np.all(_range == 0))
 

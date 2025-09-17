@@ -508,13 +508,13 @@ GENERIC_PARAMS_OTHER = {
     },
     "type_selection": {
         "type": str,
-        "default": "Data values",
+        "default": "Axis values",
         "name": "Data selection",
-        "choices": ["Data values", "Indices"],
+        "choices": ["Axis values", "Indices"],
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Select between using the axis values (in the respective."
+            "Select between using the axis values (in the respective "
             "unit) and the axis indices."
         ),
     },

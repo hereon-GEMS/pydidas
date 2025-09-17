@@ -77,7 +77,7 @@ class TestSum1dData(unittest.TestCase):
         plugin._data = data
         plugin.set_param_value("lower_limit", data.axis_ranges[0][_low])
         plugin.set_param_value("upper_limit", data.axis_ranges[0][_high])
-        plugin.set_param_value("type_selection", "Data values")
+        plugin.set_param_value("type_selection", "Axis values")
         _mask = plugin._get_mask()
         _mask_true = np.where(_mask)[0]
         self.assertEqual(_mask_true[0], _low)
@@ -91,7 +91,7 @@ class TestSum1dData(unittest.TestCase):
         plugin._data = data
         plugin.set_param_value("lower_limit", data.axis_ranges[0][_low])
         plugin.set_param_value("upper_limit", data.axis_ranges[0][_high])
-        plugin.set_param_value("type_selection", "Data values")
+        plugin.set_param_value("type_selection", "Axis values")
         _mask = plugin._get_mask()
         _mask_true = np.where(_mask)[0]
         self.assertEqual(_mask_true.size, 0)
@@ -104,7 +104,7 @@ class TestSum1dData(unittest.TestCase):
         plugin._data = data
         plugin.set_param_value("lower_limit", data.axis_ranges[0][_low])
         plugin.set_param_value("upper_limit", data.axis_ranges[0][_high])
-        plugin.set_param_value("type_selection", "Data values")
+        plugin.set_param_value("type_selection", "Axis values")
         _mask = plugin._get_mask()
         _mask_true = np.where(_mask)[0]
         self.assertEqual(_mask_true.size, 1)

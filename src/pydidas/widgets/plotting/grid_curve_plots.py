@@ -30,7 +30,7 @@ __all__ = ["GridCurvePlot"]
 from functools import partial
 from itertools import product
 from numbers import Integral, Real
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -86,8 +86,8 @@ class GridCurvePlot(WidgetWithParameterCollection):
         """Update the min and max values based on the data."""
         if min_ is None or max_ is None:
             min_, max_ = np.nanmin(data), np.nanmax(data)
-            min_ -= 0.05 * abs(max_ - min_)  # noqa E0602
-            max_ += 0.05 * abs(max_ - min_)  # noqa E0602
+            min_ -= 0.05 * abs(max_ - min_)
+            max_ += 0.05 * abs(max_ - min_)
         return min_, max_
 
     def __init__(self, **kwargs: Any):
@@ -325,7 +325,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._local_scan.update_from_scan(scan)
         self._update_plot()
 
-    def set_datasets(self, **datasets: Union[Dataset | None]):
+    def set_datasets(self, **datasets: Dataset | None):
         """
         Set the datasets to be plotted in the grid.
 
@@ -334,7 +334,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
 
         Parameters
         ----------
-        **datasets : Union[Dataset | None]
+        **datasets : Dataset | None
             The datasets to be plotted.
         """
         if not datasets:

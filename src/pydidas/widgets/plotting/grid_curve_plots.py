@@ -30,7 +30,7 @@ __all__ = ["GridCurvePlot"]
 from functools import partial
 from itertools import product
 from numbers import Integral, Real
-from typing import Any
+from typing import Any, Union
 
 import numpy as np
 from qtpy import QtCore
@@ -39,6 +39,8 @@ from pydidas.contexts import Scan
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import (
     ALIGN_BOTTOM_CENTER,
+    COLOR_BLUE,
+    COLOR_ORANGE,
     POLICY_EXP_EXP,
     QT_REG_EXP_POS_INT_VALIDATOR,
 )
@@ -47,6 +49,7 @@ from pydidas.widgets import WidgetWithParameterCollection, delete_all_items_in_l
 
 
 _BUTTON_WIDTH = 25
+_LINE_PEN = {"color": COLOR_BLUE, "width": 2}
 
 
 class GridCurvePlot(WidgetWithParameterCollection):
@@ -76,9 +79,20 @@ class GridCurvePlot(WidgetWithParameterCollection):
         if not all(isinstance(_val, Real) for _val in scaling):
             raise UserConfigError("Scaling values must be real numbers (floats).")
 
+    @staticmethod
+    def __update_min_and_max(
+        data: Dataset, min_: float, max_: float
+    ) -> tuple[float, float]:
+        """Update the min and max values based on the data."""
+        if min_ is None or max_ is None:
+            min_, max_ = np.nanmin(data), np.nanmax(data)
+            min_ -= 0.05 * abs(max_ - min_)  # noqa E0602
+            max_ += 0.05 * abs(max_ - min_)  # noqa E0602
+        return min_, max_
+
     def __init__(self, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, **kwargs)
-        self._config = {
+        self._config: dict[str, Any] = {
             "n_hor": kwargs.pop("n_hor", 2),
             "n_vert": kwargs.pop("n_vert", 2),
             "max_index": -1,
@@ -311,7 +325,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._local_scan.update_from_scan(scan)
         self._update_plot()
 
-    def set_datasets(self, **datasets: Dataset | None):
+    def set_datasets(self, **datasets: Union[Dataset | None]):
         """
         Set the datasets to be plotted in the grid.
 
@@ -320,7 +334,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
 
         Parameters
         ----------
-        **datasets : Dataset | None
+        **datasets : Union[Dataset | None]
             The datasets to be plotted.
         """
         if not datasets:
@@ -590,16 +604,19 @@ class GridCurvePlot(WidgetWithParameterCollection):
                 _plot_widget = self._widgets[_key]
                 _local_data = _data[self._current_index + _i_plot]
                 if _local_data.ndim == 1:
-                    _plot_widget.plot(_xrange, _local_data, pen="b")
+                    _plot_widget.plot(_xrange, _local_data, pen=COLOR_BLUE)
                     continue
                 _nitems = _local_data.shape[0]
-                for _n in range(_nitems):
-                    if _n < _nitems - 1:
-                        _plot_widget.scatterPlot(
-                            _xrange, _local_data[_n], pen=None, symbol="o"
-                        )
-                    else:
-                        _plot_widget.plot(_xrange, _local_data[_n], pen="b")
+                _plot_widget.plot(_xrange, _local_data[0], pen=_LINE_PEN)
+                for _index in range(1, _nitems):
+                    _color = COLOR_BLUE if _index == _nitems - 1 else COLOR_ORANGE
+                    _plot_widget.scatterPlot(
+                        _xrange,
+                        _local_data[_index],
+                        pen=_color,
+                        symbol="o",
+                        brush=_color,
+                    )
 
     def __get_limits_for_data(self, data_key: str) -> tuple[float, float, float, float]:
         """
@@ -618,16 +635,8 @@ class GridCurvePlot(WidgetWithParameterCollection):
         # Get the y and x scaling limits for the current dataset:
         _data = self._datasets[data_key]
         _xrange = _data.axis_ranges[_data.ndim - 1]
-        _ymin, _ymax = self._yscaling[data_key]
-        if _ymin is None or _ymax is None:
-            _ymin, _ymax = np.nanmin(_data), np.nanmax(_data)
-            _ymin -= 0.05 * abs(_ymax - _ymin)
-            _ymax += 0.05 * abs(_ymax - _ymin)
-        _xmin, _xmax = self._xscaling[data_key]
-        if _xmin is None or _xmax is None:
-            _xmin, _xmax = np.nanmin(_xrange), np.nanmax(_xrange)
-            _xmin -= 0.05 * abs(_xmax - _xmin)
-            _xmax += 0.05 * abs(_xmax - _xmin)
+        _ymin, _ymax = self.__update_min_and_max(_data, *self._yscaling[data_key])
+        _xmin, _xmax = self.__update_min_and_max(_xrange, *self._xscaling[data_key])
         return _xmin, _xmax, _ymin, _ymax
 
     def __prepare_plot_for_new_data(

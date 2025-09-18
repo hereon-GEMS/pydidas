@@ -47,7 +47,7 @@ from pydidas.core import (
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
-    get_widget_creation_information,
+    SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION,
 )
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import WarningBox
@@ -138,7 +138,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         self._widgets["config"] = EmptyWidget(
             font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH
         )
-        for _name, _args, _kwargs in get_widget_creation_information(self.params):
+        for _name, _args, _kwargs in SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION:
             _method = getattr(self, _name)
             if "widget" in _kwargs:
                 _kwargs["widget"] = self._widgets[_kwargs["widget"]]
@@ -321,10 +321,10 @@ class SinSquareChiResultsFrame(BaseFrame):
                     "show_sin_square_chi_branches"
                 ):
                     _data = _data[:, 2:, :]
+                _data = np.roll(_data, 1, axis=1)
             else:
                 _data = None
             setattr(self, f"_sin_{_key}_data", _data)
-
         self._plots.set_datasets(
             square=self._sin_square_chi_data, two_chi=self._sin_2chi_data
         )

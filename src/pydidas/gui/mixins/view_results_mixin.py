@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2022 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["get_ViewResultsMixin_build_config", "ViewResultsMixin"]
+__all__ = ["ViewResultsMixin"]
 
 
 import os
@@ -42,163 +42,136 @@ from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import PydidasFileDialog, ScrollArea
 from pydidas.widgets.data_viewer import DataViewer, TableWithResultDatasets
 from pydidas.widgets.dialogues import critical_warning
-from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.misc import ReadOnlyTextWidget
 from pydidas.widgets.windows import ShowInformationForResult
 from pydidas.workflow import WorkflowResults
 
 
-def get_ViewResultsMixin_build_config(
-    frame: BaseFrame,
-) -> list[list[str, tuple[str | QtWidgets.QWidget], dict[str, Any]]]:
-    """
-    Return the build configuration for the ViewResultsFrame.
-
-    Parameters
-    ----------
-    frame : BaseFrame
-        The ViewResultsFrame instance.
-
-    Returns
-    -------
-    list[list[str, tuple[str], dict[str, Any]]]
-        The build configuration in the form of a list. Each list entry consists of
-        the widget creation method name, the method arguments and the method keywords.
-    """
-    return [
-        [
-            "create_empty_widget",
-            ("config",),
-            {
-                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
-                "parent_widget": None,
-                "sizePolicy": POLICY_FIX_EXP,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("config_area", ScrollArea),
-            {
-                "sizePolicy": POLICY_FIX_EXP,
-            },
-        ],
-        [
-            "create_spacer",
-            ("title_spacer",),
-            {"fixedHeight": 15, "parent_widget": "config"},
-        ],
-        [
-            "create_label",
-            ("label_select_header", "Select results to display:"),
-            {
-                "bold": True,
-                "fontsize_offset": 1,
-                "parent_widget": "config",
-                "visible": False,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("result_table", TableWithResultDatasets),
-            {"parent_widget": "config", "visible": False},
-        ],
-        [
-            "create_spacer",
-            ("arrangement_spacer",),
-            {"fixedHeight": 15, "parent_widget": "config"},
-        ],
-        [
-            "create_radio_button_group",
-            ("radio_arrangement", ["by scan shape", "as a timeline"]),
-            {
-                "title": "Arrangement of results:",
-                "parent_widget": "config",
-                "vertical": False,
-                "visible": False,
-            },
-        ],
-        [
-            "create_spacer",
-            ("info_spacer",),
-            {"fixedHeight": 15, "parent_widget": "config"},
-        ],
-        [
-            "create_label",
-            ("label_details", "Detailed result information:"),
-            {
-                "bold": True,
-                "fontsize_offset": 1,
-                "parent_widget": "config",
-                "visible": False,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("result_info", ReadOnlyTextWidget),
-            {
-                "alignment": QtCore.Qt.AlignTop,
-                "font_metric_height_factor": 25,
-                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
-                "parent_widget": "config",
-                "visible": False,
-            },
-        ],
-        [
-            "create_spacer",
-            ("config_export_spacer",),
-            {"parent_widget": "config"},
-        ],
-        [
-            "create_param_widget",
-            (frame.get_param("saving_format"),),
-            {"parent_widget": "config", "visible": False},
-        ],
-        [
-            "create_param_widget",
-            (frame.get_param("squeeze_empty_dims"),),
-            {"parent_widget": "config", "visible": False},
-        ],
-        [
-            "create_param_widget",
-            (frame.get_param("enable_overwrite"),),
-            {"parent_widget": "config", "visible": False},
-        ],
-        [
-            "create_button",
-            ("but_export_current", "Export current node results"),
-            {
-                "enabled": False,
-                "icon": "qt-std::SP_FileIcon",
-                "parent_widget": "config",
-                "toolTip": (
-                    "Export the current node's results to file. Note that the "
-                    "filenames are pre-determined based on node ID and node label."
-                ),
-                "visible": False,
-            },
-        ],
-        [
-            "create_button",
-            ("but_export_all", "Export all results"),
-            {
-                "enabled": False,
-                "icon": "qt-std::SP_DialogSaveButton",
-                "parent_widget": "config",
-                "tooltip": "Export all results. Note that the directory must be empty.",
-                "visible": False,
-            },
-        ],
-        [
-            "create_any_widget",
-            ("data_viewer", DataViewer),
-            {
-                "plot2d_diffraction_exp": frame._EXP,
-                "plot2d_use_data_info_action": True,
-                "gridPos": (0, 1, frame.layout().rowCount(), 1),
-                "visible": False,
-            },
-        ],
-    ]
+_VIEW_RESULTS_MIXIN_BUILD_CONFIG = [
+    [
+        "create_empty_widget",
+        ("config",),
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": None,
+            "sizePolicy": POLICY_FIX_EXP,
+        },
+    ],
+    [
+        "create_any_widget",
+        ("config_area", ScrollArea),
+        {
+            "widget": "config",
+            "sizePolicy": POLICY_FIX_EXP,
+        },
+    ],
+    [
+        "create_spacer",
+        ("title_spacer",),
+        {"fixedHeight": 15, "parent_widget": "config"},
+    ],
+    [
+        "create_label",
+        ("label_select_header", "Select results to display:"),
+        {
+            "bold": True,
+            "fontsize_offset": 1,
+            "parent_widget": "config",
+            "visible": False,
+        },
+    ],
+    [
+        "create_any_widget",
+        ("result_table", TableWithResultDatasets),
+        {"parent_widget": "config", "visible": False},
+    ],
+    [
+        "create_spacer",
+        ("arrangement_spacer",),
+        {"fixedHeight": 15, "parent_widget": "config"},
+    ],
+    [
+        "create_radio_button_group",
+        ("radio_arrangement", ["by scan shape", "as a timeline"]),
+        {
+            "title": "Arrangement of results:",
+            "parent_widget": "config",
+            "vertical": False,
+            "visible": False,
+        },
+    ],
+    [
+        "create_spacer",
+        ("info_spacer",),
+        {"fixedHeight": 15, "parent_widget": "config"},
+    ],
+    [
+        "create_label",
+        ("label_details", "Detailed result information:"),
+        {
+            "bold": True,
+            "fontsize_offset": 1,
+            "parent_widget": "config",
+            "visible": False,
+        },
+    ],
+    [
+        "create_any_widget",
+        ("result_info", ReadOnlyTextWidget),
+        {
+            "alignment": QtCore.Qt.AlignTop,
+            "font_metric_height_factor": 25,
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "config",
+            "visible": False,
+        },
+    ],
+    [
+        "create_spacer",
+        ("config_export_spacer",),
+        {"parent_widget": "config"},
+    ],
+    [
+        "create_param_widget",
+        ("saving_format",),
+        {"parent_widget": "config", "visible": False},
+    ],
+    [
+        "create_param_widget",
+        ("squeeze_empty_dims",),
+        {"parent_widget": "config", "visible": False},
+    ],
+    [
+        "create_param_widget",
+        ("enable_overwrite",),
+        {"parent_widget": "config", "visible": False},
+    ],
+    [
+        "create_button",
+        ("but_export_current", "Export current node results"),
+        {
+            "enabled": False,
+            "icon": "qt-std::SP_FileIcon",
+            "parent_widget": "config",
+            "toolTip": (
+                "Export the current node's results to file. Note that the "
+                "filenames are pre-determined based on node ID and node label."
+            ),
+            "visible": False,
+        },
+    ],
+    [
+        "create_button",
+        ("but_export_all", "Export all results"),
+        {
+            "enabled": False,
+            "icon": "qt-std::SP_DialogSaveButton",
+            "parent_widget": "config",
+            "tooltip": "Export all results. Note that the directory must be empty.",
+            "visible": False,
+        },
+    ],
+]
 
 
 class ViewResultsMixin:
@@ -212,7 +185,7 @@ class ViewResultsMixin:
     _widgets: dict[str, QtWidgets.QWidget]
     params_not_to_restore: list[str] = []
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         _results = kwargs.get("workflow_results", None)
         self._RESULTS = _results if _results is not None else WorkflowResults()
         self._active_node_id = -1
@@ -234,17 +207,21 @@ class ViewResultsMixin:
 
     def build_view_results_mixin(self):
         """Build the widgets required for the ViewResultsMixin functionality."""
-        for _method, _args, _kwargs in get_ViewResultsMixin_build_config(self):
-            if _args == ("config_area", ScrollArea):
-                _kwargs["widget"] = self._widgets["config"]
+        for _method, _args, _kwargs in _VIEW_RESULTS_MIXIN_BUILD_CONFIG:
             if _args == ("config_export_spacer",):
                 self._widgets["config"].layout().setRowStretch(
                     self._widgets["config"].layout().rowCount(), 1
                 )
-            if _args == ("data_viewer", DataViewer):
-                _kwargs["gridPos"] = (0, 1, self.layout().rowCount(), 1)
             _method = getattr(self, _method)
             _method(*_args, **_kwargs)
+        self.create_any_widget(
+            "data_viewer",
+            DataViewer,
+            plot2d_diffraction_exp=self._EXP,
+            plot2d_use_data_info_action=True,
+            gridPos=(0, 1, self.layout().rowCount(), 1),
+            visible=False,
+        )
         self.layout().setRowStretch(self.layout().rowCount() - 1, 1)
 
     def connect_view_results_mixin_signals(self):

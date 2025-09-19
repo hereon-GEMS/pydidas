@@ -416,6 +416,8 @@ class CreateWidgetsMixIn:
         TypeError
             If the reference "ref" is not of type string.
         """
+        if "widget" in kwargs and isinstance(kwargs["widget"], str):
+            kwargs["widget"] = self._widgets[kwargs["widget"]]
         if hasattr(widget_class, "init_kwargs"):
             _init_kwargs = {}
             for _key in widget_class.init_kwargs:

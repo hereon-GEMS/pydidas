@@ -17,7 +17,7 @@
 
 """
 The generic_params_other module holds all the required data to create generic
-Parameters which are are not included in other specialized modules.
+Parameters which are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
@@ -68,7 +68,7 @@ GENERIC_PARAMS_STRESS_STRAIN = {
         "unit": "",
         "range": None,
         "allow_None": False,
-        "tooltip": ("The data source to be used for the visualization."),
+        "tooltip": "The data source to be used for the visualization.",
     },
     "selected_sin_square_chi_node": {
         "type": str,

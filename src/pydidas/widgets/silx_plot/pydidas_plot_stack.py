@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.data.DataViews import IMAGE_MODE
@@ -43,7 +44,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Supported keyword arguments are:
 
         parent : Union[QtWidgets.QWidget, None]
@@ -62,7 +63,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
     init_kwargs = ["parent", "cs_transform", "use_data_info_action", "diffraction_exp"]
     sig_get_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         QtWidgets.QStackedWidget.__init__(self, kwargs.get("parent", None))
         self._frame1d = QtWidgets.QWidget()
         self._frame1d.setLayout(QtWidgets.QGridLayout())
@@ -82,7 +83,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self.addWidget(self._frame2d)
         self.addWidget(self._frame3d)
 
-    def plot_data(self, data: Dataset, **kwargs: dict):
+    def plot_data(self, data: Dataset, **kwargs: Any):
         """
         Plot the given data.
 
@@ -90,7 +91,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         ----------
         data : pydidas.core.Dataset
             The data to be plotted.
-        **kwargs : dict
+        **kwargs : Any
             Any additional keywords to be passed to the plot.
         """
         _dim = min(data.ndim, 3)

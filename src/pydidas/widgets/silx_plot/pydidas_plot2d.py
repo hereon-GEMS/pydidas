@@ -143,7 +143,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._default_unit = value
         self.update_cs_units(value, value)
 
-    def _update_config(self, kwargs: dict):
+    def _update_config(self, kwargs: Any):
         """
         Update the plot configuration.
 
@@ -349,7 +349,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.sig_data_linearity.emit(True)
             self.update_cs_units("", "")
 
-    def addNonUniformImage(self, data: Dataset, **kwargs: dict):
+    def addNonUniformImage(self, data: Dataset, **kwargs: Any):
         """
         Add a non-uniform image to the plot.
 
@@ -361,7 +361,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         data : Dataset
             The input data to be displayed.
 
-        **kwargs : dict
+        **kwargs : Any
             Any supported Plot2d.addImage keyword arguments.
         """
         self._check_data_dim(data)
@@ -378,7 +378,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._notifyContentChanged(_scatter)
         self.setActiveScatter(_SCATTER_LEGEND)
 
-    def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
+    def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any):
         """
         Plot a pydidas Dataset.
 
@@ -386,23 +386,21 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         ----------
         data : pydidas.core.Dataset
             The data to be plotted.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments to be passed to the silx plot method.
         """
         self._check_data_dim(data)
         self.update_cs_units(data.axis_units[1], data.axis_units[0])
         self._plot_config = {
-            "ax_labels": [data.get_axis_description(i) for i in [0, 1]],
+            "x_ax_label": data.get_axis_description(1),
+            "y_ax_label": data.get_axis_description(0),
+            "title": kwargs.pop("title", ""),
             "kwargs": {
                 "replace": kwargs.pop("replace", True),
                 "copy": kwargs.pop("copy", False),
                 "legend": _IMAGE_LEGEND,
             }
-            | {
-                _key: _val
-                for _key, _val in kwargs.items()
-                if _key in self._config["allowed_add_image_kwargs"]
-            },
+            | self.__allowed_kwargs(kwargs),
         }
         _data_is_nonlinear = data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1)
         self.profile.setEnabled(not _data_is_nonlinear)
@@ -417,8 +415,10 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             Plot2D.addImage(self, data.array, **self._plot_config["kwargs"])
             self.setActiveImage(_IMAGE_LEGEND)
             self.sig_new_data_size.emit(*data.shape)
-        self.setGraphYLabel(self._plot_config["ax_labels"][0])
-        self.setGraphXLabel(self._plot_config["ax_labels"][1])
+        if self._plot_config["title"]:
+            self.setGraphTitle(self._plot_config["title"])
+        self.setGraphYLabel(self._plot_config["y_ax_label"])
+        self.setGraphXLabel(self._plot_config["x_ax_label"])
         self._plot_config["cbar_legend"] = ""
         if len(data.data_label) > 0:
             self._plot_config["cbar_legend"] += data.data_label
@@ -432,6 +432,10 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             else self.expandCanvasAction
         )
         _action._actionTriggered()
+
+    # display_data is a generic alias used in all custom silx plots to have a
+    # uniform interface call to display data
+    display_data = plot_pydidas_dataset
 
     def _data_has_det_dim(self, data: np.ndarray):
         """
@@ -483,3 +487,23 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if self.sender() == self._qtapp:
             return
         Plot2D._activeItemChanged(self, type_)
+
+    def __allowed_kwargs(self, kwargs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Filter the kwargs to only include those allowed by addImage.
+
+        Parameters
+        ----------
+        kwargs : dict
+            The input keyword arguments.
+
+        Returns
+        -------
+        dict
+            The filtered keyword arguments.
+        """
+        return {
+            _key: _val
+            for _key, _val in kwargs.items()
+            if _key in self._config["allowed_add_image_kwargs"]
+        }

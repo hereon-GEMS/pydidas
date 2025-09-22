@@ -29,6 +29,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasPlot2DwithIntegrationRegions"]
 
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -54,7 +55,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
     sig_new_point_selected = QtCore.Signal(float, float)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         PydidasPlot2D.__init__(self, **kwargs)
         self._config["overlay_color"] = kwargs.get(
             "overlay_color", PYDIDAS_COLORS["orange"]

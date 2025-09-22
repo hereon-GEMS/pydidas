@@ -28,12 +28,16 @@ __all__ = ["PydidasPlot1D"]
 
 
 import inspect
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
-from pydidas.core import Dataset
+from pydidas.core import Dataset, PydidasQsettings, UserConfigError
 from pydidas.widgets.silx_plot._special_plot_types_button import SpecialPlotTypesButton
+
+
+_QSETTINGS = PydidasQsettings()
 
 
 class PydidasPlot1D(Plot1D):
@@ -41,7 +45,34 @@ class PydidasPlot1D(Plot1D):
     A customized silx.gui.plot.Plot1D with an additional configuration.
     """
 
-    def __init__(self, **kwargs: dict):
+    @staticmethod
+    def _check_data_dimensions(data: Dataset):
+        """
+        Check the data dimensions.
+
+        Parameters
+        ----------
+        data : Dataset
+            The data to display.
+        """
+        if not data.ndim == 2:
+            raise UserConfigError(
+                "The given dataset does not have exactly 2 dimensions. Please check "
+                f"the input data definition:\n The input data has {data.ndim} "
+                "dimensions."
+            )
+        _n_max = _QSETTINGS.value("user/max_number_curves", int)
+        if data.shape[0] > _n_max:
+            raise UserConfigError(
+                f"The number of given curves ({data.shape[0]}) exceeds the maximum "
+                f"number of curves allowed ({_n_max}). \n"
+                "Please limit the data range to be displayed or increase the maximum "
+                "number of curves in the user settings (Options -> User config). "
+                "Please note that displaying a large number of curves will slow down "
+                "the plotting performance."
+            )
+
+    def __init__(self, **kwargs: Any):
         Plot1D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
@@ -88,7 +119,7 @@ class PydidasPlot1D(Plot1D):
             _kwargs["legend"] = _legend
             self.plot_pydidas_dataset(_data, **_kwargs)
 
-    def plot_pydidas_dataset(self, data: Dataset, **kwargs: dict):
+    def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any):
         """
         Plot a pydidas dataset.
 
@@ -96,45 +127,64 @@ class PydidasPlot1D(Plot1D):
         ----------
         data : pydidas.core.Dataset
             The data to be plotted.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments to be passed to the silx plot method.
         """
         if kwargs.get("replace", True):
             self.clear_plot()
-
+        _i_data = 0 if data.ndim == 1 else 1
+        if data.ndim > 1:
+            self._check_data_dimensions(data)
+        _ylabel = self._y_label(
+            data.axis_labels[_i_data],
+            data.axis_units[_i_data],
+            data.data_label,
+            data.data_unit,
+        )
+        _allowed_kwargs = {
+            _key: _val for _key, _val in kwargs.items() if _key in self._allowed_kwargs
+        }
         self._plot_config = {
-            "ax_label_x": data.get_axis_description(0),
-            "ax_label_y": kwargs.get(
-                "ylabel",
-                self._y_label(
-                    data.axis_labels[0],
-                    data.axis_units[0],
-                    data.data_label,
-                    data.data_unit,
-                ),
-            ),
+            "ax_label_x": data.get_axis_description(_i_data) or "x [unspecified]",
+            "ax_label_y": kwargs.get("ylabel", _ylabel),
+            "title": kwargs.get("title", ""),
             "kwargs": {
                 "linewidth": kwargs.get("linewidth", 1.5),
                 "linestyle": kwargs.get("linestyle", "-"),
                 "symbol": kwargs.get("symbol", None),
             }
-            | {
-                _key: _val
-                for _key, _val in kwargs.items()
-                if _key in self._allowed_kwargs
-            },
+            | _allowed_kwargs,
         }
         self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
         self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
-        self._current_raw_data[kwargs.get("legend", "Unnamed curve 1.1")] = (
+        if self._plot_config.get("title"):
+            self.setGraphTitle(self._plot_config["title"])
+        self._current_raw_data[kwargs.get("legend", "Curve")] = (
             data,
             self._plot_config["kwargs"],
         )
-        self.addCurve(
-            data.axis_ranges[0],
-            self._y_function(data.axis_ranges[0], data.array),
-            **self._plot_config["kwargs"],
-        )
+        if data.ndim == 1:
+            self.addCurve(
+                data.axis_ranges[_i_data],
+                self._y_function(data.axis_ranges[_i_data], data.array),
+                **self._plot_config["kwargs"],
+            )
+        else:
+            _label = data.axis_labels[0] + " = {value:.4f} " + data.axis_units[0]
+            _x = data.axis_ranges[1]
+            for _index, _pos in enumerate(data.axis_ranges[0]):
+                self.addCurve(
+                    _x,
+                    self._y_function(_x, data.array[_index]),
+                    legend=_label.format(value=_pos),
+                    # xlabel=self._plot_config["kwargs"]["ax_label_x"],
+                    ylabel=_ylabel,
+                )
+            self.setActiveCurve(_label.format(_x[0]))
+
+    # display_data is a generic alias used in all custom silx plots to have a
+    # uniform interface call to display data
+    display_data = plot_pydidas_dataset
 
     def clear_plot(self, clear_data: bool = True):
         """
@@ -168,6 +218,7 @@ class PydidasPlot1D(Plot1D):
         self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
         self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
 
+    # TODO: check if still needed with silx 2.2.2
     def _activeItemChanged(self, type_):
         """
         Listen for active item changed signal and broadcast signal

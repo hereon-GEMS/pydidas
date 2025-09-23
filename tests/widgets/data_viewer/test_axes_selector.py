@@ -23,7 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
+import h5py
 import numpy as np
 import pytest
 from qtpy import QtCore, QtTest
@@ -240,6 +240,18 @@ def test_set_metadata_from_dataset(selector):
         assert selector.current_slice[_dim] != slice(None)
 
 
+def test_set_metadata_from_dataset__w_h5py_Dataset(selector, temp_path):
+    with h5py.File(temp_path / "test.h5", "w") as _f:
+        _dset = _f.create_dataset("data", data=_DATA.array)
+        selector.set_metadata_from_dataset(_dset)
+        assert selector._data_shape == _DATA.shape
+        for _dim, _item in selector._axis_widgets.items():
+            assert _item.npoints == _DATA.shape[_dim]
+            assert _item.data_label == ""
+            assert _item.data_unit == ""
+            assert selector.current_slice[_dim] != slice(None)
+
+
 def test_set_metadata_from_dataset__new_shape(selector):
     _data1 = create_dataset(3, dtype=float, shape=(10, 12, 14))
     _data2 = create_dataset(3, dtype=float, shape=(10, 14, 14))
@@ -380,6 +392,26 @@ def test_define_additional_choices__values_set_in_widgets(selector, data):
     assert selector.current_display_selection.count("choice2") == 0
     assert selector.current_display_selection.count("choice3") == 1
     assert selector.current_display_selection.count("choice4") == 1
+
+
+@pytest.mark.parametrize("index_dims", [[0, 1, 2], [0, 2, 4], [1, 3, 4]])
+def test_assign_index_use_to_dims(selector, data, index_dims):
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    selector.assign_index_use_to_dims(index_dims)
+    for _dim, _item in selector._axis_widgets.items():
+        if _dim in index_dims:
+            assert _item.display_choice == "slice at index"
+        else:
+            assert _item.display_choice in ["choice1", "choice2"]
+
+
+@pytest.mark.parametrize("index_dims", [[0, 2], [0, 1, 2, 4]])
+def test_assign_index_use_to_dims__wrong_len(selector, data, index_dims):
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("choice1;;choice2")
+    with pytest.raises(UserConfigError):
+        selector.assign_index_use_to_dims(index_dims)
 
 
 @pytest.mark.parametrize(

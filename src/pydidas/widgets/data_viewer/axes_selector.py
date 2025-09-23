@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = ["AxesSelector"]
 
 
+import h5py
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
@@ -221,20 +222,24 @@ class AxesSelector(WidgetWithParameterCollection):
             data_range, label, unit, npoints=npoints, ndim=self.filtered_data_ndim
         )
 
-    def set_metadata_from_dataset(self, dataset: Dataset):
+    def set_metadata_from_dataset(self, dataset: Dataset | h5py.Dataset):
         """
         Set the metadata from a pydidas Dataset.
 
         Parameters
         ----------
-        dataset : Dataset
+        dataset : Dataset | h5py.Dataset
             The dataset to get the metadata from.
         """
-        if not isinstance(dataset, Dataset):
+        if not isinstance(dataset, (Dataset, h5py.Dataset)):
+            try:
+                _type = f"`<{dataset.__module__}.{dataset.__class__.__name__}>`"
+            except AttributeError:
+                _type = f"`<{dataset.__class__.__name__}>`"
             raise UserConfigError(
                 "Invalid dataset: The given object is not a pydidas Dataset but "
-                f"`{type(dataset)}`. \nAlternatively, please set the metadata "
-                "manually using the `set_axis_metadata` method."
+                f"{_type}.\nAlternatively, please set the metadata manually using the "
+                "`set_axis_metadata` method."
             )
         if dataset.ndim < len(self._additional_choices) and not self._allow_less_dims:
             raise UserConfigError(
@@ -243,11 +248,17 @@ class AxesSelector(WidgetWithParameterCollection):
             )
         self.set_data_shape(dataset.shape, update_axwidgets=False)
         for _dim in range(self._data_ndim):
-            with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
-                self._axis_widgets[_dim].set_axis_metadata(
+            if isinstance(dataset, h5py.Dataset):
+                _args = (np.arange(dataset.shape[_dim]), "", "")
+            elif isinstance(dataset, Dataset):
+                _args = (
                     dataset.axis_ranges[_dim],
                     dataset.axis_labels[_dim],
                     dataset.axis_units[_dim],
+                )
+            with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
+                self._axis_widgets[_dim].set_axis_metadata(
+                    *_args,
                     ndim=self.filtered_data_ndim,
                 )
         self._verify_additional_choices_selected(-1, block_signals=True)
@@ -344,6 +355,29 @@ class AxesSelector(WidgetWithParameterCollection):
                 with QtCore.QSignalBlocker(_axwidget):
                     _axwidget.display_choice = choice
                 break
+
+    def assign_index_use_to_dims(self, dims: list[int]):
+        """
+        Assign the "slice at index" choice to the given dimensions.
+
+        Parameters
+        ----------
+        dims : list[int]
+            The dimensions to assign the "slice at index" choice to.
+        """
+        if len(dims) + len(self._additional_choices) != self.filtered_data_ndim:
+            raise UserConfigError(
+                "The number of given dimensions and additional choices does not match "
+                "the number of dimensions in the data."
+            )
+        _choices_to_use = self._additional_choices[:]
+        for _dim in range(self.filtered_data_ndim):
+            if _dim in self._axis_widgets:
+                with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
+                    if _dim in dims:
+                        self._axis_widgets[_dim].display_choice = "slice at index"
+                    else:
+                        self._axis_widgets[_dim].display_choice = _choices_to_use.pop(0)
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):

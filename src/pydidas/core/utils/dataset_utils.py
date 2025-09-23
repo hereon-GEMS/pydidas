@@ -424,7 +424,7 @@ def convert_ranges_and_check_length(
             _wrong_dims.append([_dim, _range.size, shape[_dim]])
     if len(_wrong_dims) > 0:
         _error = (
-            "The type and or length of the given ranges does not match the size of "
+            "The type and/or length of the given ranges does not match the size of "
             "the data."
         )
         for _dim, _len, _ndata in _wrong_dims:

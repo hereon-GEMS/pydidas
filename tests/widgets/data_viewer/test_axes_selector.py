@@ -165,12 +165,11 @@ def test_transpose_require__w_additional_choices_modified(
 
 def test_set_data_shape__invalid_type(selector):
     with pytest.raises(UserConfigError):
-        selector.set_data_shape([0, 4])
+        selector.set_data_shape([0, 4])  # noqa --deliberately wrong type
 
 
 def test_set_data_shape__valid(selector):
     _shape = (5, 7, 4)
-    selector._stored_slicings = {1: "test", 2: "test"}
     selector.set_data_shape(_shape)
     assert selector._data_shape == (5, 7, 4)
     assert selector._data_ndim == 3
@@ -181,7 +180,6 @@ def test_set_data_shape__valid(selector):
 
 def test_set_data_shape__w_len_dim_1(selector):
     _shape = (5, 1, 7, 1, 4)
-    selector._stored_slicings = {1: "test", 2: "test"}
     selector.set_data_shape(_shape)
     assert selector._data_shape == _shape
     assert selector._data_ndim == 5
@@ -264,7 +262,7 @@ def test_set_metadata_from_dataset(selector):
         assert selector.current_slice[_dim] != slice(None)
 
 
-def test_set_metadata_from_dataset__w_h5py_Dataset(selector, temp_path):
+def test_set_metadata_from_dataset__w_h5py_Dataset(selector, temp_path):  # noqa C0103
     with h5py.File(temp_path / "test.h5", "w") as _f:
         _dset = _f.create_dataset("data", data=_DATA.array)
         selector.set_metadata_from_dataset(_dset)
@@ -291,30 +289,22 @@ def test_set_metadata_from_dataset__new_shape(selector):
         assert selector.current_slice[_dim] != slice(None)
 
 
-def test_set_metadata_from_dataset__new_shape_w_fewer_dims(selector):
-    _data1 = create_dataset(3, dtype=float, shape=(10, 12, 14))
-    _data2 = create_dataset(2, dtype=float, shape=(14, 14))
-    selector.define_additional_choices("choice1;;choice2")
-    selector.set_metadata_from_dataset(_data1)
-    selector.set_metadata_from_dataset(_data2)
-    assert selector._data_shape == _data2.shape
-    assert selector.current_slice == [slice(0, 14), slice(0, 14)]
-    for _dim in range(_data2.ndim):
-        _item = selector._axis_widgets[_dim]
-        assert _item.npoints == _data2.shape[_dim]
-        assert _item.data_label == _data2.axis_labels[_dim]
-        assert _item.data_unit == _data2.axis_units[_dim]
-        assert selector.current_slice[_dim] != slice(None)
-
-
-def test_set_metadata_from_dataset__new_shape_w_more_dims(selector):
+@pytest.mark.parametrize("invert_order", [True, False])
+def test_set_metadata_from_dataset__new_shape_w_different_dims(selector, invert_order):
     _data1 = create_dataset(2, dtype=float, shape=(10, 12))
     _data2 = create_dataset(3, dtype=float, shape=(5, 14, 14))
+    if invert_order:
+        _data3 = _data1
+        _data1 = _data2
+        _data2 = _data3
+        del _data3
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(_data1)
     selector.set_metadata_from_dataset(_data2)
+    _slice_ref = [slice(0, _data2.shape[i]) for i in [0, 1]]
+    _slice_ref += [slice(0, 1) for _ in range(2, _data2.ndim)]
     assert selector._data_shape == _data2.shape
-    assert selector.current_slice == [slice(0, 5), slice(0, 14), slice(0, 1)]
+    assert selector.current_slice == _slice_ref
     for _dim in range(_data2.ndim):
         _item = selector._axis_widgets[_dim]
         assert _item.npoints == _data2.shape[_dim]
@@ -337,7 +327,7 @@ def test_set_metadata_from_dataset__w_choices(selector):
 
 def test_set_metadata_from_dataset__no_dataset(selector):
     with pytest.raises(UserConfigError):
-        selector.set_metadata_from_dataset("")
+        selector.set_metadata_from_dataset("")  # noqa -- deliberately wrong type
 
 
 def test_define_additional_choices(selector, data):
@@ -376,19 +366,19 @@ def test_define_additional_choices__existing_choices(selector, data):
         assert "choice4" in _item.available_choices
 
 
-@pytest.mark.parametrize("nchoices", [2, 3, 4, 5])
-def test_define_additional_choices__no_generic_choices(selector, nchoices):
-    _choices = ";;".join([f"choice{i}" for i in range(nchoices)])
-    data = create_dataset(nchoices, dtype=float)
+@pytest.mark.parametrize("n_choices", [2, 3, 4, 5])
+def test_define_additional_choices__no_generic_choices(selector, n_choices):
+    _choices = ";;".join([f"choice{i}" for i in range(n_choices)])
+    data = create_dataset(n_choices, dtype=float)
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices(_choices)
     assert set(selector.current_display_selection) == set(_choices.split(";;"))
 
 
-@pytest.mark.parametrize("nchoices", [2, 3, 4, 5])
-def test_define_additional_choices__w_generic_choices(selector, nchoices):
-    _choices = ";;".join([f"choice{i}" for i in range(nchoices)])
-    data = create_dataset(nchoices + 3, dtype=float)
+@pytest.mark.parametrize("n_choices", [2, 3, 4, 5])
+def test_define_additional_choices__w_generic_choices(selector, n_choices):
+    _choices = ";;".join([f"choice{i}" for i in range(n_choices)])
+    data = create_dataset(n_choices + 3, dtype=float)
     selector.set_metadata_from_dataset(data)
     selector.define_additional_choices(_choices)
     assert set(selector.current_display_selection) == {"slice at index"}.union(
@@ -552,9 +542,11 @@ def test__integration__change_dataset(selector, spy_new_slicing, spy_new_slicing
     selector.set_metadata_from_dataset(data2)
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(data3)
-    assert set(selector.current_display_selection) == set(
-        ("slice at index", "choice1", "choice2")
-    )
+    assert set(selector.current_display_selection) == {
+        "slice at index",
+        "choice1",
+        "choice2",
+    }
 
 
 def test__integration__change_dataset_w_less_dims(

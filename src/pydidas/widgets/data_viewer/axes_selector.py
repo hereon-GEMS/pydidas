@@ -27,9 +27,11 @@ __status__ = "Production"
 __all__ = ["AxesSelector"]
 
 
+from typing import Any
+
 import h5py
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import POLICY_EXP_FIX
@@ -60,7 +62,7 @@ class AxesSelector(WidgetWithParameterCollection):
     sig_new_slicing = QtCore.Signal()
     sig_new_slicing_str_repr = QtCore.Signal(str, str)
 
-    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: dict):
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
         self._axis_widgets = {}
         self._data_shape = ()
@@ -222,7 +224,7 @@ class AxesSelector(WidgetWithParameterCollection):
         ----------
         axis : int
             The axis index.
-        data_range : np.ndarray, optional
+        data_range : np.ndarray | None
             The data range for the axis. Set to None, if no metadata for the
             range is available.
         label : str, optional
@@ -278,7 +280,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 )
             with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
                 self._axis_widgets[_dim].set_axis_metadata(
-                    *_args,
+                    *_args,  # noqa -- args is always set due to isinstance check above
                     ndim=self.filtered_data_ndim,
                 )
         self._verify_additional_choices_selected(-1, block_signals=True)
@@ -458,7 +460,7 @@ class AxesSelector(WidgetWithParameterCollection):
         self.sig_new_slicing.emit()
         self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 
-    def closeEvent(self, event: QtCore.QEvent):
+    def closeEvent(self, event: QtGui.QCloseEvent):
         """Close the widget and delete Children"""
         for _dim in self._axis_widgets:
             self._axis_widgets[_dim].deleteLater()

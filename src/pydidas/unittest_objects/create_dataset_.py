@@ -29,8 +29,6 @@ __status__ = "Production"
 __all__ = ["create_dataset"]
 
 
-from typing import Optional, Union
-
 import numpy as np
 
 from pydidas.core import Dataset
@@ -39,9 +37,9 @@ from pydidas.core.utils import get_random_string
 
 def create_dataset(
     ndim: int,
-    dtype: Union[int, float] = int,
-    shape: Optional[tuple[int]] = None,
-    random_seed: Optional[int] = None,
+    dtype: type[int] | type[float] = int,
+    shape: tuple[int, ...] | None = None,
+    random_seed: int | None = None,
 ) -> Dataset:
     """
     Create a Dataset object with random data and metadata.
@@ -52,12 +50,12 @@ def create_dataset(
     ----------
     ndim : int
         The number of dimensions of the dataset.
-    dtype : Union[int, float], optional
+    dtype : type[int] | type[float], optional
         The data type of the dataset. The default is int.
-    shape : Optional[tuple[int]], optional
+    shape : tuple[int, ...], optional
         The shape of the dataset. The default will create between 8 and 12 entries
         per dimension. The default is None.
-    random_seed : Optional[int], optional
+    random_seed : int, optional
         The random seed for reproducibility. The default is None.
 
     Returns

@@ -113,6 +113,30 @@ def test_transpose_required(selector):
     assert not selector.transpose_required
 
 
+def test_additional_choices__property(selector):
+    assert selector.additional_choices == []
+    selector.define_additional_choices("choice1;;choice2")
+    assert selector.additional_choices == ["choice1", "choice2"]
+
+
+def test_n_choices_property(selector):
+    assert selector.n_choices == 0
+    selector.define_additional_choices("choice1;;choice2")
+    assert selector.n_choices == 2
+
+
+def test_allow_fewer_dims_property(selector):
+    assert not selector.allow_fewer_dims
+    selector._allow_fewer_dims = True
+    assert selector.allow_fewer_dims
+
+
+def test_allow_fewer_dims_setter(selector):
+    assert not selector.allow_fewer_dims
+    selector.allow_fewer_dims = True
+    assert selector.allow_fewer_dims
+
+
 def test_transpose_require__w_additional_choices(selector, data):
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(data)
@@ -224,7 +248,7 @@ def test_set_axis_metadata__invalid_ndim(selector):
 
 def test_set_axis_metadata__invalid_ndim_w__allow_less_axes(selector):
     selector.define_additional_choices("choice1;;choice2;;choice3")
-    selector._allow_less_dims = True
+    selector._allow_fewer_dims = True
     data = create_dataset(2, dtype=float)
     selector.set_metadata_from_dataset(data)
     assert selector._data_ndim == 2

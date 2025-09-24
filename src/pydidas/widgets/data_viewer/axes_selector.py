@@ -72,7 +72,7 @@ class AxesSelector(WidgetWithParameterCollection):
         self._current_transpose_required = None
 
         self._multiline_layout = kwargs.get("multiline_layout", False)
-        self._allow_less_dims = kwargs.get("allow_less_dims", False)
+        self._allow_fewer_dims = kwargs.get("allow_fewer_dims", False)
         self.layout().setColumnStretch(0, 1)
         self.create_spacer("final_spacer", gridPos=(0, 1, 1, 1), fixedWidth=5)
 
@@ -130,6 +130,26 @@ class AxesSelector(WidgetWithParameterCollection):
     def current_slice(self) -> list[slice]:
         """The current slicing."""
         return self._current_slice
+
+    @property
+    def additional_choices(self) -> list[str]:
+        """The additional choices defined for the display selection."""
+        return self._additional_choices[:]
+
+    @property
+    def n_choices(self) -> int:
+        """The number of additional choices defined for the display selection."""
+        return len(self._additional_choices)
+
+    @property
+    def allow_fewer_dims(self) -> bool:
+        """Flag to allow fewer dimensions in the data than additional choices."""
+        return self._allow_fewer_dims
+
+    @allow_fewer_dims.setter
+    def allow_fewer_dims(self, value: bool):
+        """Set the flag to allow fewer dimensions in the data than additional choices."""
+        self._allow_fewer_dims = value
 
     def set_data_shape(self, shape: tuple[int], update_axwidgets: bool = True):
         """
@@ -241,7 +261,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 f"{_type}.\nAlternatively, please set the metadata manually using the "
                 "`set_axis_metadata` method."
             )
-        if dataset.ndim < len(self._additional_choices) and not self._allow_less_dims:
+        if dataset.ndim < len(self._additional_choices) and not self._allow_fewer_dims:
             raise UserConfigError(
                 "The dataset has less dimensions than required for the display. "
                 "Please change the dataset or how to display the dataset."
@@ -378,6 +398,7 @@ class AxesSelector(WidgetWithParameterCollection):
                         self._axis_widgets[_dim].display_choice = "slice at index"
                     else:
                         self._axis_widgets[_dim].display_choice = _choices_to_use.pop(0)
+        self.process_new_slicing(block_signals=True)
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):

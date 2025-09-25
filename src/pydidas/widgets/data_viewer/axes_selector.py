@@ -298,7 +298,7 @@ class AxesSelector(WidgetWithParameterCollection):
             The additional choices.
         """
         self._additional_choices_str = choices
-        self._additional_choices = choices.split(";;")
+        self._additional_choices = choices.split(";;") if choices else []
         for _dim, _axwidget in self._axis_widgets.items():
             with QtCore.QSignalBlocker(_axwidget):
                 _axwidget.define_additional_choices(choices)
@@ -372,6 +372,7 @@ class AxesSelector(WidgetWithParameterCollection):
             if (
                 _dim != ignore_ax
                 and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
+                and _dim < self._data_ndim
                 and self._data_shape[_dim] > 1
             ):
                 with QtCore.QSignalBlocker(_axwidget):

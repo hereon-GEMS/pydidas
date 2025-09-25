@@ -68,6 +68,8 @@ Bugfixes
 - Fixed an issue where the pyfai-calib2.ini file was not localized correctly on Unix 
   systems.
 - Fixed an issue with InputPlugins for 1-dimensional data in the GUI.
+- Fixed an issue with the AxesSelector when switching between Datasets of different 
+  dimensionality in the TableView.
 
 
 v25.05.16

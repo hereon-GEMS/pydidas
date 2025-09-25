@@ -325,6 +325,14 @@ def test_set_metadata_from_dataset__w_choices(selector):
         assert _item.data_unit == _DATA.axis_units[_dim]
 
 
+def test_set_metadata_from_dataset__w_less_data_dims_than_choices_and_widgets(selector):
+    selector.define_additional_choices("choice1;;choice2")
+    selector.allow_fewer_dims = True
+    selector.set_metadata_from_dataset(_DATA)
+    selector.set_metadata_from_dataset(_DATA[0, 0, 0, 0])
+    assert selector.current_display_selection == ["choice1"]
+
+
 def test_set_metadata_from_dataset__no_dataset(selector):
     with pytest.raises(UserConfigError):
         selector.set_metadata_from_dataset("")  # noqa -- deliberately wrong type
@@ -385,6 +393,15 @@ def test_define_additional_choices__w_generic_choices(selector, n_choices):
         set(_choices.split(";;"))
     )
     assert selector.current_display_selection.count("slice at index") == 3
+
+
+def test_define_additional_choices__only_generic_choices(selector):
+    data = create_dataset(3, dtype=float)
+    selector.set_metadata_from_dataset(data)
+    selector.define_additional_choices("")
+    assert selector._additional_choices_str == ""
+    assert selector._additional_choices == []
+    assert selector.current_display_selection == ["slice at index"] * 3
 
 
 def test_define_additional_choices__values_set_in_widgets(selector, data):

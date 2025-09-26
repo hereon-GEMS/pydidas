@@ -203,6 +203,10 @@ class DataViewer(WidgetWithParameterCollection):
         _cfg_kwargs = self._plot2d_config if view_key == "view-image" else {}
         self._widgets[view_key] = self._view_config.widget(parent=None, **_cfg_kwargs)
         self._widgets["view_stack"].addWidget(self._widgets[view_key])
+        if view_key == "view-image":
+            self._widgets[view_key].sig_get_more_info_for_data.connect(
+                self.sig_plot2d_get_more_info_for_data
+            )
 
     def __update_ax_selector_for_h5py_data(self):
         """Update the axis selector if the data is a h5py dataset with chunking"""

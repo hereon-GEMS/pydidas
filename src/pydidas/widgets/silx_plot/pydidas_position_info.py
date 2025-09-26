@@ -199,9 +199,12 @@ class PydidasPositionInfo(PositionInfo):
         tuple[float, float]
             The tuple with the polar r, chi coordinates.
         """
-        _pos = 1e3 * Point(
-            (x_pix - self._beam_center[1]) * self._pixelsize[0],
-            (y_pix - self._beam_center[0]) * self._pixelsize[1],
+        _pos = (
+            Point(
+                (x_pix - self._beam_center[1]) * self._pixelsize[0],
+                (y_pix - self._beam_center[0]) * self._pixelsize[1],
+            )
+            * 1e3
         )
         return _pos.r, _pos.chi_deg
 

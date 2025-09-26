@@ -28,7 +28,7 @@ __all__ = ["SpecialPlotTypesButton"]
 
 
 from functools import partial
-from typing import Literal
+from typing import Callable, Literal
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -40,6 +40,9 @@ from pydidas.resources import icons
 class SpecialPlotTypesButton(PlotToolButton):
     """
     Tool button to change the plot type of the original data.
+
+    This allows to display the data in different representations, e.g.
+    a Kratky plot for SAXS data.
     """
 
     CHOICES = {
@@ -137,28 +140,30 @@ class SpecialPlotTypesButton(PlotToolButton):
             The new y label.
         """
         _label = f"{ylabel} * {xlabel}^2"
-        _unit = f"{yunit} * {xunit}^2"
+        _unit = yunit
+        if xunit:
+            _unit += f" * {xunit}^2"
         return _label + (f" / ({_unit})" if len(_unit) > 0 else "")
 
     @property
-    def plot_yfunc(self) -> object:
+    def plot_yfunc(self) -> Callable:
         """
         Return the function for mapping the input data to the plot type.
 
         Returns
         -------
-        object
+        Callable
             The function which maps the input date to the chosen output.
         """
         return self._current_yfunc
 
-    def plot_ylabel(self) -> object:
+    def plot_ylabel(self) -> Callable:
         """
         Return the function for mapping the input data to the plot type.
 
         Returns
         -------
-        object
+        Callable
             The function which maps the input date to the chosen output.
         """
         return self._current_ylabel

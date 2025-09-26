@@ -41,7 +41,7 @@ from pydidas_qtcore import PydidasQApplication
 
 class SilxDataViewer(DataViewerFrame):
     """
-    A subclass of the DataViewerFrame to use custom Pydidas 2d data view.
+    A subclass of the DataViewerFrame to use custom Pydidas data views.
     """
 
     def __init__(self, parent=None):

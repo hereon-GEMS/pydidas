@@ -58,7 +58,7 @@ class ChangeCanvasToData(PlotAction):
     dimensions.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any):
         PlotAction.__init__(
             self,
             plot,
@@ -102,7 +102,7 @@ class ExpandCanvas(PlotAction):
     size allowed by the widget.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any):
         PlotAction.__init__(
             self,
             plot,
@@ -147,7 +147,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
             The default is None.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any):
         PlotAction.__init__(
             self,
             plot,
@@ -283,7 +283,7 @@ class PydidasGetDataInfoAction(PlotAction):
 
     sig_show_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any):
         PlotAction.__init__(
             self,
             plot,

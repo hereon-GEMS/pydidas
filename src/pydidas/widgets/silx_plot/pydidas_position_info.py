@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["PydidasPositionInfo"]
 
 
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 from qtpy import QtCore
@@ -54,7 +54,7 @@ class PydidasPositionInfo(PositionInfo):
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Supported keyword arguments are:
 
             converters : Union[list[tuple[str, Callable]], None], optional
@@ -67,7 +67,7 @@ class PydidasPositionInfo(PositionInfo):
                 The associated plot instance. The default is None
     """
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         PositionInfo.__init__(
             self,
             plot=kwargs.get("plot", None),

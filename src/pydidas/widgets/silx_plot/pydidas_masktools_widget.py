@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["PydidasMaskToolsWidget"]
 
 
-from typing import Union
+from typing import Any, Union
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot.MaskToolsWidget import MaskToolsWidget
@@ -43,7 +43,7 @@ class PydidasMaskToolsWidget(MaskToolsWidget):
         self,
         parent: Union[None, QtWidgets.QWidget] = None,
         plot: Union[None, QtWidgets.QWidget] = None,
-        **kwargs: dict,
+        **kwargs: Any,
     ):
         MaskToolsWidget.__init__(self, parent, plot)
 

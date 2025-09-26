@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PydidasImageDataView", "Pydidas_Plot1dView", "Pydidas_Plot1dGroupView"]
+__all__ = ["Pydidas_Plot1dView", "Pydidas_Plot1dGroupView"]
 
 
 from functools import partialmethod
@@ -33,14 +33,12 @@ from typing import Optional
 import numpy as np
 import silx.gui.data
 from qtpy import QtWidgets
-from silx.gui import icons
 from silx.gui.data.DataViews import (
-    IMAGE_MODE,
-    CompositeDataView,
-    _ComplexImageView,
     _Plot1dView,
     _Plot2dView,
 )
+from silx.gui.plot.actions.image import AggregationModeAction
+from silx.gui.plot.items import ImageDataAggregated
 from silx.gui.utils import blockSignals
 
 from pydidas.core import Dataset, PydidasQsettings, UserConfigError
@@ -59,59 +57,55 @@ DATA_VIEW_AXES_NAMES = {
 _QSETTINGS = PydidasQsettings()
 
 
-class PydidasImageDataView(CompositeDataView):
-    """
-    Display data as 2D image.
-
-    This class replaces the generic Plot2d and ComplexImageView with the
-    respective pydidas classes to access pydidas's functionality.
-    """
-
-    def __init__(self, parent):
-        super(PydidasImageDataView, self).__init__(
-            parent=parent,
-            modeId=IMAGE_MODE,
-            label="Pydidas Image",
-            icon=icons.getQIcon("view-2d"),
-        )
-        self.addView(_ComplexImageView(parent))
-        self.addView(Pydidas_Plot2dView(parent))
-
-
 class Pydidas_Plot2dView(_Plot2dView):
     """
     View data using a PydidasPlot2d widget.
     """
 
     def createWidget(self, parent):
+        # need to override the original method to use PydidasPlot2D as widget
         widget = PydidasPlot2D(parent=parent)
         widget.default_unit = "px"
-        # TODO : Required for silx 2.2.2
-        # widget.setDefaultColormap(self.defaultColormap())
-        # widget.getColormapAction().setColormapDialog(self.defaultColorDialog())
+        # removed the colormap update to keep the PydidasPlot2D generic colormap
+        widget.getColormapAction().setColormapDialog(self.defaultColorDialog())
         widget.getIntensityHistogramAction().setVisible(True)
 
-        # TODO : Required for silx 2.2.2
-        # self.__aggregationModeAction = AggregationModeAction(parent=widget)
-        # widget.toolBar().addAction(self.__aggregationModeAction)
-        # self.__aggregationModeAction.sigAggregationModeChanged.connect(
-        #     self._aggregationModeChanged
-        # )
-        # self._Plot2dView__imageItem = ImageDataAggregated()
-        # self._Plot2dView__imageItem.setAggregationMode(
-        #     self.__aggregationModeAction.getAggregationMode()
-        # )
-        # self._Plot2dView__imageItem.setName("data")
-        # self._Plot2dView__imageItem.setColormap(widget.getDefaultColormap())
-        # widget.addItem(self._Plot2dView__imageItem)
-        # widget.setActiveImage(self._Plot2dView__imageItem)
+        self._Plot2dView__aggregationModeAction = AggregationModeAction(parent=widget)
+        widget.toolBar().addAction(self._Plot2dView__aggregationModeAction)
+        self._Plot2dView__aggregationModeAction.sigAggregationModeChanged.connect(
+            self._aggregationModeChanged
+        )
 
-        widget.setKeepDataAspectRatio(True)
-        widget.getXAxis().setLabel("X")
-        widget.getYAxis().setLabel("Y")
+        self._Plot2dView__imageItem = ImageDataAggregated()
+        self._Plot2dView__imageItem.setAggregationMode(
+            self._Plot2dView__aggregationModeAction.getAggregationMode()
+        )
+        self._Plot2dView__imageItem.setName("data")
+        self._Plot2dView__imageItem.setColormap(widget.getDefaultColormap())
+        widget.addItem(self._Plot2dView__imageItem)
+        widget.setActiveImage(self._Plot2dView__imageItem)
+
+        # widget.setKeepDataAspectRatio(True)
+        # widget.getXAxis().setLabel("X")
+        # widget.getYAxis().setLabel("Y")
         maskToolsWidget = widget.getMaskToolsDockWidget().widget()
         maskToolsWidget.setItemMaskUpdated(True)
         return widget
+
+    def setData(self, data):
+        """
+        Set the data to display.
+
+        Parameters
+        ----------
+        data : Dataset
+            The data to display.
+        """
+        if isinstance(data, Dataset):
+            _widget = self.getWidget()
+            _widget.plot_pydidas_dataset(data)
+        else:
+            super().setData(data)
 
     def axesNames(self, data, info):
         return ["use as image y-axis", "use as image x-axis"]

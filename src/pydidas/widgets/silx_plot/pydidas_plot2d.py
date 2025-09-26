@@ -419,12 +419,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.setGraphTitle(self._plot_config["title"])
         self.setGraphYLabel(self._plot_config["y_ax_label"])
         self.setGraphXLabel(self._plot_config["x_ax_label"])
-        self._plot_config["cbar_legend"] = ""
-        if len(data.data_label) > 0:
-            self._plot_config["cbar_legend"] += data.data_label
-        if len(data.data_unit) > 0:
+        self._plot_config["cbar_legend"] = data.data_label
+        if data.data_unit:
+            if not self._plot_config["cbar_legend"]:
+                self._plot_config["cbar_legend"] += "unspecified"
             self._plot_config["cbar_legend"] += f" / {data.data_unit}"
-        if len(self._plot_config["cbar_legend"]) > 0:
+        if self._plot_config["cbar_legend"]:
             self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
         _action = (
             self.changeCanvasToDataAction

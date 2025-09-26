@@ -41,7 +41,8 @@ def test_point_initialization():
 
 
 def test_point_initialization__w_tuple():
-    point = Point((3.5, 7.2))
+    with pytest.warns(DeprecationWarning):
+        point = Point((3.5, 7.2))  # noqa -- deliberate use of tuple
     assert point.x == 3.5
     assert point.y == 7.2
 
@@ -50,6 +51,28 @@ def test_point_initialization__w_tuple():
 def test_point_initialization__w_wrong_tuple(value):
     with pytest.raises(TypeError):
         Point(value)
+
+
+def test_point__x_getter():
+    point = Point(3.5, 7.2)
+    assert point.x == 3.5
+
+
+def test_point__y_getter():
+    point = Point(3.5, 7.2)
+    assert point.y == 7.2
+
+
+def test_point__x_setter():
+    point = Point(3.5, 7.2)
+    point.x = 5.0
+    assert point[0] == 5.0
+
+
+def test_point__y_setter():
+    point = Point(3.5, 7.2)
+    point.y = 8.0
+    assert point[1] == 8.0
 
 
 def test_point__len():
@@ -72,6 +95,13 @@ def test_point__getitem():
     assert point[1] == 7.2
     with pytest.raises(IndexError):
         _ = point[2]  # noqa
+
+
+@pytest.mark.parametrize("slicer", [slice(0, 1), slice(1, 2), slice(0, 2), slice(None)])
+def test_point__getitem_w_slice(slicer):
+    _items = (3.5, 7.2)
+    point = Point(*_items)
+    assert point[slicer] == _items[slicer]
 
 
 def test_point__contains():
@@ -125,28 +155,11 @@ def test_point_addition_in_place():
     assert point1 == Point(4.0, 6.0)
 
 
-def test_point_addition__w_tuple_wrong_length():
+@pytest.mark.parametrize("item", [(2.0, 3.0, 2.1), (1.0,), 3, "invalid"])
+def test_point_addition__w_invalid_item(item):
     point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
-        point1 + (2.0, 3.0, 2.1)
-
-
-def test_point_addition__w_tuple__non_numbers():
-    point1 = Point(1.0, 2.0)
-    with pytest.raises(TypeError):
-        point1 + (2.0, "invalid")
-
-
-def test_point_addition__w_scalar():
-    point1 = Point(1.0, 2.0)
-    with pytest.raises(TypeError):
-        point1 + 3  # noqa
-
-
-def test_point_addition__w_invalid_type():
-    point1 = Point(1.0, 2.0)
-    with pytest.raises(TypeError):
-        point1 + "invalid"  # noqa
+        point1 + item  # noqa -- deliberate wrong type
 
 
 def test_point_subtraction__w_point():
@@ -174,28 +187,13 @@ def test_point_subtraction_in_place():
     assert point1 == Point(2.0, 3.0)
 
 
-def test_point_subtraction__w_tuple_wrong_length():
-    point1 = Point(5.0, 7.0)
+@pytest.mark.parametrize(
+    "item", [(2.0, 3.0, 2.1), (1.0,), (1, "invalid"), 3, "invalid"]
+)
+def test_point_subtraction__w_invalid_item(item):
+    point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
-        point1 - (2.0, 3.0, 2.1)
-
-
-def test_point_subtraction__w_tuple__non_numbers():
-    point1 = Point(5.0, 7.0)
-    with pytest.raises(TypeError):
-        point1 - (2.0, "invalid")
-
-
-def test_point_subtraction__w_scalar():
-    point1 = Point(5.0, 7.0)
-    with pytest.raises(TypeError):
-        point1 - 3  # noqa
-
-
-def test_point_subtraction__w_invalid_type():
-    point1 = Point(5.0, 7.0)
-    with pytest.raises(TypeError):
-        point1 - "invalid"  # noqa
+        point1 - item  # noqa -- deliberate wrong type
 
 
 def test_point_multiplication__w_scalar():

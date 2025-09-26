@@ -37,8 +37,8 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import UserConfigError
 from pydidas.widgets.data_viewer.data_viewer_utils import (
-    get_data_axis_header_creation_args,
-    get_data_axis_widget_creation_args,
+    DATA_AXIS_SELECTOR_BUILD_CONFIG,
+    DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG,
     invalid_range_str,
 )
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
@@ -85,20 +85,21 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         """
         Create the widgets for the DataAxisSelector.
         """
-        _header = get_data_axis_header_creation_args(
+        for _method_name, _args, _kwargs in DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG(
             self._axis_index, self._use_multiline
-        )
-        for _method_name, _args, _kwargs in _header:
-            _method = getattr(self, _method_name)
-            _method(*_args, **_kwargs)
+        ):
+            getattr(self, _method_name)(*_args, **_kwargs)
         if self._use_multiline:
             self.create_empty_widget("point_selection_container", gridPos=(3, 0, 1, 2))
         else:
             self.layout().setColumnStretch(self.layout().columnCount() - 1, 6)
-        _entries = get_data_axis_widget_creation_args(self._use_multiline)
-        for _method_name, _args, _kwargs in _entries:
-            _method = getattr(self, _method_name)
-            _method(*_args, **_kwargs)
+        _parent_widget = (
+            "point_selection_container" if self._use_multiline else "::self::"
+        )
+        _build_config = DATA_AXIS_SELECTOR_BUILD_CONFIG(self._use_multiline)
+        for _method_name, _args, _kwargs in _build_config:
+            _kwargs["parent_widget"] = _parent_widget
+            getattr(self, _method_name)(*_args, **_kwargs)
             if "slider" in _args and not self._use_multiline:
                 _nitems = self.layout().count()
                 _column = self.layout().getItemPosition(_nitems - 1)[1]
@@ -659,7 +660,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._widgets[edit_name].setPalette(self._palette_base)
 
     @QtCore.Slot(str)
-    def _check_edit_range_input(self, edit_name: str, new_text: str):
+    def _check_edit_range_input(self, edit_name: str, new_text: str):  # noqa
         """
         Check the input of the range edit widget.
 
@@ -685,7 +686,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         )
         self._widgets["combo_axis_use"].setCurrentText(_slice_type)
 
-    def closeEvent(self, event: QtCore.QEvent):
+    def closeEvent(self, event: QtGui.QCloseEvent):
         for child in self.findChildren(QtWidgets.QWidget):
             child.deleteLater()
         QtWidgets.QWidget.closeEvent(self, event)

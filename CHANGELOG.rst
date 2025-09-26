@@ -40,6 +40,7 @@ Improvements
   fio files.
 - Added ASCII1dProfileLoader plugin to import 1d data from various ASCII formats 
   (csv, txt, fio, dat)
+- Added direct support for h5py.Datasets to the DataViewer
 
 
 Bugfixes

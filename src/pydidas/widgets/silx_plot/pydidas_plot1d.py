@@ -145,7 +145,7 @@ class PydidasPlot1D(Plot1D):
             _key: _val for _key, _val in kwargs.items() if _key in self._allowed_kwargs
         }
         self._plot_config = {
-            "ax_label_x": data.get_axis_description(_i_data) or "x [unspecified]",
+            "ax_label_x": data.get_axis_description(_i_data) or "index",
             "ax_label_y": kwargs.get("ylabel", _ylabel),
             "title": kwargs.get("title", ""),
             "kwargs": {
@@ -180,7 +180,7 @@ class PydidasPlot1D(Plot1D):
                     # xlabel=self._plot_config["kwargs"]["ax_label_x"],
                     ylabel=_ylabel,
                 )
-            self.setActiveCurve(_label.format(_x[0]))
+            self.setActiveCurve(_label.format(value=_x[0]))
 
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data

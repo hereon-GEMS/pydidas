@@ -240,7 +240,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         This action allows to display image coordinates in polar coordinates
         (with r / mm, 2theta / deg or q / nm^-1) scaling.
         """
-        self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
+        self.cs_transform = CoordinateTransformButton(
+            parent=self, plot=self, diffraction_exp=self._config["diffraction_exp"]
+        )
         self._toolbar.addWidget(self.cs_transform)
         self.cs_transform.sig_new_coordinate_system.connect(
             self._positionWidget.new_coordinate_system
@@ -390,7 +392,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             Additional keyword arguments to be passed to the silx plot method.
         """
         self._check_data_dim(data)
-        self.update_cs_units(data.axis_units[1], data.axis_units[0])
         self._plot_config = {
             "x_ax_label": data.get_axis_description(1),
             "y_ax_label": data.get_axis_description(0),
@@ -402,12 +403,10 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             }
             | self.__allowed_kwargs(kwargs),
         }
-        _data_is_nonlinear = data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1)
-        self.profile.setEnabled(not _data_is_nonlinear)
-        self.sig_data_linearity.emit(_data_is_nonlinear)
-        if _data_is_nonlinear:
-            self.addNonUniformImage(data, **kwargs)
-        else:
+        _data_is_linear = not (data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1))
+        self.profile.setEnabled(_data_is_linear)
+        self.sig_data_linearity.emit(_data_is_linear)
+        if _data_is_linear:
             self.remove(_SCATTER_LEGEND, kind="scatter")
             _origin, _scale = get_2d_silx_plot_ax_settings(data)
             self._plot_config["kwargs"]["origin"] = _origin
@@ -415,6 +414,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             Plot2D.addImage(self, data.array, **self._plot_config["kwargs"])
             self.setActiveImage(_IMAGE_LEGEND)
             self.sig_new_data_size.emit(*data.shape)
+        else:
+            self.addNonUniformImage(data, **kwargs)
+        self.update_cs_units(data.axis_units[1], data.axis_units[0])
         if self._plot_config["title"]:
             self.setGraphTitle(self._plot_config["title"])
         self.setGraphYLabel(self._plot_config["y_ax_label"])

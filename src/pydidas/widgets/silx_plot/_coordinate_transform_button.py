@@ -28,7 +28,7 @@ __all__ = ["CoordinateTransformButton"]
 
 
 from functools import partial
-from typing import Literal
+from typing import Any, Literal
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot.PlotToolButtons import PlotToolButton
@@ -51,21 +51,15 @@ class CoordinateTransformButton(PlotToolButton):
     STATE = None
     sig_new_coordinate_system = QtCore.Signal(str)
 
-    def __init__(self, parent=None, plot=None):
-        if self.STATE is None:
-            self.__set_state()
-        PlotToolButton.__init__(self, parent=parent, plot=plot)
-        self.__current_cs = ""
-        self._data_shape = (-1, -1)
-        self._data_linear = True
-        self.__define_actions_and_create_menu()
-        DIFFRACTION_EXP.sig_params_changed.connect(self._check_enabled)
-
-    def __set_state(self):
+    @staticmethod
+    def __set_state():
         """
         Set the state variables for all required actions.
+
+        Note that this must be performed in the class as the QIcons cannot be
+        created at import time.
         """
-        self.STATE = {
+        CoordinateTransformButton.STATE = {
             ("cartesian", "icon"): icons.get_pydidas_qt_icon(
                 "silx_coordinates_xy_cartesian.png"
             ),
@@ -85,6 +79,17 @@ class CoordinateTransformButton(PlotToolButton):
             ("q_chi", "state"): f"Polar q / {CHI} coordinates",
             ("q_chi", "action"): f"Use polar q / {CHI} coordinates [nm^-1, deg]",
         }
+
+    def __init__(self, parent=None, plot=None, **kwargs: Any):
+        if CoordinateTransformButton.STATE is None:
+            self.__set_state()
+        PlotToolButton.__init__(self, parent=parent, plot=plot)
+        self.__current_cs = ""
+        self.__diffraction_exp = kwargs.get("diffraction_exp", DIFFRACTION_EXP)
+        self._data_shape = (-1, -1)
+        self._data_linear = True
+        self.__define_actions_and_create_menu()
+        self.__diffraction_exp.sig_params_changed.connect(self._check_if_action_enabled)
 
     def __define_actions_and_create_menu(self):
         """
@@ -138,38 +143,17 @@ class CoordinateTransformButton(PlotToolButton):
             self.__current_cs = cs_name
 
     @QtCore.Slot()
-    def _check_enabled(self):
+    def _check_if_action_enabled(self):
         """Check the data shape against the detector geometry"""
         if (
-            self.detector_valid
+            self.__diffraction_exp.detector_is_valid
             and self._data_linear
-            and self._data_shape
-            == (
-                DIFFRACTION_EXP.get_param_value("detector_npixy"),
-                DIFFRACTION_EXP.get_param_value("detector_npixx"),
-            )
+            and self._data_shape == self.__diffraction_exp.det_shape
         ):
             self.setEnabled(True)
             return
         self.set_coordinates("cartesian")
         self.setEnabled(False)
-
-    @property
-    def detector_valid(self) -> bool:
-        """
-        Check that the detector is valid.
-
-        Returns
-        -------
-        bool
-            Flag whether the detector has been set up correctly.
-        """
-        return (
-            DIFFRACTION_EXP.get_param_value("detector_npixx") >= 1
-            and DIFFRACTION_EXP.get_param_value("detector_npixy") >= 1
-            and DIFFRACTION_EXP.get_param_value("detector_pxsizex") > 0
-            and DIFFRACTION_EXP.get_param_value("detector_pxsizey") > 0
-        )
 
     @QtCore.Slot(int, int)
     def set_raw_data_size(self, height: int, width: int):
@@ -184,7 +168,7 @@ class CoordinateTransformButton(PlotToolButton):
             The width of the new raw data.
         """
         self._data_shape = (height, width)
-        self._check_enabled()
+        self._check_if_action_enabled()
 
     @QtCore.Slot(bool)
     def set_data_linearity(self, linear: bool):
@@ -197,4 +181,4 @@ class CoordinateTransformButton(PlotToolButton):
             The new data linearity.
         """
         self._data_linear = linear
-        self._check_enabled()
+        self._check_if_action_enabled()

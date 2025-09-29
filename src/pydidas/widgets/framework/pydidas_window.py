@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PydidasWindowMixIn and PydidasWindow classes which can be used
-to subclass BaseFrames to stand-alone Qt windows.
+Module with the PydidasWindow class which can be used to subclass BaseFrames
+to stand-alone Qt windows.
 """
 
 __author__ = "Malte Storm"
@@ -29,6 +29,7 @@ __all__ = ["PydidasWindow"]
 
 
 import os
+from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -42,84 +43,24 @@ from pydidas.widgets.framework.base_frame import BaseFrame
 from pydidas_qtcore import PydidasQApplication
 
 
-class PydidasWindowMixIn:
-    """
-    MixIn class to extend PydidasWindow functionality to other classes also derived
-    from a QObject.
-    """
-
-    def __init__(self):
-        self._geometry = None
-
-    def closeEvent(self, event: QtCore.QEvent):  # noqa
-        """
-        Overload the closeEvent to store the window's geometry.
-
-        Parameters
-        ----------
-        event : QtCore.QEvent
-            The closing event.
-        """
-        self._geometry = self.geometry()
-        self.sig_closed.emit()
-        super().closeEvent(event)
-
-    def show(self):
-        """Overload the show method to update the geometry."""
-        if self._geometry is not None:
-            self.setGeometry(self._geometry)
-        super().show()
-
-    def export_window_state(self) -> dict:
-        """
-        Get the state of the window for exporting.
-
-        The generic PydidasWindow method will return the geometry and
-        visibility. If windows need to export more information, they need
-        to reimplement this method.
-
-        Returns
-        -------
-        dict
-            The dictionary with the window state.
-        """
-        return {"geometry": self.geometry().getRect(), "visible": self.isVisible()}
-
-    def restore_window_state(self, state: dict):
-        """
-        Restore the window state from saved information.
-
-        Parameters
-        ----------
-        state : dict
-            The dictionary with the state information.
-        """
-        self.setGeometry(*state["geometry"])
-        self.setVisible(state["visible"])
-
-
-class PydidasWindow(BaseFrame, PydidasWindowMixIn):
+class PydidasWindow(BaseFrame):
     """The PydidasWindow is a standalone BaseFrame with a persistent geometry."""
 
     show_frame = False
     sig_closed = QtCore.Signal()
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
-        PydidasWindowMixIn.__init__(self)
+        self._geometry = None
         self.set_default_params()
         if kwargs.get("activate_frame", True):
             self.frame_activated(self.frame_index)
         self.setWindowIcon(icons.pydidas_icon_with_bg())
         if "title" in kwargs:
             self.setWindowTitle(kwargs.get("title"))
-
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self.open_help)
-
-        _app = PydidasQApplication.instance()
-        if hasattr(_app, "sig_exit_pydidas"):
-            _app.sig_exit_pydidas.connect(self.deleteLater)
+        PydidasQApplication.instance().sig_exit_pydidas.connect(self.deleteLater)
 
     @QtCore.Slot()
     def open_help(self):
@@ -149,3 +90,43 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         if self._geometry is not None:
             self.setGeometry(self._geometry)
         super().show()
+
+    def closeEvent(self, event: QtGui.QCloseEvent):  # noqa
+        """
+        Overload the closeEvent to store the window's geometry.
+
+        Parameters
+        ----------
+        event : QtGui.QCloseEvent
+            The closing event.
+        """
+        self._geometry = self.geometry()
+        self.sig_closed.emit()
+        super().closeEvent(event)
+
+    def export_window_state(self) -> dict:
+        """
+        Get the state of the window for exporting.
+
+        The generic PydidasWindow method will return the geometry and
+        visibility. If windows need to export more information, they need
+        to reimplement this method.
+
+        Returns
+        -------
+        dict
+            The dictionary with the window state.
+        """
+        return {"geometry": self.geometry().getRect(), "visible": self.isVisible()}
+
+    def restore_window_state(self, state: dict):
+        """
+        Restore the window state from saved information.
+
+        Parameters
+        ----------
+        state : dict
+            The dictionary with the state information.
+        """
+        self.setGeometry(*state["geometry"])
+        self.setVisible(state["visible"])

@@ -51,8 +51,7 @@ from pydidas.core.utils import (
     get_extension,
     get_hdf5_metadata,
 )
-from pydidas.data_io import IoManager, import_data
-from pydidas.data_io.implementations.ascii_io import AsciiIo
+from pydidas.data_io import IoManager, import_data, read_metadata
 from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     DATA_BROWSING_FRAME_BUILD_CONFIG,
     create_splitter,
@@ -193,14 +192,7 @@ class DataBrowsingFrame(BaseFrame):
             self.__display_dataset(_data)
 
     def __open_hdf5_file(self):
-        """
-        Process the input file and check whether it is a hdf5 file.
-
-        Parameters
-        ----------
-        filename : str
-            The filename of the hdf5 file to open.
-        """
+        """Process the input file and check whether it is a hdf5 file."""
         if self.__open_file is not None:
             self.__open_file.close()
             self.__open_file = None
@@ -303,14 +295,7 @@ class DataBrowsingFrame(BaseFrame):
         self.__browser_window.open_file(self.__current_filename)
 
     def __open_ascii_file(self):
-        """
-        Import ASCII raw data.
-
-        Parameters
-        ----------
-        use_x_col : str
-            The new value for the xcol parameter. This can be "None" or an integer.
-        """
+        """Import ASCII raw data."""
         if self.__current_filename is None:
             return
         _ascii_data = import_data(self.__current_filename, x_column=False)
@@ -353,7 +338,7 @@ class DataBrowsingFrame(BaseFrame):
         """
         if self.__current_filename is None or not self._widgets["viewer"].data_is_set:
             return
-        _metadata = AsciiIo.read_metadata_from_file(self.__current_filename)
+        _metadata = read_metadata(self.__current_filename)
         _str_repr = formatted_str_repr_of_dict(_metadata)
         if self.__metadata_window is None:
             self.__create_metadata_window()

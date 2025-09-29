@@ -290,6 +290,9 @@ class DataViewer(WidgetWithParameterCollection):
         self._update_widgets_from_data()
         self._set_new_view()
 
+    # Set up an alias for plotting
+    plot_data = set_data
+
     def _import_data(self, data: Dataset | H5Node | h5py.Dataset | np.ndarray):
         """
         Store an internal reference to the imported data.

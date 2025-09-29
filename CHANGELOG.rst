@@ -71,6 +71,8 @@ Bugfixes
 - Fixed an issue with InputPlugins for 1-dimensional data in the GUI.
 - Fixed an issue with the AxesSelector when switching between Datasets of different 
   dimensionality in the TableView.
+- Fixed an issue with the ShowInformationForResult when the input file was not 
+  available at the original path.
 
 
 v25.05.16

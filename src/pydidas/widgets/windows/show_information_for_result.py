@@ -29,6 +29,7 @@ __all__ = ["ShowInformationForResult"]
 
 
 from pathlib import Path
+from typing import Any
 
 from qtpy import QtCore
 
@@ -50,7 +51,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
     sig_closed = QtCore.Signal()
     sig_this_frame_activated = QtCore.Signal()
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         PydidasWindow.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
 

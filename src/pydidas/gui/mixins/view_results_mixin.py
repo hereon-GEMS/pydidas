@@ -29,7 +29,7 @@ __all__ = ["ViewResultsMixin"]
 
 
 import os
-from typing import Any
+from typing import Any, Protocol
 
 from qtpy import QtCore, QtWidgets
 
@@ -37,6 +37,7 @@ from pydidas.core import (
     ParameterCollection,
     UserConfigError,
     get_generic_param_collection,
+    ObjectWithParameterCollection,
 )
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import PydidasFileDialog, ScrollArea
@@ -47,7 +48,7 @@ from pydidas.widgets.windows import ShowInformationForResult
 from pydidas.workflow import WorkflowResults
 
 
-_VIEW_RESULTS_MIXIN_BUILD_CONFIG = [
+_VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = [
     [
         "create_empty_widget",
         ("config",),
@@ -328,6 +329,17 @@ class ViewResultsMixin:
         _loader_plugin = self._RESULTS.frozen_tree.root.plugin.copy()
         _loader_plugin._SCAN = self._RESULTS.frozen_scan
         if _loader_plugin.filename_string == "":
+            # if the result has been imported from disk, set the local
+            # images_per_file parameter to the counted value in case the file
+            # is not available under the stored path.
+            if (
+                _loader_plugin.get_param_value("images_per_file") == -1
+                and _loader_plugin.get_param_value("_counted_images_per_file") > 0
+            ):
+                _loader_plugin.set_param_value(
+                    "images_per_file",
+                    _loader_plugin.get_param_value("_counted_images_per_file"),
+                )
             _loader_plugin.pre_execute()
         _timeline = self.get_param_value("use_scan_timeline")
         if self._result_window is None:
@@ -386,7 +398,7 @@ class ViewResultsMixin:
         _squeeze_flag = self.get_param_value("squeeze_empty_dims")
         _overwrite = self.get_param_value("enable_overwrite")
         while True:
-            _dirname = self.__export_dialog.get_existing_directory(
+            _dir_name = self.__export_dialog.get_existing_directory(
                 caption="Export results",
                 qsettings_ref="WorkflowResults__export",
                 info_string=(
@@ -394,17 +406,17 @@ class ViewResultsMixin:
                     "results<br> or enable overwriting of results:</b>"
                 ),
             )
-            if _dirname is None or len(os.listdir(_dirname)) == 0 or _overwrite:
+            if _dir_name is None or len(os.listdir(_dir_name)) == 0 or _overwrite:
                 break
             critical_warning(
                 "Directory not empty",
                 "The selected directory is not empty. Please "
                 "select an empty directory or cancel.",
             )
-        if _dirname is None:
+        if _dir_name is None:
             return
         self._RESULTS.save_results_to_disk(
-            _dirname,
+            _dir_name,
             _formats,
             overwrite=_overwrite,
             node_id=node,

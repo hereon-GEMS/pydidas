@@ -210,11 +210,14 @@ class DataViewer(WidgetWithParameterCollection):
 
     def __update_ax_selector_for_h5py_data(self):
         """Update the axis selector if the data is a h5py dataset with chunking"""
-        if isinstance(self._data, h5py.Dataset) and self._data.chunks is not None:
+        if isinstance(self._data, h5py.Dataset):
             _ax_selector: AxesSelector = self._widgets["axes_selector"]
-            _sorted_chunking_dims = list(np.asarray(self._data.chunks).argsort())
-            _used_chunking_dims = _sorted_chunking_dims[: -_ax_selector.n_choices]
-            _ax_selector.assign_index_use_to_dims(_used_chunking_dims)
+            if self._data.chunks is not None:
+                _sorted_chunking_dims = list(np.asarray(self._data.chunks).argsort())
+                _used_index_dims = _sorted_chunking_dims[: -_ax_selector.n_choices]
+            else:
+                _used_index_dims = list(range(self._data.ndim - _ax_selector.n_choices))
+            _ax_selector.assign_index_use_to_dims(_used_index_dims)
 
     @QtCore.Slot()
     def _update_view(self, view_key: str | None = None):

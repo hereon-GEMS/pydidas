@@ -28,9 +28,8 @@ __status__ = "Production"
 
 
 from .silx_plotwindow_mixin import *
-from .view_results_mixin import *
 
 
-__all__ = silx_plotwindow_mixin.__all__ + view_results_mixin.__all__
+__all__ = silx_plotwindow_mixin.__all__
 
-del silx_plotwindow_mixin, view_results_mixin
+del silx_plotwindow_mixin

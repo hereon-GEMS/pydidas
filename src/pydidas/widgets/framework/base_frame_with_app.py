@@ -130,7 +130,8 @@ class BaseFrameWithApp(BaseFrame):
             frame's state.
         """
         _index, _state = super().export_state()
-        _state["app"] = self._app.export_state()
+        if isinstance(self._app, BaseApp):
+            _state["app"] = self._app.export_state()
         return _index, _state
 
     def restore_state(self, state: dict):
@@ -146,5 +147,6 @@ class BaseFrameWithApp(BaseFrame):
             A dictionary with 'params', 'app' and 'visibility' keys and the
             respective information for all.
         """
-        self._app.import_state(state["app"])
+        if isinstance(self._app, BaseApp) and "app" in state:
+            self._app.import_state(state["app"])
         super().restore_state(state)

@@ -164,7 +164,7 @@ shiboken6==6.9.0
     #   pyside6
     #   pyside6-addons
     #   pyside6-essentials
-silx==2.1.1
+silx==2.2.2
     # via
     #   -r requirements.in
     #   pyfai

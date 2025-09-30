@@ -32,6 +32,7 @@ from qtpy import QtWidgets
 
 from pydidas.core import constants
 from pydidas.widgets import ScrollArea
+from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.misc import (
     PointsForBeamcenterWidget,
     SelectImageFrameWidget,
@@ -138,7 +139,7 @@ class QuickIntegrationFrameBuilder:
         )
         cls._frame.create_any_widget(
             "result_plot",
-            PydidasPlotStack,
+            DataViewer,
             diffraction_exp=cls._frame._EXP,
             parent_widget=None,
         )

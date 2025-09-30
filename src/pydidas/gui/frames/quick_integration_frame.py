@@ -514,5 +514,5 @@ class QuickIntegrationFrame(BaseFrame):
         with ShowBusyMouse():
             _plugin.pre_execute()
             _results, _ = _plugin.execute(self._image)
-            self._widgets["result_plot"].plot_data(_results)
+            self._widgets["result_plot"].set_data(_results)
             self._widgets["tabs"].setCurrentIndex(1)

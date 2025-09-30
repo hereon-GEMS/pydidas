@@ -231,7 +231,7 @@ class TestPluginRegistry(unittest.TestCase):
 
     def test_get_all_plugins(self):
         PC = self.get_registry_with_random_plugins()
-        self.assertEqual(len(PC.get_all_plugins()), self.n_plugin)
+        self.assertEqual(len(PC.get_all_plugin_classes()), self.n_plugin)
 
     def test_get_plugin_by_name__no_name(self):
         PC = PluginRegistry(plugin_path=self._pluginpath)
@@ -307,7 +307,7 @@ class TestPluginRegistry(unittest.TestCase):
         self.n_plugin = 2
         PC = self.get_registry_with_random_plugins()
         PC.check_and_register_class(float)
-        self.assertEqual(len(PC.get_all_plugins()), self.n_plugin)
+        self.assertEqual(len(PC.get_all_plugin_classes()), self.n_plugin)
 
     def test_check_and_register_class__new_class_with_same_name(self):
         self.n_plugin = 2

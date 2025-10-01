@@ -30,7 +30,7 @@ __all__ = ["QuickIntegrationFrame"]
 
 from functools import partial
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -41,7 +41,9 @@ from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.data_io import import_data
-from pydidas.gui.frames.builders import QuickIntegrationFrameBuilder
+from pydidas.gui.frames.builders.quick_integration_frame_builder import (
+    QUICK_INTEGRATION_FRAME_BUILD_CONFIG,
+)
 from pydidas.plugins import PluginCollection, pyFAIintegrationBase
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.controllers import (
@@ -49,10 +51,9 @@ from pydidas.widgets.controllers import (
     ManuallySetIntegrationRoiController,
 )
 from pydidas.widgets.framework import BaseFrame
-
-
-COLL = PluginCollection()
-EXP = DiffractionExperimentContext()
+from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+    BaseParamIoWidget,
+)
 
 
 class QuickIntegrationFrame(BaseFrame):
@@ -100,27 +101,38 @@ class QuickIntegrationFrame(BaseFrame):
         _generic = pyFAIintegrationBase(diffraction_exp=self._EXP)
         self._plugins = {
             "generic": _generic,
-            "Azimuthal integration": COLL.get_plugin_by_name(
+            "Azimuthal integration": PluginCollection().get_plugin_by_name(
                 "PyFAIazimuthalIntegration"
             )(_generic.params, diffraction_exp=self._EXP),
-            "Radial integration": COLL.get_plugin_by_name("PyFAIradialIntegration")(
-                _generic.params, diffraction_exp=self._EXP
-            ),
-            "2D integration": COLL.get_plugin_by_name("PyFAI2dIntegration")(
-                _generic.params, diffraction_exp=self._EXP
-            ),
+            "Radial integration": PluginCollection().get_plugin_by_name(
+                "PyFAIradialIntegration"
+            )(_generic.params, diffraction_exp=self._EXP),
+            "2D integration": PluginCollection().get_plugin_by_name(
+                "PyFAI2dIntegration"
+            )(_generic.params, diffraction_exp=self._EXP),
         }
         self._image = None
         self._bc_controller = None
         self._roi_controller = None
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and create all widgets.
         """
-        QuickIntegrationFrameBuilder.populate_frame(self)
+        for _method, _args, _kwargs in QUICK_INTEGRATION_FRAME_BUILD_CONFIG:
+            if "input_plot" in _args or "res_plot" in _args:
+                _kwargs["diffraction_exp"] = self._EXP
+            if "input_beamcenter_points" in _args:
+                _args = _args + (self._widgets["input_plot"],)
+            if "file_selector" in _args:
+                _args += tuple(self.params.values())
+            if "roi_selector" in _args:
+                _kwargs["plugin"] = self._plugins["generic"]
+            getattr(self, _method)(*_args, **_kwargs)
+        self._widgets["tabs"].addTab(self._widgets["tab_plot"], "Input image")
+        self._widgets["tabs"].addTab(self._widgets["res_plot"], "Integration results")
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Connect all signals.
         """
@@ -189,13 +201,13 @@ class QuickIntegrationFrame(BaseFrame):
             self._new_mask_file_selection
         )
 
-    def finalize_ui(self):
+    def finalize_ui(self) -> None:
         """
         Finalizes the UI and restore the SelectImageFrameWidgets params.
         """
         self._widgets["file_selector"].restore_param_widgets()
 
-    def restore_state(self, state: dict):
+    def restore_state(self, state: dict[str, Any]) -> None:
         """
         Restore the GUI state.
 
@@ -209,21 +221,21 @@ class QuickIntegrationFrame(BaseFrame):
             self._widgets["file_selector"].restore_param_widgets()
 
     @QtCore.Slot(str, dict)
-    def open_image(self, filename: Union[str, Path], open_image_kwargs: dict):
+    def open_image(self, filename: str | Path, open_image_kwargs: dict) -> None:
         """
         Open an image with the given filename and display it in the plot.
 
         Parameters
         ----------
-        filename : Union[str, Path]
-            The filename and path. The QSignal only takes strings but if the method
+        filename : str | Path
+            The filename and path. The QSignal only accepts strings but if the method
             is called directly, Paths are also an acceptable input.
         open_image_kwargs : dict
             Additional parameters to open a specific frame in a file.
         """
         self._image = import_data(filename, **open_image_kwargs)
         self._widgets["input_plot"].plot_pydidas_dataset(self._image)
-        self._widgets["input_plot"].changeCanvasToDataAction._actionTriggered()
+        self._widgets["input_plot"].changeCanvasToDataAction._actionTriggered()  # noqa W0212
         self._roi_controller.show_plot_items("roi")
         self._toggle_fname_valid(True)
         self._update_detector_model()
@@ -231,7 +243,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._bc_controller.manual_beamcenter_update()
 
     @QtCore.Slot(bool)
-    def _toggle_fname_valid(self, is_valid: bool):
+    def _toggle_fname_valid(self, is_valid: bool) -> None:
         """
         Modify widgets visibility and activation based on the file selection.
 
@@ -250,7 +262,7 @@ class QuickIntegrationFrame(BaseFrame):
             self._widgets[_key].setVisible(is_valid)
         self.toggle_param_widget_visibility("detector_model", is_valid)
 
-    def _update_detector_model(self):
+    def _update_detector_model(self) -> None:
         """Update the detector model selection based on the input image shape."""
         _shape = self._image.shape
         _det_models = (
@@ -274,7 +286,7 @@ class QuickIntegrationFrame(BaseFrame):
         if not (_model == _old_model and _old_available):
             self._change_detector_model()
 
-    def set_param_value_and_widget(self, key, value):
+    def set_param_value_and_widget(self, key: str, value: Any) -> None:
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
@@ -285,13 +297,13 @@ class QuickIntegrationFrame(BaseFrame):
         ----------
         key : str
             The Parameter reference key.
-        value : object
+        value : Any
             The new Parameter value. The datatype is determined by the
             Parameter.
         """
         if key in self._EXP.params:
             self._EXP.set_param_value(key, value)
-            if key in ["xray_energy", "xray_wavelength"]:
+            if key in ["xray_energy", "xray_wavelength"]:  # noqa R0801
                 _energy = self.get_param_value("xray_energy")
                 _lambda = self.get_param_value("xray_wavelength")
                 self.param_widgets["xray_energy"].set_value(_energy)
@@ -302,7 +314,7 @@ class QuickIntegrationFrame(BaseFrame):
             BaseFrame.set_param_value_and_widget(self, key, value)
 
     @QtCore.Slot()
-    def _update_xray_param(self, param_key, widget):
+    def _update_xray_param(self, param_key: str, widget: BaseParamIoWidget) -> None:
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -323,7 +335,7 @@ class QuickIntegrationFrame(BaseFrame):
             _w.set_value(self._EXP.get_param_value("xray_wavelength"))
 
     @QtCore.Slot(str)
-    def _update_detector_pxsize(self, new_pxsize: str):
+    def _update_detector_pxsize(self, new_pxsize: str) -> None:
         """
         Update the detector pixel size.
 
@@ -348,7 +360,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._config["previous_det_pxsize"] = _pxsize
 
     @QtCore.Slot()
-    def _change_detector_model(self):
+    def _change_detector_model(self) -> None:
         """
         Process a manual change of the detector model.
         """
@@ -369,7 +381,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._update_detector_pxsize(_pxsize)
 
     @QtCore.Slot(str)
-    def _new_mask_file_selection(self, mask_filename: str):
+    def _new_mask_file_selection(self, mask_filename: str) -> None:
         """
         Propagate the new mask to the beamcenter controller.
 
@@ -389,7 +401,7 @@ class QuickIntegrationFrame(BaseFrame):
             self._bc_controller.set_mask_file(None)
 
     @QtCore.Slot()
-    def _update_beamcenter(self):
+    def _update_beamcenter(self) -> None:
         """
         Update the DiffractionExperiment's stored PONI from the beamcenter.
         """
@@ -400,7 +412,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._bc_controller.manual_beamcenter_update()
 
     @QtCore.Slot()
-    def _toggle_beamcenter_selection(self):
+    def _toggle_beamcenter_selection(self) -> None:
         """
         Toggle the manual beamcenter selection.
         """
@@ -424,7 +436,7 @@ class QuickIntegrationFrame(BaseFrame):
             self._update_beamcenter()
 
     @QtCore.Slot(bool)
-    def _roi_selection_toggled(self, active: bool):
+    def _roi_selection_toggled(self, active: bool) -> None:
         """
         Handle toggling of the integration ROI selection.
 
@@ -448,7 +460,7 @@ class QuickIntegrationFrame(BaseFrame):
             self.param_widgets[_key].setEnabled(not active)
 
     @QtCore.Slot(str)
-    def _changed_plugin_direction(self, direction: str):
+    def _changed_plugin_direction(self, direction: str) -> None:
         """
         Handle the selection of a new type of plugin.
 
@@ -464,11 +476,11 @@ class QuickIntegrationFrame(BaseFrame):
             "rad_npoint", direction != "Radial integration"
         )
 
-    def _copy_diffraction_exp(self):
+    def _copy_diffraction_exp(self) -> None:
         """
         Copy the DiffractionExperiment configuration from the Workflow context.
         """
-        for _key, _param in EXP.params.items():
+        for _key, _param in DiffractionExperimentContext().params.items():
             self._EXP.set_param_value(_key, _param.value)
             if _key in self.param_widgets:
                 self.param_widgets[_key].set_value(_param.value)
@@ -480,7 +492,7 @@ class QuickIntegrationFrame(BaseFrame):
         self.set_param_value_and_widget("beamcenter_y", _center.y)
         self._bc_controller.manual_beamcenter_update()
 
-    def _import_diffraction_exp(self):
+    def _import_diffraction_exp(self) -> None:
         """
         Open a dialog to select a filename and load the DiffractionExperiment.
 
@@ -501,7 +513,7 @@ class QuickIntegrationFrame(BaseFrame):
         self.update_widget_value("beamcenter_y", np.round(_center.y, 3))
 
     @QtCore.Slot()
-    def _run_integration(self):
+    def _run_integration(self) -> None:
         """
         Run the integration in the pyFAI plugin.
         """
@@ -514,5 +526,5 @@ class QuickIntegrationFrame(BaseFrame):
         with ShowBusyMouse():
             _plugin.pre_execute()
             _results, _ = _plugin.execute(self._image)
-            self._widgets["result_plot"].set_data(_results)
+            self._widgets["res_plot"].set_data(_results)
             self._widgets["tabs"].setCurrentIndex(1)

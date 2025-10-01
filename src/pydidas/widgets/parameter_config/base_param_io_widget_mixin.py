@@ -233,7 +233,7 @@ class BaseParamIoWidgetMixIn:
         """
         pass
 
-    def update_choices(self, new_choices: list) -> None:
+    def update_choices(self, new_choices: list, selection: str | None = None) -> None:
         """
         Update the choices of the BaseParamIoWidget in place.
 
@@ -243,6 +243,9 @@ class BaseParamIoWidgetMixIn:
         ----------
         new_choices : list
             The new choices to be set.
+        selection : str | None, optional
+            The selection to be set after the update. If None, the first
+            choice will be selected. Default is None.
         """
         raise NotImplementedError(
             "The update_choices method must is only implemented if the associated "

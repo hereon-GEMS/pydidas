@@ -29,7 +29,7 @@ __all__ = ["SelectImageFrameWidget"]
 
 
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 from qtpy import QtCore
 
@@ -50,22 +50,23 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
 
     Parameters
     ----------
-    *input_params : tuple[Parameter, ...]
+    *input_params : tuple[Parameter]
         Parameters passed to the widget to handle the frame references.
-    **kwargs : dict
+    **kwargs : Any
         Supported keyword arguments are;
 
-        parent : Union[None, QWidget], optional
+        parent : QWidget | None, optional
             The parent widget. The default is None.
-        import_reference : Union[None, str], optional
+        import_reference : str | None, optional
             The reference for the file dialogue to store persistent settings.
             If None, only the
     """
 
     sig_new_file_selection = QtCore.Signal(str, dict)
     sig_file_valid = QtCore.Signal(bool)
+    init_kwargs = WidgetWithParameterCollection.init_kwargs + ["import_reference"]
 
-    def __init__(self, *input_params: tuple[Parameter, ...], **kwargs: dict):
+    def __init__(self, *input_params: Parameter, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(*input_params)
         self.__import_dialog = PydidasFileDialog()
@@ -79,7 +80,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         self.create_param_widget(
             self.get_param("filename"),
             linebreak=True,
-            persistent_qsettings_ref=kwargs.get("import_reference", None),
+            persistent_qsettings_ref=self.__import_qref,
         )
         self.create_param_widget(
             self.get_param("hdf5_key"),
@@ -116,14 +117,14 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
             self.process_new_filename_input(_fname)
 
     @QtCore.Slot(str)
-    def process_new_filename_input(self, filename: Union[Path, str]):
+    def process_new_filename_input(self, filename: Path | str):
         """
         Process the input of a new filename in the Parameter widget.
 
         Parameters
         ----------
-        filename : str
-            The filename.
+        filename : Path | str
+            The filename for the new input data.
         """
         if not Path(filename).is_file():
             self._toggle_file_selected(False)

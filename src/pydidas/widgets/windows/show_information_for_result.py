@@ -37,10 +37,10 @@ from pydidas.core import UserConfigError
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import ShowBusyMouse, get_fixed_length_str
 from pydidas.plugins import InputPlugin
+from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.misc import ReadOnlyTextWidget
-from pydidas.widgets.silx_plot import PydidasPlotStack
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -93,10 +93,10 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         )
         self.create_any_widget(
             "plot",
-            PydidasPlotStack,
+            DataViewer,
             visible=False,
-            minimumHeight=600,
-            minimumWidth=600,
+            minimumHeight=800,
+            minimumWidth=800,
             gridPos=(2, 1, self.layout().rowCount() - 2, 1),  # noqa E0602
         )
         PydidasQApplication.instance().sig_font_metrics_changed.connect(

@@ -30,10 +30,8 @@ __all__ = ["PydidasPlotStack"]
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
-from silx.gui.data.DataViews import IMAGE_MODE
 
 from pydidas.core import Dataset
-from pydidas.widgets.silx_plot._silx_data_viewer import SilxDataViewer
 from pydidas.widgets.silx_plot.pydidas_plot1d import PydidasPlot1D
 from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
@@ -69,11 +67,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self._frame1d.setLayout(QtWidgets.QGridLayout())
         self._frame2d = QtWidgets.QWidget()
         self._frame2d.setLayout(QtWidgets.QGridLayout())
-        self._frame3d = QtWidgets.QWidget()
-        self._frame3d.setLayout(QtWidgets.QGridLayout())
         self._1dplot = None
         self._2dplot = None
-        self._3dplot = None
         self._config = {
             "use_data_info_action": kwargs.get("use_data_info_action", False),
             "cs_transform": kwargs.get("cs_transform", True),
@@ -81,7 +76,6 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         }
         self.addWidget(self._frame1d)
         self.addWidget(self._frame2d)
-        self.addWidget(self._frame3d)
 
     def plot_data(self, data: Dataset, **kwargs: Any):
         """
@@ -94,18 +88,17 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         **kwargs : Any
             Any additional keywords to be passed to the plot.
         """
-        _dim = min(data.ndim, 3)
+        _dim = min(data.ndim, 2)
         self._create_widget_if_required(_dim)
         self.setCurrentIndex(_dim - 1)
         _plot = getattr(self, f"_{_dim}dplot")
         _title = kwargs.pop("title", None)
-        if _title is not None and _dim < 3:
+        if _title is not None:
             _plot.setGraphTitle(_title)
-        if _dim < 3:
+        if _dim == 1:
             _plot.plot_pydidas_dataset(data, **kwargs)
         else:
-            _plot.setData(data)
-            _plot.setDisplayMode(IMAGE_MODE)
+            _plot.set_data(data)
 
     def clear_plots(self):
         """
@@ -115,8 +108,6 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
             self._1dplot.clear_plot()
         if self._2dplot is not None:
             self._2dplot.clear_plot()
-        if self._3dplot is not None:
-            self._3dplot.clear_plot()
 
     def _create_widget_if_required(self, dim: int):
         """
@@ -129,11 +120,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         """
         _plot = getattr(self, f"_{dim}dplot")
         if _plot is None:
-            _plot = (
-                PydidasPlot1D()
-                if dim == 1
-                else (PydidasPlot2D(**self._config) if dim == 2 else SilxDataViewer())
-            )
+            _plot = PydidasPlot1D() if dim == 1 else PydidasPlot2D(**self._config)
             setattr(self, f"_{dim}dplot", _plot)
             _widget = getattr(self, f"_frame{dim}d")
             _widget.layout().addWidget(_plot)

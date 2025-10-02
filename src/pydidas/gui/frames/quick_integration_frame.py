@@ -80,6 +80,7 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_model",
     )
     params_not_to_restore = [
+        "filename",
         "integration_direction",
         "azi_npoint",
         "rad_npoint",

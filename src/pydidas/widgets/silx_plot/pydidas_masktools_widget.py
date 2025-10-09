@@ -31,19 +31,18 @@ __all__ = ["PydidasMaskToolsWidget"]
 from typing import Any, Union
 
 from qtpy import QtCore, QtWidgets
+from silx.gui.plot import Plot2D
 from silx.gui.plot.MaskToolsWidget import MaskToolsWidget
 
 
 class PydidasMaskToolsWidget(MaskToolsWidget):
-    """
-    A customized silx.gui.plot.MaskToolsWidget with larger buttons.
-    """
+    """A customized silx.gui.plot.MaskToolsWidget with larger buttons."""
 
     def __init__(
         self,
-        parent: Union[None, QtWidgets.QWidget] = None,
-        plot: Union[None, QtWidgets.QWidget] = None,
-        **kwargs: Any,
+        parent: QtWidgets.QWidget | None = None,
+        plot: Union[Plot2D, None] = None,
+        **kwargs: Any,  # noqa ARG001
     ):
         MaskToolsWidget.__init__(self, parent, plot)
 

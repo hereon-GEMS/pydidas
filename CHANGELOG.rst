@@ -73,6 +73,8 @@ Bugfixes
   dimensionality in the TableView.
 - Fixed an issue with the ShowInformationForResult when the input file was not 
   available at the original path.
+- Fixed an issue when the QStandardPaths.DocumentsLocation is not available (e.g. on
+  a disconnected network drive)
 
 
 v25.05.16

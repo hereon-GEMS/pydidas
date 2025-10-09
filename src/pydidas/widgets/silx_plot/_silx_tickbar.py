@@ -37,7 +37,7 @@ from pydidas.core.utils import update_qwidget_font
 from pydidas_qtcore import PydidasQApplication
 
 
-def tickbar_paintEvent(instance: _TickBar, event: QtCore.QEvent):  # noqa C0103
+def tickbar_paintEvent(instance: _TickBar, event: QtCore.QEvent) -> None:  # noqa C0103
     """
     Handle the paintEvent with the global font.
 
@@ -74,7 +74,7 @@ def tickbar_paintTick(  # noqa C0103
     val: float,
     painter: QtGui.QPainter,
     majorTick: bool = True,  # noqa C0103
-):
+) -> None:
     """
     Paint a tick with the global font.
 

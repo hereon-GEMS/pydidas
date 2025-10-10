@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
+from numbers import Integral
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
@@ -61,7 +62,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
     init_kwargs = ["parent", "cs_transform", "use_data_info_action", "diffraction_exp"]
     sig_get_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         QtWidgets.QStackedWidget.__init__(self, kwargs.get("parent", None))
         self._frame1d = QtWidgets.QWidget()
         self._frame1d.setLayout(QtWidgets.QGridLayout())
@@ -77,7 +78,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self.addWidget(self._frame1d)
         self.addWidget(self._frame2d)
 
-    def plot_data(self, data: Dataset, **kwargs: Any):
+    def plot_data(self, data: Dataset, **kwargs: Any) -> None:
         """
         Plot the given data.
 
@@ -100,7 +101,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         else:
             _plot.set_data(data)
 
-    def clear_plots(self):
+    def clear_plots(self) -> None:
         """
         Clear all plots.
         """
@@ -109,13 +110,13 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         if self._2dplot is not None:
             self._2dplot.clear_plot()
 
-    def _create_widget_if_required(self, dim: int):
+    def _create_widget_if_required(self, dim: Integral) -> None:
         """
         Create the plot widget if required.
 
         Parameters
         ----------
-        dim : int
+        dim : Integral
             The data dimension
         """
         _plot = getattr(self, f"_{dim}dplot")

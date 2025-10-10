@@ -28,7 +28,7 @@ __all__ = ["PydidasPlot1D"]
 
 
 import inspect
-from typing import Any
+from typing import Any, NoReturn
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
@@ -45,8 +45,38 @@ class PydidasPlot1D(Plot1D):
     A customized silx.gui.plot.Plot1D with an additional configuration.
     """
 
+    _allowed_Plot1D_addCurve_kwarg_keys: list[str] | None = None
+
+    @classmethod
+    def _get_allowed_addCurve_kwargs(cls, kwargs: dict[str, Any]) -> dict[str, Any]:  # noqa
+        """
+        Filter a kwargs dictionary to only include those kwargs allowed for addCurve.
+
+        Parameters
+        ----------
+        kwargs : dict[str, Any]
+            The input keyword arguments.
+
+        Returns
+        -------
+        dict[str, Any]
+            The filtered keyword arguments.
+        """
+        if cls._allowed_Plot1D_addCurve_kwarg_keys is None:
+            _addCurve_params = inspect.signature(Plot1D.addCurve).parameters
+            cls._allowed_Plot1D_addCurve_kwarg_keys = [
+                _key
+                for _key, _value in _addCurve_params.items()
+                if _value.default is not inspect.Parameter.empty
+            ]
+        return {
+            _key: _val
+            for _key, _val in kwargs.items()
+            if _key in cls._allowed_Plot1D_addCurve_kwarg_keys
+        }
+
     @staticmethod
-    def _check_data_dimensions(data: Dataset):
+    def _check_data_dimensions(data: Dataset) -> None | NoReturn:
         """
         Check the data dimensions.
 
@@ -61,7 +91,7 @@ class PydidasPlot1D(Plot1D):
                 f"the input data definition:\n The input data has {data.ndim} "
                 "dimensions."
             )
-        _n_max = _QSETTINGS.value("user/max_number_curves", int)
+        _n_max: int = _QSETTINGS.value("user/max_number_curves", int)  # noqa
         if data.shape[0] > _n_max:
             raise UserConfigError(
                 f"The number of given curves ({data.shape[0]}) exceeds the maximum "
@@ -72,16 +102,10 @@ class PydidasPlot1D(Plot1D):
                 "the plotting performance."
             )
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         Plot1D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
-        self._allowed_kwargs = [
-            _key
-            for _key, _value in inspect.signature(self.addCurve).parameters.items()
-            if _value.default is not inspect.Parameter.empty
-        ]
-
         self.getRoiAction().setVisible(False)
         self.getFitAction().setVisible(False)
 
@@ -89,15 +113,14 @@ class PydidasPlot1D(Plot1D):
         if hasattr(self._qtapp, "sig_mpl_font_change"):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
 
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # noqa
         if kwargs.get("use_special_plots", True):
             self._add_special_plot_actions()
         self._y_function = SpecialPlotTypesButton.func_generic
         self._y_label = SpecialPlotTypesButton.label_generic
         self._current_raw_data = {}
-        self._plot_config = {}
 
-    def _add_special_plot_actions(self):
+    def _add_special_plot_actions(self) -> None:
         """
         Add the action to change the type of the plot.
 
@@ -108,7 +131,8 @@ class PydidasPlot1D(Plot1D):
         self._toolbar.addWidget(self._plot_type)
         self._plot_type.sig_new_plot_type.connect(self._process_plot_type)
 
-    def _process_plot_type(self):
+    @QtCore.Slot()
+    def _process_plot_type(self) -> None:
         """
         Process the changed plot type and set the function to update the plotted value.
         """
@@ -119,7 +143,7 @@ class PydidasPlot1D(Plot1D):
             _kwargs["legend"] = _legend
             self.plot_pydidas_dataset(_data, **_kwargs)
 
-    def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any):
+    def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any) -> None:
         """
         Plot a pydidas dataset.
 
@@ -141,33 +165,21 @@ class PydidasPlot1D(Plot1D):
             data.data_label,
             data.data_unit,
         )
-        _allowed_kwargs = {
-            _key: _val for _key, _val in kwargs.items() if _key in self._allowed_kwargs
-        }
-        self._plot_config = {
-            "ax_label_x": data.get_axis_description(_i_data) or "index",
-            "ax_label_y": kwargs.get("ylabel", _ylabel),
-            "title": kwargs.get("title", ""),
-            "kwargs": {
-                "linewidth": kwargs.get("linewidth", 1.5),
-                "linestyle": kwargs.get("linestyle", "-"),
-                "symbol": kwargs.get("symbol", None),
-            }
-            | _allowed_kwargs,
-        }
-        self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
-        self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
-        if self._plot_config.get("title"):
-            self.setGraphTitle(self._plot_config["title"])
-        self._current_raw_data[kwargs.get("legend", "Curve")] = (
-            data,
-            self._plot_config["kwargs"],
-        )
+        _plot_kwargs = {
+            "linewidth": kwargs.get("linewidth", 1.5),
+            "linestyle": kwargs.get("linestyle", "-"),
+            "symbol": kwargs.get("symbol", None),
+        } | self._get_allowed_addCurve_kwargs(kwargs)
+        self.setGraphXLabel(data.get_axis_description(_i_data) or "index")
+        self.setGraphYLabel(kwargs.get("ylabel", _ylabel))
+        if kwargs.get("title"):
+            self.setGraphTitle(kwargs.get("title"))
+        self._current_raw_data[kwargs.get("legend", "Curve")] = (data, _plot_kwargs)
         if data.ndim == 1:
             self.addCurve(
                 data.axis_ranges[_i_data],
                 self._y_function(data.axis_ranges[_i_data], data.array),
-                **self._plot_config["kwargs"],
+                **_plot_kwargs,
             )
         else:
             _label = data.axis_labels[0] + " = {value:.4f} " + data.axis_units[0]
@@ -177,7 +189,6 @@ class PydidasPlot1D(Plot1D):
                     _x,
                     self._y_function(_x, data.array[_index]),
                     legend=_label.format(value=_pos),
-                    # xlabel=self._plot_config["kwargs"]["ax_label_x"],
                     ylabel=_ylabel,
                 )
             self.setActiveCurve(_label.format(value=_x[0]))
@@ -186,7 +197,7 @@ class PydidasPlot1D(Plot1D):
     # uniform interface call to display data
     display_data = plot_pydidas_dataset
 
-    def clear_plot(self, clear_data: bool = True):
+    def clear_plot(self, clear_data: bool = True) -> None:
         """
         Clear the plot and remove all items.
 
@@ -203,28 +214,18 @@ class PydidasPlot1D(Plot1D):
             self._current_raw_data = {}
 
     @QtCore.Slot()
-    def update_mpl_fonts(self):
+    def update_mpl_fonts(self) -> None:
         """
         Update the plot's fonts.
         """
         _curve = self.getCurve()
         if _curve is None:
             return
-        _xarr, _yarr, _, _ = _curve.getData()
-        _title = self.getGraphTitle()
-        self.getBackend().fig.gca().cla()
-        self.addCurve(_xarr, _yarr, **self._plot_config.get("kwargs", {}))
-        self.setGraphTitle(_title)
-        self.setGraphXLabel(self._plot_config.get("ax_label_x", ""))
-        self.setGraphYLabel(self._plot_config.get("ax_label_y", ""))
+        self.setBackend("matplotlib")  # noqa
 
     # TODO: check if still needed with silx 2.2.2
     def _activeItemChanged(self, type_):
-        """
-        Listen for active item changed signal and broadcast signal
-
-        :param item.ItemChangedType type_: The type of item change
-        """
+        """Override generic Plot1D._activeItemChanged to catch QApplication signals."""
         if self.sender() == self._qtapp:
             return
         Plot1D._activeItemChanged(self, type_)

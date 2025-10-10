@@ -56,9 +56,6 @@ from pydidas.widgets.silx_plot.silx_actions import (
     ExpandCanvas,
     PydidasGetDataInfoAction,
 )
-from pydidas.widgets.silx_plot.utilities import (
-    get_2d_silx_plot_ax_settings,
-)
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -78,6 +75,35 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     sig_new_data_size = QtCore.Signal(int, int)
     sig_data_linearity = QtCore.Signal(bool)
     init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
+    _allowed_Plot2D_addImage_kwarg_keys: list[str] | None = None
+
+    @classmethod
+    def _get_allowed_addImage_kwargs(cls, kwargs: dict[str, Any]) -> dict[str, Any]:  # noqa
+        """
+        Filter the kwargs dictionary to only include those allowed by addImage.
+
+        Parameters
+        ----------
+        kwargs : dict[str, Any]
+            The input keyword arguments.
+
+        Returns
+        -------
+        dict[str, Any]
+            The filtered keyword arguments.
+        """
+        if cls._allowed_Plot2D_addImage_kwarg_keys is None:
+            _addImage_params = inspect.signature(Plot2D.addImage).parameters
+            cls._allowed_Plot2D_addImage_kwarg_keys = [
+                _key
+                for _key, _value in _addImage_params.items()
+                if _value.default is not inspect.Parameter.empty
+            ]
+        return {
+            _key: _val
+            for _key, _val in kwargs.items()
+            if _key in cls._allowed_Plot2D_addImage_kwarg_keys
+        }
 
     @staticmethod
     def _check_data_dim(data: np.ndarray):
@@ -96,13 +122,43 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 "dimensions."
             )
 
+    @staticmethod
+    def _get_origin_and_scale(
+        data: Dataset,
+    ) -> tuple[tuple[float, float], tuple[float, float]]:
+        """
+        Get the axis settings to have pixels centered at their values.
+
+        Parameters
+        ----------
+        data : Dataset
+            The dataset to get the axis settings from.
+
+        Returns
+        -------
+        origin : tuple[float, float]
+            The values for the axis origins.
+        scale : tuple[float, float]
+            The values for the axis scales to squeeze it into the correct
+            dimensions for silx plotting.
+        """
+        origin = []
+        scale = []
+        # calling axis #1 with x first because silx expects (x, y) values.
+        for _dim in (1, 0):
+            _ax = data.get_axis_range(_dim)
+            _delta = (_ax.max() - _ax.min()) / _ax.size
+            scale.append(_delta * (_ax.size + 1) / _ax.size)
+            origin.append(_ax[0] - _delta / 2)
+        return tuple(origin), tuple(scale)
+
     def __init__(self, **kwargs: Any):
         PydidasQsettingsMixin.__init__(self)
         Plot2D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
         self._qtapp = PydidasQApplication.instance()
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # noqa
         if hasattr(self._qtapp, "sig_mpl_font_change"):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
         if hasattr(self._qtapp, "sig_updated_user_config"):
@@ -165,13 +221,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 if kwargs.get("diffraction_exp", None) is None
                 else kwargs.get("diffraction_exp")
             ),
-            "allowed_add_image_kwargs": [
-                _key
-                for _key, _value in inspect.signature(self.addImage).parameters.items()
-                if _value.default is not inspect.Parameter.empty
-            ],
         }
-        self._plot_config = {"kwargs": {}}
 
     def _update_position_widget(self):
         """
@@ -351,9 +401,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.sig_data_linearity.emit(True)
             self.update_cs_units("", "")
 
-    def addNonUniformImage(self, data: Dataset, **kwargs: Any):
+    def plot_nonlinear_axes_image(self, data: Dataset, **kwargs: Any):  # noqa ARG001
         """
-        Add a non-uniform image to the plot.
+        Add an image with non-linear axes to the plot.
 
         This method implements an additional dimensionality check before passing
         the image to the Plot2d.addImage method.
@@ -368,7 +418,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         self._check_data_dim(data)
         self.remove(_IMAGE_LEGEND, kind="image")
-        self.sig_data_linearity.emit(True)
+        self.sig_data_linearity.emit(False)
         _scatter = self.getScatter(_SCATTER_LEGEND)
         if _scatter is None:
             _scatter = Scatter()
@@ -392,42 +442,37 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             Additional keyword arguments to be passed to the silx plot method.
         """
         self._check_data_dim(data)
-        self._plot_config = {
-            "x_ax_label": data.get_axis_description(1),
-            "y_ax_label": data.get_axis_description(0),
-            "title": kwargs.pop("title", ""),
-            "kwargs": {
-                "replace": kwargs.pop("replace", True),
-                "copy": kwargs.pop("copy", False),
-                "legend": _IMAGE_LEGEND,
-            }
-            | self.__allowed_kwargs(kwargs),
-        }
+        _title = kwargs.pop("title", "")
+        _plot_kwargs = {
+            "replace": kwargs.pop("replace", True),
+            "copy": kwargs.pop("copy", False),
+            "legend": _IMAGE_LEGEND,
+        } | self._get_allowed_addImage_kwargs(kwargs)
         _data_is_linear = not (data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1))
         self.profile.setEnabled(_data_is_linear)
         self.sig_data_linearity.emit(_data_is_linear)
         if _data_is_linear:
             self.remove(_SCATTER_LEGEND, kind="scatter")
-            _origin, _scale = get_2d_silx_plot_ax_settings(data)
-            self._plot_config["kwargs"]["origin"] = _origin
-            self._plot_config["kwargs"]["scale"] = _scale
-            Plot2D.addImage(self, data.array, **self._plot_config["kwargs"])
+            _origin, _scale = self._get_origin_and_scale(data)
+            _plot_kwargs["origin"] = _origin
+            _plot_kwargs["scale"] = _scale
+            Plot2D.addImage(self, data.array, **_plot_kwargs)
             self.setActiveImage(_IMAGE_LEGEND)
             self.sig_new_data_size.emit(*data.shape)
         else:
-            self.addNonUniformImage(data, **kwargs)
+            self.plot_nonlinear_axes_image(data, **kwargs)
         self.update_cs_units(data.axis_units[1], data.axis_units[0])
-        if self._plot_config["title"]:
-            self.setGraphTitle(self._plot_config["title"])
-        self.setGraphYLabel(self._plot_config["y_ax_label"])
-        self.setGraphXLabel(self._plot_config["x_ax_label"])
-        self._plot_config["cbar_legend"] = data.data_label
+        if _title:
+            self.setGraphTitle(_title)
+        self.setGraphYLabel(data.get_axis_description(0))
+        self.setGraphXLabel(data.get_axis_description(1))
+        _cbar_legend = data.data_label
         if data.data_unit:
-            if not self._plot_config["cbar_legend"]:
-                self._plot_config["cbar_legend"] += "unspecified"
-            self._plot_config["cbar_legend"] += f" / {data.data_unit}"
-        if self._plot_config["cbar_legend"]:
-            self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
+            if not _cbar_legend:
+                _cbar_legend += "unspecified"
+            _cbar_legend += f" / {data.data_unit}"
+        if _cbar_legend:
+            self.getColorBarWidget().setLegend(_cbar_legend)
         _action = (
             self.changeCanvasToDataAction
             if self._data_has_det_dim(data)
@@ -466,46 +511,16 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     @QtCore.Slot()
     def update_mpl_fonts(self):
         """
-        Update the plot's fonts.
+        Update the plot's fonts. This is done by resetting the backend.
         """
         _image = self.getImage()
         if _image is None:
             return
-        _title = self.getGraphTitle()
-        self.getBackend().fig.gca().cla()
-        _cb = self.getColorBarWidget()
-        _cb.setLegend(self._plot_config.get("cbar_legend", ""))
-        _cb.getColorScaleBar().setFixedWidth(int(1.6 * self._qtapp.font_height))
-        _cb.update()
-        self.addImage(_image.getData(), **self._plot_config["kwargs"])
-        self.setGraphTitle(_title)
+        self.setBackend("matplotlib")  # noqa
 
+    # TODO: check if still needed with silx 2.2.2
     def _activeItemChanged(self, type_):
-        """
-        Listen for active item changed signal and broadcast signal
-
-        :param item.ItemChangedType type_: The type of item change
-        """
+        """Override generic Plot2D._activeItemChanged to catch QApplication signals."""
         if self.sender() == self._qtapp:
             return
         Plot2D._activeItemChanged(self, type_)
-
-    def __allowed_kwargs(self, kwargs: dict[str, Any]) -> dict[str, Any]:
-        """
-        Filter the kwargs to only include those allowed by addImage.
-
-        Parameters
-        ----------
-        kwargs : dict
-            The input keyword arguments.
-
-        Returns
-        -------
-        dict
-            The filtered keyword arguments.
-        """
-        return {
-            _key: _val
-            for _key, _val in kwargs.items()
-            if _key in self._config["allowed_add_image_kwargs"]
-        }

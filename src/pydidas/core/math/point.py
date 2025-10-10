@@ -26,9 +26,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Point", "PointFromPolar"]
 
+
 import warnings
 from dataclasses import dataclass
-from numbers import Real
+from numbers import Integral, Real
 from typing import Any, Union
 
 import numpy as np
@@ -333,15 +334,10 @@ class Point:
         Returns
         -------
         float
-            The angle of the point in radians.
+            The angle of the point in radians in the interval [0, 2 pi).
         """
-        if self.x == 0.0 and self.y > 0.0:
-            return np.pi / 2
-        elif self.x == 0 and self.y < 0:
-            return 3 * np.pi / 2
-        else:
-            angle = np.arctan2(self.y, self.x)
-            return np.mod(angle, 2 * np.pi)
+        _angle = np.arctan2(self.y, self.x)
+        return np.mod(_angle, 2 * np.pi)
 
     angle = theta
     chi = theta
@@ -395,13 +391,13 @@ class Point:
         self._x = state["x"]
         self._y = state["y"]
 
-    def rounded(self, decimals: int = 6) -> "Point":
+    def rounded(self, decimals: Integral = 6) -> "Point":
         """
         Return a new Point with coordinates rounded to the specified number of decimals.
 
         Parameters
         ----------
-        decimals : int, optional
+        decimals : Integral, optional
             The number of decimal places to round to (default is 6).
 
         Returns
@@ -412,15 +408,15 @@ class Point:
         return Point(round(self.x, decimals), round(self.y, decimals))
 
 
-def PointFromPolar(r: float, theta: float) -> Point:  # noqa C0103
+def PointFromPolar(r: Real, theta: Real) -> Point:  # noqa C0103
     """
     Create a Point from polar coordinates.
 
     Parameters
     ----------
-    r : float
+    r : Real
         The radius.
-    theta : float
+    theta : Real
         The angle in radians.
 
     Returns

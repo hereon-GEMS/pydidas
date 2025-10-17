@@ -453,8 +453,20 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.verify_is_initialized()
         return list(self.plugins.values())
 
-    @warnings.deprecated("Please use `get_all_plugin_classes`.")
-    get_all_plugins = get_all_plugin_classes
+    def get_all_plugins(self):
+        """
+        Old alias for `get_all_plugin_classes`.
+
+        Warning: this method is deprecated. Please use `get_all_plugin_classes`.
+        """
+        warnings.warn(
+            (
+                "The `get_all_plugins` method is deprecated and has been replaced by "
+                "`get_all_plugin_classes`."
+            ),
+            DeprecationWarning,
+        )
+        return self.get_all_plugin_classes()
 
     def get_all_plugins_of_type(
         self, plugin_type: Literal["base", "input", "proc", "output"]

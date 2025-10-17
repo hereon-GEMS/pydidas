@@ -40,7 +40,7 @@ __NUM_BINS = 32768
 __ERROR_MSG = (
     "Internal error: Numpy cannot create a histogram for the data. Please "
     "use manual scaling for this dataset. \nProbable reason: The data values are "
-    "all equal or very close to another."
+    "all equal or very close to one another."
 )
 
 

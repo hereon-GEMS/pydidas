@@ -173,6 +173,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._set_colormap_and_bar()
         if self._config["use_data_info_action"]:
             self._add_data_info_action()
+        self.__plotted_data_shape = (0, 0)
 
     @property
     def default_unit(self) -> str:
@@ -449,6 +450,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             "legend": _IMAGE_LEGEND,
         } | self._get_allowed_addImage_kwargs(kwargs)
         _data_is_linear = not (data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1))
+        _data_has_same_shape = data.shape == self.__plotted_data_shape
+        self.__plotted_data_shape = data.shape
+        self._config["data_shape"] = data.shape
         self.profile.setEnabled(_data_is_linear)
         self.sig_data_linearity.emit(_data_is_linear)
         if _data_is_linear:
@@ -473,12 +477,15 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             _cbar_legend += f" / {data.data_unit}"
         if _cbar_legend:
             self.getColorBarWidget().setLegend(_cbar_legend)
-        _action = (
-            self.changeCanvasToDataAction
-            if self._data_has_det_dim(data)
-            else self.expandCanvasAction
-        )
-        _action._actionTriggered()
+        if _data_has_same_shape:
+            self.resetZoom()
+        else:
+            _action = (
+                self.changeCanvasToDataAction
+                if self._data_has_det_dim(data)
+                else self.expandCanvasAction
+            )
+            _action._actionTriggered()
 
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data

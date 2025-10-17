@@ -77,6 +77,7 @@ Bugfixes
   a disconnected network drive)
 - Fixed an issue in the histogram calculation for 32bit data with only small 
   differences in their values
+- Fixed an issue where the PydidasPlot2D would reset the canvas size on data reload.
 
 
 v25.05.16

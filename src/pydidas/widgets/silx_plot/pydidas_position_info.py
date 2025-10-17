@@ -67,7 +67,7 @@ class PydidasPositionInfo(PositionInfo):
                 The associated plot instance. The default is None
     """
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         PositionInfo.__init__(
             self,
             plot=kwargs.get("plot", None),
@@ -89,7 +89,7 @@ class PydidasPositionInfo(PositionInfo):
     @QtCore.Slot(str)
     def new_coordinate_system(
         self, cs_name: Literal["cartesian", "r_chi", "q_chi", "2theta_chi"]
-    ):
+    ) -> None:
         """
         Receive the signal that a new coordinate system has been selected and
         update the internal reference.
@@ -104,7 +104,7 @@ class PydidasPositionInfo(PositionInfo):
         self._cs_y_unit = AX_LABELS[cs_name][3]
         self.update_coordinate_labels()
 
-    def update_coordinate_labels(self):
+    def update_coordinate_labels(self) -> None:
         """
         Update the position info widget coordinate labels based on the stored units.
         """
@@ -113,7 +113,7 @@ class PydidasPositionInfo(PositionInfo):
         self._x_widget.setText(f"<b>{_x_text}:</b>")
         self._y_widget.setText(f"<b>{_y_text}:</b>")
 
-    def update_coordinate_units(self, x_unit: str, y_unit: str):
+    def update_coordinate_units(self, x_unit: str, y_unit: str) -> None:
         """
         Update the coordinate units in the PositionInfo widget.
 
@@ -129,7 +129,7 @@ class PydidasPositionInfo(PositionInfo):
         self.update_coordinate_labels()
 
     @QtCore.Slot()
-    def update_exp_setup_params(self):
+    def update_exp_setup_params(self) -> None:
         """
         Update beamcenter and detector distance from the DiffractionExperiment.
         """
@@ -148,7 +148,7 @@ class PydidasPositionInfo(PositionInfo):
             _fit2d_geo["det_dist"] * 1e-3,
         )
 
-    def _plotEvent(self, event: dict):
+    def _plotEvent(self, event: dict) -> None:
         """
         Handle events from the Plot.
 

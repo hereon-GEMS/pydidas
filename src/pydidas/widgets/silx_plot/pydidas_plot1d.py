@@ -224,7 +224,7 @@ class PydidasPlot1D(Plot1D):
         self.setBackend("matplotlib")  # noqa
 
     # TODO: check if still needed with silx 2.2.2
-    def _activeItemChanged(self, type_):
+    def _activeItemChanged(self, type_) -> None:
         """Override generic Plot1D._activeItemChanged to catch QApplication signals."""
         if self.sender() == self._qtapp:
             return

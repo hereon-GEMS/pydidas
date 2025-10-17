@@ -43,7 +43,7 @@ class PydidasMaskToolsWidget(MaskToolsWidget):
         parent: QtWidgets.QWidget | None = None,
         plot: Union[Plot2D, None] = None,
         **kwargs: Any,  # noqa ARG001
-    ):
+    ) -> None:
         MaskToolsWidget.__init__(self, parent, plot)
 
         for _group_index in [0, 1, 2]:

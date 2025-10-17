@@ -31,7 +31,7 @@ __all__ = ["PydidasPlot2D"]
 import inspect
 from contextlib import nullcontext
 from functools import partial
-from typing import Any
+from typing import Any, NoReturn
 
 import numpy as np
 from qtpy import QtCore
@@ -106,7 +106,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         }
 
     @staticmethod
-    def _check_data_dim(data: np.ndarray):
+    def _check_data_dim(data: np.ndarray) -> None | NoReturn:
         """
         Check the data dimensionality.
 
@@ -152,7 +152,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             origin.append(_ax[0] - _delta / 2)
         return tuple(origin), tuple(scale)
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasQsettingsMixin.__init__(self)
         Plot2D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
@@ -188,7 +188,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         return self._default_unit
 
     @default_unit.setter
-    def default_unit(self, value: str):
+    def default_unit(self, value: str) -> None:
         """
         Set the default unit for the plot axes.
 
@@ -200,7 +200,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._default_unit = value
         self.update_cs_units(value, value)
 
-    def _update_config(self, kwargs: Any):
+    def _update_config(self, kwargs: Any) -> None:
         """
         Update the plot configuration.
 
@@ -224,7 +224,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             ),
         }
 
-    def _update_position_widget(self):
+    def _update_position_widget(self) -> None:
         """
         Update the position widget to be able to display units.
         """
@@ -242,7 +242,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _layout.replaceWidget(self._positionWidget, _new_position_widget)
         self._positionWidget = _new_position_widget
 
-    def _add_canvas_resize_actions(self):
+    def _add_canvas_resize_actions(self) -> None:
         """
         Add actions to resize the canvas.
 
@@ -261,7 +261,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.addAction(self.expandCanvasAction)
         self._toolbar.insertAction(self.colormapAction, self.expandCanvasAction)
 
-    def _add_histogram_actions(self):
+    def _add_histogram_actions(self) -> None:
         """
         Add actions to change the histogram scale based on the data range.
 
@@ -284,7 +284,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.keepDataAspectRatioAction, self.autoscaleToMeanAndThreeSigmaAction
         )
 
-    def _add_cs_transform_actions(self):
+    def _add_cs_transform_actions(self) -> None:
         """
         Add the action to transform the coordinate system.
 
@@ -301,7 +301,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.sig_new_data_size.connect(self.cs_transform.set_raw_data_size)
         self.sig_data_linearity.connect(self.cs_transform.set_data_linearity)
 
-    def _set_colormap_and_bar(self):
+    def _set_colormap_and_bar(self) -> None:
         """
         Set the default colormap from the PydidasQSettings.
 
@@ -319,7 +319,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _tb.paintEvent = partial(tickbar_paintEvent, _tb)
         _tb._paintTick = partial(tickbar_paintTick, _tb)
 
-    def _add_data_info_action(self):
+    def _add_data_info_action(self) -> None:
         """
         Add the data info action to demand more information for data points.
         """
@@ -333,7 +333,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         )
 
     @QtCore.Slot(str, str)
-    def user_config_update(self, key: str, value: str):
+    def user_config_update(self, key: str, value: str) -> None:
         """
         Handle a user config update.
 
@@ -359,7 +359,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             elif key == "cmap_nan_color":
                 _current_cmap.setNaNColor(value)
 
-    def update_cs_units(self, x_unit: str, y_unit: str):
+    def update_cs_units(self, x_unit: str, y_unit: str) -> None:
         """
         Update the coordinate system units.
 
@@ -376,7 +376,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         y_unit = self._default_unit if y_unit == "" else y_unit
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
-    def addImage(self, data: Dataset | np.ndarray, **kwargs: Any):
+    def addImage(self, data: Dataset | np.ndarray, **kwargs: Any) -> None:
         """
         Add an image to the plot.
 
@@ -402,7 +402,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.sig_data_linearity.emit(True)
             self.update_cs_units("", "")
 
-    def plot_nonlinear_axes_image(self, data: Dataset, **kwargs: Any):  # noqa ARG001
+    def plot_nonlinear_axes_image(self, data: Dataset, **kwargs: Any) -> None:  # noqa ARG001
         """
         Add an image with non-linear axes to the plot.
 
@@ -431,7 +431,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._notifyContentChanged(_scatter)
         self.setActiveScatter(_SCATTER_LEGEND)
 
-    def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any):
+    def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any) -> None:
         """
         Plot a pydidas Dataset.
 
@@ -482,7 +482,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         else:
             _action = (
                 self.changeCanvasToDataAction
-                if self._data_has_det_dim(data)
+                if data.shape == self._config["diffraction_exp"].det_shape
                 else self.expandCanvasAction
             )
             _action._actionTriggered()
@@ -491,21 +491,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     # uniform interface call to display data
     display_data = plot_pydidas_dataset
 
-    def _data_has_det_dim(self, data: np.ndarray):
-        """
-        Check if the data has the detector dimensions.
-
-        Parameters
-        ----------
-        data : np.ndarray
-            The input data to be checked.
-        """
-        return data.shape == (
-            self._config["diffraction_exp"].get_param_value("detector_npixy"),
-            self._config["diffraction_exp"].get_param_value("detector_npixx"),
-        )
-
-    def clear_plot(self):
+    def clear_plot(self) -> None:
         """
         Clear the plot and remove all items.
         """
@@ -516,7 +502,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.getColorBarWidget().setLegend("")
 
     @QtCore.Slot()
-    def update_mpl_fonts(self):
+    def update_mpl_fonts(self) -> None:
         """
         Update the plot's fonts. This is done by resetting the backend.
         """
@@ -526,7 +512,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.setBackend("matplotlib")  # noqa
 
     # TODO: check if still needed with silx 2.2.2
-    def _activeItemChanged(self, type_):
+    def _activeItemChanged(self, type_) -> None:
         """Override generic Plot2D._activeItemChanged to catch QApplication signals."""
         if self.sender() == self._qtapp:
             return

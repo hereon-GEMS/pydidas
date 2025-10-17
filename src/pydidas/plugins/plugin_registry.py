@@ -447,7 +447,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
         Returns
         -------
-        type[InputPlugin | ProcPlugin | OutputPlugin]
+        list[type[InputPlugin | ProcPlugin | OutputPlugin]]
             A list with all the Plugin classes.
         """
         self.verify_is_initialized()

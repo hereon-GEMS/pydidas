@@ -243,7 +243,7 @@ class DataViewer(WidgetWithParameterCollection):
             return
         if self._view_config.use_axes_selector:
             _ax_selector = self._widgets["axes_selector"]
-            _data = self._data[*_ax_selector.current_slice].squeeze()
+            _data = self._data[_ax_selector.current_slice].squeeze()
             if _ax_selector.transpose_required:
                 _data = _data.T
         else:

@@ -281,7 +281,7 @@ def test_set_metadata_from_dataset__new_shape(selector):
     selector.set_metadata_from_dataset(_data1)
     selector.set_metadata_from_dataset(_data2)
     assert selector._data_shape == _data2.shape
-    assert selector.current_slice == [slice(0, 10), slice(0, 14), slice(0, 1)]
+    assert selector.current_slice == (slice(0, 10), slice(0, 14), slice(0, 1))
     for _dim, _item in selector._axis_widgets.items():
         assert _item.npoints == _data2.shape[_dim]
         assert _item.data_label == _data2.axis_labels[_dim]
@@ -301,8 +301,8 @@ def test_set_metadata_from_dataset__new_shape_w_different_dims(selector, invert_
     selector.define_additional_choices("choice1;;choice2")
     selector.set_metadata_from_dataset(_data1)
     selector.set_metadata_from_dataset(_data2)
-    _slice_ref = [slice(0, _data2.shape[i]) for i in [0, 1]]
-    _slice_ref += [slice(0, 1) for _ in range(2, _data2.ndim)]
+    _slice_ref = tuple(slice(0, _data2.shape[i]) for i in [0, 1])
+    _slice_ref += tuple(slice(0, 1) for _ in range(2, _data2.ndim))
     assert selector._data_shape == _data2.shape
     assert selector.current_slice == _slice_ref
     for _dim in range(_data2.ndim):

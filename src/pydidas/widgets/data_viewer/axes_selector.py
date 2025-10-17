@@ -129,9 +129,9 @@ class AxesSelector(WidgetWithParameterCollection):
         )
 
     @property
-    def current_slice(self) -> list[slice]:
-        """The current slicing."""
-        return self._current_slice
+    def current_slice(self) -> tuple[slice]:
+        """The current slicing as a tuple."""
+        return tuple(self._current_slice)
 
     @property
     def additional_choices(self) -> list[str]:

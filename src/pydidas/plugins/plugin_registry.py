@@ -453,6 +453,9 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.verify_is_initialized()
         return list(self.plugins.values())
 
+    @warnings.deprecated("Please use `get_all_plugin_classes`.")
+    get_all_plugins = get_all_plugin_classes
+
     def get_all_plugins_of_type(
         self, plugin_type: Literal["base", "input", "proc", "output"]
     ) -> list[Type[BasePlugin]]:

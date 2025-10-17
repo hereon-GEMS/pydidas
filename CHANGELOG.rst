@@ -75,6 +75,8 @@ Bugfixes
   available at the original path.
 - Fixed an issue when the QStandardPaths.DocumentsLocation is not available (e.g. on
   a disconnected network drive)
+- Fixed an issue in the histogram calculation for 32bit data with only small 
+  differences in their values
 
 
 v25.05.16

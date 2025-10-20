@@ -112,7 +112,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             _w.sig_new_value.disconnect(
                 self.param_composite_widgets[_param_key].set_param_value
             )
-            _w.sig_new_value.connect(partial(self.update_param, _param_key, _w))
+            _w.sig_value_changed.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
     def set_param_value_and_widget(self, key: str, value: object):

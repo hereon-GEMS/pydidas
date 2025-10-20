@@ -77,10 +77,11 @@ for __name, __class in _Detector.registry.items():
         PYFAI_SHAPES_OF_DETECTOR_MODELS[__model[0]] = __class.MAX_SHAPE
         PYFAI_DETECTOR_MANUFACTURERS.add(__manufacturer)
         if __class.MAX_SHAPE in PYFAI_DETECTOR_MODELS_OF_SHAPES:
-            PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = (
-                PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE]
-                + [f"[{__manufacturer}] {__model[0]}"]
-            )
+            _label = f"[{__manufacturer}] {__model[0]}"
+            if _label not in PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE]:
+                PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = (
+                    PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] + [_label]
+                )
         else:
             PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = [
                 f"[{__manufacturer}] {__model[0]}"

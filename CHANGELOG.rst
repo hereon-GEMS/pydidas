@@ -78,6 +78,9 @@ Bugfixes
 - Fixed an issue in the histogram calculation for 32bit data with only small 
   differences in their values
 - Fixed an issue where the PydidasPlot2D would reset the canvas size on data reload.
+- Fixed an issue when importing geometries from Fit2D which did not correct for 
+  the flipped image orientation.
+
 
 
 v25.05.16

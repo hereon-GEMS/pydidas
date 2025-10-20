@@ -32,14 +32,12 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.contexts.diff_exp import (
     DiffractionExperiment,
-    DiffractionExperimentContext,
 )
-from pydidas.core import get_generic_param_collection
+from pydidas.core import Parameter, get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from pydidas.widgets.framework import PydidasWindow
 
 
-EXP = DiffractionExperimentContext()
 _FIT2D_PARAM_KEYS = [
     "detector_dist_fit2d",
     "beamcenter_x",
@@ -73,6 +71,15 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
     default_params = get_generic_param_collection(
         *(_FIT2D_PARAM_KEYS + _PYFAI_PARAM_KEYS)
     )
+    default_params.add_param(
+        Parameter(
+            "use_fit2d_image_orientation",
+            bool,
+            True,
+            name="Inputs are in Fit2D image orientation",
+            choices=[True, False],
+        )
+    )
 
     sig_about_to_close = QtCore.Signal()
     sig_new_geometry = QtCore.Signal(float, float, float, float, float, float)
@@ -94,6 +101,19 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             fontsize_offset=2,
             font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
+        self.create_label(
+            "label_note",
+            (
+                "Note that Fit2D flips the detector images horizontally\n"
+                "on loading. Therefore, the beamcenter pixel coordinates in\n"
+                "Fit2D do not directly correspond to those in pyFAI.\n"
+                "The pyFAI beamcenter-y coordinate is thus calculated as \n"
+                "(detector_pixels_y - beamcenter_y_from_Fit2D)."
+            ),
+            bold=True,
+        )
+        self.create_param_widget("use_fit2d_image_orientation")
+        self.create_line(None)
 
         self.create_label(
             "label_title",
@@ -156,18 +176,36 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             self.set_param_value_and_widget(_key, 0.1 if _key == "detector_dist" else 0)
         super().show()
 
+    def update_detector(self, exp: DiffractionExperiment):
+        """
+        Update the detector in the internal DiffractionExperiment instance.
+
+        Parameters
+        ----------
+        exp : DiffractionExperiment
+            The DiffractionExperiment instance to get the detector from.
+        """
+        for _key in [
+            "detector_name",
+            "detector_npixx",
+            "detector_npixy",
+            "detector_pxsizex",
+            "detector_pxsizey",
+        ]:
+            self._exp.set_param_value(_key, exp.get_param_value(_key))
+
     @QtCore.Slot()
     def _convert_inputs_to_pyfai(self):
         """
         Convert the inputs from Fit2D to pyFAI geometry.
         """
-        self._exp.update_from_diffraction_exp(EXP)
         self._exp.set_beamcenter_from_fit2d_params(
             self.get_param_value("beamcenter_x"),
             self.get_param_value("beamcenter_y"),
             self.get_param_value("detector_dist_fit2d") / 1000,
             tilt=self.get_param_value("detector_tilt_angle"),
             tilt_plane=self.get_param_value("detector_tilt_plane"),
+            fit2d_image_orientation=self.get_param_value("use_fit2d_image_orientation"),
         )
         for _key in _PYFAI_PARAM_KEYS:
             self.update_widget_value(_key, self._exp.get_param_value(_key))

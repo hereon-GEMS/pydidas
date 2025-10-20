@@ -62,9 +62,9 @@ _TEST_SHAPE = (1111, 999)
 
 @pytest.fixture
 def exp_with_Eiger9M():
-    obj = DiffractionExperiment()
-    obj.set_detector_params_from_name("Eiger 9M")
-    return obj
+    exp = DiffractionExperiment()
+    exp.set_detector_params_from_name("Eiger 9M")
+    return exp
 
 
 @pytest.fixture(scope="module")
@@ -75,15 +75,16 @@ def temp_path():
     shutil.rmtree(_path)
 
 
-def assert_beamcenter_okay(obj, accuracy=8):
-    _rot1 = obj.get_param_value("detector_rot1")
-    _rot2 = obj.get_param_value("detector_rot2")
-    _poni1 = obj.get_param_value("detector_poni1")
-    _poni2 = obj.get_param_value("detector_poni2")
-    _z = obj.get_param_value("detector_dist")
+def assert_beamcenter_okay(exp, accuracy=8, fit2d_ori=False):
+    _rot1 = exp.get_param_value("detector_rot1")
+    _rot2 = exp.get_param_value("detector_rot2")
+    _poni1 = exp.get_param_value("detector_poni1")
+    _poni2 = exp.get_param_value("detector_poni2")
+    _z = exp.get_param_value("detector_dist")
     _beam_center_x = (_poni2 - _z * np.tan(_rot1)) / 75e-6
     _beam_center_y = (_poni1 + _z * np.tan(_rot2) / np.cos(_rot1)) / 75e-6
-    assert _beam_center_y == pytest.approx(_ypos, abs=accuracy)
+    __ypos = _ypos if not fit2d_ori else exp.det_shape[0] - _ypos
+    assert _beam_center_y == pytest.approx(__ypos, abs=accuracy)
     assert _beam_center_x == pytest.approx(_xpos, abs=accuracy)
 
 
@@ -92,28 +93,28 @@ def assert_beamcenter_okay(obj, accuracy=8):
     [["energy", 15.7, 0.78970806], ["wavelength", 0.98765, 12.5534517]],
 )
 def test_set_param__energy(key, value, other_val):
-    obj = DiffractionExperiment()
-    _spy = QtTest.QSignalSpy(obj.sig_params_changed)
-    obj.set_param_value(f"xray_{key}", value)
+    exp = DiffractionExperiment()
+    _spy = QtTest.QSignalSpy(exp.sig_params_changed)
+    exp.set_param_value(f"xray_{key}", value)
     _other_key = "xray_energy" if key == "wavelength" else "xray_wavelength"
-    assert obj.get_param_value(f"xray_{key}") == pytest.approx(value)
-    assert obj.get_param_value(_other_key) == pytest.approx(other_val)
+    assert exp.get_param_value(f"xray_{key}") == pytest.approx(value)
+    assert exp.get_param_value(_other_key) == pytest.approx(other_val)
     _spy_result = _spy.count() if IS_QT6 else len(_spy)
     assert _spy_result == 1
 
 
 @pytest.mark.parametrize("name", ["Eiger 9M", "Custom 9M"])
 def test_set_param__detector_name(name):
-    obj = DiffractionExperiment()
-    obj.set_param_value("detector_npixx", _TEST_SHAPE[1])
-    obj.set_param_value("detector_npixy", _TEST_SHAPE[0])
-    _spy = QtTest.QSignalSpy(obj.sig_params_changed)
-    obj.set_param_value("detector_name", name)
-    assert obj.get_param_value("detector_name") == name
-    assert obj.det_shape == ((3269, 3110) if name == "Eiger 9M" else _TEST_SHAPE)
+    exp = DiffractionExperiment()
+    exp.set_param_value("detector_npixx", _TEST_SHAPE[1])
+    exp.set_param_value("detector_npixy", _TEST_SHAPE[0])
+    _spy = QtTest.QSignalSpy(exp.sig_params_changed)
+    exp.set_param_value("detector_name", name)
+    assert exp.get_param_value("detector_name") == name
+    assert exp.det_shape == ((3269, 3110) if name == "Eiger 9M" else _TEST_SHAPE)
     if name == "Eiger 9M":
-        assert obj.get_param_value("detector_pxsizex") == pytest.approx(75)
-        assert obj.get_param_value("detector_pxsizey") == pytest.approx(75)
+        assert exp.get_param_value("detector_pxsizex") == pytest.approx(75)
+        assert exp.get_param_value("detector_pxsizey") == pytest.approx(75)
     _spy_result = _spy.count() if IS_QT6 else len(_spy)
     assert _spy_result == 1
 
@@ -129,13 +130,13 @@ def test_set_param__detector_name(name):
 )
 @pytest.mark.parametrize("det_name", ["Eiger 9M", "Custom 9M"])
 def test_set_param_detector__det_param(det_name, key, value):
-    obj = DiffractionExperiment()
-    _spy = QtTest.QSignalSpy(obj.sig_params_changed)
-    obj.set_param_value("detector_name", det_name)
-    obj.set_param_value(key, value)
-    assert obj.get_param_value(key) == pytest.approx(value)
+    exp = DiffractionExperiment()
+    _spy = QtTest.QSignalSpy(exp.sig_params_changed)
+    exp.set_param_value("detector_name", det_name)
+    exp.set_param_value(key, value)
+    assert exp.get_param_value(key) == pytest.approx(value)
     assert (
-        obj.get_param_value("detector_name") == det_name
+        exp.get_param_value("detector_name") == det_name
         if det_name == "Custom 9M"
         else "Eiger 9M [modified]"
     )
@@ -144,10 +145,10 @@ def test_set_param_detector__det_param(det_name, key, value):
 
 @pytest.mark.parametrize("key, value", [[k, v] for k, v in _pyfai_geo_params.items()])
 def test_set_param__other(key, value):
-    obj = DiffractionExperiment()
-    _spy = QtTest.QSignalSpy(obj.sig_params_changed)
-    obj.set_param_value(f"detector_{key}", value)
-    assert obj.get_param_value(f"detector_{key}") == pytest.approx(value)
+    exp = DiffractionExperiment()
+    _spy = QtTest.QSignalSpy(exp.sig_params_changed)
+    exp.set_param_value(f"detector_{key}", value)
+    assert exp.get_param_value(f"detector_{key}") == pytest.approx(value)
     _spy_result = _spy.count() if IS_QT6 else len(_spy)
     assert _spy_result == 1
 
@@ -155,14 +156,14 @@ def test_set_param__other(key, value):
 @pytest.mark.parametrize("det_name", ["Eiger 9M", "Custom 9M"])
 def test_get_detector(det_name):
     _pixelsize = 112.0
-    obj = DiffractionExperiment()
-    obj.set_param_value("detector_npixy", _TEST_SHAPE[0])
-    obj.set_param_value("detector_npixx", _TEST_SHAPE[1])
-    obj.set_param_value("detector_pxsizey", _pixelsize)
-    obj.set_param_value("detector_pxsizex", _pixelsize)
-    obj.set_param_value("detector_name", det_name)
+    exp = DiffractionExperiment()
+    exp.set_param_value("detector_npixy", _TEST_SHAPE[0])
+    exp.set_param_value("detector_npixx", _TEST_SHAPE[1])
+    exp.set_param_value("detector_pxsizey", _pixelsize)
+    exp.set_param_value("detector_pxsizex", _pixelsize)
+    exp.set_param_value("detector_name", det_name)
     _target_pxsize = _pixelsize * 1e-6 if det_name == "Custom 9M" else 75e-6
-    _det = obj.get_detector()
+    _det = exp.get_detector()
     assert isinstance(_det, pyFAI.detectors.Detector)
     assert _det.max_shape == (_TEST_SHAPE if det_name == "Custom 9M" else (3269, 3110))
     assert _det.pixel1 == pytest.approx(_target_pxsize)
@@ -170,20 +171,20 @@ def test_get_detector(det_name):
 
 
 def test_det_shape__getter():
-    obj = DiffractionExperiment()
-    obj.set_param_value("detector_npixy", _TEST_SHAPE[0])
-    obj.set_param_value("detector_npixx", _TEST_SHAPE[1])
-    assert obj.det_shape == _TEST_SHAPE
+    exp = DiffractionExperiment()
+    exp.set_param_value("detector_npixy", _TEST_SHAPE[0])
+    exp.set_param_value("detector_npixx", _TEST_SHAPE[1])
+    assert exp.det_shape == _TEST_SHAPE
 
 
 @pytest.mark.parametrize("det_name", ["Eiger 9M", "Custom 9M"])
 def test_det_shape__setter_w_custom_detector(det_name):
-    obj = DiffractionExperiment()
-    obj.set_param_value("detector_name", det_name)
-    obj.det_shape = _TEST_SHAPE
-    assert obj.det_shape == _TEST_SHAPE
+    exp = DiffractionExperiment()
+    exp.set_param_value("detector_name", det_name)
+    exp.det_shape = _TEST_SHAPE
+    assert exp.det_shape == _TEST_SHAPE
     assert (
-        obj.get_param_value("detector_name") == det_name
+        exp.get_param_value("detector_name") == det_name
         if det_name == "Custom 9M"
         else "Eiger 9M [modified]"
     )
@@ -193,14 +194,14 @@ def test_det_shape__setter_w_custom_detector(det_name):
 @pytest.mark.parametrize("shape", [_TEST_SHAPE, (0, 0), (1111, 0), (0, 999)])
 @pytest.mark.parametrize("pxsize", [(100, 100), (0, 0), (100, 0), (0, 100)])
 def test_detector_is_valid__no_detector(det_name, shape, pxsize):
-    obj = DiffractionExperiment()
-    obj.set_param_value("detector_npixy", shape[0])
-    obj.set_param_value("detector_npixx", shape[1])
-    obj.set_param_value("detector_pxsizey", pxsize[0])
-    obj.set_param_value("detector_pxsizex", pxsize[1])
-    obj.set_param_value("detector_name", det_name)
+    exp = DiffractionExperiment()
+    exp.set_param_value("detector_npixy", shape[0])
+    exp.set_param_value("detector_npixx", shape[1])
+    exp.set_param_value("detector_pxsizey", pxsize[0])
+    exp.set_param_value("detector_pxsizex", pxsize[1])
+    exp.set_param_value("detector_name", det_name)
     assert (
-        obj.detector_is_valid == (0 not in shape and 0 not in pxsize)
+        exp.detector_is_valid == (0 not in shape and 0 not in pxsize)
         or det_name == "Eiger 9M"
     )
 
@@ -215,39 +216,52 @@ def test_as_pyfai_geometry(exp_with_Eiger9M):
 
 
 def test_set_detector_params_from_name__wrong_name():
-    obj = DiffractionExperiment()
+    exp = DiffractionExperiment()
     with pytest.raises(UserConfigError):
-        obj.set_detector_params_from_name("no such detector")
+        exp.set_detector_params_from_name("no such detector")
 
 
 def test_set_detector_params_from_name():
     _det = {"name": "Pilatus 300k", "pixsize": 172, "npixx": 487, "npixy": 619}
-    obj = DiffractionExperiment()
-    obj.set_detector_params_from_name(_det["name"])
-    assert obj.get_param_value("detector_name") == _det["name"]
-    assert obj.get_param_value("detector_pxsizex") == pytest.approx(_det["pixsize"])
-    assert obj.get_param_value("detector_pxsizey") == pytest.approx(_det["pixsize"])
-    assert obj.get_param_value("detector_npixy") == _det["npixy"]
-    assert obj.get_param_value("detector_npixx") == _det["npixx"]
+    exp = DiffractionExperiment()
+    exp.set_detector_params_from_name(_det["name"])
+    assert exp.get_param_value("detector_name") == _det["name"]
+    assert exp.get_param_value("detector_pxsizex") == pytest.approx(_det["pixsize"])
+    assert exp.get_param_value("detector_pxsizey") == pytest.approx(_det["pixsize"])
+    assert exp.get_param_value("detector_npixy") == _det["npixy"]
+    assert exp.get_param_value("detector_npixx") == _det["npixx"]
 
 
-def test_set_beamcenter_from_fit2d_params__no_rot(exp_with_Eiger9M):
-    exp_with_Eiger9M.set_beamcenter_from_fit2d_params(*_fit2d_beamcenter)
-    assert_beamcenter_okay(exp_with_Eiger9M)
-
-
-def test_set_beamcenter_from_fit2d_params__full_rot_degree(exp_with_Eiger9M):
+@pytest.mark.parametrize("fit2d_ori", [True, False])
+def test_set_beamcenter_from_fit2d_params__no_rot(exp_with_Eiger9M, fit2d_ori):
     exp_with_Eiger9M.set_beamcenter_from_fit2d_params(
-        *_fit2d_beamcenter, tilt=5, tilt_plane=270, rot_unit="degree"
+        *_fit2d_beamcenter, fit2d_image_orientation=fit2d_ori
     )
-    assert_beamcenter_okay(exp_with_Eiger9M)
+    assert_beamcenter_okay(exp_with_Eiger9M, fit2d_ori=fit2d_ori)
 
 
-def test_set_beamcenter_from_fit2d_params_full_rot_rad(exp_with_Eiger9M):
+@pytest.mark.parametrize("fit2d_ori", [True, False])
+def test_set_beamcenter_from_fit2d_params__full_rot_degree(exp_with_Eiger9M, fit2d_ori):
     exp_with_Eiger9M.set_beamcenter_from_fit2d_params(
-        *_fit2d_beamcenter, tilt=0.5, tilt_plane=1, rot_unit="rad"
+        *_fit2d_beamcenter,
+        tilt=5,
+        tilt_plane=270,
+        rot_unit="degree",
+        fit2d_image_orientation=fit2d_ori,
     )
-    assert_beamcenter_okay(exp_with_Eiger9M)
+    assert_beamcenter_okay(exp_with_Eiger9M, fit2d_ori=fit2d_ori)
+
+
+@pytest.mark.parametrize("fit2d_ori", [True, False])
+def test_set_beamcenter_from_fit2d_params_full_rot_rad(exp_with_Eiger9M, fit2d_ori):
+    exp_with_Eiger9M.set_beamcenter_from_fit2d_params(
+        *_fit2d_beamcenter,
+        tilt=2.5,
+        tilt_plane=45,
+        rot_unit="rad",
+        fit2d_image_orientation=fit2d_ori,
+    )
+    assert_beamcenter_okay(exp_with_Eiger9M, fit2d_ori=fit2d_ori)
 
 
 def test_as_fit2d_geometry_values(exp_with_Eiger9M):
@@ -262,11 +276,11 @@ def test_as_fit2d_geometry_values__invalid_exp(exp_with_Eiger9M):
 
 
 def test_update_from_diffraction_exp():
-    obj = DiffractionExperiment()
-    obj.set_param_value("detector_name", "Eiger 9M")
+    exp = DiffractionExperiment()
+    exp.set_param_value("detector_name", "Eiger 9M")
     _exp = DiffractionExperiment()
-    _exp.update_from_diffraction_exp(obj)
-    for _key, _val in obj.param_values.items():
+    _exp.update_from_diffraction_exp(exp)
+    for _key, _val in exp.param_values.items():
         if isinstance(_val, Real):
             assert _val == pytest.approx(_exp.get_param_value(_key))
         else:
@@ -274,25 +288,25 @@ def test_update_from_diffraction_exp():
 
 
 def test_update_from_pyfai_geometry__no_detector():
-    obj = DiffractionExperiment()
-    obj.set_param_value("detector_name", "Eiger 9M")
+    exp = DiffractionExperiment()
+    exp.set_param_value("detector_name", "Eiger 9M")
     _geo = pyFAI.geometry.Geometry()
     for _key, _val in _pyfai_geo_params.items():
         setattr(_geo, _key, _val)
-    obj.update_from_pyfai_geometry(_geo)
+    exp.update_from_pyfai_geometry(_geo)
     for _key, _val in _pyfai_geo_params.items():
-        assert obj.get_param_value(f"detector_{_key}") == pytest.approx(_val)
-    assert obj.get_param_value("detector_name") == "Eiger 9M"
+        assert exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)
+    assert exp.get_param_value("detector_name") == "Eiger 9M"
 
 
 def test_update_from_pyfai_geometry__custom_detector():
-    obj = DiffractionExperiment()
+    exp = DiffractionExperiment()
     _det = pyFAI.detectors.Detector(pixel1=12e-6, pixel2=24e-6, max_shape=(1234, 567))
     _det.aliases = ["Dummy"]
     _geo = pyFAI.geometry.Geometry(**_pyfai_geo_params, detector=_det)
-    obj.update_from_pyfai_geometry(_geo)
+    exp.update_from_pyfai_geometry(_geo)
     for _key, _val in _pyfai_geo_params.items():
-        assert obj.get_param_value(f"detector_{_key}") == pytest.approx(_val)
+        assert exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)
     for _key, _val in [
         ["pxsizex", _det.pixel2 * 1e6],
         ["pxsizey", _det.pixel1 * 1e6],
@@ -300,16 +314,16 @@ def test_update_from_pyfai_geometry__custom_detector():
         ["npixy", _det.max_shape[0]],
         ["name", "Dummy"],
     ]:
-        assert obj.get_param_value(f"detector_{_key}") == pytest.approx(_val)
+        assert exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)
 
 
 def test_update_from_pyfai_geometry__generic_detector():
-    obj = DiffractionExperiment()
+    exp = DiffractionExperiment()
     _geo = pyFAI.geometry.Geometry(**_pyfai_geo_params, detector="Eiger 9M")
     _det = pyFAI.detector_factory("Eiger 9M")
-    obj.update_from_pyfai_geometry(_geo)
+    exp.update_from_pyfai_geometry(_geo)
     for _key, _val in _pyfai_geo_params.items():
-        assert obj.get_param_value(f"detector_{_key}") == pytest.approx(_val)
+        assert exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)
     for _key, _val in [
         ["pxsizex", _det.pixel2 * 1e6],
         ["pxsizey", _det.pixel1 * 1e6],
@@ -317,7 +331,7 @@ def test_update_from_pyfai_geometry__generic_detector():
         ["npixy", _det.max_shape[0]],
         ["name", "Eiger 9M"],
     ]:
-        assert obj.get_param_value(f"detector_{_key}") == pytest.approx(_val)
+        assert exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)
 
 
 @pytest.mark.parametrize("ext", ["yaml", "poni", "h5"])

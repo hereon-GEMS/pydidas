@@ -393,6 +393,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             self._fit2d_window.sig_new_geometry.connect(
                 self._process_new_geometry_from_fit2
             )
+        self._fit2d_window.update_detector(EXP)
         self._fit2d_window.show()
         self.setEnabled(False)
 

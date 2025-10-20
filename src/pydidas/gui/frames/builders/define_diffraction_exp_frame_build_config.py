@@ -156,11 +156,6 @@ DIFFRACTION_EXP_FRAME_BUILD_CONFIG = [
         ("but_convert_fit2d", "Convert Fit2D geometry"),
         {"parent_widget": "config_right"},
     ],
-    [
-        "create_label",
-        ("label_geometry", "Detector geometry:"),
-        {"bold": True, "fontsize_offset": 1, "parent_widget": "config_right"},
-    ],
     ["create_param_widget", ("detector_dist",), {"parent_widget": "config_right"}],
     ["create_param_widget", ("detector_poni1",), {"parent_widget": "config_right"}],
     ["create_param_widget", ("detector_poni2",), {"parent_widget": "config_right"}],
